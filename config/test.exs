@@ -14,7 +14,6 @@ config :oceanconnect, Oceanconnect.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: System.get_env("DATA_DB_USER") || "postgres",
   password: System.get_env("DATA_DB_PASS") || "postgres",
-#  hostname: System.get_env("DATA_DB_HOST"),
-  host: "localhost",
+  hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "oceanconnect_test",
   pool: Ecto.Adapters.SQL.Sandbox
