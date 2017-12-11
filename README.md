@@ -15,6 +15,7 @@ We use Nanobox for deployments to Azure
 
 * Create an account and install nanobox: https://dashboard.nanobox.io/download
 * Run `nanobox dns add local phoenix.local`
+* Follow the recommended nanobox setup steps in your terminal
 * Run `nanobox run`
 * Run `mix deps.get`
 * Run `cd assets && yarn install cd ../`
