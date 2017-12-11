@@ -22,5 +22,7 @@ We use Nanobox for deployments to Azure
 * Run `mix ecto.create`
 * Run `mix phx.server`
 
-Nanobox article on phoenix and azure deploys: https://content.nanobox.io/how-to-deploy-phoenix-applications-to-microsoft-azure-with-nanobox/#updatethedatabaseconnection
+Nanobox article on phoenix and azure deploys: 
+https://content.nanobox.io/how-to-deploy-phoenix-applications-to-microsoft-azure-with-nanobox/#updatethedatabaseconnection
+
 Nanobox guides: https://guides.nanobox.io/elixir/phoenix/existing-app/
