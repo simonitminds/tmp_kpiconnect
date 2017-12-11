@@ -21,6 +21,7 @@ We use Nanobox for deployments to Azure
 * Run `cd assets && yarn install cd ../`
 * Run `mix ecto.create`
 * Run `mix phx.server`
+* Go to `phoenix.local:4000` in the browser
 
 Nanobox article on phoenix and azure deploys: 
 https://content.nanobox.io/how-to-deploy-phoenix-applications-to-microsoft-azure-with-nanobox/#updatethedatabaseconnection
