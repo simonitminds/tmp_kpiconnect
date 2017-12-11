@@ -40,7 +40,7 @@ defmodule Oceanconnect.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.1"},
-      {:hound, "~> 1.0"},
+      {:wallaby, "~> 0.19.2", only: :test},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"}
     ]

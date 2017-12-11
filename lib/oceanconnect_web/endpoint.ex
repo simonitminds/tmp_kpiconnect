@@ -1,6 +1,10 @@
 defmodule OceanconnectWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :oceanconnect
 
+  if Application.get_env(:oceanconnect, :sql_sandbox) do
+    plug Phoenix.Ecto.SQL.Sandbox
+  end
+
   socket "/socket", OceanconnectWeb.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.

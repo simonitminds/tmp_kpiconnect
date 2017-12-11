@@ -9,6 +9,8 @@ run.config:
   # we need nodejs in development
   # ensure inotify exists for hot-code reloading
   dev_packages: ['nodejs', 'inotify-tools']
+  extra_packages:
+    - phantomjs
 
   # cache node_modules
   cache_dirs: ['assets/node_modules']

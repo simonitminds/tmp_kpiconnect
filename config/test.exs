@@ -4,6 +4,7 @@ use Mix.Config
 # you can enable the server option below.
 config :oceanconnect, OceanconnectWeb.Endpoint,
   http: [port: 4001],
+  url: [host: "0.0.0.0"],
   server: true
 
 # Print only warnings and errors during test
@@ -17,3 +18,11 @@ config :oceanconnect, Oceanconnect.Repo,
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "oceanconnect_test",
   pool: Ecto.Adapters.SQL.Sandbox
+
+
+config :oceanconnect, OceanconnectWeb.Endpoint,
+  server: true
+
+config :oceanconnect, :sql_sandbox, true
+
+# Start Hound for remote PhantomJs server at port 5555

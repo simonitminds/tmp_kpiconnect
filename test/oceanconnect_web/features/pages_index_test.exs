@@ -1,10 +1,12 @@
-defmodule Oceanconnect.PageFeature do
-  use Oceanconnect.Web.FeatureCase
-  use Hound.Helpers
-  alias Oceanconnect.IndexPage
+defmodule Oceanconnect.IndexPage do
+  use Oceanconnect.FeatureCase, async: true
 
-  test "renders the default index page" do
-    IndexPage.visit()
-    assert IndexPage.has_title?("Hello Oceanconnect!")
+  import Wallaby.Query, only: [css: 2]
+
+  test "renders the default index page", %{session: session} do
+    session
+    |> visit("/")
+
+    assert page_title(session) == "Hello Oceanconnect!"
   end
 end

@@ -1,19 +1,20 @@
-defmodule Oceanconnect.Web.FeatureCase do
+defmodule Oceanconnect.FeatureCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
+      use Wallaby.DSL
+
       alias Oceanconnect.Repo
-      alias Oceanconnect.Page
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Oceanconnect.Factory
+
+      import OceanconnectWeb.Router.Helpers
     end
   end
 
   setup tags do
-    use Hound.Helpers
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Oceanconnect.Repo)
 
     unless tags[:async] do
@@ -21,8 +22,7 @@ defmodule Oceanconnect.Web.FeatureCase do
     end
 
     metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Oceanconnect.Repo, self())
-    session = Hound.start_session()
+    {:ok, session} = Wallaby.start_session(metadata: metadata)
     {:ok, session: session}
   end
-
 end
