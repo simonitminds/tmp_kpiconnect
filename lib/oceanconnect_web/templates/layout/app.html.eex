@@ -8,6 +8,7 @@
     <meta name="author" content="">
 
     <title>Hello Oceanconnect!</title>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/bulma.css") %>">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
 

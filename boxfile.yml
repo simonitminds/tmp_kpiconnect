@@ -3,6 +3,7 @@ run.config:
   dev_packages:
     - nodejs
     - inotify-tools
+    - python-2.7.14
   extra_packages:
     - phantomjs
   cache_dirs:
