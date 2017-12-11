@@ -1,0 +1,30 @@
+<h2>Listing Auctions</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Vessel</th>
+      <th>Port</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for auction <- @auctions do %>
+    <tr>
+      <td><%= auction.id %></td>
+      <td><%= auction.vessel %></td>
+      <td><%= auction.port %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: auction_path(@conn, :show, auction), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: auction_path(@conn, :edit, auction), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: auction_path(@conn, :delete, auction), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Auction", to: auction_path(@conn, :new) %></span>

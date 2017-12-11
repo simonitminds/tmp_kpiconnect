@@ -1,0 +1,18 @@
+<h2>Show Auction</h2>
+
+<ul>
+
+  <li>
+    <strong>Vessel:</strong>
+    <%= @auction.vessel %>
+  </li>
+
+  <li>
+    <strong>Port:</strong>
+    <%= @auction.port %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: auction_path(@conn, :edit, @auction) %></span>
+<span><%= link "Back", to: auction_path(@conn, :index) %></span>

@@ -1,0 +1,5 @@
+<h2>Edit Auction</h2>
+
+<%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :update, @auction)) %>
+
+<span><%= link "Back", to: auction_path(@conn, :index) %></span>
