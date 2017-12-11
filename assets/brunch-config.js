@@ -21,9 +21,7 @@ exports.config = {
     },
     stylesheets: {
       joinTo: {
-        'css/app.css': 'css/app.scss',
-        'css/bulma.css': 'css/bulma-customize.scss',
-        'css/lost.css': 'css/lost.scss'
+        'css/app.css': 'css/app.scss'
       }
     },
     templates: {
@@ -49,9 +47,7 @@ exports.config = {
   // Configure your plugins
   plugins: {
     sass: {
-      options: {
-        includePaths: ['node_modules/bulma']
-      }
+      mode: 'native'
     },
     babel: {
       // Do not use ES6 compiler in vendor code
