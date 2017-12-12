@@ -14,7 +14,7 @@ run.config:
 
 deploy.config:
   extra_steps:
-    - mix phoenix.digest
+    - mix phx.digest
   before_live:
     web.main:
       - mix ecto.create --quiet
