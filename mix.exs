@@ -42,7 +42,8 @@ defmodule Oceanconnect.Mixfile do
       {:ex_machina, "~> 2.1"},
       {:wallaby, "~> 0.19.2", only: :test},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 

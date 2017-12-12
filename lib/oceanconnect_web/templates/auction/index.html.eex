@@ -6,6 +6,13 @@
       <th>ID</th>
       <th>Vessel</th>
       <th>Port</th>
+      <th>Company</th>
+      <th>PO</th>
+      <th>ETA</th>
+      <th>ETD</th>
+      <th>Auction Start</th>
+      <th>Duration</th>
+      <th>Anonymous Bidding</th>
 
       <th></th>
     </tr>
@@ -16,6 +23,13 @@
       <td><%= auction.id %></td>
       <td><%= auction.vessel %></td>
       <td><%= auction.port %></td>
+      <td><%= auction.company %></td>
+      <td><%= auction.po %></td>
+      <td><%= format_datetime(auction.eta) %></td>
+      <td><%= format_datetime(auction.etd) %></td>
+      <td><%= format_datetime(auction.auction_start) %></td>
+      <td><%= auction.duration %></td>
+      <td><%= auction.anonymous_bidding %></td>
 
       <td class="text-right">
         <span><%= link "Show", to: auction_path(@conn, :show, auction), class: "btn btn-default btn-xs" %></span>
