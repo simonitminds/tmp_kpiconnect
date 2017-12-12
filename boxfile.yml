@@ -12,7 +12,7 @@ run.config:
     - assets/node_modules/.bin
   fs_watch: true
   extra_steps:
-    — cd assets && npm install
+    - cd assets && npm install
 
 deploy.config:
   extra_steps:
