@@ -4,12 +4,11 @@ defmodule Oceanconnect.FeatureCase do
   using do
     quote do
       use Wallaby.DSL
-
       alias Oceanconnect.Repo
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-
+      use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
     end
   end

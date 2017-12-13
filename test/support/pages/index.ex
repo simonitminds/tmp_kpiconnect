@@ -1,12 +1,12 @@
-# defmodule Oceanconnect.IndexPage do
-#   use Oceanconnect.Page
-#   import Hound.Helpers.Page
-#
-#   def visit() do
-#     navigate_to("/")
-#   end
-#
-#   def has_title?(title) do
-#     page_title() == title
-#   end
-# end
+defmodule Oceanconnect.IndexPage do
+  # use Oceanconnect.Page
+  import Wallaby.Browser, only: [page_title: 1, visit: 2]
+
+  def visit(session) do
+    visit(session, "/")
+  end
+
+  def has_title?(session, title) do
+    page_title(session) == title
+  end
+end

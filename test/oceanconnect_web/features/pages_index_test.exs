@@ -1,12 +1,15 @@
-defmodule Oceanconnect.IndexPage do
+defmodule Oceanconnect.IndexTest do
   use Oceanconnect.FeatureCase, async: true
+  alias Oceanconnect.IndexPage
 
-  import Wallaby.Query, only: [css: 2]
+  setup do
+    {:ok, %{conn: build_conn()}}
+  end
 
   test "renders the default index page", %{session: session} do
     session
-    |> visit("/")
+    |> IndexPage.visit()
 
-    assert page_title(session) == "Hello Oceanconnect!"
+    assert IndexPage.has_title?(session, "Hello Oceanconnect!")
   end
 end
