@@ -20,7 +20,7 @@ import 'react-phoenix';
 
 // import socket from "./socket"
 
-import MyComponent from './components/MyComponent';
+import CreationForm from './components/auction/CreationForm';
 window.Components = {
-  MyComponent
+  CreationForm
 };

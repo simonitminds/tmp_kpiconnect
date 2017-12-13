@@ -11,5 +11,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     |> AuctionIndex.visit()
 
     assert AuctionIndex.has_content?(session, "Listing Auctions")
+
   end
 end

@@ -25,4 +25,10 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
 
 config :oceanconnect, :sql_sandbox, true
 
-# Start Hound for remote PhantomJs server at port 5555
+
+config :wallaby,
+  driver: Wallaby.Experimental.Chrome,
+  screenshot_on_failure: true,
+  chrome: [
+    headless: true
+  ]

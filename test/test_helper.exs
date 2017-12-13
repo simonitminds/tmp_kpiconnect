@@ -3,3 +3,4 @@ ExUnit.start()
 Ecto.Adapters.SQL.Sandbox.mode(Oceanconnect.Repo, :manual)
 
 Application.put_env(:wallaby, :base_url, OceanconnectWeb.Endpoint.url)
+Application.put_env(:wallaby, :screenshot_on_failure, true)

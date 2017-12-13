@@ -2,4 +2,7 @@
 
 <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :create)) %>
 
+
+<%= react_component("Components.CreationForm") %>
+
 <span><%= link "Back", to: auction_path(@conn, :index) %></span>
