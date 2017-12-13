@@ -50,6 +50,7 @@ exports.config = {
       mode: 'native'
     },
     babel: {
+      presets: ['env', 'react'],
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
     }

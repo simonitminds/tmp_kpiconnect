@@ -42,3 +42,5 @@
 </table>
 
 <span><%= link "New Auction", to: auction_path(@conn, :new) %></span>
+
+<%= react_component("Components.MyComponent") %>
