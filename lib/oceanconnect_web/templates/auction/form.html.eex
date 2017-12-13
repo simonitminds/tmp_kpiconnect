@@ -1,65 +1,55 @@
+<%= react_component("Components.CreationForm", %{auction: OceanconnectWeb.AuctionView.auction_from_changeset(@changeset.data)}) %>
+
 <%= form_for @changeset, @action, fn f -> %>
-  <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
-    </div>
+        <div class="form-group">
+          <%= label f, :port, class: "control-label" %>
+          <%= text_input f, :port, class: "form-control" %>
+          <%= error_tag f, :port %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :company, class: "control-label" %>
+          <%= text_input f, :company, class: "form-control" %>
+          <%= error_tag f, :company %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :po, class: "control-label" %>
+          <%= text_input f, :po, class: "form-control" %>
+          <%= error_tag f, :po %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :eta, class: "control-label" %>
+          <%= datetime_select f, :eta, class: "form-control" %>
+          <%= error_tag f, :eta %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :etd, class: "control-label" %>
+          <%= datetime_select f, :etd, class: "form-control" %>
+          <%= error_tag f, :etd %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :auction_start, class: "control-label" %>
+          <%= datetime_select f, :auction_start, class: "form-control" %>
+          <%= error_tag f, :auction_start %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :duration, class: "control-label" %>
+          <%= text_input f, :duration, class: "form-control" %>
+          <%= error_tag f, :duration %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :anonymous_bidding, class: "control-label" %>
+          <%= checkbox f, :anonymous_bidding, class: "form-control" %>
+          <%= error_tag f, :anonymous_bidding %>
+        </div>
+
+        <div class="form-group">
+          <%= submit "Submit", class: "btn btn-primary" %>
+        </div>
   <% end %>
-
-  <div class="form-group">
-    <%= label f, :vessel, class: "control-label" %>
-    <%= text_input f, :vessel, class: "form-control" %>
-    <%= error_tag f, :vessel %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :port, class: "control-label" %>
-    <%= text_input f, :port, class: "form-control" %>
-    <%= error_tag f, :port %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :company, class: "control-label" %>
-    <%= text_input f, :company, class: "form-control" %>
-    <%= error_tag f, :company %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :po, class: "control-label" %>
-    <%= text_input f, :po, class: "form-control" %>
-    <%= error_tag f, :po %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :eta, class: "control-label" %>
-    <%= datetime_select f, :eta, class: "form-control" %>
-    <%= error_tag f, :eta %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :etd, class: "control-label" %>
-    <%= datetime_select f, :etd, class: "form-control" %>
-    <%= error_tag f, :etd %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :auction_start, class: "control-label" %>
-    <%= datetime_select f, :auction_start, class: "form-control" %>
-    <%= error_tag f, :auction_start %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :duration, class: "control-label" %>
-    <%= text_input f, :duration, class: "form-control" %>
-    <%= error_tag f, :duration %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :anonymous_bidding, class: "control-label" %>
-    <%= checkbox f, :anonymous_bidding, class: "form-control" %>
-    <%= error_tag f, :anonymous_bidding %>
-  </div>
-
-  <div class="form-group">
-    <%= submit "Submit", class: "btn btn-primary" %>
-  </div>
-<% end %>

@@ -1,6 +1,5 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
-
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
 
