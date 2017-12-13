@@ -16,6 +16,7 @@ run.config:
 
 deploy.config:
   extra_steps:
+    - brunch build --type production
     - mix phx.digest
   before_live:
     web.main:
@@ -27,3 +28,5 @@ data.db:
 
 web.main:
   start: node-start mix phx.server
+  writable_dirs:
+      — priv
