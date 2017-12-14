@@ -3,15 +3,46 @@ import React from 'react';
 class CreationForm extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
-    this.state = { auction: props.auction };
+    // this.state = {
+    //   auction: props.auction,
+    //   errors: props.errors,
+    //   action: props.action
+    // };
   }
   render() {
     return (
       <div>
         <div className="form-group">
           <label htmlFor="auction_vessel">Vessel</label>
-          <input type="text" name="auction[vessel]" id="auction_vessel" autoComplete="off" />
+          <input
+            type="text"
+            name="auction[vessel]"
+            id="auction_vessel"
+            defaultValue={this.props.auction.vessel}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="auction_port">Port</label>
+          <input
+            type="text"
+            name="auction[port]"
+            id="auction_port"
+            defaultValue={this.props.auction.port}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="auction_company">Company</label>
+          <input
+            type="text"
+            name="auction[company]"
+            id="auction_company"
+            defaultValue={this.props.auction.company}
+            autoComplete="off"
+          />
         </div>
       </div>
     );

@@ -14,4 +14,14 @@ defmodule OceanconnectWeb.AuctionView do
     |> Map.from_struct()
     |> Map.delete(:__meta__)
   end
+
+  def errors_from_changeset(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+      Enum.reduce(opts, msg, fn {key, value}, acc ->
+        String.replace(acc, "%{#{key}}", to_string(value))
+      end)
+    end)
+  end
+
+
 end

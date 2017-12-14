@@ -7,6 +7,11 @@
     </div>
   <% end %>
 
+  <%= react_component("Components.CreationForm",
+        %{auction: OceanconnectWeb.AuctionView.auction_from_changeset(@changeset.data),
+          action: @changeset.action,
+          errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset)
+        }) %>
   <div class="field">
     <%= label f, :vessel, class: "label" %>
     <div class="control">

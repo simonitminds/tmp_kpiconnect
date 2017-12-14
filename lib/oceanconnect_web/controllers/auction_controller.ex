@@ -10,6 +10,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def new(conn, _params) do
     changeset = Auctions.change_auction(%Auction{})
+    IO.inspect(changeset.errors)
     render(conn, "new.html", changeset: changeset)
   end
 
