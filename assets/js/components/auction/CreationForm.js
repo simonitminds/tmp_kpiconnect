@@ -12,37 +12,20 @@ class CreationForm extends React.Component {
   render() {
     return (
       <div>
-        <div className="form-group">
-          <label htmlFor="auction_vessel">Vessel</label>
-          <input
-            type="text"
-            name="auction[vessel]"
-            id="auction_vessel"
-            defaultValue={this.props.auction.vessel}
-            autoComplete="off"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="auction_port">Port</label>
-          <input
-            type="text"
-            name="auction[port]"
-            id="auction_port"
-            defaultValue={this.props.auction.port}
-            autoComplete="off"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="auction_company">Company</label>
-          <input
-            type="text"
-            name="auction[company]"
-            id="auction_company"
-            defaultValue={this.props.auction.company}
-            autoComplete="off"
-          />
+        <div className="field">
+          <label htmlFor="auction_vessel" className="label">
+            Vessel
+          </label>
+          <div className="control">
+            <input
+              type="text"
+              name="auction[vessel]"
+              id="auction_vessel"
+              className="input"
+              defaultValue={this.props.auction.vessel}
+              autoComplete="off"
+            />
+          </div>
         </div>
       </div>
     );
