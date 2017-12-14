@@ -1,6 +1,6 @@
-<h2>Listing Auctions</h2>
-
-<table class="table">
+<div class="content has-margin-top-lg">
+<h1 class="title is-3">Auction Listing</h1>
+<table class="table is-striped">
   <thead>
     <tr>
       <th>ID</th>
@@ -32,13 +32,14 @@
       <td><%= auction.anonymous_bidding %></td>
 
       <td class="text-right">
-        <span><%= link "Show", to: auction_path(@conn, :show, auction), class: "btn btn-default btn-xs" %></span>
-        <span><%= link "Edit", to: auction_path(@conn, :edit, auction), class: "btn btn-default btn-xs" %></span>
-        <span><%= link "Delete", to: auction_path(@conn, :delete, auction), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+        <%= link "Show", to: auction_path(@conn, :show, auction), class: "button is-primary is-small" %>
+        <%= link "Edit", to: auction_path(@conn, :edit, auction), class: "button is-primary is-small" %>
+        <%= link "Delete", to: auction_path(@conn, :delete, auction), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-small" %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Auction", to: auction_path(@conn, :new) %></span>
+<%= link "New Auction", to: auction_path(@conn, :new), class: "button" %>
+</div>

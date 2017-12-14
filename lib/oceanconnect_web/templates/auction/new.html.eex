@@ -1,5 +1,7 @@
-<h2>New Auction</h2>
+<div class="content has-margin-top-lg">
+<h1 class="title is-3">Create New Auction</h1>
 
 <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :create)) %>
 
-<span><%= link "Back", to: auction_path(@conn, :index) %></span>
+<%= link "Back", to: auction_path(@conn, :index), class: "button" %>
+</div>

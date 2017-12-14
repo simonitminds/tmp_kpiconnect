@@ -1,55 +1,93 @@
+<div class="form">
 <%= react_component("Components.CreationForm", %{auction: OceanconnectWeb.AuctionView.auction_from_changeset(@changeset.data)}) %>
-
 <%= form_for @changeset, @action, fn f -> %>
-        <div class="form-group">
-          <%= label f, :port, class: "control-label" %>
-          <%= text_input f, :port, class: "form-control" %>
-          <%= error_tag f, :port %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :company, class: "control-label" %>
-          <%= text_input f, :company, class: "form-control" %>
-          <%= error_tag f, :company %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :po, class: "control-label" %>
-          <%= text_input f, :po, class: "form-control" %>
-          <%= error_tag f, :po %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :eta, class: "control-label" %>
-          <%= datetime_select f, :eta, class: "form-control" %>
-          <%= error_tag f, :eta %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :etd, class: "control-label" %>
-          <%= datetime_select f, :etd, class: "form-control" %>
-          <%= error_tag f, :etd %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :auction_start, class: "control-label" %>
-          <%= datetime_select f, :auction_start, class: "form-control" %>
-          <%= error_tag f, :auction_start %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :duration, class: "control-label" %>
-          <%= text_input f, :duration, class: "form-control" %>
-          <%= error_tag f, :duration %>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :anonymous_bidding, class: "control-label" %>
-          <%= checkbox f, :anonymous_bidding, class: "form-control" %>
-          <%= error_tag f, :anonymous_bidding %>
-        </div>
-
-        <div class="form-group">
-          <%= submit "Submit", class: "btn btn-primary" %>
-        </div>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>
+    </div>
   <% end %>
+
+  <div class="field">
+    <%= label f, :vessel, class: "label" %>
+    <div class="control">
+      <%= text_input f, :vessel, class: "input" %>
+    </div>
+    <%= error_tag f, :vessel %>
+  </div>
+
+  <div class="field">
+    <%= label f, :port, class: "label" %>
+    <div class="control">
+      <%= text_input f, :port, class: "input" %>
+    </div>
+    <%= error_tag f, :port %>
+  </div>
+
+  <div class="field">
+    <%= label f, :company, class: "label" %>
+    <div class="control">
+      <%= text_input f, :company, class: "input" %>
+    </div>
+    <%= error_tag f, :company %>
+  </div>
+
+  <div class="field">
+    <%= label f, :po, class: "label is-uppercase" %>
+    <div class="control">
+      <%= text_input f, :po, class: "input" %>
+    </div>
+    <%= error_tag f, :po %>
+  </div>
+
+  <div class="field">
+    <%= label f, :eta, class: "label is-uppercase" %>
+    <div class="control">
+      <div class="select is-flex is-datepicker">
+        <%= datetime_select f, :eta, class: "select" %>
+      </div>
+    </div>
+    <%= error_tag f, :eta %>
+  </div>
+
+  <div class="field">
+    <%= label f, :etd, class: "label is-uppercase" %>
+    <div class="control">
+      <div class="select is-flex is-datepicker">
+        <%= datetime_select f, :etd %>
+      </div>
+    </div>
+    <%= error_tag f, :etd %>
+  </div>
+
+  <div class="field">
+    <%= label f, :auction_start, class: "label is-capitalized" %>
+    <div class="control">
+      <div class="select is-flex is-datepicker">
+        <%= datetime_select f, :auction_start %>
+      </div>
+    </div>
+    <%= error_tag f, :auction_start %>
+
+  </div>
+
+  <div class="field">
+    <%= label f, :duration, class: "label" %>
+    <div class="control">
+      <%= text_input f, :duration, class: "input" %>
+    </div>
+    <%= error_tag f, :duration %>
+  </div>
+
+  <div class="field">
+    <div class="control">
+      <%= checkbox f, :anonymous_bidding, class: "checkbox" %>
+      <%= label f, :anonymous_bidding, class: "label is-capitalized is-inline-block has-margin-left-sm" %>
+    </div>
+    <%= error_tag f, :anonymous_bidding %>
+  </div>
+
+  <div class="field has-margin-top-lg">
+    <%= submit "Submit", class: "button is-link" %>
+  </div>
+<% end %>
+</div>

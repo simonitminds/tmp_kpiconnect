@@ -12,24 +12,39 @@
   </head>
 
   <body>
-    <div class="container">
-      <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span class="logo"></span>
-      </header>
+    <header class="header">
+      <nav role="navigation" class="navbar is-primary">
+        <div class="navbar-brand">
+          <a href="/auctions" class="navbar-item">
+            <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
+          </a>
+        </div>
+        <%# TODO: Add in actual mobile implementation of nav... %>
+        <!-- <button class="button navbar-burger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button> -->
+        <div class="navbar-menu">
+          <%# TODO: Add links as we add additional sections (when relevant) %>
+          <!-- <div class="navbar-end">
+            <a href="#" class="navbar-item">Bunkers</a>
+            <a href="#" class="navbar-item">Account Settings</a>
+            <a href="#" class="navbar-item">Messages</a>
+            <a href="#" class="navbar-item">Log Out</a>
+          </div> -->
+        </div>
+      </nav>
+    </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
       <main role="main">
-        <%= render @view_module, @view_template, assigns %>
+        <div class="container">
+          <%= render @view_module, @view_template, assigns %>
+        </div>
       </main>
-
-    </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
