@@ -1,0 +1,5 @@
+<h2>Edit Port</h2>
+
+<%= render "form.html", Map.put(assigns, :action, port_path(@conn, :update, @port)) %>
+
+<span><%= link "Back", to: port_path(@conn, :index) %></span>

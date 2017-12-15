@@ -1,0 +1,13 @@
+<h2>Show Port</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @port.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: port_path(@conn, :edit, @port) %></span>
+<span><%= link "Back", to: port_path(@conn, :index) %></span>
