@@ -6,13 +6,17 @@ run.config:
     - python-2.7.14
   extra_packages:
     - phantomjs
+    - nodejs
   cache_dirs:
     - assets/node_modules
+    - node_modules
   extra_path_dirs:
     - assets/node_modules/.bin
+    - node_modules/.bin
   fs_watch: true
   extra_steps:
     - cd assets && yarn install
+    - cd assets && brunch build
 
 deploy.config:
   extra_steps:
