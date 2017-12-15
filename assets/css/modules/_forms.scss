@@ -9,6 +9,10 @@
 
 $navbar-background-color: $primary;
 
+// Spacing Between Form Elements
+$control-padding-vertical:	calc(0.25em - 1px);
+$control-padding-horizontal:	calc(0.25em - 1px);
+
 // Adaptations
 
 .form {

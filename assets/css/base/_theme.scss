@@ -8,6 +8,21 @@
 // ========================== //
 // ========================== //
 
+// ===== COLORS ===== //
+
 $blue: #013643;
 
 $primary: $blue;
+
+
+
+// ===== TYPOGRAPHY ===== //
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,800|Open+Sans:400,400i');
+
+// Headers
+$family-header: "Montserrat", "Futura", "Helvetica", "Arial", sans-serif;
+
+.title {font-family: $family-header}
+
+// Copy
+$family-sans-serif: "Open Sans", "Helvetica", "Arial", sans-serif;
