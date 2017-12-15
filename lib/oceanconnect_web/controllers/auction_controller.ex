@@ -15,11 +15,6 @@ defmodule OceanconnectWeb.AuctionController do
 
   def create(conn, %{"auction" => auction_params}) do
     auction_params = Auction.from_params(auction_params)
-    IO.puts "auction_params"
-    IO.inspect(auction_params)
-
-    # "auction_start" => %{"day" => "1", "hour" => "0", "minute" => "0",
-    #  "month" => "1", "year" => "2012"},
     case Auctions.create_auction(auction_params) do
       {:ok, auction} ->
         conn
@@ -43,7 +38,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
     auction = Auctions.get_auction!(id)
-
+    auction_params = Auction.from_params(auction_params)
     case Auctions.update_auction(auction, auction_params) do
       {:ok, auction} ->
         conn

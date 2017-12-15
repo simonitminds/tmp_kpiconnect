@@ -1,14 +1,22 @@
 import React from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 
 class AuctionForm extends React.Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   auction: props.auction,
-    //   errors: props.errors,
-    //   action: props.action
-    // };
+  }
+
+  date_part(datetime) {
+    return moment(datetime).format('YYYY-MM-DD');
+  }
+
+  hour_part(datetime) {
+    return moment(datetime).format('HH');
+  }
+
+  minute_part(datetime) {
+    return moment(datetime).format('mm');
   }
 
   padLeft(num) {
@@ -48,8 +56,17 @@ class AuctionForm extends React.Component {
         </label>
         <div className="control">
           <div className="select is-flex is-datepicker">
-            <input type="date" name={`${model}[${field}][date]`} id={`${model}_${field}_date`} defaultValue={value} />
-            <select id={`${model}_${field}_hour`} name={`${model}[${field}][hour]`}>
+            <input
+              type="date"
+              name={`${model}[${field}][date]`}
+              id={`${model}_${field}_date`}
+              defaultValue={this.date_part(value)}
+            />
+            <select
+              id={`${model}_${field}_hour`}
+              name={`${model}[${field}][hour]`}
+              defaultValue={this.hour_part(value)}
+            >
               {_.map(_.range(24), hour => (
                 <option key={hour} value={this.padLeft(hour)}>
                   {this.padLeft(hour)}
@@ -57,7 +74,11 @@ class AuctionForm extends React.Component {
               ))}
             </select>
 
-            <select id={`${model}_${field}_minute`} name={`${model}[${field}][minute]`}>
+            <select
+              id={`${model}_${field}_minute`}
+              name={`${model}[${field}][minute]`}
+              defaultValue={this.minute_part(value)}
+            >
               {_.map(_.range(60), minutes => (
                 <option key={minutes} value={this.padLeft(minutes)}>
                   {this.padLeft(minutes)}
@@ -114,13 +135,3 @@ class AuctionForm extends React.Component {
 }
 
 export default AuctionForm;
-
-// <%= if @changeset.action do %>
-//   <div className="alert alert-danger">
-//     <p>Oops, something went wrong! Please check the errors below.</p>
-//   </div>
-// <% end %>
-//
-// onChange={e => this.props.updateProposal('company', e.target.value)}
-// value={this.props.auction.vessel}
-// className={this.props.proposal.errors.company ? 'error' : ''}
