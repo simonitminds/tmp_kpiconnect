@@ -69,36 +69,36 @@ class AuctionForm extends React.Component {
             defaultValue={this.date_part(value)}
           />
         </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id={`${model}_${field}_hour`}
-                name={`${model}[${field}][hour]`}
-                defaultValue={this.hour_part(value)}
-              >
-                {_.map(_.range(24), hour => (
-                  <option key={hour} value={this.padLeft(hour)}>
-                    {this.padLeft(hour)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="control">
+        <div className="control">
           <div className="select">
-              <select
-                id={`${model}_${field}_minute`}
-                name={`${model}[${field}][minute]`}
-                defaultValue={this.minute_part(value)}
-              >
-                {_.map(_.range(60), minutes => (
-                  <option key={minutes} value={this.padLeft(minutes)}>
-                    {this.padLeft(minutes)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              id={`${model}_${field}_hour`}
+              name={`${model}[${field}][hour]`}
+              defaultValue={this.hour_part(value)}
+            >
+              {_.map(_.range(24), hour => (
+                <option key={hour} value={this.padLeft(hour)}>
+                  {this.padLeft(hour)}
+                </option>
+              ))}
+            </select>
           </div>
+        </div>
+        <div className="control">
+          <div className="select">
+            <select
+              id={`${model}_${field}_minute`}
+              name={`${model}[${field}][minute]`}
+              defaultValue={this.minute_part(value)}
+            >
+              {_.map(_.range(60), minutes => (
+                <option key={minutes} value={this.padLeft(minutes)}>
+                  {this.padLeft(minutes)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     );
   }
@@ -153,18 +153,24 @@ class AuctionForm extends React.Component {
     return (
       <div>
         {this.input_field('auction', 'vessel', 'vessel', this.props.auction.vessel)}
+        {this.select_field('auction', 'port_id', this.state.selected_port, this.props.ports)}
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'etd', 'etd', this.props.auction.etd, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'auction_start', 'auction start', this.props.auction.auction_start, {
-        {this.select_field('auction', 'port_id', this.state.selected_port, this.props.ports)}
           labelClass: 'label is-capitalized'
         })}
         {this.input_field('auction', 'duration', 'duration', this.props.auction.duration)}
-        {this.checkbox_field('auction', 'anonymous_bidding', 'anonymous bidding', this.props.auction.anonymous_bidding, {
-          labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'
-        })}
+        {this.checkbox_field(
+          'auction',
+          'anonymous_bidding',
+          'anonymous bidding',
+          this.props.auction.anonymous_bidding,
+          {
+            labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'
+          }
+        )}
       </div>
     );
   }
