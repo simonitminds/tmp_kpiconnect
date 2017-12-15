@@ -19,6 +19,33 @@ defmodule Oceanconnect.AuctionsTest do
       auction
     end
 
+    test "#start_date_from_params" do
+      params = %{"anonymous_bidding" => "false",
+      "auction_start" => %{"date" => "2017-12-28", "hour" => "01",
+      "minute" => "30"}, "company" => "", "duration" => "",
+      "eta" => %{"date" => "", "hour" => "00", "minute" => "00"},
+      "etd" => %{"date" => "", "hour" => "00", "minute" => "00"}, "po" => "",
+      "port" => "", "vessel" => ""}
+      parsed_date = Auction.start_date_from_params(params)
+      {:ok, expected_date} = NaiveDateTime.new(2017, 12, 28, 1, 30, 0)
+
+      assert parsed_date == expected_date
+    end
+
+    # test "persisting a Auction with start_date set from params" do
+    #   params = %{"anonymous_bidding" => "false",
+    #   "auction_start" => %{"date" => "2017-12-28", "hour" => "01",
+    #   "minute" => "30"}, "company" => "", "duration" => "",
+    #   "eta" => %{"date" => "", "hour" => "00", "minute" => "00"},
+    #   "etd" => %{"date" => "", "hour" => "00", "minute" => "00"}, "po" => "",
+    #   "port" => "", "vessel" => ""}
+    #   parsed_date = Auction.start_date_from_params(params)
+    #
+    #   result = %Auction{auction_start: parsed_date}
+    #   |> Oceanconnect.Repo.insert()
+    #   assert {:ok, %Auction{}} = result
+    # end
+
     test "list_auctions/0 returns all auctions" do
       auction = auction_fixture()
       assert Auctions.list_auctions() == [auction]
