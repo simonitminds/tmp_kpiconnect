@@ -16,7 +16,7 @@ defmodule OceanconnectWeb.Router do
   scope "/", OceanconnectWeb do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/", AuctionController, :index
     resources "/auctions", AuctionController
   end
 
