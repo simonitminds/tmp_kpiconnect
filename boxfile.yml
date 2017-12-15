@@ -12,7 +12,6 @@ run.config:
     - assets/node_modules/.bin
   fs_watch: true
   extra_steps:
-    - mkdir priv/static
     - cd assets && yarn install
 
 deploy.config:
