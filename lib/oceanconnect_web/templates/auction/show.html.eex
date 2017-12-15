@@ -1,18 +1,23 @@
-<h2>Show Auction</h2>
+<div class="content has-margin-top-lg">
+<h1 class="title is-3">Show Auction</h1>
 
-<ul>
+<div class="box">
+  <ul class="list has-no-bullets">
+    <li>
+      <strong>Vessel:</strong>
+      <%= @auction.vessel %>
+    </li>
+    <li>
+      <strong>Port:</strong>
+      <%= @auction.port %>
+    </li>
+  </ul>
+</div>
 
-  <li>
-    <strong>Vessel:</strong>
-    <%= @auction.vessel %>
-  </li>
 
-  <li>
-    <strong>Port:</strong>
-    <%= @auction.port %>
-  </li>
 
-</ul>
-
-<span><%= link "Edit", to: auction_path(@conn, :edit, @auction) %></span>
-<span><%= link "Back", to: auction_path(@conn, :index) %></span>
+<span class="field is-multiple has-margin-top-lg">
+  <%= link "Back", to: auction_path(@conn, :index), class: "button is-link" %>
+  <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
+</span>
+</div>

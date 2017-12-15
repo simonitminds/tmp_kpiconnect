@@ -24,9 +24,9 @@ class AuctionForm extends React.Component {
     return ('00' + str).substring(str.length);
   }
 
-  input_field(model, field, value, opts) {
+  input_field(model, field, labelText, value, opts) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(field);
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
     return (
       <div className="field">
         <label htmlFor={`${model}_${field}`} className={labelClass}>
@@ -46,54 +46,60 @@ class AuctionForm extends React.Component {
     );
   }
 
-  dateselect_field(model, field, value, opts = {}) {
+  dateselect_field(model, field, labelText, value, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(field);
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
     return (
-      <div className="field">
+      <div className="field is-grouped">
         <label htmlFor={`${model}_${field}`} className={labelClass}>
           {labelDisplay}
         </label>
         <div className="control">
-          <div className="select is-flex is-datepicker">
-            <input
-              type="date"
-              name={`${model}[${field}][date]`}
-              id={`${model}_${field}_date`}
-              defaultValue={this.date_part(value)}
-            />
-            <select
-              id={`${model}_${field}_hour`}
-              name={`${model}[${field}][hour]`}
-              defaultValue={this.hour_part(value)}
-            >
-              {_.map(_.range(24), hour => (
-                <option key={hour} value={this.padLeft(hour)}>
-                  {this.padLeft(hour)}
-                </option>
-              ))}
-            </select>
-
-            <select
-              id={`${model}_${field}_minute`}
-              name={`${model}[${field}][minute]`}
-              defaultValue={this.minute_part(value)}
-            >
-              {_.map(_.range(60), minutes => (
-                <option key={minutes} value={this.padLeft(minutes)}>
-                  {this.padLeft(minutes)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <input
+            className="input"
+            type="date"
+            name={`${model}[${field}][date]`}
+            id={`${model}_${field}_date`}
+            defaultValue={this.date_part(value)}
+          />
         </div>
+          <div className="control">
+            <div className="select">
+              <select
+                id={`${model}_${field}_hour`}
+                name={`${model}[${field}][hour]`}
+                defaultValue={this.hour_part(value)}
+              >
+                {_.map(_.range(24), hour => (
+                  <option key={hour} value={this.padLeft(hour)}>
+                    {this.padLeft(hour)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="control">
+          <div className="select">
+              <select
+                id={`${model}_${field}_minute`}
+                name={`${model}[${field}][minute]`}
+                defaultValue={this.minute_part(value)}
+              >
+                {_.map(_.range(60), minutes => (
+                  <option key={minutes} value={this.padLeft(minutes)}>
+                    {this.padLeft(minutes)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
       </div>
     );
   }
 
-  checkbox_field(model, field, value, opts = {}) {
+  checkbox_field(model, field, labelText, value, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(field);
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
     return (
       <div className="field">
         <div className="control">
@@ -116,17 +122,17 @@ class AuctionForm extends React.Component {
   render() {
     return (
       <div>
-        {this.input_field('auction', 'vessel', this.props.auction.vessel)}
-        {this.input_field('auction', 'port', this.props.auction.port)}
-        {this.input_field('auction', 'company', this.props.auction.company)}
-        {this.input_field('auction', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
-        {this.dateselect_field('auction', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
-        {this.dateselect_field('auction', 'etd', this.props.auction.etd, { labelClass: 'label is-uppercase' })}
-        {this.dateselect_field('auction', 'auction_start', this.props.auction.auction_start, {
+        {this.input_field('auction', 'vessel', 'vessel', this.props.auction.vessel)}
+        {this.input_field('auction', 'port', 'port', this.props.auction.port)}
+        {this.input_field('auction', 'company', 'company', this.props.auction.company)}
+        {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
+        {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
+        {this.dateselect_field('auction', 'etd', 'etd', this.props.auction.etd, { labelClass: 'label is-uppercase' })}
+        {this.dateselect_field('auction', 'auction_start', 'auction start', this.props.auction.auction_start, {
           labelClass: 'label is-capitalized'
         })}
-        {this.input_field('auction', 'duration', this.props.auction.duration)}
-        {this.checkbox_field('auction', 'anonymous_bidding', this.props.auction.anonymous_bidding, {
+        {this.input_field('auction', 'duration', 'duration', this.props.auction.duration)}
+        {this.checkbox_field('auction', 'anonymous_bidding', 'anonymous bidding', this.props.auction.anonymous_bidding, {
           labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'
         })}
       </div>
