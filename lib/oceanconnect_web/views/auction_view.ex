@@ -11,6 +11,7 @@ defmodule OceanconnectWeb.AuctionView do
 
   def auction_from_changeset(struct) do
     struct
+    |> Oceanconnect.Repo.preload([:port])
     |> Map.from_struct()
     |> Map.delete(:__meta__)
   end

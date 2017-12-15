@@ -15,6 +15,10 @@
 </div>
 
 
+  <li>
+    <strong>Port:</strong>
+    <%= @auction.port.name %>
+  </li>
 
 <span class="field is-multiple has-margin-top-lg">
   <%= link "Back", to: auction_path(@conn, :index), class: "button is-link" %>

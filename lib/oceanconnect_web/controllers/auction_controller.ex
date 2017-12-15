@@ -10,7 +10,9 @@ defmodule OceanconnectWeb.AuctionController do
 
   def new(conn, _params) do
     changeset = Auctions.change_auction(%Auction{})
-    render(conn, "new.html", changeset: changeset)
+    auction = Auctions.with_port(changeset.data)
+    ports = Auctions.list_ports
+    render(conn, "new.html", changeset: changeset, ports: ports, auction: auction)
   end
 
   def create(conn, %{"auction" => auction_params}) do
@@ -21,24 +23,35 @@ defmodule OceanconnectWeb.AuctionController do
         |> put_flash(:info, "Auction created successfully.")
         |> redirect(to: auction_path(conn, :show, auction))
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        auction = Auctions.with_port(changeset.data)
+        ports = Auctions.list_ports
+        render(conn, "new.html", changeset: changeset, ports: ports, auction: auction)
     end
   end
 
   def show(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
+    |> Auctions.with_port
+
     render(conn, "show.html", auction: auction)
   end
 
   def edit(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
+    |> Auctions.with_port
     changeset = Auctions.change_auction(auction)
-    render(conn, "edit.html", auction: auction, changeset: changeset)
+
+    # auction = Auctions.with_port(changeset.data)
+    ports = Auctions.list_ports
+
+    render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
     auction = Auctions.get_auction!(id)
+    # port = Auctions.get_port!(auction_params.port_id)
     auction_params = Auction.from_params(auction_params)
+
     case Auctions.update_auction(auction, auction_params) do
       {:ok, auction} ->
         conn

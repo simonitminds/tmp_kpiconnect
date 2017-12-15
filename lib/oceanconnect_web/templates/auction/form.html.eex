@@ -7,9 +7,10 @@
   <% end %>
 
   <%= react_component("Components.AuctionForm",
-        %{auction: OceanconnectWeb.AuctionView.auction_from_changeset(@changeset.data),
+        %{auction: @auction,
           action: @changeset.action,
-          errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset)
+          errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset),
+          ports: @ports
         }) %>
 
   <div class="field has-margin-top-lg">

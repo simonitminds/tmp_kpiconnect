@@ -5,6 +5,8 @@ import moment from 'moment';
 class AuctionForm extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { selected_port: props.auction.port_id || '' };
+    this.handlePortChange = this.handlePortChange.bind(this);
   }
 
   date_part(datetime) {
@@ -22,6 +24,10 @@ class AuctionForm extends React.Component {
   padLeft(num) {
     const str = num.toString();
     return ('00' + str).substring(str.length);
+  }
+
+  handlePortChange(e) {
+    this.setState({ selected_port: e.target.value });
   }
 
   input_field(model, field, labelText, value, opts) {
@@ -97,6 +103,30 @@ class AuctionForm extends React.Component {
     );
   }
 
+  select_field(model, field, value, values, opts = {}) {
+    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(field);
+    return (
+      <div className="field">
+        <label htmlFor={`${model}_${field}`} className={labelClass}>
+          {labelDisplay}
+        </label>
+        <div className="control">
+          <div className="select is-flex ">
+            <select id={`${model}_${field}`} name={`${model}[${field}]`} value={value} onChange={this.handlePortChange}>
+              <option> </option>
+              {_.map(values, port => (
+                <option key={port.id} value={port.id}>
+                  {port.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   checkbox_field(model, field, labelText, value, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
     const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
@@ -123,12 +153,12 @@ class AuctionForm extends React.Component {
     return (
       <div>
         {this.input_field('auction', 'vessel', 'vessel', this.props.auction.vessel)}
-        {this.input_field('auction', 'port', 'port', this.props.auction.port)}
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'etd', 'etd', this.props.auction.etd, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'auction_start', 'auction start', this.props.auction.auction_start, {
+        {this.select_field('auction', 'port_id', this.state.selected_port, this.props.ports)}
           labelClass: 'label is-capitalized'
         })}
         {this.input_field('auction', 'duration', 'duration', this.props.auction.duration)}

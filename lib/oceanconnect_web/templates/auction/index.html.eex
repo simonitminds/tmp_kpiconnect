@@ -23,7 +23,7 @@
     <tr>
       <td><%= auction.id %></td>
       <td><%= auction.vessel %></td>
-      <td><%= auction.port %></td>
+      <td><%= auction.port.name %></td>
       <td><%= auction.company %></td>
       <td><%= auction.po %></td>
       <td><%= format_datetime(auction.eta) %></td>

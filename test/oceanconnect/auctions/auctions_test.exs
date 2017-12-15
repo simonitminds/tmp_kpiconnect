@@ -91,4 +91,64 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end
   end
+
+  describe "ports" do
+    alias Oceanconnect.Auctions.Port
+
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    def port_fixture(attrs \\ %{}) do
+      {:ok, port} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Auctions.create_port()
+
+      port
+    end
+
+    test "list_ports/0 returns all ports" do
+      port = port_fixture()
+      assert Auctions.list_ports() == [port]
+    end
+
+    test "get_port!/1 returns the port with given id" do
+      port = port_fixture()
+      assert Auctions.get_port!(port.id) == port
+    end
+
+    test "create_port/1 with valid data creates a port" do
+      assert {:ok, %Port{} = port} = Auctions.create_port(@valid_attrs)
+      assert port.name == "some name"
+    end
+
+    test "create_port/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Auctions.create_port(@invalid_attrs)
+    end
+
+    test "update_port/2 with valid data updates the port" do
+      port = port_fixture()
+      assert {:ok, port} = Auctions.update_port(port, @update_attrs)
+      assert %Port{} = port
+      assert port.name == "some updated name"
+    end
+
+    test "update_port/2 with invalid data returns error changeset" do
+      port = port_fixture()
+      assert {:error, %Ecto.Changeset{}} = Auctions.update_port(port, @invalid_attrs)
+      assert port == Auctions.get_port!(port.id)
+    end
+
+    test "delete_port/1 deletes the port" do
+      port = port_fixture()
+      assert {:ok, %Port{}} = Auctions.delete_port(port)
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_port!(port.id) end
+    end
+
+    test "change_port/1 returns a port changeset" do
+      port = port_fixture()
+      assert %Ecto.Changeset{} = Auctions.change_port(port)
+    end
+  end
 end
