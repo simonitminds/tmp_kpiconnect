@@ -32,4 +32,5 @@ data.db:
 web.main:
   start: node-start mix phx.server
   writable_dirs:
+      - _build
       - priv
