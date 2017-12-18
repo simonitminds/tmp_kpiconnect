@@ -41,6 +41,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "create auction" do
+    setup do
+      port = insert(:port)
+      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id})
+      {:ok, %{invalid_attrs: invalid_attrs}}
+    end
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post conn, auction_path(conn, :create), auction: valid_auction_create_attrs()
 
@@ -51,8 +56,10 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Show Auction"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, auction_path(conn, :create), auction: @invalid_attrs
+    test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
+      conn = post conn, auction_path(conn, :create), auction: invalid_attrs
+
+      assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs) |> Auctions.with_port
       assert html_response(conn, 200) =~ "New Auction"
     end
   end

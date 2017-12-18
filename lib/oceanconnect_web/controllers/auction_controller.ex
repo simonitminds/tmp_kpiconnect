@@ -23,7 +23,8 @@ defmodule OceanconnectWeb.AuctionController do
         |> put_flash(:info, "Auction created successfully.")
         |> redirect(to: auction_path(conn, :show, auction))
       {:error, %Ecto.Changeset{} = changeset} ->
-        auction = Auctions.with_port(changeset.data)
+        auction = Ecto.Changeset.apply_changes(changeset)
+          |> Auctions.with_port
         ports = Auctions.list_ports
         render(conn, "new.html", changeset: changeset, ports: ports, auction: auction)
     end
