@@ -114,7 +114,9 @@ class AuctionForm extends React.Component {
         <div className="control">
           <div className="select">
             <select id={`${model}_${field}`} name={`${model}[${field}]`} value={value} onChange={this.handlePortChange}>
-              <option> </option>
+              <option disabled value="">
+                Please select
+              </option>
               {_.map(values, port => (
                 <option key={port.id} value={port.id}>
                   {port.name}
