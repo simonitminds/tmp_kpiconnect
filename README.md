@@ -23,7 +23,18 @@ We use Nanobox for deployments to Azure
 * Run `mix phx.server`
 * Go to `phoenix.local:4000` in the browser
 
-Nanobox article on phoenix and azure deploys: 
+### Seed data
+
+* The seeds file will delete items in the database and seed new data
+* Run `mix run priv/repo/seeds.exs`
+
+### To run the "console" on Production follow these steps:
+
+* Run `nanobox console web.main`
+* Run `iex -S mix`
+* Then do things
+
+Nanobox article on phoenix and azure deploys:
 https://content.nanobox.io/how-to-deploy-phoenix-applications-to-microsoft-azure-with-nanobox/#updatethedatabaseconnection
 
 Nanobox guides: https://guides.nanobox.io/elixir/phoenix/existing-app/
