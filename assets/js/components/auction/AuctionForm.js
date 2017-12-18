@@ -103,16 +103,16 @@ class AuctionForm extends React.Component {
     );
   }
 
-  select_field(model, field, value, values, opts = {}) {
+  select_field(model, field, labelText, value, values, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(field);
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
     return (
       <div className="field">
         <label htmlFor={`${model}_${field}`} className={labelClass}>
           {labelDisplay}
         </label>
         <div className="control">
-          <div className="select is-flex ">
+          <div className="select">
             <select id={`${model}_${field}`} name={`${model}[${field}]`} value={value} onChange={this.handlePortChange}>
               <option> </option>
               {_.map(values, port => (
@@ -153,7 +153,7 @@ class AuctionForm extends React.Component {
     return (
       <div>
         {this.input_field('auction', 'vessel', 'vessel', this.props.auction.vessel)}
-        {this.select_field('auction', 'port_id', this.state.selected_port, this.props.ports)}
+        {this.select_field('auction', 'port_id', 'port', this.state.selected_port, this.props.ports)}
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
