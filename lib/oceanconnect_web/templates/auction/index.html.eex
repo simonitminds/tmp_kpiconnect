@@ -13,7 +13,6 @@
       <th>ETD</th>
       <th>Auction Start</th>
       <th>Duration</th>
-      <th>Anonymous Bidding</th>
 
       <th></th>
     </tr>
@@ -30,7 +29,6 @@
       <td><%= format_datetime(auction.etd) %></td>
       <td><%= format_datetime(auction.auction_start) %></td>
       <td><%= auction.duration %></td>
-      <td><%= auction.anonymous_bidding %></td>
 
       <td class="text-right">
         <div class="field is-grouped is-grouped-multiline">
