@@ -3,12 +3,26 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @create_attrs %{port: "some port", vessel: "some vessel"}
-  @update_attrs %{port: "some updated port", vessel: "some updated vessel"}
-  @invalid_attrs %{port: nil, vessel: nil}
+  @port_attrs %{ name: "some port" }
+  @create_attrs %{ vessel: "some vessel" }
+  @update_attrs %{ vessel: "some updated vessel"}
+  @invalid_attrs %{ vessel: nil}
+
+
+  def valid_auction_create_attrs(attrs \\ %{}) do
+    {:ok, port} = Auctions.create_port(%{name: "some port"})
+    %{port_id: port.id}
+      |> Map.merge( attrs)
+      |> Enum.into(@create_attrs)
+
+  end
+
 
   def fixture(:auction) do
-    {:ok, auction} = Auctions.create_auction(@create_attrs)
+    {:ok, port} = Auctions.create_port(@port_attrs)
+    auction_with_port = Map.put(@create_attrs, :port_id, port.id)
+
+    {:ok, auction} = Auctions.create_auction(auction_with_port)
     auction
   end
 
@@ -28,7 +42,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   describe "create auction" do
     test "redirects to show when data is valid", %{conn: conn} do
-      conn = post conn, auction_path(conn, :create), auction: @create_attrs
+      conn = post conn, auction_path(conn, :create), auction: valid_auction_create_attrs()
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
@@ -60,7 +74,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
       conn = get conn, auction_path(conn, :show, auction)
-      assert html_response(conn, 200) =~ "some updated port"
+      assert html_response(conn, 200) =~ "some updated vessel"
     end
 
     test "renders errors when data is invalid", %{conn: conn, auction: auction} do
@@ -85,4 +99,5 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     auction = fixture(:auction)
     {:ok, auction: auction}
   end
+
 end

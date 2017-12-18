@@ -11,7 +11,9 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload(:port)
   end
 
-  def get_auction!(id), do: Repo.get!(Auction, id)
+  def get_auction!(id) do
+     Repo.get!(Auction, id)
+   end
 
   def create_auction(attrs \\ %{}) do
     %Auction{}
@@ -35,7 +37,7 @@ defmodule Oceanconnect.Auctions do
 
   def with_port(data) do
     data
-    |> Oceanconnect.Repo.preload([:port])
+    |> Repo.preload([:port])
   end
 
 

@@ -35,9 +35,13 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   def maybe_parse_date_field(params, key) do
-    %{^key => %{"date" => date, "hour" =>  hour, "minute" => min}} = params
-    updated_date = parse_date(date, hour, min)
-    Map.put(params, key, updated_date)
+    try do
+       %{^key => %{"date" => date, "hour" =>  hour, "minute" => min}} = params
+      updated_date = parse_date(date, hour, min)
+      Map.put(params, key, updated_date)
+    rescue
+       _ -> params
+    end
   end
 
   def parse_date(date, hour, min) when date == "" or hour == "" or min == "", do: nil

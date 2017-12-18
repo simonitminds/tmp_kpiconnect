@@ -6,48 +6,45 @@ defmodule Oceanconnect.AuctionsTest do
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
 
-    @valid_attrs %{port: "some port", vessel: "some vessel"}
-    @update_attrs %{port: "some updated port", vessel: "some updated vessel"}
-    @invalid_attrs %{port: nil, vessel: nil}
+    @valid_attrs %{ vessel: "some vessel"}
+    @update_attrs %{ vessel: "some updated vessel"}
+    @invalid_attrs %{ vessel: nil}
 
     def auction_fixture(attrs \\ %{}) do
-      {:ok, auction} =
-        attrs
-        |> Enum.into(@valid_attrs)
+      {:ok, auction} = valid_auction_attr(attrs)
         |> Auctions.create_auction()
 
       auction
     end
 
-    test "#start_date_from_params" do
+    def auction_with_port_fixture(attrs \\ %{}) do
+      auction_fixture(attrs)
+        |> Oceanconnect.Repo.preload( [ :port ])
+    end
+
+    def valid_auction_attr(attrs \\ %{}) do
+      port = port_fixture()
+      %{port_id: port.id}
+        |> Map.merge( attrs)
+        |> Enum.into(@valid_attrs)
+    end
+
+    test "#maybe_parse_date_field" do
       params = %{"anonymous_bidding" => "false",
       "auction_start" => %{"date" => "2017-12-28", "hour" => "01",
       "minute" => "30"}, "company" => "", "duration" => "",
       "eta" => %{"date" => "", "hour" => "00", "minute" => "00"},
       "etd" => %{"date" => "", "hour" => "00", "minute" => "00"}, "po" => "",
       "port" => "", "vessel" => ""}
-      parsed_date = Auction.start_date_from_params(params)
+      %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
       {:ok, expected_date} = NaiveDateTime.new(2017, 12, 28, 1, 30, 0)
+      expected_date = expected_date |> NaiveDateTime.to_string()
 
       assert parsed_date == expected_date
     end
 
-    # test "persisting a Auction with start_date set from params" do
-    #   params = %{"anonymous_bidding" => "false",
-    #   "auction_start" => %{"date" => "2017-12-28", "hour" => "01",
-    #   "minute" => "30"}, "company" => "", "duration" => "",
-    #   "eta" => %{"date" => "", "hour" => "00", "minute" => "00"},
-    #   "etd" => %{"date" => "", "hour" => "00", "minute" => "00"}, "po" => "",
-    #   "port" => "", "vessel" => ""}
-    #   parsed_date = Auction.start_date_from_params(params)
-    #
-    #   result = %Auction{auction_start: parsed_date}
-    #   |> Oceanconnect.Repo.insert()
-    #   assert {:ok, %Auction{}} = result
-    # end
-
     test "list_auctions/0 returns all auctions" do
-      auction = auction_fixture()
+      auction = auction_with_port_fixture()
       assert Auctions.list_auctions() == [auction]
     end
 
@@ -57,8 +54,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "create_auction/1 with valid data creates a auction" do
-      assert {:ok, %Auction{} = auction} = Auctions.create_auction(@valid_attrs)
-      assert auction.port == "some port"
+      assert {:ok, %Auction{} = auction} = Auctions.create_auction(valid_auction_attr())
       assert auction.vessel == "some vessel"
     end
 
@@ -70,7 +66,6 @@ defmodule Oceanconnect.AuctionsTest do
       auction = auction_fixture()
       assert {:ok, auction} = Auctions.update_auction(auction, @update_attrs)
       assert %Auction{} = auction
-      assert auction.port == "some updated port"
       assert auction.vessel == "some updated vessel"
     end
 
@@ -95,8 +90,8 @@ defmodule Oceanconnect.AuctionsTest do
   describe "ports" do
     alias Oceanconnect.Auctions.Port
 
-    @valid_attrs %{name: "some name"}
-    @update_attrs %{name: "some updated name"}
+    @valid_attrs %{name: "some port"}
+    @update_attrs %{name: "some updated port"}
     @invalid_attrs %{name: nil}
 
     def port_fixture(attrs \\ %{}) do
@@ -120,7 +115,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_port/1 with valid data creates a port" do
       assert {:ok, %Port{} = port} = Auctions.create_port(@valid_attrs)
-      assert port.name == "some name"
+      assert port.name == "some port"
     end
 
     test "create_port/1 with invalid data returns error changeset" do
@@ -131,7 +126,7 @@ defmodule Oceanconnect.AuctionsTest do
       port = port_fixture()
       assert {:ok, port} = Auctions.update_port(port, @update_attrs)
       assert %Port{} = port
-      assert port.name == "some updated name"
+      assert port.name == "some updated port"
     end
 
     test "update_port/2 with invalid data returns error changeset" do

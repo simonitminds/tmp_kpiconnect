@@ -41,7 +41,6 @@ defmodule OceanconnectWeb.AuctionController do
     |> Auctions.with_port
     changeset = Auctions.change_auction(auction)
 
-    # auction = Auctions.with_port(changeset.data)
     ports = Auctions.list_ports
 
     render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports)
@@ -49,7 +48,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
     auction = Auctions.get_auction!(id)
-    # port = Auctions.get_port!(auction_params.port_id)
+      |> Auctions.with_port
     auction_params = Auction.from_params(auction_params)
 
     case Auctions.update_auction(auction, auction_params) do
@@ -58,7 +57,8 @@ defmodule OceanconnectWeb.AuctionController do
         |> put_flash(:info, "Auction updated successfully.")
         |> redirect(to: auction_path(conn, :show, auction))
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", auction: auction, changeset: changeset)
+        ports = Auctions.list_ports
+        render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports)
     end
   end
 
