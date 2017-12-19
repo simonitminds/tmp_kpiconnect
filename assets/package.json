@@ -14,6 +14,7 @@
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
     "react": "^15.6.2",
+    "react-datetime": "^2.11.1",
     "react-phoenix": "file:../deps/react_phoenix"
   },
   "devDependencies": {
