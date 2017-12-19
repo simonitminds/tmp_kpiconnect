@@ -5,8 +5,12 @@ import moment from 'moment';
 class AuctionForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { selected_port: props.auction.port_id || '' };
+    this.state = {
+      selected_port: props.auction.port_id || '',
+      selected_vessel: props.auction.vessel_id || ''
+    };
     this.handlePortChange = this.handlePortChange.bind(this);
+    this.handleVesselChange = this.handleVesselChange.bind(this);
   }
 
   date_part(datetime) {
@@ -28,6 +32,9 @@ class AuctionForm extends React.Component {
 
   handlePortChange(e) {
     this.setState({ selected_port: e.target.value });
+  }
+  handleVesselChange(e) {
+    this.setState({ selected_vessel: e.target.value });
   }
 
   input_field(model, field, labelText, value, opts) {
@@ -154,8 +161,56 @@ class AuctionForm extends React.Component {
   render() {
     return (
       <div>
-        {this.input_field('auction', 'vessel', 'vessel', this.props.auction.vessel)}
-        {this.select_field('auction', 'port_id', 'port', this.state.selected_port, this.props.ports)}
+        <div className="field">
+          <label htmlFor="auction_vessel_id" className="label">
+            Vessel
+          </label>
+          <div className="control">
+            <div className="select">
+              <select
+                id="auction_vessel_id"
+                name="auction[vessel_id]"
+                value={this.state.selected_vessel}
+                onChange={this.handleVesselChange}
+              >
+                <option disabled value="">
+                  Please select
+                </option>
+                {_.map(this.props.vessels, vessel => (
+                  <option key={vessel.id} value={vessel.id}>
+                    {vessel.name}, {vessel.imo}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="field">
+          <label htmlFor="auction_port_id" className="label">
+            Port
+          </label>
+          <div className="control">
+            <div className="select">
+              <select
+                id="auction_port_id"
+                name="auction[port_id]"
+                value={this.state.selected_port}
+                onChange={this.handlePortChange}
+              >
+                <option disabled value="">
+                  Please select
+                </option>
+                {_.map(this.props.ports, port => (
+                  <option key={port.id} value={port.id}>
+                    {port.name}, {port.country}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}

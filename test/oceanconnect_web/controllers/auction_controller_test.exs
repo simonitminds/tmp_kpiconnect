@@ -4,14 +4,16 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   alias Oceanconnect.Auctions
 
   @port_attrs %{ name: "some port", country: "Merica" }
-  @create_attrs %{ vessel: "some vessel" }
-  @update_attrs %{ vessel: "some updated vessel"}
-  @invalid_attrs %{ vessel: nil}
+  @vessel_attrs %{ name: "some vessel", imo: 1234567 }
+  @create_attrs %{ po: "PO text" }
+  @update_attrs %{ po: "updated PO text"}
+  @invalid_attrs %{ vessel_id: nil}
 
 
   def valid_auction_create_attrs(attrs \\ %{}) do
     {:ok, port} = Auctions.create_port(%{name: "some port", country: "Merica"})
-    %{port_id: port.id}
+    {:ok, vessel} = Auctions.create_vessel(%{name: "some vessel", imo: 7665643})
+    %{port_id: port.id, vessel_id: vessel.id}
       |> Map.merge( attrs)
       |> Enum.into(@create_attrs)
 
@@ -20,9 +22,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   def fixture(:auction) do
     {:ok, port} = Auctions.create_port(@port_attrs)
-    auction_with_port = Map.put(@create_attrs, :port_id, port.id)
+    {:ok, vessel} = Auctions.create_vessel(@vessel_attrs)
+    fully_loaded_auction = @create_attrs
+    |> Map.put( :port_id, port.id)
+    |> Map.put( :vessel_id, vessel.id)
 
-    {:ok, auction} = Auctions.create_auction(auction_with_port)
+    {:ok, auction} = Auctions.create_auction(fully_loaded_auction)
     auction
   end
 
@@ -59,7 +64,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
       conn = post conn, auction_path(conn, :create), auction: invalid_attrs
 
-      assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs) |> Auctions.with_port
+      assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs) |> Auctions.fully_loaded
       assert html_response(conn, 200) =~ "New Auction"
     end
   end
@@ -81,7 +86,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
       conn = get conn, auction_path(conn, :show, auction)
-      assert html_response(conn, 200) =~ "some updated vessel"
+      assert html_response(conn, 200) =~ "updated PO text"
     end
 
     test "renders errors when data is invalid", %{conn: conn, auction: auction} do

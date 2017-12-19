@@ -1,0 +1,28 @@
+<h2>Listing Vessels</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Imo</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for vessel <- @vessels do %>
+    <tr>
+      <td><%= vessel.name %></td>
+      <td><%= vessel.imo %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: vessel_path(@conn, :show, vessel), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: vessel_path(@conn, :edit, vessel), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: vessel_path(@conn, :delete, vessel), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Vessel", to: vessel_path(@conn, :new) %></span>

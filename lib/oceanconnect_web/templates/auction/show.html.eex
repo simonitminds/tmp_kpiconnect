@@ -5,11 +5,16 @@
   <ul class="list has-no-bullets">
     <li>
       <strong>Vessel:</strong>
-      <%= @auction.vessel %>
+      <%= @auction.vessel.name %>
     </li>
     <li>
       <strong>Port:</strong>
       <%= @auction.port.name %>
+    </li>
+
+    <li>
+      <strong>PO:</strong>
+      <%= @auction.po %>
     </li>
   </ul>
 </div>

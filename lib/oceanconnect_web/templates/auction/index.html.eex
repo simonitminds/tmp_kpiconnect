@@ -21,7 +21,7 @@
 <%= for auction <- @auctions do %>
     <tr>
       <td><%= auction.id %></td>
-      <td><%= auction.vessel %></td>
+      <td><%= auction.vessel.name %></td>
       <td><%= auction.port.name %></td>
       <td><%= auction.company %></td>
       <td><%= auction.po %></td>

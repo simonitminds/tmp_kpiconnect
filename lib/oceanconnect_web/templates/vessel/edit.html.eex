@@ -1,0 +1,5 @@
+<h2>Edit Vessel</h2>
+
+<%= render "form.html", Map.put(assigns, :action, vessel_path(@conn, :update, @vessel)) %>
+
+<span><%= link "Back", to: vessel_path(@conn, :index) %></span>

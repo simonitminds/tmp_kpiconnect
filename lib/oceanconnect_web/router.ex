@@ -19,6 +19,7 @@ defmodule OceanconnectWeb.Router do
     get "/", AuctionController, :index
     resources "/auctions", AuctionController
     resources "/ports", PortController
+    resources "/vessels", VesselController
   end
 
   # Other scopes may use custom stacks.

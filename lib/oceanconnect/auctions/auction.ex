@@ -1,13 +1,13 @@
 defmodule Oceanconnect.Auctions.Auction do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{Auction, Port}
+  alias Oceanconnect.Auctions.{Auction, Port, Vessel}
 
   @derive {Poison.Encoder, except: [:__meta__]}
   schema "auctions" do
     # field :port, :string
     belongs_to :port, Port
-    field :vessel, :string
+    belongs_to :vessel, Vessel
     field :company, :string
     field :po, :string
     field :eta, :naive_datetime
@@ -22,9 +22,10 @@ defmodule Oceanconnect.Auctions.Auction do
   @doc false
   def changeset(%Auction{} = auction, attrs) do
     auction
-    |> cast(attrs, [:vessel, :port_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding])
+    |> cast(attrs, [:vessel_id, :port_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding])
     |> cast_assoc(:port)
-    |> validate_required([:vessel, :port_id])
+    |> cast_assoc(:vessel)
+    |> validate_required([:vessel_id, :port_id])
   end
 
   def from_params(params) do

@@ -1,0 +1,18 @@
+<h2>Show Vessel</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @vessel.name %>
+  </li>
+
+  <li>
+    <strong>Imo:</strong>
+    <%= @vessel.imo %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: vessel_path(@conn, :edit, @vessel) %></span>
+<span><%= link "Back", to: vessel_path(@conn, :index) %></span>

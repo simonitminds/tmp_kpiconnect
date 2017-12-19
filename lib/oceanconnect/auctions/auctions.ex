@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions do
 
   def list_auctions do
     Repo.all(Auction)
-    |> Repo.preload(:port)
+    |> fully_loaded
   end
 
   def get_auction!(id) do
@@ -35,10 +35,11 @@ defmodule Oceanconnect.Auctions do
     Auction.changeset(auction, %{})
   end
 
-  def with_port(data) do
+  def fully_loaded(data) do
     data
-    |> Repo.preload([:port])
+    |> Repo.preload([:port, :vessel])
   end
+
 
 
   @doc """
@@ -133,5 +134,101 @@ defmodule Oceanconnect.Auctions do
   """
   def change_port(%Port{} = port) do
     Port.changeset(port, %{})
+  end
+
+  alias Oceanconnect.Auctions.Vessel
+
+  @doc """
+  Returns the list of vessels.
+
+  ## Examples
+
+      iex> list_vessels()
+      [%Vessel{}, ...]
+
+  """
+  def list_vessels do
+    Repo.all(Vessel)
+  end
+
+  @doc """
+  Gets a single vessel.
+
+  Raises `Ecto.NoResultsError` if the Vessel does not exist.
+
+  ## Examples
+
+      iex> get_vessel!(123)
+      %Vessel{}
+
+      iex> get_vessel!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_vessel!(id), do: Repo.get!(Vessel, id)
+
+  @doc """
+  Creates a vessel.
+
+  ## Examples
+
+      iex> create_vessel(%{field: value})
+      {:ok, %Vessel{}}
+
+      iex> create_vessel(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_vessel(attrs \\ %{}) do
+    %Vessel{}
+    |> Vessel.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a vessel.
+
+  ## Examples
+
+      iex> update_vessel(vessel, %{field: new_value})
+      {:ok, %Vessel{}}
+
+      iex> update_vessel(vessel, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_vessel(%Vessel{} = vessel, attrs) do
+    vessel
+    |> Vessel.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a Vessel.
+
+  ## Examples
+
+      iex> delete_vessel(vessel)
+      {:ok, %Vessel{}}
+
+      iex> delete_vessel(vessel)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_vessel(%Vessel{} = vessel) do
+    Repo.delete(vessel)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking vessel changes.
+
+  ## Examples
+
+      iex> change_vessel(vessel)
+      %Ecto.Changeset{source: %Vessel{}}
+
+  """
+  def change_vessel(%Vessel{} = vessel) do
+    Vessel.changeset(vessel, %{})
   end
 end
