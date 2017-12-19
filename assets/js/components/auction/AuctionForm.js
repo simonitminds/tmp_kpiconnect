@@ -120,7 +120,7 @@ class AuctionForm extends React.Component {
             Vessel
           </label>
           <div className="control">
-            <div className="select">
+            <div className="select is-fullwidth">
               <select
                 id="auction_vessel_id"
                 name="auction[vessel_id]"
@@ -145,7 +145,7 @@ class AuctionForm extends React.Component {
             Port
           </label>
           <div className="control">
-            <div className="select">
+            <div className="select is-fullwidth">
               <select
                 id="auction_port_id"
                 name="auction[port_id]"
