@@ -34,7 +34,6 @@
         <div class="field is-grouped is-grouped-multiline">
           <span class="control"><%= link "Show", to: auction_path(@conn, :show, auction), class: "button is-primary is-small" %></span>
           <span class="control"><%= link "Edit", to: auction_path(@conn, :edit, auction), class: "button is-primary is-small" %></span>
-          <span class="control"><%= link "Delete", to: auction_path(@conn, :delete, auction), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-small" %></span>
         </div>
       </td>
     </tr>

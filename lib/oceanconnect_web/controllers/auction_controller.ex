@@ -71,12 +71,4 @@ defmodule OceanconnectWeb.AuctionController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    auction = Auctions.get_auction!(id)
-    {:ok, _auction} = Auctions.delete_auction(auction)
-
-    conn
-    |> put_flash(:info, "Auction deleted successfully.")
-    |> redirect(to: auction_path(conn, :index))
-  end
 end
