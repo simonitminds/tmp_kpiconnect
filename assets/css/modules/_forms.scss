@@ -7,8 +7,6 @@
 
 // Associated Variables
 
-$navbar-background-color: $primary;
-
 // Adaptations
 
 .form {
@@ -21,19 +19,19 @@ $navbar-background-color: $primary;
   label {
     flex-basis: 100%;
   }
+
+  &> .control:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  .is-grouped { // Keeping time selects together in Create Auction
+    display: flex;
+
+    & .control:not(:last-child) {
+      margin-right: 0.75rem;
+    }
+  }
 }
 
 .label {
-}
-
-.is-datepicker { // For datepicker elements
-  &:after { display: none !important; }
-  vertical-align: middle;
-
-  select {
-    margin: 0 0.5rem;
-
-    &:first-child { margin-left: 0; }
-    &:last-child { margin-right: 0; }
-  }
 }

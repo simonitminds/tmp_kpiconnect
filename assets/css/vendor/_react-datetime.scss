@@ -14,15 +14,12 @@
   }
 }
 .rdtPicker {
+  @extend .box;
   display: none;
   position: absolute;
-  width: 250px;
-  padding: 4px;
+  padding: 0;
   margin-top: 1px;
   z-index: 99999 !important;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f9f9f9;
 }
 .rdtOpen .rdtPicker {
   display: block;
@@ -37,6 +34,9 @@
 }
 
 .rdtPicker table {
+  @extend .table;
+  font-size: 0.925rem; // Adjustment so the li'l table fits on mobile screens.
+  border-radius: 5px;
   width: 100%;
   margin: 0;
 }
@@ -106,12 +106,13 @@
   border-bottom: none;
 }
 .rdtPicker th.rdtSwitch {
+  vertical-align: middle;
   width: 100px;
 }
 .rdtPicker th.rdtNext,
 .rdtPicker th.rdtPrev {
   font-size: 21px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .rdtPrev span,

@@ -7,6 +7,9 @@
 // Import Components
 @import 'components/navbar';
 
+// Import Bulma
+@import '../node_modules/bulma/bulma';
+
 // Import Modules
 @import 'modules/forms';
 @import 'modules/layout';
@@ -15,8 +18,7 @@
 // Generic Phoenix Starter Styles
 @import 'phoenix-starter';
 
-// Import Bulma
-@import '../node_modules/bulma/bulma';
+
 
 // Import Vendor Styles
 @import 'vendor/react-datetime';

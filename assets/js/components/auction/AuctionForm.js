@@ -185,34 +185,36 @@ class AuctionForm extends React.Component {
               closeOnSelect={true}
             />
           </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_eta_hour"
-                name="auction[eta][hour]"
-                defaultValue={this.hour_part(this.props.auction.eta)}
-              >
-                {_.map(_.range(24), hour => (
-                  <option key={hour} value={hour}>
-                    {hour}
-                  </option>
-                ))}
-              </select>
+          <div className="control is-grouped">
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_eta_hour"
+                  name="auction[eta][hour]"
+                  defaultValue={this.hour_part(this.props.auction.eta)}
+                >
+                  {_.map(_.range(24), hour => (
+                    <option key={hour} value={hour}>
+                      {hour}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_eta_minute"
-                name="auction[eta][minute]"
-                defaultValue={this.minute_part(this.props.auction.eta)}
-              >
-                {_.map(_.range(60), minutes => (
-                  <option key={minutes} value={minutes}>
-                    {this.padLeft(minutes)}
-                  </option>
-                ))}
-              </select>
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_eta_minute"
+                  name="auction[eta][minute]"
+                  defaultValue={this.minute_part(this.props.auction.eta)}
+                >
+                  {_.map(_.range(60), minutes => (
+                    <option key={minutes} value={minutes}>
+                      {this.padLeft(minutes)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -234,34 +236,36 @@ class AuctionForm extends React.Component {
               closeOnSelect={true}
             />
           </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_etd_hour"
-                name="auction[etd][hour]"
-                defaultValue={this.hour_part(this.props.auction.etd)}
-              >
-                {_.map(_.range(24), hour => (
-                  <option key={hour} value={this.padLeft(hour)}>
-                    {this.padLeft(hour)}
-                  </option>
-                ))}
-              </select>
+          <div className="control is-grouped">
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_etd_hour"
+                  name="auction[etd][hour]"
+                  defaultValue={this.hour_part(this.props.auction.etd)}
+                >
+                  {_.map(_.range(24), hour => (
+                    <option key={hour} value={this.padLeft(hour)}>
+                      {this.padLeft(hour)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_etd_minute"
-                name="auction[etd][minute]"
-                defaultValue={this.minute_part(this.props.auction.etd)}
-              >
-                {_.map(_.range(60), minutes => (
-                  <option key={minutes} value={this.padLeft(minutes)}>
-                    {this.padLeft(minutes)}
-                  </option>
-                ))}
-              </select>
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_etd_minute"
+                  name="auction[etd][minute]"
+                  defaultValue={this.minute_part(this.props.auction.etd)}
+                >
+                  {_.map(_.range(60), minutes => (
+                    <option key={minutes} value={this.padLeft(minutes)}>
+                      {this.padLeft(minutes)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -283,34 +287,36 @@ class AuctionForm extends React.Component {
               closeOnSelect={true}
             />
           </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_auction_start_hour"
-                name="auction[auction_start][hour]"
-                defaultValue={this.hour_part(this.props.auction.auction_start)}
-              >
-                {_.map(_.range(24), hour => (
-                  <option key={hour} value={this.padLeft(hour)}>
-                    {this.padLeft(hour)}
-                  </option>
-                ))}
-              </select>
+          <div className="control is-grouped">
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_auction_start_hour"
+                  name="auction[auction_start][hour]"
+                  defaultValue={this.hour_part(this.props.auction.auction_start)}
+                >
+                  {_.map(_.range(24), hour => (
+                    <option key={hour} value={this.padLeft(hour)}>
+                      {this.padLeft(hour)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-          <div className="control">
-            <div className="select">
-              <select
-                id="auction_auction_start_minute"
-                name="auction[auction_start][minute]"
-                defaultValue={this.minute_part(this.props.auction.auction_start)}
-              >
-                {_.map(_.range(60), minutes => (
-                  <option key={minutes} value={this.padLeft(minutes)}>
-                    {this.padLeft(minutes)}
-                  </option>
-                ))}
-              </select>
+            <div className="control">
+              <div className="select">
+                <select
+                  id="auction_auction_start_minute"
+                  name="auction[auction_start][minute]"
+                  defaultValue={this.minute_part(this.props.auction.auction_start)}
+                >
+                  {_.map(_.range(60), minutes => (
+                    <option key={minutes} value={this.padLeft(minutes)}>
+                      {this.padLeft(minutes)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
