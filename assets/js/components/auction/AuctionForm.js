@@ -336,6 +336,7 @@ class AuctionForm extends React.Component {
                 <option value="20">20</option>
               </select>
             </div>
+            <span className="select__extra-label">minutes</span>
           </div>
         </div>
 
