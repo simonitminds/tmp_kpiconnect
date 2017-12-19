@@ -32,10 +32,10 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "#maybe_parse_date_field" do
       params = %{"anonymous_bidding" => "false",
-      "auction_start" => %{"date" => "2017-12-28", "hour" => "01",
+      "auction_start" => %{"date" => "28/12/2017", "hour" => "1",
       "minute" => "30"}, "company" => "", "duration" => "",
-      "eta" => %{"date" => "", "hour" => "00", "minute" => "00"},
-      "etd" => %{"date" => "", "hour" => "00", "minute" => "00"}, "po" => "",
+      "eta" => %{"date" => "", "hour" => "0", "minute" => "0"},
+      "etd" => %{"date" => "", "hour" => "0", "minute" => "0"}, "po" => "",
       "port" => "", "vessel" => ""}
       %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
       {:ok, expected_date} = NaiveDateTime.new(2017, 12, 28, 1, 30, 0)

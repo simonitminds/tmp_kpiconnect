@@ -41,14 +41,15 @@ defmodule Oceanconnect.Auctions.Auction do
       updated_date = parse_date(date, hour, min)
       Map.put(params, key, updated_date)
     rescue
-       _ -> params
+       _ ->
+         Map.delete(params, key)
     end
   end
 
   def parse_date(date, hour, min) when date == "" or hour == "" or min == "", do: nil
   def parse_date(date, hour, min) do
-    [year, month, day] = date
-    |> String.split("-")
+    [day, month, year] = date
+    |> String.split("/")
     |> Enum.map(fn(int) ->
       String.to_integer(int)
     end)
