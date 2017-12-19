@@ -7,6 +7,12 @@
     <%= @port.name %>
   </li>
 
+  <li>
+    <strong>Country:</strong>
+    <%= @port.country %>
+  </li>
+
+
 </ul>
 
 <span><%= link "Edit", to: port_path(@conn, :edit, @port) %></span>

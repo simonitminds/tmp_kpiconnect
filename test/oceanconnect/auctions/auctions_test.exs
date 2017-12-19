@@ -90,9 +90,9 @@ defmodule Oceanconnect.AuctionsTest do
   describe "ports" do
     alias Oceanconnect.Auctions.Port
 
-    @valid_attrs %{name: "some port"}
-    @update_attrs %{name: "some updated port"}
-    @invalid_attrs %{name: nil}
+    @valid_attrs %{name: "some port", country: "Merica"}
+    @update_attrs %{name: "some updated port", country: "Merica"}
+    @invalid_attrs %{name: nil, country: "Merica"}
 
     def port_fixture(attrs \\ %{}) do
       {:ok, port} =

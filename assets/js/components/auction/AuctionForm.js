@@ -119,7 +119,7 @@ class AuctionForm extends React.Component {
               </option>
               {_.map(values, port => (
                 <option key={port.id} value={port.id}>
-                  {port.name}
+                  {port.name}, {port.country}
                 </option>
               ))}
             </select>

@@ -3,14 +3,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @port_attrs %{ name: "some port" }
+  @port_attrs %{ name: "some port", country: "Merica" }
   @create_attrs %{ vessel: "some vessel" }
   @update_attrs %{ vessel: "some updated vessel"}
   @invalid_attrs %{ vessel: nil}
 
 
   def valid_auction_create_attrs(attrs \\ %{}) do
-    {:ok, port} = Auctions.create_port(%{name: "some port"})
+    {:ok, port} = Auctions.create_port(%{name: "some port", country: "Merica"})
     %{port_id: port.id}
       |> Map.merge( attrs)
       |> Enum.into(@create_attrs)

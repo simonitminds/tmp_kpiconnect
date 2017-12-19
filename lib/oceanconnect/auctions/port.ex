@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.Port do
   @derive {Poison.Encoder, except: [:__meta__]}
   schema "ports" do
     field :name, :string
+    field :country, :string
 
     timestamps()
   end
@@ -13,7 +14,7 @@ defmodule Oceanconnect.Auctions.Port do
   @doc false
   def changeset(%Port{} = port, attrs) do
     port
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :country])
+    |> validate_required([:name, :country])
   end
 end

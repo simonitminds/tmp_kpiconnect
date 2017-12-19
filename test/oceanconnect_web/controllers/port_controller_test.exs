@@ -3,9 +3,9 @@ defmodule OceanconnectWeb.PortControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @create_attrs %{name: "some name"}
-  @update_attrs %{name: "some updated name"}
-  @invalid_attrs %{name: nil}
+  @create_attrs %{name: "some name", country: "Merica"}
+  @update_attrs %{name: "some updated name", country: "Merica"}
+  @invalid_attrs %{name: nil, country: "Merica"}
 
   def fixture(:port) do
     {:ok, port} = Auctions.create_port(@create_attrs)
