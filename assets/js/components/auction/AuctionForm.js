@@ -163,7 +163,25 @@ class AuctionForm extends React.Component {
         {this.dateselect_field('auction', 'auction_start', 'auction start', this.props.auction.auction_start, {
           labelClass: 'label is-capitalized'
         })}
-        {this.input_field('auction', 'duration', 'duration', this.props.auction.duration)}
+
+        <div className="field">
+          <label htmlFor="auction_duration" className="label">
+            Duration
+          </label>
+          <div className="control">
+            <div className="select">
+              <select id="auction_duration" name="auction[duration]" defaultValue={this.props.auction.duration}>
+                <option disabled value="">
+                  Please select
+                </option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {this.checkbox_field(
           'auction',
           'anonymous_bidding',
