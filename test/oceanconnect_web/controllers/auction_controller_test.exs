@@ -95,18 +95,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
-  describe "delete auction" do
-    setup [:create_auction]
-
-    test "deletes chosen auction", %{conn: conn, auction: auction} do
-      conn = delete conn, auction_path(conn, :delete, auction)
-      assert redirected_to(conn) == auction_path(conn, :index)
-      assert_error_sent 404, fn ->
-        get conn, auction_path(conn, :show, auction)
-      end
-    end
-  end
-
   defp create_auction(_) do
     auction = fixture(:auction)
     {:ok, auction: auction}

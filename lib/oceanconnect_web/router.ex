@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", AuctionController, :index
-    resources "/auctions", AuctionController
+    resources "/auctions", AuctionController, except: [:delete]
     resources "/ports", PortController
     resources "/vessels", VesselController
   end
