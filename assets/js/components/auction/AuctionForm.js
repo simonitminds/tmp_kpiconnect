@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
+import Datetime from 'react-datetime';
 
 class AuctionForm extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class AuctionForm extends React.Component {
     };
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
   }
 
   date_part(datetime) {
@@ -158,6 +160,12 @@ class AuctionForm extends React.Component {
     );
   }
 
+  handleDateChange(date) {
+    this.setState({
+      startDate: date
+    });
+  }
+
   render() {
     return (
       <div>
@@ -211,6 +219,7 @@ class AuctionForm extends React.Component {
           </div>
         </div>
 
+        <Datetime dateFormat="DD/MM/YYYY" timeFormat={false} />
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
         {this.dateselect_field('auction', 'eta', 'eta', this.props.auction.eta, { labelClass: 'label is-uppercase' })}
