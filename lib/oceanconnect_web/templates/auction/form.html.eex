@@ -7,7 +7,7 @@
   <% end %>
 
   <%= react_component("Components.AuctionForm",
-        %{auction: @auction,
+        %{auction: OceanconnectWeb.AuctionView.auction_without_associations_from_changeset(@auction),
           action: @changeset.action,
           errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset),
           ports: @ports,

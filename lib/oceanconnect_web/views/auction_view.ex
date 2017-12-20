@@ -9,11 +9,12 @@ defmodule OceanconnectWeb.AuctionView do
     Timex.format!(date, "%d/%m/%y %R", :strftime)
   end
 
-  def auction_from_changeset(struct) do
+  def auction_without_associations_from_changeset(struct) do
     struct
-    |> Oceanconnect.Repo.preload([:port])
     |> Map.from_struct()
     |> Map.delete(:__meta__)
+    |> Map.delete(:port)
+    |> Map.delete(:vessel)
   end
 
   def errors_from_changeset(changeset) do
