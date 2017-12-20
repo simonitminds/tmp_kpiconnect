@@ -115,6 +115,10 @@ class AuctionForm extends React.Component {
   render() {
     return (
       <div>
+        <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start][minute]" value="0" />
+        <input type="hidden" id="auction_eta_minute" name="auction[eta][minute]" value="0" />
+        <input type="hidden" id="auction_etd_minute" name="auction[etd][minute]" value="0" />
+
         <div className="field">
           <label htmlFor="auction_vessel_id" className="label">
             Vessel
@@ -195,22 +199,7 @@ class AuctionForm extends React.Component {
                 >
                   {_.map(_.range(24), hour => (
                     <option key={hour} value={hour}>
-                      {hour}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_eta_minute"
-                  name="auction[eta][minute]"
-                  defaultValue={this.minute_part(this.props.auction.eta)}
-                >
-                  {_.map(_.range(60), minutes => (
-                    <option key={minutes} value={minutes}>
-                      {this.padLeft(minutes)}
+                      {hour}:00
                     </option>
                   ))}
                 </select>
@@ -246,22 +235,7 @@ class AuctionForm extends React.Component {
                 >
                   {_.map(_.range(24), hour => (
                     <option key={hour} value={hour}>
-                      {hour}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_etd_minute"
-                  name="auction[etd][minute]"
-                  defaultValue={this.minute_part(this.props.auction.etd)}
-                >
-                  {_.map(_.range(60), minutes => (
-                    <option key={minutes} value={minutes}>
-                      {this.padLeft(minutes)}
+                      {hour}:00
                     </option>
                   ))}
                 </select>
@@ -297,22 +271,7 @@ class AuctionForm extends React.Component {
                 >
                   {_.map(_.range(24), hour => (
                     <option key={hour} value={hour}>
-                      {hour}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_auction_start_minute"
-                  name="auction[auction_start][minute]"
-                  defaultValue={this.minute_part(this.props.auction.auction_start)}
-                >
-                  {_.map(_.range(60), minutes => (
-                    <option key={minutes} value={minutes}>
-                      {this.padLeft(minutes)}
+                      {hour}:00
                     </option>
                   ))}
                 </select>

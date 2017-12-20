@@ -6,7 +6,7 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def format_datetime(date) do
-    Timex.format!(date, "%m/%d/%y %R", :strftime)
+    Timex.format!(date, "%d/%m/%y %R", :strftime)
   end
 
   def auction_from_changeset(struct) do
