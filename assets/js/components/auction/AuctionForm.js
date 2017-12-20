@@ -245,8 +245,8 @@ class AuctionForm extends React.Component {
                   defaultValue={this.hour_part(this.props.auction.etd)}
                 >
                   {_.map(_.range(24), hour => (
-                    <option key={hour} value={this.padLeft(hour)}>
-                      {this.padLeft(hour)}
+                    <option key={hour} value={hour}>
+                      {hour}
                     </option>
                   ))}
                 </select>
@@ -260,7 +260,7 @@ class AuctionForm extends React.Component {
                   defaultValue={this.minute_part(this.props.auction.etd)}
                 >
                   {_.map(_.range(60), minutes => (
-                    <option key={minutes} value={this.padLeft(minutes)}>
+                    <option key={minutes} value={minutes}>
                       {this.padLeft(minutes)}
                     </option>
                   ))}
@@ -296,8 +296,8 @@ class AuctionForm extends React.Component {
                   defaultValue={this.hour_part(this.props.auction.auction_start)}
                 >
                   {_.map(_.range(24), hour => (
-                    <option key={hour} value={this.padLeft(hour)}>
-                      {this.padLeft(hour)}
+                    <option key={hour} value={hour}>
+                      {hour}
                     </option>
                   ))}
                 </select>
@@ -311,7 +311,7 @@ class AuctionForm extends React.Component {
                   defaultValue={this.minute_part(this.props.auction.auction_start)}
                 >
                   {_.map(_.range(60), minutes => (
-                    <option key={minutes} value={this.padLeft(minutes)}>
+                    <option key={minutes} value={minutes}>
                       {this.padLeft(minutes)}
                     </option>
                   ))}
