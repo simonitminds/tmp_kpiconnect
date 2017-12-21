@@ -20,6 +20,7 @@ defmodule OceanconnectWeb.Router do
     resources "/auctions", AuctionController, except: [:delete]
     resources "/ports", PortController
     resources "/vessels", VesselController
+    resources "/fuels", FuelController
   end
 
   # Other scopes may use custom stacks.

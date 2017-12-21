@@ -209,4 +209,64 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Ecto.Changeset{} = Auctions.change_vessel(vessel)
     end
   end
+
+  describe "fuels" do
+    alias Oceanconnect.Auctions.Fuel
+
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    def fuel_fixture(attrs \\ %{}) do
+      {:ok, fuel} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Auctions.create_fuel()
+
+      fuel
+    end
+
+    test "list_fuels/0 returns all fuels" do
+      fuel = fuel_fixture()
+      assert Auctions.list_fuels() == [fuel]
+    end
+
+    test "get_fuel!/1 returns the fuel with given id" do
+      fuel = fuel_fixture()
+      assert Auctions.get_fuel!(fuel.id) == fuel
+    end
+
+    test "create_fuel/1 with valid data creates a fuel" do
+      assert {:ok, %Fuel{} = fuel} = Auctions.create_fuel(@valid_attrs)
+      assert fuel.name == "some name"
+    end
+
+    test "create_fuel/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Auctions.create_fuel(@invalid_attrs)
+    end
+
+    test "update_fuel/2 with valid data updates the fuel" do
+      fuel = fuel_fixture()
+      assert {:ok, fuel} = Auctions.update_fuel(fuel, @update_attrs)
+      assert %Fuel{} = fuel
+      assert fuel.name == "some updated name"
+    end
+
+    test "update_fuel/2 with invalid data returns error changeset" do
+      fuel = fuel_fixture()
+      assert {:error, %Ecto.Changeset{}} = Auctions.update_fuel(fuel, @invalid_attrs)
+      assert fuel == Auctions.get_fuel!(fuel.id)
+    end
+
+    test "delete_fuel/1 deletes the fuel" do
+      fuel = fuel_fixture()
+      assert {:ok, %Fuel{}} = Auctions.delete_fuel(fuel)
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_fuel!(fuel.id) end
+    end
+
+    test "change_fuel/1 returns a fuel changeset" do
+      fuel = fuel_fixture()
+      assert %Ecto.Changeset{} = Auctions.change_fuel(fuel)
+    end
+  end
 end
