@@ -1,0 +1,5 @@
+<h2>New Fuel</h2>
+
+<%= render "form.html", Map.put(assigns, :action, fuel_path(@conn, :create)) %>
+
+<span><%= link "Back", to: fuel_path(@conn, :index) %></span>

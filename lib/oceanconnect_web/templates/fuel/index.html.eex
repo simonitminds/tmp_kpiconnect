@@ -1,0 +1,26 @@
+<h2>Listing Fuels</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for fuel <- @fuels do %>
+    <tr>
+      <td><%= fuel.name %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: fuel_path(@conn, :show, fuel), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: fuel_path(@conn, :edit, fuel), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Fuel", to: fuel_path(@conn, :new) %></span>

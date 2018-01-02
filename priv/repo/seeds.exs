@@ -11,11 +11,12 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Oceanconnect.Repo
-alias Oceanconnect.Auctions.{Auction, Port, Vessel}
+alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
 Repo.delete_all(Auction)
 Repo.delete_all(Port)
 Repo.delete_all(Vessel)
+Repo.delete_all(Fuel)
 
 port1 = Port.changeset(%Port{}, %{name: "Algeciras", country: "Spain"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Balboa", country: "Panama"}) |> Repo.insert!
@@ -106,7 +107,13 @@ Vessel.changeset(%Vessel{}, %{name: "Umm Slal", imo:		9525857})  |> Repo.insert!
 Vessel.changeset(%Vessel{}, %{name: "Zarga", imo:		9431214})  |> Repo.insert!
 Vessel.changeset(%Vessel{}, %{name: "Zekreet", imo:		9132818})  |> Repo.insert!
 
+fuel1 = Fuel.changeset(%Fuel{}, %{name: "MGO (DMA)"}) |> Repo.insert!
+Fuel.changeset(%Fuel{}, %{name: "Gas Oil (Sul 0.10%)"}) |> Repo.insert!
+Fuel.changeset(%Fuel{}, %{name: "RMG 380 - Sulphur max 3.50% (ISO 2005)"}) |> Repo.insert!
+Fuel.changeset(%Fuel{}, %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2010)"}) |> Repo.insert!
+Fuel.changeset(%Fuel{}, %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2012)"}) |> Repo.insert!
+
 
 %Auction{}
-|> Auction.changeset(%{vessel_id: vessel1.id, port_id: port1.id, company: "Glencore", po: "1234567"})
+|> Auction.changeset(%{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, company: "Glencore", po: "1234567"})
 |> Repo.insert()

@@ -15,6 +15,7 @@ defmodule OceanconnectWeb.AuctionView do
     |> Map.delete(:__meta__)
     |> Map.delete(:port)
     |> Map.delete(:vessel)
+    |> Map.delete(:fuel)
   end
 
   def errors_from_changeset(changeset) do

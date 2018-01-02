@@ -1,0 +1,13 @@
+<h2>Show Fuel</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @fuel.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: fuel_path(@conn, :edit, @fuel) %></span>
+<span><%= link "Back", to: fuel_path(@conn, :index) %></span>

@@ -2,8 +2,7 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions.Auction
-  alias Oceanconnect.Auctions.Port
+  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
 
   def list_auctions do
@@ -37,7 +36,7 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, :vessel])
+    |> Repo.preload([:port, :vessel, :fuel])
   end
 
 
@@ -136,7 +135,6 @@ defmodule Oceanconnect.Auctions do
     Port.changeset(port, %{})
   end
 
-  alias Oceanconnect.Auctions.Vessel
 
   @doc """
   Returns the list of vessels.
@@ -230,5 +228,99 @@ defmodule Oceanconnect.Auctions do
   """
   def change_vessel(%Vessel{} = vessel) do
     Vessel.changeset(vessel, %{})
+  end
+
+  @doc """
+  Returns the list of fuels.
+
+  ## Examples
+
+      iex> list_fuels()
+      [%Fuel{}, ...]
+
+  """
+  def list_fuels do
+    Repo.all(Fuel)
+  end
+
+  @doc """
+  Gets a single fuel.
+
+  Raises `Ecto.NoResultsError` if the Fuel does not exist.
+
+  ## Examples
+
+      iex> get_fuel!(123)
+      %Fuel{}
+
+      iex> get_fuel!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_fuel!(id), do: Repo.get!(Fuel, id)
+
+  @doc """
+  Creates a fuel.
+
+  ## Examples
+
+      iex> create_fuel(%{field: value})
+      {:ok, %Fuel{}}
+
+      iex> create_fuel(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_fuel(attrs \\ %{}) do
+    %Fuel{}
+    |> Fuel.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a fuel.
+
+  ## Examples
+
+      iex> update_fuel(fuel, %{field: new_value})
+      {:ok, %Fuel{}}
+
+      iex> update_fuel(fuel, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_fuel(%Fuel{} = fuel, attrs) do
+    fuel
+    |> Fuel.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a Fuel.
+
+  ## Examples
+
+      iex> delete_fuel(fuel)
+      {:ok, %Fuel{}}
+
+      iex> delete_fuel(fuel)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_fuel(%Fuel{} = fuel) do
+    Repo.delete(fuel)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking fuel changes.
+
+  ## Examples
+
+      iex> change_fuel(fuel)
+      %Ecto.Changeset{source: %Fuel{}}
+
+  """
+  def change_fuel(%Fuel{} = fuel) do
+    Fuel.changeset(fuel, %{})
   end
 end
