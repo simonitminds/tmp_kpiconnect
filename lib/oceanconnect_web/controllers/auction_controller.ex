@@ -12,7 +12,8 @@ defmodule OceanconnectWeb.AuctionController do
     changeset = Auctions.change_auction(%Auction{})
     ports = Auctions.list_ports
     vessels = Auctions.list_vessels
-    render(conn, "new.html", changeset: changeset, auction: changeset.data, ports: ports, vessels: vessels)
+    fuels = Auctions.list_fuels
+    render(conn, "new.html", changeset: changeset, auction: changeset.data, ports: ports, vessels: vessels, fuels: fuels)
   end
 
   def create(conn, %{"auction" => auction_params}) do
@@ -26,7 +27,8 @@ defmodule OceanconnectWeb.AuctionController do
         auction = Ecto.Changeset.apply_changes(changeset)
         ports = Auctions.list_ports
         vessels = Auctions.list_vessels
-        render(conn, "new.html", changeset: changeset, ports: ports, auction: auction, vessels: vessels)
+        fuels = Auctions.list_fuels
+        render(conn, "new.html", changeset: changeset, ports: ports, auction: auction, vessels: vessels, fuels: fuels)
     end
   end
 
@@ -42,7 +44,9 @@ defmodule OceanconnectWeb.AuctionController do
     changeset = Auctions.change_auction(auction)
     ports = Auctions.list_ports
     vessels = Auctions.list_vessels
-    render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels)
+    fuels = Auctions.list_fuels
+
+    render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels, fuels: fuels)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
@@ -58,8 +62,10 @@ defmodule OceanconnectWeb.AuctionController do
         auction = Ecto.Changeset.apply_changes(changeset)
         ports = Auctions.list_ports
         vessels = Auctions.list_vessels
+        fuels = Auctions.list_fuels
 
-        render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels)
+
+        render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels, fuels: fuels)
     end
   end
 

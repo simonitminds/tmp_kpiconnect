@@ -25,7 +25,8 @@ defmodule Oceanconnect.AuctionsTest do
     def valid_auction_attr(attrs \\ %{}) do
       port = port_fixture()
       vessel = vessel_fixture()
-      %{port_id: port.id, vessel_id: vessel.id}
+      fuel = fuel_fixture()
+      %{port_id: port.id, vessel_id: vessel.id, fuel_id: fuel.id}
         |> Map.merge( attrs)
         |> Enum.into(@valid_attrs)
     end

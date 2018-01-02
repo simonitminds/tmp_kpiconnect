@@ -9,25 +9,18 @@ class AuctionForm extends React.Component {
     this.state = {
       selected_port: props.auction.port_id || '',
       selected_vessel: props.auction.vessel_id || '',
+      selected_fuel: props.auction.fuel_id || '',
       auction_start: moment(props.auction.auction_start),
       eta: moment(props.auction.eta),
       etd: moment(props.auction.etd)
     };
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
+    this.handleFuelChange = this.handleFuelChange.bind(this);
   }
 
   hour_part(datetime) {
     return moment(datetime).hour();
-  }
-
-  minute_part(datetime) {
-    return moment(datetime).minute();
-  }
-
-  padLeft(num) {
-    const str = num.toString();
-    return ('00' + str).substring(str.length);
   }
 
   handlePortChange(e) {
@@ -35,6 +28,9 @@ class AuctionForm extends React.Component {
   }
   handleVesselChange(e) {
     this.setState({ selected_vessel: e.target.value });
+  }
+  handleFuelChange(e) {
+    this.setState({ selected_fuel: e.target.value });
   }
   handleDateChange(field, date) {
     this.setState({
@@ -59,32 +55,6 @@ class AuctionForm extends React.Component {
             defaultValue={value}
             autoComplete="off"
           />
-        </div>
-      </div>
-    );
-  }
-
-  select_field(model, field, labelText, value, values, opts = {}) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-    return (
-      <div className="field">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
-          {labelDisplay}
-        </label>
-        <div className="control">
-          <div className="select">
-            <select id={`${model}_${field}`} name={`${model}[${field}]`} value={value} onChange={this.handlePortChange}>
-              <option disabled value="">
-                Please select
-              </option>
-              {_.map(values, port => (
-                <option key={port.id} value={port.id}>
-                  {port.name}, {port.country}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
     );
@@ -162,6 +132,31 @@ class AuctionForm extends React.Component {
                 {_.map(this.props.ports, port => (
                   <option key={port.id} value={port.id}>
                     {port.name}, {port.country}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="field">
+          <label htmlFor="auction_fuel_id" className="label">
+            Fuel
+          </label>
+          <div className="control">
+            <div className="select is-fullwidth">
+              <select
+                id="auction_fuel_id"
+                name="auction[fuel_id]"
+                value={this.state.selected_fuel}
+                onChange={this.handleFuelChange}
+              >
+                <option disabled value="">
+                  Please select
+                </option>
+                {_.map(this.props.fuels, fuel => (
+                  <option key={fuel.id} value={fuel.id}>
+                    {fuel.name}
                   </option>
                 ))}
               </select>

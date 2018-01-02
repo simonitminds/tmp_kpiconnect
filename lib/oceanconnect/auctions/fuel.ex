@@ -4,6 +4,8 @@ defmodule Oceanconnect.Auctions.Fuel do
   alias Oceanconnect.Auctions.Fuel
 
 
+  @derive {Poison.Encoder, except: [:__meta__]}
+
   schema "fuels" do
     field :name, :string
 

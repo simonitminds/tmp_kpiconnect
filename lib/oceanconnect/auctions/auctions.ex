@@ -2,8 +2,7 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions.Auction
-  alias Oceanconnect.Auctions.Port
+  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
 
   def list_auctions do
@@ -37,7 +36,7 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, :vessel])
+    |> Repo.preload([:port, :vessel, :fuel])
   end
 
 
@@ -136,7 +135,6 @@ defmodule Oceanconnect.Auctions do
     Port.changeset(port, %{})
   end
 
-  alias Oceanconnect.Auctions.Vessel
 
   @doc """
   Returns the list of vessels.
@@ -231,8 +229,6 @@ defmodule Oceanconnect.Auctions do
   def change_vessel(%Vessel{} = vessel) do
     Vessel.changeset(vessel, %{})
   end
-
-  alias Oceanconnect.Auctions.Fuel
 
   @doc """
   Returns the list of fuels.

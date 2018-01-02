@@ -11,7 +11,8 @@
           action: @changeset.action,
           errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset),
           ports: @ports,
-          vessels: @vessels
+          vessels: @vessels,
+          fuels: @fuels
         }) %>
 
   <div class="field has-margin-top-lg">
