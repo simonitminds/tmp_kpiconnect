@@ -61,6 +61,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Show Auction"
     end
 
+    #TODO Refactor test to assert on specific errors
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
       conn = post conn, auction_path(conn, :create), auction: invalid_attrs
 

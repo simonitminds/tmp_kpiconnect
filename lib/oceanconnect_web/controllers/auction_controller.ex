@@ -24,6 +24,7 @@ defmodule OceanconnectWeb.AuctionController do
         |> redirect(to: auction_path(conn, :show, auction))
       {:error, %Ecto.Changeset{} = changeset} ->
         auction = Ecto.Changeset.apply_changes(changeset)
+        |> Auctions.fully_loaded
         ports = Auctions.list_ports
         vessels = Auctions.list_vessels
         render(conn, "new.html", changeset: changeset, ports: ports, auction: auction, vessels: vessels)
