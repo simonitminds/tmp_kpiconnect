@@ -15,7 +15,8 @@
           fuels: @fuels
         }) %>
 
-  <div class="field has-margin-top-lg">
+  <div class="field has-margin-top-lg has-margin-bottom-lg">
+    <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
     <%= submit "Submit", class: "button is-link" %>
   </div>
 <% end %>
