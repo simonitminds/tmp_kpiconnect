@@ -69,7 +69,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
       conn = post conn, auction_path(conn, :create), auction: invalid_attrs
 
-      assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs)
+      assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs) |> Auctions.fully_loaded
       assert html_response(conn, 200) =~ "New Auction"
     end
   end
