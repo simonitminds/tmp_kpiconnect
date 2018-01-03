@@ -26,9 +26,9 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
 config :oceanconnect, :sql_sandbox, true
 
 
-config :wallaby,
-  driver: Wallaby.Experimental.Chrome,
-  screenshot_on_failure: true,
-  chrome: [
-    headless: true
-  ]
+# config :wallaby,
+#   driver: Wallaby.Experimental.Chrome,
+#   screenshot_on_failure: true,
+#   chrome: [
+#     headless: true
+#   ]
