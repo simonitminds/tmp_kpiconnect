@@ -1,5 +1,5 @@
 <div class="form">
-<%= form_for @changeset, @action,[class: "control"], fn f -> %>
+<%= form_for @changeset, @action,[class: "control"], fn _f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>

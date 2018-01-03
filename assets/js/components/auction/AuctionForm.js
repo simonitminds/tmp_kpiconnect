@@ -60,6 +60,29 @@ class AuctionForm extends React.Component {
     );
   }
 
+  number_field(model, field, labelText, value, opts) {
+    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
+    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
+    return (
+      <div className="field">
+        <label htmlFor={`${model}_${field}`} className={labelClass}>
+          {labelDisplay}
+        </label>
+        <div className="control">
+          <input
+            type="number"
+            name={`${model}[${field}]`}
+            id={`${model}_${field}`}
+            className="input"
+            defaultValue={value}
+            autoComplete="off"
+          />
+        </div>
+      </div>
+    );
+  }
+
+
   checkbox_field(model, field, labelText, value, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
     const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
@@ -164,6 +187,7 @@ class AuctionForm extends React.Component {
           </div>
         </div>
 
+        {this.number_field('auction', 'fuel_quantity', 'Fuel Quantity (MT)', this.props.auction.fuel_quantity)}
         {this.input_field('auction', 'company', 'company', this.props.auction.company)}
         {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
 

@@ -9,6 +9,7 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
     belongs_to :fuel, Fuel
+    field :fuel_quantity, :integer
     field :company, :string
     field :po, :string
     field :eta, :naive_datetime
@@ -23,7 +24,7 @@ defmodule Oceanconnect.Auctions.Auction do
   @doc false
   def changeset(%Auction{} = auction, attrs) do
     auction
-    |> cast(attrs, [:vessel_id, :port_id, :fuel_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding])
+    |> cast(attrs, [:vessel_id, :port_id, :fuel_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding, :fuel_quantity])
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)

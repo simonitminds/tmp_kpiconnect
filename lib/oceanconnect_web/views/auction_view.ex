@@ -1,10 +1,7 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
 
-  def format_datetime(nil) do
-    ""
-  end
-
+  def format_datetime(nil), do: ""
   def format_datetime(date) do
     Timex.format!(date, "%d/%m/%y %R", :strftime)
   end
@@ -25,6 +22,4 @@ defmodule OceanconnectWeb.AuctionView do
       end)
     end)
   end
-
-
 end
