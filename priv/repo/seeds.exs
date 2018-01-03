@@ -27,7 +27,7 @@ Port.changeset(%Port{}, %{name: "Gibraltar", country: "Gibraltar"}) |> Repo.inse
 Port.changeset(%Port{}, %{name: "Hong Kong", country:	"China"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Khor Fakkan", country:	"United Arab Emirates"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Las Palmas", country: "Spain"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Port Elizabeth", country: "Sout Africa"}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Port Elizabeth", country: "South Africa"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Port Gentil", country: "Gabon"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Port Louis", country: "Mauritius"}) |> Repo.insert!
 Port.changeset(%Port{}, %{name: "Santa Cruz de Tenerife", country: "Spain"}) |> Repo.insert!
