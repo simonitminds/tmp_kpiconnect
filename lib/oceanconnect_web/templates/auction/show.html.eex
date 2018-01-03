@@ -20,7 +20,7 @@
 </div>
 
 <span class="field is-multiple has-margin-top-lg">
-  <%= link "Back", to: auction_path(@conn, :index), class: "button is-link" %>
+  <%= link "Back", to: auction_path(@conn, :index), class: "button is-link has-margin-right-sm" %>
   <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
 </span>
 </div>
