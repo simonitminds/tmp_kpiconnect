@@ -62,7 +62,7 @@ class AuctionForm extends React.Component {
 
   number_field(model, field, labelText, value, opts) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
+    const labelDisplay = _.has(opts, 'label') ? opts.label : labelText;
     return (
       <div className="field">
         <label htmlFor={`${model}_${field}`} className={labelClass}>
