@@ -9,6 +9,7 @@
       <th>Port</th>
       <th>Company</th>
       <th>PO</th>
+      <th>Fuel Requirement</th>
       <th>ETA</th>
       <th>ETD</th>
       <th>Auction Start</th>
@@ -25,6 +26,7 @@
       <td><%= auction.port.name %></td>
       <td><%= auction.company %></td>
       <td><%= auction.po %></td>
+      <td><%= auction.fuel.name %> (<%= auction.fuel_quantity %>&nbsp;MT)</td>
       <td><%= format_datetime(auction.eta) %></td>
       <td><%= format_datetime(auction.etd) %></td>
       <td><%= format_datetime(auction.auction_start) %></td>
