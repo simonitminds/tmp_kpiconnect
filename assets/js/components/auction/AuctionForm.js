@@ -1,8 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import Datetime from 'react-datetime';
-import { Component } from 'react'
+import { Component } from 'react';
+import InputField from '../InputField';
+import CheckBoxField from '../CheckBoxField';
+import DateAndTime from '../DateAndTime';
 
 class AuctionForm extends React.Component {constructor(props) {
     super(props);
@@ -17,6 +19,7 @@ class AuctionForm extends React.Component {constructor(props) {
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
     this.handleFuelChange = this.handleFuelChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
   }
 
   setDate(date) {
@@ -24,9 +27,6 @@ class AuctionForm extends React.Component {constructor(props) {
     return moment(value);
   }
 
-  hour_part(datetime) {
-    return moment(datetime).hour();
-  }
   handlePortChange(e) {
     this.setState({ selected_port: e.target.value });
   }
@@ -36,77 +36,12 @@ class AuctionForm extends React.Component {constructor(props) {
   handleFuelChange(e) {
     this.setState({ selected_fuel: e.target.value });
   }
+
   handleDateChange(field, date) {
     this.setState({
       [field]: moment(date)
     });
   }
-  input_field(model, field, labelText, value, opts) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-    return (
-      <div className="field">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
-          {labelDisplay}
-        </label>
-        <div className="control">
-          <input
-            type="text"
-            name={`${model}[${field}]`}
-            id={`${model}_${field}`}
-            className="input"
-            defaultValue={value}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  number_field(model, field, labelText, value, opts) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : labelText;
-    return (
-      <div className="field">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
-          {labelDisplay}
-        </label>
-        <div className="control">
-          <input
-            type="number"
-            name={`${model}[${field}]`}
-            id={`${model}_${field}`}
-            className="input"
-            defaultValue={value}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  checkbox_field(model, field, labelText, value, opts = {}) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-    return (
-      <div className="field">
-        <div className="control">
-          <input name={`${model}[${field}]`} type="hidden" value="false" />
-          <input
-            className="checkbox"
-            id={`${model}_${field}`}
-            name={`${model}[${field}]`}
-            type="checkbox"
-            value="true"
-          />
-          <label htmlFor={`${model}_${field}`} className={labelClass}>
-            {labelDisplay}
-          </label>
-        </div>
-      </div>
-    );
-  }
-
 
   render() {
     return (
@@ -190,92 +125,32 @@ class AuctionForm extends React.Component {constructor(props) {
           </div>
         </div>
 
-        {this.number_field('auction', 'fuel_quantity', 'Fuel Quantity (MT)', this.props.auction.fuel_quantity)}
-        {this.input_field('auction', 'company', 'company', this.props.auction.company)}
-        {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
+        <InputField
+          model={'auction'}
+          field={'fuel_quantity'}
+          labelText={'Fuel Quantity (MT)'}
+          value={this.props.auction.fuel_quantity}
+          opts={{type: 'number'}}
+        />
+        <InputField
+          model={'auction'}
+          field={'company'}
+          labelText={'company'}
+          value={this.props.auction.company}
+        />
+        <InputField
+          model={'auction'}
+          field={'po'}
+          labelText={'po'}
+          value={this.props.auction.po}
+          opts={{ labelClass: 'label is-uppercase' }}
+        />
 
-        <div className="field is-grouped">
-          <label htmlFor="auction_eta" className="label is-uppercase">
-            ETA
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-              }}
-              timeFormat={false}
-              value={this.state.eta}
-              onChange={e => this.handleDateChange('eta', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control">
-            <Datetime
-              timeFormat={"H:mm"}
-              timeConstraints={{minutes: {step: 5}}}
-              value={this.state.eta}
-              onChange={e => this.handleDateChange('eta', e)}
-              dateFormat={false}
-              closeOnSelect={true}
-            />
-          </div>
-        </div>
+        <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
+        <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
+        <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
 
-        <div className="field is-grouped">
-          <label htmlFor="auction_etd" className="label is-uppercase">
-            ETD
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-              }}
-              timeFormat={false}
-              value={this.state.etd}
-              onChange={e => this.handleDateChange('etd', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control">
-            <Datetime
-              timeFormat={"H:mm"}
-              timeConstraints={{minutes: {step: 5}}}
-              value={this.state.etd}
-              onChange={e => this.handleDateChange('etd', e)}
-              dateFormat={false}
-              closeOnSelect={true}
-            />
-          </div>
-        </div>
-
-        <div className="field is-grouped">
-          <label htmlFor="auction_start" className="label is-uppercase">
-            Auction Start
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-              }}
-              timeFormat={false}
-              value={this.state.etd}
-              onChange={e => this.handleDateChange('auction_start', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control">
-            <Datetime
-              timeFormat={"H:mm"}
-              timeConstraints={{minutes: {step: 5}}}
-              value={this.state.auction_start}
-              onChange={e => this.handleDateChange('auction_start', e)}
-              dateFormat={false}
-              closeOnSelect={true}
-            />
-          </div>
-        </div>
-
-        <div className="field">
+       <div className="field">
           <label htmlFor="auction_duration" className="label">
             Duration
           </label>
@@ -292,20 +167,16 @@ class AuctionForm extends React.Component {constructor(props) {
             </div>
             <span className="select__extra-label">minutes</span>
           </div>
-        </div>
+       </div>
 
-        {
-          this.checkbox_field(
-          'auction',
-          'anonymous_bidding',
-          'anonymous bidding',
-          this.props.auction.anonymous_bidding,
-          {
-            labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'
-          }
-        )}
-      </div>
-    );
+      <CheckBoxField
+          model={'auction'}
+          field={'anonymous_bidding'}
+          labelText={'anonymous bidding'}
+          value={this.props.auction.anonymous_bidding}
+          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+      />
+    </div>);
   }
 }
 
