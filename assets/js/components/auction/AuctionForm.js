@@ -2,27 +2,31 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import Datetime from 'react-datetime';
+import { Component } from 'react'
 
-class AuctionForm extends React.Component {
-  constructor(props) {
+class AuctionForm extends React.Component {constructor(props) {
     super(props);
     this.state = {
       selected_port: props.auction.port_id || '',
       selected_vessel: props.auction.vessel_id || '',
       selected_fuel: props.auction.fuel_id || '',
-      auction_start: moment(props.auction.auction_start),
-      eta: moment(props.auction.eta),
-      etd: moment(props.auction.etd)
+      auction_start: this.setDate(props.auction.auction_start),
+      eta: this.setDate(props.auction.eta),
+      etd: this.setDate(props.auction.etd),
     };
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
     this.handleFuelChange = this.handleFuelChange.bind(this);
   }
 
+  setDate(date) {
+    let value = date || moment().hour(0).minute(0)
+    return moment(value);
+  }
+
   hour_part(datetime) {
     return moment(datetime).hour();
   }
-
   handlePortChange(e) {
     this.setState({ selected_port: e.target.value });
   }
@@ -34,10 +38,9 @@ class AuctionForm extends React.Component {
   }
   handleDateChange(field, date) {
     this.setState({
-      [field]: date
+      [field]: moment(date)
     });
   }
-
   input_field(model, field, labelText, value, opts) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
     const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
@@ -82,7 +85,6 @@ class AuctionForm extends React.Component {
     );
   }
 
-
   checkbox_field(model, field, labelText, value, opts = {}) {
     const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
     const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
@@ -105,12 +107,13 @@ class AuctionForm extends React.Component {
     );
   }
 
+
   render() {
     return (
       <div>
-        <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start][minute]" value="0" />
-        <input type="hidden" id="auction_eta_minute" name="auction[eta][minute]" value="0" />
-        <input type="hidden" id="auction_etd_minute" name="auction[etd][minute]" value="0" />
+        <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start]" value={this.state.auction_start} />
+        <input type="hidden" id="auction_eta_minute" name="auction[eta]" value={this.state.eta} />
+        <input type="hidden" id="auction_etd_minute" name="auction[etd]" value={this.state.etd} />
 
         <div className="field">
           <label htmlFor="auction_vessel_id" className="label">
@@ -199,8 +202,6 @@ class AuctionForm extends React.Component {
             <Datetime
               dateFormat="DD/MM/YYYY"
               inputProps={{
-                id: 'auction_eta_date',
-                name: 'auction[eta][date]'
               }}
               timeFormat={false}
               value={this.state.eta}
@@ -208,22 +209,15 @@ class AuctionForm extends React.Component {
               closeOnSelect={true}
             />
           </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_eta_hour"
-                  name="auction[eta][hour]"
-                  defaultValue={this.hour_part(this.props.auction.eta)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="control">
+            <Datetime
+              timeFormat={"H:mm"}
+              timeConstraints={{minutes: {step: 5}}}
+              value={this.state.eta}
+              onChange={e => this.handleDateChange('eta', e)}
+              dateFormat={false}
+              closeOnSelect={true}
+            />
           </div>
         </div>
 
@@ -235,8 +229,6 @@ class AuctionForm extends React.Component {
             <Datetime
               dateFormat="DD/MM/YYYY"
               inputProps={{
-                id: 'auction_etd_date',
-                name: 'auction[etd][date]'
               }}
               timeFormat={false}
               value={this.state.etd}
@@ -244,58 +236,42 @@ class AuctionForm extends React.Component {
               closeOnSelect={true}
             />
           </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_etd_hour"
-                  name="auction[etd][hour]"
-                  defaultValue={this.hour_part(this.props.auction.etd)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="control">
+            <Datetime
+              timeFormat={"H:mm"}
+              timeConstraints={{minutes: {step: 5}}}
+              value={this.state.etd}
+              onChange={e => this.handleDateChange('etd', e)}
+              dateFormat={false}
+              closeOnSelect={true}
+            />
           </div>
         </div>
 
         <div className="field is-grouped">
-          <label htmlFor="auction_auction_start" className="label is-capitalized">
+          <label htmlFor="auction_start" className="label is-uppercase">
             Auction Start
           </label>
           <div className="control">
             <Datetime
               dateFormat="DD/MM/YYYY"
               inputProps={{
-                id: 'auction_auction_start_date',
-                name: 'auction[auction_start][date]'
               }}
               timeFormat={false}
-              value={this.state.auction_start}
+              value={this.state.etd}
               onChange={e => this.handleDateChange('auction_start', e)}
               closeOnSelect={true}
             />
           </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_auction_start_hour"
-                  name="auction[auction_start][hour]"
-                  defaultValue={this.hour_part(this.props.auction.auction_start)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="control">
+            <Datetime
+              timeFormat={"H:mm"}
+              timeConstraints={{minutes: {step: 5}}}
+              value={this.state.auction_start}
+              onChange={e => this.handleDateChange('auction_start', e)}
+              dateFormat={false}
+              closeOnSelect={true}
+            />
           </div>
         </div>
 
@@ -318,7 +294,8 @@ class AuctionForm extends React.Component {
           </div>
         </div>
 
-        {this.checkbox_field(
+        {
+          this.checkbox_field(
           'auction',
           'anonymous_bidding',
           'anonymous bidding',
