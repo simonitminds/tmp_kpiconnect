@@ -16,6 +16,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :auction_start, :naive_datetime
     field :duration, :integer
     field :anonymous_bidding, :boolean
+    field :additional_information, :string
 
     timestamps()
   end
@@ -23,7 +24,7 @@ defmodule Oceanconnect.Auctions.Auction do
   @doc false
   def changeset(%Auction{} = auction, attrs) do
     auction
-    |> cast(attrs, [:vessel_id, :port_id, :fuel_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding, :fuel_quantity])
+    |> cast(attrs, [:vessel_id, :port_id, :fuel_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding, :fuel_quantity, :additional_information])
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)

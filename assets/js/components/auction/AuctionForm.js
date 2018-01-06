@@ -15,6 +15,7 @@ class AuctionForm extends React.Component {constructor(props) {
       auction_start: this.setDate(props.auction.auction_start),
       eta: this.setDate(props.auction.eta),
       etd: this.setDate(props.auction.etd),
+      additional_information: props.auction.additional_information || ''
     };
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
@@ -163,6 +164,20 @@ class AuctionForm extends React.Component {constructor(props) {
           </div>
        </div>
 
+      <div className="field">
+        <label htmlFor={`auction_additional_information`} className={'label'}>
+          Additional Information
+        </label>
+        <div className="control">
+          <textarea
+            name={'auction[additional_information]'}
+            id={'auction_additional_information'}
+            className="textarea"
+            defaultValue={this.state.additional_information}
+          ></textarea>
+        </div>
+      </div>
+
       <CheckBoxField
           model={'auction'}
           field={'anonymous_bidding'}
@@ -170,6 +185,7 @@ class AuctionForm extends React.Component {constructor(props) {
           value={this.props.auction.anonymous_bidding}
           opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
       />
+
     </div>);
   }
 }
