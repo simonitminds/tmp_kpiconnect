@@ -18,6 +18,7 @@ export default class DateAndTime extends React.Component {
             inputProps={{
             }}
             timeFormat={false}
+            utc={true}
             value={this.props.value}
             onChange={e => this.props.onChange(this.props.field, e)}
             closeOnSelect={true}
@@ -26,6 +27,7 @@ export default class DateAndTime extends React.Component {
         <div className="control">
           <Datetime
             timeFormat={"H:mm"}
+            utc={true}
             timeConstraints={{minutes: {step: 5}}}
             value={this.props.value}
             onChange={e => this.props.onChange(this.props.field, e)}

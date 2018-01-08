@@ -32,17 +32,16 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "#maybe_parse_date_field" do
+      expected_date = DateTime.from_naive!(~N[2017-12-28 01:30:00.000], "Etc/UTC")
+      epoch = expected_date
+      |> DateTime.to_unix(:milliseconds)
+      |> Integer.to_string
       params = %{"anonymous_bidding" => "false",
-      "auction_start" => %{"date" => "28/12/2017", "hour" => "1",
-      "minute" => "30"}, "company" => "", "duration" => "",
-      "eta" => %{"date" => "", "hour" => "0", "minute" => "0"},
-      "etd" => %{"date" => "", "hour" => "0", "minute" => "0"}, "po" => "",
-      "port" => "", "vessel" => ""}
+      "auction_start" => epoch, "company" => "", "duration" => "",
+      "eta" => "", "etd" => "", "po" => "", "port" => "", "vessel" => ""}
       %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
-      {:ok, expected_date} = NaiveDateTime.new(2017, 12, 28, 1, 30, 0)
-      expected_date = expected_date |> NaiveDateTime.to_string()
 
-      assert parsed_date == expected_date
+      assert parsed_date == expected_date |> DateTime.to_string()
     end
 
     test "list_auctions/0 returns all auctions" do

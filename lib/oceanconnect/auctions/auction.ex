@@ -11,9 +11,9 @@ defmodule Oceanconnect.Auctions.Auction do
     field :fuel_quantity, :integer
     field :company, :string
     field :po, :string
-    field :eta, :naive_datetime
-    field :etd, :naive_datetime
-    field :auction_start, :naive_datetime
+    field :eta, :utc_datetime
+    field :etd, :utc_datetime
+    field :auction_start, :utc_datetime
     field :duration, :integer
     field :anonymous_bidding, :boolean
     field :additional_information, :string
@@ -39,36 +39,19 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   def maybe_parse_date_field(params, key) do
-    try do
-      %{^key => date} = params
-      updated_date = parse_date(date)
-      Map.put(params, key, updated_date)
-     rescue
-        _ ->
-          Map.delete(params, key)
-     end
+    case params do
+      %{^key => date} ->
+        updated_date = parse_date(date)
+        Map.put(params, key, updated_date)
+      _ -> params
+    end
   end
 
-  def parse_date(%{"date" => date, "hour" =>  hour, "minute" => min}) do
-    parse_date(date, hour, min)
-  end
-
+  def parse_date(""), do: ""
   def parse_date(epoch) do
     epoch
     |> String.to_integer
     |> DateTime.from_unix!(:milliseconds)
-    |> DateTime.to_naive
-    |> NaiveDateTime.to_string
-  end
-  def parse_date(date, hour, min) when date == "" or hour == "" or min == "", do: nil
-  def parse_date(date, hour, min) do
-    [day, month, year] = date
-    |> String.split("/")
-    |> Enum.map(fn(int) ->
-      String.to_integer(int)
-    end)
-
-    {:ok, date} = NaiveDateTime.new(year, month, day, String.to_integer(hour), String.to_integer(min), 0)
-    NaiveDateTime.to_string(date)
+    |> DateTime.to_string
   end
 end

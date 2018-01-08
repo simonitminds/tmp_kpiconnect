@@ -146,8 +146,11 @@ class AuctionForm extends React.Component {constructor(props) {
         />
 
         <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
+        <i>Local Time: {moment(this.state.eta).local().format("DD-MM-YYYY HH:mm")}</i>
         <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
+        <i>Local Time: {moment(this.state.etd).local().format("DD-MM-YYYY HH:mm")}</i>
         <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
+        <i>Local Time: {moment(this.state.auction_start).local().format("DD-MM-YYYY HH:mm")}</i>
 
        <div className="field">
           <label htmlFor="auction_duration" className="label">
