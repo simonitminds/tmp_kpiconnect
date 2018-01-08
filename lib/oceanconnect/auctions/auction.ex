@@ -40,13 +40,17 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_parse_date_field(params, key) do
     try do
-      %{^key => epoch} = params
-      updated_date = parse_date(epoch)
+      %{^key => date} = params
+      updated_date = parse_date(date)
       Map.put(params, key, updated_date)
      rescue
         _ ->
           Map.delete(params, key)
      end
+  end
+
+  def parse_date(%{"date" => date, "hour" =>  hour, "minute" => min}) do
+    parse_date(date, hour, min)
   end
 
   def parse_date(epoch) do
