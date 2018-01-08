@@ -1,26 +1,31 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import Datetime from 'react-datetime';
+import { Component } from 'react';
+import InputField from '../InputField';
+import CheckBoxField from '../CheckBoxField';
+import DateAndTime from '../DateAndTime';
 
-class AuctionForm extends React.Component {
-  constructor(props) {
+class AuctionForm extends React.Component {constructor(props) {
     super(props);
     this.state = {
       selected_port: props.auction.port_id || '',
       selected_vessel: props.auction.vessel_id || '',
       selected_fuel: props.auction.fuel_id || '',
-      auction_start: moment(props.auction.auction_start),
-      eta: moment(props.auction.eta),
-      etd: moment(props.auction.etd)
+      auction_start: this.setDate(props.auction.auction_start),
+      eta: this.setDate(props.auction.eta),
+      etd: this.setDate(props.auction.etd),
+      additional_information: props.auction.additional_information || ''
     };
     this.handlePortChange = this.handlePortChange.bind(this);
     this.handleVesselChange = this.handleVesselChange.bind(this);
     this.handleFuelChange = this.handleFuelChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
   }
 
-  hour_part(datetime) {
-    return moment(datetime).hour();
+  setDate(date) {
+    let value = date || moment().hour(0).minute(0)
+    return moment(value);
   }
 
   handlePortChange(e) {
@@ -32,86 +37,16 @@ class AuctionForm extends React.Component {
   handleFuelChange(e) {
     this.setState({ selected_fuel: e.target.value });
   }
+
   handleDateChange(field, date) {
     this.setState({
-      [field]: date
+      [field]: moment(date)
     });
-  }
-
-  input_field(model, field, labelText, value, opts) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-    return (
-      <div className="field">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
-          {labelDisplay}
-        </label>
-        <div className="control">
-          <input
-            type="text"
-            name={`${model}[${field}]`}
-            id={`${model}_${field}`}
-            className="input"
-            defaultValue={value}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  number_field(model, field, labelText, value, opts) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : labelText;
-    return (
-      <div className="field">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
-          {labelDisplay}
-        </label>
-        <div className="control">
-          <input
-            type="number"
-            name={`${model}[${field}]`}
-            id={`${model}_${field}`}
-            className="input"
-            defaultValue={value}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    );
-  }
-
-
-  checkbox_field(model, field, labelText, value, opts = {}) {
-    const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
-    const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-    return (
-      <div className="field">
-        <div className="control">
-          <input name={`${model}[${field}]`} type="hidden" value="false" />
-          <input
-            className="checkbox"
-            id={`${model}_${field}`}
-            name={`${model}[${field}]`}
-            type="checkbox"
-            value="true"
-          />
-          <label htmlFor={`${model}_${field}`} className={labelClass}>
-            {labelDisplay}
-          </label>
-        </div>
-      </div>
-    );
   }
 
   render() {
     return (
       <div>
-        <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start][minute]" value="0" />
-        <input type="hidden" id="auction_eta_minute" name="auction[eta][minute]" value="0" />
-        <input type="hidden" id="auction_etd_minute" name="auction[etd][minute]" value="0" />
-
         <div className="field">
           <label htmlFor="auction_vessel_id" className="label">
             Vessel
@@ -122,9 +57,7 @@ class AuctionForm extends React.Component {
                 id="auction_vessel_id"
                 name="auction[vessel_id]"
                 value={this.state.selected_vessel}
-                onChange={this.handleVesselChange}
-              >
-                <option disabled value="">
+                onChange={this.handleVesselChange} > <option disabled value="">
                   Please select
                 </option>
                 {_.map(this.props.vessels, vessel => (
@@ -187,119 +120,32 @@ class AuctionForm extends React.Component {
           </div>
         </div>
 
-        {this.number_field('auction', 'fuel_quantity', 'Fuel Quantity (MT)', this.props.auction.fuel_quantity)}
-        {this.input_field('auction', 'company', 'company', this.props.auction.company)}
-        {this.input_field('auction', 'po', 'po', this.props.auction.po, { labelClass: 'label is-uppercase' })}
+        <InputField
+          model={'auction'}
+          field={'fuel_quantity'}
+          labelText={'Fuel Quantity (MT)'}
+          value={this.props.auction.fuel_quantity}
+          opts={{type: 'number'}}
+        />
+        <InputField
+          model={'auction'}
+          field={'company'}
+          labelText={'company'}
+          value={this.props.auction.company}
+        />
+        <InputField
+          model={'auction'}
+          field={'po'}
+          labelText={'po'}
+          value={this.props.auction.po}
+          opts={{ labelClass: 'label is-uppercase' }}
+        />
 
-        <div className="field is-grouped">
-          <label htmlFor="auction_eta" className="label is-uppercase">
-            ETA
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-                id: 'auction_eta_date',
-                name: 'auction[eta][date]'
-              }}
-              timeFormat={false}
-              value={this.state.eta}
-              onChange={e => this.handleDateChange('eta', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_eta_hour"
-                  name="auction[eta][hour]"
-                  defaultValue={this.hour_part(this.props.auction.eta)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
+        <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
+        <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
 
-        <div className="field is-grouped">
-          <label htmlFor="auction_etd" className="label is-uppercase">
-            ETD
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-                id: 'auction_etd_date',
-                name: 'auction[etd][date]'
-              }}
-              timeFormat={false}
-              value={this.state.etd}
-              onChange={e => this.handleDateChange('etd', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_etd_hour"
-                  name="auction[etd][hour]"
-                  defaultValue={this.hour_part(this.props.auction.etd)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="field is-grouped">
-          <label htmlFor="auction_auction_start" className="label is-capitalized">
-            Auction Start
-          </label>
-          <div className="control">
-            <Datetime
-              dateFormat="DD/MM/YYYY"
-              inputProps={{
-                id: 'auction_auction_start_date',
-                name: 'auction[auction_start][date]'
-              }}
-              timeFormat={false}
-              value={this.state.auction_start}
-              onChange={e => this.handleDateChange('auction_start', e)}
-              closeOnSelect={true}
-            />
-          </div>
-          <div className="control is-grouped">
-            <div className="control">
-              <div className="select">
-                <select
-                  id="auction_auction_start_hour"
-                  name="auction[auction_start][hour]"
-                  defaultValue={this.hour_part(this.props.auction.auction_start)}
-                >
-                  {_.map(_.range(24), hour => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="field">
+       <div className="field">
           <label htmlFor="auction_duration" className="label">
             Duration
           </label>
@@ -316,19 +162,31 @@ class AuctionForm extends React.Component {
             </div>
             <span className="select__extra-label">minutes</span>
           </div>
-        </div>
+       </div>
 
-        {this.checkbox_field(
-          'auction',
-          'anonymous_bidding',
-          'anonymous bidding',
-          this.props.auction.anonymous_bidding,
-          {
-            labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'
-          }
-        )}
+      <div className="field">
+        <label htmlFor={`auction_additional_information`} className={'label'}>
+          Additional Information
+        </label>
+        <div className="control">
+          <textarea
+            name={'auction[additional_information]'}
+            id={'auction_additional_information'}
+            className="textarea"
+            defaultValue={this.state.additional_information}
+          ></textarea>
+        </div>
       </div>
-    );
+
+      <CheckBoxField
+          model={'auction'}
+          field={'anonymous_bidding'}
+          labelText={'anonymous bidding'}
+          value={this.props.auction.anonymous_bidding}
+          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+      />
+
+    </div>);
   }
 }
 
