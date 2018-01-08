@@ -47,6 +47,10 @@ class AuctionForm extends React.Component {constructor(props) {
   render() {
     return (
       <div>
+        <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start]" value={this.state.auction_start} />
+        <input type="hidden" id="auction_eta_minute" name="auction[eta]" value={this.state.eta} />
+        <input type="hidden" id="auction_etd_minute" name="auction[etd]" value={this.state.etd} />
+
         <div className="field">
           <label htmlFor="auction_vessel_id" className="label">
             Vessel
