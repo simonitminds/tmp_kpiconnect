@@ -20,7 +20,7 @@ defmodule Oceanconnect.Mixfile do
   def application do
     [
       mod: {Oceanconnect.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:comeonin, :logger, :runtime_tools]
     ]
   end
 
@@ -33,6 +33,8 @@ defmodule Oceanconnect.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:comeonin, "~> 4.0"},
+      {:bcrypt_elixir, "~> 1.0"},
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},

@@ -1,32 +1,27 @@
 # Script for populating the database. You can run it as:
 #
-#     mix run priv/repo/seeds.exs
+#   mix run priv/repo/seeds.exs
 #
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     Oceanconnect.Repo.insert!(%Oceanconnect.SomeSchema{})
+#   Oceanconnect.Repo.insert!(%Oceanconnect.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
 alias Oceanconnect.Repo
-alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
+alias Oceanconnect.Accounts
+alias Oceanconnect.Accounts.User
+alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
 
-defmodule SeedsHelpers do
-  def insert_or_update(module, map) do
-    result = Oceanconnect.Repo.get_by(module, map)
-    if result do
-      module.changeset(result, %{})
-      |> Oceanconnect.Repo.insert_or_update!
-    else
-      module.changeset(struct(module, %{}), map)
-      |> Oceanconnect.Repo.insert_or_update!
-    end
-  end
+
+user = case Repo.get_by(User, %{email: "test@example.com"}) do
+  user -> user
+  _ -> Accounts.create_user(%{email: "test@example.com", name: "test", password: "password"})
 end
 
-[port1 | _] = [
+[
   %{name: "Algeciras", country: "Spain", gmt_offset: 1},
   %{name: "Balboa", country: "Panama", gmt_offset: -5},
   %{name: "Cristobal", country: "Panama", gmt_offset: -5},
@@ -44,11 +39,10 @@ end
   %{name: "Skaw", country: "Denmark", gmt_offset: 1}
 ]
 |> Enum.map(fn(port) ->
-  SeedsHelpers.insert_or_update(Port, port)
+  Repo.get_or_insert!(Port, port)
 end)
 
-[vessel1 | _] = [
-  %{name: "Boaty McBoatFace", imo: 1234567},
+[
   %{name: "Hercules Voyager", imo: 9583732},
   %{name: "LEO VOYAGER", imo: 9602473},
   %{name: "LIBRA VOYAGER", imo: 9593206},
@@ -121,23 +115,25 @@ end)
   %{name: "Zekreet", imo: 9132818}
 ]
 |> Enum.map(fn(vessel) ->
-  SeedsHelpers.insert_or_update(Vessel, vessel)
+  Repo.get_or_insert!(Vessel, vessel)
 end)
 
 
-[fuel1 | _] = [
-    %{name: "MGO (DMA)"},
-    %{name: "Gas Oil (Sul 0.10%)"},
-    %{name: "RMG 380 - Sulphur max 3.50% (ISO 2005)"},
-    %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2010)"},
-    %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2012)"}
+[
+  %{name: "MGO (DMA)"},
+  %{name: "Gas Oil (Sul 0.10%)"},
+  %{name: "RMG 380 - Sulphur max 3.50% (ISO 2005)"},
+  %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2010)"},
+  %{name: "RMG 380 - Sulphur Max 3.50% (ISO 2012)"}
 ]
 |> Enum.map(fn(fuel) ->
-  SeedsHelpers.insert_or_update(Fuel, fuel)
+  Repo.get_or_insert!(Fuel, fuel)
 end)
 
 
-%Auction{}
-|> Auction.changeset(%{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, company: "Glencore", po: "1234567"})
-|> Repo.insert_or_update!()
+[fuel1, vessel1, port1] = [[%{name: "MGO (DMA)"}, Fuel],
+  [%{name: "Boaty McBoatFace", imo: 1234567}, Vessel],
+  [%{name: "Algeciras", country: "Spain", gmt_offset: 1}, Port]]
+|> Enum.map(fn([data, module]) -> Repo.get_or_insert!(module, data) end)
 
+Repo.get_or_insert!(Auction, %{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, company: "Glencore", po: "1234567"})
