@@ -45,6 +45,15 @@ class AuctionForm extends React.Component {constructor(props) {
   }
 
   render() {
+    const portLocalTime = (gmtTime, portId, ports)=> {
+      const port = _.chain(ports)
+        .filter(['id', parseInt(portId)])
+        .first()
+        .value();
+      const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
+      return moment(localTime).format("DD-MM-YYYY HH:mm");
+    }
+
     return (
       <div>
         <input type="hidden" id="auction_auction_start_minute" name="auction[auction_start]" value={this.state.auction_start} />
@@ -146,11 +155,11 @@ class AuctionForm extends React.Component {constructor(props) {
         />
 
         <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
-        <i>Local Time: {moment(this.state.eta).local().format("DD-MM-YYYY HH:mm")}</i>
+        <i>Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
         <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
-        <i>Local Time: {moment(this.state.etd).local().format("DD-MM-YYYY HH:mm")}</i>
+        <i>Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
         <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
-        <i>Local Time: {moment(this.state.auction_start).local().format("DD-MM-YYYY HH:mm")}</i>
+        <i>Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
 
        <div className="field">
           <label htmlFor="auction_duration" className="label">

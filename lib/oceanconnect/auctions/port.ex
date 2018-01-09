@@ -7,6 +7,7 @@ defmodule Oceanconnect.Auctions.Port do
   schema "ports" do
     field :name, :string
     field :country, :string
+    field :gmt_offset, :integer
 
     timestamps()
   end
@@ -14,7 +15,7 @@ defmodule Oceanconnect.Auctions.Port do
   @doc false
   def changeset(%Port{} = port, attrs) do
     port
-    |> cast(attrs, [:name, :country])
+    |> cast(attrs, [:name, :country, :gmt_offset])
     |> validate_required([:name, :country])
   end
 end

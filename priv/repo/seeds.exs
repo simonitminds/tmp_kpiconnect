@@ -18,21 +18,21 @@ Repo.delete_all(Port)
 Repo.delete_all(Vessel)
 Repo.delete_all(Fuel)
 
-port1 = Port.changeset(%Port{}, %{name: "Algeciras", country: "Spain"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Balboa", country: "Panama"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Cristobal", country: "Panama"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Dubai", country: "United Arab Emirates"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Fujairah", country: "United Arab Emirates"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Gibraltar", country: "Gibraltar"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Hong Kong", country:	"China"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Khor Fakkan", country:	"United Arab Emirates"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Las Palmas", country: "Spain"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Port Elizabeth", country: "South Africa"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Port Gentil", country: "Gabon"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Port Louis", country: "Mauritius"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Santa Cruz de Tenerife", country: "Spain"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Singapore", country: "Singapore"}) |> Repo.insert!
-Port.changeset(%Port{}, %{name: "Skaw", country: "Denmark"}) |> Repo.insert!
+port1 = Port.changeset(%Port{}, %{name: "Algeciras", country: "Spain", gmt_offset: 1}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Balboa", country: "Panama", gmt_offset: -5}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Cristobal", country: "Panama", gmt_offset: -5}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Dubai", country: "United Arab Emirates", gmt_offset: 4}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Fujairah", country: "United Arab Emirates", gmt_offset: 4}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Gibraltar", country: "Gibraltar", gmt_offset: 1}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Hong Kong", country:	"China", gmt_offset: 8}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Khor Fakkan", country:	"United Arab Emirates", gmt_offset: 4}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Las Palmas", country: "Spain", gmt_offset: 0}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Port Elizabeth", country: "South Africa", gmt_offset: 2}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Port Gentil", country: "Gabon", gmt_offset: 1}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Port Louis", country: "Mauritius", gmt_offset: 4}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Santa Cruz de Tenerife", country: "Spain", gmt_offset: 0}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Singapore", country: "Singapore", gmt_offset: 8}) |> Repo.insert!
+Port.changeset(%Port{}, %{name: "Skaw", country: "Denmark", gmt_offset: 1}) |> Repo.insert!
 
 
 vessel1 = Vessel.changeset(%Vessel{}, %{name: "Boaty McBoatFace", imo:	1234567})  |> Repo.insert!
