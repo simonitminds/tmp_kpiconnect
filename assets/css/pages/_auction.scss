@@ -1,0 +1,60 @@
+// ========================== //
+// ========================== //
+// Auction
+// ========================== //
+// ========================== //
+
+// Auction Headers
+
+.auction-header {
+  font-family: $family-header;
+  font-weight: 700;
+
+  // LEFT COLUMN
+
+  &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
+    margin-bottom: 0.5rem;
+    color: $white !important;
+  }
+  &__po { // Auction PO
+    margin-bottom: 0.125rem;
+    color: $gray-3;
+  }
+  &__vessel { // Auction Vessel (informally the title)
+    font-size: 'xs', 0.25;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  // RIGHT COLUMN
+
+  &__timer { // Auction Countdown Timer
+    margin-bottom: 0.25rem;
+    font-weight: normal !important;
+    text-align: right;
+  }
+
+  &__start-time { // Auction Start Time
+    margin-bottom: 0.25rem;
+    font-weight: normal !important;
+    text-align: right;
+  }
+
+  &__duration { // Auction Duration
+    font-weight: normal !important;
+    text-align: right;
+  }
+
+  // FOOTER... OF... HEADER?
+
+  &__ports { // Auction Ports (i.e. where the vessel will be docking)
+    background-color: $gray-2;
+    padding: 0.25rem 1rem;
+    margin: 0 -1rem 1.5rem;
+
+    span {
+      font-size: 0.75rem;
+    }
+  }
+
+}

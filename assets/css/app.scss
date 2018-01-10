@@ -14,11 +14,12 @@
 @import 'modules/forms';
 @import 'modules/layout';
 @import 'modules/lists';
+@import 'modules/tabs';
+@import 'modules/tags';
+@import 'modules/titles';
 
-// Generic Phoenix Starter Styles
-@import 'phoenix-starter';
-
-
+// Import View-Specific Styles
+@import 'pages/auction';
 
 // Import Vendor Styles
 @import 'vendor/react-datetime';

@@ -1,5 +1,5 @@
 <div class="content has-margin-top-lg">
-<h1 class="title is-3 is-pulled-left">Auction Listing</h1>
+<h1 class="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
 <%= link "New Auction", to: auction_path(@conn, :new), class: "button is-link is-pulled-right" %>
 <table class="table is-striped">
   <thead>

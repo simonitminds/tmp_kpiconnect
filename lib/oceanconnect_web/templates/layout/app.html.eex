@@ -27,12 +27,12 @@
         </button> -->
         <div class="navbar-menu">
           <%# TODO: Add links as we add additional sections (when relevant) %>
-          <!-- <div class="navbar-end">
-            <a href="#" class="navbar-item">Bunkers</a>
-            <a href="#" class="navbar-item">Account Settings</a>
+          <div class="navbar-end">
+            <%= link "Bunkers", to: auction_path(@conn, :index), class: "navbar-item" %>
+            <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
-            <a href="#" class="navbar-item">Log Out</a>
-          </div> -->
+            <a href="#" class="navbar-item">Log Out</a> -->
+          </div>
         </div>
       </nav>
     </header>

@@ -1,26 +1,80 @@
-<div class="content has-margin-top-lg">
-<h1 class="title is-3">Show Auction</h1>
+<%= link "Return to Auction Listing", to: auction_path(@conn, :index), class: "is-link is-inline-block has-text-dark is-italic has-margin-top-md" %>
 
-<div class="box">
-  <ul class="list has-no-bullets">
-    <li>
-      <strong>Vessel:</strong>
-      <%= @auction.vessel.name %>
-    </li>
-    <li>
-      <strong>Port:</strong>
-      <%= @auction.port.name %>
-    </li>
+<div class="has-margin-top-lg">
+  <div class="auction-header">
+    <div class="columns has-margin-bottom-none">
+      <div class="column">
+        <div class="auction-header__status tag is-rounded">
+          Open
+        </div>
+        <div class="auction-header__po is-uppercase">
+          Auction <%= @auction.po %>
+        </div>
+        <h1 class="auction-header__vessel title has-text-weight-bold">
+          <%= @auction.vessel.name %> (<% @auction.vessel.imo %>)
+        </h1>
+      </div>
+      <div class="column">
+        <div class="auction-header__timer has-text-left-mobile">
+          <div class="tag has-text-weight-bold is-medium is-danger is-uppercase">3:00 remaining in auction</div>
+        </div>
+        <div class="auction-header__start-time has-text-left-mobile">
+          <span class="has-text-weight-bold is-uppercase">Started at</span> <%= format_datetime(@auction.auction_start) %> GMT
+        </div>
+        <div class="auction-header__duration has-text-left-mobile">
+          <span class="has-text-weight-bold is-uppercase">Auction Length</span> <%= @auction.duration %> minutes
+        </div>
+      </div>
+    </div>
+    <div class="auction-header__ports">
+      <%= @auction.port.name %> <span class="has-text-weight-normal">ETA <%= format_datetime(@auction.eta) %> GMT &ndash; ETD <%= format_datetime(@auction.etd) %> GMT</span>
+    </div>
 
-    <li>
-      <strong>PO:</strong>
-      <%= @auction.po %>
-    </li>
-  </ul>
-</div>
+  </div>
+<div class="columns is-gapless">
+  <div class="column is-two-thirds">
+    <div class="tabs is-fullwidth is-medium">
+      <ul>
+        <li class="is-active">
+          <h2 class="title is-size-6"><a class="has-text-left">Auction Monitor</a></h2>
+        </li>
+      </ul>
+    </div>
+    <div class="box has-margin-right-md">
 
-<span class="field is-multiple has-margin-top-lg">
-  <%= link "Back", to: auction_path(@conn, :index), class: "button is-link has-margin-right-sm" %>
-  <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
-</span>
+    </div>
+  </div>
+  <div class="column is-one-third">
+    <div class="tabs is-fullwidth is-medium">
+      <ul>
+        <li class="is-active">
+          <h2 class="title is-size-6"><a>Auction Information</a></h2>
+        </li>
+        <li>
+          <h2 class="title is-size-6"><a>Messages</a></h2>
+        </li>
+      </ul>
+    </div>
+    <div class="box has-margin-left-md">
+      <ul class="list has-no-bullets">
+        <li>
+          <strong>Vessel:</strong>
+          <%= @auction.vessel.name %>
+        </li>
+        <li>
+          <strong>Port:</strong>
+          <%= @auction.port.name %>
+        </li>
+
+        <li>
+          <strong>PO:</strong>
+          <%= @auction.po %>
+        </li>
+      </ul>
+
+      <div class="field has-margin-top-md">
+        <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
+      </div>
+    </div>
+  </div>
 </div>

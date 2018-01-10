@@ -13,19 +13,42 @@
 $navy: #013643;
 $teal: #188eac;
 $turquoise: #1db8b9;
+$black: #363636;
+
+// The lighter the gray, the lower the number...
+$gray-1: #efefef;
+$gray-2: #dbdbdb;
+$gray-3: #888888;
 
 $primary: $navy;
 $link: $turquoise;
 
 
-
 // ===== TYPOGRAPHY ===== //
-@import url('https://fonts.googleapis.com/css?family=Montserrat:700,800|Open+Sans:400,400i');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,400i');
 
 // Headers
 $family-header: "Montserrat", "Futura", "Helvetica", "Arial", sans-serif;
 
-.title {font-family: $family-header}
+//// Associated Utility
+.has-family-header { font-family: $family-header; }
 
 // Copy
 $family-sans-serif: "Open Sans", "Helvetica", "Arial", sans-serif;
+
+//// Associated Utility
+.has-family-copy { font-family: $family-sans-serif; }
+
+// ===== ELEMENTS ===== //
+
+// Tags
+
+$tag-background-color: $turquoise;
+
+
+// ===== COMPONENTS ===== //
+
+// Tabs
+
+$tabs-link-active-color: $black;
+$tabs-border-bottom-width: 4px;
