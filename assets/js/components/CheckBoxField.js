@@ -11,7 +11,7 @@ const CheckBoxField = ({model, field, labelText, value, opts = {}}) => {
       <div className="control">
         <input name={`${model}[${field}]`} type="hidden" value="false" />
         <input
-          className="checkbox"
+          className={`checkbox qa-${model}-${field}`}
           id={`${model}_${field}`}
           name={`${model}[${field}]`}
           type="checkbox"

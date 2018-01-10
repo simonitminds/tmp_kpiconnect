@@ -8,7 +8,7 @@ export default class DateAndTime extends React.Component {
   }
   render(){
     return(
-      <div className="field is-grouped">
+      <div className={`field is-grouped qa-${this.props.model}-${this.props.field}`}>
         <label htmlFor={`${this.props.model}_${this.props.field}`} className="label">
           {this.props.labelText}
         </label>

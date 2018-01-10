@@ -45,13 +45,15 @@ class AuctionForm extends React.Component {constructor(props) {
   }
 
   render() {
-    const portLocalTime = (gmtTime, portId, ports)=> {
-      const port = _.chain(ports)
-        .filter(['id', parseInt(portId)])
-        .first()
-        .value();
-      const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
-      return moment(localTime).format("DD/MM/YYYY HH:mm");
+    const portLocalTime = (gmtTime, portId, ports) => {
+      if (gmtTime && portId != "" && ports != null) {
+        const port = _.chain(ports)
+          .filter(['id', parseInt(portId)])
+          .first()
+          .value();
+        const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
+        return moment(localTime).format("DD-MM-YYYY HH:mm");
+      }
     }
 
     return (
@@ -69,6 +71,7 @@ class AuctionForm extends React.Component {constructor(props) {
               <select
                 id="auction_vessel_id"
                 name="auction[vessel_id]"
+                className="qa-auction-vessel"
                 value={this.state.selected_vessel}
                 onChange={this.handleVesselChange} > <option disabled value="">
                   Please select
@@ -92,6 +95,7 @@ class AuctionForm extends React.Component {constructor(props) {
               <select
                 id="auction_port_id"
                 name="auction[port_id]"
+                className="qa-auction-port"
                 value={this.state.selected_port}
                 onChange={this.handlePortChange}
               >
@@ -117,6 +121,7 @@ class AuctionForm extends React.Component {constructor(props) {
               <select
                 id="auction_fuel_id"
                 name="auction[fuel_id]"
+                className="qa-auction-fuel"
                 value={this.state.selected_fuel}
                 onChange={this.handleFuelChange}
               >
@@ -167,7 +172,7 @@ class AuctionForm extends React.Component {constructor(props) {
           </label>
           <div className="control">
             <div className="select">
-              <select id="auction_duration" name="auction[duration]" defaultValue={this.props.auction.duration}>
+              <select id="auction_duration" name="auction[duration]" defaultValue={this.props.auction.duration} className="qa-auction-duration">
                 <option disabled value="">
                   Please select
                 </option>
@@ -188,7 +193,7 @@ class AuctionForm extends React.Component {constructor(props) {
           <textarea
             name={'auction[additional_information]'}
             id={'auction_additional_information'}
-            className="textarea"
+            className="textarea qa-auction-additional_information"
             defaultValue={this.state.additional_information}
           ></textarea>
         </div>

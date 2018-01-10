@@ -16,7 +16,7 @@ const InputField = ({model, field, labelText, value, opts}) => {
           type={type}
           name={`${model}[${field}]`}
           id={`${model}_${field}`}
-          className="input"
+          className={`input qa-${model}-${field}`}
           defaultValue={value}
           autoComplete="off"
         />

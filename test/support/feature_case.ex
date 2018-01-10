@@ -10,6 +10,7 @@ defmodule Oceanconnect.FeatureCase do
       import Ecto.Query
       use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
+      import Oceanconnect.Factory
     end
   end
 
