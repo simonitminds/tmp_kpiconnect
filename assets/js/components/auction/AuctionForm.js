@@ -52,7 +52,7 @@ class AuctionForm extends React.Component {constructor(props) {
           .first()
           .value();
         const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
-        return moment(localTime).format("DD-MM-YYYY HH:mm");
+        return moment(localTime).format("DD/MM/YYYY HH:mm");
       }
     }
 
