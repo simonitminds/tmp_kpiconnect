@@ -26,9 +26,4 @@ defmodule Oceanconnect.Accounts.User do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
   defp put_pass_hash(changeset), do: changeset
-
-  def check_password(user, password) do
-    Comeonin.Bcrypt.check_pass(user, password)
-  end
-
 end
