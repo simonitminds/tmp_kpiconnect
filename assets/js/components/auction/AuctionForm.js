@@ -51,7 +51,7 @@ class AuctionForm extends React.Component {constructor(props) {
         .first()
         .value();
       const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
-      return moment(localTime).format("DD-MM-YYYY HH:mm");
+      return moment(localTime).format("DD/MM/YYYY HH:mm");
     }
 
     return (
@@ -155,11 +155,11 @@ class AuctionForm extends React.Component {constructor(props) {
         />
 
         <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
-        <i>Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
+        <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
         <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
-        <i>Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
+        <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
         <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
-        <i>Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
+        <i className="is-caption">Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
 
        <div className="field">
           <label htmlFor="auction_duration" className="label">
