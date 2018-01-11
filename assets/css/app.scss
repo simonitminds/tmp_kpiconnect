@@ -12,6 +12,7 @@
 
 // Import Modules
 @import 'modules/box';
+@import 'modules/columns';
 @import 'modules/container';
 @import 'modules/forms';
 @import 'modules/layout';
@@ -25,3 +26,8 @@
 
 // Import Vendor Styles
 @import 'vendor/react-datetime';
+
+// Set overall scaling for rem units
+
+html { font-size: 87.5%; }
+// h1, h2, h3, h4, h5, h6 { font-size: 87.5%; }

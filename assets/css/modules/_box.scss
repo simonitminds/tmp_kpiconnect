@@ -12,7 +12,7 @@
 // Additions
 
 .box {
-  &__subsection {
+  &__subsection { // When a box element has multiple sections
     padding: 0.75rem 1.25rem 1rem;
     margin: 0 -1.25rem;
     &:first-child {
@@ -20,6 +20,19 @@
     }
     &:nth-child(even) {
       background-color: $gray-1;
+    }
+  }
+  &__header { // Headers for a box element
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: $family-header;
+
+    &--bordered { // When a box header has an underline for additional separation
+      margin-left: -1.25rem;
+      margin-right: -1.25rem;
+      padding: 0 1.25rem;
+      border-bottom: 4px solid $turquoise;
     }
   }
 }

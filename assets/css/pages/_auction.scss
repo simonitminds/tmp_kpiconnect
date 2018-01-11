@@ -58,3 +58,20 @@
   }
 
 }
+
+// Auction Main Content Block
+
+.auction-content {
+  &> .columns.is-gapless > .column:first-child > .box {
+    margin-right: 1rem;
+    @media (max-width: 768px) {
+      margin: 0 !important;
+    }
+  }
+  &> .columns.is-gapless > .column:last-child > .box {
+    margin-left: 1rem;
+    @media (max-width: 768px) {
+      margin: 0 !important;
+    }
+  }
+}

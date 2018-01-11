@@ -13,6 +13,7 @@
 $navy: #013643;
 $teal: #188eac;
 $turquoise: #1db8b9;
+$yellow: #ffed55;
 $black: #363636;
 
 // The lighter the gray, the lower the number...
@@ -22,6 +23,7 @@ $gray-3: #888888;
 
 $primary: $navy;
 $link: $turquoise;
+$highlight: $yellow;
 
 
 // ===== TYPOGRAPHY ===== //
@@ -40,6 +42,14 @@ $family-sans-serif: "Open Sans", "Helvetica", "Arial", sans-serif;
 .has-family-copy { font-family: $family-sans-serif; }
 
 // ===== ELEMENTS ===== //
+
+// Tables
+
+$table-row-active-background-color: $highlight;
+$table-row-active-color: $black;
+$table-striped-row-even-background-color: $gray-1;
+$table-head-cell-border-width: 0 0 0;
+$table-cell-border-width: 0 0 0;
 
 // Tags
 
