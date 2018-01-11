@@ -56,22 +56,38 @@
       </ul>
     </div>
     <div class="box has-margin-left-md">
-      <ul class="list has-no-bullets">
-        <li>
-          <strong>Vessel:</strong>
-          <%= @auction.vessel.name %>
-        </li>
-        <li>
-          <strong>Port:</strong>
-          <%= @auction.port.name %>
-        </li>
-
-        <li>
-          <strong>PO:</strong>
-          <%= @auction.po %>
-        </li>
-      </ul>
-
+      <div class="box__subsection">
+        <h3 class="has-text-weight-bold has-family-header is-uppercase has-margin-bottom-sm">Buyer Information</h3>
+        <ul class="list has-no-bullets">
+          <li>
+            <strong>Organization</strong>
+            <%= @auction.company %>
+          </li>
+        </ul>
+      </div>
+      <div class="box__subsection">
+        <h3 class="has-text-weight-bold has-family-header is-uppercase has-margin-bottom-sm">Fuel Requirements</h3>
+        <ul class="list has-no-bullets">
+          <li>
+            <strong><%= @auction.fuel.name %></strong> <%= @auction.fuel_quantity %> MT
+          </li>
+        </ul>
+      </div>
+      <div class="box__subsection">
+        <h3 class="has-text-weight-bold has-family-header is-uppercase has-margin-bottom-sm">Port Information</h3>
+          <ul class="list has-no-bullets">
+            <li>
+              <strong class="is-block"><%= @auction.port.name %></strong>
+              <span class="is-size-7"><strong>ETA</strong> <%= format_datetime(@auction.eta) %> GMT &ndash; <strong>ETD</strong> <%= format_datetime(@auction.etd) %> GMT</span>
+            </li>
+          </ul>
+      </div>
+      <div class="box__subsection">
+        <h3 class="has-text-weight-bold has-family-header is-uppercase has-margin-bottom-sm">Additional Information</h3>
+        <ul class="list has-no-bullets">
+          <li><%= @auction.additional_information %></li>
+        </ul>
+      </div>
       <div class="field has-margin-top-md">
         <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
       </div>

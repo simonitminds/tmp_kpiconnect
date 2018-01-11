@@ -1,0 +1,25 @@
+// ========================== //
+// ========================== //
+// Box
+// ========================== //
+// ========================== //
+
+
+// Associated Variables
+
+// Adaptations
+
+// Additions
+
+.box {
+  &__subsection {
+    padding: 0.75rem 1.25rem 1rem;
+    margin: 0 -1.25rem;
+    &:first-child {
+      padding-top: 0;
+    }
+    &:nth-child(even) {
+      background-color: $gray-1;
+    }
+  }
+}
