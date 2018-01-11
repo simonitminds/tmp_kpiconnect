@@ -17,8 +17,8 @@ alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
 
 
 user = case Repo.get_by(User, %{email: "test@example.com"}) do
+  nil -> Accounts.create_user(%{email: "test@example.com", name: "test", password: "password"})
   user -> user
-  _ -> Accounts.create_user(%{email: "test@example.com", name: "test", password: "password"})
 end
 
 [
@@ -118,7 +118,6 @@ end)
   Repo.get_or_insert!(Vessel, vessel)
 end)
 
-
 [
   %{name: "MGO (DMA)"},
   %{name: "Gas Oil (Sul 0.10%)"},
@@ -129,7 +128,6 @@ end)
 |> Enum.map(fn(fuel) ->
   Repo.get_or_insert!(Fuel, fuel)
 end)
-
 
 [fuel1, vessel1, port1] = [[%{name: "MGO (DMA)"}, Fuel],
   [%{name: "Boaty McBoatFace", imo: 1234567}, Vessel],

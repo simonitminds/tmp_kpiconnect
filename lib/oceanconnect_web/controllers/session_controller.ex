@@ -1,11 +1,10 @@
-defmodule OceanconnectWeb.Admin.SessionController do
+defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
-  alias OceanconnectWeb.Accounts
-
-  # plug EnsureNotAuthenticated, [handler: __MODULE__] when action in [:new, :create]
+  alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.Auth
 
   def new(conn, _) do
-    render(conn, "login.html")
+    render(conn, "new.html")
   end
 
   def create(conn, %{"session" => session}) do
@@ -13,13 +12,13 @@ defmodule OceanconnectWeb.Admin.SessionController do
       {:ok, user} ->
         conn
         |> Auth.build_session(user)
-        |> redirect(to: auctions_path(conn, :index))
+        |> redirect(to: auction_path(conn, :index))
 
       {:error, _} ->
         conn
         |> put_flash(:error, "Invalid email/password")
         |> put_status(401)
-        |> render("login.html")
+        |> render("new.html")
     end
   end
 end

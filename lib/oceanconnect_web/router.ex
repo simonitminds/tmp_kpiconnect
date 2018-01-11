@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", SessionController, :new
-    get "/sessions", SessionController, :new
+    get "/sessions/new", SessionController, :new
     post "/sessions", SessionController, :create
     resources "/auctions", AuctionController, except: [:delete]
     resources "/ports", PortController

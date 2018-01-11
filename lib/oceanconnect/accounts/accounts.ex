@@ -105,7 +105,7 @@ defmodule Oceanconnect.Accounts do
   def verify_login(%{"email" => email, "password" => password}) do
     case Repo.get_by(User, email: email) do
       nil -> {:error, "Invalid email/password"}
-      {:ok, user} -> Comeonin.Bcrypt.check_pass(user, password)
+      user -> Comeonin.Bcrypt.check_pass(user, password)
     end
   end
   def verify_login(_), do: {:error, "Invalid email/password"}

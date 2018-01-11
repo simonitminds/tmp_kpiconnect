@@ -1,7 +1,7 @@
 <div class="content has-margin-top-lg">
-<h1 class="title is-3">Login</h1>
+  <h1 class="title is-3">Login</h1>
 
-<%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
+  <%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
     <div class="u-push-md-top">
       <label for="email">Email</label>
       <%= text_input f, :email, class: "form-control qa-session-email" %>
@@ -11,16 +11,9 @@
       <label for="password">Password</label>
       <%= password_input f, :password, class: "form-control qa-session-password" %>
     </div>
-    <div class="u-push-md-top checkbox">
-      <label class="checkbox"><input type="checkbox">
-        Remember Me
-      </label>
-    </div>
+
     <div class="u-text-center">
-      <%= submit "Login", class: "button button--primary button--medium u-push-sm-top qa-session-submit" %>
-      <a href="<%= admin_forgot_password_path(@conn, :forgot_password) %>" class="u-push-md-left">Forgot Password</a>
+      <%= submit "Login", class: "qa-session-submit" %>
     </div>
-<% end %>
-
-
+  <% end %>
 </div>
