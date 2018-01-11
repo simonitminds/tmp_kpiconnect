@@ -61,8 +61,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
+      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
       conn = get conn, auction_path(conn, :show, id)
-      assert html_response(conn, 200) =~ "Show Auction"
+      assert html_response(conn, 200) =~ auction.vessel.name
     end
 
     #TODO Refactor test to assert on specific errors
