@@ -13,7 +13,7 @@
 
   <body>
     <header class="header">
-      <nav role="navigation" class="navbar is-primary">
+      <nav role="navigation" class="navbar is-primary is-fixed-top">
         <div class="navbar-brand">
           <a href="/auctions" class="navbar-item">
             <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
