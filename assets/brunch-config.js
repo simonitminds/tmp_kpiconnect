@@ -47,7 +47,10 @@ exports.config = {
   // Configure your plugins
   plugins: {
     sass: {
-      mode: 'native'
+      mode: 'native',
+      options: {
+        includePaths: ['node_modules/bulma']
+      }
     },
     babel: {
       presets: ['env', 'react'],
