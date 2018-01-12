@@ -4,7 +4,7 @@ use Mix.Config
 # you can enable the server option below.
 config :oceanconnect, OceanconnectWeb.Endpoint,
   http: [port: 4001],
-  url: [host: "0.0.0.0"],
+  url: [host: System.get_env("HOSTNAME") || "localhost"],
   server: true
 
 # Print only warnings and errors during test
