@@ -4,8 +4,8 @@ defmodule Oceanconnect.AuctionNewTest do
 
   setup(%{session: session}) do
     user = insert(:user)
-    login_user(session, user)
-    {:ok}
+    authed_session = login_user(session, user)
+    {:ok, %{session: authed_session}}
   end
 
   test "visting the new auction page", %{session: session} do

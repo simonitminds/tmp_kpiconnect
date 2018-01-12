@@ -12,6 +12,13 @@ defmodule OceanconnectWeb.PortControllerTest do
     port
   end
 
+  setup do
+    user = insert(:user, password: "password")
+    conn = build_conn()
+    |> login_user(user)
+    {:ok, %{conn: conn}}
+  end
+
   describe "index" do
     test "lists all ports", %{conn: conn} do
       conn = get conn, port_path(conn, :index)

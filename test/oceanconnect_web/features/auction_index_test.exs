@@ -4,8 +4,8 @@ defmodule Oceanconnect.AuctionIndexTest do
 
   setup(%{session: session}) do
     user = insert(:user)
-    login_user(session, user)
-    {:ok}
+    authed_session = login_user(session, user)
+    {:ok, %{session: authed_session}}
   end
 
   test "renders the default auction index page", %{session: session} do

@@ -9,7 +9,15 @@ defmodule OceanconnectWeb.FuelControllerTest do
 
   def fixture(:fuel) do
     {:ok, fuel} = Auctions.create_fuel(@create_attrs)
+
     fuel
+  end
+
+  setup do
+    user = insert(:user, password: "password")
+    conn = build_conn()
+    |> login_user(user)
+    {:ok, %{conn: conn}}
   end
 
   describe "index" do

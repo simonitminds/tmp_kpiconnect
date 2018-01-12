@@ -12,6 +12,13 @@ defmodule OceanconnectWeb.VesselControllerTest do
     vessel
   end
 
+  setup do
+    user = insert(:user, password: "password")
+    conn = build_conn()
+    |> login_user(user)
+    {:ok, %{conn: conn}}
+  end
+
   describe "index" do
     test "lists all vessels", %{conn: conn} do
       conn = get conn, vessel_path(conn, :index)

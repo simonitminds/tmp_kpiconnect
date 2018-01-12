@@ -12,7 +12,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   setup do
     user = insert(:user)
-    authed_conn = login_user(conn, user)
+    authed_conn = login_user(build_conn(), user)
     {:ok, conn: authed_conn}
   end
 
