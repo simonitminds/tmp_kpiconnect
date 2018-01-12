@@ -7,11 +7,11 @@ defmodule OceanconnectWeb.SessionTest do
     {:ok, %{user: user}}
   end
 
-  test "logging in with valid user credentials", %{session: session, user: user} do
-    NewSessionPage.visit(session)
-    NewSessionPage.enter_credentials(session, user.email, "password")
-    NewSessionPage.submit(session)
+  test "logging in with valid user credentials", %{user: user} do
+    NewSessionPage.visit()
+    NewSessionPage.enter_credentials(user.email, "password")
+    NewSessionPage.submit()
 
-    assert AuctionIndex.is_current_path?(session)
+    assert AuctionIndex.is_current_path?()
   end
 end

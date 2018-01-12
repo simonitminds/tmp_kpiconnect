@@ -2,17 +2,15 @@ defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.AuctionIndex
 
-  setup(%{session: session}) do
+  setup do
     user = insert(:user)
-    authed_session = login_user(session, user)
-    {:ok, %{session: authed_session}}
+    login_user(user)
+    {:ok, %{}}
   end
 
-  test "renders the default auction index page", %{session: session} do
-    session
-    |> AuctionIndex.visit()
+  test "renders the default auction index page" do
+    AuctionIndex.visit()
 
-    assert AuctionIndex.has_content?(session, "Auction Listing")
-
+    assert AuctionIndex.has_content?("Auction Listing")
   end
 end

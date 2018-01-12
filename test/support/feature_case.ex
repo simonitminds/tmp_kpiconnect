@@ -3,7 +3,6 @@ defmodule Oceanconnect.FeatureCase do
 
   using do
     quote do
-      use Wallaby.DSL
       alias Oceanconnect.Repo
       import Ecto
       import Ecto.Changeset
@@ -11,12 +10,13 @@ defmodule Oceanconnect.FeatureCase do
       use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
       import Oceanconnect.Factory
+      use Hound.Helpers
 
-      def login_user(session, user) do
+      def login_user(user) do
         alias Oceanconnect.NewSessionPage
-        NewSessionPage.visit(session)
-        NewSessionPage.enter_credentials(session, user.email, user.password)
-        NewSessionPage.submit(session)
+        NewSessionPage.visit()
+        NewSessionPage.enter_credentials(user.email, user.password)
+        NewSessionPage.submit()
       end
     end
   end
@@ -29,7 +29,8 @@ defmodule Oceanconnect.FeatureCase do
     end
 
     metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Oceanconnect.Repo, self())
-    {:ok, session} = Wallaby.start_session(metadata: metadata)
-    {:ok, session: session}
+    Hound.start_session(metadata: metadata)
+
+    {:ok, %{}}
   end
 end

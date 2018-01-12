@@ -25,10 +25,10 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
 
 config :oceanconnect, :sql_sandbox, true
 
+config :hound,
+  driver: "selenium",
+  browser: "chrome",
+  host: System.get_env("DATA_CHROME_HOST") || "localhost",
+  app_host: System.get_env("HOSTNAME") || "localhost",
+  app_port: 4001
 
-# config :wallaby,
-#   driver: Wallaby.Experimental.Chrome,
-#   screenshot_on_failure: true,
-#   chrome: [
-#     headless: true
-#   ]

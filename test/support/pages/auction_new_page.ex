@@ -1,19 +1,14 @@
 defmodule Oceanconnect.AuctionNewPage do
-  # use Oceanconnect.Page
-  import Wallaby.Browser, only: [visit: 2, page_source: 1]
-  alias Wallaby.{Browser}
+  @page_path "/auctions/new"
+  use Oceanconnect.Page
 
-  def visit(session) do
-    visit(session, "/auctions/new")
+  def visit do
+    navigate_to(@page_path)
   end
 
-  def has_content?(session, title) do
-    String.contains?(page_source(session), title)
-  end
-
-  def has_fields?(session, fields) do
+  def has_fields?(fields) do
     Enum.all?(fields, fn(field) ->
-      Browser.has_css?(session, ".qa-auction-#{field}")
+      find_element(:class, "qa-auction-#{field}")
     end)
   end
 end
