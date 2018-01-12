@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.Auth
+  alias OceanconnectWeb.Plugs.Auth
 
   def new(conn, _) do
     render(conn, "new.html")
@@ -20,5 +20,25 @@ defmodule OceanconnectWeb.SessionController do
         |> put_status(401)
         |> render("new.html")
     end
+  end
+
+  def delete(conn, _) do
+    conn
+    |> Auth.browser_logout
+    |> put_status(302)
+    |> redirect(to: session_path(conn, :new))
+  end
+
+  def already_authenticated(conn, _) do
+    conn
+    |> put_status(302)
+    |> redirect(to: auction_path(conn, :index))
+  end
+
+  def unauthenticated(conn) do
+    conn
+    |> put_flash(:error, "Authentication Required")
+    |> put_status(302)
+    |> redirect(to: session_path(conn, :new))
   end
 end

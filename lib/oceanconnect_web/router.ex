@@ -13,12 +13,19 @@ defmodule OceanconnectWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug OceanconnectWeb.Plugs.Auth, handler: OceanconnectWeb.SessionController
+  end
+
   scope "/", OceanconnectWeb do
     pipe_through :browser # Use the default browser stack
 
-    get "/", SessionController, :new
     get "/sessions/new", SessionController, :new
+    get "/", SessionController, :new
     post "/sessions", SessionController, :create
+
+    pipe_through :authenticated # Routes requiring authentication
+    delete "/sessions/logout", SessionController, :delete
     resources "/auctions", AuctionController, except: [:delete]
     resources "/ports", PortController
     resources "/vessels", VesselController

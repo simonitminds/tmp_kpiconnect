@@ -31,22 +31,22 @@ defmodule Oceanconnectweb.SessionControllerTest do
     assert html_response(response, 401) =~ "Invalid email/password"
   end
 
-  # test "logging out", %{conn: conn} do
-  #   response = conn
-  #   |> post("/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
-  #   |> delete("/user/logout")
-  #   assert redirected_to(response, 302) =~ "/sessions"
-  # end
-  #
-  # test "logging out invalidates session", %{conn: conn} do
-  #   response = conn
-  #   |> post("/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
-  #   |> delete("/user/logout")
-  #   |> get("/user/dashboard")
-  #
-  #   assert redirected_to(response, 302) =~ "/sessions"
-  #   assert response.private.phoenix_flash["error"] == "Authentication Required"
-  # end
+  test "logging out", %{conn: conn} do
+    response = conn
+    |> post("/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
+    |> delete("/sessions/logout")
+    assert redirected_to(response, 302) =~ "/sessions/new"
+  end
+
+  test "logging out invalidates session", %{conn: conn} do
+    response = conn
+    |> post("/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
+    |> delete("/sessions/logout")
+    |> get("/auctions")
+
+    assert redirected_to(response, 302) =~ "/sessions/new"
+    assert response.private.phoenix_flash["error"] == "Authentication Required"
+  end
 
   # test "already logged in", %{conn: conn} do
   #   response = post(conn, "/sessions", %{"session": %{email: "foo@example.com", password: "password"}})

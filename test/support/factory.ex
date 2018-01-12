@@ -1,6 +1,19 @@
 defmodule Oceanconnect.Factory do
   use ExMachina.Ecto, repo: Oceanconnect.Repo
 
+  def set_password(user) do
+    hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)
+    %{user | password_hash: hashed_password}
+  end
+
+  def user_factory() do
+    %Oceanconnect.Accounts.User{
+      email: "foo@example.com",
+      password: "password"
+    }
+    |> set_password
+  end
+
   def new_datetime(offset_hours) do
     {:ok, datetime} = NaiveDateTime.new(2018, 1, 1, 0, 0, 0)
     datetime

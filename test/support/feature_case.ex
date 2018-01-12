@@ -11,6 +11,13 @@ defmodule Oceanconnect.FeatureCase do
       use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
       import Oceanconnect.Factory
+
+      def login_user(session, user) do
+        alias Oceanconnect.NewSessionPage
+        NewSessionPage.visit(session)
+        NewSessionPage.enter_credentials(session, user.email, user.password)
+        NewSessionPage.submit(session)
+      end
     end
   end
 

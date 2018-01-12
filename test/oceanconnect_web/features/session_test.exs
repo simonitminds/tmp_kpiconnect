@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.SessionTest do
   alias Oceanconnect.{AuctionIndex, NewSessionPage}
 
   setup do
-    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "test@example.com", password: "password"})
+    user = insert(:user, password: "password")
     {:ok, %{user: user}}
   end
 

@@ -23,6 +23,11 @@ defmodule OceanconnectWeb.ConnCase do
       import Oceanconnect.Factory
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
+
+      def login_user(conn, user) do
+        conn
+        |> Plug.Conn.put_session(user: user)
+      end
     end
   end
 
