@@ -3,7 +3,7 @@ defmodule Oceanconnect.NewSessionPage do
   @page_path "/sessions/new"
 
   use Oceanconnect.Page
-  
+
 
   def visit do
     navigate_to(@page_path)

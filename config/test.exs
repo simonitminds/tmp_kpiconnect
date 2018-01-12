@@ -20,9 +20,6 @@ config :oceanconnect, Oceanconnect.Repo,
   pool: Ecto.Adapters.SQL.Sandbox
 
 
-config :oceanconnect, OceanconnectWeb.Endpoint,
-  server: true
-
 config :oceanconnect, :sql_sandbox, true
 
 config :hound,
