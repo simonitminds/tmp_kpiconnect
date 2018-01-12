@@ -31,7 +31,6 @@ data.db:
 
 data.chrome:
   image: selenium/standalone-chrome
-  local_only: true
 
 web.main:
   start: node-start mix phx.server
