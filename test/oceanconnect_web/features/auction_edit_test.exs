@@ -2,6 +2,8 @@ defmodule Oceanconnect.AuctionEditTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.AuctionEditPage
 
+  hound_session()
+
   setup do
     user = insert(:user)
     login_user(user)

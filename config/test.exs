@@ -4,7 +4,6 @@ use Mix.Config
 # you can enable the server option below.
 config :oceanconnect, OceanconnectWeb.Endpoint,
   http: [port: 4001],
-  url: [host: System.get_env("HOSTNAME") || "localhost"],
   server: true
 
 # Print only warnings and errors during test
@@ -28,4 +27,5 @@ config :hound,
   host: System.get_env("DATA_CHROME_HOST") || "localhost",
   app_host: System.get_env("HOSTNAME") || "localhost",
   app_port: 4001
+
 

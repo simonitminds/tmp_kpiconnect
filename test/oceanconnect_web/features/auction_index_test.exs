@@ -2,6 +2,8 @@ defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.AuctionIndex
 
+  hound_session()
+
   setup do
     user = insert(:user)
     login_user(user)

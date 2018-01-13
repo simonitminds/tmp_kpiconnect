@@ -2,6 +2,8 @@ defmodule Oceanconnect.IndexTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.IndexPage
 
+  hound_session()
+
   setup do
     user = insert(:user)
     login_user(user)
