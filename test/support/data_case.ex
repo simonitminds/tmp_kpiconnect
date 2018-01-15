@@ -35,6 +35,12 @@ defmodule Oceanconnect.DataCase do
     :ok
   end
 
+  def all_values_match?(map, struct) do
+    Enum.all?(map, fn({k, v}) ->
+      Map.fetch!(struct, k) == v
+    end)
+  end
+
   @doc """
   A helper that transform changeset errors to a map of messages.
 

@@ -176,8 +176,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_vessel/1 with valid data creates a vessel" do
       assert {:ok, %Vessel{} = vessel} = Auctions.create_vessel(@valid_attrs)
-      assert vessel.imo == 42
-      assert vessel.name == "some name"
+      assert all_values_match?(@valid_attrs, vessel)
     end
 
     test "create_vessel/1 with invalid data returns error changeset" do
@@ -188,8 +187,7 @@ defmodule Oceanconnect.AuctionsTest do
       vessel = vessel_fixture()
       assert {:ok, vessel} = Auctions.update_vessel(vessel, @update_attrs)
       assert %Vessel{} = vessel
-      assert vessel.imo == 43
-      assert vessel.name == "some updated name"
+      assert all_values_match?(@update_attrs, vessel)
     end
 
     test "update_vessel/2 with invalid data returns error changeset" do
