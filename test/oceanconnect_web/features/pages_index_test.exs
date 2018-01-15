@@ -2,14 +2,17 @@ defmodule Oceanconnect.IndexTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.IndexPage
 
+  hound_session()
+
   setup do
-    {:ok, %{conn: build_conn()}}
+    user = insert(:user)
+    login_user(user)
+    {:ok, %{auction: insert(:auction)}}
   end
 
-  test "renders the default index page", %{session: session} do
-    session
-    |> IndexPage.visit()
+  test "renders the default index page" do
+    IndexPage.visit()
 
-    assert IndexPage.has_title?(session, "Hello Oceanconnect!")
+    assert IndexPage.has_title?("Hello Oceanconnect!")
   end
 end

@@ -1,12 +1,12 @@
 defmodule Oceanconnect.IndexPage do
-  # use Oceanconnect.Page
-  import Wallaby.Browser, only: [page_title: 1, visit: 2]
+  @page_path "/"
+  use Oceanconnect.Page
 
-  def visit(session) do
-    visit(session, "/")
+  def visit do
+    navigate_to("/")
   end
 
-  def has_title?(session, title) do
-    page_title(session) == title
+  def has_title?(title) do
+    page_title() == title
   end
 end

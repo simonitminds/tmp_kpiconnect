@@ -2,11 +2,18 @@ defmodule Oceanconnect.AuctionNewTest do
   use Oceanconnect.FeatureCase, async: true
   alias Oceanconnect.AuctionNewPage
 
-  test "visting the new auction page", %{session: session} do
-    session
-    |> AuctionNewPage.visit()
+  hound_session()
 
-    assert AuctionNewPage.has_fields?(session, [
+  setup do
+    user = insert(:user)
+    _authed_session = login_user(user)
+    {:ok, %{}}
+  end
+
+  test "visting the new auction page" do
+    AuctionNewPage.visit()
+
+    assert AuctionNewPage.has_fields?([
       "additional_information",
       "anonymous_bidding",
       "auction_start",
@@ -20,6 +27,5 @@ defmodule Oceanconnect.AuctionNewTest do
       "port",
       "vessel"
     ])
-
   end
 end

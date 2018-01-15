@@ -4,7 +4,7 @@ use Mix.Config
 # you can enable the server option below.
 config :oceanconnect, OceanconnectWeb.Endpoint,
   http: [port: 4001],
-  url: [host: "0.0.0.0"],
+  url: [host: System.get_env("APP_IP") || "localhost", port: 80],
   server: true
 
 # Print only warnings and errors during test
@@ -20,15 +20,13 @@ config :oceanconnect, Oceanconnect.Repo,
   pool: Ecto.Adapters.SQL.Sandbox
 
 
-config :oceanconnect, OceanconnectWeb.Endpoint,
-  server: true
-
 config :oceanconnect, :sql_sandbox, true
 
+config :hound,
+  driver: "selenium",
+  browser: "chrome",
+  host: System.get_env("DATA_CHROME_HOST") || "localhost",
+  app_host: "http://" <> (System.get_env("APP_IP") || "localhost"),
+  app_port: 4001
 
-# config :wallaby,
-#   driver: Wallaby.Experimental.Chrome,
-#   screenshot_on_failure: true,
-#   chrome: [
-#     headless: true
-#   ]
+

@@ -10,6 +10,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   @update_attrs %{ po: "updated PO text"}
   @invalid_attrs %{ vessel_id: nil}
 
+  setup do
+    user = insert(:user)
+    authed_conn = login_user(build_conn(), user)
+    {:ok, conn: authed_conn}
+  end
 
   def valid_auction_create_attrs(attrs \\ %{}) do
     {:ok, port} = Auctions.create_port(%{name: "some port", country: "Merica"})

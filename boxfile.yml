@@ -29,6 +29,8 @@ deploy.config:
 data.db:
   image: nanobox/postgresql:9.6
 
+data.chrome:
+  image: selenium/standalone-chrome
 web.main:
   start: node-start mix phx.server
   writable_dirs:

@@ -23,6 +23,10 @@ defmodule OceanconnectWeb.ConnCase do
       import Oceanconnect.Factory
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
+
+      def login_user(conn, user) do
+        post(conn, session_path(conn, :create), %{ session: %{email: user.email, password: user.password}})
+      end
     end
   end
 
