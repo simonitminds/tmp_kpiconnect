@@ -14,6 +14,13 @@ defmodule Oceanconnect.Factory do
     |> set_password
   end
 
+  def user_profile_factory() do
+    %Oceanconnect.Accounts.UserProfile{
+      user: build(:user),
+      email: "shared@example.com"
+    }
+  end
+
   def new_datetime(offset_hours) do
     {:ok, datetime} = NaiveDateTime.new(2018, 1, 1, 0, 0, 0)
     datetime

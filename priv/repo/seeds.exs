@@ -12,12 +12,35 @@
 
 alias Oceanconnect.Repo
 alias Oceanconnect.Accounts
-alias Oceanconnect.Accounts.User
+alias Oceanconnect.Accounts.{Company, User}
 alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
 
 
+[
+  %{name: "Global Energy Trading Pte Ltd", address1: "Alexandra Point",
+    address2: "4438 Alexandra Road, #13-01", city: "Singapore",
+    country: "Singapore", contact_name: "Munee Chow", email: "sales@genergytrading.com",
+    main_phone: "+65 6559 1631", mobile_phone: "+65 9785 6238", postal_code: "11958"},
+  %{name: "Petrochina International (Singapore) Pte Ltd", address1: "One Temasek Avenue",
+    address2: "#27-00 Millenia Tower", city: "Singapore",
+    country: "Singapore", contact_name: "Wee Tee Ng", email: "ng-weetee@petrochina.com.sg",
+    main_phone: "+65 6411 7513", mobile_phone: "+65 9119 0771", postal_code: "039192"},
+  %{name: "Shell International Eastern Trading Company", address1: "The Metropolis Tower",
+    address2: "1-9 North Bueno Vista Drive", city: "Singapore",
+    country: "Singapore", contact_name: "Benjamin Ong", email: "sales@genergytrading.com",
+    main_phone: "+65 6505 2612", mobile_phone: "+65 9727 8577", postal_code: "138588"},
+  %{name: "Qatargas Operating Company Limited", address1: "Office 2W-705",
+    address2: "", city: "Doha",
+    country: "Qatar", contact_name: "Lee Pritchard", email: "sales@genergytrading.com",
+    main_phone: "+974 4452 3043", mobile_phone: "+44 7803 632226", postal_code: "22666"},
+]
+|> Enum.map(fn(company) ->
+  Repo.get_or_insert!(Company, company)
+end)
+
+# User creation doesn't use get_or_insert! fn due to virtual password field
 user = case Repo.get_by(User, %{email: "test@example.com"}) do
-  nil -> Accounts.create_user(%{email: "test@example.com", name: "test", password: "password"})
+  nil -> Accounts.create_user(%{email: "test@example.com", password: "password"})
   user -> user
 end
 

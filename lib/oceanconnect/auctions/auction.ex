@@ -9,7 +9,6 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :vessel, Vessel
     belongs_to :fuel, Fuel
     field :fuel_quantity, :integer
-    field :company, :string
     field :po, :string
     field :eta, :utc_datetime
     field :etd, :utc_datetime
@@ -21,14 +20,31 @@ defmodule Oceanconnect.Auctions.Auction do
     timestamps()
   end
 
+    @required_fields [
+      :fuel_id,
+      :port_id,
+      :vessel_id
+    ]
+
+    @optional_fields [
+      :additional_information,
+      :anonymous_bidding,
+      :auction_start,
+      :duration,
+      :eta,
+      :etd,
+      :fuel_quantity,
+      :po
+    ]
+
   @doc false
   def changeset(%Auction{} = auction, attrs) do
     auction
-    |> cast(attrs, [:vessel_id, :port_id, :fuel_id, :company, :po, :eta, :etd, :auction_start, :duration, :anonymous_bidding, :fuel_quantity, :additional_information])
+    |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)
-    |> validate_required([:vessel_id, :port_id, :fuel_id])
   end
 
   def from_params(params) do

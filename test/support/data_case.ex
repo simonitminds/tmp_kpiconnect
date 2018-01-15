@@ -22,6 +22,7 @@ defmodule Oceanconnect.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Oceanconnect.DataCase
+      import Oceanconnect.Factory
     end
   end
 

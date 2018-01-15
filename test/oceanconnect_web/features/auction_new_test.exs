@@ -6,7 +6,7 @@ defmodule Oceanconnect.AuctionNewTest do
 
   setup do
     user = insert(:user)
-    _authed_session = login_user(user)
+    login_user(user)
     {:ok, %{}}
   end
 
