@@ -88,7 +88,8 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "add_supplier_to_auction/2 with valid data" do
       supplier = insert(:user)
-      auction = :auction |> insert |> Auctions.add_supplier_to_auction(supplier)
+      auction = insert(:auction)
+      auction = auction |> Auctions.add_supplier_to_auction(supplier)
       assert auction.suppliers == [supplier]
     end
 

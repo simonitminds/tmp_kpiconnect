@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
 
   def list_auctions do

@@ -42,7 +42,8 @@ end)
 
 # User creation doesn't use get_or_insert! fn due to virtual password field
 user = case Repo.get_by(User, %{email: "test@example.com"}) do
-  nil -> Accounts.create_user(%{email: "test@example.com", password: "password", company_id: company.id})
+  nil -> {:ok, user} = Accounts.create_user(%{email: "test@example.com", password: "password", company_id: company.id})
+          user
   user -> user
 end
 

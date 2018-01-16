@@ -17,7 +17,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :duration, :integer
     field :anonymous_bidding, :boolean
     field :additional_information, :string
-    many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: "auction_suppliers",
+    many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
       join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete
 
     timestamps()
