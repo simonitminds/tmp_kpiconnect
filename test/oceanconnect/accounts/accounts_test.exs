@@ -123,5 +123,32 @@ defmodule Oceanconnect.AccountsTest do
       company = company_fixture()
       assert %Ecto.Changeset{} = Accounts.change_company(company)
     end
+
+    test "add_port_to_company/2 with valid data" do
+      port = insert(:port)
+      company = :company |> insert |> Accounts.add_port_to_company(port)
+      assert company.ports == [port]
+    end
+
+    test "add_port_to_company/2 with existing ports" do
+      [port1, port2] = insert_list(2, :port)
+      company = :company |> insert |> Accounts.add_port_to_company(port1)
+      |> Accounts.add_port_to_company(port2)
+      assert Enum.all?(company.ports, fn(port) -> port in [port1, port2] end)
+    end
+
+    test "set_ports_on_company/2 with valid data" do
+      ports = insert_list(2, :port)
+      company = :company |> insert |> Accounts.set_ports_on_company(ports)
+      assert company.ports == ports
+    end
+
+    test "set_ports_on_company/2 overwriting existing ports" do
+      [port1, port2] = insert_list(2, :port)
+      company = :company |> insert |> Accounts.set_ports_on_company([port1])
+      |> Accounts.set_ports_on_company([port2])
+      assert company.ports == [port2]
+    end
+
   end
 end

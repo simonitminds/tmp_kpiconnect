@@ -205,4 +205,22 @@ defmodule Oceanconnect.Accounts do
   def change_company(%Company{} = company) do
     Company.changeset(company, %{})
   end
+
+  def add_port_to_company(%Company{} = company, %Oceanconnect.Auctions.Port{} = port) do
+    company_with_ports = company
+    |> Repo.preload(:ports)
+
+    company_with_ports
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:ports, [port | company_with_ports.ports])
+    |> Repo.update!
+  end
+
+  def set_ports_on_company(%Company{} = company, ports) when is_list(ports) do
+    company
+    |> Repo.preload(:ports)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:ports, ports)
+    |> Repo.update!
+  end
 end

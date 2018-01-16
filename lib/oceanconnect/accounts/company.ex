@@ -3,7 +3,7 @@ defmodule Oceanconnect.Accounts.Company do
   import Ecto.Changeset
   alias Oceanconnect.Accounts.Company
 
-  @derive {Poison.Encoder, except: [:__meta__, :users, :vessels]}
+  @derive {Poison.Encoder, except: [:__meta__, :users, :vessels, :ports]}
 
   schema "companies" do
     field :address1, :string
@@ -18,7 +18,7 @@ defmodule Oceanconnect.Accounts.Company do
     field :postal_code, :integer
     has_many :users, Oceanconnect.Accounts.User
     has_many :vessels, Oceanconnect.Auctions.Vessel
-    # many_to_many :ports, Oceanconnect.Auctions.Port
+    many_to_many :ports, Oceanconnect.Auctions.Port, join_through: "company_ports", on_replace: :delete
 
     timestamps()
   end

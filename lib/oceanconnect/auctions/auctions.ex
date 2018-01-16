@@ -136,6 +136,14 @@ defmodule Oceanconnect.Auctions do
   end
 
 
+  def companies_by_port(port_id) do
+    query = from company_port in "company_ports",
+      join: company in Oceanconnect.Accounts.Company, on: company.id == company_port.company_id,
+      where: company_port.port_id == ^port_id,
+      select: company
+    query |> Repo.all
+  end
+
   @doc """
   Returns the list of vessels.
 
