@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Repo.Migrations.AddCompanyToUserAndVessel do
   use Ecto.Migration
 
-  def up do
+  def change do
     alter table("users") do
       add :company_id, references(:companies)
     end

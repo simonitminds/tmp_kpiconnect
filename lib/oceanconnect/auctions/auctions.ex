@@ -36,7 +36,7 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, :vessel, :fuel])
+    |> Repo.preload([:port, [vessel: :company], :fuel])
   end
 
 
@@ -147,6 +147,7 @@ defmodule Oceanconnect.Auctions do
   """
   def list_vessels do
     Repo.all(Vessel)
+    |> Repo.preload(:company)
   end
 
   @doc """
@@ -163,7 +164,7 @@ defmodule Oceanconnect.Auctions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_vessel!(id), do: Repo.get!(Vessel, id)
+  def get_vessel!(id), do: Repo.get!(Vessel, id) |> Repo.preload(:company)
 
   @doc """
   Creates a vessel.

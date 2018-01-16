@@ -13,7 +13,6 @@ defmodule Oceanconnect.AuctionsTest do
     def auction_fixture(attrs \\ %{}) do
       {:ok, auction} = valid_auction_attr(attrs)
         |> Auctions.create_auction()
-
       auction
     end
 
@@ -24,7 +23,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     def valid_auction_attr(attrs \\ %{}) do
       port = port_fixture()
-      vessel = vessel_fixture()
+      vessel = insert(:vessel)
       fuel = fuel_fixture()
       %{port_id: port.id, vessel_id: vessel.id, fuel_id: fuel.id}
         |> Map.merge( attrs)
@@ -100,7 +99,6 @@ defmodule Oceanconnect.AuctionsTest do
         attrs
         |> Enum.into(@valid_attrs)
         |> Auctions.create_port()
-
       port
     end
 
@@ -160,22 +158,27 @@ defmodule Oceanconnect.AuctionsTest do
         attrs
         |> Enum.into(@valid_attrs)
         |> Auctions.create_vessel()
-
-      vessel
+      vessel |> Oceanconnect.Repo.preload(:company)
     end
 
-    test "list_vessels/0 returns all vessels" do
-      vessel = vessel_fixture()
+    setup do
+      company = insert(:company)
+      {:ok, %{company_id: company.id}}
+    end
+
+    test "list_vessels/0 returns all vessels", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert Auctions.list_vessels() == [vessel]
     end
 
-    test "get_vessel!/1 returns the vessel with given id" do
-      vessel = vessel_fixture()
+    test "get_vessel!/1 returns the vessel with given id", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert Auctions.get_vessel!(vessel.id) == vessel
     end
 
-    test "create_vessel/1 with valid data creates a vessel" do
-      assert {:ok, %Vessel{} = vessel} = Auctions.create_vessel(@valid_attrs)
+    test "create_vessel/1 with valid data creates a vessel", %{company_id: company_id} do
+      attrs = Map.merge(@valid_attrs, %{company_id: company_id})
+      assert {:ok, %Vessel{} = vessel} = Auctions.create_vessel(attrs)
       assert all_values_match?(@valid_attrs, vessel)
     end
 
@@ -183,27 +186,27 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_vessel(@invalid_attrs)
     end
 
-    test "update_vessel/2 with valid data updates the vessel" do
-      vessel = vessel_fixture()
+    test "update_vessel/2 with valid data updates the vessel", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert {:ok, vessel} = Auctions.update_vessel(vessel, @update_attrs)
       assert %Vessel{} = vessel
       assert all_values_match?(@update_attrs, vessel)
     end
 
-    test "update_vessel/2 with invalid data returns error changeset" do
-      vessel = vessel_fixture()
+    test "update_vessel/2 with invalid data returns error changeset", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert {:error, %Ecto.Changeset{}} = Auctions.update_vessel(vessel, @invalid_attrs)
       assert vessel == Auctions.get_vessel!(vessel.id)
     end
 
-    test "delete_vessel/1 deletes the vessel" do
-      vessel = vessel_fixture()
+    test "delete_vessel/1 deletes the vessel", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert {:ok, %Vessel{}} = Auctions.delete_vessel(vessel)
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_vessel!(vessel.id) end
     end
 
-    test "change_vessel/1 returns a vessel changeset" do
-      vessel = vessel_fixture()
+    test "change_vessel/1 returns a vessel changeset", %{company_id: company_id} do
+      vessel = vessel_fixture(%{company_id: company_id})
       assert %Ecto.Changeset{} = Auctions.change_vessel(vessel)
     end
   end
@@ -220,7 +223,6 @@ defmodule Oceanconnect.AuctionsTest do
         attrs
         |> Enum.into(@valid_attrs)
         |> Auctions.create_fuel()
-
       fuel
     end
 

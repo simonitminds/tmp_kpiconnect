@@ -3,41 +3,23 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @port_attrs %{ name: "some port", country: "Merica" }
-  @vessel_attrs %{ name: "some vessel", imo: 1234567 }
-  @fuel_attrs %{ name: "some fuel" }
-  @create_attrs %{ po: "PO text" }
   @update_attrs %{ po: "updated PO text"}
   @invalid_attrs %{ vessel_id: nil}
 
   setup do
     user = insert(:user)
+    vessel = insert(:vessel) |> Oceanconnect.Repo.preload(:company)
+    fuel = insert(:fuel)
+    port = insert(:port)
+    auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
+    auction_params = Map.update!(auction_params, "auction_start", fn(_) ->
+      DateTime.utc_now
+      |> DateTime.to_unix
+      |> to_string
+    end)
     authed_conn = login_user(build_conn(), user)
-    {:ok, conn: authed_conn}
-  end
-
-  def valid_auction_create_attrs(attrs \\ %{}) do
-    {:ok, port} = Auctions.create_port(%{name: "some port", country: "Merica"})
-    {:ok, vessel} = Auctions.create_vessel(%{name: "some vessel", imo: 7665643})
-    {:ok, fuel} = Auctions.create_fuel(@fuel_attrs)
-    %{port_id: port.id, vessel_id: vessel.id, fuel_id: fuel.id}
-      |> Map.merge( attrs)
-      |> Enum.into(@create_attrs)
-
-  end
-
-
-  def fixture(:auction) do
-    {:ok, port} = Auctions.create_port(@port_attrs)
-    {:ok, vessel} = Auctions.create_vessel(@vessel_attrs)
-    {:ok, fuel} = Auctions.create_fuel(@fuel_attrs)
-    fully_loaded_auction = @create_attrs
-    |> Map.put( :port_id, port.id)
-    |> Map.put( :vessel_id, vessel.id)
-    |> Map.put( :fuel_id, fuel.id)
-
-    {:ok, auction} = Auctions.create_auction(fully_loaded_auction)
-    auction
+    auction = insert(:auction, vessel: vessel)
+    {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction}
   end
 
   describe "index" do
@@ -60,8 +42,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id})
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post conn, auction_path(conn, :create), auction: valid_auction_create_attrs()
+
+    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params} do
+      conn = post conn, auction_path(conn, :create), auction: valid_auction_params
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
@@ -81,8 +64,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "edit auction" do
-    setup [:create_auction]
-
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)
       assert html_response(conn, 200) =~ "Edit Auction"
@@ -90,7 +71,10 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "update auction" do
-    setup [:create_auction]
+    test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
+      conn = get conn, auction_path(conn, :edit, auction)
+      assert html_response(conn, 200) =~ "Edit Auction"
+    end
 
     test "redirects when data is valid", %{conn: conn, auction: auction} do
       conn = put conn, auction_path(conn, :update, auction), auction: @update_attrs
@@ -105,10 +89,4 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Edit Auction"
     end
   end
-
-  defp create_auction(_) do
-    auction = fixture(:auction)
-    {:ok, auction: auction}
-  end
-
 end

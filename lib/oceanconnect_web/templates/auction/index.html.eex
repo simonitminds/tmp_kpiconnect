@@ -7,7 +7,7 @@
       <th>ID</th>
       <th>Vessel</th>
       <th>Port</th>
-      <th>Company</th>
+      <!-- <th>Company</th> -->
       <th>PO</th>
       <th>Fuel Requirement</th>
       <th>ETA</th>
@@ -24,7 +24,7 @@
       <td><%= auction.id %></td>
       <td><%= auction.vessel.name %></td>
       <td><%= auction.port.name %></td>
-      <td><%= auction.company %></td>
+      <!-- <td><%=# auction.company %></td> -->
       <td><%= auction.po %></td>
       <td><%= auction.fuel.name %> (<%= auction.fuel_quantity %>&nbsp;MT)</td>
       <td><%= format_datetime(auction.eta) %></td>

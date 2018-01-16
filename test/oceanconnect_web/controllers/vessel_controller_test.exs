@@ -1,22 +1,14 @@
 defmodule OceanconnectWeb.VesselControllerTest do
   use OceanconnectWeb.ConnCase
 
-  alias Oceanconnect.Auctions
-
-  @create_attrs %{imo: 42, name: "some name"}
-  @update_attrs %{imo: 43, name: "some updated name"}
-  @invalid_attrs %{imo: nil, name: nil}
-
-  def fixture(:vessel) do
-    {:ok, vessel} = Auctions.create_vessel(@create_attrs)
-    vessel
-  end
-
   setup do
     user = insert(:user, password: "password")
+    vessel = insert(:vessel)
+    |> Oceanconnect.Repo.preload(:company)
     conn = build_conn()
     |> login_user(user)
-    {:ok, %{conn: conn}}
+
+    {:ok, %{conn: conn, vessel: vessel}}
   end
 
   describe "index" do
@@ -34,9 +26,9 @@ defmodule OceanconnectWeb.VesselControllerTest do
   end
 
   describe "create vessel" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post conn, vessel_path(conn, :create), vessel: @create_attrs
-
+    test "redirects to show when data is valid", %{conn: conn, vessel: vessel} do
+      vessel_params = string_params_for(:vessel, company_id: vessel.company_id)
+      conn = post(conn, vessel_path(conn, :create), vessel: vessel_params)
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == vessel_path(conn, :show, id)
 
@@ -45,14 +37,12 @@ defmodule OceanconnectWeb.VesselControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, vessel_path(conn, :create), vessel: @invalid_attrs
+      conn = post conn, vessel_path(conn, :create), vessel: %{imo: nil, name: nil}
       assert html_response(conn, 200) =~ "New Vessel"
     end
   end
 
   describe "edit vessel" do
-    setup [:create_vessel]
-
     test "renders form for editing chosen vessel", %{conn: conn, vessel: vessel} do
       conn = get conn, vessel_path(conn, :edit, vessel)
       assert html_response(conn, 200) =~ "Edit Vessel"
@@ -60,10 +50,8 @@ defmodule OceanconnectWeb.VesselControllerTest do
   end
 
   describe "update vessel" do
-    setup [:create_vessel]
-
     test "redirects when data is valid", %{conn: conn, vessel: vessel} do
-      conn = put conn, vessel_path(conn, :update, vessel), vessel: @update_attrs
+      conn = put conn, vessel_path(conn, :update, vessel), vessel: %{imo: 43, name: "some updated name"}
       assert redirected_to(conn) == vessel_path(conn, :show, vessel)
 
       conn = get conn, vessel_path(conn, :show, vessel)
@@ -71,14 +59,12 @@ defmodule OceanconnectWeb.VesselControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, vessel: vessel} do
-      conn = put conn, vessel_path(conn, :update, vessel), vessel: @invalid_attrs
+      conn = put conn, vessel_path(conn, :update, vessel), vessel: %{imo: nil, name: nil}
       assert html_response(conn, 200) =~ "Edit Vessel"
     end
   end
 
   describe "delete vessel" do
-    setup [:create_vessel]
-
     test "deletes chosen vessel", %{conn: conn, vessel: vessel} do
       conn = delete conn, vessel_path(conn, :delete, vessel)
       assert redirected_to(conn) == vessel_path(conn, :index)
@@ -86,10 +72,5 @@ defmodule OceanconnectWeb.VesselControllerTest do
         get conn, vessel_path(conn, :show, vessel)
       end
     end
-  end
-
-  defp create_vessel(_) do
-    vessel = fixture(:vessel)
-    {:ok, vessel: vessel}
   end
 end

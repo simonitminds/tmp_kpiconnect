@@ -6,19 +6,18 @@ defmodule Oceanconnect.Factory do
     %{user | password_hash: hashed_password}
   end
 
+  def company_factory() do
+    %Oceanconnect.Accounts.Company{
+      name: sequence(:name, &"Company-#{&1}")
+    }
+  end
+
   def user_factory() do
     %Oceanconnect.Accounts.User{
-      email: "foo@example.com",
+      email: sequence(:email, &("user-#{&1}@example.com")),
       password: "password"
     }
     |> set_password
-  end
-
-  def user_profile_factory() do
-    %Oceanconnect.Accounts.UserProfile{
-      user: build(:user),
-      email: "shared@example.com"
-    }
   end
 
   def new_datetime(offset_hours) do
@@ -30,7 +29,7 @@ defmodule Oceanconnect.Factory do
 
   def auction_factory() do
     %Oceanconnect.Auctions.Auction{
-       auction_start: new_datetime(0),
+       auction_start: DateTime.utc_now(),
        duration: 10,
        fuel: build(:fuel),
        fuel_quantity: 1000,
@@ -54,7 +53,8 @@ defmodule Oceanconnect.Factory do
   def vessel_factory() do
     %Oceanconnect.Auctions.Vessel{
        imo: 1234567,
-       name: "New Vessel"
+       name: "New Vessel",
+       company: build(:company)
     }
   end
 end
