@@ -94,11 +94,6 @@ defmodule Oceanconnect.AccountsTest do
     test "create_company/1 with valid data creates a company" do
       assert {:ok, %Company{} = company} = Accounts.create_company(@valid_attrs)
       assert all_values_match?(@valid_attrs, company)
-      # assert company.address == "some address"
-      # assert company.contact_name == "some contact_name"
-      # assert company.country == "some country"
-      # assert company.name == "some name"
-      # assert company.phone == "some phone"
     end
 
     test "create_company/1 with invalid data returns error changeset" do
@@ -110,11 +105,6 @@ defmodule Oceanconnect.AccountsTest do
       assert {:ok, company} = Accounts.update_company(company, @update_attrs)
       assert %Company{} = company
       assert all_values_match?(@update_attrs, company)
-      # assert company.address == "some updated address"
-      # assert company.contact_name == "some updated contact_name"
-      # assert company.country == "some updated country"
-      # assert company.name == "some updated name"
-      # assert company.phone == "some updated phone"
     end
 
     test "update_company/2 with invalid data returns error changeset" do

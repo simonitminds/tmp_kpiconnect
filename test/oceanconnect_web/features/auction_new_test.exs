@@ -17,7 +17,6 @@ defmodule Oceanconnect.AuctionNewTest do
       "additional_information",
       "anonymous_bidding",
       "auction_start",
-      "company",
       "duration",
       "eta",
       "etd",
