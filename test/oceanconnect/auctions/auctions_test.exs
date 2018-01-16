@@ -85,6 +85,33 @@ defmodule Oceanconnect.AuctionsTest do
       auction = auction_fixture()
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end
+
+    test "add_supplier_to_auction/2 with valid data" do
+      supplier = insert(:user)
+      auction = :auction |> insert |> Auctions.add_supplier_to_auction(supplier)
+      assert auction.suppliers == [supplier]
+    end
+
+    test "add_supplier_to_auction/2 with existing suppliers" do
+      [supplier1, supplier2] = insert_list(2, :user)
+      auction = :auction |> insert |> Auctions.add_supplier_to_auction(supplier1)
+      |> Auctions.add_supplier_to_auction(supplier2)
+      assert Enum.all?(auction.suppliers, fn(supplier) -> supplier in [supplier1, supplier2] end)
+    end
+
+    test "set_suppliers_for_auction/2 with valid data" do
+      suppliers = insert_list(2, :user)
+      auction = :auction |> insert |> Auctions.set_suppliers_for_auction(suppliers)
+      assert auction.suppliers == suppliers
+    end
+
+    test "set_suppliers_for_auction/2 overwriting existing suppliers" do
+      [supplier1, supplier2] = [insert(:user), insert(:user)]
+      auction = insert(:auction)
+      |> Auctions.set_suppliers_for_auction([supplier1])
+      |> Auctions.set_suppliers_for_auction([supplier2])
+      assert auction.suppliers == [supplier2]
+    end
   end
 
   describe "ports" do

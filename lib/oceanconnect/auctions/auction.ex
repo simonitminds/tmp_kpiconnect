@@ -3,11 +3,12 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
-  @derive {Poison.Encoder, except: [:__meta__]}
+  @derive {Poison.Encoder, except: [:__meta__, :suppliers]}
   schema "auctions" do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
     belongs_to :fuel, Fuel
+    belongs_to :buyer, Oceanconnect.Accounts.User
     field :fuel_quantity, :integer
     field :po, :string
     field :eta, :utc_datetime
@@ -16,6 +17,8 @@ defmodule Oceanconnect.Auctions.Auction do
     field :duration, :integer
     field :anonymous_bidding, :boolean
     field :additional_information, :string
+    many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: "auction_suppliers",
+      join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete
 
     timestamps()
   end
@@ -27,6 +30,7 @@ defmodule Oceanconnect.Auctions.Auction do
     ]
 
     @optional_fields [
+      :buyer_id,
       :additional_information,
       :anonymous_bidding,
       :auction_start,
@@ -42,6 +46,7 @@ defmodule Oceanconnect.Auctions.Auction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)

@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, Port, Vessel, Fuel}
 
 
   def list_auctions do
@@ -36,10 +36,26 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, [vessel: :company], :fuel])
+    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
   end
 
+  def add_supplier_to_auction(%Auction{} = auction, %Oceanconnect.Accounts.User{} = supplier) do
+    auction_with_suppliers = auction
+    |> Repo.preload(:suppliers)
 
+    auction_with_suppliers
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, [supplier | auction_with_suppliers.suppliers])
+    |> Repo.update!
+  end
+
+  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
+    auction
+    |> Repo.preload(:suppliers)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
+    |> Repo.update!
+  end
 
   @doc """
   Returns the list of ports.
