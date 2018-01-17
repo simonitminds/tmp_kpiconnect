@@ -31,10 +31,12 @@ defmodule Oceanconnect.AuctionNewTest do
     ])
   end
 
-  test "vessels dropdown list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
+  test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
     AuctionNewPage.visit()
+    buyer_vessels = Enum.map(buyer_vessels, fn(v) -> "#{v.name}, #{v.imo}" end)
+    vessels_on_page = MapSet.new(AuctionNewPage.vessel_list())
+    company_vessels = MapSet.new(buyer_vessels)
 
-    buyer_vessel_mapset = Enum.map(buyer_vessels, fn(v) -> v.name end) |> MapSet.new
-    assert MapSet.equal?(MapSet.new(AuctionNewPage.vessel_list()), buyer_vessel_mapset)
+    assert MapSet.equal?(vessels_on_page, company_vessels)
   end
 end

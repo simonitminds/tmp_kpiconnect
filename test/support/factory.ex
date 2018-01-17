@@ -54,7 +54,7 @@ defmodule Oceanconnect.Factory do
   def vessel_factory() do
     %Oceanconnect.Auctions.Vessel{
        imo: 1234567,
-       name: "New Vessel",
+       name: sequence(:vessel_name, &"Vessel-#{&1}"),
        company: build(:company)
     }
   end

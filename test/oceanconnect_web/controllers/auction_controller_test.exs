@@ -7,8 +7,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   @invalid_attrs %{ vessel_id: nil}
 
   setup do
-    user = insert(:user)
-    vessel = insert(:vessel) |> Oceanconnect.Repo.preload(:company)
+    company = insert(:company)
+    user = insert(:user, company: company)
+    vessel = insert(:vessel, company: company) |> Oceanconnect.Repo.preload(:company)
     fuel = insert(:fuel)
     port = insert(:port)
     auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
@@ -19,7 +20,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end)
     authed_conn = login_user(build_conn(), user)
     auction = insert(:auction, vessel: vessel)
-    {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction}
+    {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction, user: user}
   end
 
   describe "index" do
@@ -33,6 +34,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     test "renders form", %{conn: conn} do
       conn = get conn, auction_path(conn, :new)
       assert html_response(conn, 200) =~ "New Auction"
+    end
+
+    test "vessels are filtered by logged in users company", %{conn: conn, user: user} do
+      conn = get(conn, auction_path(conn, :new))
+      assert conn.assigns[:vessels] == Auctions.vessels_for_buyer(user)
     end
   end
 

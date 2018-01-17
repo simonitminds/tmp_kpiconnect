@@ -3,6 +3,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
+  alias Oceanconnect.Accounts.{User}
 
 
   def list_auctions do
@@ -158,6 +159,20 @@ defmodule Oceanconnect.Auctions do
       where: company_port.port_id == ^port_id,
       select: company
     query |> Repo.all
+  end
+
+
+  @doc """
+  Returns list of vessels belonging to buyers company
+  ## Examples
+      iex> vessels_for_buyer(%User{})
+      [%Vessel{}, ...]
+
+  """
+
+  def vessels_for_buyer(%User{company_id: company_id}) do
+    Vessel.by_company(company_id)
+    |> Repo.all
   end
 
   @doc """

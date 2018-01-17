@@ -15,5 +15,6 @@ defmodule Oceanconnect.AuctionNewPage do
   def vessel_list() do
     find_all_elements(:css, ".qa-auction-vessel option")
     |> Enum.map(fn(elem) -> inner_text(elem) end)
+    |> Enum.reject(fn(elem) -> elem == "Please select" end)
   end
 end

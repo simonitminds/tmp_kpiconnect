@@ -5,7 +5,9 @@ defmodule Oceanconnect.AuctionEditTest do
   hound_session()
 
   setup do
-    user = insert(:user)
+    company = insert(:company)
+    user = insert(:user, company: company)
+    insert_list(2, :vessel, company: company)
     login_user(user)
     {:ok, %{auction: insert(:auction)}}
   end

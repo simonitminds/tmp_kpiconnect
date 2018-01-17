@@ -208,7 +208,17 @@ defmodule Oceanconnect.AuctionsTest do
 
     setup do
       company = insert(:company)
-      {:ok, %{company_id: company.id}}
+      user = insert(:user, company: company)
+      {:ok, %{company_id: company.id, user: user, company: company}}
+    end
+
+    test "vessels_for_buyer/1", %{user: user, company: company} do
+      vessel = insert(:vessel, company: company)
+      extra_vessel = insert(:vessel)
+      result = Auctions.vessels_for_buyer(user)
+      |> Oceanconnect.Repo.preload(:company)
+      assert result == [vessel]
+      refute extra_vessel in result
     end
 
     test "list_vessels/0 returns all vessels", %{company_id: company_id} do
