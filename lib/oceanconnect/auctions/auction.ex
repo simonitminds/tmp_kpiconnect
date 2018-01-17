@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
-  @derive {Poison.Encoder, except: [:__meta__, :suppliers]}
+  @derive {Poison.Encoder, except: [:__meta__]}
   schema "auctions" do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
