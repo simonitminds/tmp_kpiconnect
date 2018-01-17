@@ -11,41 +11,43 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Oceanconnect.Repo
-alias Oceanconnect.Accounts
 alias Oceanconnect.Accounts.{Company, User}
+alias Oceanconnect.Auctions
 alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
 
 
-company = [
+companies = [
   %{name: "Global Energy Trading Pte Ltd", address1: "Alexandra Point",
     address2: "4438 Alexandra Road, #13-01", city: "Singapore",
     country: "Singapore", contact_name: "Munee Chow", email: "sales@genergytrading.com",
-    main_phone: "+65 6559 1631", mobile_phone: "+65 9785 6238", postal_code: "11958"},
+    main_phone: "+65 6559 1631", mobile_phone: "+65 9785 6238", postal_code: 11958},
   %{name: "Petrochina International (Singapore) Pte Ltd", address1: "One Temasek Avenue",
     address2: "#27-00 Millenia Tower", city: "Singapore",
     country: "Singapore", contact_name: "Wee Tee Ng", email: "ng-weetee@petrochina.com.sg",
-    main_phone: "+65 6411 7513", mobile_phone: "+65 9119 0771", postal_code: "039192"},
+    main_phone: "+65 6411 7513", mobile_phone: "+65 9119 0771", postal_code: 039192},
   %{name: "Shell International Eastern Trading Company", address1: "The Metropolis Tower",
     address2: "1-9 North Bueno Vista Drive", city: "Singapore",
-    country: "Singapore", contact_name: "Benjamin Ong", email: "sales@genergytrading.com",
-    main_phone: "+65 6505 2612", mobile_phone: "+65 9727 8577", postal_code: "138588"},
+    country: "Singapore", contact_name: "Benjamin Ong", email: "benjamin.ong@shell.com",
+    main_phone: "+65 6505 2612", mobile_phone: "+65 9727 8577", postal_code: 138588},
   %{name: "Qatargas Operating Company Limited", address1: "Office 2W-705",
     address2: "", city: "Doha",
-    country: "Qatar", contact_name: "Lee Pritchard", email: "sales@genergytrading.com",
-    main_phone: "+974 4452 3043", mobile_phone: "+44 7803 632226", postal_code: "22666"},
+    country: "Qatar", contact_name: "Lee Pritchard", email: "lpritchard@qatargas.com.qa",
+    main_phone: "+974 4452 3043", mobile_phone: "+44 7803 632226", postal_code: 22666},
 ]
 |> Enum.map(fn(company) ->
   Repo.get_or_insert!(Company, company)
 end)
-|> hd
-
+company = companies |> hd
 
 # User creation doesn't use get_or_insert! fn due to virtual password field
-user = case Repo.get_by(User, %{email: "test@example.com"}) do
-  nil -> {:ok, user} = Accounts.create_user(%{email: "test@example.com", password: "password", company_id: company.id})
-          user
-  user -> user
-end
+[buyer | suppliers] = Enum.map(companies, fn(c) ->
+  if c.name == company.name do
+    Repo.get_or_insert_user!(Repo.get_by(User, %{email: "test@example.com"}), "test@example.com", c)
+  else
+    Repo.get_or_insert_user!(Repo.get_by(User, %{email: c.email}), c.email, c)
+  end
+end)
+
 
 [
   %{name: "Algeciras", country: "Spain", gmt_offset: 1},
@@ -160,4 +162,5 @@ end)
   [%{name: "Algeciras", country: "Spain", gmt_offset: 1}, Port]]
 |> Enum.map(fn([data, module]) -> Repo.get_or_insert!(module, data) end)
 
-Repo.get_or_insert!(Auction, %{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, po: "1234567", buyer_id: user.id})
+auction = Repo.get_or_insert!(Auction, %{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, po: "1234567", buyer_id: buyer.id})
+Auctions.set_suppliers_for_auction(auction, suppliers)
