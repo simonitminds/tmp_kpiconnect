@@ -11,4 +11,9 @@ defmodule Oceanconnect.AuctionNewPage do
       find_element(:class, "qa-auction-#{field}")
     end)
   end
+
+  def vessel_list() do
+    find_all_elements(:css, ".qa-auction-vessel option")
+    |> Enum.map(fn(elem) -> inner_text(elem) end)
+  end
 end

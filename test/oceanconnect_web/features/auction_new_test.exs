@@ -5,9 +5,12 @@ defmodule Oceanconnect.AuctionNewTest do
   hound_session()
 
   setup do
-    user = insert(:user)
+    company = insert(:company)
+    user = insert(:user, company: company)
     login_user(user)
-    {:ok, %{}}
+    buyer_vessels = insert_list(3, :vessel, company: company)
+    insert(:vessel)
+    {:ok, %{buyer_vessels: buyer_vessels}}
   end
 
   test "visting the new auction page" do
@@ -26,5 +29,12 @@ defmodule Oceanconnect.AuctionNewTest do
       "port",
       "vessel"
     ])
+  end
+
+  test "vessels dropdown list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
+    AuctionNewPage.visit()
+
+    buyer_vessel_mapset = Enum.map(buyer_vessels, fn(v) -> v.name end) |> MapSet.new
+    assert MapSet.equal?(MapSet.new(AuctionNewPage.vessel_list()), buyer_vessel_mapset)
   end
 end
