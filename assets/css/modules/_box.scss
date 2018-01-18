@@ -21,6 +21,14 @@
     &:nth-child(even) {
       background-color: $gray-1;
     }
+
+    &--bordered { // For those subsections needing a border demarcation...
+      border-top: 1px solid $gray-2;
+    }
+
+    &--base { // Get last .box__subsection flush with the base of the box.
+      margin-bottom: -1.25rem;
+    }
   }
   &__header { // Headers for a box element
     margin-bottom: 0.5rem;

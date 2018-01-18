@@ -22,7 +22,8 @@
           <span class="has-text-weight-bold is-uppercase">Started at</span> <%= format_datetime(@auction.auction_start) %> GMT
         </div>
         <div class="auction-header__duration has-text-left-mobile">
-          <span class="has-text-weight-bold is-uppercase">Auction Length</span> <%= @auction.duration %> minutes
+<%# TODO: We currently don't have decision period length as a parameter, so we'll have to add that in. %>
+          <span class="has-text-weight-bold is-uppercase">Decision Period</span> <%= @auction.duration %> minutes
         </div>
       </div>
     </div>
@@ -42,26 +43,96 @@
           </ul>
         </div>
         <div class="box">
-          <h3 class="box__header box__header--bordered">Lowest Bid(s)</h3>
-          <table class="table is-fullwidth is-striped">
-            <thead>
-              <tr>
-                <th>Seller</th>
-                <th><%= @auction.fuel.name %></th>
-                <th>Unit Price</th>
-                <th>Delivery</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="is-selected">
-                <%# TODO: Replace this business with real auction data. %>
-                <td> Seller 2<!-- Seller Name --></td>
-                <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
-                <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
-                <td> Completed <!-- Delivery Status --></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="box__subsection">
+            <h3 class="box__header box__header--bordered">Lowest Bid(s)</h3>
+            <table class="table is-fullwidth is-striped">
+              <thead>
+                <tr>
+                  <th>Seller</th>
+                  <th><%= @auction.fuel.name %></th>
+                  <th>Unit Price</th>
+                  <th>Delivery</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="is-selected">
+                  <%# TODO: Replace this business with real auction data. %>
+                  <td> Seller 2<!-- Seller Name --></td>
+                  <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
+                  <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
+                  <td> Completed <!-- Delivery Status --></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box__subsection box__subsection--bordered box__subsection--base">
+            <h3 class="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
+            <div class="field is-horizontal is-expanded"> <!-- Fuel Type -->
+              <div class="field-label">
+                <div class="control">
+                  <label class="label" for="">Fuel Type</label>
+                </div>
+              </div>
+              <div class="field-body">
+                <div class="control is-expanded">
+                  <div class="select is-fullwidth">
+                    <select class="" name="">
+                      <option value="">{ Fuel Type }</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal is-expanded"> <!-- Bid Amount -->
+              <div class="field-label">
+                <div class="control">
+                  <label class="label" for="">Bid Amount</label>
+                </div>
+              </div>
+              <div class="field-body">
+                <div class="control is-expanded">
+                  <input class="input" type="text" name="" value="">
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal is-expanded"> <!-- Bid Expiration -->
+              <div class="field-label">
+                <div class="control">
+                  <label class="label" for="">Expiration</label>
+                </div>
+              </div>
+              <div class="field-body">
+                <div class="control is-expanded">
+                  <div class="select is-fullwidth">
+                    <select class="" name="">
+                      <option value="">{ Bid Expiration }</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal is-expanded"> <!-- Credit Terms -->
+              <div class="field-label">
+                <div class="control">
+                  <label class="label" for="">Credit Terms</label>
+                </div>
+              </div>
+              <div class="field-body">
+                <div class="control is-expanded">
+                  <div class="select is-fullwidth">
+                    <select class="" name="">
+                      <option value="">{ Credit Terms }</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
+              <div class="control">
+                <button type="button" class="button is-primary">Place Bid</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="box">
           <h3 class="box__header box__header--bordered">Grade Display</h3>
@@ -111,6 +182,21 @@
             </li>
           </ul>
         </div>
+        <div class="box">
+          <div class="box__subsection">
+            <h3 class="box__header">Buyer Information</h3>
+            <ul class="list has-no-bullets">
+              <li>
+                <strong>Organization</strong> { Company }
+              </li>
+              <li>
+                <strong>Buyer</strong> { Buyer Name }
+              </li>
+              <li>
+                <strong>Buyer Reference Number</strong> { BRN }
+              </li>
+            </ul>
+          </div>
           <div class="box__subsection">
             <h3 class="box__header">Fuel Requirements</h3>
             <ul class="list has-no-bullets">
@@ -143,6 +229,7 @@
           <div class="field has-margin-top-md">
             <%= link "Edit", to: auction_path(@conn, :edit, @auction), class: "button is-primary" %>
           </div>
+        </div>
         </div>
       </div>
     </div>

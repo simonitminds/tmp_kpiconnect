@@ -33,6 +33,10 @@
   }
 }
 
+.control.is-expanded { // The proper Bulma class doesn't seem to compile with the rest, so here's a shim for the meantime.
+  width: 100%;
+}
+
 
 .label {
 }
