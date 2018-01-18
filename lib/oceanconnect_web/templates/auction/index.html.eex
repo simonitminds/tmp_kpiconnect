@@ -33,6 +33,9 @@
                 <div class="has-text-weight-bold has-margin-top-md">
                   <%= auction.fuel.name %> (<%= auction.fuel_quantity %>&nbsp;MT)
                 </div>
+                <div class="card-content__best-price">
+                  <strong>Best Offer: </strong> { Price }
+                </div>
               </div>
               <footer class="card-footer">
                 <%= link "Show", to: auction_path(@conn, :show, auction), class: "card-footer-item" %>
