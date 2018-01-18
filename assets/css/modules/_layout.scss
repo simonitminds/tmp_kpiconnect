@@ -7,6 +7,34 @@
 
 // ===== FRESH UTILITIES ===== //
 
+// TODO: Channel these classes somewhere more appropriate...
+
+section.auction-list {
+  padding-bottom: 2rem;
+
+  &:last-child {
+    padding-bottom: 4rem;
+  }
+
+  &> .container {
+    padding-top: 2rem !important;
+  }
+
+  .empty-list {
+    background-color: $gray-1;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  &:nth-child(even) {
+    background-color: $gray-1;
+
+    .empty-list {
+      background-color: white;
+    }
+  }
+}
+
 .container {
   padding: 0 1rem;
 }

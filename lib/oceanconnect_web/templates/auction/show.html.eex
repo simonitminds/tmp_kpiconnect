@@ -1,3 +1,4 @@
+<div class="container is-fullhd">
 <%= link "Return to Auction Listing", to: auction_path(@conn, :index), class: "is-link is-inline-block has-text-dark is-italic has-margin-top-md" %>
 
 <div class="has-margin-top-lg">
@@ -234,3 +235,5 @@
       </div>
     </div>
   </div>
+
+</div>
