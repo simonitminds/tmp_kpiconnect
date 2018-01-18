@@ -1,5 +1,12 @@
 <div class="container is-fullhd">
-<%= link "Return to Auction Listing", to: auction_path(@conn, :index), class: "is-link is-inline-block has-text-dark is-italic has-margin-top-md" %>
+
+<nav class="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link "Auction Listing", to: auction_path(@conn, :index), class: "" %></li>
+    <li class="is-active"><a href="#" aria-current="page">Auction <%= @auction.po %></a></li>
+  </ul>
+</nav>
+
 
 <div class="has-margin-top-lg">
   <div class="auction-header">
