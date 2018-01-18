@@ -9,6 +9,13 @@ defmodule OceanconnectWeb.AuctionController do
     render(conn, "index.html", auctions: auctions)
   end
 
+  def start(conn, %{"id" => id}) do
+    auction = Auctions.get_auction!(id)
+    |> Auctions.start_auction
+
+    render(conn, "show.html", auction: auction)
+  end
+
   def new(conn, _params) do
     changeset = Auctions.change_auction(%Auction{})
     ports = Auctions.list_ports

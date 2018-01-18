@@ -4,7 +4,7 @@ defmodule Oceanconnect.Page do
       use Hound.Helpers
 
       def is_current_path? do
-        current_path() == @page_path
+        current_path() =~ @page_path
       end
 
       def has_content?(content) do
