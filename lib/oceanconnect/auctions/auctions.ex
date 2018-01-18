@@ -3,6 +3,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
+  alias Oceanconnect.Accounts.{User}
 
 
   def list_auctions do
@@ -36,10 +37,26 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, :vessel, :fuel])
+    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer, :suppliers])
   end
 
+  def add_supplier_to_auction(%Auction{} = auction, %Oceanconnect.Accounts.User{} = supplier) do
+    auction_with_suppliers = auction
+    |> Repo.preload(:suppliers)
 
+    auction_with_suppliers
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, [supplier | auction_with_suppliers.suppliers])
+    |> Repo.update!
+  end
+
+  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
+    auction
+    |> Repo.preload(:suppliers)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
+    |> Repo.update!
+  end
 
   @doc """
   Returns the list of ports.
@@ -136,6 +153,28 @@ defmodule Oceanconnect.Auctions do
   end
 
 
+  def companies_by_port(port_id) do
+    query = from company_port in "company_ports",
+      join: company in Oceanconnect.Accounts.Company, on: company.id == company_port.company_id,
+      where: company_port.port_id == ^port_id,
+      select: company
+    query |> Repo.all
+  end
+
+
+  @doc """
+  Returns list of vessels belonging to buyers company
+  ## Examples
+      iex> vessels_for_buyer(%User{})
+      [%Vessel{}, ...]
+
+  """
+
+  def vessels_for_buyer(%User{company_id: company_id}) do
+    Vessel.by_company(company_id)
+    |> Repo.all
+  end
+
   @doc """
   Returns the list of vessels.
 
@@ -147,6 +186,7 @@ defmodule Oceanconnect.Auctions do
   """
   def list_vessels do
     Repo.all(Vessel)
+    |> Repo.preload(:company)
   end
 
   @doc """
@@ -163,7 +203,7 @@ defmodule Oceanconnect.Auctions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_vessel!(id), do: Repo.get!(Vessel, id)
+  def get_vessel!(id), do: Repo.get!(Vessel, id) |> Repo.preload(:company)
 
   @doc """
   Creates a vessel.

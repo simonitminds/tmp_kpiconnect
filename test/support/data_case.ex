@@ -22,6 +22,7 @@ defmodule Oceanconnect.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Oceanconnect.DataCase
+      import Oceanconnect.Factory
     end
   end
 
@@ -33,6 +34,12 @@ defmodule Oceanconnect.DataCase do
     end
 
     :ok
+  end
+
+  def all_values_match?(map, struct) do
+    Enum.all?(map, fn({k, v}) ->
+      Map.fetch!(struct, k) == v
+    end)
   end
 
   @doc """

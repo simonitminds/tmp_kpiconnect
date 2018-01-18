@@ -7,4 +7,8 @@ defmodule Oceanconnect.Accounts.Auth do
     |> assign(:current_user, user)
     |> configure_session(renew: true)
   end
+
+  def current_user(conn) do
+    conn.assigns[:current_user]
+  end
 end

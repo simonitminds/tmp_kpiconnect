@@ -3,12 +3,13 @@ defmodule Oceanconnect.Accounts.User do
   import Ecto.Changeset
   alias Oceanconnect.Accounts.User
 
+  @derive {Poison.Encoder, except: [:__meta__]}
 
   schema "users" do
     field :email, :string
-    field :name, :string
     field :password_hash, :string
     field :password, :string, virtual: true
+    belongs_to :company, Oceanconnect.Accounts.Company
 
     timestamps()
   end
@@ -16,8 +17,9 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :name, :password])
+    |> cast(attrs, [:email, :password, :company_id])
     |> validate_required([:email, :password])
+    |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)
     |> put_pass_hash()
   end

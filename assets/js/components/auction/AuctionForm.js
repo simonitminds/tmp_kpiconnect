@@ -147,12 +147,6 @@ class AuctionForm extends React.Component {constructor(props) {
         />
         <InputField
           model={'auction'}
-          field={'company'}
-          labelText={'company'}
-          value={this.props.auction.company}
-        />
-        <InputField
-          model={'auction'}
           field={'po'}
           labelText={'po'}
           value={this.props.auction.po}

@@ -111,16 +111,6 @@
             </li>
           </ul>
         </div>
-        <div class="box">
-          <div class="box__subsection">
-            <h3 class="box__header">Buyer Information</h3>
-            <ul class="list has-no-bullets">
-              <li>
-                <strong>Organization</strong>
-                <%= @auction.company %>
-              </li>
-            </ul>
-          </div>
           <div class="box__subsection">
             <h3 class="box__header">Fuel Requirements</h3>
             <ul class="list has-no-bullets">
