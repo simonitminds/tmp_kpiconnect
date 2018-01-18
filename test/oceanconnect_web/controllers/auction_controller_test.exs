@@ -43,13 +43,13 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "create auction" do
-    setup do
+    setup(%{user: user}) do
       port = insert(:port)
-      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id})
+      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id, buyer_id: user.id})
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
 
-    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params} do
+    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, user: user} do
       conn = post conn, auction_path(conn, :create), auction: valid_auction_params
 
       assert %{id: id} = redirected_params(conn)
@@ -58,6 +58,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
       conn = get conn, auction_path(conn, :show, id)
       assert html_response(conn, 200) =~ auction.vessel.name
+      assert auction.buyer_id == user.id
     end
 
     #TODO Refactor test to assert on specific errors

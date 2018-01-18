@@ -19,6 +19,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def create(conn, %{"auction" => auction_params}) do
     auction_params = Auction.from_params(auction_params)
+    |> Map.put("buyer_id", Auth.current_user(conn).id)
     case Auctions.create_auction(auction_params) do
       {:ok, auction} ->
         conn
