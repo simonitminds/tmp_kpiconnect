@@ -1,9 +1,12 @@
 defmodule Oceanconnect.AuctionIndexPage do
-  @page_path "/auctions"
   use Oceanconnect.Page
 
   def visit do
-    navigate_to(@page_path)
+    navigate_to("/auctions")
+  end
+
+  def is_current_path? do
+    current_path() == "/auctions"
   end
 
   def start_auction(auction) do

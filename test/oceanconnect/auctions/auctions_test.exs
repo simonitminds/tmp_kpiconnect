@@ -113,6 +113,16 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.set_suppliers_for_auction([supplier2])
       assert auction.suppliers == [supplier2]
     end
+
+    test "start_auction" do
+      auction = insert(:auction)
+
+      assert %{status: :pending} = Auctions.current_state(auction)
+      Auctions.start_auction(auction)
+      assert %{status: :open} = Auctions.current_state(auction)
+      Auctions.start_auction(auction)
+      assert %{status: :open} = Auction.current_state(auction)
+    end
   end
 
   describe "ports" do

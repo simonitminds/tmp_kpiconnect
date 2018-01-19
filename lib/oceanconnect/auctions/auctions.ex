@@ -15,6 +15,17 @@ defmodule Oceanconnect.Auctions do
      Repo.get!(Auction, id)
    end
 
+  def current_state(auction = %Auction{}) do
+    {:ok, state = %AuctionState{}} = AuctionStore.current_state(auction)
+    state
+  end
+
+  def start_auction(auction = %Auction{}) do
+    %AuctionState{status: status} = auction
+    |> AuctionCommand.start_auction()
+    |> AuctionStore.process_command()
+  end
+
   def create_auction(attrs \\ %{}) do
     %Auction{}
     |> Auction.changeset(attrs)

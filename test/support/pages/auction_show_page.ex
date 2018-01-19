@@ -1,12 +1,16 @@
 defmodule Oceanconnect.AuctionShowPage do
-  @page_path "/auctions/"
   use Oceanconnect.Page
 
   def visit(id) do
-    navigate_to("#{@page_path}#{id}")
+    navigate_to("/auctions/#{id}")
+  end
+
+  def is_current_path?(id) do
+    current_path() == "/auctions/#{id}"
   end
 
   def auction_status() do
-    find_element(:class, "qa-auction-status").inner_text()
+    find_element(:class, "qa-auction-status")
+    |> inner_text()
   end
 end

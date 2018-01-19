@@ -70,6 +70,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
+  describe "start auction" do
+    test "manually starting an auction", (%{user: user, auction: auction = %Oceanconnect.Auctions.Auction{id: auction_id}, conn: conn}) do
+      conn = get(conn, auction_path(conn, :start, auction_id))
+
+      assert html_response(conn, 200) =~ "Auction Listing"
+    end
+  end
+
   describe "edit auction" do
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)

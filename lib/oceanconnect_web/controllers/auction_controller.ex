@@ -10,10 +10,11 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def start(conn, %{"id" => id}) do
-    auction = Auctions.get_auction!(id)
+    id
+    |> Auctions.get_auction!
     |> Auctions.start_auction
 
-    render(conn, "show.html", auction: auction)
+    redirect(conn, to: auction_path(conn, :index))
   end
 
   def new(conn, _params) do

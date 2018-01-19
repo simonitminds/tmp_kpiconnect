@@ -1,5 +1,5 @@
 defmodule Oceanconnect.AuctionShowTest do
-  use Oceanconnect.FeatureCase, async: true
+  use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionIndexPage, AuctionShowPage}
   import Hound.Helpers.Session
 
@@ -19,14 +19,15 @@ defmodule Oceanconnect.AuctionShowTest do
     in_browser_session(:supplier_session, fn ->
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_status == "Pending"
+      assert AuctionShowPage.is_current_path?(auction.id)
+      assert AuctionShowPage.auction_status == "PENDING"
     end)
 
     AuctionIndexPage.start_auction(auction)
 
     in_browser_session :supplier_session, fn ->
-      assert AuctionShowPage.is_current_path()
-      assert AuctionShowPage.auction_status == "Open"
+      assert AuctionShowPage.is_current_path?(auction.id)
+      assert AuctionShowPage.auction_status == "OPEN"
     end
   end
 end
