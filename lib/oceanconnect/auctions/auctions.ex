@@ -2,7 +2,8 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
   alias Oceanconnect.Accounts.{User}
 
 
@@ -16,8 +17,8 @@ defmodule Oceanconnect.Auctions do
    end
 
   def current_state(auction = %Auction{}) do
-    {:ok, state = %AuctionState{}} = AuctionStore.current_state(auction)
-    state
+    %AuctionState{status: status} = AuctionStore.get_current_state(auction)
+    status
   end
 
   def start_auction(auction = %Auction{}) do
