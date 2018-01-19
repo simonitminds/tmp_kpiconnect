@@ -40,7 +40,7 @@
               <footer class="card-footer">
                 <%= link "Show", to: auction_path(@conn, :show, auction), class: "card-footer-item" %>
                 <%= link "Edit", to: auction_path(@conn, :edit, auction), class: "card-footer-item" %>
-                <span class="control qa-auction-start"><%= link "Start", to: auction_path(@conn, :start, auction), class: "card-footer-item" %></span>
+                <span class="control qa-auction-start" style="background-color: pink"><%= link "Start", to: auction_path(@conn, :start, auction), class: "card-footer-item" %></span>
               </footer>
 
               <!-- Other data fragments formerly on the table that I chose not to use...
