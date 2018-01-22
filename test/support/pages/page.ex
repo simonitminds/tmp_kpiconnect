@@ -3,10 +3,6 @@ defmodule Oceanconnect.Page do
     quote do
       use Hound.Helpers
 
-      def is_current_path? do
-        current_path() == @page_path
-      end
-
       def has_content?(content) do
         String.contains?(page_source(), content)
       end

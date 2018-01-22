@@ -1,7 +1,7 @@
 defmodule Oceanconnect.AuctionEditPage do
   @page_path "/auctions/:id/edit"
   use Oceanconnect.Page
-  
+
 
   def visit(id) do
     navigate_to("/auctions/#{id}/edit")

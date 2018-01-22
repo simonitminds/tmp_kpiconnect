@@ -1,6 +1,6 @@
 defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase, async: true
-  alias Oceanconnect.AuctionIndex
+  alias Oceanconnect.AuctionIndexPage
 
   hound_session()
 
@@ -11,8 +11,8 @@ defmodule Oceanconnect.AuctionIndexTest do
   end
 
   test "renders the default auction index page" do
-    AuctionIndex.visit()
+    AuctionIndexPage.visit()
 
-    assert AuctionIndex.has_content?("Auction Listing")
+    assert AuctionIndexPage.has_content?("Auction Listing")
   end
 end

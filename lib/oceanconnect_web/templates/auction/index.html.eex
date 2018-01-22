@@ -17,12 +17,12 @@
 
       <%= for auction <- @auctions do %>
           <div class="column is-one-third">
-            <div class="card">
+            <div class="card qa-auction-<%= auction.id %>">
               <div class="card-content has-padding-bottom-md">
                 <div class="is-clearfix">
                   <p class="has-text-weight-bold is-pulled-left"><%= auction.po %></p>
                   <div class="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold">
-                    Open
+                    <%= auction_status(auction) %>
                   </div>
                   <p class="is-pulled-right"><%= format_datetime(auction.auction_start) %></p>
                 </div>
@@ -40,6 +40,7 @@
               <footer class="card-footer">
                 <%= link "Show", to: auction_path(@conn, :show, auction), class: "card-footer-item" %>
                 <%= link "Edit", to: auction_path(@conn, :edit, auction), class: "card-footer-item" %>
+                <span class="control qa-auction-start" style="background-color: pink"><%= link "Start", to: auction_path(@conn, :start, auction), class: "card-footer-item" %></span>
               </footer>
 
               <!-- Other data fragments formerly on the table that I chose not to use...

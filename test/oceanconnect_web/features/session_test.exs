@@ -1,6 +1,6 @@
 defmodule OceanconnectWeb.SessionTest do
   use Oceanconnect.FeatureCase, async: true
-  alias Oceanconnect.{AuctionIndex, NewSessionPage}
+  alias Oceanconnect.{AuctionIndexPage, NewSessionPage}
 
   hound_session()
 
@@ -14,6 +14,6 @@ defmodule OceanconnectWeb.SessionTest do
     NewSessionPage.enter_credentials(user.email, "password")
     NewSessionPage.submit()
 
-    assert AuctionIndex.is_current_path?()
+    assert AuctionIndexPage.is_current_path?()
   end
 end
