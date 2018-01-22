@@ -5,7 +5,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
   alias Oceanconnect.Accounts.{User}
-
+  alias Oceanconnect.Auctions.AuctionsSupervisor
 
   def list_auctions do
     Repo.all(Auction)
@@ -24,7 +24,11 @@ defmodule Oceanconnect.Auctions do
   def start_auction(auction = %Auction{}) do
     %AuctionState{status: status} = auction
     |> AuctionCommand.start_auction()
-    |> AuctionStore.process_command()
+    |> AuctionStore.process_command(auction.id)
+  end
+
+  def supervise_auction(auction = %Auction{}) do
+    AuctionsSupervisor.start_child(auction.id)
   end
 
   def create_auction(attrs \\ %{}) do

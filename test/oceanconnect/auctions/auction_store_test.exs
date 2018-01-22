@@ -5,17 +5,29 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   setup do
     auction = insert(:auction)
-    {:ok, auction_store} = AuctionStore.start_link(auction.id)
-    {:ok, %{auction_store: auction_store, auction: auction}}
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
+    {:ok, %{auction: auction}}
   end
 
   test "starting auction_store for auction", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
 
     command = AuctionCommand.start_auction(auction)
-    AuctionStore.process_command(command)
+    AuctionStore.process_command(command, auction.id)
 
     assert %AuctionState{status: :open, auction_id: auction.id} == AuctionStore.get_current_state(auction)
   end
 
+  test "auction is supervised", %{auction: auction} do
+    pid = AuctionStore.find_store(auction.id)
+    assert Process.alive?(pid)
+
+    Process.exit(pid, :shutdown)
+
+    refute Process.alive?(pid)
+    :timer.sleep(500)
+
+    new_pid = AuctionStore.find_store(auction.id)
+    assert Process.alive?(new_pid)
+  end
 end

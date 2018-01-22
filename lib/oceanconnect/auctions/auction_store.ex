@@ -3,6 +3,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
 
+  @registry_name :auctions_registry
+
   defmodule AuctionState do
     defstruct auction_id: nil, status: :pending
   end
@@ -15,8 +17,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
   end
 
+  defp get_auction_store_name(auction_id) do
+    {:via, Registry, {:auctions_registry, auction_id}}
+  end
+
   def start_link(auction_id) when is_integer(auction_id) do
-    GenServer.start_link(__MODULE__, auction_id, name: __MODULE__)
+    GenServer.start_link(__MODULE__, auction_id, name: get_auction_store_name(auction_id))
   end
 
   def init(auction_id) do
@@ -31,15 +37,26 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Client
   def get_current_state(%Oceanconnect.Auctions.Auction{id: auction_id}) do
-    GenServer.call(__MODULE__, :get_current_state)
+    pid = find_store(auction_id)
+    GenServer.call(pid, :get_current_state)
   end
 
-  def process_command(%AuctionCommand{command: :start_auction, data: data}) do
-    GenServer.cast(__MODULE__, {:start_auction, data})
+  def find_store(auction_id) do
+    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
+      pid
+    else
+      [] -> {:error, "Not Started"}
+    end
   end
 
-  def process_command(%AuctionCommand{command: cmd, data: data}) do
-    GenServer.call(__MODULE__, {cmd, data})
+  def process_command(%AuctionCommand{command: :start_auction, data: data}, auction_id) do
+    pid = find_store(auction_id)
+    GenServer.cast(pid, {:start_auction, data})
+  end
+
+  def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
+    pid = find_store(auction_id)
+    GenServer.call(pid, {cmd, data})
   end
 
    # Server

@@ -30,6 +30,7 @@ defmodule OceanconnectWeb.AuctionController do
     |> Map.put("buyer_id", Auth.current_user(conn).id)
     case Auctions.create_auction(auction_params) do
       {:ok, auction} ->
+        Auctions.supervise_auction(auction)
         conn
         |> put_flash(:info, "Auction created successfully.")
         |> redirect(to: auction_path(conn, :show, auction))
