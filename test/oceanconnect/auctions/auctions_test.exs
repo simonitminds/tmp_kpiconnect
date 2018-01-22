@@ -104,14 +104,15 @@ defmodule Oceanconnect.AuctionsTest do
       |> MapSet.equal?(MapSet.new([s1.id, s2.id]))
     end
 
-    test "start_auction" do
-      auction = insert(:auction)
+    test "auction status" do
+      auction_attrs = insert(:auction)|> Map.take([:fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
+      {:ok, auction} = Auctions.create_auction(auction_attrs)
 
-      assert %{status: :pending} = Auctions.current_state(auction)
+      assert :pending = Auctions.auction_status(auction)
       Auctions.start_auction(auction)
-      assert %{status: :open} = Auctions.current_state(auction)
+      assert :open = Auctions.auction_status(auction)
       Auctions.start_auction(auction)
-      assert %{status: :open} = Auction.current_state(auction)
+      assert :open = Auctions.auction_status(auction)
     end
   end
 

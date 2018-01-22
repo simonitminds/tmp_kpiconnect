@@ -22,7 +22,7 @@
                 <div class="is-clearfix">
                   <p class="has-text-weight-bold is-pulled-left"><%= auction.po %></p>
                   <div class="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold">
-                    Open
+                    <%= auction_status(auction) %>
                   </div>
                   <p class="is-pulled-right"><%= format_datetime(auction.auction_start) %></p>
                 </div>

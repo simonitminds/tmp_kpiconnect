@@ -37,26 +37,26 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Client
   def get_current_state(%Oceanconnect.Auctions.Auction{id: auction_id}) do
-    pid = find_store(auction_id)
-    GenServer.call(pid, :get_current_state)
+    with {:ok, pid} <- find_store(auction_id),
+    do: GenServer.call(pid, :get_current_state)
   end
 
   def find_store(auction_id) do
     with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
-      pid
+      {:ok, pid}
     else
       [] -> {:error, "Not Started"}
     end
   end
 
   def process_command(%AuctionCommand{command: :start_auction, data: data}, auction_id) do
-    pid = find_store(auction_id)
-    GenServer.cast(pid, {:start_auction, data})
+    return = with {:ok, pid} <- find_store(auction_id),
+    do: GenServer.cast(pid, {:start_auction, data})
   end
 
   def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
-    pid = find_store(auction_id)
-    GenServer.call(pid, {cmd, data})
+    with {:ok, pid} <- find_store(auction_id),
+    do: GenServer.call(pid, {cmd, data})
   end
 
    # Server

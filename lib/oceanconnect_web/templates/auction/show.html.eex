@@ -13,7 +13,7 @@
     <div class="columns has-margin-bottom-none">
       <div class="column">
         <div class="auction-header__status tag is-rounded qa-auction-status">
-          Pending
+          <%= auction_status(@auction) %>
         </div>
         <div class="auction-header__po is-uppercase">
           Auction <%= @auction.po %>

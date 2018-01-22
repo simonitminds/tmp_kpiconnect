@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions.AuctionStore
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
-
+ 
   setup do
     auction = insert(:auction)
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
@@ -19,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "auction is supervised", %{auction: auction} do
-    pid = AuctionStore.find_store(auction.id)
+   {:ok, pid} = AuctionStore.find_store(auction.id)
     assert Process.alive?(pid)
 
     Process.exit(pid, :shutdown)
@@ -27,7 +27,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     refute Process.alive?(pid)
     :timer.sleep(500)
 
-    new_pid = AuctionStore.find_store(auction.id)
+    {:ok, new_pid} = AuctionStore.find_store(auction.id)
     assert Process.alive?(new_pid)
   end
 end

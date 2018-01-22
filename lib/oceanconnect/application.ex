@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Application do
   use Application
-  alias Oceanconnect.Auctions.AuctionsSupervisor
+  alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter}
 
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
@@ -15,7 +15,8 @@ defmodule Oceanconnect.Application do
       supervisor(OceanconnectWeb.Endpoint, []),
       {Registry, keys: :unique, name: :auctions_registry},
       # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
-      worker(AuctionsSupervisor, [], restart: :permanent)
+      worker(AuctionsSupervisor, [], restart: :permanent),
+      worker(AuctionStoreStarter, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

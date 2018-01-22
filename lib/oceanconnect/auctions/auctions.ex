@@ -16,25 +16,34 @@ defmodule Oceanconnect.Auctions do
      Repo.get!(Auction, id)
    end
 
-  def current_state(auction = %Auction{}) do
-    %AuctionState{status: status} = AuctionStore.get_current_state(auction)
-    status
+  def auction_status(auction = %Auction{}) do
+    case AuctionStore.get_current_state(auction) do
+      {:error, "Not Started"} -> :pending
+      %AuctionState{status: status} -> status
+    end
   end
 
   def start_auction(auction = %Auction{}) do
-    %AuctionState{status: status} = auction
+    auction
     |> AuctionCommand.start_auction()
     |> AuctionStore.process_command(auction.id)
   end
 
   def supervise_auction(auction = %Auction{}) do
-    AuctionsSupervisor.start_child(auction.id)
   end
 
   def create_auction(attrs \\ %{}) do
-    %Auction{}
+    auction = %Auction{}
     |> Auction.changeset(attrs)
     |> Repo.insert()
+
+    case auction do
+      {:ok, auction} ->
+        AuctionsSupervisor.start_child(auction.id)
+        {:ok, auction}
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   def update_auction(%Auction{} = auction, attrs) do
