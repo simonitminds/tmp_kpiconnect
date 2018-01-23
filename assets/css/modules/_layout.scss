@@ -25,13 +25,22 @@ section {
     }
 
     .empty-list {
-      background-color: $gray-1;
+      background-color: $gray-0;
       padding: 1rem;
       text-align: center;
     }
 
     &:nth-child(even) {
-      background-color: $gray-1;
+      background-color: $gray-0;
+
+      .empty-list {
+        background-color: white;
+      }
+    }
+  }
+  &.auction-info { // Form divisions for Auction Create/Edit
+    &:nth-child(even) {
+      background-color: $gray-0;
 
       .empty-list {
         background-color: white;

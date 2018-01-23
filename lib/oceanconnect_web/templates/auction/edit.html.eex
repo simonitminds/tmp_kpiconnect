@@ -1,10 +1,7 @@
 <div class="container is-fullhd">
-
-<div class="content has-margin-top-lg">
-<h1 class="title is-3 has-text-weight-bold">Edit Auction</h1>
+  <div class="content has-margin-top-lg">
+    <h1 class="title is-3 has-text-weight-bold">Edit Auction</h1>
+  </div>
+</div>
 
 <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :update, @auction)) %>
-
-</div>
-
-</div>

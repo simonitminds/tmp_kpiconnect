@@ -62,6 +62,12 @@ class AuctionForm extends React.Component {constructor(props) {
         <input type="hidden" id="auction_eta_minute" name="auction[eta]" value={this.state.eta} />
         <input type="hidden" id="auction_etd_minute" name="auction[etd]" value={this.state.etd} />
 
+{/* TODO: Finish cleaning this up once I get an internet connection again... */}
+<section className="auction-info">
+  <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+    <div className="content">
+      <fieldset>
+        <legend className="subtitle is-4" >Vessel Being Fueled</legend>
         <div className="field">
           <label htmlFor="auction_vessel_id" className="label">
             Vessel
@@ -85,33 +91,6 @@ class AuctionForm extends React.Component {constructor(props) {
             </div>
           </div>
         </div>
-
-        <div className="field">
-          <label htmlFor="auction_port_id" className="label">
-            Port
-          </label>
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select
-                id="auction_port_id"
-                name="auction[port_id]"
-                className="qa-auction-port"
-                value={this.state.selected_port}
-                onChange={this.handlePortChange}
-              >
-                <option disabled value="">
-                  Please select
-                </option>
-                {_.map(this.props.ports, port => (
-                  <option key={port.id} value={port.id}>
-                    {port.name}, {port.country}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
         <div className="field">
           <label htmlFor="auction_fuel_id" className="label">
             Fuel
@@ -145,6 +124,78 @@ class AuctionForm extends React.Component {constructor(props) {
           value={this.props.auction.fuel_quantity}
           opts={{type: 'number', label: "Fuel Quantity (MT)"}}
         />
+      </fieldset>
+    </div>
+  </div>
+</section>
+  <section className="auction-info">
+  <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+    <div className="content">
+        <fieldset>
+          <legend className="subtitle is-4" >Port</legend>
+          <div className="field">
+            <label htmlFor="auction_port_id" className="label">
+              Port
+            </label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select
+                  id="auction_port_id"
+                  name="auction[port_id]"
+                  className="qa-auction-port"
+                  value={this.state.selected_port}
+                  onChange={this.handlePortChange}
+                >
+                  <option disabled value="">
+                    Please select
+                  </option>
+                  {_.map(this.props.ports, port => (
+                    <option key={port.id} value={port.id}>
+                      {port.name}, {port.country}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
+          <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
+          <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
+          <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
+      </fieldset>
+    </div>
+  </div>
+</section>
+  <section className="auction-info">
+  <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+    <div className="content">
+      <fieldset>
+        <legend className="subtitle is-4" >Additional Considerations</legend>
+
+        <div className="field">
+          <label htmlFor={`auction_additional_information`} className={'label'}>
+            Additional Information
+          </label>
+          <div className="control">
+            <textarea
+              name={'auction[additional_information]'}
+              id={'auction_additional_information'}
+              className="textarea qa-auction-additional_information"
+              defaultValue={this.state.additional_information}
+            ></textarea>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</section>
+  <section className="auction-info">
+  <div className="container is-fullhd">
+    <div className="content has-margin-top-lg">
+      <fieldset>
+        <legend className="subtitle is-4" >Auction Details</legend>
+
         <InputField
           model={'auction'}
           field={'po'}
@@ -153,10 +204,6 @@ class AuctionForm extends React.Component {constructor(props) {
           opts={{ labelClass: 'label is-uppercase' }}
         />
 
-        <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
-        <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
-        <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
-        <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
         <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
         <i className="is-caption">Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
 
@@ -179,29 +226,19 @@ class AuctionForm extends React.Component {constructor(props) {
           </div>
        </div>
 
-      <div className="field">
-        <label htmlFor={`auction_additional_information`} className={'label'}>
-          Additional Information
-        </label>
-        <div className="control">
-          <textarea
-            name={'auction[additional_information]'}
-            id={'auction_additional_information'}
-            className="textarea qa-auction-additional_information"
-            defaultValue={this.state.additional_information}
-          ></textarea>
-        </div>
-      </div>
+       <CheckBoxField
+           model={'auction'}
+           field={'anonymous_bidding'}
+           labelText={'anonymous bidding'}
+           value={this.props.auction.anonymous_bidding}
+           opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+       />
 
-      <CheckBoxField
-          model={'auction'}
-          field={'anonymous_bidding'}
-          labelText={'anonymous bidding'}
-          value={this.props.auction.anonymous_bidding}
-          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-      />
-
-    </div>);
+      </fieldset>
+    </div>
+  </div>
+</section>
+</div>);
   }
 }
 

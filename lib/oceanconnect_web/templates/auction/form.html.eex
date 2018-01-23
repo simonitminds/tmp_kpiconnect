@@ -1,9 +1,14 @@
 <div class="form">
 <%= form_for @changeset, @action,[class: "control"], fn _f -> %>
+
   <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>
+  <div class="container is-fullhd">
+    <div class="content has-margin-top-lg">
+      <div class="alert alert-danger">
+        <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>
+      </div>
     </div>
+  </div>
   <% end %>
 
   <%= react_component("Components.AuctionForm",
@@ -14,10 +19,15 @@
           vessels: @vessels,
           fuels: @fuels
         }) %>
-
-  <div class="field has-margin-top-lg has-margin-bottom-lg">
-    <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
-    <%= submit "Submit", class: "button is-link" %>
+  <section class="auction-info has-margin-top-lg has-background-gray-0">
+  <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
+    <div class="content">
+      <div class="field">
+        <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
+        <%= submit "Submit", class: "button is-link" %>
+      </div>
+    </div>
   </div>
+</section>
 <% end %>
 </div>

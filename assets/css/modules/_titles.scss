@@ -20,3 +20,9 @@ $size-7: 0.75rem; .is-size-7, .is-7 { font-size: 0.75rem; }
 .title {font-family: $family-header;}
 
 // Additions
+
+.title {
+  .content > &:only-child {
+    margin-bottom: 1.5rem;
+  }
+}

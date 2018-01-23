@@ -20,6 +20,7 @@ $gold: #ffae30;
 $red: #ff552e;
 
 // The lighter the gray, the lower the number...
+$gray-0: #f3f3f3;
 $gray-1: #efefef;
 $gray-2: #dbdbdb;
 $gray-3: #888888;
@@ -32,6 +33,11 @@ $danger: $red;
 $dark: $gray-3;
 $highlight: $yellow;
 
+//// Associated Utilities
+
+.has-background-gray-0 {
+  background-color: $gray-0;
+}
 
 // ===== TYPOGRAPHY ===== //
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,400i');
