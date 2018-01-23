@@ -1,45 +1,54 @@
-<div class="container is-fullhd">
+<section class="auction-page">
+  <div class="container">
+  <nav class="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold" aria-label="breadcrumbs">
+    <ul>
+      <li><%= link "Auction Listing", to: auction_path(@conn, :index), class: "" %></li>
+      <li class="is-active"><a href="#" aria-current="page">Auction <%= @auction.po %></a></li>
+    </ul>
+  </nav>
 
-<nav class="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link "Auction Listing", to: auction_path(@conn, :index), class: "" %></li>
-    <li class="is-active"><a href="#" aria-current="page">Auction <%= @auction.po %></a></li>
-  </ul>
-</nav>
 
-
-<div class="has-margin-top-lg">
-  <div class="auction-header">
-    <div class="columns has-margin-bottom-none">
-      <div class="column">
-        <div class="auction-header__status tag is-rounded qa-auction-status">
-          <%= auction_status(@auction) %>
+  <div class="has-margin-top-lg">
+    <div class="auction-header">
+      <div class="columns has-margin-bottom-none">
+        <div class="column">
+          <div class="auction-header__status tag is-rounded qa-auction-status">
+            <%= auction_status(@auction) %>
+          </div>
+          <div class="auction-header__po is-uppercase">
+            Auction <%= @auction.po %>
+          </div>
+          <h1 class="auction-header__vessel title has-text-weight-bold">
+            <%= @auction.vessel.name %> (<% @auction.vessel.imo %>)
+          </h1>
         </div>
-        <div class="auction-header__po is-uppercase">
-          Auction <%= @auction.po %>
-        </div>
-        <h1 class="auction-header__vessel title has-text-weight-bold">
-          <%= @auction.vessel.name %> (<% @auction.vessel.imo %>)
-        </h1>
-      </div>
-      <div class="column">
-        <div class="auction-header__timer has-text-left-mobile">
-          <div class="tag has-text-weight-bold is-medium is-danger is-uppercase">3:00 remaining in auction</div>
-        </div>
-        <div class="auction-header__start-time has-text-left-mobile">
-          <span class="has-text-weight-bold is-uppercase">Started at</span> <%= format_datetime(@auction.auction_start) %> GMT
-        </div>
-        <div class="auction-header__duration has-text-left-mobile">
-<%# TODO: We currently don't have decision period length as a parameter, so we'll have to add that in. %>
-          <span class="has-text-weight-bold is-uppercase">Decision Period</span> <%= @auction.duration %> minutes
+        <div class="column">
+          <div class="auction-header__timer has-text-left-mobile">
+            <div class="tag has-text-weight-bold is-medium is-danger is-uppercase">3:00 remaining in auction</div>
+          </div>
+          <div class="auction-header__start-time has-text-left-mobile">
+            <span class="has-text-weight-bold is-uppercase">Started at</span> <%= format_datetime(@auction.auction_start) %> GMT
+          </div>
+          <div class="auction-header__duration has-text-left-mobile">
+  <%# TODO: We currently don't have decision period length as a parameter, so we'll have to add that in. %>
+            <span class="has-text-weight-bold is-uppercase">Decision Period</span> <%= @auction.duration %> minutes
+          </div>
         </div>
       </div>
     </div>
-    <div class="auction-header__ports">
-      <%= @auction.port.name %> <span class="has-text-weight-normal">ETA <%= format_datetime(@auction.eta) %> GMT &ndash; ETD <%= format_datetime(@auction.etd) %> GMT</span>
-    </div>
-
   </div>
+</section>
+<section class="auction-page">
+  <div class="container">
+    <div class="auction-header__ports has-text-weight-bold">
+      <%= @auction.port.name %> <span class="has-text-weight-normal is-inline-block has-padding-left-sm">ETA <%= format_datetime(@auction.eta) %> GMT &ndash; ETD <%= format_datetime(@auction.etd) %> GMT</span>
+    </div>
+  </div>
+</section>
+<section class="auction-page">
+  <div class="container">
+
+
   <div class="auction-content">
     <div class="columns is-gapless">
       <div class="column is-two-thirds">
@@ -59,7 +68,7 @@
                   <th>Seller</th>
                   <th><%= @auction.fuel.name %></th>
                   <th>Unit Price</th>
-                  <th>Delivery</th>
+                  <th>Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -68,7 +77,7 @@
                   <td> Seller 2<!-- Seller Name --></td>
                   <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
                   <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
-                  <td> Completed <!-- Delivery Status --></td>
+                  <td> 12:17 <!-- Time Bid Was Placed --></td>
                 </tr>
               </tbody>
             </table>
@@ -163,21 +172,21 @@
                 <td> Seller 2<!-- Seller Name --></td>
                 <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
                 <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
-                <td> 12:17 <!-- Delivery Status --></td>
+                <td> 12:17 <!-- Time Bid Was Placed --></td>
               </tr>
               <tr>
                 <%# TODO: Replace this business with real auction data. %>
                 <td> OceanConnect Marine<!-- Seller Name --></td>
                 <td> $380.25 <!-- Bid per MT of Auctioned Fuel Type --></td>
                 <td> $380.25 <!-- Total cost per MT for Auctioned Fuel --></td>
-                <td> 12:16 <!-- Delivery Status --></td>
+                <td> 12:16 <!-- Time Bid Was Placed --></td>
               </tr>
               <tr>
                 <%# TODO: Replace this business with real auction data. %>
                 <td> OceanConnect Marine<!-- Seller Name --></td>
                 <td> $380.50 <!-- Bid per MT of Auctioned Fuel Type --></td>
                 <td> $380.50 <!-- Total cost per MT for Auctioned Fuel --></td>
-                <td> 12:15 <!-- Delivery Status --></td>
+                <td> 12:15 <!-- Time Bid Was Placed --></td>
               </tr>
             </tbody>
           </table>
@@ -256,5 +265,4 @@
       </div>
     </div>
   </div>
-
-</div>
+</section>

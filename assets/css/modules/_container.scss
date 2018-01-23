@@ -12,4 +12,8 @@ main > .container {
   padding-top: 52px !important; // The height of the navbar.
 }
 
+main > section:first-child > .container {
+  padding-top: 52px !important; // The height of the navbar.
+}
+
 // Additions

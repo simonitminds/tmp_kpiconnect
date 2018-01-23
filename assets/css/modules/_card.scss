@@ -30,3 +30,17 @@
   padding: 0.5rem 1rem;
   margin: 0.75rem -1rem -0.25rem -1rem;
 }
+
+.card-footer-item {
+  &.is-link {
+    background-color: $teal;
+    border-color: transparent;
+    color: #fff;
+
+    &:hover, &:focus {
+      background-color: darken($teal, 5%);
+      border-color: transparent;
+      color: #fff;
+    }
+  }
+}

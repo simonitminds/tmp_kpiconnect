@@ -4,82 +4,72 @@
   <%= link "New Auction", to: auction_path(@conn, :new), class: "button is-link is-pulled-right" %>
   </div>
 </div>
-<!-- ================================= -->
-
-<!-- CONSTRUCTION ZONE FOR CARD FORMAT -->
-
-<!-- ================================= -->
-<section class="auction-list">
-  <div class="container is-fullhd">
-    <div class="content has-gray-lighter">
-      <h2>Active Auctions</h2>
-      <div class="columns is-multiline">
-
-      <%= for auction <- @auctions do %>
-          <div class="column is-one-third">
-            <div class="card qa-auction-<%= auction.id %>">
-              <div class="card-content has-padding-bottom-md">
-                <div class="is-clearfix">
-                  <p class="has-text-weight-bold is-pulled-left"><%= auction.po %></p>
-                  <div class="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold">
-                    <%= auction_status(auction) %>
-                  </div>
-                  <p class="is-pulled-right"><%= format_datetime(auction.auction_start) %></p>
-                </div>
-                <div class="card-title">
-                  <h3 class="title is-size-4 has-text-weight-bold is-marginless"><%= auction.vessel.name %></h3>
-                  <p class="has-family-header has-margin-top-xs"><span class="has-text-weight-bold"><%= auction.port.name %></span> (<strong>ETA</strong> <%= format_datetime(auction.eta) %> &ndash; <strong>ETD</strong> <%= format_datetime(auction.etd) %>)</p>
-                </div>
-                <div class="has-text-weight-bold has-margin-top-md">
-                  <%= auction.fuel.name %> (<%= auction.fuel_quantity %>&nbsp;MT)
-                </div>
-                <div class="card-content__best-price">
-                  <strong>Best Offer: </strong> { Price }
-                </div>
-              </div>
-              <footer class="card-footer">
-                <%= link "Show", to: auction_path(@conn, :show, auction), class: "card-footer-item" %>
-                <%= link "Edit", to: auction_path(@conn, :edit, auction), class: "card-footer-item" %>
-                <span class="control qa-auction-start" style="background-color: pink"><%= link "Start", to: auction_path(@conn, :start, auction), class: "card-footer-item" %></span>
-              </footer>
-
-              <!-- Other data fragments formerly on the table that I chose not to use...
-                <%= auction.id %>
-                <%= auction.duration %>
-               -->
-
-            </div>
-          </div>
-        <% end %>
-
-      </div>
-
-    </div>
-  </div>
-</section>
-<section class="auction-list">
+  <section class="auction-list">
     <div class="container is-fullhd">
-    <div class="content">
-      <h2>Upcoming Auctions</h2>
-      <div class="empty-list">
-        <em>You have no upcoming auctions</em>
+      <div class="content has-gray-lighter">
+        <h2>Active Auctions</h2>
+        <div class="columns is-multiline">
+
+        <%= for auction <- @auctions do %>
+            <div class="column is-one-third">
+              <div class="card qa-auction-<%= auction.id %>">
+                <div class="card-content has-padding-bottom-md">
+                  <div class="is-clearfix">
+                    <p class="has-text-weight-bold is-pulled-left"><%= auction.po %></p>
+                    <div class="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold">
+                      <%= auction_status(auction) %>
+                    </div>
+                    <p class="is-pulled-right"><%= format_datetime(auction.auction_start) %></p>
+                  </div>
+                  <div class="card-title">
+                    <h3 class="title is-size-4 has-text-weight-bold is-marginless"><%= auction.vessel.name %></h3>
+                    <p class="has-family-header has-margin-top-xs"><span class="has-text-weight-bold"><%= auction.port.name %></span> (<strong>ETA</strong> <%= format_datetime(auction.eta) %> &ndash; <strong>ETD</strong> <%= format_datetime(auction.etd) %>)</p>
+                  </div>
+                  <div class="has-text-weight-bold has-margin-top-md">
+                    <%= auction.fuel.name %> (<%= auction.fuel_quantity %>&nbsp;MT)
+                  </div>
+                  <div class="card-content__best-price">
+                    <strong>Best Offer: </strong> { Price }
+                  </div>
+                </div>
+                <footer class="card-footer">
+                  <%= link "Show", to: auction_path(@conn, :show, auction), class: "card-footer-item" %>
+                  <%= link "Edit", to: auction_path(@conn, :edit, auction), class: "card-footer-item" %>
+                  <%= link "Start", to: auction_path(@conn, :start, auction), class: "card-footer-item qa-auction-start is-link" %>
+                </footer>
+
+                <!-- Other data fragments formerly on the table that I chose not to use...
+                  <%= auction.id %>
+                  <%= auction.duration %>
+                 -->
+
+              </div>
+            </div>
+          <% end %>
+
+        </div>
+
       </div>
     </div>
-  </div>
-</section>
-<section class="auction-list">
-  <div class="container is-fullhd">
-    <div class="content">
-      <h2>Completed Auctions</h2>
-      <div class="empty-list">
-        <em>You have no completed auctions</em>
+  </section>
+  <section class="auction-list">
+      <div class="container is-fullhd">
+      <div class="content">
+        <h2>Upcoming Auctions</h2>
+        <div class="empty-list">
+          <em>You have no upcoming auctions</em>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-<!-- ================================= -->
-
-<!-- END CONSTRUCTION ZONE FOR CARD FORMAT -->
-
-<!-- ================================= -->
+  </section>
+  <section class="auction-list">
+    <div class="container is-fullhd">
+      <div class="content">
+        <h2>Completed Auctions</h2>
+        <div class="empty-list">
+          <em>You have no completed auctions</em>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

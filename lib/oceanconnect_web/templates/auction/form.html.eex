@@ -19,7 +19,7 @@
           vessels: @vessels,
           fuels: @fuels
         }) %>
-  <section class="auction-info has-margin-top-lg has-background-gray-0">
+  <section class="auction-info has-margin-top-lg is-gray-0">
   <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
     <div class="content">
       <div class="field">
