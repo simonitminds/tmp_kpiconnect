@@ -98,8 +98,12 @@
                 </div>
               </div>
               <div class="field-body">
-                <div class="control is-expanded">
-                  <input class="input" type="text" name="" value="">
+                <div class="control is-expanded has-icons-left">
+<%# TODO: Apply some JS magic to format the input number increments to more accurately resemble prices. %>
+                  <input class="input" type="number" step="0.25" name="" value="">
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-dollar-sign"></i>
+                  </span>
                 </div>
               </div>
             </div>
