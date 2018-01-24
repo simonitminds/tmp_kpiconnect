@@ -30,7 +30,7 @@
         <div class="navbar-menu">
           <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
-            <%= link OceanconnectWeb.SessionView.current_user(@conn), to: auction_path(@conn, :index), class: "navbar-item" %>
+            <span class="navbar-item has-text-weight-bold"><%= OceanconnectWeb.SessionView.current_user(@conn) %></span>
             <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
             <a href="#" class="navbar-item">Log Out</a> -->
