@@ -62,7 +62,7 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(data) do
     data
-    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer, :suppliers])
+    |> Repo.preload([:port, [vessel: :company], :fuel, [buyer: :company], [suppliers: :company]])
   end
 
   def add_supplier_to_auction(%Auction{} = auction, %Oceanconnect.Accounts.User{} = supplier) do

@@ -6,8 +6,10 @@
     "watch": "brunch watch --stdin"
   },
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "bulma": "^0.6.1",
     "es6-promise": "^4.2.2",
     "humps": "^2.0.1",
@@ -22,6 +24,7 @@
     "react-dom": "^16.2.0",
     "react-phoenix": "file:../deps/react_phoenix",
     "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0"
   },
@@ -35,5 +38,10 @@
     "redux-logger": "^3.0.6",
     "sass-brunch": "^2.10.4",
     "uglify-js-brunch": "2.10.0"
+  },
+  "babel": {
+    "presets": [
+      "stage-0"
+    ]
   }
 }

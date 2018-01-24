@@ -17,6 +17,13 @@ defmodule OceanconnectWeb.Router do
     plug OceanconnectWeb.Plugs.Auth, handler: OceanconnectWeb.SessionController
   end
 
+
+  # Other scopes may use custom stacks.
+  scope "/api", OceanconnectWeb.Api do
+    pipe_through :api
+    get "/auctions", AuctionApiController, :index
+  end
+
   scope "/", OceanconnectWeb do
     pipe_through :browser # Use the default browser stack
 
@@ -33,8 +40,4 @@ defmodule OceanconnectWeb.Router do
     resources "/fuels", FuelController
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", OceanconnectWeb do
-  #   pipe_through :api
-  # end
 end
