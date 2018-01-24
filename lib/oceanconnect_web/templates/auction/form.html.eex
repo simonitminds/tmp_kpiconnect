@@ -19,15 +19,15 @@
           vessels: @vessels,
           fuels: @fuels
         }) %>
-  <section class="auction-info has-margin-top-lg is-gray-0">
-  <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
-    <div class="content">
-      <div class="field">
-        <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
-        <%= submit "Submit", class: "button is-link" %>
+  <section class="auction-info has-margin-top-lg is-white">
+    <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
+      <div class="content">
+        <div class="field">
+          <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
+          <%= submit "Submit", class: "button is-link" %>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 <% end %>
 </div>

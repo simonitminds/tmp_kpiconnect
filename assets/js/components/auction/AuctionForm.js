@@ -200,8 +200,8 @@ class AuctionForm extends React.Component {constructor(props) {
   </div>
 </section>
   <section className="auction-info">
-  <div className="container is-fullhd">
-    <div className="content has-margin-top-lg">
+  <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+    <div className="content">
       <fieldset>
         <legend className="subtitle is-4" >Auction Details</legend>
 
