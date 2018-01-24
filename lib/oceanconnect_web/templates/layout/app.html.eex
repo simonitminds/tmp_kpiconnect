@@ -30,11 +30,11 @@
         <div class="navbar-menu">
           <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
-            <%= link "Bunkers", to: auction_path(@conn, :index), class: "navbar-item" %>
+            <%= link OceanconnectWeb.SessionView.current_user(@conn), to: auction_path(@conn, :index), class: "navbar-item" %>
             <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
             <a href="#" class="navbar-item">Log Out</a> -->
-            <%= link "Log Out", to: session_path(@conn, :delete), method: :delete, class: "navbar-item" %>
+            <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
           </div>
         </div>
       </nav>
