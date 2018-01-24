@@ -63,71 +63,38 @@ class AuctionForm extends React.Component {constructor(props) {
         <input type="hidden" id="auction_etd_minute" name="auction[etd]" value={this.state.etd} />
 
 {/* TODO: Finish cleaning this up once I get an internet connection again... */}
-<section className="auction-info">
-  <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
-    <div className="content">
-      <fieldset>
-        <legend className="subtitle is-4" >Vessel Being Fueled</legend>
-        <div className="field">
-          <label htmlFor="auction_vessel_id" className="label">
-            Vessel
-          </label>
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select
-                id="auction_vessel_id"
-                name="auction[vessel_id]"
-                className="qa-auction-vessel"
-                value={this.state.selected_vessel}
-                onChange={this.handleVesselChange} > <option disabled value="">
-                  Please select
-                </option>
-                {_.map(this.props.vessels, vessel => (
-                  <option key={vessel.id} value={vessel.id}>
-                    {vessel.name}, {vessel.imo}
+  <section className="auction-info">
+    <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+      <div className="content">
+        <fieldset>
+          <legend className="subtitle is-4" >Vessel</legend>
+          <div className="field">
+            <label htmlFor="auction_vessel_id" className="label">
+              Vessel
+            </label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select
+                  id="auction_vessel_id"
+                  name="auction[vessel_id]"
+                  className="qa-auction-vessel"
+                  value={this.state.selected_vessel}
+                  onChange={this.handleVesselChange} > <option disabled value="">
+                    Please select
                   </option>
-                ))}
-              </select>
+                  {_.map(this.props.vessels, vessel => (
+                    <option key={vessel.id} value={vessel.id}>
+                      {vessel.name}, {vessel.imo}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="field">
-          <label htmlFor="auction_fuel_id" className="label">
-            Fuel
-          </label>
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select
-                id="auction_fuel_id"
-                name="auction[fuel_id]"
-                className="qa-auction-fuel"
-                value={this.state.selected_fuel}
-                onChange={this.handleFuelChange}
-              >
-                <option disabled value="">
-                  Please select
-                </option>
-                {_.map(this.props.fuels, fuel => (
-                  <option key={fuel.id} value={fuel.id}>
-                    {fuel.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <InputField
-          model={'auction'}
-          field={'fuel_quantity'}
-          labelText={'Fuel Quantity (MT)'}
-          value={this.props.auction.fuel_quantity}
-          opts={{type: 'number', label: "Fuel Quantity (MT)"}}
-        />
-      </fieldset>
+        </fieldset>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
   <section className="auction-info">
   <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
     <div className="content">
@@ -163,10 +130,52 @@ class AuctionForm extends React.Component {constructor(props) {
           <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
           <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
           <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
-      </fieldset>
+        </fieldset>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+  <section className="auction-info">
+    <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+      <div className="content">
+        <fieldset>
+          <legend className="subtitle is-4" >Fuel</legend>
+          <div className="field">
+            <label htmlFor="auction_fuel_id" className="label">
+              Fuel
+            </label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select
+                  id="auction_fuel_id"
+                  name="auction[fuel_id]"
+                  className="qa-auction-fuel"
+                  value={this.state.selected_fuel}
+                  onChange={this.handleFuelChange}
+                >
+                  <option disabled value="">
+                    Please select
+                  </option>
+                  {_.map(this.props.fuels, fuel => (
+                    <option key={fuel.id} value={fuel.id}>
+                      {fuel.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <InputField
+            model={'auction'}
+            field={'fuel_quantity'}
+            labelText={'Fuel Quantity (MT)'}
+            value={this.props.auction.fuel_quantity}
+            opts={{type: 'number', label: "Fuel Quantity (MT)"}}
+          />
+        </fieldset>
+      </div>
+    </div>
+  </section>
   <section className="auction-info">
   <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
     <div className="content">
