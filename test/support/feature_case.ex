@@ -11,6 +11,7 @@ defmodule Oceanconnect.FeatureCase do
       import OceanconnectWeb.Router.Helpers
       import Oceanconnect.Factory
       use Hound.Helpers
+      import Oceanconnect.AsyncHelpers
 
       def login_user(user) do
         alias Oceanconnect.NewSessionPage

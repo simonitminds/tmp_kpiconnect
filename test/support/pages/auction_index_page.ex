@@ -17,7 +17,7 @@ defmodule Oceanconnect.AuctionIndexPage do
 
   def has_auctions?(auctions) do
     auctions
-    |> Enum.map(fn(auction) ->
+    |> Enum.all?(fn(auction) ->
       case search_element(:class, "qa-auction-#{auction.id}") do
         {:ok, _} -> true
         _ -> false

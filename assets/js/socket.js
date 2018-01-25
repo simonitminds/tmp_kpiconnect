@@ -48,11 +48,10 @@ import {Socket} from "phoenix"
 //
 // Finally, pass the token on connect as below. Or remove it
 // from connect if you don't care about authentication.
+let socket = new Socket("/socket", {params: {token: window.userToken}});
+socket.connect();
 
-let socket = new Socket("/socket", {params: {token: window.userToken}})
-socket.connect()
-
-let channel = socket.channel("auctions:lobby", {})
+let channel = socket.channel("auctions:lobby", {});
 
 channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
