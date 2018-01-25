@@ -7,12 +7,14 @@ defmodule Oceanconnect.AuctionIndexTest do
   setup do
     user = insert(:user)
     login_user(user)
-    {:ok, %{}}
+    auctions = insert_list(2, :auction)
+    {:ok, %{auctions: auctions}}
   end
 
-  test "renders the default auction index page" do
+  test "renders the default auction index page", %{auctions: auctions} do
     AuctionIndexPage.visit()
 
-    assert AuctionIndexPage.has_content?("Auction Listing")
+    assert AuctionIndexPage.is_current_path?()
+    assert AuctionIndexPage.has_auctions?(auctions)
   end
 end

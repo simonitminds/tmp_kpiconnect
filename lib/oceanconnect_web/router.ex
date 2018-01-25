@@ -14,7 +14,17 @@ defmodule OceanconnectWeb.Router do
   end
 
   pipeline :authenticated do
-    plug OceanconnectWeb.Plugs.Auth, handler: OceanconnectWeb.SessionController
+    plug OceanconnectWeb.Plugs.Auth
+    plug :put_user_token
+  end
+
+  defp put_user_token(conn, _) do
+    if current_user = conn.assigns[:current_user] do
+      token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+      assign(conn, :user_token, token)
+    else
+      conn
+    end
   end
 
 

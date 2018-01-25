@@ -19,6 +19,10 @@ export function subscribeToAuctionUpdates() {
       .receive("ok", resp => { console.log("Joined successfully", resp); })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
+    channel.on("auctions_updated", payload => {
+      console.log(payload);
+    });
+
     channel.on("auction_updated", payload => {
       console.log(payload);
     });

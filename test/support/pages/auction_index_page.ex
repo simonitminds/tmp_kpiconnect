@@ -14,4 +14,14 @@ defmodule Oceanconnect.AuctionIndexPage do
     |> find_within_element(:class, "qa-auction-start")
     |> click
   end
+
+  def has_auctions?(auctions) do
+    auctions
+    |> Enum.map(fn(auction) ->
+      case search_element(:class, "qa-auction-#{auction.id}") do
+        {:ok, _} -> true
+        _ -> false
+      end
+    end)
+  end
 end
