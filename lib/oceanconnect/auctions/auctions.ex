@@ -27,9 +27,17 @@ defmodule Oceanconnect.Auctions do
     auction
     |> AuctionCommand.start_auction()
     |> AuctionStore.process_command(auction.id)
+
+    auction
+    |> Repo.preload(:suppliers)
+    |> Oceanconnect.Auctions.notify_participants
   end
 
-  def supervise_auction(auction = %Auction{}) do
+  def notify_participants(auction) do
+    buyer_id = auction.buyer_id
+    suppliers_ids = Enum.map(auction.suppliers, fn(s) -> s.id end)
+    auction_state = AuctionStore.get_current_state(auction)
+    #TODO: Get user sockets and broadcasts the auction state to them.
   end
 
   def create_auction(attrs \\ %{}) do

@@ -19,7 +19,7 @@ defmodule OceanconnectWeb.ChannelCase do
     quote do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
-
+      import Oceanconnect.Factory
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
     end
