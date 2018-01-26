@@ -1,8 +1,13 @@
 defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
-
   alias OceanconnectWeb.AuctionsChannel
-  alias Oceanconnect.Auctions
+  alias Oceanconnect.{Auctions, Accounts}
+  alias OceanconnectWeb.Plugs.Auth
+
+  defp conn() do
+    %Plug.Conn{}
+    |> Plug.Conn.put_private(:phoenix_endpoint, OceanconnectWeb.Endpoint)
+  end
 
   setup do
     buyer_company = insert(:company)
@@ -16,10 +21,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     Auctions.set_suppliers_for_auction(auction, [supplier])
     {:ok, store} = Auctions.AuctionStore.start_link(auction.id)
 
-    buyer_token = ""
-    supplier_token = ""
-    non_participatant_token = ""
-
+    conn = conn()
+    buyer_token = Auth.generate_user_token(conn, buyer)
+    supplier_token = Auth.generate_user_token(conn, supplier)
+    non_participatant_token = Auth.generate_user_token(conn, non_participatant)
 
     {:ok, _, supplier_socket} =
       socket("user_id", %{token: supplier_token})
