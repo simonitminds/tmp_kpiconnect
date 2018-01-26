@@ -26,12 +26,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def init(auction_id) do
-    # loop over all the auctions and initialize state based off event store
-     # state = %{}
-     # state = for %Oceanconnect.Auction{id: auction_id} in Auctions.list_auctions
-     auction = Auctions.get_auction!(auction_id)
-     state = %AuctionState{auction_id: auction.id, status: calculate_status(auction)}
-     # AuctionEvents.build_current_state(auction_id)
+    auction = Auctions.get_auction!(auction_id)
+    state = %AuctionState{auction_id: auction.id, status: calculate_status(auction)}
     {:ok, state}
   end
 
@@ -50,7 +46,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def process_command(%AuctionCommand{command: :start_auction, data: data}, auction_id) do
-    return = with {:ok, pid} <- find_store(auction_id),
+    with {:ok, pid} <- find_store(auction_id),
     do: GenServer.cast(pid, {:start_auction, data})
   end
 
@@ -73,7 +69,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  defp calculate_status(auction) do
+  defp calculate_status(_auction) do
     :pending
     # Go through event log
   end

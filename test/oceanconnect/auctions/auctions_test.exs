@@ -105,7 +105,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "auction status" do
-      auction_attrs = insert(:auction)|> Map.take([:fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
+      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
       {:ok, auction} = Auctions.create_auction(auction_attrs)
 
       assert :pending = Auctions.auction_status(auction)
