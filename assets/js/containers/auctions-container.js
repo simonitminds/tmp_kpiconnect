@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionsIndex from '../components/auction/index'
-import { getAllAuctions} from '../actions';
+import { getAllAuctions, subscribeToAuctionUpdates } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -18,6 +18,7 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionsContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(getAllAuctions());
+    this.props.dispatch(subscribeToAuctionUpdates());
   }
   componentDidMount() {
     this.dispatchItem();

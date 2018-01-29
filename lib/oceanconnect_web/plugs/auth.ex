@@ -34,7 +34,9 @@ defmodule OceanconnectWeb.Plugs.Auth do
         conn
         |> halt
         |> OceanconnectWeb.SessionController.unauthenticated
-      user -> assign(conn, :current_user, user)
+      user ->
+        assign(conn, :current_user, user)
+        |> put_user_token
     end
   end
 

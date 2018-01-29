@@ -30,14 +30,14 @@ defmodule Oceanconnect.Auctions do
 
     auction
     |> Repo.preload([:suppliers, :buyer])
-    |> Oceanconnect.Auctions.notify_participants("auctions:lobby", AuctionStore.get_current_state(auction))
+    |> Oceanconnect.Auctions.notify_participants("user_auctions", AuctionStore.get_current_state(auction))
   end
 
   def notify_participants(%{buyer: buyer, suppliers: suppliers}, channel, payload) do
     buyer_id = buyer.id
     supplier_ids = Enum.map(suppliers, fn(s) -> s.id end)
     Enum.map([buyer_id | supplier_ids], fn(id) ->
-      OceanconnectWeb.Endpoint.broadcast("user_socket:#{id}:#{channel}", "auctions_update", payload)
+      OceanconnectWeb.Endpoint.broadcast("#{channel}:#{id}", "auctions_update", payload)
     end)
   end
 

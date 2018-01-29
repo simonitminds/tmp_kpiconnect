@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", OceanconnectWeb.RoomChannel
+  channel "user_auctions:*", OceanconnectWeb.AuctionsChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -33,6 +33,7 @@ defmodule OceanconnectWeb.UserSocket do
   #
 
   def id(socket), do: "user_socket:#{socket.assigns.current_user}"
+
   #
   # Would allow you to broadcast a "disconnect" event and terminate
   # all active sockets and channels for a given user:

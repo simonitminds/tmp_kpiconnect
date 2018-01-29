@@ -1,11 +1,14 @@
-// import thunk from 'redux-thunk';
+import thunk from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
 import socket from "./socket";
 
 import { RECEIVE_AUCTIONS } from "./constants/auctions";
 
-let channel = socket.channel("auctions:lobby", {});
+let channel;
+if(window.userToken && window.userToken != "" && window.userId && window.userId != "") {
+  channel = socket.channel(`user_auctions:${window.userId}`, {token: window.userToken});
+};
 
 const defaultHeaders = {
   Accept: 'application/json',
@@ -16,14 +19,11 @@ const defaultHeaders = {
 export function subscribeToAuctionUpdates() {
   return dispatch => {
     channel.join()
-      .receive("ok", resp => { console.log("Joined successfully", resp); })
+      .receive("ok", resp => { console.log("Joined successful", resp); })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
-    channel.on("auctions_updated", payload => {
-      console.log(payload);
-    });
-
-    channel.on("auction_updated", payload => {
+    channel.on("auctions_update", payload => {
+      console.log("GOT HERE!");
       console.log(payload);
     });
   };
