@@ -41,6 +41,10 @@ $highlight: $yellow;
 .is-white {
   background-color: #fff !important;
 }
+.is-highlit {
+  background-color: $highlight !important;
+  color: $dark;
+}
 
 // ===== TYPOGRAPHY ===== //
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,400i');
