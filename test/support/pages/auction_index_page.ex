@@ -14,4 +14,20 @@ defmodule Oceanconnect.AuctionIndexPage do
     |> find_within_element(:class, "qa-auction-start")
     |> click
   end
+
+  def has_auctions?(auctions) do
+    auctions
+    |> Enum.all?(fn(auction) ->
+      case search_element(:class, "qa-auction-#{auction.id}") do
+        {:ok, _} -> true
+        _ -> false
+      end
+    end)
+  end
+
+  def auction_status(auction) do
+    find_element(:class, "qa-auction-#{auction.id}")
+    |> find_within_element(:class, "qa-auction-status")
+    |> inner_text()
+  end
 end

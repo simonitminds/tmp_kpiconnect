@@ -26,9 +26,7 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def auction_status(auction) do
-    case Oceanconnect.Auctions.auction_status(auction) do
-      {:error, "Not Started"} -> :pending
-      atom -> atom
-    end
+    %{state: state} = Oceanconnect.Auctions.auction_state(auction)
+    state.status
   end
 end
