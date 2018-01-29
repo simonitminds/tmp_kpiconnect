@@ -68,26 +68,30 @@ class AuctionForm extends React.Component {constructor(props) {
       <div className="content">
         <fieldset>
           <legend className="subtitle is-4" >Vessel</legend>
-          <div className="field">
-            <label htmlFor="auction_vessel_id" className="label">
-              Vessel
-            </label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select
-                  id="auction_vessel_id"
-                  name="auction[vessel_id]"
-                  className="qa-auction-vessel"
-                  value={this.state.selected_vessel}
-                  onChange={this.handleVesselChange} > <option disabled value="">
-                    Please select
-                  </option>
-                  {_.map(this.props.vessels, vessel => (
-                    <option key={vessel.id} value={vessel.id}>
-                      {vessel.name}, {vessel.imo}
+          <div className="field is-horizontal">
+            <div className="field-label">
+              <label htmlFor="auction_vessel_id" className="label">
+                Vessel Name
+              </label>
+            </div>
+            <div className="field-body">
+              <div className="control">
+                <div className="select is-fullwidth">
+                  <select
+                    id="auction_vessel_id"
+                    name="auction[vessel_id]"
+                    className="qa-auction-vessel"
+                    value={this.state.selected_vessel}
+                    onChange={this.handleVesselChange} > <option disabled value="">
+                      Please select
                     </option>
-                  ))}
-                </select>
+                    {_.map(this.props.vessels, vessel => (
+                      <option key={vessel.id} value={vessel.id}>
+                        {vessel.name}, {vessel.imo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -100,36 +104,54 @@ class AuctionForm extends React.Component {constructor(props) {
     <div className="content">
         <fieldset>
           <legend className="subtitle is-4" >Port</legend>
-          <div className="field">
-            <label htmlFor="auction_port_id" className="label">
-              Port
-            </label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select
-                  id="auction_port_id"
-                  name="auction[port_id]"
-                  className="qa-auction-port"
-                  value={this.state.selected_port}
-                  onChange={this.handlePortChange}
-                >
-                  <option disabled value="">
-                    Please select
-                  </option>
-                  {_.map(this.props.ports, port => (
-                    <option key={port.id} value={port.id}>
-                      {port.name}, {port.country}
+          <div className="field is-horizontal">
+            <div className="field-label">
+              <label htmlFor="auction_port_id" className="label">
+                Port
+              </label>
+            </div>
+            <div className="field-body">
+              <div className="control">
+                <div className="select is-fullwidth">
+                  <select
+                    id="auction_port_id"
+                    name="auction[port_id]"
+                    className="qa-auction-port"
+                    value={this.state.selected_port}
+                    onChange={this.handlePortChange}
+                  >
+                    <option disabled value="">
+                      Please select
                     </option>
-                  ))}
-                </select>
+                    {_.map(this.props.ports, port => (
+                      <option key={port.id} value={port.id}>
+                        {port.name}, {port.country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
           <DateAndTime value={this.state.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={this.handleDateChange} />
-          <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
+          <div className="field is-horizontal">
+            <div className="field-label"></div>
+            <div className="field-body">
+              <div className="control">
+                <i className="is-caption">Port Local Time: {portLocalTime(this.state.eta, this.state.selected_port, this.props.ports)}</i>
+              </div>
+            </div>
+          </div>
           <DateAndTime value={this.state.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={this.handleDateChange} />
-          <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
+          <div className="field is-horizontal">
+            <div className="field-label"></div>
+            <div className="field-body">
+              <div className="control">
+                <i className="is-caption">Port Local Time: {portLocalTime(this.state.etd, this.state.selected_port, this.props.ports)}</i>
+              </div>
+            </div>
+          </div>
         </fieldset>
       </div>
     </div>
@@ -139,28 +161,32 @@ class AuctionForm extends React.Component {constructor(props) {
       <div className="content">
         <fieldset>
           <legend className="subtitle is-4" >Fuel</legend>
-          <div className="field">
-            <label htmlFor="auction_fuel_id" className="label">
-              Fuel
-            </label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select
-                  id="auction_fuel_id"
-                  name="auction[fuel_id]"
-                  className="qa-auction-fuel"
-                  value={this.state.selected_fuel}
-                  onChange={this.handleFuelChange}
-                >
-                  <option disabled value="">
-                    Please select
-                  </option>
-                  {_.map(this.props.fuels, fuel => (
-                    <option key={fuel.id} value={fuel.id}>
-                      {fuel.name}
+          <div className="field is-horizontal">
+            <div className="field-label">
+              <label htmlFor="auction_fuel_id" className="label">
+                Fuel
+              </label>
+            </div>
+            <div className="field-body">
+              <div className="control">
+                <div className="select is-fullwidth">
+                  <select
+                    id="auction_fuel_id"
+                    name="auction[fuel_id]"
+                    className="qa-auction-fuel"
+                    value={this.state.selected_fuel}
+                    onChange={this.handleFuelChange}
+                  >
+                    <option disabled value="">
+                      Please select
                     </option>
-                  ))}
-                </select>
+                    {_.map(this.props.fuels, fuel => (
+                      <option key={fuel.id} value={fuel.id}>
+                        {fuel.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -180,26 +206,21 @@ class AuctionForm extends React.Component {constructor(props) {
   <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
     <div className="content">
       <fieldset>
-        <legend className="subtitle is-4" >Additional Considerations</legend>
+        <legend className="subtitle is-4" >Additional Information</legend>
 
-        <div className="field">
-          <label htmlFor={`auction_additional_information`} className={'label'}>
-            Additional Information
-          </label>
-          <div className="control">
+        <div className="field is-horizontal">
             <textarea
               name={'auction[additional_information]'}
               id={'auction_additional_information'}
               className="textarea qa-auction-additional_information"
               defaultValue={this.state.additional_information}
             ></textarea>
-          </div>
         </div>
       </fieldset>
     </div>
   </div>
 </section>
-  <section className="auction-info">
+<section className="auction-info">
   <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
     <div className="content">
       <fieldset>
@@ -214,12 +235,22 @@ class AuctionForm extends React.Component {constructor(props) {
         />
 
         <DateAndTime value={this.state.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={this.handleDateChange} />
-        <i className="is-caption">Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
+        <div className="field is-horizontal">
+          <div className="field-label"></div>
+          <div className="field-body">
+            <div className="control">
+              <i className="is-caption">Port Local Time: {portLocalTime(this.state.auction_start, this.state.selected_port, this.props.ports)}</i>
+            </div>
+          </div>
+        </div>
 
-       <div className="field">
+       <div className="field is-horizontal">
+         <div className="field-label">
           <label htmlFor="auction_duration" className="label">
             Duration
           </label>
+        </div>
+        <div className="field-body">
           <div className="control">
             <div className="select">
               <select id="auction_duration" name="auction[duration]" defaultValue={this.props.auction.duration} className="qa-auction-duration">
@@ -233,15 +264,21 @@ class AuctionForm extends React.Component {constructor(props) {
             </div>
             <span className="select__extra-label">minutes</span>
           </div>
+        </div>
        </div>
 
-       <CheckBoxField
-           model={'auction'}
-           field={'anonymous_bidding'}
-           labelText={'anonymous bidding'}
-           value={this.props.auction.anonymous_bidding}
-           opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-       />
+       <div className="field is-horizontal">
+         <div className="field-label"></div>
+         <div className="field-body">
+           <CheckBoxField
+               model={'auction'}
+               field={'anonymous_bidding'}
+               labelText={'anonymous bidding'}
+               value={this.props.auction.anonymous_bidding}
+               opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+           />
+         </div>
+       </div>
 
       </fieldset>
     </div>
