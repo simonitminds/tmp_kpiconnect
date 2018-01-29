@@ -1,16 +1,33 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router';
+import moment from 'moment';
+
 
 const AuctionsIndex = (props)=> {
+
+  // =============================================================== //
+  //                          GMT TIME                               //
+  // (Where Lauren tries to get the current time in GMT into the UI) //
+  // =============================================================== //
+  // =============================================================== //
+
+  const gmtTimeElement = document.querySelector('#gmt-time');
+  window.setInterval(function(){
+    if (gmtTimeElement) {
+      gmtTimeElement.innerHTML =  moment().utc().format("k:mm:ss");
+    }
+}, 1000);
+
   return (
-    <div>
+    <div className="has-margin-top-xl has-padding-top-lg">
       <div className="container is-fullhd">
         <div className="content has-margin-top-lg is-clearfix">
           <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
           <a href="/auctions/new" className="button is-link is-pulled-right">
             New Auction
           </a>
+          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold"><i className="far fa-clock has-margin-right-xs"></i><span className="tag__timer" id="gmt-time" >12:00:00</span>GMT</div>
         </div>
       </div>
 
