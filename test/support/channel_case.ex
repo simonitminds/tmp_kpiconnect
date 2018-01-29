@@ -23,7 +23,7 @@ defmodule OceanconnectWeb.ChannelCase do
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
 
-      def conn() do
+      def build_conn() do
         %Plug.Conn{}
         |> Plug.Conn.put_private(:phoenix_endpoint, @endpoint)
       end

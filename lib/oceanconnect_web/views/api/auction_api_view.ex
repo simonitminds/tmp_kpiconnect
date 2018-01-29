@@ -9,6 +9,7 @@ defmodule OceanconnectWeb.Api.AuctionApiView do
   end
 
   def render("auction.json", %{auction: auction}) do
-    Map.put(auction, :status, OceanconnectWeb.AuctionView.auction_status(auction))
+    %{state: state} = Oceanconnect.Auctions.auction_state(auction)
+    Map.put(auction, :state, state)
   end
 end

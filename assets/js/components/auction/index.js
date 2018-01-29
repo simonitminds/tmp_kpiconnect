@@ -26,8 +26,8 @@ const AuctionsIndex = (props)=> {
                       <div className="card-content has-padding-bottom-md">
                         <div className="is-clearfix">
                           <p className="has-text-weight-bold is-pulled-left">{auction.po}</p>
-                          <div className="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold">
-                            {auction.status}
+                          <div className="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold qa-auction-status">
+                            {auction.state.status}
                           </div>
                           <p className="is-pulled-right">{auction.auction_start}</p>
                         </div>

@@ -16,10 +16,10 @@ defmodule Oceanconnect.Auctions do
      Repo.get!(Auction, id)
    end
 
-  def auction_status(auction = %Auction{}) do
+  def auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
-      {:error, "Not Started"} -> :pending
-      %AuctionState{status: status} -> status
+      {:error, "Not Started"} -> %{id: id, state: %{status: :pending}}
+       %AuctionState{status: status} -> %{id: id, state: %{status: status}}
     end
   end
 
@@ -30,7 +30,7 @@ defmodule Oceanconnect.Auctions do
 
     auction
     |> Repo.preload([:suppliers, :buyer])
-    |> Oceanconnect.Auctions.notify_participants("user_auctions", AuctionStore.get_current_state(auction))
+    |> Oceanconnect.Auctions.notify_participants("user_auctions", auction_state(auction))
   end
 
   def notify_participants(%{buyer: buyer, suppliers: suppliers}, channel, payload) do

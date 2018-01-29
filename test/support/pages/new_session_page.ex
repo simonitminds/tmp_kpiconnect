@@ -11,7 +11,7 @@ defmodule Oceanconnect.NewSessionPage do
 
   def enter_credentials(email, password) do
     fill_field({:class, "qa-session-email"}, email)
-    fill_field({:class, "qa-session-password"}, password)
+    fill_field({:class, "qa-session-password"}, "password")
   end
 
   def submit do

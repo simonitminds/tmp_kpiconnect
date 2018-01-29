@@ -3,7 +3,8 @@ import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
 import socket from "./socket";
 
-import { RECEIVE_AUCTIONS } from "./constants/auctions";
+import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "./constants/auctions";
+
 
 let channel;
 if(window.userToken && window.userToken != "" && window.userId && window.userId != "") {
@@ -23,8 +24,7 @@ export function subscribeToAuctionUpdates() {
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     channel.on("auctions_update", payload => {
-      console.log("GOT HERE!");
-      console.log(payload);
+      dispatch({type: UPDATE_AUCTION_STATE, auction: payload});
     });
   };
 }
