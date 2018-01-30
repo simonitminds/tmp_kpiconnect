@@ -31,7 +31,7 @@ export function subscribeToAuctionUpdates() {
 
 export function getAllAuctions() {
   return dispatch => {
-    fetch('api/auctions', { headers: defaultHeaders })
+    fetch('/api/auctions', { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {

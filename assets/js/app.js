@@ -26,6 +26,7 @@ import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
 import { getAllAuctions} from './actions';
 import AuctionsContainer from './containers/auctions-container';
+import AuctionContainer from './containers/auction-container';
 import AuctionForm from './components/auction/AuctionForm';
 
 window.Components = {
@@ -41,9 +42,17 @@ if (document.getElementById('auctions-app')) {
     )
   );
 
+  const setContainer = () => {
+    switch (window.container) {
+      case "index": { return <AuctionsContainer /> }
+      case "show": { return <AuctionContainer /> }
+      default: {return(<div></div>)}
+    }
+  }
+
   render((
     <Provider store={store}>
-      <AuctionsContainer />
+      {setContainer()}
     </Provider>
   ), document.getElementById('auctions-app'));
 }
