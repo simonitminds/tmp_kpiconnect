@@ -27,14 +27,14 @@ defmodule Oceanconnect.AuctionIndexTest do
       login_user(supplier)
       AuctionIndexPage.visit()
       assert AuctionIndexPage.is_current_path?
-      assert AuctionIndexPage.auction_status(auction) == "PENDING"
+      assert AuctionIndexPage.auction_is_status(auction, "pending")
     end)
 
     AuctionIndexPage.start_auction(auction)
 
     in_browser_session "supplier_session", fn ->
       assert AuctionIndexPage.is_current_path?()
-      assert AuctionIndexPage.auction_status(auction) == "OPEN"
+      assert AuctionIndexPage.auction_is_status(auction, "open")
     end
   end
 end

@@ -13,11 +13,57 @@ const AuctionsIndex = (props)=> {
   // =============================================================== //
 
   const gmtTimeElement = document.querySelector('#gmt-time');
-  window.setInterval(function(){
-    if (gmtTimeElement) {
-      gmtTimeElement.innerHTML =  moment().utc().format("k:mm:ss");
+    window.setInterval(function(){
+      if (gmtTimeElement) {
+        gmtTimeElement.innerHTML =  moment().utc().format("k:mm:ss");
+      }
+  }, 1000);
+
+  const AuctionCard = (auction) => (
+    <div className="column is-one-third" key={auction.id}>
+      <div className={`card qa-auction-${auction.id}`}>
+        <div className="card-content has-padding-bottom-md">
+          <div className="is-clearfix">
+            <p className="has-text-weight-bold is-pulled-left">{auction.po}</p>
+            <div className="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold qa-auction-status">
+              {auction.state.status}
+            </div>
+            <p className="is-pulled-right">{auction.auction_start}</p>
+          </div>
+          <div className="card-title">
+            <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
+            <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {auction.eta} &ndash; <strong>ETD</strong> {auction.etd})</p>
+          </div>
+          <div className="has-text-weight-bold has-margin-top-md">
+            {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+          </div>
+          <div className="card-content__best-price">
+            <strong>Best Offer: </strong> PRICE
+          </div>
+        </div>
+        <footer className="card-footer">
+          <a href={`/auctions/${auction.id}`} className="card-footer-item">Show</a>
+          <a href={`/auctions/${auction.id}/edit`} className="card-footer-item">Edit</a>
+          <a href={`/auctions/start/${auction.id}`} className="card-footer-item qa-auction-start">Start</a>
+        </footer>
+      </div>
+   </div>
+  );
+
+  const filteredAuctionsDisplay = (status) => {
+    const filteredAuctions = _.filter(props.auctions, (auction) => { return(auction.state.status === status)});
+    if(filteredAuctions.length === 0) {
+      return(
+        <div className="empty-list">
+          <em>{`You have no ${status} auctions`}</em>
+        </div>);
+    } else {
+      return(
+        <div className="columns is-multiline">
+          { _.map(filteredAuctions, (auction) =>  {  return(AuctionCard(auction)); }) }
+        </div>);
     }
-}, 1000);
+  };
 
   return (
     <div className="has-margin-top-xl has-padding-top-lg">
@@ -31,63 +77,28 @@ const AuctionsIndex = (props)=> {
         </div>
       </div>
 
-      <section className="auction-list">
+      <section className="auction-list qa-open-auctions-list">
         <div className="container is-fullhd">
           <div className="content has-gray-lighter">
             <h2>Active Auctions</h2>
-            <div className="columns is-multiline">
-
-              {_.map(props.auctions, (auction)=> (
-                  <div className="column is-one-third" key={auction.id}>
-                  <div className={`card qa-auction-${auction.id}`}>
-                      <div className="card-content has-padding-bottom-md">
-                        <div className="is-clearfix">
-                          <p className="has-text-weight-bold is-pulled-left">{auction.po}</p>
-                          <div className="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold qa-auction-status">
-                            {auction.state.status}
-                          </div>
-                          <p className="is-pulled-right">{auction.auction_start}</p>
-                        </div>
-                        <div className="card-title">
-                          <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
-                          <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {auction.eta} &ndash; <strong>ETD</strong> {auction.etd})</p>
-                        </div>
-                        <div className="has-text-weight-bold has-margin-top-md">
-                          {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
-                        </div>
-                        <div className="card-content__best-price">
-                          <strong>Best Offer: </strong> PRICE
-                        </div>
-                      </div>
-                      <footer className="card-footer">
-                        <a href={`/auctions/${auction.id}`} className="card-footer-item">Show</a>
-                        <a href={`/auctions/${auction.id}/edit`} className="card-footer-item">Edit</a>
-                        <a href={`/auctions/start/${auction.id}`} className="card-footer-item qa-auction-start">Start</a>
-                      </footer>
-                    </div>
-                  </div>))}
-            </div>
+            { filteredAuctionsDisplay("open") }
           </div>
         </div>
       </section>
 
-      <section className="auction-list">
+      <section className="auction-list qa-pending-auctions-list">
         <div className="container is-fullhd">
           <div className="content">
             <h2>Upcoming Auctions</h2>
-            <div className="empty-list">
-              <em>You have no upcoming auctions</em>
-            </div>
+            { filteredAuctionsDisplay("pending") }
           </div>
         </div>
       </section>
-      <section className="auction-list">
+      <section className="auction-list qa-completed-auctions-list">
         <div className="container is-fullhd">
           <div className="content">
             <h2>Completed Auctions</h2>
-            <div className="empty-list">
-              <em>You have no completed auctions</em>
-            </div>
+            { filteredAuctionsDisplay("completed") }
           </div>
         </div>
       </section>
