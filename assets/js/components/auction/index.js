@@ -6,17 +6,11 @@ import moment from 'moment';
 
 const AuctionsIndex = (props)=> {
 
-  // =============================================================== //
-  //                          GMT TIME                               //
-  // (Where Lauren tries to get the current time in GMT into the UI) //
-  // =============================================================== //
-  // =============================================================== //
-
-  const gmtTimeElement = document.querySelector('#gmt-time');
-    window.setInterval(function(){
-      if (gmtTimeElement) {
-        gmtTimeElement.innerHTML =  moment().utc().format("k:mm:ss");
-      }
+  const currentGMTTime = moment().utc().format("DD MMM YYYY, k:mm:ss");
+  console.log(typeof currentGMTTime)
+  window.setInterval(
+    function(){
+      if (gmtTimeElement) { gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
   }, 1000);
 
   const AuctionCard = (auction) => (
@@ -73,7 +67,7 @@ const AuctionsIndex = (props)=> {
           <a href="/auctions/new" className="button is-link is-pulled-right">
             New Auction
           </a>
-          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold"><i className="far fa-clock has-margin-right-xs"></i><span className="tag__timer" id="gmt-time" >12:00:00</span>GMT</div>
+          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold"><i className="far fa-clock has-margin-right-xs"></i><span className="tag__timer" id="gmt-time" >{currentGMTTime}</span>GMT</div>
         </div>
       </div>
 
