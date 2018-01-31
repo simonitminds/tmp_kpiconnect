@@ -46,16 +46,16 @@ export default class AuctionShow extends React.Component {
                             <tr>
                               <th>Seller</th>
                               <th>{ auction.fuel.name }</th>
-                              <th>Unit Price</th>
-                              <th>Time</th>
+                              <th>Price per MT</th>
+                              <th>Time Placed (GMT)</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr className="is-selected">
                               <td> Seller 2 Seller Name</td>
                               <td> $380.00  Bid per MT of Auctioned Fuel Type</td>
-                              <td> $380.00  Total cost per MT for Auctioned Fuel</td>
-                              <td> 12:17  Time Bid Was Placed</td>
+                              <td> $380.00</td>
+                              <td> 12:17</td>
                             </tr>
                           </tbody>
                         </table>
@@ -139,28 +139,28 @@ export default class AuctionShow extends React.Component {
                           <tr>
                             <th>Seller</th>
                             <th>{ auction.fuel.name }</th>
-                            <th>Unit Price</th>
-                            <th>Time</th>
+                            <th>Price per MT</th>
+                            <th>Time Placed (GMT)</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr className="is-selected">
                             <td> Seller 2 Seller Name</td>
                             <td> $380.00  Bid per MT of Auctioned Fuel Type</td>
-                            <td> $380.00  Total cost per MT for Auctioned Fuel</td>
-                            <td> 12:17  Time Bid Was Placed</td>
+                            <td> $380.00</td>
+                            <td> 12:17</td>
                           </tr>
                           <tr>
                             <td> OceanConnect Marine Seller Name</td>
                             <td> $380.25  Bid per MT of Auctioned Fuel Type</td>
-                            <td> $380.25  Total cost per MT for Auctioned Fuel</td>
-                            <td> 12:16  Time Bid Was Placed</td>
+                            <td> $380.25</td>
+                            <td> 12:16</td>
                           </tr>
                           <tr>
                             <td> OceanConnect Marine Seller Name</td>
                             <td> $380.50  Bid per MT of Auctioned Fuel Type</td>
-                            <td> $380.50  Total cost per MT for Auctioned Fuel</td>
-                            <td> 12:15  Time Bid Was Placed</td>
+                            <td> $380.50</td>
+                            <td> 12:15</td>
                           </tr>
                         </tbody>
                       </table>
