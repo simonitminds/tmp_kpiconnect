@@ -8,7 +8,7 @@ export default class AuctionShow extends React.Component {
   }
 
   render() {
-    let auction =_.filter(this.props.auctions, ['id', window.auctionId]);
+    const auction =_.filter(this.props.auctions, ['id', window.auctionId]);
     return(<div>
       { auction.map((auction, index) =>
         <div key={index}>
@@ -62,7 +62,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <div className="box__subsection box__subsection--bordered box__subsection--base">
                         <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
-                        <div className="field is-horizontal is-expanded">  Fuel Type
+                        <div className="field is-horizontal is-expanded">
                           <div className="field-label">
                             <div className="control">
                               <label className="label" htmlFor="fuel_type">Fuel Type</label>
@@ -71,14 +71,14 @@ export default class AuctionShow extends React.Component {
                           <div className="field-body">
                             <div className="control is-expanded">
                               <div className="select is-fullwidth">
-                                <select className="" name="">
+                                <select className="" name="" id="fuel_type">
                                   <option value="">Fuel Type</option>
                                 </select>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="field is-horizontal is-expanded"> Bid Amount
+                        <div className="field is-horizontal is-expanded">
                           <div className="field-label">
                             <div className="control">
                               <label className="label" htmlFor="bid">Bid Amount</label>
@@ -93,7 +93,7 @@ export default class AuctionShow extends React.Component {
                             </div>
                           </div>
                         </div>
-                        <div className="field is-horizontal is-expanded">  Bid Expiration
+                        <div className="field is-horizontal is-expanded">
                           <div className="field-label">
                             <div className="control">
                               <label className="label" htmlFor="expiration">Expiration</label>
@@ -102,14 +102,14 @@ export default class AuctionShow extends React.Component {
                           <div className="field-body">
                             <div className="control is-expanded">
                               <div className="select is-fullwidth">
-                                <select className="" name="">
+                                <select className="" name="" id="expiration">
                                   <option value="">Bid Expiration</option>
                                 </select>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="field is-horizontal is-expanded">  Credit Terms
+                        <div className="field is-horizontal is-expanded">
                           <div className="field-label">
                             <div className="control">
                               <label className="label" htmlFor="terms">Credit Terms</label>
@@ -118,7 +118,7 @@ export default class AuctionShow extends React.Component {
                           <div className="field-body">
                             <div className="control is-expanded">
                               <div className="select is-fullwidth">
-                                <select className="" name="">
+                                <select className="" name="" id="terms">
                                   <option value="">Credit Terms</option>
                                 </select>
                               </div>
@@ -145,7 +145,6 @@ export default class AuctionShow extends React.Component {
                         </thead>
                         <tbody>
                           <tr className="is-selected">
-                            <td></td>
                             <td> Seller 2 Seller Name</td>
                             <td> $380.00  Bid per MT of Auctioned Fuel Type</td>
                             <td> $380.00  Total cost per MT for Auctioned Fuel</td>
@@ -199,7 +198,7 @@ export default class AuctionShow extends React.Component {
                             <strong>Buyer</strong> Buyer Name
                           </li>
                           <li>
-                            <strong>Buyer Reference Number</strong>  BRN 
+                            <strong>Buyer Reference Number</strong>  BRN
                           </li>
                         </ul>
                       </div>
@@ -229,7 +228,7 @@ export default class AuctionShow extends React.Component {
                         </ul>
                       </div>
                       <div className="field has-margin-top-md">
-                        <a href={"/auctions/${auction.id}/edit"}>Edit</a>
+                        <a href={`/auctions/${auction.id}/edit`}>Edit</a>
                       </div>
                     </div>
                   </div>
