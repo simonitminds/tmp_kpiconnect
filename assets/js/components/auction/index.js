@@ -7,7 +7,7 @@ import moment from 'moment';
 const AuctionsIndex = (props)=> {
 
   const currentGMTTime = moment().utc().format("DD MMM YYYY, k:mm:ss");
-  console.log(typeof currentGMTTime)
+  const gmtTimeElement = document.querySelector("#gmt-time")
   window.setInterval(
     function(){
       if (gmtTimeElement) { gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
