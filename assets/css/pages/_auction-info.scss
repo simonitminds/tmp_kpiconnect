@@ -15,6 +15,11 @@
   &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
     margin-bottom: 0.5rem;
     color: $white !important;
+
+    // Color Auction Status tags based on... auction status.
+    &--open { background-color: $green !important; }
+    &--pending { background-color: $teal !important; }
+    &--completed { background-color: $gray-3 !important; }
   }
   &__po { // Auction PO
     margin-bottom: 0.125rem;
