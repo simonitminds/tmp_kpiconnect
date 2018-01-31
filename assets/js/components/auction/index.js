@@ -10,8 +10,9 @@ const AuctionsIndex = (props)=> {
   const gmtTimeElement = document.querySelector("#gmt-time")
   window.setInterval(
     function(){
-      if (gmtTimeElement) { gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
+      if (gmtTimeElement) {gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
   }, 1000);
+  const cardDateFormat = function(time){return moment(time).format("DD/MM/YY k:mm")};
 
   const AuctionCard = (auction) => (
     <div className="column is-one-third" key={auction.id}>
@@ -19,14 +20,14 @@ const AuctionsIndex = (props)=> {
         <div className="card-content has-padding-bottom-md">
           <div className="is-clearfix">
             <p className="has-text-weight-bold is-pulled-left">{auction.po}</p>
-            <div className="auction-header__status tag is-rounded is-pulled-right has-margin-left-md has-text-weight-bold qa-auction-status">
+            <div className={`auction-card__status auction-card__status--${auction.state.status} qa-auction-status`}>
               {auction.state.status}
             </div>
-            <p className="is-pulled-right">{auction.auction_start}</p>
+            <p className="is-pulled-right">{cardDateFormat(auction.auction_start)}</p>
           </div>
           <div className="card-title">
             <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
-            <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {auction.eta} &ndash; <strong>ETD</strong> {auction.etd})</p>
+            <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
           </div>
           <div className="has-text-weight-bold has-margin-top-md">
             {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
@@ -67,7 +68,9 @@ const AuctionsIndex = (props)=> {
           <a href="/auctions/new" className="button is-link is-pulled-right">
             New Auction
           </a>
-          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold"><i className="far fa-clock has-margin-right-xs"></i><span className="tag__timer" id="gmt-time" >{currentGMTTime}</span>GMT</div>
+          <div className="auction-list__timer">
+            <i className="far fa-clock has-margin-right-xs"></i><span className="auction-list__timer__time" id="gmt-time" >{currentGMTTime}</span>GMT
+          </div>
         </div>
       </div>
 

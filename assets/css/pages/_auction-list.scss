@@ -1,0 +1,44 @@
+// ========================== //
+// ========================== //
+// Auction
+// ========================== //
+// ========================== //
+
+// Auction Listing (Overall layout elements)
+
+.auction-list {
+  &__timer { // Date and time stamp at top of the page.
+    @extend .tag, .is-rounded, .is-highlit, .is-medium;
+    margin-right: 1rem;
+    float: right;
+    font-weight: bold;
+
+    &__time {
+      display: inline-block;
+      width: 156px;
+    }
+  }
+}
+
+// Auction Card (Overall layout elements)
+
+.auction-card {
+  font-family: $family-header;
+  font-weight: 700;
+
+  // LEFT COLUMN
+
+  &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
+    @extend .tag, .is-rounded;
+    margin-bottom: 0.5rem;
+    margin-left: 1rem;
+    float: right;
+    font-weight: bold;
+    color: $white !important;
+
+    // Color Auction Status tags based on... auction status.
+    &--open { background-color: $green !important; }
+    &--pending { background-color: $teal !important; }
+    &--completed { background-color: $gray-3 !important; }
+  }
+}
