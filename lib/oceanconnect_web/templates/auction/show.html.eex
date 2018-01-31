@@ -74,7 +74,7 @@
               <tbody>
                 <tr class="is-selected">
                   <%# TODO: Replace this business with real auction data. %>
-                  <td> Seller 2<!-- Seller Name --></td>
+                  <td> [ Seller 2 ]<!-- Seller Name --></td>
                   <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
                   <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
                   <td> 12:17 <!-- Time Bid Was Placed --></td>
@@ -94,7 +94,7 @@
                 <div class="control is-expanded">
                   <div class="select is-fullwidth">
                     <select class="" name="">
-                      <option value="">{ Fuel Type }</option>
+                      <option value="">[ Fuel Type ]</option>
                     </select>
                   </div>
                 </div>
@@ -126,7 +126,7 @@
                 <div class="control is-expanded">
                   <div class="select is-fullwidth">
                     <select class="" name="">
-                      <option value="">{ Bid Expiration }</option>
+                      <option value="">[ Bid Expiration ]</option>
                     </select>
                   </div>
                 </div>
@@ -142,7 +142,7 @@
                 <div class="control is-expanded">
                   <div class="select is-fullwidth">
                     <select class="" name="">
-                      <option value="">{ Credit Terms }</option>
+                      <option value="">[ Credit Terms ]</option>
                     </select>
                   </div>
                 </div>
@@ -169,7 +169,7 @@
             <tbody>
               <tr class="is-selected">
                 <%# TODO: Replace this business with real auction data. %>
-                <td> Seller 2<!-- Seller Name --></td>
+                <td> [ Seller 2 ]<!-- Seller Name --></td>
                 <td> $380.00 <!-- Bid per MT of Auctioned Fuel Type --></td>
                 <td> $380.00 <!-- Total cost per MT for Auctioned Fuel --></td>
                 <td> 12:17 <!-- Time Bid Was Placed --></td>
@@ -206,11 +206,11 @@
         <div class="box">
           <h3 class="box__header">Invited Suppliers</h3>
           <ul>
-            <li><span class="icon has-text-success has-margin-right-sm"><i class="fas fa-check-circle"></i></span>{ Seller #1}</li>
-            <li><span class="icon has-text-success has-margin-right-sm"><i class="fas fa-check-circle"></i></span>{ Seller #2}</li>
-            <li><span class="icon has-text-warning has-margin-right-sm"><i class="fas fa-adjust"></i></span>{ Seller #3}</li>
-            <li><span class="icon has-text-danger has-margin-right-sm"><i class="fas fa-times-circle"></i></span>{ Seller #4}</li>
-            <li><span class="icon has-text-dark has-margin-right-sm"><i class="fas fa-question-circle"></i></span>{ Seller #5}</li>
+            <li><span class="icon has-text-success has-margin-right-sm"><i class="fas fa-check-circle"></i></span>[ Seller #1 ]</li>
+            <li><span class="icon has-text-success has-margin-right-sm"><i class="fas fa-check-circle"></i></span>[ Seller #2 ]</li>
+            <li><span class="icon has-text-warning has-margin-right-sm"><i class="fas fa-adjust"></i></span>[ Seller #3 ]</li>
+            <li><span class="icon has-text-danger has-margin-right-sm"><i class="fas fa-times-circle"></i></span>[ Seller #4 ]</li>
+            <li><span class="icon has-text-dark has-margin-right-sm"><i class="fas fa-question-circle"></i></span>[ Seller #5 ]</li>
           </ul>
         </div>
         <div class="box">
@@ -218,13 +218,13 @@
             <h3 class="box__header">Buyer Information</h3>
             <ul class="list has-no-bullets">
               <li>
-                <strong>Organization</strong> { Company }
+                <strong>Organization</strong> [ Company ]
               </li>
               <li>
-                <strong>Buyer</strong> { Buyer Name }
+                <strong>Buyer</strong> [ Buyer Name ]
               </li>
               <li>
-                <strong>Buyer Reference Number</strong> { BRN }
+                <strong>Buyer Reference Number</strong> [ BRN ]
               </li>
             </ul>
           </div>
