@@ -28,6 +28,8 @@ defmodule Oceanconnect.Auctions do
     |> AuctionCommand.start_auction()
     |> AuctionStore.process_command(auction.id)
 
+    Oceanconnect.Auctions.TimersSupervisor.start_timer(auction)
+
     auction
     |> Repo.preload([:suppliers, :buyer])
     |> Oceanconnect.Auctions.notify_participants("user_auctions", auction_state(auction))

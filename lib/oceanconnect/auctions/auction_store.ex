@@ -5,6 +5,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   @registry_name :auctions_registry
 
+  def find_pid(auction_id) do
+    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
+      {:ok, pid}
+    else
+      [] -> {:error, "Not Started"}
+    end
+  end
+
   defmodule AuctionState do
     defstruct auction_id: nil, status: :pending
   end
@@ -15,10 +23,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     def start_auction(%Oceanconnect.Auctions.Auction{id: auction_id}) do
       %AuctionCommand{command: :start_auction, data: auction_id}
     end
+
+    def end_auction(%Oceanconnect.Auctions.Auction{id: auction_id}) do
+      %AuctionCommand{command: :end_auction, data: auction_id}
+    end
   end
 
   defp get_auction_store_name(auction_id) do
-    {:via, Registry, {:auctions_registry, auction_id}}
+    {:via, Registry, {@registry_name, auction_id}}
   end
 
   def start_link(auction_id) when is_integer(auction_id) do
@@ -33,25 +45,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Client
   def get_current_state(%Oceanconnect.Auctions.Auction{id: auction_id}) do
-    with {:ok, pid} <- find_store(auction_id),
+    with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, :get_current_state)
   end
 
-  def find_store(auction_id) do
-    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
-      {:ok, pid}
-    else
-      [] -> {:error, "Not Started"}
-    end
-  end
-
   def process_command(%AuctionCommand{command: :start_auction, data: data}, auction_id) do
-    with {:ok, pid} <- find_store(auction_id),
+    with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.cast(pid, {:start_auction, data})
   end
 
   def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
-    with {:ok, pid} <- find_store(auction_id),
+    with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, {cmd, data})
   end
 
@@ -66,6 +70,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     # process the start_auction command based on that state.
     new_state = %AuctionState{current_state | status: :open}
     # broadcast to the auction channel
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:end_auction, _}, current_state) do
+    new_state = %AuctionState{current_state | status: :closed}
     {:noreply, new_state}
   end
 
