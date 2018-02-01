@@ -35,5 +35,5 @@ defmodule OceanconnectWeb.AuctionsChannel do
         false
     end
   end
-  defp authorized?(_,_), do: false
+  defp authorized?(_,_,_), do: false
 end

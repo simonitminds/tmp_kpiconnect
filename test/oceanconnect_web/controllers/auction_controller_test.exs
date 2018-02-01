@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @update_attrs %{ po: "updated PO text"}
+  @update_attrs %{ duration: 15}
   @invalid_attrs %{ vessel_id: nil}
 
   setup do
@@ -19,7 +19,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       |> to_string
     end)
     authed_conn = login_user(build_conn(), user)
-    auction = insert(:auction, vessel: vessel)
+    auction = insert(:auction, vessel: vessel, duration: 10)
     {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction, user: user}
   end
 
@@ -57,7 +57,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
       auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
       conn = get conn, auction_path(conn, :show, id)
-      assert html_response(conn, 200) =~ auction.vessel.name
+      assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == user.id
     end
 
@@ -97,7 +97,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
       conn = get conn, auction_path(conn, :show, auction)
-      assert html_response(conn, 200) =~ "updated PO text"
+      assert html_response(conn, 200) =~ "window.userToken"
     end
 
     test "renders errors when data is invalid", %{conn: conn, auction: auction} do

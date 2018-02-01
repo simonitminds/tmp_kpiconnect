@@ -13,8 +13,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     auction = insert(:auction, buyer: buyer, duration: 10)
     Auctions.set_suppliers_for_auction(auction, [supplier])
     current_time =  DateTime.utc_now()
-    time_remaining = Time.diff(Time.new(0, auction.duration, 0, 0) - Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0))
-    expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
+    {:ok, duration} = Time.new(0, auction.duration, 0, 0)
+    {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
+    time_remaining = Time.diff(duration, elapsed_time)
+    expected_payload = %{id: auction.id, state: %{status: :open}}
     {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
 
     {:ok, %{supplier_id: Integer.to_string(supplier.id),
@@ -71,7 +73,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     assert {:error, %{reason: "unauthorized"}} = subscribe_and_join(non_participant_socket, OceanconnectWeb.AuctionsChannel, channel)
   end
 
-  test "auction start begins time remaining countdown", %{buyer_id: buyer_id, auction: auction} do
+  test "auction start begins time remaining countdown", %{buyer_id: buyer_id,
+                                                          auction: auction,
+                                                          expected_payload: expected_payload} do
     channel = "user_auctions:#{buyer_id}"
     event = "auctions_update"
 

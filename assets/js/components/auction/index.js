@@ -46,7 +46,7 @@ const AuctionsIndex = (props)=> {
 
   const filteredAuctionsDisplay = (status) => {
     const filteredAuctions = _.filter(props.auctions, (auction) => { return(auction.state.status === status)});
-    if(filteredAuctions.length === 0) {
+    if(_.isEmpty(filteredAuctions)) {
       return(
         <div className="empty-list">
           <em>{`You have no ${status} auctions`}</em>

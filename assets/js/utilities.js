@@ -29,16 +29,8 @@ export const portLocalTime = (gmtTime, portId, ports) => {
   }
 }
 
-
-export function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    window.location.search
-        .substr(1)
-        .split("&")
-        .forEach(function (item) {
-          tmp = item.split("=");
-          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-        });
-    return result;
+export function formatTimeRemaining(auction) {
+  const mins = Math.floor(auction.time_remaining / 60);
+  const secs = auction.time_remaining - mins * 60;
+  return `${mins}:${secs}`
 }
