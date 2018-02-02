@@ -30,7 +30,12 @@ export const portLocalTime = (gmtTime, portId, ports) => {
 }
 
 export function formatTimeRemaining(auction) {
-  const mins = Math.floor(auction.time_remaining / 60);
-  const secs = auction.time_remaining - mins * 60;
-  return `${mins}:${secs}`
+  if (auction.time_remaining) {
+    const mins = Math.floor(auction.time_remaining / 60);
+    const secs = auction.time_remaining - mins * 60;
+    return `${mins}:${secs} remaining in auction`
+  } else {
+    return "Auction has not started"
+  }
+
 }

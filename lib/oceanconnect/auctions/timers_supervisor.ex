@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.TimersSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_timer(%Oceanconnect.Auctions.Auction{id: id}) do
-    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionTimer, id})
+  def start_timer(auction_id) do
+    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionTimer, auction_id})
   end
 end

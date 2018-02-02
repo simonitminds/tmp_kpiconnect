@@ -43,7 +43,7 @@ const AuctionShow = (props) => {
                     <div className="column">
                       <div className="auction-header__timer has-text-left-mobile">
                         <div className="tag has-text-weight-bold is-medium is-danger is-uppercase">
-                          <span className="qa-auction-time-remaining">{formatTimeRemaining(auction)}</span> remaining in auction
+                          <span className="qa-auction-time-remaining">{formatTimeRemaining(auction)}</span>
                         </div>
                       </div>
                       <div className="auction-header__start-time has-text-left-mobile">

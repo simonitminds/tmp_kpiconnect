@@ -19,7 +19,9 @@ defmodule Oceanconnect.Auctions do
   def auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Not Started"} -> %{id: id, state: %{status: :pending}}
-       %AuctionState{status: status} -> %{id: id, state: %{status: status}}
+      state ->
+        reduced_state = Map.take(state, [:status, :current_server_time, :time_remaining])
+        %{id: id, state: reduced_state}
     end
   end
 
@@ -27,8 +29,6 @@ defmodule Oceanconnect.Auctions do
     auction
     |> AuctionCommand.start_auction()
     |> AuctionStore.process_command(auction.id)
-
-    Oceanconnect.Auctions.TimersSupervisor.start_timer(auction)
 
     auction
     |> Repo.preload([:suppliers, :buyer])

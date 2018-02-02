@@ -13,8 +13,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
   end
 
+  def add_times_to_state?(state = %{status: :open}, auction_id) do
+    time_remaining = Process.read_timer(Oceanconnect.Auctions.AuctionTimer.timer_ref(auction_id))
+    state
+    |> Map.put(:time_remaining, time_remaining)
+    |> Map.put(:current_server_time, DateTime.utc_now())
+  end
+  def add_times_to_state?(state, _auction_id), do: state
+
   defmodule AuctionState do
-    defstruct auction_id: nil, status: :pending
+    defstruct auction_id: nil, status: :pending, current_server_time: nil, time_remaining: nil
   end
 
   defmodule AuctionCommand do
@@ -40,7 +48,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def init(auction_id) do
     auction = Auctions.get_auction!(auction_id)
     state = %AuctionState{auction_id: auction.id, status: calculate_status(auction)}
-    {:ok, state}
+    updated_state = add_times_to_state?(state, auction_id)
+    {:ok, updated_state}
   end
 
    # Client
@@ -60,15 +69,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
    # Server
-  def handle_call(:get_current_state, _from, current_state) do
+  def handle_call(:get_current_state, _from, current_state = %{auction_id: auction_id}) do
     # Get the Auction State from current_state
-    {:reply, current_state, current_state}
+    updated_state = add_times_to_state?(current_state, auction_id)
+
+    {:reply, updated_state, current_state}
   end
 
-  def handle_cast({:start_auction, _}, current_state) do
+  def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
     # Get the current Auction State from current_state
     # process the start_auction command based on that state.
-    new_state = %AuctionState{current_state | status: :open}
+    Oceanconnect.Auctions.TimersSupervisor.start_timer(auction_id)
+    new_state = add_times_to_state?(%AuctionState{current_state | status: :open}, auction_id)
+
     # broadcast to the auction channel
     {:noreply, new_state}
   end

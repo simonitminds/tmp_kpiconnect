@@ -17,7 +17,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
   end
 
   test "auction_timer is supervised", %{auction: auction} do
-    {:ok, pid} = Oceanconnect.Auctions.TimersSupervisor.start_timer(auction)
+    {:ok, pid} = Oceanconnect.Auctions.TimersSupervisor.start_timer(auction.id)
     assert Process.alive?(pid)
 
     Process.exit(pid, :shutdown)
