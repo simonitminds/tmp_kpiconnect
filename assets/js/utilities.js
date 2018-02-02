@@ -34,23 +34,29 @@ export function timeRemainingCountdown(auction, clientTime) {
   if (_.get(auction, 'state.status') == "open" && _.get(auction, 'state.time_remaining')) {
     const serverTime = moment(auction.state.current_server_time);
     const timeLeft = auction.state.time_remaining - clientTime.diff(serverTime);
-    return formatTimeRemaining(auction, timeLeft);
+    return timeLeft;
   }
 }
 
-export function formatTimeRemaining(auction, timeLeft = null) {
-  if (_.get(auction, 'state.status') == "open" && _.get(auction, 'state.time_remaining')) {
-    let timeRemaining;
-    if (timeLeft) {
-      timeRemaining = timeLeft;
-    } else {
-      timeRemaining = auction.state.time_remaining;
-    }
+export function formatTimeRemaining(timeRemaining) {
+  if (timeRemaining) {
     const mins = Math.floor(timeRemaining / 60000);
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
-    return `${mins}:${secs} remaining in auction`;
+    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in auction`;
   } else {
     return "Auction has not started";
   }
+}
 
+export function leftpad (str, len, ch) {
+  if (!ch) ch = ' ';
+  let new_str = String(str);
+
+  len = len - new_str.length;
+  let i = -1;
+  while (++i < len) {
+    new_str = ch + new_str;
+  }
+
+  return new_str;
 }

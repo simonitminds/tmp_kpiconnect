@@ -29,15 +29,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
            }}
   end
 
-  def assert_rounded_time_broadcast(auction_id, event, status, channel, expected_payload) do
+  def assert_rounded_time_broadcast(auction, event, status, channel, expected_payload) do
+    auction_id = auction.id
     receive do
       %Phoenix.Socket.Broadcast{
-        event: event,
-        payload: %{id: auction_id, state: %{status: status, time_remaining: time}}, topic: channel} ->
-          assert Utilities.round_time_remaining(time) == expected_payload.state.time_remaining
+        event: ^event,
+        payload: payload = %{id: ^auction_id, state: %{status: ^status, time_remaining: _time}}, topic: ^channel} ->
+          assert Utilities.trunc_times(payload.state) == Utilities.trunc_times(expected_payload.state)
     after
       5000 ->
-        IO.puts :stderr, "No message in 5 seconds"
+        assert false, "Expected message received nothing."
     end
   end
 
@@ -50,7 +51,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
+    assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
   end
 
   test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
@@ -62,7 +63,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
+    assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
   end
 
   test "broadcasts are pushed to a non_participant", %{non_participant_id: non_participant_id,
@@ -94,6 +95,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
+    assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
   end
 end

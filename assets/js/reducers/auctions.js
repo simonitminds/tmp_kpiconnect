@@ -3,7 +3,8 @@ import { replaceListItem } from "../utilities";
 import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "../constants/auctions";
 
 const initialState = {
-  auctions: []
+  auctions: [],
+  loading: true
 };
 
 export default function(state, action) {
@@ -12,7 +13,11 @@ export default function(state, action) {
       if(_.isEmpty(action.auctions)) {
         return state;
       } else {
-        return {...state, auctions: action.auctions};
+        return {
+          ...state,
+          auctions: action.auctions,
+          loading: false
+        };
       }
     }
     case UPDATE_AUCTION_STATE: {
@@ -22,7 +27,11 @@ export default function(state, action) {
             .value();
       const updatedAuction = {...origAuction, state: action.auction.state};
       const newAuctionList = replaceListItem(state.auctions, origAuction, updatedAuction);
-      return {...state, auctions: newAuctionList};
+      return {
+        ...state,
+        auctions: newAuctionList,
+        loading: false
+      };
     }
     default: {
       return state || initialState;

@@ -67,7 +67,10 @@ const AuctionsIndex = (props)=> {
           <a href="/auctions/new" className="button is-link is-pulled-right">
             New Auction
           </a>
-          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold"><i className="far fa-clock has-margin-right-xs"></i><span className="tag__timer" id="gmt-time" >{currentGMTTime}</span>GMT</div>
+          <div className="tag is-rounded is-highlit is-pulled-right is-medium has-margin-right-md has-text-weight-bold">
+            <i className="far fa-clock has-margin-right-xs"></i>
+            <span className="tag__timer" id="gmt-time" >{currentGMTTime}</span>GMT
+          </div>
         </div>
       </div>
 

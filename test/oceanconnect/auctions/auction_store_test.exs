@@ -13,14 +13,14 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "starting auction_store for auction", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
 
-    time_remaining = auction.duration * 60_000
-    current_time = DateTime.utc_now()
+    remaining = auction.duration * 60_000
+    current = DateTime.utc_now()
     command = AuctionCommand.start_auction(auction)
     AuctionStore.process_command(command, auction.id)
-    assert %AuctionState{
-      status: :open, auction_id: auction.id,
-      time_remaining: time_remaining, current_server_time: current_time}
-      |> Utilities.trunc_times == auction |> AuctionStore.get_current_state |> Utilities.trunc_times
+    expected_state =  %AuctionState{status: :open, auction_id: auction.id, time_remaining: remaining, current_server_time: current}
+    actual_state = AuctionStore.get_current_state(auction)
+
+    assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
   end
 
   test "auction is supervised", %{auction: auction} do

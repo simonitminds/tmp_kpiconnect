@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -6,7 +7,8 @@ import { getAllAuctions, subscribeToAuctionUpdates } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
-    auctions: state.auctionsReducer.auctions
+    auctions: state.auctionsReducer.auctions,
+    loading: state.auctionsReducer.loading
   }
 };
 
@@ -16,6 +18,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export class AuctionContainer extends React.Component {
+
   dispatchItem() {
     this.props.dispatch(getAllAuctions());
     this.props.dispatch(subscribeToAuctionUpdates());
@@ -28,8 +31,19 @@ export class AuctionContainer extends React.Component {
       this.dispatchItem();
     }
   }
+
+
   render() {
-    return <AuctionShow {...this.props} />;
+    const auction = _.chain(this.props.auctions)
+      .filter(['id', window.auctionId])
+      .first()
+      .value();
+
+    if (this.props.loading) {
+      return <div>Loading...</div>
+    } else {
+      return <AuctionShow auction={auction} />;
+    }
   }
 }
 

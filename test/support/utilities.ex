@@ -9,6 +9,6 @@ defmodule Oceanconnect.Utilities do
   end
 
   def round_time_remaining(time_remaining) do
-    Float.round((time_remaining / 100_000), 0) * 100_000
+    round(Float.round((time_remaining / 1_000), 0) * 1_000)
   end
 end
