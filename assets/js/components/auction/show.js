@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatDateTime, formatTimeRemaining } from '../../utilities';
+import { formatDateTime, formatTimeRemaining, timeRemainingCountdown} from '../../utilities';
+import moment from 'moment';
 
 const AuctionShow = (props) => {
   const auction = _.filter(props.auctions, ['id', window.auctionId]);
@@ -12,6 +13,14 @@ const AuctionShow = (props) => {
       return <i>No additional information provided.</i>;
     }
   }
+
+  window.setInterval(
+    function(){
+      const timeRemaining = document.querySelector("#time-remaining");
+      if (timeRemaining) {
+        timeRemaining.innerHTML = timeRemainingCountdown(_.first(auction), moment().utc());
+      }
+  }, 1000);
 
   return (
     <div>
@@ -30,7 +39,7 @@ const AuctionShow = (props) => {
                 <div className="auction-header">
                   <div className="columns has-margin-bottom-none">
                     <div className="column">
-                      <div className="auction-header__status auction-header__status--{auction_status(auction)} tag is-rounded qa-auction-status">
+                      <div className="auction-header__status auction-header__status--{auction_status(auction)} tag is-rounded qa-auction-status" id="time-remaing">
                         {auction.state.status}
                       </div>
                       <div className="auction-header__po is-uppercase">
@@ -43,7 +52,7 @@ const AuctionShow = (props) => {
                     <div className="column">
                       <div className="auction-header__timer has-text-left-mobile">
                         <div className="tag has-text-weight-bold is-medium is-danger is-uppercase">
-                          <span className="qa-auction-time-remaining">{formatTimeRemaining(auction)}</span>
+                          <span className="qa-auction-time-remaining" id="time-remaining">{formatTimeRemaining(auction)}</span>
                         </div>
                       </div>
                       <div className="auction-header__start-time has-text-left-mobile">
