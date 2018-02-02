@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
+  alias Oceanconnect.Utilities
   alias Oceanconnect.{Auctions}
 
   setup do
@@ -28,6 +29,17 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
            }}
   end
 
+  def assert_rounded_time_broadcast(auction_id, event, status, channel, expected_payload) do
+    receive do
+      %Phoenix.Socket.Broadcast{
+        event: event,
+        payload: %{id: auction_id, state: %{status: status, time_remaining: time}}, topic: channel} ->
+          assert Utilities.round_time_remaining(time) == expected_payload.state.time_remaining
+    after
+      5000 ->
+        IO.puts :stderr, "No message in 5 seconds"
+    end
+  end
 
   test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                auction: auction,
@@ -38,7 +50,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_broadcast ^event, ^expected_payload
+    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
   end
 
   test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
@@ -50,7 +62,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_broadcast ^event, ^expected_payload
+    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
   end
 
   test "broadcasts are pushed to a non_participant", %{non_participant_id: non_participant_id,
@@ -82,6 +94,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     @endpoint.subscribe(channel)
     Auctions.start_auction(auction)
 
-    assert_broadcast ^event, ^expected_payload
+    assert_rounded_time_broadcast(auction.id, event, :open, channel, expected_payload)
   end
 end

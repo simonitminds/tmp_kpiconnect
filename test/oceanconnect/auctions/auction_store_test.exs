@@ -1,5 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
+  alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions.AuctionStore
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
 
@@ -18,8 +19,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     AuctionStore.process_command(command, auction.id)
     assert %AuctionState{
       status: :open, auction_id: auction.id,
-      time_remaining: time_remaining, current_server_time: current_time} ==
-      AuctionStore.get_current_state(auction)
+      time_remaining: time_remaining, current_server_time: current_time}
+      |> Utilities.trunc_times == auction |> AuctionStore.get_current_state |> Utilities.trunc_times
   end
 
   test "auction is supervised", %{auction: auction} do
