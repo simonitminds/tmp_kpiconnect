@@ -162,5 +162,5 @@ end)
   [%{name: "Algeciras", country: "Spain", gmt_offset: 1}, Port]]
 |> Enum.map(fn([data, module]) -> Repo.get_or_insert!(module, data) end)
 
-auction = Repo.get_or_insert!(Auction, %{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, po: "1234567", buyer_id: buyer.id, duration: 15})
+auction = Repo.get_or_insert!(Auction, %{vessel_id: vessel1.id, port_id: port1.id, fuel_id: fuel1.id, po: "1234567", buyer_id: buyer.id, duration: 15 * 60_000})
 Auctions.set_suppliers_for_auction(auction, suppliers)

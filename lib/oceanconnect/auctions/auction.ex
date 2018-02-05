@@ -14,7 +14,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :eta, :utc_datetime
     field :etd, :utc_datetime
     field :auction_start, :utc_datetime
-    field :duration, :integer
+    field :duration, :integer # milliseconds
     field :anonymous_bidding, :boolean
     field :additional_information, :string
     many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
@@ -57,6 +57,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("auction_start")
     |> maybe_parse_date_field("eta")
     |> maybe_parse_date_field("etd")
+    |> maybe_convert_duration("duration")
   end
 
   def maybe_parse_date_field(params, key) do
@@ -64,6 +65,15 @@ defmodule Oceanconnect.Auctions.Auction do
       %{^key => date} ->
         updated_date = parse_date(date)
         Map.put(params, key, updated_date)
+      _ -> params
+    end
+  end
+
+  def maybe_convert_duration(params, key) do
+    case params do
+      %{^key => duration} ->
+        updated_duration = duration * 60_000
+        Map.put(params, key, updated_duration)
       _ -> params
     end
   end

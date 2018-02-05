@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
-  alias Oceanconnect.Auctions
+  alias Oceanconnect.{Auctions, Repo}
+  alias Oceanconnect.Auctions.AuctionStore
   alias Oceanconnect.Auctions.AuctionStore.AuctionCommand
 
   @registry_name :auction_timers_registry
@@ -30,7 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   def init(auction_id) do
     if {:ok, pid} = find_pid(auction_id) do
       auction = Auctions.get_auction!(auction_id)
-      timer = Process.send_after(pid, :end_auction_timer, auction.duration * 60_000)
+      timer = Process.send_after(pid, :end_auction_timer, auction.duration)
       {:ok, %{timer: timer, auction_id: auction_id}}
     end
   end
@@ -54,12 +55,13 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   #   {:noreply, %{timer: timer}}
   # end
 
-  def handle_cast(:end_auction_timer, state = %{auction_id: auction_id}) do
-    # auction_id
-    # |> Auctions.get_auction!
-    # |> Repo.preload([:suppliers, :buyer])
-    # |> AuctionCommand.end_auction
-    # |> Auctions.notify_participants("user_auctions", Auctions.auction_state(auction))
+  def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
+    auction_id
+    |> Auctions.get_auction!
+    |> Repo.preload([:suppliers, :buyer])
+    |> AuctionCommand.end_auction
+    |> AuctionStore.process_command(auction_id)
+
     {:noreply, state}
   end
 

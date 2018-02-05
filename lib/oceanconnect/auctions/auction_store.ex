@@ -63,6 +63,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     do: GenServer.cast(pid, {:start_auction, data})
   end
 
+  def process_command(%AuctionCommand{command: :end_auction, data: data}, auction_id) do
+    with {:ok, pid} <- find_pid(auction_id),
+    do: GenServer.cast(pid, {:end_auction, data})
+  end
+
   def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, {cmd, data})
@@ -73,7 +78,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     # Get the Auction State from current_state
     updated_state = add_times_to_state?(current_state, auction_id)
 
-    {:reply, updated_state, current_state}
+    {:reply, updated_state, updated_state}
   end
 
   def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
@@ -87,7 +92,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction, _}, current_state) do
-    new_state = %AuctionState{current_state | status: :closed}
+    new_state = %AuctionState{current_state | status: :closed, time_remaining: 0}
     {:noreply, new_state}
   end
 

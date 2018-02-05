@@ -11,10 +11,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     supplier = insert(:user, company: supplier_company)
     non_participant = insert(:user)
 
-    auction = insert(:auction, buyer: buyer, duration: 10)
+    auction = insert(:auction, buyer: buyer, duration: 10 * 60_000)
     Auctions.set_suppliers_for_auction(auction, [supplier])
     current_time =  DateTime.utc_now()
-    {:ok, duration} = Time.new(0, auction.duration, 0, 0)
+    {:ok, duration} = Time.new(0, round(auction.duration / 60_000), 0, 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
     expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}

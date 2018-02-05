@@ -3,17 +3,17 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
   alias Oceanconnect.Auctions.AuctionTimer
 
   setup do
-    auction = insert(:auction, duration: 15)
+    auction = insert(:auction, duration: 15 * 60_000)
     {:ok, %{auction: auction}}
   end
 
   test "start auction_timer for auction", %{auction: auction} do
     assert {:ok, _pid} = AuctionTimer.start_link(auction.id)
     ref = AuctionTimer.timer_ref(auction.id)
-    assert Process.read_timer(ref) == auction.duration * 60_000
+    assert Process.read_timer(ref) == auction.duration
 
     :timer.sleep(500)
-    assert Process.read_timer(ref) < auction.duration * 60_000
+    assert Process.read_timer(ref) < auction.duration
   end
 
   test "auction_timer is supervised", %{auction: auction} do

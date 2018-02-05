@@ -7,8 +7,10 @@ import CheckBoxField from '../CheckBoxField';
 import DateAndTime from '../DateAndTime';
 import { portLocalTime } from '../../utilities';
 
-class AuctionForm extends React.Component {constructor(props) {
+class AuctionForm extends React.Component {
+  constructor(props) {
     super(props);
+    console.log(props);
     this.state = {
       selected_port: props.auction.port_id || '',
       selected_vessel: props.auction.vessel_id || '',
@@ -52,7 +54,7 @@ class AuctionForm extends React.Component {constructor(props) {
         <input type="hidden" id="auction_eta_minute" name="auction[eta]" value={this.state.eta} />
         <input type="hidden" id="auction_etd_minute" name="auction[etd]" value={this.state.etd} />
 
-        <section className="auction-info"> // Vessel selection
+        <section className="auction-info"> {/* Vessel info */}
           <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
             <div className="content">
               <fieldset>
@@ -87,9 +89,9 @@ class AuctionForm extends React.Component {constructor(props) {
               </fieldset>
             </div>
           </div>
-        </section> // Vessel selection
+        </section> {/* Vessel info */}
 
-        <section className="auction-info"> //  Port selection
+        <section className="auction-info"> {/* Port info */}
           <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
             <div className="content">
               <fieldset>
@@ -145,9 +147,9 @@ class AuctionForm extends React.Component {constructor(props) {
               </fieldset>
             </div>
           </div>
-        </section> //  Port selection
+        </section> {/* Port info */}
 
-        <section className="auction-info"> // Fuel Entry
+        <section className="auction-info"> {/* Fuel info */}
           <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
             <div className="content">
               <fieldset>
@@ -192,9 +194,9 @@ class AuctionForm extends React.Component {constructor(props) {
               </fieldset>
             </div>
           </div>
-        </section> // Fuel Entry
+        </section> {/* Fuel info */}
 
-        <section className="auction-info"> // Add'l info
+        <section className="auction-info"> {/* Add'l info */}
           <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
             <div className="content">
               <fieldset>
@@ -211,9 +213,9 @@ class AuctionForm extends React.Component {constructor(props) {
               </fieldset>
             </div>
           </div>
-        </section> // Add'l info
+        </section> {/* Add'l info */}
 
-        <section className="auction-info"> // Auction details
+        <section className="auction-info"> {/* Auction details */}
           <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
             <div className="content">
               <fieldset>
@@ -275,7 +277,7 @@ class AuctionForm extends React.Component {constructor(props) {
               </fieldset>
             </div>
           </div>
-        </section> // Auction details
+        </section> {/* Auction details */}
       </div>);
   }
 }

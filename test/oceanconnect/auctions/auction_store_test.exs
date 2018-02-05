@@ -5,7 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
 
   setup do
-    auction = insert(:auction)
+    auction = insert(:auction, duration: 1_000)
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
     {:ok, %{auction: auction}}
   end
@@ -13,11 +13,13 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "starting auction_store for auction", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
 
-    remaining = auction.duration * 60_000
     current = DateTime.utc_now()
-    command = AuctionCommand.start_auction(auction)
-    AuctionStore.process_command(command, auction.id)
-    expected_state =  %AuctionState{status: :open, auction_id: auction.id, time_remaining: remaining, current_server_time: current}
+
+    auction
+    |> AuctionCommand.start_auction
+    |> AuctionStore.process_command(auction.id)
+
+    expected_state =  %AuctionState{status: :open, auction_id: auction.id, time_remaining: auction.duration, current_server_time: current}
     actual_state = AuctionStore.get_current_state(auction)
 
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
@@ -34,5 +36,22 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     {:ok, new_pid} = AuctionStore.find_pid(auction.id)
     assert Process.alive?(new_pid)
+  end
+
+  test "auction status is closed after duration timeout", %{auction: auction} do
+    assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
+    current = DateTime.utc_now()
+
+    auction
+    |> AuctionCommand.start_auction
+    |> AuctionStore.process_command(auction.id)
+
+    assert AuctionStore.get_current_state(auction).status == :open
+
+    :timer.sleep(1_100)
+
+    expected_state =  %AuctionState{status: :closed, auction_id: auction.id, time_remaining: 0, current_server_time: current}
+    actual_state = AuctionStore.get_current_state(auction)
+    assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
   end
 end
