@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
-  alias Oceanconnect.{Auctions, Repo}
+  alias Oceanconnect.{Auctions}
   alias Oceanconnect.Auctions.AuctionStore
   alias Oceanconnect.Auctions.AuctionStore.AuctionCommand
 
@@ -56,9 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   # end
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
-    auction_id
-    |> Auctions.get_auction!
-    |> Repo.preload([:suppliers, :buyer])
+    %Auctions.Auction{id: auction_id}
     |> AuctionCommand.end_auction
     |> AuctionStore.process_command(auction_id)
 

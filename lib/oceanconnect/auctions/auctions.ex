@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
   alias Oceanconnect.Accounts.{User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
