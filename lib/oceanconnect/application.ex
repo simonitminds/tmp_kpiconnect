@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Application do
   use Application
-  alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter, TimersSupervisor}
+  alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter, TimersSupervisor, AuctionNotifier}
 
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications

@@ -1,8 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel, AuctionNotifier}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
   alias Oceanconnect.Accounts.{User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -32,17 +31,7 @@ defmodule Oceanconnect.Auctions do
 
     update_auction(auction, %{auction_start: DateTime.utc_now()})
 
-    auction
-    |> Repo.preload([:suppliers, :buyer])
-    |> Oceanconnect.Auctions.notify_participants("user_auctions", auction_state(auction))
-  end
-
-  def notify_participants(%{buyer: buyer, suppliers: suppliers}, channel, payload) do
-    buyer_id = buyer.id
-    supplier_ids = Enum.map(suppliers, fn(s) -> s.id end)
-    Enum.map([buyer_id | supplier_ids], fn(id) ->
-      OceanconnectWeb.Endpoint.broadcast("#{channel}:#{id}", "auctions_update", payload)
-    end)
+    AuctionNotifier.notify_participants(auction.id)
   end
 
   def create_auction(attrs \\ %{}) do

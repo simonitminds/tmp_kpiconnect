@@ -19,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> AuctionCommand.start_auction
     |> AuctionStore.process_command(auction.id)
 
-    expected_state =  %AuctionState{status: :open, auction_id: auction.id, time_remaining: auction.duration, current_server_time: current}
+    expected_state = %AuctionState{status: :open, auction_id: auction.id, time_remaining: auction.duration, current_server_time: current}
     actual_state = AuctionStore.get_current_state(auction)
 
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)

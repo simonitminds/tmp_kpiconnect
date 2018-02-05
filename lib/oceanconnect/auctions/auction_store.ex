@@ -5,22 +5,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   @registry_name :auctions_registry
 
-  def find_pid(auction_id) do
-    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
-      {:ok, pid}
-    else
-      [] -> {:error, "Not Started"}
-    end
-  end
-
-  def add_times_to_state?(state = %{status: :open}, auction_id) do
-    time_remaining = Process.read_timer(Oceanconnect.Auctions.AuctionTimer.timer_ref(auction_id))
-    state
-    |> Map.put(:time_remaining, time_remaining)
-    |> Map.put(:current_server_time, DateTime.utc_now())
-  end
-  def add_times_to_state?(state, _auction_id), do: state
-
   defmodule AuctionState do
     defstruct auction_id: nil, status: :pending, current_server_time: nil, time_remaining: nil
   end
@@ -36,6 +20,22 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       %AuctionCommand{command: :end_auction, data: auction_id}
     end
   end
+
+  def find_pid(auction_id) do
+    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
+      {:ok, pid}
+    else
+      [] -> {:error, "Not Started"}
+    end
+  end
+
+  def add_times_to_state?(state = %{status: :open}, auction_id) do
+    time_remaining = Process.read_timer(Oceanconnect.Auctions.AuctionTimer.timer_ref(auction_id))
+    state
+    |> Map.put(:time_remaining, time_remaining)
+    |> Map.put(:current_server_time, DateTime.utc_now())
+  end
+  def add_times_to_state?(state, _auction_id), do: state
 
   defp get_auction_store_name(auction_id) do
     {:via, Registry, {@registry_name, auction_id}}

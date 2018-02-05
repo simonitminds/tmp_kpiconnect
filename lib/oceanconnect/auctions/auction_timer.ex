@@ -36,26 +36,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     end
   end
 
-  # def reset_timer() do
-  #   GenServer.call(__MODULE__, :reset_timer)
-  # end
-
-  # def handle_call(:reset_timer, _from, %{timer: timer}) do
-  #   :timer.cancel(timer)
-  #   timer = Process.send_after(self(), :work, 60_000)
-  #   {:reply, :ok, %{timer: timer})
-  # end
-
-  # def handle_info(:work, state) do
-  #   # Do the work you desire here
-  #
-  #   # Start the timer again
-  #   timer = Process.send_after(self(), :work, 60_000)
-  #
-  #   {:noreply, %{timer: timer}}
-  # end
-
-  def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
+    def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
     %Auctions.Auction{id: auction_id}
     |> AuctionCommand.end_auction
     |> AuctionStore.process_command(auction_id)
@@ -67,8 +48,13 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, timer_ref, state}
   end
 
-  # So that unhandled messages don't error
-  # def handle_call(_, state) do
-  #   {:ok, state)
+  # def reset_timer() do
+  #   GenServer.call(__MODULE__, :reset_timer)
+  # end
+
+  # def handle_call(:reset_timer, _from, %{timer: timer}) do
+  #   :timer.cancel(timer)
+  #   timer = Process.send_after(self(), :work, 60_000)
+  #   {:reply, :ok, %{timer: timer})
   # end
 end
