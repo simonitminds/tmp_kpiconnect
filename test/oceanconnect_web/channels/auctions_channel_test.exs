@@ -10,30 +10,25 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     buyer = insert(:user, company: buyer_company)
     supplier = insert(:user, company: supplier_company)
     non_participant = insert(:user)
+    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000)
+    Auctions.set_suppliers_for_auction(auction, [supplier])
+    current_time =  DateTime.utc_now()
+    {:ok, duration} = Time.new(0, round(auction.duration / 60_000), 0, 0)
+    {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
+    time_remaining = Time.diff(duration, elapsed_time) * 1_000
+    {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
+
+    expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
 
     {:ok, %{supplier_id: Integer.to_string(supplier.id),
             buyer_id: Integer.to_string(buyer.id),
             non_participant_id: Integer.to_string(non_participant.id),
             non_participant: non_participant,
-            buyer: buyer,
-            supplier: supplier}}
+            expected_payload: expected_payload,
+            auction: auction}}
   end
 
   describe "Auction Start" do
-    setup(%{buyer: buyer, supplier: supplier}) do
-      auction = insert(:auction, buyer: buyer, duration: 10 * 60_000)
-      Auctions.set_suppliers_for_auction(auction, [supplier])
-      current_time =  DateTime.utc_now()
-      {:ok, duration} = Time.new(0, round(auction.duration / 60_000), 0, 0)
-      {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
-      time_remaining = Time.diff(duration, elapsed_time) * 1_000
-      {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
-
-
-      expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
-      {:ok, %{expected_payload: expected_payload, auction: auction}}
-    end
-
     test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                 auction: auction,
                                                 expected_payload: expected_payload} do
@@ -91,56 +86,41 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Auction Ended" do
-    setup(%{buyer: buyer, supplier: supplier}) do
-      auction = insert(:auction, buyer: buyer, duration: 1_000)
-      Auctions.set_suppliers_for_auction(auction, [supplier])
-      {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
-      expected_payload = %{id: auction.id, state: %{status: :decision, time_remaining: 0}}
-      {:ok, %{expected_payload: expected_payload, auction: auction}}
+  describe "Auction goes into Decision" do
+    setup(%{expected_payload: expected_payload}) do
+      current_time =  DateTime.utc_now()
+      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, current_server_time: current_time})
+      {:ok, %{payload: payload}}
     end
 
-    test "buyers get notified when the auction ends", %{auction: auction, buyer: buyer, expected_payload: payload} do
-      buyer_id = buyer.id
+    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, payload: payload} do
       channel = "user_auctions:#{buyer_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-
       Auctions.start_auction(auction)
-      receive do
-        %{event: ^event, payload: ^payload, topic: ^channel} ->
-          assert true
-      after
-        2_000 -> assert false
-      end
+
+      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
     end
 
-    test "suppliers get notified when the auction ends", %{auction: auction, supplier: supplier, expected_payload: payload} do
-      supplier_id = supplier.id
+    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
       channel = "user_auctions:#{supplier_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-
       Auctions.start_auction(auction)
-      receive do
-        %{event: ^event, payload: ^payload, topic: ^channel} ->
-          assert true
-      after
-        2_000 -> assert false
-      end
+
+      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
     end
 
-    test "a non participant does not", %{auction: auction, non_participant: non_participant}  do
-      non_participant_id = non_participant.id
+    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
       channel = "user_auctions:#{non_participant_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-
       Auctions.start_auction(auction)
-      refute_receive %{event: ^event, payload: %{status: :decision}, topic: ^channel}
+
+      refute_broadcast ^event, ^payload
     end
   end
 end

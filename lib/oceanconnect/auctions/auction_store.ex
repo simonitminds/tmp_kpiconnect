@@ -94,7 +94,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :decision, time_remaining: 0}
 
-    reduced_state = Map.take(new_state, [:status, :time_remaining])
+    reduced_state = Map.take(new_state, [:status, :current_server_time, :time_remaining])
     AuctionNotifier.notify_participants(auction_id, %{id: auction_id, state: reduced_state})
 
     {:noreply, new_state}
