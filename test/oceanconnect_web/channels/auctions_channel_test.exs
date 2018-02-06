@@ -123,4 +123,42 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       refute_broadcast ^event, ^payload
     end
   end
+
+  describe "Auction Ends (post Decision Period)" do
+    setup(%{expected_payload: expected_payload}) do
+      current_time =  DateTime.utc_now()
+      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, current_server_time: current_time})
+      {:ok, %{payload: payload}}
+    end
+
+    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, payload: payload} do
+      channel = "user_auctions:#{buyer_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.start_auction(auction)
+
+      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+    end
+
+    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
+      channel = "user_auctions:#{supplier_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.start_auction(auction)
+
+      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+    end
+
+    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
+      channel = "user_auctions:#{non_participant_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.start_auction(auction)
+
+      refute_broadcast ^event, ^payload
+    end
+  end
 end
