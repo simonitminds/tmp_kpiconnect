@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
       {:ok, pid}
     else
-      [] -> {:error, "Not Started"}
+      [] -> {:error, "Auction Timer Not Started"}
     end
   end
 

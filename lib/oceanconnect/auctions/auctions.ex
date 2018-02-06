@@ -17,7 +17,7 @@ defmodule Oceanconnect.Auctions do
 
   def auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
-      {:error, "Not Started"} -> %{id: id, state: %{status: :pending}}
+      {:error, "Auction Store Not Started"} -> %{id: id, state: %{status: :pending}}
       state ->
         reduced_state = Map.take(state, [:status, :current_server_time, :time_remaining])
         %{id: id, state: reduced_state}
