@@ -11,6 +11,10 @@ export function replaceListItem(list, oldItem, newItem) {
   ];
 }
 
+export const formatGMTDateTime = (dateTime) => {
+  return formatDateTime(moment(dateTime).utc());
+}
+
 export const formatDateTime = (dateTime) => {
   if (dateTime) {
     return moment(dateTime).format("DD/MM/YYYY HH:mm");
@@ -31,10 +35,12 @@ export const portLocalTime = (gmtTime, portId, ports) => {
 }
 
 export function timeRemainingCountdown(auction, clientTime) {
-  if (_.get(auction, 'state.status') == "open" && _.get(auction, 'state.time_remaining')) {
+  if (_.get(auction, 'state.status') === "open" && _.get(auction, 'state.time_remaining')) {
     const serverTime = moment(auction.state.current_server_time);
     const timeLeft = auction.state.time_remaining - clientTime.diff(serverTime);
     return timeLeft;
+  } else if (_.get(auction, 'state.status') === "decision") {
+    return 0;
   }
 }
 
@@ -44,7 +50,11 @@ export function formatTimeRemaining(timeRemaining) {
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
     return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in auction`;
   } else {
-    return "Auction has not started";
+    if (timeRemaining === 0) {
+      return "Decision Period"
+    } else {
+      return "Auction has not started";
+    }
   }
 }
 

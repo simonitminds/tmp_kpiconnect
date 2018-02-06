@@ -94,8 +94,8 @@ const AuctionsIndex = (props)=> {
       <section className="auction-list qa-completed-auctions-list">
         <div className="container is-fullhd">
           <div className="content">
-            <h2>Completed Auctions</h2>
-            { filteredAuctionsDisplay("completed") }
+            <h2>Decision Period Auctions</h2>
+            { filteredAuctionsDisplay("decision") }
           </div>
         </div>
       </section>

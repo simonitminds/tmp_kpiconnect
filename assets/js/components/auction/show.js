@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatDateTime, formatTimeRemaining, timeRemainingCountdown} from '../../utilities';
+import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown} from '../../utilities';
 import moment from 'moment';
 
 export default class AuctionShow extends React.Component {
@@ -73,7 +73,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                     </div>
                     <div className="auction-header__start-time has-text-left-mobile">
-                      <span className="has-text-weight-bold is-uppercase">Started at</span> {formatDateTime(auction.auction_start)} GMT
+                      <span className="has-text-weight-bold is-uppercase">Started at</span> {formatGMTDateTime(auction.auction_start)} GMT
                     </div>
                     <div className="auction-header__duration has-text-left-mobile">
                       <span className="has-text-weight-bold is-uppercase">Decision Period</span> {auction.duration} minutes
@@ -87,7 +87,7 @@ export default class AuctionShow extends React.Component {
           <section className="auction-page"> {/* Port selection */}
             <div className="container">
               <div className="auction-header__ports has-text-weight-bold">
-                {auction.port.name} <span className="has-text-weight-normal is-inline-block has-padding-left-sm">ETA {formatDateTime(auction.eta)} GMT &ndash; ETD {formatDateTime(auction.etd)} GMT</span>
+                {auction.port.name} <span className="has-text-weight-normal is-inline-block has-padding-left-sm">ETA {formatGMTDateTime(auction.eta)} GMT &ndash; ETD {formatGMTDateTime(auction.etd)} GMT</span>
               </div>
             </div>
           </section> {/* Port selection */}
@@ -281,7 +281,7 @@ export default class AuctionShow extends React.Component {
                         <ul className="list has-no-bullets">
                           <li>
                             <strong className="is-block">{auction.port.name}</strong>
-                            <span className="is-size-7"><strong>ETA</strong> {formatDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatDateTime(auction.etd)} GMT</span>
+                            <span className="is-size-7"><strong>ETA</strong> {formatGMTDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatGMTDateTime(auction.etd)} GMT</span>
                           </li>
                         </ul>
                       </div>

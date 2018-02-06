@@ -96,12 +96,12 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       auction = insert(:auction, buyer: buyer, duration: 1_000)
       Auctions.set_suppliers_for_auction(auction, [supplier])
       {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
-      {:ok, %{auction: auction}}
+      expected_payload = %{id: auction.id, state: %{status: :decision, time_remaining: 0}}
+      {:ok, %{expected_payload: expected_payload, auction: auction}}
     end
 
-    test "buyers get notified when the auction ends", %{auction: auction, buyer: buyer} do
+    test "buyers get notified when the auction ends", %{auction: auction, buyer: buyer, expected_payload: payload} do
       buyer_id = buyer.id
-      auction_id = auction.id
       channel = "user_auctions:#{buyer_id}"
       event = "auctions_update"
 
@@ -109,15 +109,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       Auctions.start_auction(auction)
       receive do
-        %{event: ^event, payload: %{auction_id: ^auction_id, status: :closed, time_remaining: 0}, topic: ^channel} ->
+        %{event: ^event, payload: ^payload, topic: ^channel} ->
           assert true
       after
         2_000 -> assert false
       end
     end
 
-    test "suppliers get notified when the auction ends", %{auction: auction, supplier: supplier} do
-      auction_id = auction.id
+    test "suppliers get notified when the auction ends", %{auction: auction, supplier: supplier, expected_payload: payload} do
       supplier_id = supplier.id
       channel = "user_auctions:#{supplier_id}"
       event = "auctions_update"
@@ -126,7 +125,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       Auctions.start_auction(auction)
       receive do
-        %{event: ^event, payload: %{auction_id: ^auction_id, status: :closed, time_remaining: 0}, topic: ^channel} ->
+        %{event: ^event, payload: ^payload, topic: ^channel} ->
           assert true
       after
         2_000 -> assert false
@@ -141,7 +140,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
 
       Auctions.start_auction(auction)
-      refute_receive %{event: ^event, payload: %{status: :closed}, topic: ^channel}
+      refute_receive %{event: ^event, payload: %{status: :decision}, topic: ^channel}
     end
   end
 end

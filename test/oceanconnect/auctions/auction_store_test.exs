@@ -6,11 +6,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   setup do
     auction = insert(:auction, duration: 1_000)
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
     {:ok, %{auction: auction}}
   end
 
   test "starting auction_store for auction", %{auction: auction} do
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
     assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
 
     current = DateTime.utc_now()
@@ -26,7 +26,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "auction is supervised", %{auction: auction} do
-   {:ok, pid} = AuctionStore.find_pid(auction.id)
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
+    {:ok, pid} = AuctionStore.find_pid(auction.id)
     assert Process.alive?(pid)
 
     Process.exit(pid, :shutdown)
@@ -38,7 +39,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     assert Process.alive?(new_pid)
   end
 
-  test "auction status is closed after duration timeout", %{auction: auction} do
+  test "auction status is decision after duration timeout", %{auction: auction} do
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
     assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
     current = DateTime.utc_now()
 
@@ -50,7 +52,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     :timer.sleep(1_100)
 
-    expected_state =  %AuctionState{status: :closed, auction_id: auction.id, time_remaining: 0, current_server_time: current}
+    expected_state =  %AuctionState{status: :decision, auction_id: auction.id, time_remaining: 0, current_server_time: current}
     actual_state = AuctionStore.get_current_state(auction)
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
   end
