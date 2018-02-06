@@ -263,6 +263,28 @@ class AuctionForm extends React.Component {
                </div>
 
                <div className="field is-horizontal">
+                 <div className="field-label">
+                  <label htmlFor="auction_decision_duration" className="label">
+                    Decision Duration
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select">
+                      <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={this.props.auction.decision_duration} className="qa-auction-decision_duration">
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        <option value="15">15</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <span className="select__extra-label">minutes</span>
+                  </div>
+                </div>
+               </div>
+
+               <div className="field is-horizontal">
                  <div className="field-label"></div>
                  <div className="field-body">
                    <CheckBoxField

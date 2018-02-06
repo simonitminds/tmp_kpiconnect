@@ -15,6 +15,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :etd, :utc_datetime
     field :auction_start, :utc_datetime
     field :duration, :integer # milliseconds
+    field :decision_duration, :integer # milliseconds
     field :anonymous_bidding, :boolean
     field :additional_information, :string
     many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
@@ -35,6 +36,7 @@ defmodule Oceanconnect.Auctions.Auction do
       :anonymous_bidding,
       :auction_start,
       :duration,
+      :decision_duration,
       :eta,
       :etd,
       :fuel_quantity,
@@ -58,6 +60,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("eta")
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
+    |> maybe_convert_duration("decision_duration")
   end
 
   def maybe_parse_date_field(params, key) do

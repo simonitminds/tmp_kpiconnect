@@ -50,7 +50,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, user: user} do
-      updated_params = Map.put(valid_auction_params, "duration", round(valid_auction_params["duration"] / 60_000))
+      updated_params = valid_auction_params
+      |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+      |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
       conn = post(conn, auction_path(conn, :create), auction: updated_params)
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
