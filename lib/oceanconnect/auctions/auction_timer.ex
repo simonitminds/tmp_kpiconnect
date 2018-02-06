@@ -24,19 +24,19 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:via, Registry, {@registry_name, auction_id}}
   end
 
-  def start_link(auction_id) when is_integer(auction_id) do
-    GenServer.start_link(__MODULE__, auction_id, name: get_auction_timer_name(auction_id))
+  def start_link({auction_id, type}) when is_integer(auction_id) and type in [:duration, :decision_duration] do
+    GenServer.start_link(__MODULE__, {auction_id, type}, name: get_auction_timer_name(auction_id))
   end
 
-  def init(auction_id) do
+  def init({auction_id, type}) do
     if {:ok, pid} = find_pid(auction_id) do
       auction = Auctions.get_auction!(auction_id)
-      timer = Process.send_after(pid, :end_auction_timer, auction.duration)
+      timer = create_timer(pid, auction, type)
       {:ok, %{timer: timer, auction_id: auction_id}}
     end
   end
 
-    def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
+  def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
     %Auctions.Auction{id: auction_id}
     |> AuctionCommand.end_auction
     |> AuctionStore.process_command(auction_id)
@@ -44,8 +44,23 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:noreply, state}
   end
 
+  def handle_info(:end_auction_decision_timer, state = %{auction_id: auction_id}) do
+    %Auctions.Auction{id: auction_id}
+    |> AuctionCommand.end_auction_decision_period
+    |> AuctionStore.process_command(auction_id)
+
+    {:noreply, state}
+  end
+
   def handle_call(:read_timer, _from, state = %{timer: timer_ref}) do
     {:reply, timer_ref, state}
+  end
+
+  defp create_timer(pid, auction, _type = :duration) do
+    Process.send_after(pid, :end_auction_timer, auction.duration)
+  end
+  defp create_timer(pid, auction, _type = :decision_duration) do
+    Process.send_after(pid, :end_auction_timer, auction.decision_duration)
   end
 
   # def reset_timer() do

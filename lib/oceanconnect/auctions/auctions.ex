@@ -41,7 +41,7 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        AuctionsSupervisor.start_child(auction.id)
+        AuctionsSupervisor.start_child(auction)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
@@ -60,6 +60,11 @@ defmodule Oceanconnect.Auctions do
 
   def change_auction(%Auction{} = auction) do
     Auction.changeset(auction, %{})
+  end
+
+  def with_participants(%Auction{} = auction) do
+    auction
+    |> Repo.preload([:buyer, :suppliers])
   end
 
   def fully_loaded(data) do

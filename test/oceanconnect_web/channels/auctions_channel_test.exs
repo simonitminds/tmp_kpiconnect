@@ -16,7 +16,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     {:ok, duration} = Time.new(0, round(auction.duration / 60_000), 0, 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
-    {:ok, _store} = Auctions.AuctionStore.start_link(auction.id)
+    {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
     expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
 

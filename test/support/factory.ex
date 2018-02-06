@@ -37,7 +37,8 @@ defmodule Oceanconnect.Factory do
        fuel_quantity: 1000,
        port: build(:port),
        vessel: build(:vessel),
-       buyer: build(:user)
+       buyer: build(:user),
+       suppliers: [build(:user)]
     }
   end
 

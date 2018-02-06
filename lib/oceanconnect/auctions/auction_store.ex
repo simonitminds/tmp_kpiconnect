@@ -7,7 +7,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   @registry_name :auctions_registry
 
   defmodule AuctionState do
-    defstruct auction_id: nil, status: :pending, current_server_time: nil, time_remaining: nil end
+    alias __MODULE__
+    defstruct auction_id: nil, status: :pending, current_server_time: nil, time_remaining: nil, buyer_id: nil, supplier_ids: []
+
+    def from_auction(auction) do
+      %AuctionState{auction_id: auction.id, buyer_id: auction.buyer.id, supplier_ids: Enum.map(auction.suppliers, &(&1.id))}
+    end
+  end
 
   defmodule AuctionCommand do
     defstruct command: :get_current_state, data: nil
@@ -18,6 +24,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     def end_auction(%Auction{id: auction_id}) do
       %AuctionCommand{command: :end_auction, data: auction_id}
+    end
+
+    def end_auction_decision_period(%Auction{id: auction_id}) do
+      %AuctionCommand{command: :end_auction_decision_period, data: auction_id}
     end
   end
 
@@ -41,14 +51,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:via, Registry, {@registry_name, auction_id}}
   end
 
-  def start_link(auction_id) when is_integer(auction_id) do
-    GenServer.start_link(__MODULE__, auction_id, name: get_auction_store_name(auction_id))
+  def start_link(auction) do
+    state = AuctionState.from_auction(auction)
+    GenServer.start_link(__MODULE__, state, name: get_auction_store_name(auction.id))
   end
 
-  def init(auction_id) do
-    auction = Auctions.get_auction!(auction_id)
-    state = %AuctionState{auction_id: auction.id, status: calculate_status(auction)}
-    updated_state = add_times_to_state?(state, auction_id)
+  def init(auction_state) do
+    state = Map.put(auction_state, :status, calculate_status(auction_state))
+    updated_state = add_times_to_state?(state, auction_state.auction_id)
     {:ok, updated_state}
   end
 
@@ -68,6 +78,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     do: GenServer.cast(pid, {:end_auction, data})
   end
 
+  def process_command(%AuctionCommand{command: :end_auction_decision_period, data: data}, auction_id) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {:end_auction_decision_period, data})
+  end
+
   def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, {cmd, data})
@@ -75,16 +90,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Server
   def handle_call(:get_current_state, _from, current_state = %{auction_id: auction_id}) do
-    # Get the Auction State from current_state
     updated_state = add_times_to_state?(current_state, auction_id)
-
     {:reply, updated_state, updated_state}
   end
 
   def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
     # Get the current Auction State from current_state
     # process the start_auction command based on that state.
-    TimersSupervisor.start_timer(auction_id)
+    TimersSupervisor.start_timer({auction_id, :duration})
     new_state = add_times_to_state?(%AuctionState{current_state | status: :open}, auction_id)
 
     # broadcast to the auction channel
@@ -93,6 +106,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :decision, time_remaining: 0}
+
+    reduced_state = Map.take(new_state, [:status, :current_server_time, :time_remaining])
+    AuctionNotifier.notify_participants(auction_id, %{id: auction_id, state: reduced_state})
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:end_auction_decision_period, _}, current_state = %{auction_id: auction_id}) do
+    new_state = %AuctionState{current_state | status: :closed, time_remaining: 0}
 
     reduced_state = Map.take(new_state, [:status, :current_server_time, :time_remaining])
     AuctionNotifier.notify_participants(auction_id, %{id: auction_id, state: reduced_state})

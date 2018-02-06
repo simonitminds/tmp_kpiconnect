@@ -9,7 +9,7 @@ defmodule Oceanconnect.AuctionShowTest do
     buyer = insert(:user)
     supplier = insert(:user)
     auction = insert(:auction, buyer: buyer)
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     login_user(buyer)
     {:ok, %{auction: auction, supplier: supplier}}
   end
