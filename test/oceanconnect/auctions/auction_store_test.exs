@@ -23,7 +23,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     expected_state = auction
     |> AuctionState.from_auction()
     |> Map.merge(%{status: :open, auction_id: auction.id, time_remaining: auction.duration, current_server_time: current})
-
     actual_state = AuctionStore.get_current_state(auction)
 
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
@@ -45,7 +44,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   test "auction status is decision after duration timeout", %{auction: auction} do
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    assert AuctionStore.get_current_state(auction) == %AuctionState{status: :pending, auction_id: auction.id}
+    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
+
     current = DateTime.utc_now()
 
     auction
@@ -56,8 +56,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     :timer.sleep(1_100)
 
-    expected_state =  %AuctionState{status: :decision, auction_id: auction.id, time_remaining: 0, current_server_time: current}
+    expected_state = auction
+    |> AuctionState.from_auction
+    |> Map.merge(%{status: :decision, auction_id: auction.id, time_remaining: 0, current_server_time: current})
     actual_state = AuctionStore.get_current_state(auction)
+
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
   end
 
@@ -77,8 +80,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> AuctionStore.process_command(auction.id)
 
     current = DateTime.utc_now()
-    expected_state = %AuctionState{status: :closed, auction_id: auction.id, time_remaining: 0, current_server_time: current}
+
+    expected_state = auction
+    |> AuctionState.from_auction
+    |> Map.merge(%{status: :closed, auction_id: auction.id, time_remaining: 0, current_server_time: current})
     actual_state = AuctionStore.get_current_state(auction)
+
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
   end
 end

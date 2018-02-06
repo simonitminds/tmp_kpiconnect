@@ -13,6 +13,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     def from_auction(auction) do
       %AuctionState{auction_id: auction.id, buyer_id: auction.buyer.id, supplier_ids: Enum.map(auction.suppliers, &(&1.id))}
     end
+
+    def maybe_update_times(auction_state = %AuctionState{status: :open, auction_id: auction_id}) do
+      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id))
+
+      auction_state
+      |> Map.put(:time_remaining, time_remaining)
+      |> Map.put(:current_server_time, DateTime.utc_now())
+    end
+    def maybe_update_times(auction_state), do: auction_state
   end
 
   defmodule AuctionCommand do
@@ -39,14 +48,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
   end
 
-  def add_times_to_state?(state = %{status: :open}, auction_id) do
-    time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id))
-    state
-    |> Map.put(:time_remaining, time_remaining)
-    |> Map.put(:current_server_time, DateTime.utc_now())
-  end
-  def add_times_to_state?(state, _auction_id), do: state
-
   defp get_auction_store_name(auction_id) do
     {:via, Registry, {@registry_name, auction_id}}
   end
@@ -58,7 +59,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def init(auction_state) do
     state = Map.put(auction_state, :status, calculate_status(auction_state))
-    updated_state = add_times_to_state?(state, auction_state.auction_id)
+    updated_state = AuctionState.maybe_update_times(state)
     {:ok, updated_state}
   end
 
@@ -90,15 +91,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Server
   def handle_call(:get_current_state, _from, current_state = %{auction_id: auction_id}) do
-    updated_state = add_times_to_state?(current_state, auction_id)
+    updated_state = AuctionState.maybe_update_times(current_state)
     {:reply, updated_state, updated_state}
   end
+  def handle_call(:get_current_state, _from, state), do: state
 
   def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
     # Get the current Auction State from current_state
     # process the start_auction command based on that state.
     TimersSupervisor.start_timer({auction_id, :duration})
-    new_state = add_times_to_state?(%AuctionState{current_state | status: :open}, auction_id)
+    new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :open})
+    AuctionNotifier.notify_participants(new_state)
 
     # broadcast to the auction channel
     {:noreply, new_state}
@@ -106,18 +109,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :decision, time_remaining: 0}
-
-    reduced_state = Map.take(new_state, [:status, :current_server_time, :time_remaining])
-    AuctionNotifier.notify_participants(auction_id, %{id: auction_id, state: reduced_state})
+    AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end
 
   def handle_cast({:end_auction_decision_period, _}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :closed, time_remaining: 0}
-
-    reduced_state = Map.take(new_state, [:status, :current_server_time, :time_remaining])
-    AuctionNotifier.notify_participants(auction_id, %{id: auction_id, state: reduced_state})
+    AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end

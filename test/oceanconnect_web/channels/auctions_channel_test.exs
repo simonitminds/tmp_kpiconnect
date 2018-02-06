@@ -10,12 +10,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     buyer = insert(:user, company: buyer_company)
     supplier = insert(:user, company: supplier_company)
     non_participant = insert(:user)
-    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000)
-    Auctions.set_suppliers_for_auction(auction, [supplier])
     current_time =  DateTime.utc_now()
-    {:ok, duration} = Time.new(0, round(auction.duration / 60_000), 0, 0)
+    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000, auction_start: current_time)
+    Auctions.set_suppliers_for_auction(auction, [supplier])
+    {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
-    time_remaining = Time.diff(duration, elapsed_time) * 1_000
+    IO.inspect([duration, elapsed_time])
+    time_remaining = Time.diff(duration, elapsed_time) * 1_000 |> IO.inspect
     {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
     expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
@@ -39,7 +40,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       Auctions.start_auction(auction)
 
       assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
-    end
+      end
 
     test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
                                                     auction: auction,

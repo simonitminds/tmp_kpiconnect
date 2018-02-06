@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions do
 
     update_auction(auction, %{auction_start: DateTime.utc_now()})
 
-    AuctionNotifier.notify_participants(auction.id)
+    # AuctionNotifier.notify_participants(auction.id)
   end
 
   def create_auction(attrs \\ %{}) do
