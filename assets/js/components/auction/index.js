@@ -55,6 +55,7 @@ const AuctionsIndex = (props)=> {
           </div>
           <div className="card-title">
             <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
+            <p className="has-family-header">{auction.buyer.company.name}</p>
             <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
           </div>
           <div className="has-text-weight-bold has-margin-top-md">
