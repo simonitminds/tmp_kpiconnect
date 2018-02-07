@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel, AuctionNotifier}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
   alias Oceanconnect.Accounts.{User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -30,8 +30,6 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command(auction.id)
 
     update_auction(auction, %{auction_start: DateTime.utc_now()})
-
-    # AuctionNotifier.notify_participants(auction.id)
   end
 
   def create_auction(attrs \\ %{}) do

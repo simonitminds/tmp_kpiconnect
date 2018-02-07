@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
-  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionNotifier, AuctionTimer, TimersSupervisor}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
 
@@ -101,7 +100,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     updated_state = AuctionState.maybe_update_times(current_state)
     {:reply, updated_state, updated_state}
   end
-  def handle_call(:get_current_state, _from, state), do: state
 
   def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
     # Get the current Auction State from current_state
