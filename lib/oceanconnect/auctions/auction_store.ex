@@ -113,10 +113,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
-    new_state = %AuctionState{current_state | status: :decision, time_remaining: 0}
+    TimersSupervisor.start_timer({auction_id, :decision_duration})
+    new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :decision})
     AuctionNotifier.notify_participants(new_state)
 
-    TimersSupervisor.start_timer({auction_id, :decision_duration})
     {:noreply, new_state}
   end
 

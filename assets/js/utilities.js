@@ -35,11 +35,12 @@ export const portLocalTime = (gmtTime, portId, ports) => {
 }
 
 export function timeRemainingCountdown(auction, clientTime) {
-  if (_.get(auction, 'state.status') === "open" && _.get(auction, 'state.time_remaining')) {
+  const status = _.get(auction, 'state.status');
+  if ((status === "open" || status === "decision") && _.get(auction, 'state.time_remaining')) {
     const serverTime = moment(auction.state.current_server_time);
     const timeLeft = auction.state.time_remaining - clientTime.diff(serverTime);
     return timeLeft;
-  } else if (_.get(auction, 'state.status') === "decision") {
+  } else if (_.get(auction, 'state.status') === "closed") {
     return 0;
   }
 }
@@ -51,7 +52,7 @@ export function formatTimeRemaining(timeRemaining) {
     return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in auction`;
   } else {
     if (timeRemaining === 0) {
-      return "Decision Period"
+      return "Auction Closed"
     } else {
       return "Auction has not started";
     }
