@@ -11,7 +11,7 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction = insert(:auction, @valid_attrs)
+      auction = insert(:auction_without_suppliers, @valid_attrs)
       {:ok, %{auction: Auctions.get_auction!(auction.id)}}
     end
 

@@ -6,30 +6,30 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   @registry_name :auction_timers_registry
 
-  def find_pid(auction_id) do
-    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
+  def find_pid(auction_id, type) do
+    with [{pid, _}] <- Registry.lookup(@registry_name, "#{auction_id}-#{type}") do
       {:ok, pid}
     else
       [] -> {:error, "Auction Timer Not Started"}
     end
   end
 
-  def timer_ref(auction_id) do
-    with {:ok, pid}       <- find_pid(auction_id),
+  def timer_ref(auction_id, type) do
+    with {:ok, pid}       <- find_pid(auction_id, type),
          {:ok, timer_ref} <- GenServer.call(pid, :read_timer),
          do: timer_ref
   end
 
-  defp get_auction_timer_name(auction_id) do
-    {:via, Registry, {@registry_name, auction_id}}
+  defp get_auction_timer_name(auction_id, type) do
+    {:via, Registry, {@registry_name, "#{auction_id}-#{type}"}}
   end
 
   def start_link({auction_id, type}) when is_integer(auction_id) and type in [:duration, :decision_duration] do
-    GenServer.start_link(__MODULE__, {auction_id, type}, name: get_auction_timer_name(auction_id))
+    GenServer.start_link(__MODULE__, {auction_id, type}, name: get_auction_timer_name(auction_id, type))
   end
 
   def init({auction_id, type}) do
-    if {:ok, pid} = find_pid(auction_id) do
+    if {:ok, pid} = find_pid(auction_id, type) do
       auction = Auctions.get_auction!(auction_id)
       timer = create_timer(pid, auction, type)
       {:ok, %{timer: timer, auction_id: auction_id}}
@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     Process.send_after(pid, :end_auction_timer, auction.duration)
   end
   defp create_timer(pid, auction, _type = :decision_duration) do
-    Process.send_after(pid, :end_auction_timer, auction.decision_duration)
+    Process.send_after(pid, :end_auction_decision_timer, auction.decision_duration)
   end
 
   # def reset_timer() do

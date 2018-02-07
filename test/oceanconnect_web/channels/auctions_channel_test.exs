@@ -11,12 +11,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     supplier = insert(:user, company: supplier_company)
     non_participant = insert(:user)
     current_time =  DateTime.utc_now()
-    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000, auction_start: current_time)
-    Auctions.set_suppliers_for_auction(auction, [supplier])
+    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000, auction_start: current_time, suppliers: [supplier])
     {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
-    IO.inspect([duration, elapsed_time])
-    time_remaining = Time.diff(duration, elapsed_time) * 1_000 |> IO.inspect
+    time_remaining = Time.diff(duration, elapsed_time) * 1_000
     {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
     expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
@@ -40,7 +38,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       Auctions.start_auction(auction)
 
       assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
-      end
+    end
 
     test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
                                                     auction: auction,
@@ -139,7 +137,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
@@ -149,7 +147,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
     end
 
     test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do

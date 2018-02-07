@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   test "start auction_duration_timer for auction", %{auction: auction} do
     assert {:ok, _pid} = AuctionTimer.start_link({auction.id, :duration})
-    ref = AuctionTimer.timer_ref(auction.id)
+    ref = AuctionTimer.timer_ref(auction.id, :duration)
     assert round(Float.round(Process.read_timer(ref) / 10) * 10) == auction.duration
 
     :timer.sleep(500)
@@ -18,7 +18,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   test "start auction_decision_duration_timer for auction", %{auction: auction} do
     assert {:ok, _pid} = AuctionTimer.start_link({auction.id, :decision_duration})
-    ref = AuctionTimer.timer_ref(auction.id)
+    ref = AuctionTimer.timer_ref(auction.id, :decision_duration)
     assert round(Float.round(Process.read_timer(ref) / 10) * 10) == auction.decision_duration
 
     :timer.sleep(500)
@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
     refute Process.alive?(pid)
     :timer.sleep(500)
 
-    {:ok, new_pid} = AuctionTimer.find_pid(auction.id)
+    {:ok, new_pid} = AuctionTimer.find_pid(auction.id, :duration)
     assert Process.alive?(new_pid)
   end
 end

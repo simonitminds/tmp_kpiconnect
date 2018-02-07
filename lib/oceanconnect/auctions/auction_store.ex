@@ -15,13 +15,20 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
 
     def maybe_update_times(auction_state = %AuctionState{status: :open, auction_id: auction_id}) do
-      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id))
+      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
+      update_times(auction_state, time_remaining)
+    end
+    def maybe_update_times(auction_state = %AuctionState{status: :decision, auction_id: auction_id}) do
+      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :decision_duration))
+      update_times(auction_state, time_remaining)
+    end
+    def maybe_update_times(auction_state), do: auction_state
 
+    defp update_times(auction_state, time_remaining) do
       auction_state
       |> Map.put(:time_remaining, time_remaining)
       |> Map.put(:current_server_time, DateTime.utc_now())
     end
-    def maybe_update_times(auction_state), do: auction_state
   end
 
   defmodule AuctionCommand do
@@ -90,7 +97,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
    # Server
-  def handle_call(:get_current_state, _from, current_state = %{auction_id: auction_id}) do
+  def handle_call(:get_current_state, _from, current_state) do
     updated_state = AuctionState.maybe_update_times(current_state)
     {:reply, updated_state, updated_state}
   end
@@ -111,10 +118,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state = %AuctionState{current_state | status: :decision, time_remaining: 0}
     AuctionNotifier.notify_participants(new_state)
 
+    TimersSupervisor.start_timer({auction_id, :decision_duration})
     {:noreply, new_state}
   end
 
-  def handle_cast({:end_auction_decision_period, _}, current_state = %{auction_id: auction_id}) do
+  def handle_cast({:end_auction_decision_period, _}, current_state) do
     new_state = %AuctionState{current_state | status: :closed, time_remaining: 0}
     AuctionNotifier.notify_participants(new_state)
 

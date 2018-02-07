@@ -1,9 +1,9 @@
 defmodule Oceanconnect.Utilities do
 
-  def trunc_times(auction_state = %{time_remaining: time_remaining, current_server_time: current_time}) do
-    trunc_time = %{current_time | microsecond: {0, 0}}
+  def trunc_times(auction_state = %{time_remaining: time_remaining}) do
+    reduced_state = Map.drop(auction_state, [:current_server_time])
 
-    %{auction_state | time_remaining: round_time_remaining(time_remaining), current_server_time: trunc_time}
+    %{reduced_state | time_remaining: round_time_remaining(time_remaining)}
   end
   def trunc_times(auction_state), do: auction_state
 

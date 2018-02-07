@@ -41,7 +41,9 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        AuctionsSupervisor.start_child(auction)
+        auction
+        |> with_participants
+        |> AuctionsSupervisor.start_child
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}

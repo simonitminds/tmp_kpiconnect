@@ -35,7 +35,7 @@ defmodule OceanconnectWeb.ChannelCase do
           %Phoenix.Socket.Broadcast{
             event: ^event,
             payload: payload = %{id: ^auction_id, state: %{status: ^status, time_remaining: _time}}, topic: ^channel} ->
-            assert Utilities.trunc_times(payload.state) == Utilities.trunc_times(expected_payload.state)
+              assert Utilities.trunc_times(payload.state) == Utilities.trunc_times(expected_payload.state)
         after
           5000 ->
             assert false, "Expected message received nothing."

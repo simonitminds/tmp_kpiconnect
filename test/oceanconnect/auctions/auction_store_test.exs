@@ -54,11 +54,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     assert AuctionStore.get_current_state(auction).status == :open
 
-    :timer.sleep(1_100)
+    :timer.sleep(1_000)
 
     expected_state = auction
     |> AuctionState.from_auction
-    |> Map.merge(%{status: :decision, auction_id: auction.id, time_remaining: 0, current_server_time: current})
+    |> Map.merge(%{status: :decision, auction_id: auction.id, time_remaining: auction.decision_duration, current_server_time: current})
     actual_state = AuctionStore.get_current_state(auction)
 
     assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
