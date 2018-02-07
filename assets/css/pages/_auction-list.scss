@@ -56,4 +56,13 @@
     &--pending { background-color: $gray-3 !important; }
     &--completed { background-color: $gray-1 !important; }
   }
+  &__link-to-auction {
+    margin-right: -0.5rem;
+    float: right;
+    color: $gray-3;
+  }
+  &__link-to-auction-edit {
+    float: right;
+    color: $gray-3;
+  }
 }

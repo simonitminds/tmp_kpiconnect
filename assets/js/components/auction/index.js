@@ -45,6 +45,12 @@ const AuctionsIndex = (props)=> {
               </span>
             </div>
             {/* End Status/Time Bubble */}
+            {/* Start Link to Auction */}
+              <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+            {/* End Link to Auction */}
+            {/* Start Link to Auction Edit */}
+              <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit"><span className="icon is-medium has-text-right"><i className="fas fa-lg fa-edit"></i></span></a>
+            {/* End Link to Auction Edit */}
 
           </div>
           <div className="card-title">
@@ -59,8 +65,6 @@ const AuctionsIndex = (props)=> {
           </div>
         </div>
         <footer className="card-footer">
-          <a href={`/auctions/${auction.id}`} className="card-footer-item">Show</a>
-          <a href={`/auctions/${auction.id}/edit`} className="card-footer-item">Edit</a>
           <a href={`/auctions/start/${auction.id}`} className="card-footer-item qa-auction-start">Start</a>
         </footer>
       </div>
