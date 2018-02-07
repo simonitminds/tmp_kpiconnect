@@ -40,16 +40,19 @@ export default class AuctionShow extends React.Component {
     }
 
     return (
-      <section className="auction-page"> {/* Overall section */}
-        <div className="container">
-          <nav className="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold" aria-label="breadcrumbs">
-            <ul>
-              <li><a href="/auctions">Auctions</a></li>
-              <li className="is-active"><a href="#" aria-current="page">Auction ({auction.id})</a></li>
-            </ul>
-          </nav>
-
-          <section className="auction-page"> {/* Vessel info */}
+      <div>
+        <section className="auction-page"> {/* Breadcrumb information */}
+          <div className="container has-margin-top-xl">
+            <nav className="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold has-padding-top-md" aria-label="breadcrumbs">
+              <ul>
+                <li><a href="/auctions">Auctions</a></li>
+                <li className="is-active"><a href="#" aria-current="page">Auction ({auction.id})</a></li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+        <section className="auction-page"> {/* Vessel info */}
+          <div className="container">
             <div className="has-margin-top-lg">
               <div className="auction-header">
                 <div className="columns has-margin-bottom-none">
@@ -82,7 +85,8 @@ export default class AuctionShow extends React.Component {
                 </div>
               </div>
             </div>
-          </section> {/* Vessel info */}
+          </div>
+        </section> {/* Vessel info */}
 
           <section className="auction-page"> {/* Port selection */}
             <div className="container">
@@ -302,8 +306,7 @@ export default class AuctionShow extends React.Component {
               </div>
             </div>
           </section> {/* Auction details */}
-        </div>
-      </section>
+      </div>
     );
   }
 }
