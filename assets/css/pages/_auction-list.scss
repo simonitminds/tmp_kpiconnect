@@ -31,8 +31,6 @@
   &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
     @extend .tag, .is-rounded;
     margin-bottom: 0.5rem;
-    margin-left: 1rem;
-    float: right;
     font-weight: bold;
     color: $white !important;
 
@@ -40,5 +38,22 @@
     &--open { background-color: $green !important; }
     &--pending { background-color: $teal !important; }
     &--completed { background-color: $gray-3 !important; }
+  }
+
+  &__time-remaining {
+    display: inline-block;
+    height: 1.7rem;
+    padding: 0.1rem 0.65rem 0 0.5rem;
+    margin-left: 0.75rem;
+    margin-right: -1rem;
+    border-top-right-radius: 0.85rem;
+    border-bottom-right-radius: 0.85rem;
+
+    // Color Auction Status tags based on... auction status.
+    &--under-3 { background-color: $danger !important; }
+    &--under-7 { background-color: $gold !important; }
+    &--open { background-color: $gray-3 !important; }
+    &--pending { background-color: $gray-3 !important; }
+    &--completed { background-color: $gray-1 !important; }
   }
 }

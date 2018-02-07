@@ -14,16 +14,38 @@ const AuctionsIndex = (props)=> {
   }, 1000);
   const cardDateFormat = function(time){return moment(time).format("DD/MM/YY k:mm")};
 
+  function AuctionTimeRemaining() {
+    const auctionStatus = auction.state.status;
+
+    if (auctionStatus == "open") {
+      return <span className="auction-card__time-remaining auction-card__time-remaining--open">
+              <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
+                5:00 remaining
+              </span>;
+    }
+    else {
+      return <span className="auction-card__time-remaining auction-card__time-remaining--open">
+              <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
+                {cardDateFormat(auction.auction_start)}
+              </span>;
+    }
+  };
+
   const AuctionCard = (auction) => (
     <div className="column is-one-third" key={auction.id}>
       <div className={`card qa-auction-${auction.id}`}>
         <div className="card-content has-padding-bottom-md">
           <div className="is-clearfix">
-            <p className="has-text-weight-bold is-pulled-left">{auction.po}</p>
+            {/* Start Status/Time Bubble */}
             <div className={`auction-card__status auction-card__status--${auction.state.status} qa-auction-status`}>
               {auction.state.status}
+              <span className={`auction-card__time-remaining auction-card__time-remaining--${auction.state.status}`}>
+                <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
+                {auction.state.status === "open" ? "5:00 remaining" : `${cardDateFormat(auction.auction_start)} GMT`}
+              </span>
             </div>
-            <p className="is-pulled-right">{cardDateFormat(auction.auction_start)}</p>
+            {/* End Status/Time Bubble */}
+
           </div>
           <div className="card-title">
             <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
