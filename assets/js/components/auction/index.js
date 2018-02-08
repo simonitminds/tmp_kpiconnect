@@ -41,7 +41,7 @@ const AuctionsIndex = (props)=> {
               <span className="qa-auction-status">{auction.state.status}</span>
               <span className={`auction-card__time-remaining auction-card__time-remaining--${auction.state.status}`}>
                 <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-                {auction.state.status === "open" ? "5:00 remaining" : `${cardDateFormat(auction.auction_start)} GMT`}
+                {auction.state.status === "open" ? "5:00 remaining" : `${cardDateFormat(auction.auction_start)}&nbsp;GMT`}
               </span>
             </div>
             {/* End Status/Time Bubble */}
