@@ -37,7 +37,7 @@
     // Color Auction Status tags based on... auction status.
     &--open { background-color: $green !important; }
     &--pending { background-color: $teal !important; }
-    &--completed { background-color: $gray-3 !important; }
+    &--closed { background-color: $gray-3 !important; }
   }
 
   &__time-remaining {
@@ -53,8 +53,11 @@
     &--under-3 { background-color: $danger !important; }
     &--under-7 { background-color: $gold !important; }
     &--open { background-color: $gray-3 !important; }
-    &--pending { background-color: $gray-3 !important; }
+    &--decision { background-color: $gray-3 !important; }
+    &--pending { background-color: $gray-2 !important; color: $black !important;}
     &--completed { background-color: $gray-1 !important; }
+    &--closed { background-color: $gray-2 !important; color: $black !important;}
+
   }
   &__link-to-auction {
     margin-right: -0.5rem;

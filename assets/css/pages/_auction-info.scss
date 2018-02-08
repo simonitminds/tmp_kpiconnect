@@ -29,6 +29,10 @@
     font-size: 'xs', 0.25;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+
+    &__imo { // Auction Vessel IMO number
+      color: $gray-3;
+    }
   }
 
   // RIGHT COLUMN
@@ -95,5 +99,6 @@
   &--under-3 { background-color: $danger !important; }
   &--under-7 { background-color: $gold !important; }
   &--active { background-color: $gray-3 !important; }
-  &--inactive { background-color: $gray-3 !important; }
+  &--in-decision { background-color: $gray-3 !important; width: 310px !important; }
+  &--inactive { background-color: $gray-2 !important; color: $black !important; }
 }

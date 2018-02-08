@@ -12,7 +12,7 @@ const AuctionsIndex = (props)=> {
     function(){
       if (gmtTimeElement) {gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
   }, 1000);
-  const cardDateFormat = function(time){return moment(time).format("DD/MM/YY k:mm")};
+  const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
 
   function AuctionTimeRemaining() {
     const auctionStatus = auction.state.status;
@@ -111,6 +111,15 @@ const AuctionsIndex = (props)=> {
         </div>
       </section>
 
+      <section className="auction-list qa-completed-auctions-list">
+        <div className="container is-fullhd">
+          <div className="content">
+            <h2>Auctions In Decision</h2>
+            { filteredAuctionsDisplay("decision") }
+          </div>
+        </div>
+      </section>
+
       <section className="auction-list qa-pending-auctions-list">
         <div className="container is-fullhd">
           <div className="content">
@@ -119,14 +128,7 @@ const AuctionsIndex = (props)=> {
           </div>
         </div>
       </section>
-      <section className="auction-list qa-completed-auctions-list">
-        <div className="container is-fullhd">
-          <div className="content">
-            <h2>Decision Period Auctions</h2>
-            { filteredAuctionsDisplay("decision") }
-          </div>
-        </div>
-      </section>
+
       <section className="auction-list qa-completed-auctions-list">
         <div className="container is-fullhd">
           <div className="content">

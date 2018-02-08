@@ -45,11 +45,18 @@ export function timeRemainingCountdown(auction, clientTime) {
   }
 }
 
-export function formatTimeRemaining(timeRemaining) {
-  if (timeRemaining) {
+export function formatTimeRemaining(auction, timeRemaining) {
+  const status = _.get(auction, 'state.status');
+
+  if (timeRemaining && status === "open") {
     const mins = Math.floor(timeRemaining / 60000);
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
     return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in auction`;
+  }
+  else if (timeRemaining && status == "decision") {
+    const mins = Math.floor(timeRemaining / 60000);
+    const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
+    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in decision period`;
   } else {
     if (timeRemaining === 0) {
       return "Auction Closed"
@@ -59,17 +66,22 @@ export function formatTimeRemaining(timeRemaining) {
   }
 }
 
-export function formatTimeRemainingColor(timeRemaining) {
-  if (timeRemaining) {
-    if (timeRemaining < 3) {
+export function formatTimeRemainingColor(auction, timeRemaining) {
+  const status = _.get(auction, 'state.status');
+
+  if (timeRemaining && status === "open") {
+    if (Math.floor(timeRemaining / 60000) < 3) {
       return `under-3`;
     }
-    else if (timeRemaining < 7) {
+    else if (Math.floor(timeRemaining / 60000) < 7) {
       return `under-7`;
     }
     else {
       return `active`;
     }
+  }
+  else if (timeRemaining && status === "decision") {
+    return `in-decision`;
   }
   else {
     return `inactive`;

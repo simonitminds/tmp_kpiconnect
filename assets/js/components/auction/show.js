@@ -22,6 +22,7 @@ export default class AuctionShow extends React.Component {
     clearInterval(this.timerID);
   }
 
+
   tick() {
     this.setState({
       timeRemaining: timeRemainingCountdown(this.props.auction, moment().utc())
@@ -64,14 +65,14 @@ export default class AuctionShow extends React.Component {
                       Auction {auction.po}
                     </div>
                     <h1 className="auction-header__vessel title has-text-weight-bold">
-                      {auction.vessel.name} ({auction.vessel.imo})
+                      {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})</span>
                     </h1>
                   </div>
                   <div className="column">
                     <div className="auction-header__timer has-text-left-mobile">
-                      <div className={`auction-timer auction-timer--${formatTimeRemainingColor(this.state.timeRemaining)}`}>
+                      <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auction, this.state.timeRemaining)}`}>
                         <span className="qa-auction-time-remaining" id="time-remaining">
-                          {formatTimeRemaining(this.state.timeRemaining)}
+                          {formatTimeRemaining(auction, this.state.timeRemaining)}
                         </span>
                       </div>
                     </div>
@@ -79,7 +80,7 @@ export default class AuctionShow extends React.Component {
                       <span className="has-text-weight-bold is-uppercase">Started at</span> {formatGMTDateTime(auction.auction_start)} GMT
                     </div>
                     <div className="auction-header__duration has-text-left-mobile">
-                      <span className="has-text-weight-bold is-uppercase">Decision Period</span> {auction.duration} minutes
+                      <span className="has-text-weight-bold is-uppercase">Decision Period</span> {auction.decision_duration} minutes
                     </div>
                   </div>
                 </div>
@@ -262,13 +263,13 @@ export default class AuctionShow extends React.Component {
                         <h3 className="box__header">Buyer Information</h3>
                         <ul className="list has-no-bullets">
                           <li>
-                            <strong>Organization</strong>Company
+                            <strong>Organization</strong> {auction.buyer.company.name}
                           </li>
                           <li>
-                            <strong>Buyer</strong>Buyer Name
+                            <strong>Buyer</strong> Buyer Name
                           </li>
                           <li>
-                            <strong>Buyer Reference Number</strong>BRN
+                            <strong>Buyer Reference Number</strong> BRN
                           </li>
                         </ul>
                       </div>
