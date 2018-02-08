@@ -15,7 +15,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
   def handle_info(:start_auction_stores, _) do
     results = Auctions.list_auctions()
     |> Enum.map(fn(auction) ->
-      with {:ok, pid} <- AuctionsSupervisor.start_child(auction.id)
+      auction_with_participants = auction
+      |> Auctions.with_participants
+      with {:ok, pid} <- AuctionsSupervisor.start_child(auction_with_participants)
         do
           {auction.id, pid}
         else

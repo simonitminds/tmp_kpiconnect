@@ -1,5 +1,4 @@
 defmodule Oceanconnect.AuctionEditPage do
-  @page_path "/auctions/:id/edit"
   use Oceanconnect.Page
 
 

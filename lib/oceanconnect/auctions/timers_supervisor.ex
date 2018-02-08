@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Auctions.AuctionsSupervisor do
+defmodule Oceanconnect.Auctions.TimersSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
 
@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(auction_id) do
-    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionStore, auction_id})
+  def start_timer({auction_id, type}) do
+    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionTimer, {auction_id, type}})
   end
 end

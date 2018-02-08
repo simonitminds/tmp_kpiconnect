@@ -74,7 +74,7 @@ const AuctionsIndex = (props)=> {
 
   const filteredAuctionsDisplay = (status) => {
     const filteredAuctions = _.filter(props.auctions, (auction) => { return(auction.state.status === status)});
-    if(filteredAuctions.length === 0) {
+    if(_.isEmpty(filteredAuctions)) {
       return(
         <div className="empty-list">
           <em>{`You have no ${status} auctions`}</em>
@@ -96,7 +96,8 @@ const AuctionsIndex = (props)=> {
             New Auction
           </a>
           <div className="auction-list__timer">
-            <i className="far fa-clock has-margin-right-xs"></i><span className="auction-list__timer__time" id="gmt-time" >{currentGMTTime}</span>GMT
+            <i className="far fa-clock has-margin-right-xs"></i>
+            <span className="auction-list__timer__time" id="gmt-time" >{currentGMTTime}</span>GMT
           </div>
         </div>
       </div>
@@ -121,8 +122,16 @@ const AuctionsIndex = (props)=> {
       <section className="auction-list qa-completed-auctions-list">
         <div className="container is-fullhd">
           <div className="content">
-            <h2>Completed Auctions</h2>
-            { filteredAuctionsDisplay("completed") }
+            <h2>Decision Period Auctions</h2>
+            { filteredAuctionsDisplay("decision") }
+          </div>
+        </div>
+      </section>
+      <section className="auction-list qa-completed-auctions-list">
+        <div className="container is-fullhd">
+          <div className="content">
+            <h2>Closed Auctions</h2>
+            { filteredAuctionsDisplay("closed") }
           </div>
         </div>
       </section>

@@ -20,12 +20,26 @@ defmodule OceanconnectWeb.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
       import Oceanconnect.Factory
+      alias Oceanconnect.Utilities
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
 
       def build_conn() do
         %Plug.Conn{}
         |> Plug.Conn.put_private(:phoenix_endpoint, @endpoint)
+      end
+
+      def assert_rounded_time_broadcast(auction, event, status, channel, expected_payload) do
+        auction_id = auction.id
+        receive do
+          %Phoenix.Socket.Broadcast{
+            event: ^event,
+            payload: payload = %{id: ^auction_id, state: %{status: ^status, time_remaining: _time}}, topic: ^channel} ->
+              assert Utilities.trunc_times(payload.state) == Utilities.trunc_times(expected_payload.state)
+        after
+          5000 ->
+            assert false, "Expected message received nothing."
+        end
       end
     end
   end

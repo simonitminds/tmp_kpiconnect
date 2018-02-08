@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionsChannel do
   use OceanconnectWeb, :channel
 
   def join("user_auctions:" <> id, payload, socket) do
-    if authorized?(socket, payload) do
+    if authorized?(socket, id, payload) do
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -23,10 +23,10 @@ defmodule OceanconnectWeb.AuctionsChannel do
   # end
 
   # Add authorization logic here as required.
-  defp authorized?(socket = %Phoenix.Socket{assigns: %{current_user: current_user_id}}, %{"token" => token}) do
+  defp authorized?(socket = %Phoenix.Socket{assigns: %{current_user: current_user_id}}, id, %{"token" => token}) do
     case Phoenix.Token.verify(socket, "user socket", token, max_age: 1209600) do
       {:ok, user_id} ->
-        if current_user_id == user_id do
+        if current_user_id = user_id = String.to_integer(id) do
           true
         else
           false
@@ -35,5 +35,5 @@ defmodule OceanconnectWeb.AuctionsChannel do
         false
     end
   end
-  defp authorized?(_,_), do: false
+  defp authorized?(_,_,_), do: false
 end

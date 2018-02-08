@@ -11,7 +11,7 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction = insert(:auction, @valid_attrs)
+      auction = insert(:auction_without_suppliers, @valid_attrs)
       {:ok, %{auction: Auctions.get_auction!(auction.id)}}
     end
 
@@ -105,7 +105,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "auction status" do
-      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
+      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
       {:ok, auction} = Auctions.create_auction(auction_attrs)
 
       assert :pending = Auctions.auction_state(auction).state.status

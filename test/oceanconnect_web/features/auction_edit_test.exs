@@ -20,6 +20,7 @@ defmodule Oceanconnect.AuctionEditTest do
       "anonymous_bidding",
       "auction_start",
       "duration",
+      "decision_duration",
       "eta",
       "etd",
       "fuel",

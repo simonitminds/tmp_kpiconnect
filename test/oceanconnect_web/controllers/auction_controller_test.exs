@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @update_attrs %{ po: "updated PO text"}
+  @update_attrs %{ duration: 15}
   @invalid_attrs %{ vessel_id: nil}
 
   setup do
@@ -50,14 +50,16 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, user: user} do
-      conn = post conn, auction_path(conn, :create), auction: valid_auction_params
-
+      updated_params = valid_auction_params
+      |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+      |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+      conn = post(conn, auction_path(conn, :create), auction: updated_params)
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
       auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
       conn = get conn, auction_path(conn, :show, id)
-      assert html_response(conn, 200) =~ auction.vessel.name
+      assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == user.id
     end
 
@@ -71,9 +73,8 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "start auction" do
-    test "manually starting an auction", (%{auction: %Oceanconnect.Auctions.Auction{id: auction_id}, conn: conn}) do
-      {:ok, _pid} = Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction_id)
-      new_conn = get(conn, auction_path(conn, :start, auction_id))
+    test "manually starting an auction", (%{auction: auction, conn: conn}) do
+      new_conn = get(conn, auction_path(conn, :start, auction.id))
 
       assert redirected_to(new_conn, 302) == "/auctions"
     end
@@ -97,7 +98,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
       conn = get conn, auction_path(conn, :show, auction)
-      assert html_response(conn, 200) =~ "updated PO text"
+      assert html_response(conn, 200) =~ "window.userToken"
     end
 
     test "renders errors when data is invalid", %{conn: conn, auction: auction} do

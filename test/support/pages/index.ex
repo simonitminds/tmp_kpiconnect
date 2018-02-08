@@ -1,5 +1,4 @@
 defmodule Oceanconnect.IndexPage do
-  @page_path "/"
   use Oceanconnect.Page
 
   def visit do

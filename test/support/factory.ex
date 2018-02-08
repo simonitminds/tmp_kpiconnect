@@ -31,7 +31,22 @@ defmodule Oceanconnect.Factory do
   def auction_factory() do
     %Oceanconnect.Auctions.Auction{
        auction_start: DateTime.utc_now(),
-       duration: 10,
+       duration: 10 * 60_000,
+       decision_duration: 15 * 60_000,
+       fuel: build(:fuel),
+       fuel_quantity: 1000,
+       port: build(:port),
+       vessel: build(:vessel),
+       buyer: build(:user),
+       suppliers: [build(:user)]
+    }
+  end
+
+  def auction_without_suppliers_factory() do
+    %Oceanconnect.Auctions.Auction{
+       auction_start: DateTime.utc_now(),
+       duration: 10 * 60_000,
+       decision_duration: 15 * 60_000,
        fuel: build(:fuel),
        fuel_quantity: 1000,
        port: build(:port),

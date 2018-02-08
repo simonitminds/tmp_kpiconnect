@@ -1,9 +1,8 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
   alias Oceanconnect.Accounts.{User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
@@ -18,8 +17,10 @@ defmodule Oceanconnect.Auctions do
 
   def auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
-      {:error, "Not Started"} -> %{id: id, state: %{status: :pending}}
-       %AuctionState{status: status} -> %{id: id, state: %{status: status}}
+      {:error, "Auction Store Not Started"} -> %{id: id, state: %{status: :pending}}
+      state ->
+        reduced_state = Map.take(state, [:status, :current_server_time, :time_remaining])
+        %{id: id, state: reduced_state}
     end
   end
 
@@ -28,17 +29,7 @@ defmodule Oceanconnect.Auctions do
     |> AuctionCommand.start_auction()
     |> AuctionStore.process_command(auction.id)
 
-    auction
-    |> Repo.preload([:suppliers, :buyer])
-    |> Oceanconnect.Auctions.notify_participants("user_auctions", auction_state(auction))
-  end
-
-  def notify_participants(%{buyer: buyer, suppliers: suppliers}, channel, payload) do
-    buyer_id = buyer.id
-    supplier_ids = Enum.map(suppliers, fn(s) -> s.id end)
-    Enum.map([buyer_id | supplier_ids], fn(id) ->
-      OceanconnectWeb.Endpoint.broadcast("#{channel}:#{id}", "auctions_update", payload)
-    end)
+    update_auction(auction, %{auction_start: DateTime.utc_now()})
   end
 
   def create_auction(attrs \\ %{}) do
@@ -48,7 +39,9 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        AuctionsSupervisor.start_child(auction.id)
+        auction
+        |> with_participants
+        |> AuctionsSupervisor.start_child
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
@@ -67,6 +60,11 @@ defmodule Oceanconnect.Auctions do
 
   def change_auction(%Auction{} = auction) do
     Auction.changeset(auction, %{})
+  end
+
+  def with_participants(%Auction{} = auction) do
+    auction
+    |> Repo.preload([:buyer, :suppliers])
   end
 
   def fully_loaded(data) do
