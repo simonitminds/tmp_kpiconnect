@@ -59,6 +59,23 @@ export function formatTimeRemaining(timeRemaining) {
   }
 }
 
+export function formatTimeRemainingColor(timeRemaining) {
+  if (timeRemaining) {
+    if (timeRemaining < 3) {
+      return `under-3`;
+    }
+    else if (timeRemaining < 7) {
+      return `under-7`;
+    }
+    else {
+      return `active`;
+    }
+  }
+  else {
+    return `inactive`;
+  }
+}
+
 export function leftpad (str, len, ch) {
   if (!ch) ch = ' ';
   let new_str = String(str);

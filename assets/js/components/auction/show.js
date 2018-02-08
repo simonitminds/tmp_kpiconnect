@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown} from '../../utilities';
+import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 import moment from 'moment';
 
 export default class AuctionShow extends React.Component {
@@ -57,7 +57,7 @@ export default class AuctionShow extends React.Component {
               <div className="auction-header">
                 <div className="columns has-margin-bottom-none">
                   <div className="column">
-                    <div className="auction-header__status auction-header__status--{auction_status(auction)} tag is-rounded qa-auction-status" id="time-remaing">
+                    <div className={`auction-header__status auction-header__status--${auction.state.status} tag is-rounded qa-auction-status`} id="time-remaining">
                       {auction.state.status}
                     </div>
                     <div className="auction-header__po is-uppercase">
@@ -69,7 +69,7 @@ export default class AuctionShow extends React.Component {
                   </div>
                   <div className="column">
                     <div className="auction-header__timer has-text-left-mobile">
-                      <div className="tag has-text-weight-bold is-medium is-danger is-uppercase">
+                      <div className={`auction-timer auction-timer--${formatTimeRemainingColor(this.state.timeRemaining)}`}>
                         <span className="qa-auction-time-remaining" id="time-remaining">
                           {formatTimeRemaining(this.state.timeRemaining)}
                         </span>

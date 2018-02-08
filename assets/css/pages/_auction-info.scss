@@ -80,3 +80,20 @@
     }
   }
 }
+
+// Auction Time Remaining
+
+.auction-timer {
+  @extend .tag;
+  width: 240px;
+  font-size: 1rem !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: $white !important;
+
+  // Color Auction Timer tags based on time remaining.
+  &--under-3 { background-color: $danger !important; }
+  &--under-7 { background-color: $gold !important; }
+  &--active { background-color: $gray-3 !important; }
+  &--inactive { background-color: $gray-3 !important; }
+}
