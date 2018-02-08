@@ -37,8 +37,8 @@ const AuctionsIndex = (props)=> {
         <div className="card-content has-padding-bottom-md">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}
-            <div className={`auction-card__status auction-card__status--${auction.state.status} qa-auction-status`}>
-              {auction.state.status}
+            <div className={`auction-card__status auction-card__status--${auction.state.status}`}>
+              <span className="qa-auction-status">{auction.state.status}</span>
               <span className={`auction-card__time-remaining auction-card__time-remaining--${auction.state.status}`}>
                 <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
                 {auction.state.status === "open" ? "5:00 remaining" : `${cardDateFormat(auction.auction_start)} GMT`}
