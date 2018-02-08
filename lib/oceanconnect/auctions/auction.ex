@@ -75,11 +75,14 @@ defmodule Oceanconnect.Auctions.Auction do
   def maybe_convert_duration(params, key) do
     case params do
       %{^key => duration} ->
-        updated_duration = duration * 60_000
+        updated_duration = parse_duration(duration) * 60_000
         Map.put(params, key, updated_duration)
       _ -> params
     end
   end
+
+  defp parse_duration(duration) when is_binary(duration), do: String.to_integer(duration)
+  defp parse_duration(duration) when is_integer(duration), do: duration
 
   def parse_date(""), do: ""
   def parse_date(epoch) do
