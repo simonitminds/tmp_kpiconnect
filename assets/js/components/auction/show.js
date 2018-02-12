@@ -167,6 +167,21 @@ export default class AuctionShow extends React.Component {
                         <div className="field is-horizontal is-expanded">
                           <div className="field-label">
                             <div className="control">
+                              <label className="label" htmlFor="bid">Minimum Bid</label>
+                            </div>
+                          </div>
+                          <div className="field-body">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" type="number" id="minimumBid" step="0.25" name="" value="" />
+                              <span className="icon is-small is-left">
+                                <i className="fas fa-dollar-sign"></i>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="field is-horizontal is-expanded">
+                          <div className="field-label">
+                            <div className="control">
                               <label className="label" htmlFor="expiration">Expiration</label>
                             </div>
                           </div>
