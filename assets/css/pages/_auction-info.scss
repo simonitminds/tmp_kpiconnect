@@ -94,10 +94,11 @@
   font-weight: bold;
   text-transform: uppercase;
   color: $white !important;
+  transition: all 0.2s ease-in;
 
   // Color Auction Timer tags based on time remaining.
-  &--under-3 { background-color: $danger !important; }
-  &--under-7 { background-color: $gold !important; }
+  &--under-1 { background-color: $danger !important; }
+  &--under-3 { background-color: $gold !important; }
   &--active { background-color: $gray-3 !important; }
   &--in-decision { background-color: $gray-3 !important; width: 310px !important; }
   &--inactive { background-color: $gray-2 !important; color: $black !important; }

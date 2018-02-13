@@ -70,11 +70,11 @@ export function formatTimeRemainingColor(auction, timeRemaining) {
   const status = _.get(auction, 'state.status');
 
   if (timeRemaining && status === "open") {
-    if (Math.floor(timeRemaining / 60000) < 3) {
-      return `under-3`;
+    if (timeRemaining <= 60001) {
+      return `under-1`;
     }
-    else if (Math.floor(timeRemaining / 60000) < 7) {
-      return `under-7`;
+    else if (timeRemaining <= 180001) {
+      return `under-3`;
     }
     else {
       return `active`;
