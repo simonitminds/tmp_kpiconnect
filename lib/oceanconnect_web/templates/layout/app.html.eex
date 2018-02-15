@@ -31,6 +31,7 @@
           <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
             <span class="navbar-item has-text-weight-bold"><%= OceanconnectWeb.SessionView.current_user(@conn) %></span>
+            <span class="navbar-item"><i class="is-size-6 is-block">(<%= @current_user.company.name %></i>)</span>
             <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
             <a href="#" class="navbar-item">Log Out</a> -->
