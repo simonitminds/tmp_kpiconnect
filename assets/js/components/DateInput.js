@@ -8,7 +8,8 @@ export default class DateInput extends React.Component {
     super(props);
     this.state = {
       date: moment(props.value).utc(),
-      focused: false
+      focused: false,
+      numberOfMonths: 1
     }
   }
 
@@ -28,9 +29,9 @@ export default class DateInput extends React.Component {
 
     return(
       <div>
-        <label htmlFor={`${model}_${field}`} className="label">
+        {/* <label htmlFor={`${model}_${field}`} className="label">
           {labelText}
-        </label>
+        </label> */}
         <div className={`control qa-${model}-${field}_date`}>
           <SingleDatePicker
             id={`${model}_${field}_date`}
@@ -41,6 +42,7 @@ export default class DateInput extends React.Component {
               }
             }
             focused={this.state.focused}
+            numberOfMonths={this.state.numberOfMonths}
             onFocusChange={({ focused }) => this.setState({ focused })}
           />
         </div>
