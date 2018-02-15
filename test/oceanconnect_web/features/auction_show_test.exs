@@ -6,11 +6,13 @@ defmodule Oceanconnect.AuctionShowTest do
   hound_session()
 
   setup do
-    buyer = insert(:user)
-    supplier = insert(:user)
-    auction = insert(:auction, buyer: buyer)
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+    buyer_company = insert(:company)
+    buyer = insert(:user, company: buyer_company)
     login_user(buyer)
+    supplier_company = insert(:company)
+    supplier = insert(:user, company: supplier_company)
+    auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     {:ok, %{auction: auction, supplier: supplier}}
   end
 

@@ -13,8 +13,8 @@ import {
 } from "./constants";
 
 let channel;
-if(window.userToken && window.userToken != "" && window.userId && window.userId != "") {
-  channel = socket.channel(`user_auctions:${window.userId}`, {token: window.userToken});
+if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
+  channel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
 };
 
 const defaultHeaders = {

@@ -29,7 +29,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def create(conn, %{"auction" => auction_params}) do
     auction_params = Auction.from_params(auction_params)
-    |> Map.put("buyer_id", Auth.current_user(conn).id)
+    |> Map.put("buyer_id", Auth.current_user(conn).company.id)
     case Auctions.create_auction(auction_params) do
       {:ok, auction} ->
         conn
@@ -92,7 +92,7 @@ defmodule OceanconnectWeb.AuctionController do
     buyer = Auth.current_user(conn)
     fuels = Auctions.list_fuels()
     ports = Auctions.ports_for_company(buyer.company)
-    vessels = Auctions.vessels_for_buyer(buyer)
+    vessels = Auctions.vessels_for_buyer(buyer.company)
     Enum.map([fuels, ports, vessels], fn(list) ->
       list |> Poison.encode!
     end)

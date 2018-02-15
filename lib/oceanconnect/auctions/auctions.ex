@@ -68,7 +68,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def fully_loaded(auction = %Auction{}) do
-    Repo.preload(auction, [:port, [vessel: :company], :fuel, [buyer: :company], [suppliers: :company]])
+    Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
   end
   def fully_loaded(company = %Company{}) do
     Repo.preload(company, [:users, :vessels, :ports])
@@ -106,7 +106,7 @@ defmodule Oceanconnect.Auctions do
   defp maybe_replace_non_loaded(value = %{}), do: strip_non_loaded(value)
   defp maybe_replace_non_loaded(value), do: value
 
-  def add_supplier_to_auction(%Auction{} = auction, %Oceanconnect.Accounts.User{} = supplier) do
+  def add_supplier_to_auction(%Auction{} = auction, %Company{} = supplier) do
     auction_with_suppliers = auction
     |> Repo.preload(:suppliers)
 
@@ -233,13 +233,13 @@ defmodule Oceanconnect.Auctions do
   @doc """
   Returns list of vessels belonging to buyers company
   ## Examples
-      iex> vessels_for_buyer(%User{})
+      iex> vessels_for_buyer(%Company{})
       [%Vessel{}, ...]
 
   """
 
-  def vessels_for_buyer(%User{company_id: company_id}) do
-    Vessel.by_company(company_id)
+  def vessels_for_buyer(%Company{id: id}) do
+    Vessel.by_company(id)
     |> Repo.all
   end
 

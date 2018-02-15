@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
     belongs_to :fuel, Fuel
-    belongs_to :buyer, Oceanconnect.Accounts.User
+    belongs_to :buyer, Oceanconnect.Accounts.Company
     field :fuel_quantity, :integer
     field :po, :string
     field :eta, :utc_datetime, default: @current_time_trunc
@@ -20,8 +20,8 @@ defmodule Oceanconnect.Auctions.Auction do
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
     field :anonymous_bidding, :boolean
     field :additional_information, :string
-    many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
-      join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete
+    many_to_many :suppliers, Oceanconnect.Accounts.Company, join_through: Oceanconnect.Auctions.AuctionSuppliers,
+      join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete, on_delete: :delete_all
 
     timestamps()
   end

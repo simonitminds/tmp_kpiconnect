@@ -279,7 +279,7 @@ export default class AuctionShow extends React.Component {
                         <h3 className="box__header">Buyer Information</h3>
                         <ul className="list has-no-bullets">
                           <li>
-                            <strong>Organization</strong> {auction.buyer.company.name}
+                            <strong>Organization</strong> {auction.buyer.name}
                           </li>
                           <li>
                             <strong>Buyer</strong> Buyer Name

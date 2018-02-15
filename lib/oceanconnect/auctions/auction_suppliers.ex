@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   schema "auction_suppliers" do
     field :participation, :string
     belongs_to :auction, Oceanconnect.Auctions.Auction
-    belongs_to :supplier, Oceanconnect.Accounts.User
+    belongs_to :supplier, Oceanconnect.Accounts.Company
 
     timestamps()
   end

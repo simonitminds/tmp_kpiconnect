@@ -5,15 +5,15 @@ defmodule Oceanconnect.AuctionNewTest do
   hound_session()
 
   setup do
-    company = insert(:company)
-    buyer = insert(:user, company: company)
-    supplier = insert(:user)
-    fuel = insert(:fuel)
+    buyer_company = insert(:company)
+    buyer = insert(:user, company: buyer_company)
     login_user(buyer)
-    buyer_vessels = insert_list(3, :vessel, company: company)
+    fuel = insert(:fuel)
+    buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
-    port = insert(:port, companies: [company])
+    port = insert(:port, companies: [buyer_company])
     selected_vessel = hd(buyer_vessels)
+    supplier_company = insert(:company)
 
     auction_params = %{
       auction_start_date: DateTime.utc_now(),

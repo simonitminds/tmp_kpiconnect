@@ -70,13 +70,13 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "add_supplier_to_auction/2 with valid data", %{auction: auction} do
-      supplier = insert(:user)
+      supplier = insert(:company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(supplier)
       assert updated_auction.suppliers == [supplier]
     end
 
     test "add_supplier_to_auction/2 with existing suppliers", %{auction: auction} do
-      [s1, s2] = insert_list(2, :user)
+      [s1, s2] = insert_list(2, :company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(s1)
       |> Auctions.add_supplier_to_auction(s2)
       assert updated_auction.suppliers
@@ -86,7 +86,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "set_suppliers_for_auction/2 with valid data", %{auction: auction} do
-      [s1, s2] = insert_list(2, :user)
+      [s1, s2] = insert_list(2, :company)
       updated_auction = auction |> Auctions.set_suppliers_for_auction([s1, s2])
       assert updated_auction.suppliers
       |> Enum.map(fn(s) -> s.id end)
@@ -95,7 +95,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "set_suppliers_for_auction/2 overwriting existing suppliers", %{auction: auction} do
-      [s1, s2, s3] = insert_list(3, :user)
+      [s1, s2, s3] = insert_list(3, :company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(s3)
       |> Auctions.set_suppliers_for_auction([s1, s2])
       assert updated_auction.suppliers
@@ -207,7 +207,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "vessels_for_buyer/1", %{user: user, vessel: vessel} do
       extra_vessel = insert(:vessel)
-      result = Auctions.vessels_for_buyer(user)
+      result = Auctions.vessels_for_buyer(user.company)
       |> Oceanconnect.Repo.preload(:company)
       assert result == [vessel]
       refute extra_vessel in result
@@ -303,14 +303,12 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   test "strip non loaded" do
-    auction = insert(:auction, suppliers: insert_list(1, :user))
+    auction = insert(:auction)
     partially_loaded_auction = Oceanconnect.Auctions.Auction
     |> Repo.get(auction.id)
-    |> Repo.preload([:vessel, :buyer, :suppliers])
+    |> Repo.preload([:vessel])
 
     result = Auctions.strip_non_loaded(partially_loaded_auction)
-    assert result.buyer.company == nil
-    assert hd(result.suppliers).company == nil
     assert result.vessel.company == nil
   end
 end
