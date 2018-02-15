@@ -6,7 +6,7 @@ defmodule Oceanconnect.Accounts do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Accounts.User
+  alias Oceanconnect.Accounts.{Company, User}
 
   @doc """
   Returns the list of users.
@@ -110,7 +110,7 @@ defmodule Oceanconnect.Accounts do
   end
   def verify_login(_), do: {:error, "Invalid email/password"}
 
-  alias Oceanconnect.Accounts.Company
+  def load_company_on_user(%User{} = user), do: Repo.preload(user, [:company])
 
   @doc """
   Returns the list of companies.
@@ -221,6 +221,24 @@ defmodule Oceanconnect.Accounts do
     |> Repo.preload(:ports)
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:ports, ports)
+    |> Repo.update!
+  end
+
+  def add_vessel_to_company(%Company{} = company, %Oceanconnect.Auctions.Vessel{} = vessel) do
+    company_with_vessels = company
+    |> Repo.preload(:vessels)
+
+    company_with_vessels
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:vessels, [vessel | company_with_vessels.vessels])
+    |> Repo.update!
+  end
+
+  def set_vessels_on_company(%Company{} = company, vessels) when is_list(vessels) do
+    company
+    |> Repo.preload(:vessels)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:vessels, vessels)
     |> Repo.update!
   end
 end

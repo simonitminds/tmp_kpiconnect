@@ -41,7 +41,6 @@ defmodule OceanconnectWeb do
       import OceanconnectWeb.ErrorHelpers
       import OceanconnectWeb.Gettext
 
-      import ReactPhoenix.ClientSide
     end
   end
 

@@ -1,15 +1,18 @@
 defmodule OceanconnectWeb.Api.AuctionApiView do
   use OceanconnectWeb, :view
 
-  def render("index.json", %{auctions: auctions}) do
+  def render("index.json", %{data: auctions}) do
     %{data: Enum.map(auctions, fn(auction) ->
-        render(__MODULE__, "auction.json", auction: auction)
+        render(__MODULE__, "auction.json", data: auction)
       end)
     }
   end
 
-  def render("auction.json", %{auction: auction}) do
-    %{state: state} = Oceanconnect.Auctions.auction_state(auction)
+  def render("auction.json", %{data: auction}) do
+    state = case Oceanconnect.Auctions.auction_state(auction) do
+      %{state: state} -> state
+      _ -> nil
+    end
     %{
       id: auction.id,
       port: auction.port,

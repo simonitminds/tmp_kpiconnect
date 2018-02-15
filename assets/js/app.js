@@ -12,7 +12,6 @@
 // If you no longer want to use a dependency, remember
 // to also remove its path from 'config.paths.watched'.
 import 'phoenix_html';
-import 'react-phoenix';
 // Import local files
 //
 // Local files can be imported directly using relative
@@ -24,14 +23,20 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
-import { getAllAuctions} from './actions';
+import { getAllAuctions, receiveAuctionFormData } from './actions';
+import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';
-import AuctionForm from './components/auction/AuctionForm';
 
-window.Components = {
-  AuctionForm
-};
+
+function getDataForComponent(componentName) {
+  let data = document.getElementById(componentName).dataset;
+  let auction = JSON.parse(data.auction);
+  let fuels = JSON.parse(data.fuels);
+  let ports = JSON.parse(data.ports);
+  let vessels = JSON.parse(data.vessels);
+  return <AuctionFormContainer auction={auction} fuels={fuels} ports={ports} vessels={vessels} />;
+}
 
 if (document.getElementById('auctions-app')) {
   const store = createStore(
@@ -46,13 +51,16 @@ if (document.getElementById('auctions-app')) {
     switch (window.container) {
       case "index": { return <AuctionsContainer /> }
       case "show": { return <AuctionContainer /> }
+      case "edit": { return getDataForComponent("AuctionFormContainer")}
+      case "new": { return getDataForComponent("AuctionFormContainer")}
       default: {return(<div></div>)}
     }
-  }
+  };
 
   render((
     <Provider store={store}>
       {setContainer()}
     </Provider>
+
   ), document.getElementById('auctions-app'));
 }

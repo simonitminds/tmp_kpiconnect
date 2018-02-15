@@ -1,10 +1,16 @@
+import _ from "lodash";
 import thunk from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
 import socket from "./socket";
 
-import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "./constants/auctions";
-
+import {
+  RECEIVE_AUCTIONS,
+  RECIEVE_AUCTION_FORM_DATA,
+  UPDATE_AUCTION_STATE,
+  UPDATE_DATE,
+  UPDATE_INFORMATION
+} from "./constants";
 
 let channel;
 if(window.userToken && window.userToken != "" && window.userId && window.userId != "") {
@@ -43,6 +49,35 @@ export function getAllAuctions() {
 export function receiveAuctions(auctions) {
   return {type: RECEIVE_AUCTIONS,
           auctions: auctions};
+}
+
+export function receiveAuctionFormData(auction, fuels, ports, vessels) {
+  return {type: RECIEVE_AUCTION_FORM_DATA,
+          data: {
+            auction,
+            fuels,
+            ports,
+            vessels
+          }
+        };
+}
+
+export function updateInformation(property, value) {
+  return {type: UPDATE_INFORMATION,
+          data: {
+            property,
+            'value': _.get(value, 'target.value', value)
+          }
+        };
+}
+
+export function updateDate(property, value) {
+  return {type: UPDATE_DATE,
+          data: {
+            property,
+            'value': _.get(value, 'target.value', value)
+          }
+        };
 }
 
 function checkStatus(response) {

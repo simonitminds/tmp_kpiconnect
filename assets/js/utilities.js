@@ -29,7 +29,7 @@ export const portLocalTime = (gmtTime, portId, ports) => {
       .filter(['id', parseInt(portId)])
       .first()
       .value();
-    const localTime = moment(gmtTime).add(port.gmt_offset, 'hours');
+    const localTime = moment(gmtTime).utc().add(_.get(port, 'gmt_offset', 0), 'hours');
     return formatDateTime(localTime);
   }
 }

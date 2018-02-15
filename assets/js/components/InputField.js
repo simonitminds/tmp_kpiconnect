@@ -2,7 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 import _ from 'lodash';
 
-const InputField = ({model, field, labelText, value, opts}) => {
+const InputField = ({model, field, labelText, value, opts, onChange}) => {
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
   const type = _.has(opts, 'type') ? opts.type : 'text';
@@ -22,6 +22,7 @@ const InputField = ({model, field, labelText, value, opts}) => {
             className={`input qa-${model}-${field}`}
             defaultValue={value}
             autoComplete="off"
+            onChange={onChange}
           />
         </div>
       </div>

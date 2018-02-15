@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Oceanconnect.Repo
+alias Oceanconnect.Accounts
 alias Oceanconnect.Accounts.{Company, User}
 alias Oceanconnect.Auctions
 alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
@@ -168,9 +169,12 @@ auction_params = %{
   fuel_id: fuel1.id,
   po: "1234567",
   buyer_id: buyer.id,
-  duration: 15 * 60_000,
-  decision_duration: 15 * 60_000
+  duration: 1 * 60_000,
+  decision_duration: 1 * 60_000
 }
 
 auction = Repo.get_or_insert!(Auction, auction_params)
+
 Auctions.set_suppliers_for_auction(auction, suppliers)
+Accounts.set_ports_on_company(company, Auctions.list_ports())
+Accounts.set_vessels_on_company(company, Auctions.list_vessels())

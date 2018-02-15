@@ -2,29 +2,30 @@
 <%= form_for @changeset, @action,[class: "control"], fn _f -> %>
 
   <%= if @changeset.action do %>
-  <div class="container is-fullhd">
-    <div class="content has-margin-top-lg">
-      <div class="alert alert-danger">
-        <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>
+    <div class="container is-fullhd">
+      <div class="content has-margin-top-lg">
+        <div class="alert alert-danger">
+          <p class="help is-danger">Oops, something went wrong! Please check the errors below.</p>
+        </div>
       </div>
     </div>
-  </div>
   <% end %>
 
-  <%= react_component("Components.AuctionForm",
-        %{auction: OceanconnectWeb.AuctionView.auction_without_associations_from_changeset(@auction),
-          action: @changeset.action,
-          errors: OceanconnectWeb.AuctionView.errors_from_changeset(@changeset),
-          ports: @ports,
-          vessels: @vessels,
-          fuels: @fuels
-        }) %>
+  <div id="auctions-app">
+    <div id="AuctionFormContainer"
+      data-auction="<%= @json_auction %>"
+      data-fuels="<%= @fuels %>"
+      data-ports="<%= @ports %>"
+      data-vessels="<%= @vessels %>"
+    ></div>
+  </div>
+
   <section class="auction-info has-margin-top-lg is-white">
     <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
       <div class="content">
         <div class="field">
           <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>
-          <%= submit "Submit", class: "button is-link" %>
+          <%= submit "Submit", class: "button is-link qa-auction-submit" %>
         </div>
       </div>
     </div>

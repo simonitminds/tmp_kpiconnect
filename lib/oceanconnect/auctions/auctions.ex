@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Repo
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
-  alias Oceanconnect.Accounts.{User}
+  alias Oceanconnect.Accounts.{Company, User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
   def list_auctions do
@@ -67,10 +67,44 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:buyer, :suppliers])
   end
 
-  def fully_loaded(data) do
-    data
-    |> Repo.preload([:port, [vessel: :company], :fuel, [buyer: :company], [suppliers: :company]])
+  def fully_loaded(auction = %Auction{}) do
+    Repo.preload(auction, [:port, [vessel: :company], :fuel, [buyer: :company], [suppliers: :company]])
   end
+  def fully_loaded(company = %Company{}) do
+    Repo.preload(company, [:users, :vessels, :ports])
+  end
+  def fully_loaded(port = %Port{}) do
+    Repo.preload(port, [:companies])
+  end
+  def fully_loaded(vessel = %Vessel{}) do
+    Repo.preload(vessel, [:company])
+  end
+  def fully_loaded(struct), do: struct
+
+  def strip_non_loaded(struct = %{}) do
+    Enum.reduce(maybe_convert_struct(struct), %{}, fn({k, v}, acc) ->
+      Map.put(acc, k, maybe_replace_non_loaded(v))
+    end)
+  end
+  def strip_non_loaded(struct), do: struct
+
+  defp maybe_convert_struct(struct = %{__meta__: _meta}) do
+    struct
+    |> Map.from_struct
+    |> Map.drop([:__meta__, :inserted_at, :updated_at])
+  end
+  defp maybe_convert_struct(data), do: data
+
+  defp maybe_replace_non_loaded(%Ecto.Association.NotLoaded{}), do: nil
+  defp maybe_replace_non_loaded(value) when is_list(value) do
+    Enum.map(value, fn(list_item) ->
+      strip_non_loaded(list_item)
+    end)
+  end
+  defp maybe_replace_non_loaded(value = %{__meta__: _meta}), do: strip_non_loaded(value)
+  defp maybe_replace_non_loaded(value = %DateTime{}), do: value
+  defp maybe_replace_non_loaded(value = %{}), do: strip_non_loaded(value)
+  defp maybe_replace_non_loaded(value), do: value
 
   def add_supplier_to_auction(%Auction{} = auction, %Oceanconnect.Accounts.User{} = supplier) do
     auction_with_suppliers = auction
@@ -184,15 +218,17 @@ defmodule Oceanconnect.Auctions do
     Port.changeset(port, %{})
   end
 
-
-  def companies_by_port(port_id) do
-    query = from company_port in "company_ports",
-      join: company in Oceanconnect.Accounts.Company, on: company.id == company_port.company_id,
-      where: company_port.port_id == ^port_id,
-      select: company
-    query |> Repo.all
+  def ports_for_company(company = %Company{}) do
+    company
+    |> Repo.preload([ports: :companies])
+    |> Map.get(:ports)
   end
 
+  def companies_for_port(port = %Port{}) do
+    port
+    |> Repo.preload(:companies)
+    |> Map.get(:companies)
+  end
 
   @doc """
   Returns list of vessels belonging to buyers company
@@ -218,7 +254,6 @@ defmodule Oceanconnect.Auctions do
   """
   def list_vessels do
     Repo.all(Vessel)
-    |> Repo.preload(:company)
   end
 
   @doc """

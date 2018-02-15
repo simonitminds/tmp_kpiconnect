@@ -64,7 +64,7 @@ export default class AuctionShow extends React.Component {
                     <div className="auction-header__po is-uppercase">
                       Auction {auction.po}
                     </div>
-                    <h1 className="auction-header__vessel title has-text-weight-bold">
+                    <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
                       {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})</span>
                     </h1>
                   </div>
@@ -92,7 +92,8 @@ export default class AuctionShow extends React.Component {
           <section className="auction-page"> {/* Port selection */}
             <div className="container">
               <div className="auction-header__ports has-text-weight-bold">
-                {auction.port.name} <span className="has-text-weight-normal is-inline-block has-padding-left-sm">ETA {formatGMTDateTime(auction.eta)} GMT &ndash; ETD {formatGMTDateTime(auction.etd)} GMT</span>
+                <span className="qa-auction-port">{auction.port.name}</span>
+                <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> ETA {formatGMTDateTime(auction.eta)} GMT &ndash; ETD {formatGMTDateTime(auction.etd)} GMT</span>
               </div>
             </div>
           </section> {/* Port selection */}

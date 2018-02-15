@@ -7,6 +7,6 @@ defmodule OceanconnectWeb.Api.AuctionApiController do
     |> Enum.map(fn(auction) ->
       Auctions.fully_loaded(auction)
     end)
-    render(conn, "index.json", auctions: auctions)
+    render(conn, "index.json", data: auctions)
   end
 end

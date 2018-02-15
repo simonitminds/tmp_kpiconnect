@@ -166,7 +166,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
-  describe "companies by port" do
+  describe "port and company relationship" do
     setup do
       [port1, port2] = insert_list(2, :port)
       [company1, company2, company3] = insert_list(3, :company)
@@ -175,11 +175,19 @@ defmodule Oceanconnect.AuctionsTest do
       company3 |> Oceanconnect.Accounts.add_port_to_company(port2)
       {:ok, %{p1: port1, p2: port2, c1: company1, c2: company2, c3: company3}}
     end
-    test "companies_by_port/1 returns companies with associated port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
-      companies = Auctions.companies_by_port(p1.id)
+
+    test "companies_for_port/1 returns companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
+      companies = Auctions.companies_for_port(p1)
       assert Enum.all?(companies, fn(c) -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.companies_by_port(p2.id), fn(c) -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+    end
+
+    test "ports_for_company/1 returns ports for given company", %{p1: p1, p2: p2, c1: c1, c2: c2} do
+      ports = Auctions.ports_for_company(c2)
+      assert Enum.all?(ports, fn(p) -> p.id in [p1.id, p2.id] end)
+      assert length(ports) == 2
+      assert Enum.all?(Auctions.ports_for_company(c1), fn(p) -> p.id === p1.id end)
     end
   end
 
@@ -206,7 +214,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "list_vessels/0 returns all vessels", %{vessel: vessel} do
-      assert Auctions.list_vessels() == [vessel]
+      assert Auctions.list_vessels() |> Repo.preload(:company) == [vessel]
     end
 
     test "get_vessel!/1 returns the vessel with given id", %{vessel: vessel} do
@@ -292,5 +300,17 @@ defmodule Oceanconnect.AuctionsTest do
     test "change_fuel/1 returns a fuel changeset", %{fuel: fuel} do
       assert %Ecto.Changeset{} = Auctions.change_fuel(fuel)
     end
+  end
+
+  test "strip non loaded" do
+    auction = insert(:auction, suppliers: insert_list(1, :user))
+    partially_loaded_auction = Oceanconnect.Auctions.Auction
+    |> Repo.get(auction.id)
+    |> Repo.preload([:vessel, :buyer, :suppliers])
+
+    result = Auctions.strip_non_loaded(partially_loaded_auction)
+    assert result.buyer.company == nil
+    assert hd(result.suppliers).company == nil
+    assert result.vessel.company == nil
   end
 end

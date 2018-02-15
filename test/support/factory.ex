@@ -21,13 +21,6 @@ defmodule Oceanconnect.Factory do
     |> set_password
   end
 
-  def new_datetime(offset_hours) do
-    {:ok, datetime} = NaiveDateTime.new(2018, 1, 1, 0, 0, 0)
-    datetime
-    |> NaiveDateTime.add(offset_hours*3600, :second)
-    |> DateTime.from_naive!("Etc/UTC")
-  end
-
   def auction_factory() do
     %Oceanconnect.Auctions.Auction{
        auction_start: DateTime.utc_now(),
@@ -63,7 +56,8 @@ defmodule Oceanconnect.Factory do
 
   def port_factory() do
     %Oceanconnect.Auctions.Port{
-       name: "New Port"
+       name: "New Port",
+       country: "Timbuktu"
     }
   end
 

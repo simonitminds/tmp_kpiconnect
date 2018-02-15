@@ -13,4 +13,12 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:class, "qa-auction-status")
     |> inner_text()
   end
+
+  def has_values_from_params?(params) do
+    Enum.all?(params, fn({k, v}) ->
+      text = find_element(:class, "qa-auction-#{k}")
+      |> inner_text
+      text == v
+    end)
+  end
 end

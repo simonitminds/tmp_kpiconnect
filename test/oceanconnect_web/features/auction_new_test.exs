@@ -1,16 +1,45 @@
 defmodule Oceanconnect.AuctionNewTest do
   use Oceanconnect.FeatureCase, async: true
-  alias Oceanconnect.AuctionNewPage
+  alias Oceanconnect.{AuctionNewPage, AuctionShowPage}
 
   hound_session()
 
   setup do
     company = insert(:company)
-    user = insert(:user, company: company)
-    login_user(user)
+    buyer = insert(:user, company: company)
+    supplier = insert(:user)
+    fuel = insert(:fuel)
+    login_user(buyer)
     buyer_vessels = insert_list(3, :vessel, company: company)
     insert(:vessel)
-    {:ok, %{buyer_vessels: buyer_vessels}}
+    port = insert(:port, companies: [company])
+    selected_vessel = hd(buyer_vessels)
+
+    auction_params = %{
+      auction_start_date: DateTime.utc_now(),
+      auction_start_time: DateTime.utc_now(),
+      eta_date: DateTime.utc_now(),
+      eta_time: DateTime.utc_now(),
+      etd_date: DateTime.utc_now(),
+      etd_time: DateTime.utc_now(),
+      decision_duration: 15,
+      duration: 10,
+      fuel_id: fuel.id,
+      fuel_quantity: 1_000,
+      port_id: port.id,
+      # suppliers: [
+      #   %{
+      #     id: supplier.id,
+      #     company: supplier.company
+      #   }
+      # ],
+      vessel_id: selected_vessel.id
+    }
+    show_params = %{
+      vessel: "#{selected_vessel.name} (#{selected_vessel.imo})",
+      port: port.name
+    }
+    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, show_params: show_params}}
   end
 
   test "visting the new auction page" do
@@ -24,11 +53,11 @@ defmodule Oceanconnect.AuctionNewTest do
       "decision_duration",
       "eta",
       "etd",
-      "fuel",
+      "fuel_id",
       "fuel_quantity",
       "po",
-      "port",
-      "vessel"
+      "port_id",
+      "vessel_id"
     ])
   end
 
@@ -39,5 +68,17 @@ defmodule Oceanconnect.AuctionNewTest do
     company_vessels = MapSet.new(buyer_vessels)
 
     assert MapSet.equal?(vessels_on_page, company_vessels)
+  end
+
+
+  test "creating an auction", %{params: params, show_params: show_params} do
+    AuctionNewPage.visit()
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.submit()
+
+    eventually fn ->
+      assert current_path() =~ ~r/auctions\/\d/
+      assert AuctionShowPage.has_values_from_params?(show_params)
+    end
   end
 end

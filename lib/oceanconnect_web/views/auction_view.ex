@@ -1,11 +1,6 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
 
-  def format_datetime(nil), do: ""
-  def format_datetime(date) do
-    Timex.format!(date, "%d/%m/%y %R", :strftime)
-  end
-
   def auction_without_associations_from_changeset(struct) do
     struct
     |> Map.from_struct()

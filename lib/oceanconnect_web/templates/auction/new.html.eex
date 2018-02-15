@@ -4,4 +4,7 @@
   </div>
 </div>
 
+<script> window.container = "new";</script>
+<script> window.auctionId = null;</script>
+
 <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :create)) %>

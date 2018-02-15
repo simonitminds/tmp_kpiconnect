@@ -3,6 +3,8 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
+  @current_time_trunc %DateTime{DateTime.utc_now() | hour: 0, minute: 0, second: 0}
+
   @derive {Poison.Encoder, except: [:__meta__]}
   schema "auctions" do
     belongs_to :port, Port
@@ -11,11 +13,11 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :buyer, Oceanconnect.Accounts.User
     field :fuel_quantity, :integer
     field :po, :string
-    field :eta, :utc_datetime
-    field :etd, :utc_datetime
-    field :auction_start, :utc_datetime
-    field :duration, :integer # milliseconds
-    field :decision_duration, :integer # milliseconds
+    field :eta, :utc_datetime, default: @current_time_trunc
+    field :etd, :utc_datetime, default: @current_time_trunc
+    field :auction_start, :utc_datetime, default: @current_time_trunc
+    field :duration, :integer, default: 10 * 60_000 # milliseconds
+    field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
     field :anonymous_bidding, :boolean
     field :additional_information, :string
     many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
@@ -24,24 +26,24 @@ defmodule Oceanconnect.Auctions.Auction do
     timestamps()
   end
 
-    @required_fields [
-      :fuel_id,
-      :port_id,
-      :vessel_id
-    ]
+  @required_fields [
+    :fuel_id,
+    :port_id,
+    :vessel_id
+  ]
 
-    @optional_fields [
-      :buyer_id,
-      :additional_information,
-      :anonymous_bidding,
-      :auction_start,
-      :duration,
-      :decision_duration,
-      :eta,
-      :etd,
-      :fuel_quantity,
-      :po
-    ]
+  @optional_fields [
+    :buyer_id,
+    :additional_information,
+    :anonymous_bidding,
+    :auction_start,
+    :duration,
+    :decision_duration,
+    :eta,
+    :etd,
+    :fuel_quantity,
+    :po
+  ]
 
   @doc false
   def changeset(%Auction{} = auction, attrs) do

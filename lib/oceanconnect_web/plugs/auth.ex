@@ -8,9 +8,11 @@ defmodule OceanconnectWeb.Plugs.Auth do
   end
 
   def build_session(conn, user) do
+    user_with_company = Oceanconnect.Accounts.load_company_on_user(user)
+
     conn
-    |> put_session(:user, user)
-    |> assign(:current_user, user)
+    |> put_session(:user, user_with_company)
+    |> assign(:current_user, user_with_company)
     |> configure_session(renew: true)
     |> put_user_token
   end
@@ -48,5 +50,4 @@ defmodule OceanconnectWeb.Plugs.Auth do
       conn
     end
   end
-
 end

@@ -135,5 +135,30 @@ defmodule Oceanconnect.AccountsTest do
       assert updated_company.ports == [port2]
     end
 
+    test "add_vessel_to_company/2 with valid data", %{company: company} do
+      vessel = insert(:vessel)
+      updated_company = company |> Accounts.add_vessel_to_company(vessel)
+      assert Enum.all?(updated_company.vessels, fn(vessel) -> vessel.id == vessel.id end)
+    end
+
+    test "add_vessel_to_company/2 with existing vessels", %{company: company} do
+      [vessel1, vessel2] = insert_list(2, :vessel)
+      updated_company = company |> Accounts.add_vessel_to_company(vessel1)
+      |> Accounts.add_vessel_to_company(vessel2)
+      assert Enum.all?(updated_company.vessels, fn(vessel) -> vessel.id in [vessel1.id, vessel2.id] end)
+    end
+
+    test "set_vessels_on_company/2 with valid data", %{company: company} do
+      vessels = insert_list(2, :vessel)
+      updated_company = company |> Accounts.set_vessels_on_company(vessels)
+      assert Enum.all?(updated_company.vessels, fn(vessel) -> vessel.id in Enum.map(vessels, &(&1.id)) end)
+    end
+
+    test "set_vessels_on_company/2 overwriting existing vessels", %{company: company} do
+      [vessel1, vessel2] = insert_list(2, :vessel)
+      updated_company = company |> Accounts.set_vessels_on_company([vessel1])
+      |> Accounts.set_vessels_on_company([vessel2])
+      assert Enum.all?(updated_company.vessels, fn(vessel) -> vessel.id == vessel2.id end)
+    end
   end
 end

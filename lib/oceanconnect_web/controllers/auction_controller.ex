@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
-  alias Oceanconnect.Accounts.Auth
+  alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
     auctions = Auctions.list_auctions()
@@ -19,10 +19,12 @@ defmodule OceanconnectWeb.AuctionController do
 
   def new(conn, _params) do
     changeset = Auctions.change_auction(%Auction{})
-    ports = Auctions.list_ports
-    vessels = Auctions.vessels_for_buyer(Auth.current_user(conn))
-    fuels = Auctions.list_fuels
-    render(conn, "new.html", changeset: changeset, auction: changeset.data, ports: ports, vessels: vessels, fuels: fuels)
+    [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
+    json_auction = %Auction{}
+    |> Auctions.strip_non_loaded
+    |> Poison.encode!
+
+    render(conn, "new.html", changeset: changeset, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
   end
 
   def create(conn, %{"auction" => auction_params}) do
@@ -36,10 +38,13 @@ defmodule OceanconnectWeb.AuctionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         auction = Ecto.Changeset.apply_changes(changeset)
         |> Auctions.fully_loaded
-        ports = Auctions.list_ports
-        vessels = Auctions.vessels_for_buyer(Auth.current_user(conn))
-        fuels = Auctions.list_fuels
-        render(conn, "new.html", changeset: changeset, ports: ports, auction: auction, vessels: vessels, fuels: fuels)
+
+        [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
+        json_auction = auction
+        |> Auctions.fully_loaded
+        |> Poison.encode!
+
+        render(conn, "new.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
     end
   end
 
@@ -53,11 +58,12 @@ defmodule OceanconnectWeb.AuctionController do
   def edit(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
     changeset = Auctions.change_auction(auction)
-    ports = Auctions.list_ports
-    vessels = Auctions.vessels_for_buyer(Auth.current_user(conn))
-    fuels = Auctions.list_fuels
+    [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
+    json_auction = auction
+    |> Auctions.fully_loaded
+    |> Poison.encode!
 
-    render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels, fuels: fuels)
+    render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
@@ -71,12 +77,24 @@ defmodule OceanconnectWeb.AuctionController do
         |> redirect(to: auction_path(conn, :show, auction))
       {:error, %Ecto.Changeset{} = changeset} ->
         auction = Ecto.Changeset.apply_changes(changeset)
-        ports = Auctions.list_ports
-        vessels = Auctions.vessels_for_buyer(Auth.current_user(conn))
-        fuels = Auctions.list_fuels
+        |> Auctions.fully_loaded
 
+        [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
+        json_auction = auction
+        |> Auctions.fully_loaded
+        |> Poison.encode!
 
-        render(conn, "edit.html", auction: auction, changeset: changeset, ports: ports, vessels: vessels, fuels: fuels)
+        render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
     end
+  end
+
+  defp auction_inputs_by_buyer(conn) do
+    buyer = Auth.current_user(conn)
+    fuels = Auctions.list_fuels()
+    ports = Auctions.ports_for_company(buyer.company)
+    vessels = Auctions.vessels_for_buyer(buyer)
+    Enum.map([fuels, ports, vessels], fn(list) ->
+      list |> Poison.encode!
+    end)
   end
 end

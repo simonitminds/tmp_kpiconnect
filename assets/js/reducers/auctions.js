@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
-import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "../constants/auctions";
+import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "../constants";
 
 const initialState = {
   auctions: [],
