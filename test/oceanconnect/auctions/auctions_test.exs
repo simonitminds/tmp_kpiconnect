@@ -169,18 +169,20 @@ defmodule Oceanconnect.AuctionsTest do
   describe "port and company relationship" do
     setup do
       [port1, port2] = insert_list(2, :port)
-      [company1, company2, company3] = insert_list(3, :company)
+      [company1, company2, company3] = insert_list(3, :company, is_supplier: true)
+      company4 = insert(:company)
       company1 |> Oceanconnect.Accounts.add_port_to_company(port1)
       company2 |> Oceanconnect.Accounts.set_ports_on_company([port1, port2])
       company3 |> Oceanconnect.Accounts.add_port_to_company(port2)
+      company4 |> Oceanconnect.Accounts.add_port_to_company(port1)
       {:ok, %{p1: port1, p2: port2, c1: company1, c2: company2, c3: company3}}
     end
 
-    test "companies_for_port/1 returns companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
-      companies = Auctions.companies_for_port(p1)
+    test "supplier_companies_for_port/1 returns only supplier companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
+      companies = Auctions.supplier_companies_for_port(p1)
       assert Enum.all?(companies, fn(c) -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.supplier_companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
     end
 
     test "ports_for_company/1 returns ports for given company", %{p1: p1, p2: p2, c1: c1, c2: c2} do

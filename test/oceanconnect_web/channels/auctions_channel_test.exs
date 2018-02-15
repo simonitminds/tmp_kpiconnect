@@ -6,7 +6,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
   setup do
     buyer_company = insert(:company)
     insert(:user, company: buyer_company)
-    supplier_company = insert(:company)
+    supplier_company = insert(:company, is_supplier: true)
     insert(:user, company: supplier_company)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)

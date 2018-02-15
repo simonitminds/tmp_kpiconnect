@@ -16,6 +16,7 @@ defmodule Oceanconnect.Accounts.Company do
     field :main_phone, :string
     field :mobile_phone, :string
     field :postal_code, :integer
+    field :is_supplier, :boolean, default: false
     has_many :users, Oceanconnect.Accounts.User, on_replace: :delete
     has_many :vessels, Oceanconnect.Auctions.Vessel, on_replace: :delete
     many_to_many :ports, Oceanconnect.Auctions.Port, join_through: "company_ports", on_replace: :delete
@@ -36,7 +37,8 @@ defmodule Oceanconnect.Accounts.Company do
     :email,
     :main_phone,
     :mobile_phone,
-    :postal_code
+    :postal_code,
+    :is_supplier
   ]
 
   @doc false

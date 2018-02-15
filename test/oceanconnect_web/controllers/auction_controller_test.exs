@@ -11,8 +11,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     buyer = insert(:user, company: buyer_company)
     vessel = insert(:vessel, company: buyer_company)
     fuel = insert(:fuel)
-    port = insert(:port, companies: [buyer_company])
-    auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
+    supplier_company = insert(:company, is_supplier: true)
+    port = insert(:port, companies: [buyer_company, supplier_company])
+    auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port, suppliers: [supplier_company])
     |> Oceanconnect.Utilities.maybe_convert_date_times
     authed_conn = login_user(build_conn(), buyer)
     auction = insert(:auction, vessel: vessel)

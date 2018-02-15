@@ -8,7 +8,7 @@ defmodule Oceanconnect.AuctionIndexTest do
     buyer_company = insert(:company)
     buyer = insert(:user, company: buyer_company)
     login_user(buyer)
-    supplier_company = insert(:company)
+    supplier_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     auctions = insert_list(2, :auction, buyer: buyer_company, suppliers: [supplier_company])
     {:ok, %{auctions: auctions, supplier: supplier}}

@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Repo
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
-  alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
   def list_auctions do
@@ -224,10 +224,10 @@ defmodule Oceanconnect.Auctions do
     |> Map.get(:ports)
   end
 
-  def companies_for_port(port = %Port{}) do
-    port
-    |> Repo.preload(:companies)
-    |> Map.get(:companies)
+  def supplier_companies_for_port(%Port{id: id}) do
+    id
+    |> Port.suppliers_for_port_id
+    |> Repo.all
   end
 
   @doc """
