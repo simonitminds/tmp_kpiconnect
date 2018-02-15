@@ -112,7 +112,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_date')} />
                   </div>
-                  <div className="control">
+                  <div className="control has-margin-left-sm">
                     <TimeInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_time')} />
                   </div>
                 </div>
@@ -133,7 +133,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_date')} />
                   </div>
-                  <div className="control">
+                  <div className="control has-margin-left-sm">
                     <TimeInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_time')} />
                   </div>
                 </div>
@@ -242,7 +242,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_date')} />
                   </div>
-                  <div className="control">
+                  <div className="control has-margin-left-sm">
                     <TimeInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_time')} />
                   </div>
                 </div>

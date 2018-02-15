@@ -24,7 +24,7 @@ export default class TimeInput extends React.Component {
     } = this.props;
 
     return(
-      <div className={`control qa-${model}-${field}_time`}>
+      <div className={`qa-${model}-${field}_time`}>
         <TimePicker
           id={`${model}_${field}_time`}
           value={this.state.time || "00:00"}

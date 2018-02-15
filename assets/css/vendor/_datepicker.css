@@ -6,8 +6,8 @@
   height: 100%;
   text-align: center;
   background: 0 0;
-  border: 2px solid #00a699;
-  color: #00a699;
+  border: 2px solid $teal;
+  color: $teal;
   padding: 4px 12px;
   margin-right: 8px;
   font: inherit;
@@ -23,7 +23,7 @@
 }
 .PresetDateRangePicker_button__selected {
   color: #fff;
-  background: #00a699
+  background: $teal
 }
 .SingleDatePicker {
   position: relative;
@@ -272,9 +272,7 @@
 }
 .DayPicker_weekHeader_ul {
   list-style: none;
-  margin: 1px 0;
-  padding-left: 0;
-  padding-right: 0;
+  margin: 1px 0 !important;
   font-size: 14px
 }
 .DayPicker_weekHeader_li {
@@ -326,7 +324,7 @@
 }
 .DayPickerKeyboardShortcuts_show__bottomRight {
   border-top: 26px solid transparent;
-  border-right: 33px solid #00a699;
+  border-right: 33px solid $teal;
   bottom: 0;
   right: 0
 }
@@ -335,7 +333,7 @@
 }
 .DayPickerKeyboardShortcuts_show__topRight {
   border-bottom: 26px solid transparent;
-  border-right: 33px solid #00a699;
+  border-right: 33px solid $teal;
   top: 0;
   right: 0
 }
@@ -344,7 +342,7 @@
 }
 .DayPickerKeyboardShortcuts_show__topLeft {
   border-bottom: 26px solid transparent;
-  border-left: 33px solid #00a699;
+  border-left: 33px solid $teal;
   top: 0;
   left: 0
 }
@@ -463,13 +461,13 @@
   user-select: none
 }
 .DayPickerNavigation_button__default {
-  border: 1px solid #e4e7e7;
+  border-bottom: 1px solid #dbdbdb !important;
   background-color: #fff;
-  color: #757575
+  color: #757575;
 }
 .DayPickerNavigation_button__default:focus,
 .DayPickerNavigation_button__default:hover {
-  border: 1px solid #c4c4c4
+  border-bottom: 1px solid #dbdbdb !important;
 }
 .DayPickerNavigation_button__default:active {
   background: #f2f2f2
@@ -584,7 +582,9 @@
   cursor: default
 }
 .CalendarDay__default {
-  border: 1px solid #e4e7e7;
+  border: 1px solid $white !important;
+  border-width: 1px !important;
+  border-bottom-color: #e4e7e7 !important;
   color: #565a5c;
   background: #fff
 }
@@ -634,13 +634,13 @@
   color: #fff
 }
 .CalendarDay__last_in_range {
-  border-right: #00a699
+  border-right: $teal
 }
 .CalendarDay__selected,
 .CalendarDay__selected:active,
 .CalendarDay__selected:hover {
-  background: #00a699;
-  border: 1px solid #00a699;
+  background: $teal;
+  border: 1px solid $teal;
   color: #fff
 }
 .CalendarDay__hovered_span,
