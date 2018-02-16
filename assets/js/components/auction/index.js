@@ -56,7 +56,7 @@ export default class AuctionsIndex extends React.Component {
               className="qa-auction-time_remaining"
               id="time-remaining"
             >
-              {formatTimeRemaining(auction, auctionTimer)}
+              {formatTimeRemaining(auction, auctionTimer, "index")}
             </span>
           </span>
         );

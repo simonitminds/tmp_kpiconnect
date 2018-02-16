@@ -45,18 +45,19 @@ export function timeRemainingCountdown(auction, clientTime) {
   }
 }
 
-export function formatTimeRemaining(auction, timeRemaining) {
+export function formatTimeRemaining(auction, timeRemaining, page) {
   const status = _.get(auction, 'state.status');
-
-  if (timeRemaining && status === "open") {
-    const mins = Math.floor(timeRemaining / 60000);
-    const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
-    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in auction`;
+  let message;
+  switch (`${status}-${page}`) {
+    case "open-show": {message = "remaining in auction"; break;}
+    case "open-index": {message = "remaining"; break;}
+    case "decision-show": {message = "remaining in decision period"; break;}
+    case "decision-index": {message = "remaining"; break;}
   }
-  else if (timeRemaining && status == "decision") {
+  if (timeRemaining && timeRemaining != 0) {
     const mins = Math.floor(timeRemaining / 60000);
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
-    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} remaining in decision period`;
+    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} ${message}`;
   } else {
     if (timeRemaining === 0) {
       return "Auction Closed"

@@ -72,7 +72,7 @@ export default class AuctionShow extends React.Component {
                     <div className="auction-header__timer has-text-left-mobile">
                       <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auction, this.state.timeRemaining)}`}>
                         <span className="qa-auction-time_remaining" id="time-remaining">
-                          {formatTimeRemaining(auction, this.state.timeRemaining)}
+                          {formatTimeRemaining(auction, this.state.timeRemaining, "show")}
                         </span>
                       </div>
                     </div>
