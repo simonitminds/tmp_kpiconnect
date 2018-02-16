@@ -30,6 +30,7 @@ export default class TimeInput extends React.Component {
           value={this.state.time || "00:00"}
           showSecond={false}
           minuteStep={5}
+          allowEmpty={false}
           onChange={value => {
               onChange(value);
               this.setState({ time: value });
