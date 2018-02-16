@@ -3,7 +3,13 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionForm from '../components/auction/AuctionForm';
-import { receiveAuctionFormData, updateDate, updateInformation } from '../actions';
+import { receiveAuctionFormData,
+         updateDate,
+         updateInformation,
+         toggleSupplier,
+         selectAllSuppliers,
+         deselectAllSuppliers,
+         selectPort } from '../actions';
 
 const mapStateToProps = (state, props) => {
   return {
@@ -17,13 +23,20 @@ const mapStateToProps = (state, props) => {
     fuels: state.auctionFormReducer.fuels || props.fuels,
     ports: state.auctionFormReducer.ports || props.ports,
     vessels: state.auctionFormReducer.vessels || props.vessels,
-    loading: state.auctionFormReducer.loading
-  }
+    loading: state.auctionFormReducer.loading,
+    suppliers: state.auctionFormReducer.suppliers,
+    selected_suppliers: state.auctionFormReducer.selected_suppliers
+  };
 };
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  ...bindActionCreators({ updateDate, updateInformation }, dispatch)
+  ...bindActionCreators({ updateDate,
+                          updateInformation,
+                          toggleSupplier,
+                          selectAllSuppliers,
+                          deselectAllSuppliers,
+                          selectPort }, dispatch)
 });
 
 export class AuctionFormContainer extends React.Component {

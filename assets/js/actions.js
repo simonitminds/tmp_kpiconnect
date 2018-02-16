@@ -6,10 +6,15 @@ import socket from "./socket";
 
 import {
   RECEIVE_AUCTIONS,
-  RECIEVE_AUCTION_FORM_DATA,
+  RECEIVE_AUCTION_FORM_DATA,
   UPDATE_AUCTION_STATE,
   UPDATE_DATE,
-  UPDATE_INFORMATION
+  UPDATE_INFORMATION,
+  TOGGLE_SUPPLIER,
+  SELECT_ALL_SUPPLIERS,
+  DESELECT_ALL_SUPPLIERS,
+  SELECT_PORT,
+  RECEIVE_SUPPLIERS
 } from "./constants";
 
 let channel;
@@ -46,13 +51,29 @@ export function getAllAuctions() {
   };
 }
 
+export function selectPort(port) {
+  return dispatch => {
+    fetch(`/api/port/${port.id}/suppliers`, { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveSuppliers(port, response.data));
+      });
+  };
+}
 export function receiveAuctions(auctions) {
   return {type: RECEIVE_AUCTIONS,
           auctions: auctions};
 }
 
+export function receiveSuppliers(port, suppliers) {
+  return {type: RECEIVE_SUPPLIERS,
+          port: port,
+          suppliers: suppliers};
+}
+
 export function receiveAuctionFormData(auction, fuels, ports, vessels) {
-  return {type: RECIEVE_AUCTION_FORM_DATA,
+  return {type: RECEIVE_AUCTION_FORM_DATA,
           data: {
             auction,
             fuels,
@@ -78,6 +99,23 @@ export function updateDate(property, value) {
             'value': _.get(value, 'target.value', value)
           }
         };
+}
+export function toggleSupplier(supplier) {
+  return {
+           type: TOGGLE_SUPPLIER,
+           data: {supplier: supplier}
+         };
+}
+
+export function selectAllSuppliers() {
+  return {
+    type: SELECT_ALL_SUPPLIERS
+  };
+}
+export function deselectAllSuppliers() {
+  return {
+    type: DESELECT_ALL_SUPPLIERS
+  };
 }
 
 function checkStatus(response) {

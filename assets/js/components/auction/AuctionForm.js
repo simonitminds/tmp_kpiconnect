@@ -7,6 +7,10 @@ import CheckBoxField from '../CheckBoxField';
 import DateInput from '../DateInput';
 import TimeInput from '../TimeInput';
 import { portLocalTime } from '../../utilities';
+import SupplierList  from './SupplierList'
+ 
+
+
 
 const AuctionForm = (props) => {
   const {
@@ -20,6 +24,7 @@ const AuctionForm = (props) => {
     fuels,
     ports,
     suppliers,
+    selected_suppliers,
     vessels,
     updateDate,
     updateInformation
@@ -33,8 +38,7 @@ const AuctionForm = (props) => {
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={moment(auction.etd).utc()} />
 
       <section className="auction-info"> {/* Vessel info */}
-        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
-          <div className="content">
+        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg"> <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Vessel</legend>
               <div className="field is-horizontal">
@@ -104,7 +108,9 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-              <div className="field is-horizontal">
+              <SupplierList suppliers={suppliers} selected-suppliers={selected_suppliers} />
+
+              <div className="field is-horizontal is-grouped">
                 <div className="field-label">
                   <label className="label">ETA</label>
                 </div>

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment from 'moment';
 import { replaceListItem } from "../utilities";
-import { RECIEVE_AUCTION_FORM_DATA, UPDATE_DATE, UPDATE_INFORMATION } from "../constants";
+import { RECEIVE_AUCTION_FORM_DATA, UPDATE_DATE, UPDATE_INFORMATION } from "../constants";
 
 const initialState = {
   auction: null,
@@ -27,7 +27,7 @@ const setUTCDateTime = (dateTime) => {
 
 export default function(state, action) {
   switch(action.type) {
-    case RECIEVE_AUCTION_FORM_DATA: {
+    case RECEIVE_AUCTION_FORM_DATA: {
       if(_.isEmpty(action.data)) {
         return state;
       } else {
