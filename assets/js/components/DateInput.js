@@ -25,7 +25,6 @@ export default class DateInput extends React.Component {
     const {
       model, field, labelText, value, onChange
     } = this.props;
-    const date = moment(value);
 
     return(
       <div>
@@ -37,7 +36,9 @@ export default class DateInput extends React.Component {
             id={`${model}_${field}_date`}
             date={this.state.date}
             onDateChange={date => {
-                onChange(date);
+                if (date) {
+                  onChange(date);
+                }
                 this.setState({ date });
               }
             }
