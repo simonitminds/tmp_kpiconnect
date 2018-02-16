@@ -11,6 +11,11 @@ defmodule OceanconnectWeb.SessionView do
   end
   def current_user_id(_conn), do: ""
 
+  def current_company(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
+    user.company.name
+  end
+  def current_company(_conn), do: ""
+
   def log_in_logout_link(conn) do
     if current_user(conn) != "" do
       link("Log Out", to: session_path(conn, :delete), method: :delete, class: "navbar-item")

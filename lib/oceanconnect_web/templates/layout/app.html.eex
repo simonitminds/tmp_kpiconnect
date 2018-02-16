@@ -30,7 +30,10 @@
         <div class="navbar-menu">
           <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
-            <span class="navbar-item has-text-weight-bold"><%= OceanconnectWeb.SessionView.current_user(@conn) %><i class="is-size-6 is-block has-margin-left-sm">(<%= @current_user.company.name %>)</i></span>
+            <span class="navbar-item has-text-weight-bold">
+              <%= OceanconnectWeb.SessionView.current_user(@conn) %>
+              <i class="is-size-6 is-block has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
+            </span>
             <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
             <a href="#" class="navbar-item">Log Out</a> -->

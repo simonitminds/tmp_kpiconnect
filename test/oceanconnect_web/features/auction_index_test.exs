@@ -35,6 +35,8 @@ defmodule Oceanconnect.AuctionIndexTest do
     in_browser_session "supplier_session", fn ->
       assert AuctionIndexPage.is_current_path?()
       assert AuctionIndexPage.auction_is_status(auction, "open")
+      :timer.sleep(500)
+      assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
     end
   end
 end

@@ -19,6 +19,14 @@ defmodule Oceanconnect.FeatureCase do
         NewSessionPage.enter_credentials(user.email, user.password)
         NewSessionPage.submit()
       end
+
+      def convert_to_millisecs(time_remaining) do
+        time = String.slice(time_remaining, 0..4)
+        case String.split(time, ":") do
+          [mins, secs] -> (String.to_integer(mins) * 60 + String.to_integer(secs)) * 1_000
+          _ -> time_remaining
+        end
+      end
     end
   end
 

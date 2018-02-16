@@ -21,6 +21,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
      assert AuctionShowPage.is_current_path?(auction.id)
      assert AuctionShowPage.auction_status == "OPEN"
+     assert AuctionShowPage.time_remaining() |> convert_to_millisecs < auction.duration
    end
 
   # TODO: Make this pass

@@ -21,4 +21,9 @@ defmodule Oceanconnect.AuctionShowPage do
       text == v
     end)
   end
+
+  def time_remaining() do
+    find_element(:css, ".qa-auction-time_remaining")
+    |> Hound.Helpers.Element.inner_text
+  end
 end

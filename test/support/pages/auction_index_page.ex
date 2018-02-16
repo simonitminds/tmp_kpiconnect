@@ -32,4 +32,9 @@ defmodule Oceanconnect.AuctionIndexPage do
     |> inner_text()
     String.downcase(actual_status) == status
   end
+
+  def time_remaining() do
+    find_element(:css, ".qa-auction-time_remaining")
+    |> Hound.Helpers.Element.inner_text
+  end
 end
