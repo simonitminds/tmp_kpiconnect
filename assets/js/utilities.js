@@ -70,10 +70,10 @@ export function formatTimeRemainingColor(auction, timeRemaining) {
   const status = _.get(auction, 'state.status');
 
   if (timeRemaining && status === "open") {
-    if (timeRemaining <= 60001) {
+    if (timeRemaining <= 480001) { // 60001 traditionally...
       return `under-1`;
     }
-    else if (timeRemaining <= 180001) {
+    else if (timeRemaining <= 540001) { // 180001 traditionally...
       return `under-3`;
     }
     else {

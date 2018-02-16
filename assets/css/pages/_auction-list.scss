@@ -42,18 +42,20 @@
 
   &__time-remaining {
     display: inline-block;
+    background-color: $gray-3 !important;
     height: 1.7rem;
-    padding: 0.1rem 0.65rem 0 0.5rem;
+    padding: 0.1rem 1rem 0 0.5rem;
     margin-left: 0.75rem;
     margin-right: -1rem;
     border-top-right-radius: 0.85rem;
     border-bottom-right-radius: 0.85rem;
+    transition: all 0.2s ease-in;
 
     // Color Auction Status tags based on... auction status.
-    &--under-3 { background-color: $danger !important; }
-    &--under-7 { background-color: $gold !important; }
-    &--open { background-color: $gray-3 !important; }
-    &--decision { background-color: $gray-3 !important; }
+    &--under-1 { background-color: $danger !important; width: 230px !important;}
+    &--under-3 { background-color: $gold !important; width: 230px !important;}
+    &--active { background-color: $gray-3 !important; width: 230px !important;}
+    &--decision { background-color: $gray-3 !important; width: 230px !important;}
     &--pending { background-color: $gray-2 !important; color: $black !important;}
     &--completed { background-color: $gray-1 !important; }
     &--closed { background-color: $gray-2 !important; color: $black !important;}

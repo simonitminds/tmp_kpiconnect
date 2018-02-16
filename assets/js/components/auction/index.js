@@ -50,10 +50,10 @@ export default class AuctionsIndex extends React.Component {
       const auctionTimer = timeRemaining[auction.id];
       if (auctionStatus == "open" || auctionStatus == "decision") {
         return (
-          <span className="auction-card__time-remaining auction-card__time-remaining--open">
+          <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auction, auctionTimer)}`}>
             <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
             <span
-              className={`qa-auction-time_remaining auction-timer auction-timer--${formatTimeRemainingColor(auction, auctionTimer)}`}
+              className="qa-auction-time_remaining"
               id="time-remaining"
             >
               {formatTimeRemaining(auction, auctionTimer)}
