@@ -20,7 +20,7 @@ defmodule OceanconnectWeb.Router do
   # Other scopes may use custom stacks.
   scope "/api", OceanconnectWeb.Api do
     pipe_through :api
-    get "/auctions", AuctionController, :index
+    get "/auctions", AuctionController, :index, as: :auction_api
     get "/ports/:port_id/suppliers", PortSupplierController, :index
   end
 

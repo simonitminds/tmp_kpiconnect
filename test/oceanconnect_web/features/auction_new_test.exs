@@ -13,7 +13,7 @@ defmodule Oceanconnect.AuctionNewTest do
     insert(:vessel)
     port = insert(:port, companies: [buyer_company])
     selected_vessel = hd(buyer_vessels)
-    supplier_company = insert(:company, is_supplier: true)
+    _supplier_company = insert(:company, is_supplier: true)
 
     auction_params = %{
       auction_start_date: DateTime.utc_now(),
