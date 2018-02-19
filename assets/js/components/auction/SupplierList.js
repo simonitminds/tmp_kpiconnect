@@ -31,18 +31,28 @@ const SupplierList = (props) => {
       <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
         <div className="content"> <fieldset> <legend className="subtitle is-4">Invited Suppliers</legend>
             <p className="has-text-weight-bold is-5 has-margin-bottom-sm">{portLabel()}</p>
-            { _.map(suppliers, (supplier) => {
-                return(
-                  <div className="invite-selector is-rounded" key={supplier.id}>
-                    <label className="invite-selector__checkbox" htmlFor={`invite-${supplier.id}`}>
-                      <input type="checkbox" name={`auction[suppliers][supplier-${supplier.id}]`} id={`invite-${supplier.id}`} value={supplier.id} checked={!!isSelected(supplier.id)} onChange={onToggleSupplier.bind(this, supplier.id)}/>
-                      <span className="invite-selector__facade"></span>
-                      <span className="invite-selector__label">{supplier.name}</span>
-                    </label>
-                  </div>
-                );
-              })
-            }
+            <div className="qa-auction-suppliers">
+              { _.map(suppliers, (supplier) => {
+                  return(
+                    <div className="invite-selector is-rounded" key={supplier.id}>
+                      <label className="invite-selector__checkbox" htmlFor={`invite-${supplier.id}`}>
+                        <input
+                          type="checkbox"
+                          className={`qa-auction-supplier-${supplier.id}`}
+                          name={`auction[suppliers][supplier-${supplier.id}]`}
+                          id={`invite-${supplier.id}`}
+                          value={supplier.id}
+                          checked={!!isSelected(supplier.id)}
+                          onChange={onToggleSupplier.bind(this, supplier.id)}
+                        />
+                        <span className="invite-selector__facade"></span>
+                        <span className="invite-selector__label">{supplier.name}</span>
+                      </label>
+                    </div>
+                  );
+                })
+              }
+            </div>
             <div className="field has-addons">
               <div className="control">
                 <a id="selectAllSellers" className="button" onClick={onSelectAllSuppliers}>

@@ -56,18 +56,21 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    auction = Auctions.get_auction!(id)
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
     changeset = Auctions.change_auction(auction)
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
     json_auction = auction
-    |> Auctions.fully_loaded
     |> Poison.encode!
 
     render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
-    auction = Auctions.get_auction!(id)
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
     auction_params = Auction.from_params(auction_params)
 
     case Auctions.update_auction(auction, auction_params) do
