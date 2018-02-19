@@ -1,4 +1,5 @@
 defmodule Oceanconnect.Auctions.Auction do
+  import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
@@ -54,7 +55,13 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)
+    |> maybe_add_suppliers(attrs)
   end
+
+  def maybe_add_suppliers(changeset, attrs = %{"suppliers" => suppliers}) do
+    put_assoc(changeset, :suppliers, suppliers)
+  end
+  def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def from_params(params) do
     params
@@ -63,6 +70,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
+    |> maybe_convert_suppliers("suppliers")
   end
 
   def maybe_parse_date_field(params, key) do
@@ -79,6 +87,17 @@ defmodule Oceanconnect.Auctions.Auction do
       %{^key => duration} ->
         updated_duration = parse_duration(duration) * 60_000
         Map.put(params, key, updated_duration)
+      _ -> params
+    end
+  end
+
+  def maybe_convert_suppliers(params, "suppliers") do
+    case params do
+      %{"suppliers" => suppliers} ->
+        supplier_ids = Enum.map(suppliers, fn({_key, supplier_id}) -> String.to_integer(supplier_id) end)
+        query = from c in Oceanconnect.Accounts.Company,
+          where: c.id in ^supplier_ids
+        Map.put(params, "suppliers", Oceanconnect.Repo.all(query))
       _ -> params
     end
   end

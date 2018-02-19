@@ -13,11 +13,13 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     fuel = insert(:fuel)
     supplier_company = insert(:company, is_supplier: true)
     port = insert(:port, companies: [buyer_company, supplier_company])
-    auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port, suppliers: [supplier_company])
+    auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
     |> Oceanconnect.Utilities.maybe_convert_date_times
+    |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
     authed_conn = login_user(build_conn(), buyer)
     auction = insert(:auction, vessel: vessel)
-    {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction, buyer: buyer_company}
+    {:ok, conn: authed_conn, valid_auction_params: auction_params,
+          auction: auction, buyer: buyer_company, supplier: supplier_company}
   end
 
   describe "index" do
@@ -64,7 +66,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
 
-    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, buyer: buyer} do
+    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, buyer: buyer, supplier: supplier} do
       updated_params = valid_auction_params
       |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
       |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
@@ -72,10 +74,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
+      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload([:vessel, :suppliers])
       conn = get conn, auction_path(conn, :show, id)
       assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == buyer.id
+      assert List.first(auction.suppliers).id == supplier.id
     end
 
     #TODO Refactor test to assert on specific errors

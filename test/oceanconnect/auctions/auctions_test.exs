@@ -20,12 +20,27 @@ defmodule Oceanconnect.AuctionsTest do
       epoch = expected_date
       |> DateTime.to_unix(:milliseconds)
       |> Integer.to_string
-      params = %{"anonymous_bidding" => "false",
-      "auction_start" => epoch, "company" => "", "duration" => "",
-      "eta" => "", "etd" => "", "po" => "", "port" => "", "vessel" => ""}
+      params = %{"auction_start" => epoch}
       %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
 
       assert parsed_date == expected_date |> DateTime.to_string()
+    end
+
+    test "#maybe_convert_duration" do
+      params = %{"duration" => "10", "decision_duration" => "15"}
+      %{ "duration" => duration } = Auction.maybe_convert_duration(params, "duration")
+      %{ "decision_duration" => decision_duration } = Auction.maybe_convert_duration(params, "decision_duration")
+
+      assert duration == 10 * 60_000
+      assert decision_duration == 15 * 60_000
+    end
+
+    test "#maybe_convert_suppliers" do
+      supplier = insert(:company, is_supplier: true)
+      params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
+      %{ "suppliers" => suppliers } = Auction.maybe_convert_suppliers(params, "suppliers")
+
+      assert List.first(suppliers).id == supplier.id
     end
 
     test "list_auctions/0 returns all auctions", %{auction: auction} do
