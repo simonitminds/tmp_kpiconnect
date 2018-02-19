@@ -19,7 +19,7 @@ const SupplierList = (props) => {
   };
 
   const isSelected = (id) => {
-    if(id in selectedSuppliers) {
+    if(_.includes(selectedSuppliers, id)) {
       return true;
     } else {
       return false;
@@ -34,7 +34,7 @@ const SupplierList = (props) => {
                 return(
                   <div className="invite-selector is-rounded" key={supplier.id}>
                     <label className="invite-selector__checkbox" htmlFor={`invite-${supplier.id}`}>
-                      <input type="checkbox" id={`invite-${supplier.id}`} checked={isSelected(supplier.id)} onChange={onToggleSupplier.bind(this, supplier.id)}/>
+                      <input type="checkbox" id={`invite-${supplier.id}`} checked={!!isSelected(supplier.id)} onChange={onToggleSupplier.bind(this, supplier.id)}/>
                       <span className="invite-selector__facade"></span>
                       <span className="invite-selector__label">{supplier.name}</span>
                     </label>
