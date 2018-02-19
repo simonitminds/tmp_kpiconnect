@@ -52,11 +52,11 @@
     transition: all 0.2s ease-in;
 
     // Color Auction Status tags based on... auction status.
-    &--under-1 { background-color: $danger !important; width: 230px !important;}
-    &--under-3 { background-color: $gold !important; width: 230px !important;}
-    &--active { background-color: $gray-3 !important; width: 230px !important;}
-    &--decision { background-color: $gray-3 !important; width: 230px !important;}
-    &--pending { background-color: $gray-2 !important; color: $black !important;}
+    &--under-1 { background-color: $danger !important; width: 150px !important;}
+    &--under-3 { background-color: $gold !important; width: 150px !important;}
+    &--active { background-color: $gray-3 !important; width: 150px !important;}
+    &--in-decision { background-color: $gray-3 !important; width: 150px !important;}
+    &--inactive { background-color: $gray-2 !important; color: $black !important;}
     &--completed { background-color: $gray-1 !important; }
     &--closed { background-color: $gray-2 !important; color: $black !important;}
 

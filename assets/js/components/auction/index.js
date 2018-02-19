@@ -63,7 +63,7 @@ export default class AuctionsIndex extends React.Component {
       }
       else {
         return (
-          <span className="auction-card__time-remaining auction-card__time-remaining--open">
+          <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auction, auctionTimer)}`}>
             <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
             {cardDateFormat(auction.auction_start)}
           </span>
