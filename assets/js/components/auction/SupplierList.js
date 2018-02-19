@@ -25,6 +25,7 @@ const SupplierList = (props) => {
       return false;
     }
   }
+  if(!_.isEmpty(suppliers)){
   return(
     <section className="auction-info">
       <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
@@ -34,7 +35,7 @@ const SupplierList = (props) => {
                 return(
                   <div className="invite-selector is-rounded" key={supplier.id}>
                     <label className="invite-selector__checkbox" htmlFor={`invite-${supplier.id}`}>
-                      <input type="checkbox" id={`invite-${supplier.id}`} checked={!!isSelected(supplier.id)} onChange={onToggleSupplier.bind(this, supplier.id)}/>
+                      <input type="checkbox" name={`auction[suppliers][supplier-${supplier.id}]`} id={`invite-${supplier.id}`} value={supplier.id} checked={!!isSelected(supplier.id)} onChange={onToggleSupplier.bind(this, supplier.id)}/>
                       <span className="invite-selector__facade"></span>
                       <span className="invite-selector__label">{supplier.name}</span>
                     </label>
@@ -65,6 +66,20 @@ const SupplierList = (props) => {
       </div>
     </section>
   );
+  } else {
+    return(<div>
+      <section className="auction-info">
+        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+          <div className="content">
+            <fieldset>
+              <legend className="subtitle is-4">Invited Suppliers</legend>
+              <i> Select Port to invite Suppliers</i>
+            </fieldset>
+          </div>
+        </div>
+      </section>
+    </div>)
+  }
 };
 
 export default SupplierList;
