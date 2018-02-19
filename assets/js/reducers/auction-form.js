@@ -39,6 +39,7 @@ export default function(state, action) {
       if(_.isEmpty(action.data)) {
         return state;
       } else {
+        const supplierList = _.map(action.data.auction.suppliers, 'id');
         return {
           ...state,
           auction: action.data.auction,
@@ -48,6 +49,7 @@ export default function(state, action) {
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
           etd_time: setUTCDateTime(action.data.auction.etd),
+          selectedSuppliers: supplierList,
           fuels: action.data.fuels,
           ports: action.data.ports,
           vessels: action.data.vessels,
