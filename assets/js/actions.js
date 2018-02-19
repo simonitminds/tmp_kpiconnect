@@ -55,6 +55,9 @@ export function selectPort(event) {
 }
 
 export function setPort(port_id) {
+  return fetchSuppliers(port_id);
+}
+export function fetchSuppliers(port_id) {
   return dispatch => {
     fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
       .then(checkStatus)
@@ -64,6 +67,7 @@ export function setPort(port_id) {
       });
   };
 }
+
 export function receiveAuctions(auctions) {
   return {type: RECEIVE_AUCTIONS,
           auctions: auctions};

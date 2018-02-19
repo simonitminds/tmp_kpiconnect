@@ -87,7 +87,7 @@ export default function(state, action) {
     case RECEIVE_SUPPLIERS: {
       const port_id = parseInt(action.port);
       const suppliers = action.suppliers;
-      return {...state, auction: {...state.auction, port_id: port_id}, suppliers: suppliers};
+      return {...state, auction: {...state.auction, port_id: port_id}, suppliers: suppliers, selectedSuppliers: []};
     }
     case TOGGLE_SUPPLIER: {
       const supplier_id = action.data.supplier_id;
