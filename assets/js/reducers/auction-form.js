@@ -1,7 +1,14 @@
 import _ from "lodash";
 import moment from 'moment';
 import { replaceListItem } from "../utilities";
-import { RECEIVE_AUCTION_FORM_DATA, UPDATE_DATE, UPDATE_INFORMATION } from "../constants";
+import { RECEIVE_AUCTION_FORM_DATA,
+         UPDATE_DATE,
+         UPDATE_INFORMATION,
+         RECEIVE_SUPPLIERS,
+         SELECT_ALL_SUPPLIERS,
+         TOGGLE_SUPPLIER,
+         DESELECT_ALL_SUPPLIERS,
+ } from "../constants";
 
 const initialState = {
   auction: null,
@@ -14,7 +21,8 @@ const initialState = {
   fuels: null,
   ports: null,
   vessels: null,
-  loading: true
+  loading: true,
+  selectedSuppliers: []
 };
 
 const setUTCDateTime = (dateTime) => {
@@ -51,10 +59,10 @@ export default function(state, action) {
       const property = action.data.property;
       const split_property = _.split(property, '.');
       if (split_property.length === 2) {
-        return {...state, [split_property[0]]: {...state[split_property[0]], [split_property[1]]: action.data.value}}
+        return {...state, [split_property[0]]: {...state[split_property[0]], [split_property[1]]: action.data.value}};
       } else {
         return { ...state,
-          [property]: action.data.value,
+                 [property]: action.data.value,
         };
       }
     }
@@ -72,7 +80,33 @@ export default function(state, action) {
         [auctionProperty + "_date"]: value,
         [auctionProperty + "_time"]: value,
         auction: { ...state.auction, [auctionProperty]: value}
+      };
+    }
+    case RECEIVE_SUPPLIERS: {
+      const port_id = parseInt(action.port);
+      const suppliers = action.suppliers;
+      return {...state, auction: {...state.auction, port_id: port_id}, suppliers: suppliers};
+    }
+    case TOGGLE_SUPPLIER: {
+      const supplier_id = action.data.supplier_id;
+      let newList;
+
+      if(_.includes(state.selectedSuppliers, supplier_id)) {
+        newList = replaceListItem(state.selectedSuppliers, supplier_id, null);
+      } else {
+        newList = [...state.selectedSuppliers, supplier_id];
       }
+      return {...state, selectedSuppliers: newList};
+    }
+    case SELECT_ALL_SUPPLIERS: {
+      if(state.suppliers) {
+        return {...state, selectedSuppliers: _.map(state.suppliers, 'id')};
+      } else {
+        return state;
+      }
+    }
+    case DESELECT_ALL_SUPPLIERS: {
+      return {...state, selectedSuppliers: []};
     }
     default: {
       return state || initialState;

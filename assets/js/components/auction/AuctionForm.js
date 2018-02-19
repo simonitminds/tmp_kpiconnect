@@ -8,9 +8,6 @@ import DateInput from '../DateInput';
 import TimeInput from '../TimeInput';
 import { portLocalTime } from '../../utilities';
 import SupplierList  from './SupplierList'
- 
-
-
 
 const AuctionForm = (props) => {
   const {
@@ -23,14 +20,23 @@ const AuctionForm = (props) => {
     etd_time,
     fuels,
     ports,
-    suppliers,
-    selected_suppliers,
     vessels,
     updateDate,
-    updateInformation
+    updateInformation,
+    selectedSuppliers,
+    suppliers,
+    selectPort,
+    toggleSupplier,
+    selectAllSuppliers,
+    deselectAllSuppliers,
   } = props;
 
   const port_id = _.get(auction, 'port.id');
+  const selectedPort = _.chain(ports)
+                        .filter(['id', auction.port_id])
+                        .first()
+                        .value();
+
   return (
     <div>
       <input type="hidden" name="auction[auction_start]" className="qa-auction-auction_start" value={moment(auction.auction_start).utc()} />
@@ -91,8 +97,8 @@ const AuctionForm = (props) => {
                         id="auction_port_id"
                         name="auction[port_id]"
                         className="qa-auction-port_id"
-                        value={auction.port || ""}
-                        onChange={updateInformation.bind(this, 'auction.port')}
+                        value={auction.port_id || ""}
+                        onChange={selectPort.bind(this)}
                       >
                         <option disabled value="">
                           Please select
@@ -108,7 +114,12 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-              <SupplierList suppliers={suppliers} selected-suppliers={selected_suppliers} />
+              <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
+                            onSelectAllSuppliers={selectAllSuppliers}
+                            onToggleSupplier={toggleSupplier}
+                            selectedPort={selectedPort}
+                            selectedSuppliers={selectedSuppliers}
+                            suppliers={suppliers} />
 
               <div className="field is-horizontal is-grouped">
                 <div className="field-label">
@@ -188,8 +199,7 @@ const AuctionForm = (props) => {
                         ))}
                       </select>
                     </div>
-                  </div>
-                </div>
+                  </div> </div>
               </div>
 
               <InputField

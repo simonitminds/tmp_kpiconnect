@@ -1,4 +1,4 @@
-defmodule OceanconnectWeb.Api.AuctionApiView do
+defmodule OceanconnectWeb.Api.AuctionView do
   use OceanconnectWeb, :view
 
   def render("index.json", %{data: auctions}) do

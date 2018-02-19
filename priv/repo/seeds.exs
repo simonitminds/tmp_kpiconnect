@@ -49,7 +49,6 @@ Enum.map(companies, fn(c) ->
   end
 end)
 
-
 [
   %{name: "Algeciras", country: "Spain", gmt_offset: 1},
   %{name: "Balboa", country: "Panama", gmt_offset: -5},
@@ -177,4 +176,8 @@ auction = Repo.get_or_insert!(Auction, auction_params)
 
 Auctions.set_suppliers_for_auction(auction, suppliers)
 Accounts.set_ports_on_company(buyer_company, Auctions.list_ports())
+tl(companies)
+|> Enum.map(fn(company) ->
+  Accounts.set_ports_on_company(company, Auctions.list_ports())
+end)
 Accounts.set_vessels_on_company(buyer_company, Auctions.list_vessels())

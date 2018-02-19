@@ -1,4 +1,4 @@
-defmodule OceanconnectWeb.Api.AuctionApiController do
+defmodule OceanconnectWeb.Api.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
 

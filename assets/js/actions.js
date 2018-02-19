@@ -27,7 +27,6 @@ const defaultHeaders = {
   'Content-Type': 'application/json'
 };
 
-
 export function subscribeToAuctionUpdates() {
   return dispatch => {
     channel.join()
@@ -51,13 +50,14 @@ export function getAllAuctions() {
   };
 }
 
-export function selectPort(port) {
+export function selectPort(event) {
+  const port_id = event.target.value;
   return dispatch => {
-    fetch(`/api/port/${port.id}/suppliers`, { headers: defaultHeaders })
+    fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        return dispatch(receiveSuppliers(port, response.data));
+        return dispatch(receiveSuppliers(port_id, response.data));
       });
   };
 }
@@ -100,10 +100,10 @@ export function updateDate(property, value) {
           }
         };
 }
-export function toggleSupplier(supplier) {
+export function toggleSupplier(supplier_id) {
   return {
            type: TOGGLE_SUPPLIER,
-           data: {supplier: supplier}
+           data: {supplier_id: supplier_id}
          };
 }
 

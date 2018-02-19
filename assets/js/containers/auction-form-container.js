@@ -25,7 +25,7 @@ const mapStateToProps = (state, props) => {
     vessels: state.auctionFormReducer.vessels || props.vessels,
     loading: state.auctionFormReducer.loading,
     suppliers: state.auctionFormReducer.suppliers,
-    selected_suppliers: state.auctionFormReducer.selected_suppliers
+    selectedSuppliers: state.auctionFormReducer.selectedSuppliers
   };
 };
 
