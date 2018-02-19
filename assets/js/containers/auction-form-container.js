@@ -9,6 +9,7 @@ import { receiveAuctionFormData,
          toggleSupplier,
          selectAllSuppliers,
          deselectAllSuppliers,
+         setPort,
          selectPort } from '../actions';
 
 const mapStateToProps = (state, props) => {
@@ -42,6 +43,9 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionFormContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(receiveAuctionFormData(this.props.auction, this.props.fuels, this.props.ports, this.props.vessels));
+    if(this.props.auction.port) {
+      this.props.dispatch(setPort(this.props.auction.port.id));
+    }
   }
   componentDidMount() {
     this.dispatchItem();

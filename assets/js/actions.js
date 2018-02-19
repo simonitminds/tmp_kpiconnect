@@ -49,9 +49,12 @@ export function getAllAuctions() {
       });
   };
 }
-
 export function selectPort(event) {
   const port_id = event.target.value;
+  return setPort(port_id);
+}
+
+export function setPort(port_id) {
   return dispatch => {
     fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
       .then(checkStatus)
