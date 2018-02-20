@@ -104,7 +104,7 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-              <div className="field is-horizontal is-grouped">
+              <div className="field is-horizontal">
                 <div className="field-label">
                   <label className="label">ETA</label>
                 </div>
@@ -112,7 +112,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_date')} />
                   </div>
-                  <div className="control has-margin-left-sm">
+                  <div className="control">
                     <TimeInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_time')} />
                   </div>
                 </div>
@@ -125,7 +125,7 @@ const AuctionForm = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="field is-horizontal is-grouped">
+              <div className="field is-horizontal">
                 <div className="field-label">
                   <label className="label">ETD</label>
                 </div>
@@ -133,7 +133,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_date')} />
                   </div>
-                  <div className="control has-margin-left-sm">
+                  <div className="control">
                     <TimeInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_time')} />
                   </div>
                 </div>
@@ -234,7 +234,7 @@ const AuctionForm = (props) => {
                 onChange={updateInformation.bind(this, 'auction.po')}
               />
 
-              <div className="field is-horizontal is-grouped">
+              <div className="field is-horizontal">
                 <div className="field-label">
                   <label className="label">Auction Start</label>
                 </div>
@@ -242,7 +242,7 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <DateInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_date')} />
                   </div>
-                  <div className="control has-margin-left-sm">
+                  <div className="control">
                     <TimeInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_time')} />
                   </div>
                 </div>

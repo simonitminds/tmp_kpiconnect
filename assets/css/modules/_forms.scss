@@ -25,12 +25,17 @@
   &> .control:not(:last-child) {
     margin-bottom: 0.5rem;
   }
+}
 
-  .is-grouped { // Keeping time selects together in Create Auction
-    display: flex;
+.field.is-horizontal > .field-body { // Keeping time selects together in Create Auction
 
-    & .control:not(:last-child) {
-      margin-right: 0.75rem;
+  &> .control:not(:last-child) {
+    margin-right: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    &> .control:last-child {
+      margin-top: 0.5rem;
     }
   }
 }
