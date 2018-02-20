@@ -35,8 +35,7 @@ defmodule Oceanconnect.AuctionNewPage do
       # find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
       # |> inner_html
       # |> IO.inspect
-      find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
-      |> click
+      execute_script("document.getElementById('invite-#{supplier.id}').click();", [])
     end)
   end
   def fill_form_element(_key, element, "select", value) do
