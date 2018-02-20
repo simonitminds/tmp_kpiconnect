@@ -74,7 +74,7 @@ export default class AuctionsIndex extends React.Component {
     const AuctionCard = (auction) => (
       <div className="column is-one-third" key={auction.id}>
         <div className={`card qa-auction-${auction.id}`}>
-          <div className="card-content has-padding-bottom-md">
+          <div className="card-content">
             <div className="is-clearfix">
               {/* Start Status/Time Bubble */}
               <div className={`auction-card__status auction-card__status--${auction.state.status}`}>
@@ -92,10 +92,10 @@ export default class AuctionsIndex extends React.Component {
           </div>
           <div className="card-title">
             <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
-            <p className="has-family-header">{auction.buyer.name}</p>
-            <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
+            <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
+            <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
           </div>
-          <div className="has-text-weight-bold has-margin-top-md">
+          <div className="card-content__products">
             {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
           </div>
           <div className="card-content__best-price">

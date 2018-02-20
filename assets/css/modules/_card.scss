@@ -10,7 +10,7 @@
 // Adaptations
 
 .card-content {
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
 }
 
 .card-footer {
@@ -25,12 +25,19 @@
 
 .card-title {
   margin: 1rem 0;
+  padding: 0 1rem;
 }
 
 .card-content__best-price {
   background-color: $highlight;
   padding: 0.5rem 1rem;
-  margin: 0.75rem -1rem -0.25rem -1rem;
+  margin: 0.75rem 0;
+}
+
+.card-content__products {
+  margin-top: 1rem;
+  padding: 0 1rem;
+  font-weight: bold;
 }
 
 .card-footer-item {
