@@ -282,7 +282,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "list_fuels/0 returns all fuels", %{fuel: fuel} do
-      assert Auctions.list_fuels() == [fuel]
+      assert Enum.map(Auctions.list_fuels(), fn(f) -> f.id end) == [fuel.id]
     end
 
     test "get_fuel!/1 returns the fuel with given id", %{fuel: fuel} do

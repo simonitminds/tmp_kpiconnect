@@ -1,5 +1,5 @@
 defmodule Oceanconnect.AuctionIndexTest do
-  use Oceanconnect.FeatureCase
+  use Oceanconnect.FeatureCase, async: false
   alias Oceanconnect.AuctionIndexPage
 
   hound_session()

@@ -1,5 +1,5 @@
 defmodule OceanconnectWeb.SessionTest do
-  use Oceanconnect.FeatureCase, async: true
+  use Oceanconnect.FeatureCase, async: false
   alias Oceanconnect.{AuctionIndexPage, NewSessionPage}
 
   hound_session()
