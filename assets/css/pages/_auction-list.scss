@@ -42,7 +42,6 @@
 
   &__time-remaining {
     display: inline-block;
-    background-color: $gray-3 !important;
     height: 1.7rem;
     padding: 0.1rem 1rem 0 0.5rem;
     margin-left: 0.75rem;
@@ -50,6 +49,25 @@
     border-top-right-radius: 0.85rem;
     border-bottom-right-radius: 0.85rem;
     transition: all 0.2s ease-in;
+    overflow: hidden;
+
+    .auction-card__status--open &{
+      background-color: $gray-3 !important;
+      color: $white !important;
+      width: 150px !important;
+
+      &--under-1 { background-color: $danger !important; width: 150px !important;}
+      &--under-3 { background-color: $gold !important; width: 150px !important;}
+    }
+
+    .auction-card__status--decision &{
+      background-color: $gray-3 !important;
+      color: $white !important;
+      width: 150px !important;
+
+      &--under-1 { background-color: $danger !important; width: 150px !important;}
+      &--under-3 { background-color: $gold !important; width: 150px !important;}
+    }
 
     // Color Auction Status tags based on... auction status.
     &--under-1 { background-color: $danger !important; width: 150px !important;}
@@ -57,7 +75,6 @@
     &--active { background-color: $gray-3 !important; width: 150px !important;}
     &--in-decision { background-color: $gray-3 !important; width: 150px !important;}
     &--inactive { background-color: $gray-2 !important; color: $black !important;}
-    &--completed { background-color: $gray-1 !important; }
     &--closed { background-color: $gray-2 !important; color: $black !important;}
 
   }
