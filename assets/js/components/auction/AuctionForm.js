@@ -83,7 +83,7 @@ const AuctionForm = (props) => {
         <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Port</legend>
+              <legend className="subtitle is-4" >Arrival / Departure</legend>
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_port_id" className="label">
@@ -113,14 +113,7 @@ const AuctionForm = (props) => {
                   </div>
                 </div>
               </div>
-              <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
-                            onSelectAllSuppliers={selectAllSuppliers}
-                            onToggleSupplier={toggleSupplier}
-                            selectedPort={selectedPort}
-                            selectedSuppliers={selectedSuppliers}
-                            suppliers={suppliers} />
 
-              <legend className="subtitle is-4">Arrival / Departure</legend>
               <div className="field is-horizontal">
 
                 <div className="field-label">
@@ -168,6 +161,13 @@ const AuctionForm = (props) => {
           </div>
         </div>
       </section> {/* Port info */}
+
+      <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
+                    onSelectAllSuppliers={selectAllSuppliers}
+                    onToggleSupplier={toggleSupplier}
+                    selectedPort={selectedPort}
+                    selectedSuppliers={selectedSuppliers}
+                    suppliers={suppliers} />
 
       <section className="auction-info"> {/* Fuel info */}
         <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">

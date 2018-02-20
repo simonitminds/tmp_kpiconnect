@@ -30,11 +30,11 @@ const SupplierList = (props) => {
     <section className="auction-info">
       <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
         <div className="content"> <fieldset> <legend className="subtitle is-4">Invited Suppliers</legend>
-            <p className="has-text-weight-bold is-5 has-margin-bottom-sm">{portLabel()}</p>
-            <div className="qa-auction-suppliers">
+            <p className="has-text-weight-bold is-5 has-margin-bottom-md">{portLabel()}</p>
+            <div className="invite-selector__container qa-auction-suppliers">
               { _.map(suppliers, (supplier) => {
                   return(
-                    <div className="invite-selector is-rounded" key={supplier.id}>
+                    <div className="invite-selector" key={supplier.id}>
                       <label className="invite-selector__checkbox" htmlFor={`invite-${supplier.id}`}>
                         <input
                           type="checkbox"
