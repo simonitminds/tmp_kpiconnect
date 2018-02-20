@@ -18,10 +18,12 @@ const initialState = {
   eta_time: null,
   etd_date: null,
   etd_time: null,
+  suppliers: null,
   fuels: null,
   ports: null,
   vessels: null,
   loading: true,
+  selectedPort: null,
   selectedSuppliers: []
 };
 
@@ -49,7 +51,9 @@ export default function(state, action) {
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
           etd_time: setUTCDateTime(action.data.auction.etd),
+          selectedPort: _.get(action, 'data.auction.port.id'),
           selectedSuppliers: supplierList,
+          suppliers: _.get(action, 'data.suppliers', []),
           fuels: action.data.fuels,
           ports: action.data.ports,
           vessels: action.data.vessels,
@@ -87,7 +91,9 @@ export default function(state, action) {
     case RECEIVE_SUPPLIERS: {
       const port_id = parseInt(action.port);
       const suppliers = action.suppliers;
-      return {...state, auction: {...state.auction, port_id: port_id}, suppliers: suppliers, selectedSuppliers: []};
+      return {
+        ...state, auction: {...state.auction, port_id: port_id},
+        suppliers: suppliers, selectedPort: port_id, selectedSuppliers: []};
     }
     case TOGGLE_SUPPLIER: {
       const supplier_id = action.data.supplier_id;

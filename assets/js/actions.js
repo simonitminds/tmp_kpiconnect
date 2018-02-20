@@ -51,13 +51,6 @@ export function getAllAuctions() {
 }
 export function selectPort(event) {
   const port_id = event.target.value;
-  return setPort(port_id);
-}
-
-export function setPort(port_id) {
-  return fetchSuppliers(port_id);
-}
-export function fetchSuppliers(port_id) {
   return dispatch => {
     fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
       .then(checkStatus)
@@ -79,10 +72,11 @@ export function receiveSuppliers(port, suppliers) {
           suppliers: suppliers};
 }
 
-export function receiveAuctionFormData(auction, fuels, ports, vessels) {
+export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels) {
   return {type: RECEIVE_AUCTION_FORM_DATA,
           data: {
             auction,
+            suppliers,
             fuels,
             ports,
             vessels

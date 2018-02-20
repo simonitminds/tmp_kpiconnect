@@ -24,7 +24,8 @@ defmodule OceanconnectWeb.AuctionController do
     |> Auctions.strip_non_loaded
     |> Poison.encode!
 
-    render(conn, "new.html", changeset: changeset, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+    render(conn, "new.html", changeset: changeset, json_auction: json_auction,
+      fuels: fuels, ports: ports, vessels: vessels, suppliers: Poison.encode!([]))
   end
 
   def create(conn, %{"auction" => auction_params}) do
@@ -44,7 +45,8 @@ defmodule OceanconnectWeb.AuctionController do
         |> Auctions.fully_loaded
         |> Poison.encode!
 
-        render(conn, "new.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+        render(conn, "new.html", changeset: changeset, auction: auction, json_auction: json_auction,
+          fuels: fuels, ports: ports, vessels: vessels, suppliers: Poison.encode!([]))
     end
   end
 
@@ -59,12 +61,20 @@ defmodule OceanconnectWeb.AuctionController do
     auction = id
     |> Auctions.get_auction!
     |> Auctions.fully_loaded
+    suppliers = case auction.port do
+      nil -> []
+      _ ->
+        auction.port
+        |> Auctions.supplier_companies_for_port
+        |> Poison.encode!
+    end
     changeset = Auctions.change_auction(auction)
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
     json_auction = auction
     |> Poison.encode!
 
-    render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+    render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
+      fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
@@ -81,13 +91,20 @@ defmodule OceanconnectWeb.AuctionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         auction = Ecto.Changeset.apply_changes(changeset)
         |> Auctions.fully_loaded
-
+        suppliers = case auction.port do
+          nil -> []
+          _ ->
+            auction.port
+            |> Auctions.supplier_companies_for_port
+            |> Poison.encode!
+        end
         [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
         json_auction = auction
         |> Auctions.fully_loaded
         |> Poison.encode!
 
-        render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+        render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
+          fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
     end
   end
 

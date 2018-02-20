@@ -21,11 +21,11 @@ const mapStateToProps = (state, props) => {
     eta_time: state.auctionFormReducer.eta_time,
     etd_date: state.auctionFormReducer.etd_date,
     etd_time: state.auctionFormReducer.etd_time,
+    suppliers: state.auctionFormReducer.suppliers || props.suppliers,
     fuels: state.auctionFormReducer.fuels || props.fuels,
     ports: state.auctionFormReducer.ports || props.ports,
     vessels: state.auctionFormReducer.vessels || props.vessels,
     loading: state.auctionFormReducer.loading,
-    suppliers: state.auctionFormReducer.suppliers,
     selectedSuppliers: state.auctionFormReducer.selectedSuppliers
   };
 };
@@ -42,10 +42,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 export class AuctionFormContainer extends React.Component {
   dispatchItem() {
-    this.props.dispatch(receiveAuctionFormData(this.props.auction, this.props.fuels, this.props.ports, this.props.vessels));
-    if(this.props.auction.port) {
-      this.props.dispatch(setPort(this.props.auction.port.id));
-    }
+    this.props.dispatch(receiveAuctionFormData(this.props.auction, this.props.suppliers, this.props.fuels, this.props.ports, this.props.vessels));
   }
   componentDidMount() {
     this.dispatchItem();

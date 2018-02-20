@@ -32,10 +32,11 @@ import AuctionContainer from './containers/auction-container';
 function getDataForComponent(componentName) {
   let data = document.getElementById(componentName).dataset;
   let auction = JSON.parse(data.auction);
+  let suppliers = JSON.parse(data.suppliers);
   let fuels = JSON.parse(data.fuels);
   let ports = JSON.parse(data.ports);
   let vessels = JSON.parse(data.vessels);
-  return <AuctionFormContainer auction={auction} fuels={fuels} ports={ports} vessels={vessels} />;
+  return <AuctionFormContainer auction={auction} suppliers={suppliers} fuels={fuels} ports={ports} vessels={vessels} />;
 }
 
 if (document.getElementById('auctions-app')) {
