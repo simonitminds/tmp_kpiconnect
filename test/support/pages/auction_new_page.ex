@@ -32,9 +32,6 @@ defmodule Oceanconnect.AuctionNewPage do
   end
   def fill_form_element(_key, element, _type, value) when is_list(value) do
     Enum.map(value, fn(supplier) ->
-      # find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
-      # |> inner_html
-      # |> IO.inspect
       execute_script("document.getElementById('invite-#{supplier.id}').click();", [])
     end)
   end

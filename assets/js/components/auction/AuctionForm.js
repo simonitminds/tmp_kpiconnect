@@ -7,7 +7,7 @@ import CheckBoxField from '../CheckBoxField';
 import DateInput from '../DateInput';
 import TimeInput from '../TimeInput';
 import { portLocalTime } from '../../utilities';
-import SupplierList  from './SupplierList'
+import SupplierList  from './SupplierList';
 
 const AuctionForm = (props) => {
   const {
