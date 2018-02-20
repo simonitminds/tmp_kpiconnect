@@ -14,6 +14,7 @@
   <div id="auctions-app">
     <div id="AuctionFormContainer"
       data-auction="<%= @json_auction %>"
+      data-suppliers="<%= @suppliers %>"
       data-fuels="<%= @fuels %>"
       data-ports="<%= @ports %>"
       data-vessels="<%= @vessels %>"

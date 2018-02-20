@@ -7,6 +7,7 @@ import CheckBoxField from '../CheckBoxField';
 import DateInput from '../DateInput';
 import TimeInput from '../TimeInput';
 import { portLocalTime } from '../../utilities';
+import SupplierList  from './SupplierList'
 
 const AuctionForm = (props) => {
   const {
@@ -19,13 +20,23 @@ const AuctionForm = (props) => {
     etd_time,
     fuels,
     ports,
-    suppliers,
     vessels,
     updateDate,
-    updateInformation
+    updateInformation,
+    selectedSuppliers,
+    suppliers,
+    selectPort,
+    toggleSupplier,
+    selectAllSuppliers,
+    deselectAllSuppliers,
   } = props;
 
   const port_id = _.get(auction, 'port.id');
+  const selectedPort = _.chain(ports)
+                        .filter(['id', auction.port_id])
+                        .first()
+                        .value();
+
   return (
     <div>
       <input type="hidden" name="auction[auction_start]" className="qa-auction-auction_start" value={moment(auction.auction_start).utc()} />
@@ -33,8 +44,7 @@ const AuctionForm = (props) => {
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={moment(auction.etd).utc()} />
 
       <section className="auction-info"> {/* Vessel info */}
-        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
-          <div className="content">
+        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg"> <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Vessel</legend>
               <div className="field is-horizontal">
@@ -87,8 +97,8 @@ const AuctionForm = (props) => {
                         id="auction_port_id"
                         name="auction[port_id]"
                         className="qa-auction-port_id"
-                        value={auction.port || ""}
-                        onChange={updateInformation.bind(this, 'auction.port')}
+                        value={auction.port_id || ""}
+                        onChange={selectPort.bind(this)}
                       >
                         <option disabled value="">
                           Please select
@@ -103,8 +113,16 @@ const AuctionForm = (props) => {
                   </div>
                 </div>
               </div>
+              <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
+                            onSelectAllSuppliers={selectAllSuppliers}
+                            onToggleSupplier={toggleSupplier}
+                            selectedPort={selectedPort}
+                            selectedSuppliers={selectedSuppliers}
+                            suppliers={suppliers} />
 
-              <div className="field is-horizontal">
+              <legend className="subtitle is-4">Arrival / Departure</legend>
+              <div className="field is-horizontal is-grouped">
+
                 <div className="field-label">
                   <label className="label">ETA</label>
                 </div>
@@ -182,8 +200,7 @@ const AuctionForm = (props) => {
                         ))}
                       </select>
                     </div>
-                  </div>
-                </div>
+                  </div> </div>
               </div>
 
               <InputField

@@ -49,7 +49,7 @@ import {Socket} from "phoenix"
 // Finally, pass the token on connect as below. Or remove it
 // from connect if you don't care about authentication.
 let socket = "";
-if(window.userToken && window.userToken != "" && window.userId && window.userId != "") {
+if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
   socket = new Socket("/socket", {params: {token: window.userToken}});
   socket.connect();
 }

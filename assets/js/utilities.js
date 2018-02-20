@@ -4,11 +4,18 @@ import moment from 'moment';
 
 export function replaceListItem(list, oldItem, newItem) {
   const index = _.indexOf(list, oldItem);
-  return [
-    ..._.slice(list, 0, index),
-    newItem,
-    ..._.slice(list, index + 1, list.length)
-  ];
+  if(newItem) {
+    return [
+      ..._.slice(list, 0, index),
+      newItem,
+      ..._.slice(list, index + 1, list.length)
+    ];
+  } else {
+    return [
+      ..._.slice(list, 0, index),
+      ..._.slice(list, index + 1, list.length)
+    ];
+  }
 }
 
 export const formatGMTDateTime = (dateTime) => {

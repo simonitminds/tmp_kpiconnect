@@ -1,4 +1,5 @@
 defmodule Oceanconnect.Auctions.Port do
+  import Ecto.Query, warn: false
   use Ecto.Schema
   import Ecto.Changeset
   alias Oceanconnect.Auctions.Port
@@ -18,5 +19,12 @@ defmodule Oceanconnect.Auctions.Port do
     port
     |> cast(attrs, [:name, :country, :gmt_offset])
     |> validate_required([:name, :country])
+  end
+
+  def suppliers_for_port_id(port_id) do
+    from c in Oceanconnect.Accounts.Company,
+      join: p in assoc(c, :ports),
+      where: p.id == ^port_id and c.is_supplier == true,
+      select: c
   end
 end

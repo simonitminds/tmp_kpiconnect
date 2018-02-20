@@ -6,10 +6,10 @@ defmodule OceanconnectWeb.SessionView do
   end
   def current_user(_conn), do: ""
 
-  def current_user_id(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
-    user.id
+  def current_user_company_id(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
+    user.company.id
   end
-  def current_user_id(_conn), do: ""
+  def current_user_company_id(_conn), do: ""
 
   def current_company(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
     user.company.name

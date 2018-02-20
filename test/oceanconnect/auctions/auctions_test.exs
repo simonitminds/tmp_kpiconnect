@@ -20,12 +20,27 @@ defmodule Oceanconnect.AuctionsTest do
       epoch = expected_date
       |> DateTime.to_unix(:milliseconds)
       |> Integer.to_string
-      params = %{"anonymous_bidding" => "false",
-      "auction_start" => epoch, "company" => "", "duration" => "",
-      "eta" => "", "etd" => "", "po" => "", "port" => "", "vessel" => ""}
+      params = %{"auction_start" => epoch}
       %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
 
       assert parsed_date == expected_date |> DateTime.to_string()
+    end
+
+    test "#maybe_convert_duration" do
+      params = %{"duration" => "10", "decision_duration" => "15"}
+      %{ "duration" => duration } = Auction.maybe_convert_duration(params, "duration")
+      %{ "decision_duration" => decision_duration } = Auction.maybe_convert_duration(params, "decision_duration")
+
+      assert duration == 10 * 60_000
+      assert decision_duration == 15 * 60_000
+    end
+
+    test "#maybe_convert_suppliers" do
+      supplier = insert(:company, is_supplier: true)
+      params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
+      %{ "suppliers" => suppliers } = Auction.maybe_convert_suppliers(params, "suppliers")
+
+      assert List.first(suppliers).id == supplier.id
     end
 
     test "list_auctions/0 returns all auctions", %{auction: auction} do
@@ -70,13 +85,13 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "add_supplier_to_auction/2 with valid data", %{auction: auction} do
-      supplier = insert(:user)
+      supplier = insert(:company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(supplier)
       assert updated_auction.suppliers == [supplier]
     end
 
     test "add_supplier_to_auction/2 with existing suppliers", %{auction: auction} do
-      [s1, s2] = insert_list(2, :user)
+      [s1, s2] = insert_list(2, :company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(s1)
       |> Auctions.add_supplier_to_auction(s2)
       assert updated_auction.suppliers
@@ -86,7 +101,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "set_suppliers_for_auction/2 with valid data", %{auction: auction} do
-      [s1, s2] = insert_list(2, :user)
+      [s1, s2] = insert_list(2, :company)
       updated_auction = auction |> Auctions.set_suppliers_for_auction([s1, s2])
       assert updated_auction.suppliers
       |> Enum.map(fn(s) -> s.id end)
@@ -95,7 +110,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "set_suppliers_for_auction/2 overwriting existing suppliers", %{auction: auction} do
-      [s1, s2, s3] = insert_list(3, :user)
+      [s1, s2, s3] = insert_list(3, :company)
       updated_auction = auction |> Auctions.add_supplier_to_auction(s3)
       |> Auctions.set_suppliers_for_auction([s1, s2])
       assert updated_auction.suppliers
@@ -169,18 +184,20 @@ defmodule Oceanconnect.AuctionsTest do
   describe "port and company relationship" do
     setup do
       [port1, port2] = insert_list(2, :port)
-      [company1, company2, company3] = insert_list(3, :company)
+      [company1, company2, company3] = insert_list(3, :company, is_supplier: true)
+      company4 = insert(:company)
       company1 |> Oceanconnect.Accounts.add_port_to_company(port1)
       company2 |> Oceanconnect.Accounts.set_ports_on_company([port1, port2])
       company3 |> Oceanconnect.Accounts.add_port_to_company(port2)
+      company4 |> Oceanconnect.Accounts.add_port_to_company(port1)
       {:ok, %{p1: port1, p2: port2, c1: company1, c2: company2, c3: company3}}
     end
 
-    test "companies_for_port/1 returns companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
-      companies = Auctions.companies_for_port(p1)
+    test "supplier_companies_for_port/1 returns only supplier companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
+      companies = Auctions.supplier_companies_for_port(p1)
       assert Enum.all?(companies, fn(c) -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.supplier_companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
     end
 
     test "ports_for_company/1 returns ports for given company", %{p1: p1, p2: p2, c1: c1, c2: c2} do
@@ -207,7 +224,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "vessels_for_buyer/1", %{user: user, vessel: vessel} do
       extra_vessel = insert(:vessel)
-      result = Auctions.vessels_for_buyer(user)
+      result = Auctions.vessels_for_buyer(user.company)
       |> Oceanconnect.Repo.preload(:company)
       assert result == [vessel]
       refute extra_vessel in result
@@ -303,14 +320,12 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   test "strip non loaded" do
-    auction = insert(:auction, suppliers: insert_list(1, :user))
+    auction = insert(:auction)
     partially_loaded_auction = Oceanconnect.Auctions.Auction
     |> Repo.get(auction.id)
-    |> Repo.preload([:vessel, :buyer, :suppliers])
+    |> Repo.preload([:vessel])
 
     result = Auctions.strip_non_loaded(partially_loaded_auction)
-    assert result.buyer.company == nil
-    assert hd(result.suppliers).company == nil
     assert result.vessel.company == nil
   end
 end

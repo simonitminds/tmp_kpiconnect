@@ -88,27 +88,25 @@ export default class AuctionsIndex extends React.Component {
               {/* Start Link to Auction Edit */}
                 <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit"><span className="icon is-medium has-text-right"><i className="fas fa-lg fa-edit"></i></span></a>
               {/* End Link to Auction Edit */}
-
             </div>
-            <div className="card-title">
-              <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
-              <p className="has-family-header">{auction.buyer.company.name}</p>
-              <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
-            </div>
-            <div className="has-text-weight-bold has-margin-top-md">
-              {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
-            </div>
-            <div className="card-content__best-price">
-              <strong>Best Offer: </strong> PRICE
-            </div>
+          </div>
+          <div className="card-title">
+            <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
+            <p className="has-family-header">{auction.buyer.name}</p>
+            <p className="has-family-header has-margin-top-xs"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
+          </div>
+          <div className="has-text-weight-bold has-margin-top-md">
+            {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+          </div>
+          <div className="card-content__best-price">
+            <strong>Best Offer: </strong> PRICE
           </div>
           <footer className="card-footer">
             <a href={`/auctions/start/${auction.id}`} className="card-footer-item qa-auction-start">Start</a>
           </footer>
         </div>
-     </div>
+      </div>
     );
-
     const filteredAuctionsDisplay = (status) => {
       const filteredAuctions = _.filter(this.props.auctions, (auction) => { return(auction.state.status === status)});
       if(_.isEmpty(filteredAuctions)) {

@@ -7,17 +7,19 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   @invalid_attrs %{ "vessel_id" => nil}
 
   setup do
-    company = insert(:company)
-    user = insert(:user, company: company)
-    vessel = insert(:vessel, company: company) |> Oceanconnect.Repo.preload(:company)
+    buyer_company = insert(:company)
+    buyer = insert(:user, company: buyer_company)
+    vessel = insert(:vessel, company: buyer_company)
     fuel = insert(:fuel)
-    port = insert(:port)
-    Oceanconnect.Accounts.add_port_to_company(company, port)
+    supplier_company = insert(:company, is_supplier: true)
+    port = insert(:port, companies: [buyer_company, supplier_company])
     auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
     |> Oceanconnect.Utilities.maybe_convert_date_times
-    authed_conn = login_user(build_conn(), user)
+    |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
+    authed_conn = login_user(build_conn(), buyer)
     auction = insert(:auction, vessel: vessel)
-    {:ok, conn: authed_conn, valid_auction_params: auction_params, auction: auction, user: user}
+    {:ok, conn: authed_conn, valid_auction_params: auction_params,
+          auction: auction, buyer: buyer_company, supplier: supplier_company}
   end
 
   describe "index" do
@@ -33,9 +35,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "New Auction"
     end
 
-    test "vessels are filtered by logged in users company", %{conn: conn, user: user} do
+    test "vessels are filtered by logged in buyers company", %{conn: conn, buyer: buyer} do
       conn = get(conn, auction_path(conn, :new))
-      assert conn.assigns[:vessels] == user
+      assert conn.assigns[:vessels] == buyer
       |> Auctions.vessels_for_buyer
       |> Auctions.strip_non_loaded
       |> Poison.encode!
@@ -58,13 +60,13 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "create auction" do
-    setup(%{user: user}) do
+    setup(%{buyer: buyer}) do
       port = insert(:port)
-      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id, buyer_id: user.id})
+      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id, buyer_id: buyer.id})
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
 
-    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, user: user} do
+    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, buyer: buyer, supplier: supplier} do
       updated_params = valid_auction_params
       |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
       |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
@@ -72,10 +74,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload(:vessel)
+      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Oceanconnect.Repo.preload([:vessel, :suppliers])
       conn = get conn, auction_path(conn, :show, id)
       assert html_response(conn, 200) =~ "window.userToken"
-      assert auction.buyer_id == user.id
+      assert auction.buyer_id == buyer.id
+      assert List.first(auction.suppliers).id == supplier.id
     end
 
     #TODO Refactor test to assert on specific errors

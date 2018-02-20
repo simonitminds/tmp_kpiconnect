@@ -24,12 +24,13 @@ defmodule OceanconnectWeb.AuctionController do
     |> Auctions.strip_non_loaded
     |> Poison.encode!
 
-    render(conn, "new.html", changeset: changeset, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+    render(conn, "new.html", changeset: changeset, json_auction: json_auction,
+      fuels: fuels, ports: ports, vessels: vessels, suppliers: Poison.encode!([]))
   end
 
   def create(conn, %{"auction" => auction_params}) do
     auction_params = Auction.from_params(auction_params)
-    |> Map.put("buyer_id", Auth.current_user(conn).id)
+    |> Map.put("buyer_id", Auth.current_user(conn).company.id)
     case Auctions.create_auction(auction_params) do
       {:ok, auction} ->
         conn
@@ -44,7 +45,8 @@ defmodule OceanconnectWeb.AuctionController do
         |> Auctions.fully_loaded
         |> Poison.encode!
 
-        render(conn, "new.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+        render(conn, "new.html", changeset: changeset, auction: auction, json_auction: json_auction,
+          fuels: fuels, ports: ports, vessels: vessels, suppliers: Poison.encode!([]))
     end
   end
 
@@ -56,18 +58,29 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    auction = Auctions.get_auction!(id)
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
+    suppliers = case auction.port do
+      nil -> []
+      _ ->
+        auction.port
+        |> Auctions.supplier_companies_for_port
+        |> Poison.encode!
+    end
     changeset = Auctions.change_auction(auction)
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
     json_auction = auction
-    |> Auctions.fully_loaded
     |> Poison.encode!
 
-    render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+    render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
+      fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
-    auction = Auctions.get_auction!(id)
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
     auction_params = Auction.from_params(auction_params)
 
     case Auctions.update_auction(auction, auction_params) do
@@ -78,13 +91,20 @@ defmodule OceanconnectWeb.AuctionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         auction = Ecto.Changeset.apply_changes(changeset)
         |> Auctions.fully_loaded
-
+        suppliers = case auction.port do
+          nil -> []
+          _ ->
+            auction.port
+            |> Auctions.supplier_companies_for_port
+            |> Poison.encode!
+        end
         [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
         json_auction = auction
         |> Auctions.fully_loaded
         |> Poison.encode!
 
-        render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction, fuels: fuels, ports: ports, vessels: vessels)
+        render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
+          fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
     end
   end
 
@@ -92,7 +112,7 @@ defmodule OceanconnectWeb.AuctionController do
     buyer = Auth.current_user(conn)
     fuels = Auctions.list_fuels()
     ports = Auctions.ports_for_company(buyer.company)
-    vessels = Auctions.vessels_for_buyer(buyer)
+    vessels = Auctions.vessels_for_buyer(buyer.company)
     Enum.map([fuels, ports, vessels], fn(list) ->
       list |> Poison.encode!
     end)

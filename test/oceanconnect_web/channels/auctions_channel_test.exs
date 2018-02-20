@@ -5,13 +5,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   setup do
     buyer_company = insert(:company)
-    supplier_company = insert(:company)
-
-    buyer = insert(:user, company: buyer_company)
-    supplier = insert(:user, company: supplier_company)
-    non_participant = insert(:user)
+    insert(:user, company: buyer_company)
+    supplier_company = insert(:company, is_supplier: true)
+    insert(:user, company: supplier_company)
+    non_participant_company = insert(:company)
+    non_participant = insert(:user, company: non_participant_company)
     current_time =  DateTime.utc_now()
-    auction = insert(:auction, buyer: buyer, duration: 1_000, decision_duration: 1_000, auction_start: current_time, suppliers: [supplier])
+    auction = insert(:auction, buyer: buyer_company, duration: 1_000, decision_duration: 1_000, auction_start: current_time, suppliers: [supplier_company])
     {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
@@ -19,9 +19,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
     expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
 
-    {:ok, %{supplier_id: Integer.to_string(supplier.id),
-            buyer_id: Integer.to_string(buyer.id),
-            non_participant_id: Integer.to_string(non_participant.id),
+    {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
+            buyer_id: Integer.to_string(buyer_company.id),
+            non_participant_id: Integer.to_string(non_participant_company.id),
             non_participant: non_participant,
             expected_payload: expected_payload,
             auction: auction}}

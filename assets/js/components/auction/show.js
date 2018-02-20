@@ -266,12 +266,17 @@ export default class AuctionShow extends React.Component {
                     </div>
                     <div className="box">
                       <h3 className="box__header">Invited Suppliers</h3>
-                      <ul>
-                        <li><span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>Seller #1</li>
-                        <li><span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>Seller #2</li>
-                        <li><span className="icon has-text-warning has-margin-right-sm"><i className="fas fa-adjust"></i></span>Seller #3</li>
-                        <li><span className="icon has-text-danger has-margin-right-sm"><i className="fas fa-times-circle"></i></span>Seller #4</li>
-                        <li><span className="icon has-text-dark has-margin-right-sm"><i className="fas fa-question-circle"></i></span>Seller #5</li>
+                      <ul className="qa-auction-suppliers">
+                        { _.map(auction.suppliers, (supplier) => {
+                          return (
+                            <li key={supplier.id}>
+                              <span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>
+                              <span className={`qa-auction-supplier-${supplier.id}`}>{supplier.name}</span>
+                            </li>
+                          );
+                        })
+
+                        }
                       </ul>
                     </div>
                     <div className="box">
@@ -279,7 +284,7 @@ export default class AuctionShow extends React.Component {
                         <h3 className="box__header">Buyer Information</h3>
                         <ul className="list has-no-bullets">
                           <li>
-                            <strong>Organization</strong> {auction.buyer.company.name}
+                            <strong>Organization</strong> {auction.buyer.name}
                           </li>
                           <li>
                             <strong>Buyer</strong> Buyer Name

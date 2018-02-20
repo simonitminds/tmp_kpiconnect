@@ -5,15 +5,17 @@ defmodule Oceanconnect.AuctionNewTest do
   hound_session()
 
   setup do
-    company = insert(:company)
-    buyer = insert(:user, company: company)
-    supplier = insert(:user)
-    fuel = insert(:fuel)
+    buyer_company = insert(:company)
+    buyer = insert(:user, company: buyer_company)
     login_user(buyer)
-    buyer_vessels = insert_list(3, :vessel, company: company)
+    fuel = insert(:fuel)
+    buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
-    port = insert(:port, companies: [company])
+    supplier_companies = insert_list(3, :company, is_supplier: true)
+    port = insert(:port, companies: [buyer_company] ++ supplier_companies)
     selected_vessel = hd(buyer_vessels)
+    selected_company1 = Enum.at(supplier_companies, 0)
+    selected_company2 = Enum.at(supplier_companies, 2)
 
     auction_params = %{
       auction_start_date: DateTime.utc_now(),
@@ -26,20 +28,22 @@ defmodule Oceanconnect.AuctionNewTest do
       duration: 10,
       fuel_id: fuel.id,
       fuel_quantity: 1_000,
-      port_id: port.id,
-      # suppliers: [
-      #   %{
-      #     id: supplier.id,
-      #     company: supplier.company
-      #   }
-      # ],
+      suppliers: [
+        %{
+          id: selected_company1.id
+        },
+        %{
+          id: selected_company2.id
+        }
+      ],
       vessel_id: selected_vessel.id
     }
     show_params = %{
       vessel: "#{selected_vessel.name} (#{selected_vessel.imo})",
-      port: port.name
+      port: port.name,
+      suppliers: [selected_company1, selected_company2]
     }
-    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, show_params: show_params}}
+    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, show_params: show_params, port: port}}
   end
 
   test "visting the new auction page" do
@@ -70,9 +74,9 @@ defmodule Oceanconnect.AuctionNewTest do
     assert MapSet.equal?(vessels_on_page, company_vessels)
   end
 
-
-  test "creating an auction", %{params: params, show_params: show_params} do
+  test "creating an auction", %{params: params, show_params: show_params, port: port} do
     AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.submit()
 

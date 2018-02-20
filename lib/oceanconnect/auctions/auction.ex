@@ -1,4 +1,5 @@
 defmodule Oceanconnect.Auctions.Auction do
+  import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
@@ -10,7 +11,7 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
     belongs_to :fuel, Fuel
-    belongs_to :buyer, Oceanconnect.Accounts.User
+    belongs_to :buyer, Oceanconnect.Accounts.Company
     field :fuel_quantity, :integer
     field :po, :string
     field :eta, :utc_datetime, default: @current_time_trunc
@@ -20,8 +21,8 @@ defmodule Oceanconnect.Auctions.Auction do
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
     field :anonymous_bidding, :boolean
     field :additional_information, :string
-    many_to_many :suppliers, Oceanconnect.Accounts.User, join_through: Oceanconnect.Auctions.AuctionSuppliers,
-      join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete
+    many_to_many :suppliers, Oceanconnect.Accounts.Company, join_through: Oceanconnect.Auctions.AuctionSuppliers,
+      join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete, on_delete: :delete_all
 
     timestamps()
   end
@@ -54,7 +55,13 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
     |> cast_assoc(:fuel)
+    |> maybe_add_suppliers(attrs)
   end
+
+  def maybe_add_suppliers(changeset, attrs = %{"suppliers" => suppliers}) do
+    put_assoc(changeset, :suppliers, suppliers)
+  end
+  def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def from_params(params) do
     params
@@ -63,6 +70,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
+    |> maybe_convert_suppliers("suppliers")
   end
 
   def maybe_parse_date_field(params, key) do
@@ -79,6 +87,17 @@ defmodule Oceanconnect.Auctions.Auction do
       %{^key => duration} ->
         updated_duration = parse_duration(duration) * 60_000
         Map.put(params, key, updated_duration)
+      _ -> params
+    end
+  end
+
+  def maybe_convert_suppliers(params, "suppliers") do
+    case params do
+      %{"suppliers" => suppliers} ->
+        supplier_ids = Enum.map(suppliers, fn({_key, supplier_id}) -> String.to_integer(supplier_id) end)
+        query = from c in Oceanconnect.Accounts.Company,
+          where: c.id in ^supplier_ids
+        Map.put(params, "suppliers", Oceanconnect.Repo.all(query))
       _ -> params
     end
   end

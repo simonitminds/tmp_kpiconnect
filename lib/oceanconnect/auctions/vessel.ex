@@ -25,7 +25,7 @@ defmodule Oceanconnect.Auctions.Vessel do
 
   def by_company(%Company{id: company_id}) do
     from v in Vessel,
-    where: v.company_id == ^company_id
+      where: v.company_id == ^company_id
   end
   def by_company(company_id) when is_integer(company_id) do
     from v in Vessel,
