@@ -121,7 +121,7 @@ const AuctionForm = (props) => {
                             suppliers={suppliers} />
 
               <legend className="subtitle is-4">Arrival / Departure</legend>
-              <div className="field is-horizontal is-grouped">
+              <div className="field is-horizontal">
 
                 <div className="field-label">
                   <label className="label">ETA</label>

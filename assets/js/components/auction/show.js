@@ -219,6 +219,8 @@ export default class AuctionShow extends React.Component {
                         </div>
                       </div>
                     </div>
+
+            {/* BUYER ONLY */}
                     <div className="box">
                       <h3 className="box__header box__header--bordered">Grade Display</h3>
                       <table className="table is-fullwidth is-striped">
@@ -252,6 +254,7 @@ export default class AuctionShow extends React.Component {
                         </tbody>
                       </table>
                     </div>
+          {/* / BUYER ONLY */}
                   </div>
                   <div className="column is-one-third">
                     <div className="tabs is-fullwidth is-medium">
@@ -266,7 +269,7 @@ export default class AuctionShow extends React.Component {
                     </div>
                     <div className="box">
                       <h3 className="box__header">Invited Suppliers</h3>
-                      <ul className="qa-auction-suppliers">
+                      <ul className="list has-no-bullets qa-auction-suppliers">
                         { _.map(auction.suppliers, (supplier) => {
                           return (
                             <li key={supplier.id}>
@@ -281,7 +284,11 @@ export default class AuctionShow extends React.Component {
                     </div>
                     <div className="box">
                       <div className="box__subsection">
-                        <h3 className="box__header">Buyer Information</h3>
+                        <h3 className="box__header">Buyer Information
+                          <div className="field is-inline-block is-pulled-right">
+                            <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
+                          </div>
+                        </h3>
                         <ul className="list has-no-bullets">
                           <li>
                             <strong>Organization</strong> {auction.buyer.name}
@@ -318,9 +325,6 @@ export default class AuctionShow extends React.Component {
                             {additionInfoDisplay(auction)}
                         </li>
                         </ul>
-                      </div>
-                      <div className="field has-margin-top-md">
-                        <a href={`/auctions/${auction.id}/edit`}>Edit</a>
                       </div>
                     </div>
                   </div>
