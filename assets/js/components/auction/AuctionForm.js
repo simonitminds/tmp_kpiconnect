@@ -282,7 +282,7 @@ const AuctionForm = (props) => {
               <div className="field-body">
                 <div className="control">
                   <div className="select">
-                    <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
+                    <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
                       <option disabled value="">
                         Please select
                       </option>
@@ -305,7 +305,7 @@ const AuctionForm = (props) => {
               <div className="field-body">
                 <div className="control">
                   <div className="select">
-                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
+                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
                       <option disabled value="">
                         Please select
                       </option>
