@@ -63,6 +63,11 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     Process.send_after(pid, :end_auction_decision_timer, auction.decision_duration)
   end
 
+  # Client
+ def get_timer(pid) do
+   GenServer.call(pid, :read_timer)
+ end
+
   # def reset_timer() do
   #   GenServer.call(__MODULE__, :reset_timer)
   # end
