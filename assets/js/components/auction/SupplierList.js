@@ -77,7 +77,7 @@ const SupplierList = (props) => {
     </section>
   );
   } else {
-    return(<div>
+    return(
       <section className="auction-info">
         <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
           <div className="content">
@@ -87,8 +87,7 @@ const SupplierList = (props) => {
             </fieldset>
           </div>
         </div>
-      </section>
-    </div>)
+      </section>)
   }
 };
 
