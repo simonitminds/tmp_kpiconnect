@@ -36,7 +36,26 @@ $highlight: $yellow;
 //// Associated Utilities
 
 .is-gray-0 {
-  background-color: $gray-0;
+  background-color: $gray-0 !important;
+}
+.is-gray-1 {
+  background-color: $gray-1 !important;
+}
+.is-gray-3 {
+  background-color: $gray-3 !important;
+  color: #fff !important;
+}
+.is-success {
+  background-color: $success !important;
+  color: #fff !important;
+}
+.is-warning {
+  background-color: $warning !important;
+  color: #fff !important;
+}
+.is-danger {
+  background-color: $danger !important;
+  color: #fff !important;
 }
 .is-white {
   background-color: #fff !important;

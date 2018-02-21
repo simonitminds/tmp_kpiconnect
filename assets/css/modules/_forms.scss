@@ -60,6 +60,21 @@ fieldset {
   padding: 0.25rem 0.5rem;
 }
 
+.select--transparent { // Transparent background select for use on colored backgrounds
+  select {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid #fff !important;
+
+    &:hover, &:focus {
+      border-color: #f3f3f3;
+    }
+  }
+  &::after {
+    border-color: #fff !important;
+  }
+}
+
 .is-caption { // When a form field has additional annotation (See: Port Local Time)
   margin-top: -9px;
   margin-bottom: 16px;

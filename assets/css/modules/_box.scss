@@ -15,6 +15,7 @@
   &__subsection { // When a box element has multiple sections
     padding: 0.75rem 1.25rem 1rem;
     margin: 0 -1.25rem;
+    
     &:first-child {
       padding-top: 0;
     }
@@ -42,5 +43,9 @@
       padding: 0 1.25rem;
       border-bottom: 4px solid $turquoise;
     }
+  }
+  &__icon-marker {
+    display: inline-block;
+    margin:  -0.5rem 0.25rem 0 -0.25rem;
   }
 }
