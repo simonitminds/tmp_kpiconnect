@@ -104,8 +104,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast({:start_auction, _}, current_state = %{auction_id: auction_id}) do
     # Get the current Auction State from current_state
     # process the start_auction command based on that state.
-    {:ok, pid} = TimersSupervisor.start_timer({auction_id, :duration})
-    _timer_ref = AuctionTimer.get_timer(pid)
+    case TimersSupervisor.start_timer({auction_id, :duration}) do
+      {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
+      error -> error
+    end
     new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :open})
     AuctionNotifier.notify_participants(new_state)
 
@@ -114,8 +116,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
-    {:ok, pid} = TimersSupervisor.start_timer({auction_id, :decision_duration})
-    _timer_ref = AuctionTimer.get_timer(pid)
+    case TimersSupervisor.start_timer({auction_id, :decision_duration}) do
+      {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
+      error -> error
+    end
     new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :decision})
     AuctionNotifier.notify_participants(new_state)
 

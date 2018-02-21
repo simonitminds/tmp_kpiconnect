@@ -1,5 +1,5 @@
 defmodule OceanconnectWeb.AuctionsChannelTest do
-  use OceanconnectWeb.ChannelCase
+  use OceanconnectWeb.ChannelCase, async: false
   alias Oceanconnect.Utilities
   alias Oceanconnect.{Auctions}
 

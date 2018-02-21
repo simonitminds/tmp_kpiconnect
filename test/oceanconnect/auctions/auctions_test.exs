@@ -123,11 +123,13 @@ defmodule Oceanconnect.AuctionsTest do
       auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
       {:ok, auction} = Auctions.create_auction(auction_attrs)
 
-      assert :pending = Auctions.auction_state(auction).state.status
+      assert :pending == Auctions.auction_state(auction).state.status
+
       Auctions.start_auction(auction)
-      assert :open = Auctions.auction_state(auction).state.status
+      assert :open == Auctions.auction_state(auction).state.status
+
       Auctions.start_auction(auction)
-      assert :open = Auctions.auction_state(auction).state.status
+      assert :open == Auctions.auction_state(auction).state.status
     end
   end
 

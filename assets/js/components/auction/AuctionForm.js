@@ -31,7 +31,9 @@ const AuctionForm = (props) => {
     deselectAllSuppliers,
   } = props;
 
-  const port_id = _.get(auction, 'port.id', "");
+  const fuel_id = auction.fuel_id ? auction.fuel_id : "";
+  const port_id = auction.port_id ? auction.port_id : "";
+  const vessel_id = auction.vessel_id ? auction.vessel_id : "";
   const selectedPort = _.chain(ports)
                         .filter(['id', auction.port_id])
                         .first()
@@ -60,7 +62,7 @@ const AuctionForm = (props) => {
                         id="auction_vessel_id"
                         name="auction[vessel_id]"
                         className="qa-auction-vessel_id"
-                        value={auction.vessel_id}
+                        value={vessel_id}
                         onChange={updateInformation.bind(this, 'auction.vessel_id')} > <option disabled value="">
                           Please select
                         </option>
@@ -97,7 +99,7 @@ const AuctionForm = (props) => {
                         id="auction_port_id"
                         name="auction[port_id]"
                         className="qa-auction-port_id"
-                        value={auction.port_id}
+                        value={port_id}
                         onChange={selectPort.bind(this)}
                       >
                         <option disabled value="">
@@ -187,7 +189,7 @@ const AuctionForm = (props) => {
                         id="auction_fuel_id"
                         name="auction[fuel_id]"
                         className="qa-auction-fuel_id"
-                        value={auction.fuel_id}
+                        value={fuel_id}
                         onChange={updateInformation.bind(this, 'auction.fuel_id')}
                       >
                         <option disabled value="">
