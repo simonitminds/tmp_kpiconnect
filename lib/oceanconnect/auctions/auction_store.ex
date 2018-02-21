@@ -114,6 +114,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:end_auction, _}, current_state = %{auction_id: auction_id}) do
     TimersSupervisor.start_timer({auction_id, :decision_duration})
+    :timer.sleep(200)
     new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :decision})
     AuctionNotifier.notify_participants(new_state)
 
