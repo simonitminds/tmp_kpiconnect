@@ -1,23 +1,20 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor, setTimeRemaining} from '../../utilities';
+import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 import moment from 'moment';
-
-const TICK_INTERVAL = 500;
 
 export default class AuctionShow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: _.get(props, 'auction.state.time_remaining', 0)
-    };
+      timeRemaining: timeRemainingCountdown(props.auction, moment().utc())
+    }
   }
-
 
   componentDidMount() {
     this.timerID = setInterval(
       () => this.tick(),
-      TICK_INTERVAL
+      500
     );
   }
 
@@ -28,7 +25,7 @@ export default class AuctionShow extends React.Component {
 
   tick() {
     this.setState({
-      timeRemaining: timeRemainingCountdown(this.props.auction, this.state.timeRemaining, TICK_INTERVAL)
+      timeRemaining: timeRemainingCountdown(this.props.auction, moment().utc())
     });
   }
 

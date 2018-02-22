@@ -41,15 +41,12 @@ export const portLocalTime = (gmtTime, portId, ports) => {
   }
 }
 
-export function timeRemainingCountdown(auction, timeRemaining, interval) {
+export function timeRemainingCountdown(auction, clientTime) {
   const status = _.get(auction, 'state.status');
   if ((status === "open" || status === "decision") && _.get(auction, 'state.time_remaining')) {
-    if(timeRemaining){
-
-      return timeRemaining - interval;
-    } else {
-      return auction.state.time_remaining;
-    }
+    const serverTime = moment(auction.state.current_server_time);
+    const timeLeft = auction.state.time_remaining - clientTime.diff(serverTime);
+    return timeLeft;
   } else if (_.get(auction, 'state.status') === "closed") {
     return 0;
   }

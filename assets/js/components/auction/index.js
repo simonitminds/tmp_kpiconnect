@@ -4,19 +4,21 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import { formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 
-const TICK_INTERVAL = 500;
-
 export default class AuctionsIndex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: {}
-    };
+      timeRemaining: _.reduce(props.auctions, (acc, auction) => {
+          acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, moment().utc())
+          return acc
+        }, {})
+    }
   }
+
   componentDidMount() {
     this.timerID = setInterval(
       () => this.tick(),
-      TICK_INTERVAL
+      500
     );
   }
 
@@ -28,16 +30,15 @@ export default class AuctionsIndex extends React.Component {
   tick() {
     this.setState({
       timeRemaining: _.reduce(this.props.auctions, (acc, auction) => {
-        let remaining = this.state.timeRemaining[auction.id];
-        acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, remaining, TICK_INTERVAL);
-        return acc;
+          acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, moment().utc())
+          return acc
         }, {})
     });
   }
 
   render() {
     const currentGMTTime = moment().utc().format("DD MMM YYYY, k:mm:ss");
-    const gmtTimeElement = document.querySelector("#gmt-time");
+    const gmtTimeElement = document.querySelector("#gmt-time")
     window.setInterval(
       function(){
         if (gmtTimeElement) {gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
