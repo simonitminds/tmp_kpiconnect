@@ -96,13 +96,87 @@ export default class AuctionsIndex extends React.Component {
           </div>
           <div className="card-content__products">
             {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+
+            <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
+
           </div>
-          <div className="card-content__best-price">
-            <strong>Best Offer: </strong> PRICE
+  {/* BUYER ONLY */}
+          <div className="card-content__auction-status has-margin-top-md">
+              <div>Suppliers Participating</div>
+              <div className="card-content__rsvp">
+                <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>0&nbsp;
+                <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
+                <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
+                <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+              </div>
           </div>
-          <footer className="card-footer">
-            <a href={`/auctions/start/${auction.id}`} className="card-footer-item qa-auction-start">Start</a>
-          </footer>
+          <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
+            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
+          </div>
+          {/* <div className="card-content__auction-status">
+              <div>Are you ready to post your auction?</div>
+              <button className="button is-primary">Schedule Auction</button>
+          </div> */}
+  {/* / BUYER ONLY */}
+  {/* SUPPLIER ONLY */}
+          {/* <div className="card-content__auction-status">
+            <div>Respond to Invitation</div>
+            <div className="field has-addons">
+              <p className="control">
+                <a className="button is-success">
+                  <span>Accept</span>
+                </a>
+              </p>
+              <p className="control">
+                <a className="button is-danger">
+                  <span>Decline</span>
+                </a>
+              </p>
+              <p className="control">
+                <a className="button is-gray-3">
+                  <span>Maybe</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
+            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
+          </div>
+          <div className="card-content__bid">
+            <div className="card-content__bid__title has-padding-right-xs">
+              <div>Place Bid</div>
+              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+            </div>
+          </div> */}
+  {/* / SUPPLIER ONLY */}
+  {/* ADMIN ONLY */}
+          {/* <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
+            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
+          </div>
+          <div className="card-content__bid">
+            <div className="card-content__bid__title has-padding-right-xs">
+              <div>Place Bid</div>
+              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+            </div>
+          </div>
+          <div className="card-content__bid">
+            <div className="card-content__bid__title">
+              <div>Change RSVP</div>
+              <div className="card-content__change-rsvp">
+                <div className="card-content__rsvp">
+                  <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>0&nbsp;
+                  <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
+                  <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
+                  <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+                </div>
+                <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+              </div>
+            </div>
+          </div> */}
+  {/* / ADMIN ONLY */}
         </div>
       </div>
     );

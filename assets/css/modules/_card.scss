@@ -28,16 +28,78 @@
   padding: 0 1rem;
 }
 
-.card-content__best-price {
-  background-color: $highlight;
+.card-content__bid-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  font-weight: bold;
+  background-color: $gray-3;
+  color: $white;
   padding: 0.5rem 1rem;
-  margin: 0.75rem 0;
+  margin: 0;
+}
+
+.card-content__best-bidder {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.card-content__best-price {
+  display: inline-block;
+  float: right;
+  background-color: $highlight;
+  color: $black !important;
+  padding: 0.25rem 0.75rem;
+  margin: 0 -0.25rem 0 0;
+  border-radius: 3px;
 }
 
 .card-content__products {
   margin-top: 1rem;
   padding: 0 1rem;
   font-weight: bold;
+}
+
+.card-content__bid {
+  background-color: $gray-2;
+  margin: 0 0;
+}
+
+.card-content__bid__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $family-header;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  border-top: 1px solid $gray-2;
+}
+
+.card-content__auction-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  font-weight: bold;
+  background-color: $gray-1;
+  padding: 0.5rem 1rem;
+  margin: 0 0 0 0;
+}
+
+.card-content__rsvp {
+  margin: 0 -0.25rem 0 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  background-color: $white;
+}
+
+.card-content__change-rsvp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: -0.75rem;
 }
 
 .card-footer-item {
@@ -51,5 +113,15 @@
       border-color: transparent;
       color: #fff;
     }
+  }
+}
+
+.card__start-auction { // Temporary Auction Start Button
+  float: right;
+  margin-top: -5px;
+
+  span {
+    display: inline-block;
+    margin-right: 4px !important;
   }
 }
