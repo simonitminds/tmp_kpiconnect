@@ -96,9 +96,9 @@ export default class AuctionsIndex extends React.Component {
           </div>
           <div className="card-content__products">
             {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
-
+          </div>
+          <div className="card-content__products">
             <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
-
           </div>
   {/* BUYER ONLY */}
           <div className="card-content__auction-status has-margin-top-md">
