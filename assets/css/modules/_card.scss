@@ -84,6 +84,7 @@
   overflow: hidden;
   font-weight: bold;
   background-color: $gray-1;
+  width: 100%;
   padding: 0.5rem 1rem;
   margin: 0 0 0 0;
 }
@@ -117,8 +118,7 @@
 }
 
 .card__start-auction { // Temporary Auction Start Button
-  float: right;
-  margin-top: -5px;
+  margin-top: 8px;
 
   span {
     display: inline-block;
