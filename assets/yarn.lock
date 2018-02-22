@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@types/node@9.4.1":
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.1.tgz#0f636f7837e15d2d73a7f6f3ea0e322eb2a5ab65"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -1301,6 +1305,10 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
   dependencies:
     delayed-stream "~1.0.0"
+
+commander@2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.14.1.tgz#2235123e37af8ca3c65df45b026dbd357b01b9aa"
 
 commander@^2.0.0, commander@~2.9:
   version "2.9.0"
@@ -2930,6 +2938,13 @@ normalize-path@^2.0.0, normalize-path@^2.0.1:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
+ntpclient@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/ntpclient/-/ntpclient-0.6.1.tgz#64d4fae86a986bbbc0129e38a29da1af601b8fb3"
+  dependencies:
+    "@types/node" "9.4.1"
+    commander "2.14.1"
+
 number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
@@ -3872,6 +3887,10 @@ serve-static@1.13.1, serve-static@^1.10.0:
     escape-html "~1.0.3"
     parseurl "~1.3.2"
     send "0.16.1"
+
+serverdate@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/serverdate/-/serverdate-3.1.0.tgz#a2d55bef0c7165c197eece70397597aa850ef3a5"
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"

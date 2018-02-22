@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 import moment from 'moment';
+import  ServerDate from '../../serverdate';
 
 export default class AuctionShow extends React.Component {
   constructor(props) {
@@ -24,8 +25,9 @@ export default class AuctionShow extends React.Component {
 
 
   tick() {
+    let time = moment(ServerDate.now()).utc();
     this.setState({
-      timeRemaining: timeRemainingCountdown(this.props.auction, moment().utc())
+      timeRemaining: timeRemainingCountdown(this.props.auction, time)
     });
   }
 

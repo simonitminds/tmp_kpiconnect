@@ -3,16 +3,15 @@ import React from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import  ServerDate from '../../serverdate';
+
 
 export default class AuctionsIndex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: _.reduce(props.auctions, (acc, auction) => {
-          acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, moment().utc())
-          return acc
-        }, {})
-    }
+      timeRemaining: []
+    };
   }
 
   componentDidMount() {
@@ -28,9 +27,10 @@ export default class AuctionsIndex extends React.Component {
 
 
   tick() {
+    let time = moment(ServerDate.now()).utc();
     this.setState({
       timeRemaining: _.reduce(this.props.auctions, (acc, auction) => {
-          acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, moment().utc())
+        acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, time);
           return acc
         }, {})
     });
