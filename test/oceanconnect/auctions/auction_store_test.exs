@@ -5,7 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
 
   setup do
-    auction = insert(:auction, duration: 1_000)
+    auction = insert(:auction, duration: 1_000, decision_duration: 1_000)
     {:ok, %{auction: auction}}
   end
 
@@ -17,7 +17,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     auction
     |> AuctionCommand.start_auction
-    |> AuctionStore.process_command(auction.id)
+    |> AuctionStore.process_command
 
 
     expected_state = auction
@@ -50,7 +50,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     auction
     |> AuctionCommand.start_auction
-    |> AuctionStore.process_command(auction.id)
+    |> AuctionStore.process_command
+
+    AuctionStore.get_current_state(auction)
 
     assert AuctionStore.get_current_state(auction).status == :open
 
@@ -69,15 +71,15 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     auction
     |> AuctionCommand.start_auction
-    |> AuctionStore.process_command(auction.id)
+    |> AuctionStore.process_command
 
     auction
     |> AuctionCommand.end_auction
-    |> AuctionStore.process_command(auction.id)
+    |> AuctionStore.process_command
 
     auction
     |> AuctionCommand.end_auction_decision_period
-    |> AuctionStore.process_command(auction.id)
+    |> AuctionStore.process_command
 
     current = DateTime.utc_now()
 
