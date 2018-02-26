@@ -209,7 +209,7 @@ export default class AuctionsIndex extends React.Component {
                 <i className="far fa-clock has-margin-right-xs"></i>
                 <span className="auction-list__timer__clock" id="gmt-time" >{currentGMTTime}</span>&nbsp;GMT
               </div>
-              <i>Clock Set to Server Time</i>
+              <i>Server Time</i>
             </div>
 
           </div>
