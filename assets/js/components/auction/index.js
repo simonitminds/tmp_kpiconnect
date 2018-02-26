@@ -204,10 +204,14 @@ export default class AuctionsIndex extends React.Component {
             <a href="/auctions/new" className="button is-link is-pulled-right">
               New Auction
             </a>
-            <div className="auction-list__timer">
-              <i className="far fa-clock has-margin-right-xs"></i>
-              <span className="auction-list__timer__time" id="gmt-time" >{currentGMTTime}</span>&nbsp;GMT
+            <div class="auction-list__time-box">
+              <div className="auction-list__timer">
+                <i className="far fa-clock has-margin-right-xs"></i>
+                <span className="auction-list__timer__clock" id="gmt-time" >{currentGMTTime}</span>&nbsp;GMT
+              </div>
+              <i>Clock Set to Server Time</i>
             </div>
+
           </div>
         </div>
 
