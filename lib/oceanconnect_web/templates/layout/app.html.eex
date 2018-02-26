@@ -32,7 +32,9 @@
           <div class="navbar-end">
             <span class="navbar-item has-text-weight-bold">
               <%= OceanconnectWeb.SessionView.current_user(@conn) %>
-              <i class="is-size-6 is-block has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
+              <%= if OceanconnectWeb.SessionView.current_company(@conn) !== "" do %>
+                <i class="is-size-6 is-block has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
+              <% end %>
             </span>
             <!-- <a href="#" class="navbar-item">Account Settings</a>
             <a href="#" class="navbar-item">Messages</a>
