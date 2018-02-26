@@ -11,6 +11,27 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
+  def list_participating_auctions(user_id) do
+    buyer_auctions(user_id) ++ supplier_auctions(user_id)
+  end
+
+  defp buyer_auctions(buyer_id) do
+    query = from a in Auction,
+      where: a.buyer_id == ^buyer_id
+    query
+    |> Repo.all
+    |> fully_loaded
+  end
+
+  defp supplier_auctions(supplier_id) do
+    query = from as in Oceanconnect.Auctions.AuctionSuppliers,
+      join: a in Auction, on: a.id == as.auction_id,
+      where: as.supplier_id == ^supplier_id,
+      select: a
+    Repo.all(query)
+    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
+  end
+
   def get_auction!(id) do
      Repo.get!(Auction, id)
    end
@@ -69,6 +90,9 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(auction = %Auction{}) do
     Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+  end
+  def fully_loaded(auctions = []) do
+    Repo.preload(auctions, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
   end
   def fully_loaded(company = %Company{}) do
     Repo.preload(company, [:users, :vessels, :ports])

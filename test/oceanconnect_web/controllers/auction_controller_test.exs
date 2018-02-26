@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     |> Oceanconnect.Utilities.maybe_convert_date_times
     |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
     authed_conn = login_user(build_conn(), buyer)
-    auction = insert(:auction, vessel: vessel)
+    auction = insert(:auction, buyer: buyer_company, vessel: vessel)
     {:ok, conn: authed_conn, valid_auction_params: auction_params,
           auction: auction, buyer: buyer_company,
           supplier: supplier, supplier_company: supplier_company}
