@@ -1,5 +1,4 @@
 import React from 'react';
-import { Component } from 'react';
 import _ from 'lodash';
 
 const InputField = ({model, field, labelText, value, opts, onChange}) => {

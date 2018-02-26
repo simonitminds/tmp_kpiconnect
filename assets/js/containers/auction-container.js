@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AuctionShow from '../components/auction/show'
+import AuctionShow from '../components/auction/show';
 import { getAllAuctions, subscribeToAuctionUpdates } from '../actions';
 
 const mapStateToProps = (state) => {

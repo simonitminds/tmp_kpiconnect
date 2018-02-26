@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { Component } from 'react';
 import InputField from '../InputField';
 import CheckBoxField from '../CheckBoxField';
 import DateInput from '../DateInput';
