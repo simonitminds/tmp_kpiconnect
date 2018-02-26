@@ -37,4 +37,22 @@ defmodule Oceanconnect.AuctionIndexPage do
     find_element(:css, ".qa-auction-time_remaining")
     |> Hound.Helpers.Element.inner_text
   end
+
+  def has_values_from_params?(params) do
+    Enum.all?(params, fn({k, v}) ->
+      element = find_element(:class, "qa-auction-#{k}")
+      value_equals_element_text?(k, element, v)
+    end)
+  end
+
+  defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
+    Enum.all?(suppliers, fn(supplier) ->
+      text = find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
+      |> inner_text
+      supplier.name == text
+    end)
+  end
+  defp value_equals_element_text?(_key, element, value) do
+    value == element |> inner_text
+  end
 end

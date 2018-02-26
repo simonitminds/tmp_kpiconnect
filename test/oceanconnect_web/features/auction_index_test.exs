@@ -20,7 +20,7 @@ defmodule Oceanconnect.AuctionIndexTest do
     assert AuctionIndexPage.has_auctions?(auctions)
   end
 
-  test "Auction realtime start", %{auctions: auctions, supplier: supplier} do
+  test "auction realtime start", %{auctions: auctions, supplier: supplier} do
     auction = hd(auctions)
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     AuctionIndexPage.visit()
@@ -40,5 +40,22 @@ defmodule Oceanconnect.AuctionIndexTest do
       :timer.sleep(500)
       assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
     end
+  end
+
+  test "buyer can see his view of the auction card", %{auctions: auctions} do
+    auction = auctions |> hd
+    buyer_params = %{
+      suppliers: auction.suppliers
+    }
+
+    AuctionIndexPage.visit()
+    assert AuctionIndexPage.has_values_from_params?(buyer_params)
+  end
+
+  test "supplier can see his view of the auction card", %{supplier: supplier} do
+    login_user(supplier)
+    AuctionIndexPage.visit()
+    assert has_css?(".qa-auction-invitation-controls")
+    refute has_css?(".qa-auction-suppliers")
   end
 end

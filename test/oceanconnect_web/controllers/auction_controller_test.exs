@@ -12,6 +12,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     vessel = insert(:vessel, company: buyer_company)
     fuel = insert(:fuel)
     supplier_company = insert(:company, is_supplier: true)
+    supplier = insert(:user, company: supplier_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
     auction_params = string_params_for(:auction, vessel: vessel, fuel: fuel, port: port)
     |> Oceanconnect.Utilities.maybe_convert_date_times
@@ -19,13 +20,23 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     authed_conn = login_user(build_conn(), buyer)
     auction = insert(:auction, vessel: vessel)
     {:ok, conn: authed_conn, valid_auction_params: auction_params,
-          auction: auction, buyer: buyer_company, supplier: supplier_company}
+          auction: auction, buyer: buyer_company,
+          supplier: supplier, supplier_company: supplier_company}
   end
 
   describe "index" do
     test "lists all auctions", %{conn: conn} do
       conn = get conn, auction_path(conn, :index)
       assert html_response(conn, 200)
+    end
+
+    test "user can view only auctions they are participating in", %{auction: auction, conn: conn, buyer: buyer} do
+      auction_as_supplier = insert(:auction, suppliers: [buyer])
+      insert(:auction)
+      new_conn = get conn, auction_path(conn, :index)
+      auctions = new_conn.assigns.auctions
+      assert Enum.all?(auctions, fn(a) -> a.id in [auction.id, auction_as_supplier.id] end)
+      assert length(auctions) == 2
     end
   end
 
@@ -66,7 +77,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
 
-    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, buyer: buyer, supplier: supplier} do
+    test "redirects to show when data is valid", %{conn: conn, valid_auction_params: valid_auction_params, buyer: buyer, supplier_company: supplier_company} do
       updated_params = valid_auction_params
       |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
       |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
@@ -78,7 +89,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn = get conn, auction_path(conn, :show, id)
       assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == buyer.id
-      assert List.first(auction.suppliers).id == supplier.id
+      assert List.first(auction.suppliers).id == supplier_company.id
     end
 
     #TODO Refactor test to assert on specific errors
