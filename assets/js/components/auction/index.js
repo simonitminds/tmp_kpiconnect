@@ -10,7 +10,8 @@ export default class AuctionsIndex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: []
+      timeRemaining: [],
+      serverTime: moment().utc()
     };
   }
 
@@ -32,17 +33,12 @@ export default class AuctionsIndex extends React.Component {
       timeRemaining: _.reduce(this.props.auctions, (acc, auction) => {
         acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, time);
           return acc
-        }, {})
+        }, {}),
+      serverTime: time
     });
   }
 
   render() {
-    const currentGMTTime = moment().utc().format("DD MMM YYYY, k:mm:ss");
-    const gmtTimeElement = document.querySelector("#gmt-time")
-    window.setInterval(
-      function(){
-        if (gmtTimeElement) {gmtTimeElement.innerHTML =  moment().utc().format("DD MMM YYYY, k:mm:ss");}
-    }, 1000);
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
 
     function AuctionTimeRemaining(auction, timeRemaining) {
@@ -207,7 +203,7 @@ export default class AuctionsIndex extends React.Component {
             <div class="auction-list__time-box">
               <div className="auction-list__timer">
                 <i className="far fa-clock has-margin-right-xs"></i>
-                <span className="auction-list__timer__clock" id="gmt-time" >{currentGMTTime}</span>&nbsp;GMT
+                <span className="auction-list__timer__clock" id="gmt-time" >{this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}</span>&nbsp;GMT
               </div>
               <i>Server Time</i>
             </div>
