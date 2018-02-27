@@ -54,8 +54,11 @@ defmodule OceanconnectWeb.AuctionController do
   def show(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
     |> Auctions.fully_loaded
-
-    render(conn, "show.html", auction: auction)
+    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) do
+      render(conn, "show.html", auction: auction)
+    else
+      redirect(conn, to: auction_path(conn, :index))
+    end
   end
 
   def edit(conn, %{"id" => id}) do
@@ -64,8 +67,7 @@ defmodule OceanconnectWeb.AuctionController do
     |> Auctions.fully_loaded
 
     if(auction.buyer_id != Auth.current_user(conn).company_id) do
-      conn
-      |> redirect(to: auction_path(conn, :index))
+      redirect(conn, to: auction_path(conn, :index))
     else
       suppliers = case auction.port do
         nil -> []
@@ -90,8 +92,7 @@ defmodule OceanconnectWeb.AuctionController do
     |> Auctions.fully_loaded
     auction_params = Auction.from_params(auction_params)
     if(auction.buyer_id != Auth.current_user(conn).company_id) do
-      conn
-      |> redirect(to: auction_path(conn, :index))
+      redirect(conn, to: auction_path(conn, :index))
     else
       case Auctions.update_auction(auction, auction_params) do
         {:ok, auction} ->

@@ -109,6 +109,16 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
+  describe "show auction" do
+    test "redirects to index unless user is a participant", %{auction: auction} do
+      user = insert(:user)
+      non_participant_conn = login_user(build_conn(), user)
+
+      conn = get non_participant_conn, auction_path(non_participant_conn, :show, auction)
+      assert redirected_to(conn, 302) == "/auctions"
+    end
+  end
+
   describe "edit auction" do
     test "redirects if current user is not buyer", %{supplier: supplier, auction: auction} do
       supplier_conn = login_user(build_conn(), supplier)

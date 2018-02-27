@@ -6,6 +6,13 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
+  def is_participant?(auction = %Auction{}, company_id) do
+    auction_with_participants = auction
+    |> with_participants
+    suppliers = Enum.map(auction_with_participants.suppliers, fn(supplier) -> supplier.id end)
+    company_id in [auction_with_participants.buyer.id | suppliers]
+  end
+
   def list_auctions do
     Repo.all(Auction)
     |> fully_loaded
