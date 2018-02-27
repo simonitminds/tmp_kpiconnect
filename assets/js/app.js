@@ -39,6 +39,11 @@ function getDataForComponent(componentName) {
   return <AuctionFormContainer auction={auction} suppliers={suppliers} fuels={fuels} ports={ports} vessels={vessels} />;
 }
 
+let currentUserCompanyId = null;
+if(window.companyId && window.companyId != ""){
+  currentUserCompanyId = window.companyId;
+}
+
 if (document.getElementById('auctions-app')) {
   const store = createStore(
     rootReducer,
@@ -50,8 +55,8 @@ if (document.getElementById('auctions-app')) {
 
   const setContainer = () => {
     switch (window.container) {
-      case "index": { return <AuctionsContainer /> }
-      case "show": { return <AuctionContainer /> }
+      case "index": { return <AuctionsContainer currentUserCompanyId={currentUserCompanyId} /> }
+      case "show": { return <AuctionContainer currentUserCompanyId={currentUserCompanyId} /> }
       case "edit": { return getDataForComponent("AuctionFormContainer")}
       case "new": { return getDataForComponent("AuctionFormContainer")}
       default: {return(<div></div>)}

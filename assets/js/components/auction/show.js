@@ -42,7 +42,7 @@ export default class AuctionShow extends React.Component {
   render() {
     const auction = this.props.auction;
     const currentUser = {
-      isBuyer: false
+      isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer.id
     };
 
     const additionInfoDisplay = (auction) => {
@@ -62,10 +62,17 @@ export default class AuctionShow extends React.Component {
             <div className="auction-content">
               <div className="columns is-gapless">
                 <div className="column is-two-thirds">
+                  <div className="tabs is-fullwidth is-medium">
+                    <ul>
+                      <li className="is-active">
+                        <h2 className="title is-size-5"><a className="has-text-left">Auction Monitor</a></h2>
+                      </li>
+                    </ul>
+                  </div>
+                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} />}
                   <LowestBid auction={auction} />
                   {currentUser.isBuyer ? <BidList auction={auction} /> : <BiddingForm auction={auction} />}
                 </div>
-
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">
                     <ul>
@@ -78,7 +85,7 @@ export default class AuctionShow extends React.Component {
                     </ul>
                   </div>
 
-                  {currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : <AuctionInvitation auction={auction} />}
+                  {currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                   <div className="box">
                     <div className="box__subsection">

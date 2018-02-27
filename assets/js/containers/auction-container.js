@@ -42,7 +42,7 @@ export class AuctionContainer extends React.Component {
     if (this.props.loading) {
       return <div>Loading...</div>
     } else {
-      return <AuctionShow auction={auction} />;
+      return <AuctionShow auction={auction} currentUserCompanyId={this.props.currentUserCompanyId}/>;
     }
   }
 }

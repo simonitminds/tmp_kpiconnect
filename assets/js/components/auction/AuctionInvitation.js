@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 const AuctionInvitation = ({auction}) => {
   return(
-    <div>
+    <div className="qa-auction-invitation-controls">
       <div className="box is-gray-1">
         <h3 className="has-text-weight-bold">Do you intend to participate in the auction?</h3>
         <div className="field has-addons has-margin-top-md">
