@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
-import { Link } from 'react-router';
 import moment from 'moment';
-import { formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
-import  ServerDate from '../../serverdate';
+import { timeRemainingCountdown } from '../../utilities';
+import ServerDate from '../../serverdate';
 import AuctionCard from './auction-card';
 
 
@@ -55,7 +54,7 @@ export default class AuctionsIndex extends React.Component {
         return(
           <div className="columns is-multiline">
             { _.map(filteredAuctions, (auction) => {
-              return <AuctionCard key={auction.id} timeRemaining={this.state.timeRemaining} auction={auction} currentUserIsBuyer={currentUserIsBuyer(auction)}/>;
+              return <AuctionCard key={auction.id} auction={auction} timeRemaining={this.state.timeRemaining} currentUserIsBuyer={currentUserIsBuyer(auction)}/>;
             }) }
           </div>);
       }
@@ -69,7 +68,7 @@ export default class AuctionsIndex extends React.Component {
             <a href="/auctions/new" className="button is-link is-pulled-right">
               New Auction
             </a>
-            <div class="auction-list__time-box">
+            <div className="auction-list__time-box">
               <div className="auction-list__timer">
                 <i className="far fa-clock has-margin-right-xs"></i>
                 <span className="auction-list__timer__clock" id="gmt-time" >{this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}</span>&nbsp;GMT

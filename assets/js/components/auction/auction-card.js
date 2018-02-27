@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import { formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import { formatTimeRemaining, formatTimeRemainingColor } from '../../utilities';
 
 const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
-  const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
+  const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
   function AuctionTimeRemaining(auction, timeRemaining) {
     const auctionStatus = auction.state.status;
@@ -74,7 +74,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
             <div className="card-content__rsvp qa-auction-suppliers">
               {_.map(auction.suppliers, (supplier) => {
                 return(
-                  <span className={`icon has-text-success has-margin-right-xs qa-auction-supplier-${supplier.id}`}>
+                  <span key={supplier.id} className={`icon has-text-success has-margin-right-xs qa-auction-supplier-${supplier.id}`}>
                     <i className="fas fa-check-circle"></i>
                     </span>
                   );

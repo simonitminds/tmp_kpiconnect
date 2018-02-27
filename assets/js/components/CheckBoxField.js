@@ -1,5 +1,4 @@
 import React from 'react';
-import { Component } from 'react';
 import _ from 'lodash';
 
 const CheckBoxField = ({model, field, labelText, value, opts = {}}) => {
