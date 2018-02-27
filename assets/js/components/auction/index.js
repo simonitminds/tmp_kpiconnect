@@ -41,6 +41,8 @@ export default class AuctionsIndex extends React.Component {
 
   render() {
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
+    const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
+
 
     const filteredAuctionsDisplay = (status) => {
       const filteredAuctions = _.filter(this.props.auctions, (auction) => { return(auction.state.status === status)});
@@ -53,7 +55,7 @@ export default class AuctionsIndex extends React.Component {
         return(
           <div className="columns is-multiline">
             { _.map(filteredAuctions, (auction) => {
-              return <AuctionCard key={auction.id} timeRemaining={this.state.timeRemaining} auction={auction} />;
+              return <AuctionCard key={auction.id} timeRemaining={this.state.timeRemaining} auction={auction} currentUserIsBuyer={currentUserIsBuyer(auction)}/>;
             }) }
           </div>);
       }

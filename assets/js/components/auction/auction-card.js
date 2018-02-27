@@ -3,7 +3,7 @@ import React from 'react';
 import moment from 'moment';
 import { formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 
-const AuctionCard = ({auction, timeRemaining}) => {
+const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
   const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
 
   function AuctionTimeRemaining(auction, timeRemaining) {
@@ -61,57 +61,66 @@ const AuctionCard = ({auction, timeRemaining}) => {
         <div className="card-content__products">
           <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
         </div>
-    {/* BUYER ONLY */}
-        <div className="card-content__auction-status has-margin-top-md">
+
+      { currentUserIsBuyer ?
+        <div>
+          <div className="card-content__auction-status has-margin-top-md">
             <div>Suppliers Participating</div>
             <div className="card-content__rsvp qa-auction-suppliers">
-              <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>0&nbsp;
-              <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
-              <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
-              <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+              {_.map(auction.suppliers, (supplier) => {
+                return(
+                  <span className={`icon has-text-success has-margin-right-xs qa-auction-supplier-${supplier.id}`}>
+                    <i className="fas fa-check-circle"></i>
+                    </span>
+                  );
+                })
+               }
             </div>
+          </div>
+          <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
+            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
+          </div>
+          {/* <div className="card-content__auction-status">
+              <div>Are you ready to post your auction?</div>
+              <button className="button is-primary">Schedule Auction</button>
+          </div> */}
         </div>
-        <div className="card-content__bid-status">
-          <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
-          <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
-        </div>
-        {/* <div className="card-content__auction-status">
-            <div>Are you ready to post your auction?</div>
-            <button className="button is-primary">Schedule Auction</button>
-        </div> */}
-    {/* / BUYER ONLY */}
-    {/* SUPPLIER ONLY */}
-        {/* <div className="card-content__auction-status">
-          <div>Respond to Invitation</div>
-          <div className="field has-addons">
-            <p className="control">
-              <a className="button is-success">
-                <span>Accept</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-danger">
-                <span>Decline</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-gray-3">
-                <span>Maybe</span>
-              </a>
-            </p>
+      :
+        <div>
+          <div className="card-content__auction-status">
+            <div>Respond to Invitation</div>
+            <div className="field has-addons qa-auction-invitation-controls">
+              <p className="control">
+                <a className="button is-success">
+                  <span>Accept</span>
+                </a>
+              </p>
+              <p className="control">
+                <a className="button is-danger">
+                  <span>Decline</span>
+                </a>
+              </p>
+              <p className="control">
+                <a className="button is-gray-3">
+                  <span>Maybe</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
+            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
+          </div>
+          <div className="card-content__bid">
+            <div className="card-content__bid__title has-padding-right-xs">
+              <div>Place Bid</div>
+              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+            </div>
           </div>
         </div>
-        <div className="card-content__bid-status">
-          <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
-          <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
-        </div>
-        <div className="card-content__bid">
-          <div className="card-content__bid__title has-padding-right-xs">
-            <div>Place Bid</div>
-            <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
-          </div>
-        </div> */}
-    {/* / SUPPLIER ONLY */}
+      }
+
     {/* ADMIN ONLY */}
         {/* <div className="card-content__bid-status">
           <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
