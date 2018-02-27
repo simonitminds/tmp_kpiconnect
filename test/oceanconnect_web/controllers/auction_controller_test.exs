@@ -110,6 +110,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "edit auction" do
+    test "redirects if current user is not buyer", %{supplier: supplier, auction: auction} do
+      supplier_conn = login_user(build_conn(), supplier)
+      conn = get supplier_conn, auction_path(supplier_conn, :edit, auction)
+      assert redirected_to(conn, 302) == "/auctions"
+    end
+
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)
       assert html_response(conn, 200) =~ "Edit Auction"
@@ -117,6 +123,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "update auction" do
+    test "redirects if current user is not buyer", %{supplier: supplier, auction: auction} do
+      supplier_conn = login_user(build_conn(), supplier)
+      |> put(auction_path(build_conn(), :update, auction), auction: @update_attrs)
+      assert redirected_to(supplier_conn, 302) == "/auctions"
+    end
+
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)
       assert html_response(conn, 200) =~ "Edit Auction"

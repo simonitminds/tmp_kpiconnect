@@ -46,7 +46,12 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
               <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
             {/* Start Link to Auction Edit */}
-              <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit"><span className="icon is-medium has-text-right"><i className="fas fa-lg fa-edit"></i></span></a>
+              { currentUserIsBuyer ?
+                <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit">
+                  <span className="icon is-medium has-text-right">
+                    <i className="fas fa-lg fa-edit"></i>
+                  </span>
+                </a> : ""}
             {/* End Link to Auction Edit */}
           </div>
         </div>
