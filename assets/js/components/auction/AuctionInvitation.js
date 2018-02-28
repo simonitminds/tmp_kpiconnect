@@ -4,7 +4,7 @@ import _ from 'lodash';
 const AuctionInvitation = ({auction}) => {
   return(
     <div className="auction-invitation qa-auction-invitation-controls">
-      <div className="box box--bordered-left is-gray-1">
+      <div className="auction-invitation__status box box--bordered-left is-gray-1">
         <h3 className="has-text-weight-bold">Do you intend to participate in the auction?</h3>
         <div className="field has-addons has-margin-top-md">
           <p className="control">
@@ -24,7 +24,7 @@ const AuctionInvitation = ({auction}) => {
           </p>
         </div>
       </div>
-      <div className = "box is-success" >
+      <div className = "auction-invitation__status box is-success" >
         <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-check-circle"></i>
@@ -45,7 +45,7 @@ const AuctionInvitation = ({auction}) => {
           </div>
         </div>
       </div>
-      <div className = "box is-danger" >
+      <div className = "auction-invitation__status box is-danger" >
         <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-times-circle"></i>
@@ -66,7 +66,7 @@ const AuctionInvitation = ({auction}) => {
           </div>
         </div>
       </div>
-      <div className = "box is-warning" >
+      <div className = "auction-invitation__status box is-warning" >
         <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-adjust"></i>

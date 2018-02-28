@@ -9,4 +9,12 @@
 
 .auction-invitation {
   margin-bottom: 1.5rem;
+
+  .icon.is-medium { // Modify height to keep spacing consistent even when invite status text wraps.
+    height: 1rem;
+  }
+
+  &__status {
+    h3 { line-height: 1.3;}
+  }
 }
