@@ -63,9 +63,13 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         <div className="card-content__products">
           {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
         </div>
+      { currentUserIsBuyer ?
         <div className="card-content__products">
           <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
         </div>
+        :
+        <div className="is-none"></div>
+      }
 
       { currentUserIsBuyer ?
         <div>
@@ -93,24 +97,24 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         </div>
       :
         <div>
-          <div className="card-content__auction-status">
+          <div className="card-content__auction-status has-margin-top-md">
             <div>Respond to Invitation</div>
             <div className="field has-addons qa-auction-invitation-controls">
-              <p className="control">
-                <a className="button is-success">
+              <div className="control">
+                <a className="button is-small is-success">
                   <span>Accept</span>
                 </a>
-              </p>
-              <p className="control">
-                <a className="button is-danger">
+              </div>
+              <div className="control">
+                <a className="button is-small is-danger">
                   <span>Decline</span>
                 </a>
-              </p>
-              <p className="control">
-                <a className="button is-gray-3">
+              </div>
+              <div className="control">
+                <a className="button is-small is-gray-3">
                   <span>Maybe</span>
                 </a>
-              </p>
+              </div>
             </div>
           </div>
           <div className="card-content__bid-status">

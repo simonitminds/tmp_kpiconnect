@@ -64,6 +64,9 @@ $highlight: $yellow;
   background-color: $highlight !important;
   color: $dark;
 }
+.is-none { // Just a casual utility to display: none
+  display: none !important;
+}
 
 // ===== TYPOGRAPHY ===== //
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,400i');

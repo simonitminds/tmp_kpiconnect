@@ -69,7 +69,6 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} />}
                   <LowestBid auction={auction} />
                   {currentUser.isBuyer ? <BidList auction={auction} /> : <BiddingForm auction={auction} />}
                 </div>
@@ -84,7 +83,7 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-
+                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} />}
                   {currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                   <div className="box">

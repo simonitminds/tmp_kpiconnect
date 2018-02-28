@@ -11,11 +11,15 @@
 
 // Additions
 
+.box--bordered-left { // For boxes with a heavy turquoise left border...
+  border-left: 10px solid $turquoise;
+}
+
 .box {
   &__subsection { // When a box element has multiple sections
     padding: 0.75rem 1.25rem 1rem;
     margin: 0 -1.25rem;
-    
+
     &:first-child {
       padding-top: 0;
     }

@@ -41,7 +41,7 @@ const AuctionHeader = ({auction, timeRemaining}) => {
           </div>
         </div>
       </section>
-      <section className="auction-page">
+      <section className="auction-page auction-page--gray">
         <div className="container">
           <div className="auction-header__ports has-text-weight-bold">
             <span className="qa-auction-port">{auction.port.name}</span>

@@ -50,7 +50,7 @@ section {
   &.auction-page { // Form divisions for Auction Show Page
     padding: 0 1rem;
 
-    &:nth-child(3) {
+    &.auction-page--gray {
       background-color: $gray-0;
 
       .empty-list {
