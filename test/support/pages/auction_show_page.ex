@@ -28,12 +28,37 @@ defmodule Oceanconnect.AuctionShowPage do
       supplier.name == text
     end)
   end
-  defp value_equals_element_text?(_key, element, value) do
+  defp value_equals_element_text?(key, element, value) do
     value == element |> inner_text
   end
 
   def time_remaining() do
     find_element(:css, ".qa-auction-time_remaining")
     |> Hound.Helpers.Element.inner_text
+  end
+
+  def enter_bid(params = %{}) do
+    params
+    |> Enum.map(fn({key, value}) ->
+      element = find_element(:class, "qa-auction-bid-#{key}")
+      type = Hound.Helpers.Element.tag_name(element)
+      fill_form_element(key, element, type, value)
+    end)
+  end
+
+  def fill_form_element(:additional_charges, element, _type, value) do
+    element |> click
+  end
+  def fill_form_element(_key, element, "select", value) do
+    find_within_element(element, :css, "option[value='#{value}']")
+    |> click
+  end
+  def fill_form_element(_key, element, _type, value) do
+    fill_field(element, value)
+  end
+
+  def submit_bid() do
+    find_element(:css, ".qa-auction-bid-submit")
+    |> click
   end
 end

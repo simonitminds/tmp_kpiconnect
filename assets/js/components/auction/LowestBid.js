@@ -18,8 +18,8 @@ const LowestBid = ({auction}) => {
           </thead>
           <tbody>
             <tr className="is-selected">
-              <td> Seller 2</td>
-              <td> $380.00</td>
+              <td className="qa-auction-lowest-bid-supplier"> Seller 2</td>
+              <td className="qa-auction-lowest-bid-amount"> $380.00</td>
               <td> $380.00</td>
               <td> 12:17</td>
             </tr>

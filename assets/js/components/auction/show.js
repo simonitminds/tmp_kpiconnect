@@ -8,6 +8,8 @@ import AuctionHeader from './AuctionHeader';
 import LowestBid from './LowestBid';
 import BidList from './BidList';
 import BiddingForm from './BiddingForm';
+import MinimumBid from './MinimumBid';
+import MostRecentBid from './MostRecentBid';
 import InvitedSuppliers from './InvitedSuppliers';
 import AuctionInvitation from './AuctionInvitation';
 
@@ -53,6 +55,17 @@ export default class AuctionShow extends React.Component {
       }
     }
 
+    const supplierBidComponents = (auction) => {
+      return (
+        <div  className="box">
+          <MostRecentBid auction={auction} />
+          <MinimumBid auction={auction} />
+          <BiddingForm auction={auction} />
+        </div>
+      )
+
+    }
+
     return (
       <div>
         <AuctionBreadCrumbs auction={auction} />
@@ -70,7 +83,7 @@ export default class AuctionShow extends React.Component {
                     </ul>
                   </div>
                   <LowestBid auction={auction} />
-                  {currentUser.isBuyer ? <BidList auction={auction} /> : <BiddingForm auction={auction} />}
+                  {currentUser.isBuyer ? <BidList auction={auction} /> : supplierBidComponents(auction) }
                 </div>
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">
