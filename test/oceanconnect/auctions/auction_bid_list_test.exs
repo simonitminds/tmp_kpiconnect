@@ -1,8 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Utilities
-  alias Oceanconnect.Auctions.AuctionBidList
-  alias Oceanconnect.Auctions.AuctionBidList.{AuctionBid, BidCommand}
+  alias Oceanconnect.Auctions.{Command, AuctionBidList}
+  alias Oceanconnect.Auctions.AuctionBidList.{AuctionBid}
 
   setup do
     supplier_company = insert(:company)
@@ -23,7 +23,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     %AuctionBid{}
     |> Map.merge(bid_params)
-    |> BidCommand.enter_bid
+    |> Command.enter_bid
     |> AuctionBidList.process_command
 
     actual_state = bid_params.auction_id

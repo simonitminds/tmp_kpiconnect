@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionBidList do
   use GenServer
-  alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
-  alias __MODULE__.{AuctionBid, BidCommand}
+  alias Oceanconnect.Auctions.{Command}
+  alias __MODULE__.{AuctionBid}
 
   @registry_name :auction_bids_registry
 
@@ -23,17 +23,6 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       other: nil,
       total_price: nil,
       time_entered: nil
-  end
-
-  defmodule BidCommand do
-    defstruct command: :enter_bid, data: nil
-
-    def enter_bid(bid = %AuctionBid{amount: amount, fuel_quantity: fuel_quantity}) do
-      time_entered = DateTime.utc_now()
-      total_price = amount * fuel_quantity
-      updated_bid = Map.merge(bid, %{id: UUID.uuid4(:hex), total_price: total_price, time_entered: time_entered})
-      %BidCommand{command: :enter_bid, data: updated_bid}
-    end
   end
 
   def find_pid(auction_id) do
@@ -62,12 +51,12 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
     do: GenServer.call(pid, :get_bid_list)
   end
 
-  def process_command(%BidCommand{command: :enter_bid, data: bid = %AuctionBid{auction_id: auction_id}}) do
+  def process_command(%Command{command: :enter_bid, data: bid = %AuctionBid{auction_id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.cast(pid, {:enter_bid, bid})
   end
 
-  def process_command(%BidCommand{command: cmd, data: bid = %AuctionBid{auction_id: auction_id}}) do
+  def process_command(%Command{command: cmd, data: bid = %AuctionBid{auction_id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, {cmd, bid})
   end

@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
   alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
+  alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
@@ -54,7 +54,7 @@ defmodule Oceanconnect.Auctions do
 
   def start_auction(auction = %Auction{}) do
     auction
-    |> AuctionCommand.start_auction
+    |> Command.start_auction
     |> AuctionStore.process_command
 
     update_auction(auction, %{auction_start: DateTime.utc_now()})

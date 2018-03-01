@@ -1,14 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  # def notify_participants(auction_state) do
-  #   {:ok, pid} = Task.Supervisor.start_link()
-  #   @task_supervisor.async_nolink(pid, fn ->
-  #     notification_state = Oceanconnect.Auctions.auction_state(%Oceanconnect.Auctions.Auction{id: auction.id})
-  #     send_notification_to_participants(auction, "user_auctions", notification_state)
-  #   end)
-  # end
-
   def notify_participants(auction_state) do
     {:ok, pid} = Task.Supervisor.start_link()
     @task_supervisor.async_nolink(pid, fn ->

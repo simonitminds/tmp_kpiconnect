@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
-  alias Oceanconnect.Auctions.{Auction, AuctionNotifier, AuctionTimer, TimersSupervisor}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
+  alias Oceanconnect.Auctions.{Auction, AuctionNotifier, AuctionTimer, Command, TimersSupervisor}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   @registry_name :auctions_registry
 
@@ -27,22 +27,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       auction_state
       |> Map.put(:time_remaining, time_remaining)
       |> Map.put(:current_server_time, DateTime.utc_now())
-    end
-  end
-
-  defmodule AuctionCommand do
-    defstruct command: :get_current_state, data: nil
-
-    def start_auction(%Auction{id: auction_id, duration: duration}) do
-      %AuctionCommand{command: :start_auction, data: %{id: auction_id, duration: duration}}
-    end
-
-    def end_auction(%Auction{id: auction_id, decision_duration: duration}) do
-      %AuctionCommand{command: :end_auction, data: %{id: auction_id, duration: duration}}
-    end
-
-    def end_auction_decision_period(%Auction{id: auction_id}) do
-      %AuctionCommand{command: :end_auction_decision_period, data: %{id: auction_id}}
     end
   end
 
@@ -75,22 +59,22 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     do: GenServer.call(pid, :get_current_state)
   end
 
-  def process_command(%AuctionCommand{command: :start_auction, data: data}) do
+  def process_command(%Command{command: :start_auction, data: data}) do
     with {:ok, pid} <- find_pid(data.id),
     do: GenServer.cast(pid, {:start_auction, data})
   end
 
-  def process_command(%AuctionCommand{command: :end_auction, data: data}) do
+  def process_command(%Command{command: :end_auction, data: data}) do
     with {:ok, pid} <- find_pid(data.id),
     do: GenServer.cast(pid, {:end_auction, data})
   end
 
-  def process_command(%AuctionCommand{command: :end_auction_decision_period, data: data}) do
+  def process_command(%Command{command: :end_auction_decision_period, data: data}) do
     with {:ok, pid} <- find_pid(data.id),
       do: GenServer.cast(pid, {:end_auction_decision_period, data})
   end
 
-  def process_command(%AuctionCommand{command: cmd, data: data}, auction_id) do
+  def process_command(%Command{command: cmd, data: data}, auction_id) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.call(pid, {cmd, data})
   end

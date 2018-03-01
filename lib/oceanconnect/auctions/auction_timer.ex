@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
   alias Oceanconnect.{Auctions}
   alias Oceanconnect.Auctions.AuctionStore
-  alias Oceanconnect.Auctions.AuctionStore.AuctionCommand
+  alias Oceanconnect.Auctions.Command
 
   @registry_name :auction_timers_registry
 
@@ -37,7 +37,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id, duration: duration}) do
     %Auctions.Auction{id: auction_id, decision_duration: duration}
-    |> AuctionCommand.end_auction
+    |> Command.end_auction
     |> AuctionStore.process_command
 
     {:noreply, state}
@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_decision_timer, state = %{auction_id: auction_id}) do
     %Auctions.Auction{id: auction_id}
-    |> AuctionCommand.end_auction_decision_period
+    |> Command.end_auction_decision_period
     |> AuctionStore.process_command
 
     {:noreply, state}

@@ -1,8 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Utilities
-  alias Oceanconnect.Auctions.AuctionStore
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand, AuctionState}
+  alias Oceanconnect.Auctions.{AuctionStore, Command}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000)
@@ -16,7 +16,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     current = DateTime.utc_now()
 
     auction
-    |> AuctionCommand.start_auction
+    |> Command.start_auction
     |> AuctionStore.process_command
 
 
@@ -49,7 +49,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     current = DateTime.utc_now()
 
     auction
-    |> AuctionCommand.start_auction
+    |> Command.start_auction
     |> AuctionStore.process_command
 
     AuctionStore.get_current_state(auction)
@@ -70,15 +70,15 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
 
     auction
-    |> AuctionCommand.start_auction
+    |> Command.start_auction
     |> AuctionStore.process_command
 
     auction
-    |> AuctionCommand.end_auction
+    |> Command.end_auction
     |> AuctionStore.process_command
 
     auction
-    |> AuctionCommand.end_auction_decision_period
+    |> Command.end_auction_decision_period
     |> AuctionStore.process_command
 
     current = DateTime.utc_now()
