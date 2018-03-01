@@ -74,14 +74,12 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
       { currentUserIsBuyer ?
         <div>
           <div className="card-content__auction-status has-margin-top-md">
-            <div className="card-content__auction-status has-margin-top-md">
-                <div>Suppliers Participating</div>
-                <div className="card-content__rsvp qa-auction-suppliers">
-                  <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
-                  <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
-                  <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
-                  <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
-                </div>
+            <div>Suppliers Participating</div>
+            <div className="card-content__rsvp qa-auction-suppliers">
+              <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
+              <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
+              <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
+              <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
             </div>
           </div>
           <div className="card-content__bid-status">
