@@ -74,16 +74,14 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
       { currentUserIsBuyer ?
         <div>
           <div className="card-content__auction-status has-margin-top-md">
-            <div>Suppliers Participating</div>
-            <div className="card-content__rsvp qa-auction-suppliers">
-              {_.map(auction.suppliers, (supplier) => {
-                return(
-                  <span key={supplier.id} className={`icon has-text-success has-margin-right-xs qa-auction-supplier-${supplier.id}`}>
-                    <i className="fas fa-check-circle"></i>
-                    </span>
-                  );
-                })
-               }
+            <div className="card-content__auction-status has-margin-top-md">
+                <div>Suppliers Participating</div>
+                <div className="card-content__rsvp qa-auction-suppliers">
+                  <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
+                  <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
+                  <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
+                  <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+                </div>
             </div>
           </div>
           <div className="card-content__bid-status">
