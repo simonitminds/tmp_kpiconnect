@@ -45,11 +45,11 @@ defmodule Oceanconnect.AuctionIndexPage do
     end)
   end
 
-  defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
-    Enum.all?(suppliers, fn(supplier) ->
-      find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
-    end)
-  end
+  # defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
+  #   Enum.all?(suppliers, fn(supplier) ->
+  #     find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
+  #   end)
+  # end
   defp value_equals_element_text?(_key, element, value) do
     value == element |> inner_text
   end

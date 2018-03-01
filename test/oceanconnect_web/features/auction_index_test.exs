@@ -41,15 +41,15 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
   end
 
-  test "buyer can see his view of the auction card", %{auctions: auctions} do
-    auction = auctions |> hd
-    buyer_params = %{
-      suppliers: auction.suppliers
-    }
+  # test "buyer can see his view of the auction card", %{auctions: auctions} do
+  #   auction = auctions |> hd
+  #   buyer_params = %{
+  #     suppliers: auction.suppliers
+  #   }
 
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.has_values_from_params?(buyer_params)
-  end
+    # AuctionIndexPage.visit()
+    # assert AuctionIndexPage.has_values_from_params?(buyer_params)
+  # end
 
   test "supplier can see his view of the auction card", %{supplier: supplier} do
     login_user(supplier)
