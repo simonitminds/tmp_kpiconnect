@@ -1,8 +1,7 @@
 defmodule Oceanconnect.AuctionIndexTest do
-  use Oceanconnect.FeatureCase, async: false
+  use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
 
-  hound_session()
 
   setup do
     buyer_company = insert(:company)

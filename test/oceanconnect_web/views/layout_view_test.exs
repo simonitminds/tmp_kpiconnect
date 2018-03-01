@@ -1,3 +1,3 @@
 defmodule OceanconnectWeb.LayoutViewTest do
-  use OceanconnectWeb.ConnCase, async: true
+  use OceanconnectWeb.ConnCase
 end

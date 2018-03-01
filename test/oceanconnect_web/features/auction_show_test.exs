@@ -1,5 +1,5 @@
 defmodule Oceanconnect.AuctionShowTest do
-  use Oceanconnect.FeatureCase, async: false
+  use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionIndexPage, AuctionShowPage}
 #  import Hound.Helpers.Session
 
