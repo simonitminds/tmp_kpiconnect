@@ -45,6 +45,7 @@ defmodule Oceanconnect.Mixfile do
       {:hound, "~> 1.0", only: :test},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:uuid, "~> 1.1"},
     ]
   end
 
