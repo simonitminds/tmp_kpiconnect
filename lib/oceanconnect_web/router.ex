@@ -11,6 +11,7 @@ defmodule OceanconnectWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug OceanconnectWeb.Plugs.Auth
   end
 
   pipeline :authenticated do
@@ -21,6 +22,7 @@ defmodule OceanconnectWeb.Router do
   scope "/api", OceanconnectWeb.Api do
     pipe_through :api
     get "/auctions", AuctionController, :index, as: :auction_api
+    post "/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api
     get "/ports/:port_id/suppliers", PortSupplierController, :index
   end
 

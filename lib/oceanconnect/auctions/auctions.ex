@@ -39,9 +39,13 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
   end
 
+  def get_auction(id) do
+    Repo.get(Auction, id)
+  end
+
   def get_auction!(id) do
-     Repo.get!(Auction, id)
-   end
+    Repo.get!(Auction, id)
+  end
 
   def auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
