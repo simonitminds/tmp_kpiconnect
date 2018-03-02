@@ -21,7 +21,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
   test "starting auction_bid_list for auction", %{bid_params: bid_params} do
     assert AuctionBidList.get_bid_list(bid_params.auction_id) == []
 
-    %AuctionBid{}
+    %AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}
     |> Map.merge(bid_params)
     |> Command.enter_bid
     |> AuctionBidList.process_command

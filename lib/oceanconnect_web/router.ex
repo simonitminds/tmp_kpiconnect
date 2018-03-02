@@ -11,7 +11,6 @@ defmodule OceanconnectWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug OceanconnectWeb.Plugs.Auth
   end
 
   pipeline :authenticated do

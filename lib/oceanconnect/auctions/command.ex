@@ -23,4 +23,8 @@ defmodule Oceanconnect.Auctions.Command do
     updated_bid = Map.merge(bid, %{id: UUID.uuid4(:hex), total_price: total_price, time_entered: time_entered})
     %Command{command: :enter_bid, data: updated_bid}
   end
+
+  def process_new_bid(bid = %AuctionBid{}) do
+    %Command{command: :process_new_bid, data: bid}
+  end
 end

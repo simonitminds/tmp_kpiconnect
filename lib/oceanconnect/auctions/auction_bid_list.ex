@@ -1,11 +1,12 @@
 defmodule Oceanconnect.Auctions.AuctionBidList do
   use GenServer
-  alias Oceanconnect.Auctions.{Command}
-  alias __MODULE__.{AuctionBid}
+  alias Oceanconnect.Auctions.Command
+  alias __MODULE__.AuctionBid
 
   @registry_name :auction_bids_registry
 
   defmodule AuctionBid do
+    @enforce_keys [:auction_id, :amount, :supplier_id]
     defstruct id: nil,
       auction_id: nil,
       amount: nil,
@@ -15,14 +16,19 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       expiration: nil,
       min_amount: nil,
       supplier_id: nil,
-      additional_charges: false,
-      barging: nil,
-      wharfage: nil,
-      booming: nil,
-      taxes: nil,
-      other: nil,
       total_price: nil,
       time_entered: nil
+
+    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
+      params = %{
+        auction_id: auction.id,
+        amount: amount,
+        fuel_id: auction.fuel_id,
+        fuel_quantity: auction.fuel_quantity,
+        supplier_id: supplier_id
+      }
+      Map.merge(%AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}, params)
+    end
   end
 
   def find_pid(auction_id) do
@@ -68,7 +74,6 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
 
   def handle_cast({:enter_bid, bid = %AuctionBid{}}, current_state) do
     new_state = [bid | current_state]
-    # AuctionNotifier.notify_participants(new_state)
     {:noreply, new_state}
   end
 end

@@ -17,7 +17,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
     {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
-    expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
+    expected_payload = %{id: auction.id,
+      state: %{status: :open, time_remaining: time_remaining, winning_bid: []}
+    }
 
     {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
             buyer_id: Integer.to_string(buyer_company.id),
@@ -87,8 +89,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction goes into Decision" do
     setup(%{expected_payload: expected_payload}) do
-      current_time =  DateTime.utc_now()
-      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, current_server_time: current_time})
+      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, winning_bid: []})
       {:ok, %{payload: payload}}
     end
 
@@ -125,8 +126,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction Ends (post Decision Period)" do
     setup(%{expected_payload: expected_payload}) do
-      current_time =  DateTime.utc_now()
-      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, current_server_time: current_time})
+      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, winning_bid: []})
       {:ok, %{payload: payload}}
     end
 
