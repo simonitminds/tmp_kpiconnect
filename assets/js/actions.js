@@ -52,7 +52,7 @@ export function getAllAuctions() {
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {
-    fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
+    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, {headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {

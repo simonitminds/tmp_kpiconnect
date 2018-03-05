@@ -17,6 +17,7 @@ defmodule Oceanconnect.AuctionNewTest do
     selected_company1 = Enum.at(supplier_companies, 0)
     selected_company2 = Enum.at(supplier_companies, 2)
 
+    suppliers = [selected_company1, selected_company2]
     auction_params = %{
       auction_start_date: DateTime.utc_now(),
       auction_start_time: DateTime.utc_now(),
@@ -41,9 +42,10 @@ defmodule Oceanconnect.AuctionNewTest do
     show_params = %{
       vessel: "#{selected_vessel.name} (#{selected_vessel.imo})",
       port: port.name,
-      suppliers: [selected_company1, selected_company2]
+      suppliers: suppliers
     }
-    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, show_params: show_params, port: port}}
+    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, buyer_company: buyer_company,
+            show_params: show_params, suppliers: suppliers, port: port}}
   end
 
   test "visting the new auction page" do
@@ -72,6 +74,14 @@ defmodule Oceanconnect.AuctionNewTest do
     company_vessels = MapSet.new(buyer_vessels)
 
     assert MapSet.equal?(vessels_on_page, company_vessels)
+  end
+
+  test "supplier list is filtered by port", %{buyer_company: buyer_company, suppliers: suppliers, port: port} do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+
+    assert AuctionNewPage.has_suppliers?(suppliers)
+    assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
   test "creating an auction", %{params: params, show_params: show_params, port: port} do

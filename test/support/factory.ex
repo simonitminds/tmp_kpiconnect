@@ -31,7 +31,7 @@ defmodule Oceanconnect.Factory do
        port: build(:port),
        vessel: build(:vessel),
        buyer: build(:company),
-       suppliers: [build(:company)]
+       suppliers: [build(:company, is_supplier: true)]
     }
   end
 

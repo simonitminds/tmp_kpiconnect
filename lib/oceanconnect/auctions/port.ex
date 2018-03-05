@@ -27,4 +27,10 @@ defmodule Oceanconnect.Auctions.Port do
       where: p.id == ^port_id and c.is_supplier == true,
       select: c
   end
+  def suppliers_for_port_id(port_id, buyer_id) do
+    from c in Oceanconnect.Accounts.Company,
+      join: p in assoc(c, :ports),
+      where: p.id == ^port_id and c.is_supplier == true and c.id != ^buyer_id,
+      select: c
+  end
 end

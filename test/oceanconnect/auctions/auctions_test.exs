@@ -195,11 +195,17 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, %{p1: port1, p2: port2, c1: company1, c2: company2, c3: company3}}
     end
 
-    test "supplier_companies_for_port/1 returns only supplier companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
-      companies = Auctions.supplier_companies_for_port(p1)
+    test "supplier_list_for_auction/1 returns only supplier companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
+      companies = Auctions.supplier_list_for_auction(p1)
       assert Enum.all?(companies, fn(c) -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.supplier_companies_for_port(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.supplier_list_for_auction(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+    end
+
+    test "supplier_list_for_auction/2 returns only supplier companies for given port and not buyer", %{p1: p1, c1: buyer, c2: c2} do
+      companies = Auctions.supplier_list_for_auction(p1, buyer.id)
+      assert length(companies) == 1
+      assert hd(companies).id == c2.id
     end
 
     test "ports_for_company/1 returns ports for given company", %{p1: p1, p2: p2, c1: c1, c2: c2} do
