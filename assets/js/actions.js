@@ -41,7 +41,7 @@ export function subscribeToAuctionUpdates() {
 
 export function getAllAuctions() {
   return dispatch => {
-    fetch('/api/auctions', { headers: defaultHeaders })
+    fetch(`/api/auctions?buyer_id=${window.companyId}`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {

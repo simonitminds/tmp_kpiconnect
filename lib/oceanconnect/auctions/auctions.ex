@@ -18,8 +18,8 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def list_participating_auctions(user_id) do
-    buyer_auctions(user_id) ++ supplier_auctions(user_id)
+  def list_participating_auctions(company_id) do
+    buyer_auctions(company_id) ++ supplier_auctions(company_id)
   end
 
   defp buyer_auctions(buyer_id) do

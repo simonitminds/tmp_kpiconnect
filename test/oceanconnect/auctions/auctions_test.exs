@@ -50,6 +50,15 @@ defmodule Oceanconnect.AuctionsTest do
       |> MapSet.equal?(MapSet.new([auction.id]))
     end
 
+    test "list_participating_auctions/1 returns all auctions a company is a participant in", %{auction: auction} do
+      supplier_auction = insert(:auction, suppliers: [Repo.preload(auction, [:buyer]).buyer])
+      insert(:auction)
+      assert Auctions.list_participating_auctions(auction.buyer_id)
+      |> Enum.map(fn(a) -> a.id end)
+      |> MapSet.new
+      |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
+    end
+
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end
