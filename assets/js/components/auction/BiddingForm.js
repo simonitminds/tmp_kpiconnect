@@ -1,10 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 
-const BiddingForm = ({auction}) => {
+const BiddingForm = ({auction, formSubmit}) => {
   const fuel = _.get(auction, 'fuel.name');
   return(
-    <div>
+    <form onSubmit={formSubmit.bind(this, auction.id)}>
       <div className="box__subsection box__subsection--bordered box__subsection--base is-gray-1">
         <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
         <div className="field is-horizontal is-expanded">
@@ -16,8 +16,9 @@ const BiddingForm = ({auction}) => {
           <div className="field-body">
             <div className="control is-expanded">
               <div className="select is-fullwidth">
-                <select className="" name="" id="fuel_type">
+                <select className="" name="fuel" id="fuel_type">
                   <option value="">Fuel Type</option>
+                  <option value={auction.fuel.id}>{auction.fuel.name}</option>
                 </select>
               </div>
             </div>
@@ -31,7 +32,7 @@ const BiddingForm = ({auction}) => {
           </div>
           <div className="field-body">
             <div className="control is-expanded has-icons-left">
-              <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" name="" />
+              <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" name="amount" />
               <span className="icon is-small is-left">
                 <i className="fas fa-dollar-sign"></i>
               </span>
@@ -46,7 +47,7 @@ const BiddingForm = ({auction}) => {
           </div>
           <div className="field-body">
             <div className="control is-expanded has-icons-left">
-              <input className="input" type="number" id="minimumBid" step="0.25" name="" value="" />
+              <input className="input" type="number" id="minimumBid" step="0.25" name="min_amount" value="" />
               <span className="icon is-small is-left">
                 <i className="fas fa-dollar-sign"></i>
               </span>
@@ -62,7 +63,7 @@ const BiddingForm = ({auction}) => {
           <div className="field-body">
             <div className="control is-expanded">
               <div className="select is-fullwidth">
-                <select className="" name="" id="expiration">
+                <select className="" name="expiration" id="expiration">
                   <option value="">None</option>
                   <option value="10">10 mins</option>
                   <option value="15">15 mins</option>
@@ -80,8 +81,9 @@ const BiddingForm = ({auction}) => {
           <div className="field-body">
             <div className="control is-expanded">
               <div className="select is-fullwidth">
-                <select className="" name="" id="terms">
+                <select className="" name="credit_terms" id="terms">
                   <option value="">Credit Terms</option>
+                  <option value="net30">30 Days from Delivery Date</option>
                 </select>
               </div>
             </div>
@@ -89,11 +91,11 @@ const BiddingForm = ({auction}) => {
         </div>
         <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
           <div className="control">
-            <button type="button" className="button is-primary qa-auction-bid-submit">Place Bid</button>
+            <button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

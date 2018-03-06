@@ -3,17 +3,26 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
-import { getAllAuctions, subscribeToAuctionUpdates } from '../actions';
+import { getAllAuctions, subscribeToAuctionUpdates, submitBid } from '../actions';
 
 const mapStateToProps = (state) => {
+  const auction = _.chain(state.auctionsReducer.auctions)
+    .filter(['id', window.auctionId])
+    .first()
+    .value();
   return {
-    auctions: state.auctionsReducer.auctions,
+    auction,
     loading: state.auctionsReducer.loading
   }
 };
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
+  formSubmit(auction_id, ev) {
+    ev.preventDefault();
+
+    dispatch(submitBid(auction_id, new FormData(ev.target)))
+  },
   ...bindActionCreators(dispatch)
 });
 
@@ -34,15 +43,10 @@ export class AuctionContainer extends React.Component {
 
 
   render() {
-    const auction = _.chain(this.props.auctions)
-      .filter(['id', window.auctionId])
-      .first()
-      .value();
-
     if (this.props.loading) {
       return <div>Loading...</div>
     } else {
-      return <AuctionShow auction={auction} currentUserCompanyId={this.props.currentUserCompanyId}/>;
+      return <AuctionShow {...this.props}/>;
     }
   }
 }

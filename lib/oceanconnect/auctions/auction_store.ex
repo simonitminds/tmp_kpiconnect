@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
-  alias Oceanconnect.Auctions.{Auction, AuctionNotifier, AuctionTimer, Command, TimersSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionBidsSupervisor, AuctionNotifier, AuctionTimer, Command, TimersSupervisor}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   @registry_name :auctions_registry
@@ -59,6 +59,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     do: GenServer.call(pid, :get_current_state)
   end
 
+  def process_command(%Command{command: cmd, data: data = %{auction_id: auction_id}}) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {cmd, data})
+  end
   def process_command(%Command{command: cmd, data: data}) do
     with {:ok, pid} <- find_pid(data.id),
       do: GenServer.cast(pid, {cmd, data})
@@ -83,6 +87,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
       error -> error
     end
+    AuctionBidsSupervisor.start_child(auction_id)
     new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :open})
     AuctionNotifier.notify_participants(new_state)
 
@@ -108,20 +113,26 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_new_bid, bid = %{amount: amount}},
-    current_state = %{winning_bid: winning_bid = %{amount: amount}}) do
-    new_state = %AuctionState{current_state | winning_bid: [bid | winning_bid]}
+
+  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{winning_bid: winning_bid}) do
+    winning_amount = case winning_bid do
+      [] -> nil
+      _ -> hd(winning_bid).amount
+    end
+    new_state = set_winning_bid?(bid, amount, current_state, winning_amount)
     {:noreply, new_state}
   end
-  def handle_cast({:process_new_bid, bid = %{amount: amount}},
-    current_state = %{winning_bid: %{amount: winning_amount}})
-    when winning_amount > amount do
-    new_state = %AuctionState{current_state | winning_bid: [bid]}
-    {:noreply, new_state}
+
+  defp set_winning_bid?(bid, _amount, current_state, nil) do
+    %AuctionState{current_state | winning_bid: [bid]}
   end
-  def handle_cast({:process_new_bid, _bid}, current_state) do
-    {:noreply, current_state}
+  defp set_winning_bid?(bid, amount, current_state, winning_amount) when winning_amount > amount do
+    %AuctionState{current_state | winning_bid: [bid]}
   end
+  defp set_winning_bid?(bid, amount, current_state = %{winning_bid: winning_bid}, amount) do
+    %AuctionState{current_state | winning_bid: [bid | winning_bid]}
+  end
+  defp set_winning_bid?(_bid, _amount, current_state, _winning_amount), do: current_state
 
   defp calculate_status(_auction) do
     :pending

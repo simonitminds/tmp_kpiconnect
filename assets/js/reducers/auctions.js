@@ -21,6 +21,7 @@ export default function(state, action) {
       }
     }
     case UPDATE_AUCTION_STATE: {
+      console.log(action);
       const origAuction = _.chain(state.auctions)
             .filter(['id', action.auction.id])
             .first()

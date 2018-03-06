@@ -20,6 +20,7 @@ export default class AuctionShow extends React.Component {
     this.state = {
       timeRemaining: timeRemainingCountdown(props.auction, moment().utc())
     }
+    console.log(props);
   }
 
   componentDidMount() {
@@ -60,7 +61,7 @@ export default class AuctionShow extends React.Component {
         <div  className="box">
           <MostRecentBid auction={auction} />
           <MinimumBid auction={auction} />
-          <BiddingForm auction={auction} />
+          <BiddingForm {...this.props} />
         </div>
       )
 
@@ -83,7 +84,7 @@ export default class AuctionShow extends React.Component {
                     </ul>
                   </div>
                   <LowestBid auction={auction} />
-                  {currentUser.isBuyer ? <BidList auction={auction} /> : supplierBidComponents(auction) }
+                  { currentUser.isBuyer ? <BidList auction={auction} /> : supplierBidComponents(auction) }
                 </div>
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">
@@ -96,8 +97,8 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} />}
-                  {currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
+                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                  { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                   <div className="box">
                     <div className="box__subsection">

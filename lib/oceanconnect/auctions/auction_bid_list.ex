@@ -19,10 +19,11 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       total_price: nil,
       time_entered: nil
 
-    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
+    def from_params_to_auction_bid(%{"id" => id, "amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
       params = %{
+        id: id,
         auction_id: auction.id,
-        amount: amount,
+        amount: String.to_float(amount),
         fuel_id: auction.fuel_id,
         fuel_quantity: auction.fuel_quantity,
         supplier_id: supplier_id

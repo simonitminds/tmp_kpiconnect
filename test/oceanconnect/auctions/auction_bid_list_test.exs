@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions.{Command, AuctionBidList}
   alias Oceanconnect.Auctions.AuctionBidList.{AuctionBid}
 

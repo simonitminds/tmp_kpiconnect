@@ -52,11 +52,32 @@ export function getAllAuctions() {
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {
-    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, {headers: defaultHeaders })
+    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
         return dispatch(receiveSuppliers(port_id, response.data));
+      });
+  };
+}
+export function submitBid(auction_id, formData) {
+  return dispatch => {
+    fetch(`/api/auctions/${auction_id}/bids?supplier_id=${window.companyId}`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(
+        {
+          'bid': {
+            'amount': formData.get('amount'),
+            'fuel_id': formData.get('fuel')
+          }
+        }
+      )
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return console.log(response);
       });
   };
 }

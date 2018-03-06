@@ -20,7 +20,7 @@ defmodule Oceanconnect.Auctions.Command do
   def enter_bid(bid = %AuctionBid{amount: amount, fuel_quantity: fuel_quantity}) do
     time_entered = DateTime.utc_now()
     total_price = amount * fuel_quantity
-    updated_bid = Map.merge(bid, %{id: UUID.uuid4(:hex), total_price: total_price, time_entered: time_entered})
+    updated_bid = Map.merge(bid, %{total_price: total_price, time_entered: time_entered})
     %Command{command: :enter_bid, data: updated_bid}
   end
 
