@@ -30,7 +30,7 @@ defmodule Oceanconnect.AuctionNewPage do
   def fill_form_element(_key, element, _type, _value = %DateTime{}) do
     find_within_element(element, :css, "input")
   end
-  def fill_form_element(_key, element, _type, value) when is_list(value) do
+  def fill_form_element(_key, _element, _type, value) when is_list(value) do
     Enum.map(value, fn(supplier) ->
       execute_script("document.getElementById('invite-#{supplier.id}').click();", [])
     end)
@@ -46,6 +46,19 @@ defmodule Oceanconnect.AuctionNewPage do
   def select_port(port_id) do
     find_element(:css, ".qa-auction-port_id option[value='#{port_id}']")
     |> click
+  end
+
+  def has_suppliers?(suppliers) do
+    Enum.all?(suppliers, fn(supplier) ->
+      find_element(:class, "qa-auction-supplier-#{supplier.id}")
+    end)
+  end
+
+  def supplier_count(suppliers) do
+    Enum.map(suppliers, fn(supplier) ->
+      find_element(:class, "qa-auction-supplier-#{supplier.id}")
+    end)
+    |> length
   end
 
   def submit do

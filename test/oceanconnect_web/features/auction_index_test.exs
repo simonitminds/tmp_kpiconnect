@@ -41,20 +41,37 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
   end
 
-  # test "buyer can see his view of the auction card", %{auctions: auctions} do
-  #   auction = auctions |> hd
-  #   buyer_params = %{
-  #     suppliers: auction.suppliers
-  #   }
+  test "buyer can see his view of the auction card", %{auctions: auctions} do
+    auction = auctions |> hd
 
-    # AuctionIndexPage.visit()
-    # assert AuctionIndexPage.has_values_from_params?(buyer_params)
-  # end
+    AuctionIndexPage.visit()
+    assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+  end
 
-  test "supplier can see his view of the auction card", %{supplier: supplier} do
+  test "supplier can see his view of the auction card", %{auctions: auctions, supplier: supplier} do
+    auction = auctions |> hd
+
     login_user(supplier)
     AuctionIndexPage.visit()
-    assert has_css?(".qa-auction-invitation-controls")
-    refute has_css?(".qa-auction-suppliers")
+    assert AuctionIndexPage.has_field_in_auction?(auction.id, "invitation-controls")
+    refute AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+  end
+
+  test "supplier/buyer can see his respective view per auction", %{auctions: auctions} do
+    auction = auctions |> hd
+    supplier_auction = insert(:auction, suppliers: [hd(auctions).buyer])
+
+    AuctionIndexPage.visit()
+    assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+    assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "invitation-controls")
+  end
+
+  test "user can only see auctions they participate in", %{auctions: auctions} do
+    non_participant_auctions = insert_list(2, :auction)
+    supplier_auction = insert(:auction, suppliers: [hd(auctions).buyer])
+
+    AuctionIndexPage.visit()
+    assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
+    refute AuctionIndexPage.has_auctions?(non_participant_auctions)
   end
 end

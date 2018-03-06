@@ -18,8 +18,8 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def list_participating_auctions(user_id) do
-    buyer_auctions(user_id) ++ supplier_auctions(user_id)
+  def list_participating_auctions(company_id) do
+    buyer_auctions(company_id) ++ supplier_auctions(company_id)
   end
 
   defp buyer_auctions(buyer_id) do
@@ -255,9 +255,14 @@ defmodule Oceanconnect.Auctions do
     |> Map.get(:ports)
   end
 
-  def supplier_companies_for_port(%Port{id: id}) do
+  def supplier_list_for_auction(%Port{id: id}) do
     id
     |> Port.suppliers_for_port_id
+    |> Repo.all
+  end
+  def supplier_list_for_auction(%Port{id: port_id}, buyer_id) do
+    port_id
+    |> Port.suppliers_for_port_id(buyer_id)
     |> Repo.all
   end
 

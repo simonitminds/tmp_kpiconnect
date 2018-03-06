@@ -73,7 +73,7 @@ defmodule OceanconnectWeb.AuctionController do
         nil -> []
         _ ->
           auction.port
-          |> Auctions.supplier_companies_for_port
+          |> Auctions.supplier_list_for_auction(auction.buyer_id)
           |> Poison.encode!
       end
       changeset = Auctions.change_auction(auction)
@@ -106,7 +106,7 @@ defmodule OceanconnectWeb.AuctionController do
             nil -> []
             _ ->
               auction.port
-              |> Auctions.supplier_companies_for_port
+              |> Auctions.supplier_list_for_auction(auction.buyer_id)
               |> Poison.encode!
           end
           [fuels, ports, vessels] = auction_inputs_by_buyer(conn)

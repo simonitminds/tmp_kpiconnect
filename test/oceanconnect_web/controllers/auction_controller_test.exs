@@ -7,7 +7,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   @invalid_attrs %{ "vessel_id" => nil}
 
   setup do
-    buyer_company = insert(:company)
+    buyer_company = insert(:company, is_supplier: true)
     buyer = insert(:user, company: buyer_company)
     vessel = insert(:vessel, company: buyer_company)
     fuel = insert(:fuel)
@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     |> Oceanconnect.Utilities.maybe_convert_date_times
     |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
     authed_conn = login_user(build_conn(), buyer)
-    auction = insert(:auction, buyer: buyer_company, vessel: vessel)
+    auction = insert(:auction, port: port, buyer: buyer_company, vessel: vessel, suppliers: [supplier_company])
     {:ok, conn: authed_conn, valid_auction_params: auction_params,
           auction: auction, buyer: buyer_company,
           supplier: supplier, supplier_company: supplier_company}
@@ -129,6 +129,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)
       assert html_response(conn, 200) =~ "Edit Auction"
+    end
+
+    test "confirms buyer is not in supplier list", %{conn: conn, auction: auction} do
+      conn = get conn, auction_path(conn, :edit, auction)
+      refute conn.assigns.suppliers =~ auction.buyer.name
     end
   end
 
