@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import { formatUTCDateTime, timeRemainingCountdown} from '../../utilities';
 import moment from 'moment';
 import  ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
-import LowestBid from './LowestBid';
+import WinningBid from './WinningBid';
 import BidList from './BidList';
 import BiddingForm from './BiddingForm';
 import MinimumBid from './MinimumBid';
@@ -20,7 +20,6 @@ export default class AuctionShow extends React.Component {
     this.state = {
       timeRemaining: timeRemainingCountdown(props.auction, moment().utc())
     }
-    console.log(props);
   }
 
   componentDidMount() {
@@ -60,7 +59,6 @@ export default class AuctionShow extends React.Component {
       return (
         <div  className="box">
           <MostRecentBid auction={auction} />
-          <MinimumBid auction={auction} />
           <BiddingForm {...this.props} />
         </div>
       )
@@ -83,7 +81,7 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  <LowestBid auction={auction} />
+                  <WinningBid auction={auction} />
                   { currentUser.isBuyer ? <BidList auction={auction} /> : supplierBidComponents(auction) }
                 </div>
                 <div className="column is-one-third">
@@ -136,7 +134,7 @@ export default class AuctionShow extends React.Component {
                       <ul className="list has-no-bullets">
                         <li>
                           <strong className="is-block">{auction.port.name}</strong>
-                          <span className="is-size-7"><strong>ETA</strong> {formatGMTDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatGMTDateTime(auction.etd)} GMT</span>
+                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
                         </li>
                       </ul>
                     </div>

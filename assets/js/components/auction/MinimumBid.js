@@ -10,13 +10,11 @@ const MinimumBid = ({auction}) => {
         <thead>
           <tr>
             <th>{fuel}</th>
-            <th>Unit Price</th>
             <th>Time</th>
           </tr>
         </thead>
         <tbody>
           <tr className="is-gray-1">
-            <td> $380.00</td>
             <td> $380.00</td>
             <td> 12:12</td>
           </tr>

@@ -19,14 +19,15 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       total_price: nil,
       time_entered: nil
 
-    def from_params_to_auction_bid(%{"id" => id, "amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
+    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
       params = %{
-        id: id,
+        id: UUID.uuid4(:hex),
         auction_id: auction.id,
-        amount: String.to_float(amount),
+        amount: amount,
         fuel_id: auction.fuel_id,
         fuel_quantity: auction.fuel_quantity,
-        supplier_id: supplier_id
+        supplier_id: supplier_id,
+        time_entered: DateTime.utc_now()
       }
       Map.merge(%AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}, params)
     end

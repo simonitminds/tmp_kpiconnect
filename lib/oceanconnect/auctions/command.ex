@@ -17,11 +17,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :end_auction_decision_period, data: %{id: auction_id}}
   end
 
-  def enter_bid(bid = %AuctionBid{amount: amount, fuel_quantity: fuel_quantity}) do
-    time_entered = DateTime.utc_now()
-    total_price = amount * fuel_quantity
-    updated_bid = Map.merge(bid, %{total_price: total_price, time_entered: time_entered})
-    %Command{command: :enter_bid, data: updated_bid}
+  def enter_bid(bid = %AuctionBid{}) do
+    %Command{command: :enter_bid, data: bid}
   end
 
   def process_new_bid(bid = %AuctionBid{}) do

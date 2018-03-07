@@ -28,7 +28,7 @@ defmodule Oceanconnect.AuctionShowPage do
       supplier.name == text
     end)
   end
-  defp value_equals_element_text?(key, element, value) do
+  defp value_equals_element_text?(_key, element, value) do
     value == element |> inner_text
   end
 
@@ -46,7 +46,7 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  def fill_form_element(:additional_charges, element, _type, value) do
+  def fill_form_element(:additional_charges, element, _type, _value) do
     element |> click
   end
   def fill_form_element(_key, element, "select", value) do

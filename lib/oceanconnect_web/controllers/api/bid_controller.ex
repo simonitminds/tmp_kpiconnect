@@ -8,14 +8,12 @@ defmodule OceanconnectWeb.Api.BidController do
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          %{status: :open} <- AuctionStore.get_current_state(auction)
     do
-      auction_with_participants = Auctions.with_participants(auction)
       orig_bid_list = AuctionBidList.get_bid_list(auction_id)
       supplier_id = String.to_integer(supplier_id)
 
       bid = bid_params
       |> Map.put("supplier_id", supplier_id)
-      |> Map.put("id", UUID.uuid4(:hex))
-      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction_with_participants)
+      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
       bid
       |> Command.enter_bid

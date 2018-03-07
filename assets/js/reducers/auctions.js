@@ -21,12 +21,17 @@ export default function(state, action) {
       }
     }
     case UPDATE_AUCTION_STATE: {
-      console.log(action);
+      console.log(action.auction);
       const origAuction = _.chain(state.auctions)
             .filter(['id', action.auction.id])
             .first()
             .value();
-      const updatedAuction = {...origAuction, state: action.auction.state};
+      let updatedAuction;
+      if (action.auction.bid_list) {
+        updatedAuction = {...origAuction, state: action.auction.state, bidList: action.auction.bid_list};
+      } else {
+        updatedAuction = {...origAuction, state: action.auction.state};
+      }
       const newAuctionList = replaceListItem(state.auctions, origAuction, updatedAuction);
       return {
         ...state,

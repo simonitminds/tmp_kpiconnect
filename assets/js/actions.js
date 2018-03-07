@@ -68,8 +68,7 @@ export function submitBid(auction_id, formData) {
       body: JSON.stringify(
         {
           'bid': {
-            'amount': formData.get('amount'),
-            'fuel_id': formData.get('fuel')
+            'amount': formData.get('amount')
           }
         }
       )

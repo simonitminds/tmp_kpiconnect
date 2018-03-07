@@ -7,6 +7,7 @@ const BiddingForm = ({auction, formSubmit}) => {
     <form onSubmit={formSubmit.bind(this, auction.id)}>
       <div className="box__subsection box__subsection--bordered box__subsection--base is-gray-1">
         <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
+{/*
         <div className="field is-horizontal is-expanded">
           <div className="field-label">
             <div className="control">
@@ -24,6 +25,7 @@ const BiddingForm = ({auction, formSubmit}) => {
             </div>
           </div>
         </div>
+*/}
         <div className="field is-horizontal is-expanded">
           <div className="field-label">
             <div className="control">
@@ -39,6 +41,7 @@ const BiddingForm = ({auction, formSubmit}) => {
             </div>
           </div>
         </div>
+{/*
         <div className="field is-horizontal is-expanded">
           <div className="field-label">
             <div className="control">
@@ -89,6 +92,7 @@ const BiddingForm = ({auction, formSubmit}) => {
             </div>
           </div>
         </div>
+*/}
         <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
           <div className="control">
             <button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button>

@@ -22,8 +22,6 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     current_bid_list = Oceanconnect.Auctions.AuctionBidList.get_bid_list(auction.id)
     current_auction_state = Oceanconnect.Auctions.AuctionStore.get_current_state(auction)
     # if hd(current_bid_list).id == bid.id do
-    participants = [current_auction_state.buyer_id] ++ current_auction_state.supplier_ids
-
     payload = current_auction_state
     |> build_auction_state_payload
 
@@ -36,11 +34,16 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     winning_bid_ids = Enum.reduce(current_auction_state.winning_bid, [], fn(bid, acc) ->
       [bid.id | acc]
     end)
+
+    send_notification_to_participants("user_auctions", buyer_payload, [auction.buyer_id])
+    send_notification_to_participants("user_auctions", supplier_payload, [supplier_id])
     if bid.id in winning_bid_ids do
-      send_notification_to_participants("user_auctions", payload, participants)
-    else
-      send_notification_to_participants("user_auctions", buyer_payload, [auction.buyer_id])
-      send_notification_to_participants("user_auctions", supplier_payload, [supplier_id])
+      # TODO: Remove suppliers that declined from notification list
+      auction_with_participants = Oceanconnect.Auctions.with_participants(auction)
+      rest_of_suppliers = Enum.filter(auction_with_participants.suppliers, fn(supplier) ->
+        supplier.id != supplier_id
+      end)
+      send_notification_to_participants("user_auctions", payload, rest_of_suppliers)
     end
     # else
     #   {:error, "Bid Not Stored"}

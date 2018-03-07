@@ -64,7 +64,10 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "supplier login" do
-    setup %{supplier: supplier} do
+    setup %{auction: auction, buyer: buyer, supplier: supplier} do
+      login_user(buyer)
+      AuctionIndexPage.visit()
+      AuctionIndexPage.start_auction(auction)
       login_user(supplier)
       :ok
     end
@@ -81,8 +84,8 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.submit_bid()
 
       show_params = %{
-        "lowest-bid-amount" => "$1.25",
-        "lowest-bid-supplier" => supplier.company.name
+        "winning-bid-amount" => "$1.25",
+        "winning-bid-supplier" => "#{supplier.company.id}"
       }
       assert AuctionShowPage.has_values_from_params?(show_params)
     end
