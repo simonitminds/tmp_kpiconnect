@@ -37,6 +37,12 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       assert json_response(conn, 422)
     end
 
+    test "cannot enter bids of non $0.25 increments ", %{conn: conn, auction: auction, bid_params: params} do
+      updated_params = Map.put(params, "bid", %{"amount" => "2.95"})
+      conn = create_post(conn, auction, updated_params)
+      assert json_response(conn, 422)
+    end
+
     test "creating a bid for an auction", %{auction: auction, conn: conn, bid_params: params} do
       conn = create_post(conn, auction, params)
       assert json_response(conn, 200)
