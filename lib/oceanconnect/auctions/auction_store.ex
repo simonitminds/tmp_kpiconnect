@@ -95,7 +95,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:end_auction, %{id: auction_id, duration: duration}}, current_state) do
+  def handle_cast({:end_auction, %{id: auction_id, duration: duration}}, current_state = %{status: :open}) do
     case TimersSupervisor.start_timer({auction_id, duration, :decision_duration}) do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
       error -> error
@@ -124,15 +124,27 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp set_winning_bid?(bid, _amount, current_state, nil) do
+    maybe_extend_auction(current_state.auction_id)
     %AuctionState{current_state | winning_bid: [bid]}
   end
   defp set_winning_bid?(bid, amount, current_state, winning_amount) when winning_amount > amount do
+    maybe_extend_auction(current_state.auction_id)
     %AuctionState{current_state | winning_bid: [bid]}
   end
   defp set_winning_bid?(bid, amount, current_state = %{winning_bid: winning_bid}, amount) do
+    maybe_extend_auction(current_state.auction_id)
     %AuctionState{current_state | winning_bid: [bid | winning_bid]}
   end
   defp set_winning_bid?(_bid, _amount, current_state, _winning_amount), do: current_state
+
+  defp maybe_extend_auction(auction_id) do
+    time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
+    if time_remaining <= 3 * 60_000 do
+      auction_id
+      |> Command.extend_duration
+      |> AuctionTimer.process_command
+    end
+  end
 
   defp calculate_status(_auction) do
     :pending

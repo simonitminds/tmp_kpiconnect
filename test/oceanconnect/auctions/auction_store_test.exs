@@ -105,13 +105,14 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       {:ok, %{bid: bid}}
     end
 
-    test "first bid is added", %{auction: auction, bid: bid} do
+    test "first bid is added and extends duration", %{auction: auction, bid: bid} do
       actual_state = AuctionStore.get_current_state(auction)
 
       assert [bid] == actual_state.winning_bid
+      assert actual_state.time_remaining > 2 * 60_000
     end
 
-    test "matching bid is added", %{auction: auction, bid: bid} do
+    test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
       new_bid = bid
       |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now()})
 
@@ -122,9 +123,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       actual_state = AuctionStore.get_current_state(auction)
 
       assert [new_bid, bid] == actual_state.winning_bid
+      assert actual_state.time_remaining > 2 * 60_000
     end
 
-    test "non-winning bid is not added", %{auction: auction, bid: bid} do
+    test "non-winning bid is not added and duration does not extend", %{auction: auction, bid: bid} do
+      :timer.sleep(1_100)
       new_bid = bid
       |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "1.50"})
 
@@ -135,9 +138,10 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       actual_state = AuctionStore.get_current_state(auction)
 
       assert [bid] == actual_state.winning_bid
+      assert actual_state.time_remaining < 2 * 60_000
     end
 
-    test "new winning bid is added", %{auction: auction, bid: bid} do
+    test "new winning bid is added and extends duration", %{auction: auction, bid: bid} do
       new_bid = bid
       |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "0.75"})
 
@@ -148,6 +152,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       actual_state = AuctionStore.get_current_state(auction)
 
       assert [new_bid] == actual_state.winning_bid
+      assert actual_state.time_remaining > 2 * 60_000
     end
   end
 end

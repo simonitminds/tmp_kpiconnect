@@ -40,9 +40,11 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     if bid.id in winning_bid_ids do
       # TODO: Remove suppliers that declined from notification list
       auction_with_participants = Oceanconnect.Auctions.with_participants(auction)
-      rest_of_suppliers = Enum.filter(auction_with_participants.suppliers, fn(supplier) ->
+      rest_of_suppliers = auction_with_participants.suppliers
+      |> Enum.filter(fn(supplier) ->
         supplier.id != supplier_id
       end)
+      |> Enum.map(&(&1.id))
       send_notification_to_participants("user_auctions", payload, rest_of_suppliers)
     end
     # else
