@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
 
   schema "auction_suppliers" do
     field :participation, :string
+    field :alias_name, :string
     belongs_to :auction, Oceanconnect.Auctions.Auction
     belongs_to :supplier, Oceanconnect.Accounts.Company
 
@@ -15,7 +16,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   @doc false
   def changeset(%AuctionSuppliers{} = auction_suppliers, attrs) do
     auction_suppliers
-    |> cast(attrs, [:participation, :auction_id, :supplier_id])
+    |> cast(attrs, [:participation, :alias_name, :auction_id, :supplier_id])
     |> validate_required([:auction_id, :supplier_id])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:supplier_id)

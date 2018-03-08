@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -71,13 +71,26 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        auction
+        auction_with_participants = auction
         |> with_participants
-        |> AuctionsSupervisor.start_child
+        |> create_supplier_aliases
+
+        AuctionsSupervisor.start_child(auction_with_participants)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  def create_supplier_aliases(auction = %{suppliers: suppliers}) do
+    Enum.reduce(suppliers, 1, fn(supplier, acc) ->
+      AuctionSuppliers
+      |> Repo.get_by(%{auction_id: auction.id, supplier_id: supplier.id})
+      |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
+      |> Repo.update!
+      acc = acc + 1
+    end)
+    auction
   end
 
   def update_auction(%Auction{} = auction, attrs) do

@@ -225,6 +225,7 @@ defmodule SupplierHelper do
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
     |> Repo.update!
+    |> Auctions.create_supplier_aliases
   end
 end
 

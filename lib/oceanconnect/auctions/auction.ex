@@ -61,6 +61,9 @@ defmodule Oceanconnect.Auctions.Auction do
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
   end
+  def maybe_add_suppliers(changeset, %{suppliers: suppliers}) do
+    put_assoc(changeset, :suppliers, suppliers)
+  end
   def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def from_params(params) do

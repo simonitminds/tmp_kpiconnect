@@ -64,9 +64,15 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
-      auction_attrs = auction |> Map.take([:fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
+      auction_with_participants = Auctions.with_participants(auction)
+      auction_attrs = auction_with_participants |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
+
       assert all_values_match?(auction_attrs, new_auction)
+
+      supplier = hd(auction_with_participants.suppliers)
+      auction_supplier = Repo.get_by(Auctions.AuctionSuppliers, %{auction_id: new_auction.id, supplier_id: supplier.id})
+      assert auction_supplier.alias_name == "Supplier 1"
     end
 
     test "create_auction/1 with invalid data returns error changeset" do
