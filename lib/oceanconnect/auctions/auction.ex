@@ -58,7 +58,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_add_suppliers(attrs)
   end
 
-  def maybe_add_suppliers(changeset, attrs = %{"suppliers" => suppliers}) do
+  def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
   end
   def maybe_add_suppliers(changeset, _attrs), do: changeset
@@ -70,7 +70,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
-    |> maybe_convert_suppliers("suppliers")
+    |> maybe_load_suppliers("suppliers")
   end
 
   def maybe_parse_date_field(params, key) do
@@ -91,7 +91,7 @@ defmodule Oceanconnect.Auctions.Auction do
     end
   end
 
-  def maybe_convert_suppliers(params, "suppliers") do
+  def maybe_load_suppliers(params, "suppliers") do
     case params do
       %{"suppliers" => suppliers} ->
         supplier_ids = Enum.map(suppliers, fn({_key, supplier_id}) -> String.to_integer(supplier_id) end)

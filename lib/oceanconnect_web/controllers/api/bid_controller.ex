@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.Api.BidController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionNotifier, AuctionStore, Command}
 
-  def create(conn, params = %{"auction_id" => auction_id, "supplier_id" => supplier_id, "bid" => bid_params}) do
+  def create(conn, %{"auction_id" => auction_id, "supplier_id" => supplier_id, "bid" => bid_params}) do
     auction_id = String.to_integer(auction_id)
     updated_bid_params = convert_amount(bid_params)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),

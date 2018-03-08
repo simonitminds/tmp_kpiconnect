@@ -141,24 +141,6 @@ defmodule Oceanconnect.Auctions do
   defp maybe_replace_non_loaded(value = %{}), do: strip_non_loaded(value)
   defp maybe_replace_non_loaded(value), do: value
 
-  def add_supplier_to_auction(%Auction{} = auction, %Company{} = supplier) do
-    auction_with_suppliers = auction
-    |> Repo.preload(:suppliers)
-
-    auction_with_suppliers
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, [supplier | auction_with_suppliers.suppliers])
-    |> Repo.update!
-  end
-
-  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
-    auction
-    |> Repo.preload(:suppliers)
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
-    |> Repo.update!
-  end
-
   @doc """
   Returns the list of ports.
 
