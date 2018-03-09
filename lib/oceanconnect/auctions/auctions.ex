@@ -31,12 +31,16 @@ defmodule Oceanconnect.Auctions do
   end
 
   defp supplier_auctions(supplier_id) do
-    query = from as in Oceanconnect.Auctions.AuctionSuppliers,
+    query = from as in AuctionSuppliers,
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
       select: a
     Repo.all(query)
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
+  end
+
+  def get_auction_supplier(auction_id, supplier_id) do
+    Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
   def get_auction(id) do
