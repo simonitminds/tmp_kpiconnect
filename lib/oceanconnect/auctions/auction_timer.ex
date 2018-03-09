@@ -80,14 +80,4 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
  def get_timer(pid) do
    GenServer.call(pid, :read_timer)
  end
-
-  # def reset_timer() do
-  #   GenServer.call(__MODULE__, :reset_timer)
-  # end
-
-  # def handle_call(:reset_timer, _from, %{timer: timer}) do
-  #   :timer.cancel(timer)
-  #   timer = Process.send_after(self(), :work, 60_000)
-  #   {:reply, :ok, %{timer: timer})
-  # end
 end
