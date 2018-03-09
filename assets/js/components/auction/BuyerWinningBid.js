@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime } from '../../utilities';
 
-const WinningBid = ({auction}) => {
+const BuyerWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
   const winnningBidList = _.get(auction, 'state.winning_bid', []);
   const winnningBidListDisplay = () => {
@@ -19,8 +19,8 @@ const WinningBid = ({auction}) => {
           <tbody>
             {_.map(winnningBidList, (bid) => {
               return (
-                <tr key={bid.id} className="is-selected">
-                  <td className="qa-auction-winning-bid-supplier">{bid.supplier_id}</td>
+                <tr key={bid.id}>
+                  <td className="qa-auction-winning-bid-supplier">{bid.supplier}</td>
                   <td className="qa-auction-winning-bid-amount">${bid.amount}</td>
                   <td>{formatTime(bid.time_entered)}</td>
                 </tr>
@@ -33,7 +33,7 @@ const WinningBid = ({auction}) => {
       return <i>No bids placed</i>;
     }
   }
-  
+
   return(
     <div className="box">
       <div className="box__subsection">
@@ -43,4 +43,4 @@ const WinningBid = ({auction}) => {
     </div>
   );
 };
-export default WinningBid;
+export default BuyerWinningBid;

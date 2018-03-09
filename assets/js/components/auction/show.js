@@ -5,8 +5,10 @@ import moment from 'moment';
 import  ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
-import WinningBid from './WinningBid';
-import BidList from './BidList';
+import BuyerWinningBid from './BuyerWinningBid';
+import SupplierWinningBid from './SupplierWinningBid';
+import BuyerBidList from './BuyerBidList';
+import SupplierBidList from './SupplierBidList';
 import BiddingForm from './BiddingForm';
 import MinimumBid from './MinimumBid';
 import MostRecentBid from './MostRecentBid';
@@ -55,14 +57,24 @@ export default class AuctionShow extends React.Component {
       }
     }
 
-    const supplierBidComponents = (auction) => {
+
+    const buyerBidComponents = (auction) => {
       return (
-        <div  className="box">
-          <MostRecentBid auction={auction} />
-          <BiddingForm {...this.props} />
+        <div>
+          <BuyerWinningBid auction={auction} />
+          <BuyerBidList auction={auction} />
         </div>
       )
+    }
 
+    const supplierBidComponents = (auction) => {
+      return (
+        <div>
+          <SupplierWinningBid auction={auction} />
+          <BiddingForm {...this.props} />
+          <SupplierBidList auction={auction} />
+        </div>
+      )
     }
 
     return (
@@ -81,8 +93,7 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  <WinningBid auction={auction} />
-                  { currentUser.isBuyer ? <BidList auction={auction} /> : supplierBidComponents(auction) }
+                  { currentUser.isBuyer ? buyerBidComponents(auction) : supplierBidComponents(auction) }
                 </div>
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">
