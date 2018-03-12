@@ -127,7 +127,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     end
 
     test "non-winning bid is not added and duration does not extend", %{auction: auction, bid: bid} do
-      :timer.sleep(1_100)
       new_bid = bid
       |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "1.50"})
 
@@ -135,10 +134,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> Command.process_new_bid
       |> AuctionStore.process_command
 
+      :timer.sleep(1_100)
       actual_state = AuctionStore.get_current_state(auction)
 
       assert [bid] == actual_state.winning_bid
-      assert actual_state.time_remaining < 2 * 60_000
+      assert actual_state.time_remaining < 3 * 60_000 - 1_000
     end
 
     test "new winning bid is added and extends duration", %{auction: auction, bid: bid} do
