@@ -4,7 +4,7 @@ import { formatTime } from '../../utilities';
 
 const SupplierBidList = ({auction, buyer}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const bidList = _.get(auction, 'bidList', []);
+  const bidList = _.get(auction, 'bid_list', []);
   const winningBidIds = _.chain(auction)
     .get('state.winning_bid', [])
     .map('id')

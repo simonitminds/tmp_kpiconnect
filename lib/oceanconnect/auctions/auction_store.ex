@@ -8,6 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defmodule AuctionState do
     alias __MODULE__
     defstruct auction_id: nil,
+      anonymous_bidding: false,
       status: :pending,
       current_server_time: nil,
       time_remaining: nil,
@@ -16,7 +17,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       supplier_ids: []
 
     def from_auction(auction) do
-      %AuctionState{auction_id: auction.id, buyer_id: auction.buyer.id, supplier_ids: Enum.map(auction.suppliers, &(&1.id))}
+      %AuctionState{auction_id: auction.id,
+        anonymous_bidding: auction.anonymous_bidding,
+        buyer_id: auction.buyer.id,
+        supplier_ids: Enum.map(auction.suppliers, &(&1.id))
+      }
     end
 
     def maybe_update_times(auction_state = %AuctionState{status: :open, auction_id: auction_id}) do

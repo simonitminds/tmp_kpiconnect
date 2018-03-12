@@ -1,6 +1,7 @@
 defmodule Oceanconnect.AuctionShowTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionIndexPage, AuctionShowPage}
+  alias Oceanconnect.Auctions
 #  import Hound.Helpers.Session
 
   hound_session()
@@ -16,6 +17,7 @@ defmodule Oceanconnect.AuctionShowTest do
       amount: 1.25
     }
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+    Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
     {:ok, %{auction: auction, bid_params: bid_params, buyer: buyer, supplier: supplier,
             supplier_company: supplier_company, supplier_company2: supplier_company2}}
   end
@@ -59,34 +61,39 @@ defmodule Oceanconnect.AuctionShowTest do
      #   end
      # end
 
-     test "buyer can see his view of the auction card", %{auction: auction} do
-       buyer_params = %{
-         suppliers: auction.suppliers
-       }
+    test "buyer can see his view of the auction card", %{auction: auction} do
+      buyer_params = %{
+        suppliers: auction.suppliers
+      }
 
-       AuctionShowPage.visit(auction.id)
-       assert AuctionShowPage.has_values_from_params?(buyer_params)
-     end
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.has_values_from_params?(buyer_params)
+    end
 
-     test "buyer can see the bid list", %{auction: auction} do
-       [s1, s2] = auction.suppliers
-       bid_list = [
-         %{"amount" => 1.25, "supplier_id" => s1.id},
-         %{"amount" => 1, "supplier_id" => s2.id}
-       ]
-       Enum.each(bid_list, fn(bid_params) ->
-         create_bid_for_auction(bid_params, auction)
-       end)
-       stored_bid_list = AuctionBidList.get_bid_list(auction.id)
-       bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
-         %{"bids" => %{
-            "bid-#{bid.id}" => %{"amount" => bid.amount}
-          }
-       end)
+    test "buyer can see the bid list", %{auction: auction} do
+      [s1, s2] = auction.suppliers
+      bid_list = [
+        %{"amount" => 1.25, "supplier_id" => s1.id},
+        %{"amount" => 1, "supplier_id" => s2.id}
+      ]
+      Enum.each(bid_list, fn(bid_params) ->
+        create_bid_for_auction(bid_params, auction)
+      end)
+      stored_bid_list = auction.id
+      |> Auctions.AuctionBidList.get_bid_list
+      |> Auctions.convert_to_supplier_names(auction)
+      bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
+        %{"id" => bid.id,
+          "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier}}
+      end)
 
-       AuctionShowPage.visit(auction.id)
-       assert AuctionShowPage.has_values_from_params?(buyer_params)
-     end
+      auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(auction.buyer_id)
+
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.has_buyer_bids?(bid_list_params)
+    end
   end
 
   describe "supplier login" do
@@ -104,13 +111,12 @@ defmodule Oceanconnect.AuctionShowTest do
       refute has_css?(".qa-auction-suppliers")
     end
 
-    test "supplier can enter a bid", %{bid_params: bid_params, supplier: supplier} do
+    test "supplier can enter a bid", %{bid_params: bid_params} do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
 
       show_params = %{
-        "winning-bid-amount" => "$1.25",
-        "winning-bid-supplier" => "#{supplier.company.id}"
+        "winning-bid-amount" => "$1.25"
       }
       assert AuctionShowPage.has_values_from_params?(show_params)
     end

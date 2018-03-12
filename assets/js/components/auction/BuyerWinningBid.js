@@ -19,7 +19,7 @@ const BuyerWinningBid = ({auction}) => {
           <tbody>
             {_.map(winnningBidList, (bid) => {
               return (
-                <tr key={bid.id}>
+                <tr key={bid.id} className={`qa-auction-winning-bid-${bid.id}`}>
                   <td className="qa-auction-winning-bid-supplier">{bid.supplier}</td>
                   <td className="qa-auction-winning-bid-amount">${bid.amount}</td>
                   <td>{formatTime(bid.time_entered)}</td>

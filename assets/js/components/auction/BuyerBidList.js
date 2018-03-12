@@ -4,7 +4,7 @@ import { formatTime } from '../../utilities';
 
 const BuyerBidList = ({auction, buyer}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const bidList = _.get(auction, 'bidList', []);
+  const bidList = _.get(auction, 'bid_list', []);
   const winningBidIds = _.chain(auction)
     .get('state.winning_bid', [])
     .map('id')
@@ -33,8 +33,8 @@ const BuyerBidList = ({auction, buyer}) => {
               <tr key={bid.id}
                   className={`${winningBid(bid.id)} qa-auction-bid-${bid.id}`}
               >
-                <td>{bid.supplier}</td>
-                <td>${bid.amount}</td>
+                <td className="qa-auction-bid-supplier">{bid.supplier}</td>
+                <td className="qa-auction-bid-amount">${bid.amount}</td>
                 <td>{formatTime(bid.time_entered)}</td>
               </tr>
             );

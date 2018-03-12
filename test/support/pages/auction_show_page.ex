@@ -32,6 +32,17 @@ defmodule Oceanconnect.AuctionShowPage do
     value == element |> inner_text
   end
 
+  def has_buyer_bids?(bid_list) do
+    Enum.all?(bid_list, fn(bid) ->
+      element = find_element(:class, "qa-auction-bid-#{bid["id"]}")
+      Enum.all?(bid["data"], fn({k, v}) ->
+        text = find_within_element(element, :css, ".qa-auction-bid-#{k}")
+        |> inner_text
+        v == text
+      end)
+    end)
+  end
+
   def time_remaining() do
     find_element(:css, ".qa-auction-time_remaining")
     |> Hound.Helpers.Element.inner_text
