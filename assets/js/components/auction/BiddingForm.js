@@ -4,9 +4,8 @@ import _ from 'lodash';
 const BiddingForm = ({auction, formSubmit}) => {
   const fuel = _.get(auction, 'fuel.name');
   return(
-    <div className="box">
+    <div className="box box--nested-base box--nested-base--base is-gray-1 has-padding-top-md">
       <form onSubmit={formSubmit.bind(this, auction.id)}>
-        <div className="box__subsection box__subsection--bordered box__subsection--base is-gray-1">
           <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
   {/*
           <div className="field is-horizontal is-expanded">
@@ -99,7 +98,6 @@ const BiddingForm = ({auction, formSubmit}) => {
               <button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button>
             </div>
           </div>
-        </div>
       </form>
     </div>
   );
