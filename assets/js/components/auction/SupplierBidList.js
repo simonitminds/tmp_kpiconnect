@@ -10,27 +10,41 @@ const SupplierBidList = ({auction, buyer}) => {
     .map('id')
     .value();
 
+    if (bidList.length > 0 ) {
+      return(
+        <div className="box">
+          <h3 className="box__header box__header--bordered">Your Bid History</h3>
+          <table className="table is-fullwidth is-striped is-marginless qa-auction-bids">
+            <thead>
+              <tr>
+                <th>{fuel}</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {_.map(bidList, (bid) => {
+                return (
+                  <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
+                    <td>${bid.amount}</td>
+                    <td>{formatTime(bid.time_entered)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    else {
+
+    }
+
   return(
     <div className="box">
-      <h3 className="box__header box__header--bordered">Grade Display</h3>
-      <table className="table is-fullwidth is-striped is-marginless qa-auction-bids">
-        <thead>
-          <tr>
-            <th>{fuel}</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {_.map(bidList, (bid) => {
-            return (
-              <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                <td>${bid.amount}</td>
-                <td>{formatTime(bid.time_entered)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <h3 className="box__header box__header--bordered">Your Bid History</h3>
+      <div className="auction-table-placeholder">
+        <i>You haven't placed a bid on this auction</i>
+      </div>
     </div>
   );
 };

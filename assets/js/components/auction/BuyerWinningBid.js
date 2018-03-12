@@ -30,13 +30,15 @@ const BuyerWinningBid = ({auction}) => {
         </table>
       );
     } else {
-      return <i>No bids placed</i>;
+      return <div className="auction-table-placeholder">
+        <i>No bids have been placed on this auction</i>
+      </div>;
     }
   }
 
   return(
     <div className="box">
-      <div className="box__subsection">
+      <div className="box__subsection has-padding-bottom-none">
         <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>
         {winnningBidListDisplay()}
       </div>

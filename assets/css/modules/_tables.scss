@@ -9,9 +9,12 @@
 
 // Adaptations
 
-.table thead tr th {
-  vertical-align: bottom;
-  border-bottom: 2px solid $gray-1;
+.table.is-striped tbody tr:not(.is-selected):nth-child(2n) {
+  background-color: #fff;
+}
+
+.table.is-striped tbody tr:not(.is-selected):nth-child(2n-1) {
+  background-color: $gray-1;
 }
 
 // Additions

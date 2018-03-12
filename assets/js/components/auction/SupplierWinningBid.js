@@ -73,7 +73,9 @@ const SupplierWinningBid = ({auction}) => {
         </table>
       );
     } else {
-      return <i>No bids placed</i>;
+      return <div className="auction-table-placeholder">
+        <i>No bids have been placed on this auction</i>
+      </div>;
     }
   }
 
