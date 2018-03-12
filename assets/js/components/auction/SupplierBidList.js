@@ -36,17 +36,15 @@ const SupplierBidList = ({auction, buyer}) => {
       );
     }
     else {
-
+      return(
+        <div className="box">
+          <h3 className="box__header box__header--bordered">Your Bid History</h3>
+          <div className="auction-table-placeholder">
+            <i>You haven't placed a bid on this auction</i>
+          </div>
+        </div>
+      );
     }
-
-  return(
-    <div className="box">
-      <h3 className="box__header box__header--bordered">Your Bid History</h3>
-      <div className="auction-table-placeholder">
-        <i>You haven't placed a bid on this auction</i>
-      </div>
-    </div>
-  );
 };
 
 export default SupplierBidList;
