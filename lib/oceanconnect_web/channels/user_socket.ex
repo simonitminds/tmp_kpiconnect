@@ -21,9 +21,9 @@ defmodule OceanconnectWeb.UserSocket do
   # performing token verification on connect.
   def connect(%{"token" => token}, socket) do
     # max_age: 1209600 is equivalent to two weeks in seconds
-    case Phoenix.Token.verify(socket, "user socket", token, max_age: 1209600) do
-      {:ok, user_id} ->
-        {:ok, assign(socket, :current_user, user_id)}
+    case Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token) do
+      {:ok, authed_socket} ->
+        {:ok, authed_socket}
       {:error, _reason} ->
         :error
     end
@@ -32,7 +32,7 @@ defmodule OceanconnectWeb.UserSocket do
   # Socket id's are topics that allow you to identify all sockets for a given user:
   #
 
-  def id(socket), do: "user_socket:#{socket.assigns.current_user}"
+  def id(socket), do: "user_socket:#{Guardian.Phoenix.Socket.current_resource(socket).id}"
 
   #
   # Would allow you to broadcast a "disconnect" event and terminate

@@ -36,15 +36,10 @@ defmodule OceanconnectWeb.SessionController do
     |> redirect(to: auction_path(conn, :index))
   end
 
-  def unauthenticated(conn) do
+  def auth_error(conn, {_type, _reason}, _opts) do
     conn
     |> put_flash(:error, "Authentication Required")
     |> put_status(302)
     |> redirect(to: session_path(conn, :new))
-  end
-
-  def auth_error(conn, {type, reason}, _opts) do
-    body = Poison.encode!(%{message: to_string(type)})
-    send_resp(conn, 401, body)
   end
 end

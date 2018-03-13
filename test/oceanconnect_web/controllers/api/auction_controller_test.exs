@@ -11,6 +11,12 @@ defmodule OceanconnectWeb.Api.AuctionControllerTest do
     {:ok, conn: authed_conn, auction: auction, buyer: buyer_company}
   end
 
+  test "user must be authenticated", %{auction: auction} do
+    conn = build_conn()
+    conn = get conn, auction_api_path(conn, :index, %{"user_id" => auction.buyer_id})
+    assert conn.resp_body == "{\"message\":\"unauthenticated\"}"
+  end
+
   describe "index" do
     test "user can view only auctions they are participating in", %{auction: auction, conn: conn, buyer: buyer} do
       auction_as_supplier = insert(:auction, suppliers: [buyer])
