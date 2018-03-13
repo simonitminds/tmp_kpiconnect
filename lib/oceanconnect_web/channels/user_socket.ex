@@ -21,7 +21,8 @@ defmodule OceanconnectWeb.UserSocket do
   # performing token verification on connect.
   def connect(%{"token" => token}, socket) do
     # max_age: 1209600 is equivalent to two weeks in seconds
-    case Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token) do
+    auth = Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token)
+    case auth do
       {:ok, authed_socket} ->
         {:ok, authed_socket}
       {:error, _reason} ->
