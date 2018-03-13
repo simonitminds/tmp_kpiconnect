@@ -1,5 +1,12 @@
 defmodule OceanconnectWeb.Plugs.Auth do
-  import Plug.Conn
+  use Guardian.Plug.Pipeline, otp_app: :oceanconnect,
+    module: OceanconnectWeb.Tokens,
+    error_handler: OceanconnectWeb.SessionController
+
+  plug Guardian.Plug.VerifySession, claims: @claims
+  plug Guardian.Plug.VerifyHeader, claims: @claims, realm: "Bearer"
+  plug Guardian.Plug.EnsureAuthenticated
+  plug Guardian.Plug.LoadResource, ensure: true
 
   def init(default), do: default
 
@@ -9,12 +16,7 @@ defmodule OceanconnectWeb.Plugs.Auth do
 
   def build_session(conn, user) do
     user_with_company = Oceanconnect.Accounts.load_company_on_user(user)
-
-    conn
-    |> put_session(:user, user_with_company)
-    |> assign(:current_user, user_with_company)
-    |> configure_session(renew: true)
-    |> put_user_token
+    Oceanconnect.Guardian.Plug.sign_in(conn, user_with_company)
   end
 
   def current_user(conn) do

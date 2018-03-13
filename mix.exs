@@ -43,6 +43,7 @@ defmodule Oceanconnect.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.1"},
       {:hound, "~> 1.0", only: :test},
+      {:guardian, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:uuid, "~> 1.1"},

@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
+  import Plug.Conn
   alias Oceanconnect.Accounts
   alias OceanconnectWeb.Plugs.Auth
 
@@ -40,5 +41,10 @@ defmodule OceanconnectWeb.SessionController do
     |> put_flash(:error, "Authentication Required")
     |> put_status(302)
     |> redirect(to: session_path(conn, :new))
+  end
+
+  def auth_error(conn, {type, reason}, _opts) do
+    body = Poison.encode!(%{message: to_string(type)})
+    send_resp(conn, 401, body)
   end
 end

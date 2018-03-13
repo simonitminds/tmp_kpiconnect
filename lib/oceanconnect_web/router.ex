@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.Router do
   end
 
   pipeline :authenticated do
-    plug OceanconnectWeb.Plugs.Auth
+    plug Guardian.Plug.EnsureAuthenticated, error_handler: OceanconnectWeb.Session.SessionController
   end
 
   # Other scopes may use custom stacks.

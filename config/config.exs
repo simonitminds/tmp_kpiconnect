@@ -9,6 +9,11 @@ use Mix.Config
 config :oceanconnect,
   ecto_repos: [Oceanconnect.Repo]
 
+# guardian config
+config :oceanconnect, Oceanconnect.Guardian,
+  issuer: "ocm",
+  secret_key: "LAwQIGHp4LvQrw9SuXP3c50u1cShZPiT5a5t83dV3E4u/eL3geg69BVTmSC5gm/R"
+
 # Configures the endpoint
 config :oceanconnect, OceanconnectWeb.Endpoint,
   url: [host: "localhost"],
