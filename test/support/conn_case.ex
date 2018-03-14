@@ -25,7 +25,7 @@ defmodule OceanconnectWeb.ConnCase do
       @endpoint OceanconnectWeb.Endpoint
 
       def login_user(conn, user) do
-        post(conn, session_path(conn, :create), %{ session: %{email: user.email, password: user.password}})
+        post(conn, session_path(conn, :create), %{"session" => %{email: user.email, password: user.password}})
       end
     end
   end
