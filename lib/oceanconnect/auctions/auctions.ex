@@ -162,7 +162,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_supplier_aliases(auction = %{suppliers: suppliers}) do
-    Enum.reduce(suppliers, 1, fn(supplier, acc) ->
+    Enum.reduce(Enum.shuffle(suppliers), 1, fn(supplier, acc) ->
       AuctionSuppliers
       |> Repo.get_by(%{auction_id: auction.id, supplier_id: supplier.id})
       |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
