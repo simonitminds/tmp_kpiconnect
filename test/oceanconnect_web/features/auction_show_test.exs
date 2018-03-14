@@ -33,6 +33,26 @@ defmodule Oceanconnect.AuctionShowTest do
     assert AuctionShowPage.time_remaining() |> convert_to_millisecs < auction.duration
   end
 
+  test "Auction realtime start", %{auction: auction, supplier: supplier, buyer: buyer} do
+    login_user(buyer)
+    AuctionIndexPage.visit()
+
+    in_browser_session(:supplier_session, fn ->
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.is_current_path?(auction.id)
+      assert AuctionShowPage.auction_status == "PENDING"
+    end)
+
+    AuctionIndexPage.start_auction(auction)
+
+    in_browser_session :supplier_session, fn ->
+      assert AuctionShowPage.is_current_path?(auction.id)
+      assert AuctionShowPage.auction_status == "OPEN"
+    end
+  end
+
+
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
       login_user(buyer)
@@ -41,25 +61,6 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.visit(auction.id)
       :ok
     end
-
-    # TODO: Make this pass
-     # test "Auction realtime start", %{auction: auction, supplier: supplier} do
-     #   AuctionIndexPage.visit()
-
-     #   in_browser_session(:supplier_session, fn ->
-     #     login_user(supplier)
-     #     AuctionShowPage.visit(auction.id)
-     #     assert AuctionShowPage.is_current_path?(auction.id)
-     #     assert AuctionShowPage.auction_status == "PENDING"
-     #   end)
-
-     #   AuctionIndexPage.start_auction(auction)
-
-     #   in_browser_session :supplier_session, fn ->
-     #     assert AuctionShowPage.is_current_path?(auction.id)
-     #     assert AuctionShowPage.auction_status == "OPEN"
-     #   end
-     # end
 
     test "buyer can see his view of the auction card", %{auction: auction} do
       buyer_params = %{
@@ -97,13 +98,22 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "supplier login" do
-    setup %{auction: auction, buyer: buyer, supplier: supplier} do
+    setup do
+      buyer_company = insert(:company)
+      buyer = insert(:user, company: buyer_company)
+      supplier_company = insert(:company, is_supplier: true)
+      supplier = insert(:user, company: supplier_company)
+      second_supplier_company = insert(:company, is_supplier: true)
+      second_supplier = insert(:user, company: second_supplier_company)
+      auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company, second_supplier_company])
+
       login_user(buyer)
       AuctionIndexPage.visit()
       AuctionIndexPage.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
-      :ok
+
+      {:ok, %{second_supplier: second_supplier, auction: auction}}
     end
 
     test "supplier can see his view of the auction card" do
@@ -119,6 +129,27 @@ defmodule Oceanconnect.AuctionShowTest do
         "winning-bid-amount" => "$1.25"
       }
       assert AuctionShowPage.has_values_from_params?(show_params)
+    end
+
+    test "index displays bid status to suppliers", %{second_supplier: second_supplier, auction: auction} do
+      assert AuctionShowPage.auction_bid_status() =~ "You haven't bid on this auction"
+      AuctionShowPage.enter_bid(%{amount: 1.00})
+      AuctionShowPage.submit_bid()
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
+
+      in_browser_session(:second_supplier, fn ->
+        login_user(second_supplier)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You haven't bid on this auction"
+        AuctionShowPage.enter_bid(%{amount: 0.50})
+        AuctionShowPage.submit_bid()
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
+      end)
+
+      assert AuctionShowPage.auction_bid_status() =~ "You've been outbid"
+      AuctionShowPage.enter_bid(%{amount: 0.50})
+      AuctionShowPage.submit_bid()
+      assert AuctionShowPage.auction_bid_status() =~ "You're in lowest bid position number 2"
     end
   end
 end

@@ -16,7 +16,7 @@ const SupplierWinningBid = ({auction}) => {
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-adjust"></i>
         </span>
-        <span className="is-inline-block">You haven't bid on this auction.</span>
+        <span className="is-inline-block qa-supplier-bid-status-message">You haven't bid on this auction.</span>
         </h3>
       </div>;
     }
@@ -26,7 +26,7 @@ const SupplierWinningBid = ({auction}) => {
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-check-circle"></i>
         </span>
-        <span className="is-inline-block">You are currently winning!</span>
+        <span className="is-inline-block qa-supplier-bid-status-message">You're currently winning!</span>
         </h3>
       </div>;
     } else {
@@ -37,7 +37,7 @@ const SupplierWinningBid = ({auction}) => {
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-check-circle"></i>
           </span>
-          <span className="is-inline-block">You are in bid position number {order + 1}</span>
+          <span className="is-inline-block qa-supplier-bid-status-message">You're in lowest bid position number {order + 1}</span>
           </h3>
         </div>;
       } else {
@@ -47,7 +47,7 @@ const SupplierWinningBid = ({auction}) => {
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-times-circle"></i>
           </span>
-          <span className="is-inline-block">You've been outbid on this auction</span>
+          <span className="is-inline-block qa-supplier-bid-status-message">You've been outbid on this auction</span>
           </h3>
         </div>;
       }
@@ -92,3 +92,4 @@ const SupplierWinningBid = ({auction}) => {
   );
 };
 export default SupplierWinningBid;
+
