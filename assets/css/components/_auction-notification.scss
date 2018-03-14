@@ -20,3 +20,21 @@
     h3 { line-height: 1.3;}
   }
 }
+
+@keyframes fancy-flip {
+  from {
+    color: transparent;
+    background-color: $green;
+    transform: rotateX(-180deg);
+  }
+
+  to {
+    color: #fff;
+    background-color: $gold;
+    transform: rotateX(0deg);
+  }
+}
+
+.new-status {
+  animation: 1s ease-out 0s 1 fancy-flip;
+}

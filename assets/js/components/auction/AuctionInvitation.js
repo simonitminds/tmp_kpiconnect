@@ -3,10 +3,10 @@ import _ from 'lodash';
 
 const AuctionInvitation = ({auction}) => {
   return(
-    <div className="auction-invitation qa-auction-invitation-controls">
-      <div className="auction-invitation__status box box--bordered-left is-gray-1">
-        <h3 className="has-text-weight-bold">Do you intend to participate in the auction?</h3>
-        <div className="field has-addons has-margin-top-md">
+    <div className="auction-invitation auction-invitation--large qa-auction-invitation-controls">
+      <div className="auction-invitation__status box box--bordered-left">
+        <h3 className="auction-invitation__status__copy">Do you intend to participate in the auction?</h3>
+        <div className="field has-addons has-margin-right-md">
           <p className="control">
             <a className="button is-success">
               <span>Accept</span>
@@ -24,57 +24,55 @@ const AuctionInvitation = ({auction}) => {
           </p>
         </div>
       </div>
-      <div className = "auction-invitation__status box is-success" >
-        <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
-        <span className="icon box__icon-marker is-medium has-margin-top-none">
+      <div className = "auction-invitation__status auction-invitation__status--accepted box" >
+        <div className="auction-invitation__status__marker">
           <i className="fas fa-lg fa-check-circle"></i>
-        </span>
-        <span className="is-inline-block">You are participating in this auction</span></h3>
-        <div className="field has-margin-top-xs has-margin-left-lg">
-          <div className="control">
-            <div className="select select--transparent">
-              <select>
-                <option disabled="disabled" value="">
-                  Change Status
-                </option>
-                <option>Participating</option>
-                <option>May Participate</option>
-                <option>Not Participating</option>
-              </select>
-            </div>
-          </div>
         </div>
+        <h3 className="auction-invitation__status__copy">
+          You are participating in this auction
+        </h3>
+        <span className="auction-invitation__status__edit icon">
+          <i className="fas fa-lg fa-pencil-alt"></i>
+        </span>
       </div>
-      <div className = "auction-invitation__status box is-danger" >
-        <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
-        <span className="icon box__icon-marker is-medium has-margin-top-none">
+      <div className = "auction-invitation__status auction-invitation__status--decline box" >
+        <div className="auction-invitation__status__marker">
           <i className="fas fa-lg fa-times-circle"></i>
-        </span>
-        <span className="is-inline-block">You are not participating in this auction</span></h3>
-        <div className="field has-margin-top-xs has-margin-left-lg">
-          <div className="control">
-            <div className="select select--transparent">
-              <select>
-                <option disabled="disabled" value="">
-                  Change Status
-                </option>
-                <option>Participating</option>
-                <option>May Participate</option>
-                <option>Not Participating</option>
-              </select>
-            </div>
-          </div>
         </div>
+        <h3 className="auction-invitation__status__copy">
+          You are not participating in this auction
+        </h3>
+        <span className="auction-invitation__status__edit icon">
+          <i className="fas fa-lg fa-pencil-alt"></i>
+        </span>
       </div>
-      <div className = "auction-invitation__status box is-warning" >
-        <h3 className="has-text-weight-bold is-flex has-margin-bottom-md">
-          <span className="icon box__icon-marker is-medium has-margin-top-none">
-            <i className="fas fa-lg fa-adjust"></i>
-          </span>
-          <span className="is-inline-block">You might participate in this auction</span></h3>
-        <div className="field has-margin-top-xs has-margin-left-lg">
+      <div className = "auction-invitation__status auction-invitation__status--maybe box" >
+        <div className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-adjust"></i>
+        </div>
+        <h3 className="auction-invitation__status__copy">
+          You might participate in this auction
+        </h3>
+        <span className="auction-invitation__status__edit icon">
+          <i className="fas fa-lg fa-pencil-alt"></i>
+        </span>
+      </div>
+      <div className = "auction-invitation__status auction-invitation__status--unanswered box" >
+        <div className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-question-circle"></i>
+        </div>
+        <h3 className="auction-invitation__status__copy">
+          You have not RSVPed to this auction
+        </h3>
+      </div>
+      <div className = "auction-invitation__status auction-invitation__status--unanswered box" >
+        <div className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-question-circle"></i>
+        </div>
+        <h3 className="auction-invitation__status__copy has-margin-top-xs">Change RSVP</h3>
+        <div className="auction-invitation__status__button field has-addons has-margin-right-md">
           <div className="control">
-            <div className="select select--transparent">
+            <div className="select">
               <select>
                 <option disabled="disabled" value="">
                   Change Status
@@ -85,6 +83,11 @@ const AuctionInvitation = ({auction}) => {
               </select>
             </div>
           </div>
+          <p class="control">
+            <a class="button is-primary">
+              <i className="fas fa-md fa-check"></i>
+            </a>
+          </p>
         </div>
       </div>
     </div>

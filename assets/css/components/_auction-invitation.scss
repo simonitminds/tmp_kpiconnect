@@ -9,12 +9,61 @@
 
 .auction-invitation {
   margin-bottom: 1.5rem;
+  padding-top: 12px;
 
-  .icon.is-medium { // Modify height to keep spacing consistent even when invite status text wraps.
-    height: 1rem;
+  &--large {
+    &__status {
+      padding-right: 1rem !important;
+    }
   }
 
   &__status {
-    h3 { line-height: 1.3;}
+    display: flex !important;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0.75rem 2px 0.75rem 0 !important;
+    background-color: $gray-1 !important;
+
+    &> * {
+      display: flex !important;
+    }
+
+    &__copy {
+      margin-left: 1rem;
+      font-weight: bold;
+    }
+
+    &__marker {
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      margin: -12px 0 -11px 0 !important;
+      padding: 0 0.25rem;
+      flex-basis: 32px;
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+
+      .auction-invitation__status--accepted & { background-color: $green; }
+      .auction-invitation__status--maybe & { background-color: $gold; }
+      .auction-invitation__status--decline & { background-color: $red; }
+      .auction-invitation__status--unanswered & { background-color: $gray-3; }
+
+    }
+
+  }
+
+  .auction-invitation__status__edit { // Pencil edit button for auction view invite
+    width: 2rem;
+    height: 2rem;
+    margin-left: auto;
+    padding: 0 0.5rem;
+    color: $gray-3 !important;
+  }
+  .auction-invitation__status__button { // Pencil edit button for auction view invite
+    margin-left: auto;
+    padding: 0;
+    color: $gray-3 !important;
   }
 }
