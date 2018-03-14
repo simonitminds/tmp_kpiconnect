@@ -8,7 +8,8 @@ defmodule OceanconnectWeb.Api.BidController do
     updated_bid_params = convert_amount(bid_params)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          %{status: :open} <- Auctions.get_auction_state(auction),
-         0.0 <- (updated_bid_params["amount"] / 0.25) - Float.floor(updated_bid_params["amount"] / 0.25)
+         0.0 <- (updated_bid_params["amount"] / 0.25) - Float.floor(updated_bid_params["amount"] / 0.25),
+         true <- String.to_integer(supplier_id) in Auctions.auction_supplier_ids(auction)
     do
       orig_bid_list = AuctionBidList.get_bid_list(auction_id)
       supplier_id = String.to_integer(supplier_id)

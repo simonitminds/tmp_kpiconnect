@@ -76,7 +76,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       {:ok, supplier_2_participant_token, _claims} = Oceanconnect.Guardian.encode_and_sign(user_with_company)
 
       {:ok, supplier_2_socket} = connect(OceanconnectWeb.UserSocket, %{"token" => supplier_2_participant_token})
-      assert {:ok, %{}, socket} = subscribe_and_join(supplier_2_socket, OceanconnectWeb.AuctionsChannel, channel, %{"token" => supplier_2_participant_token})
+      assert {:ok, %{}, _socket} = subscribe_and_join(supplier_2_socket, OceanconnectWeb.AuctionsChannel, channel, %{"token" => supplier_2_participant_token})
     end
 
     test "joining another companies auction channel is unauthorized", %{supplier_id: supplier_id, non_participant: non_participant} do

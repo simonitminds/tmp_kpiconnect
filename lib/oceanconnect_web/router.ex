@@ -11,24 +11,16 @@ defmodule OceanconnectWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Guardian.Plug.Pipeline, module: Oceanconnect.Guardian,
-                             error_handler: OceanconnectWeb.Api.AuthController
-    plug Guardian.Plug.VerifyHeader, claims: @claims, realm: "Bearer"
-    plug Guardian.Plug.EnsureAuthenticated
-    plug Guardian.Plug.LoadResource, ensure: true
   end
 
   pipeline :authenticated do
-    plug Guardian.Plug.Pipeline, module: Oceanconnect.Guardian,
-                             error_handler: OceanconnectWeb.SessionController
-    plug Guardian.Plug.VerifySession, claims: @claims
-    plug Guardian.Plug.EnsureAuthenticated
-    plug Guardian.Plug.LoadResource, ensure: true
+    plug Oceanconnect.Guardian.AuthPipeline
   end
 
   # Other scopes may use custom stacks.
   scope "/api", OceanconnectWeb.Api do
     pipe_through :api
+    pipe_through :authenticated # Routes requiring authentication
     get "/auctions", AuctionController, :index, as: :auction_api
     post "/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api
     get "/ports/:port_id/suppliers", PortSupplierController, :index

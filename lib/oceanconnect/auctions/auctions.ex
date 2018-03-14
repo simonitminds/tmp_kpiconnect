@@ -7,10 +7,16 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
   def is_participant?(auction = %Auction{}, company_id) do
-    auction_with_participants = auction
-    |> with_participants
-    suppliers = Enum.map(auction_with_participants.suppliers, fn(supplier) -> supplier.id end)
-    company_id in [auction_with_participants.buyer.id | suppliers]
+    company_id in auction_participant_ids(auction)
+  end
+
+  def auction_participant_ids(auction = %Auction{}) do
+    [auction.buyer_id | auction_supplier_ids(auction)]
+  end
+
+  def auction_supplier_ids(auction = %Auction{}) do
+    auction_with_participants = with_participants(auction)
+    Enum.map(auction_with_participants.suppliers, &(&1.id))
   end
 
   def list_auctions do

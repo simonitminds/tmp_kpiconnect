@@ -100,6 +100,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  def handle_cast({:end_auction, _}, current_state = %{status: :closed}), do: {:noreply, current_state}
   def handle_cast({:end_auction, %{id: auction_id, duration: duration}}, current_state = %{status: :open}) do
     case TimersSupervisor.start_timer({auction_id, duration, :decision_duration}) do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)

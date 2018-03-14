@@ -6,7 +6,7 @@ defmodule OceanconnectWeb.Api.AuctionControllerTest do
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     port = insert(:port, companies: [buyer_company, supplier_company])
-    authed_conn = login_user(build_conn(), buyer)
+    authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
     auction = insert(:auction, port: port, buyer: buyer_company, suppliers: [supplier_company])
     {:ok, conn: authed_conn, auction: auction, buyer: buyer_company}
   end
@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.Api.AuctionControllerTest do
   test "user must be authenticated", %{auction: auction} do
     conn = build_conn()
     conn = get conn, auction_api_path(conn, :index, %{"user_id" => auction.buyer_id})
-    assert conn.resp_body == "{\"message\":\"unauthenticated\"}"
+    assert conn.resp_body == "\"Unauthorized\""
   end
 
   describe "index" do

@@ -23,8 +23,10 @@ if(window.userToken && window.userToken != "" && window.companyId && window.comp
 };
 
 const defaultHeaders = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json'
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${window.userToken}`,
+  'x-expires': window.expiration
 };
 
 export function subscribeToAuctionUpdates() {

@@ -8,7 +8,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     auction = insert(:auction, buyer: buyer.company, suppliers: [supplier_company])
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
-    authed_conn = login_user(build_conn(), supplier)
+    authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
     bid_params = %{"bid" => %{"amount" => "3.50"}}
     {:ok, %{auction: auction, conn: authed_conn, buyer: buyer, bid_params: bid_params}}
   end
@@ -32,9 +32,9 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       :ok
     end
 
-    test "cannot bid when not logged in ", %{conn: conn, auction: auction, bid_params: params} do
-      conn = create_post(conn, auction, params)
-      assert json_response(conn, 422)
+    test "cannot bid when not logged in ", %{auction: auction, bid_params: params} do
+      conn = create_post(build_conn(), auction, params)
+      assert json_response(conn, 401)
     end
 
     test "cannot enter bids of non $0.25 increments ", %{conn: conn, auction: auction, bid_params: params} do
@@ -48,19 +48,20 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       assert json_response(conn, 200)
     end
 
-    test "creating a bid for a auction as a non supplier", %{auction: auction, bid_params: params} do
-      non_participant = insert(:user)
-      conn = login_user(build_conn(), non_participant)
+    test "creating a bid for an auction as a non supplier", %{auction: auction, bid_params: params} do
+      non_participant_company = insert(:company)
+      non_participant = insert(:user, company: non_participant_company)
+      conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), non_participant)
 
-      conn = create_post(conn, auction, params)
+      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}?supplier_id=#{non_participant_company.id}", params)
       assert json_response(conn, 422)
     end
 
-    test "creating a bid for a auction as a buyer", %{buyer: buyer, auction: auction, bid_params: params} do
-      conn = login_user(build_conn(), buyer)
-      conn = create_post(conn, auction, params)
+    test "creating a bid for an auction as a buyer", %{buyer: buyer, auction: auction, bid_params: params} do
+      conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
+      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}?supplier_id=#{auction.buyer_id}", params)
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 422)
     end
   end
 

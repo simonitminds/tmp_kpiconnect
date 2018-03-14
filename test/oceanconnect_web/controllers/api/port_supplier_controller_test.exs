@@ -10,7 +10,7 @@ defmodule OceanconnectWeb.Api.PortSupplierControllerTest do
 
     port = insert(:port, companies: supplier_companies ++ [buyer_company])
     _different_port = insert(:port, companies: [different_port_supplier])
-    authed_conn = login_user(build_conn(), buyer)
+    authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
    {:ok, conn: authed_conn, port_suppliers: supplier_companies, port: port,
          buyer_company: buyer_company, different_port_supplier: different_port_supplier}
   end

@@ -42,11 +42,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
       payload = current_auction_state
       |> Auctions.build_auction_state_payload(nil)
 
-      rest_of_suppliers = auction_with_participants.suppliers
-      |> Enum.filter(fn(supplier) ->
-        supplier.id != supplier_id
-      end)
-      |> Enum.map(&(&1.id))
+      rest_of_suppliers = List.delete(Auctions.auction_supplier_ids(auction), supplier_id)
 
       send_notification_to_participants("user_auctions", payload, rest_of_suppliers)
     end
