@@ -74,7 +74,11 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
     {:reply, current_state, current_state}
   end
 
-  def handle_cast({:enter_bid, bid = %AuctionBid{}}, current_state) do
+  def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id}}, current_state) do
+    current_bid_list_supplier_ids = Enum.map(current_state, fn(bid) -> bid.supplier_id end)
+    unless supplier_id in current_bid_list_supplier_ids do
+      Oceanconnect.Auctions.AuctionTimer.maybe_extend_auction(auction_id)
+    end
     new_state = [bid | current_state]
     {:noreply, new_state}
   end

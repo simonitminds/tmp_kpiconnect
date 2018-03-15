@@ -1,37 +1,21 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{Command, AuctionBidList}
-  alias Oceanconnect.Auctions.AuctionBidList.{AuctionBid}
+  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionStore}
 
   setup do
     supplier_company = insert(:company)
-    supplier = insert(:user, company: supplier_company)
-    auction = insert(:auction, suppliers: [supplier_company])
-    bid_params = %{
-      auction_id: auction.id,
-      amount: 1.25,
-      fuel_quantity: auction.fuel_quantity,
-      supplier_id: supplier.id
-    }
+    supplier2_company = insert(:company)
+    auction = insert(:auction, suppliers: [supplier_company, supplier2_company])
+    bid = %{"amount" => "1.25"}
+    |> Map.put("supplier_id", supplier_company.id)
+    |> Map.put("id", UUID.uuid4(:hex))
+    |> Map.put("time_entered", DateTime.utc_now())
+    |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
+
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
-    {:ok, %{auction: auction, bid_params: bid_params}}
-  end
-
-  test "starting auction_bid_list for auction", %{bid_params: bid_params} do
-    assert AuctionBidList.get_bid_list(bid_params.auction_id) == []
-
-    %AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}
-    |> Map.merge(bid_params)
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    actual_state = bid_params.auction_id
-    |> AuctionBidList.get_bid_list
-    |> hd
-
-    assert Enum.all?(bid_params, fn({k, v}) ->
-      Map.fetch!(actual_state, k) == v
-    end)
+    Oceanconnect.Auctions.start_auction(auction)
+    {:ok, %{auction: auction, bid: bid, supplier2_company: supplier2_company}}
   end
 
   test "auction is supervised", %{auction: auction} do
@@ -45,5 +29,40 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     {:ok, new_pid} = AuctionBidList.find_pid(auction.id)
     assert Process.alive?(new_pid)
+  end
+
+  test "entering a bid for auction", %{bid: bid} do
+    assert AuctionBidList.get_bid_list(bid.auction_id) == []
+
+    bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+
+    actual_state = bid.auction_id
+    |> AuctionBidList.get_bid_list
+    |> hd
+
+    assert Enum.all?(bid |> Map.from_struct, fn({k, v}) ->
+      Map.fetch!(actual_state, k) == v
+    end)
+  end
+
+  test "first bid by supplier in last 3 minutes extends duration", %{auction: auction, bid: bid, supplier2_company: supplier2_company} do
+    bid
+    |> Command.process_new_bid
+    |> AuctionStore.process_command
+
+    :timer.sleep(1_000)
+    new_bid = bid
+    |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "3.00", supplier_id: supplier2_company.id})
+
+    new_bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+
+    actual_state = AuctionStore.get_current_state(auction)
+
+    assert [bid] == actual_state.winning_bid
+    assert actual_state.time_remaining > 3 * 60_000 - 500
   end
 end
