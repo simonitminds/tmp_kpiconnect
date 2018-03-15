@@ -5,57 +5,57 @@ import { formatTime } from '../../utilities';
 const SupplierWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
   const bidList = _.get(auction, 'bid_list', []);
-  const winningBidList = _.get(auction, 'state.winning_bid', []);
-  const winningBid = _.first(winningBidList);
-  const mostRecentBid = _.first(bidList);
-  const order = _.findIndex(winningBidList, ['id', _.get(mostRecentBid, 'id')]);
+  const winningBid = _.get(auction, 'state.winning_bid');
+  const order = _.get(auction, 'state.winning_bid_position');
   const bidStatsDisplay = () => {
-    if (bidList.length == 0) {
-      return <div className = "auction-notification box is-warning" >
-        <h3 className="has-text-weight-bold is-flex">
-        <span className="icon box__icon-marker is-medium has-margin-top-none">
-          <i className="fas fa-lg fa-adjust"></i>
-        </span>
-        <span className="is-inline-block qa-supplier-bid-status-message">You have not bid on this auction</span>
-        </h3>
-      </div>;
-    }
-    else if (order == 0) {
-      return <div className = "auction-notification box is-success" >
-        <h3 className="has-text-weight-bold is-flex">
-        <span className="icon box__icon-marker is-medium has-margin-top-none">
-          <i className="fas fa-lg fa-check-circle"></i>
-        </span>
-        <span className="is-inline-block qa-supplier-bid-status-message">Your bid is currently lowest</span>
-        </h3>
-      </div>;
-    } else {
-      if (order > 0) {
-        return
- <div className = "auction-notification box is-success" >
+    if(auction.state.status != "pending") {
+      if (bidList.length == 0) {
+        return <div className = "auction-notification box is-warning" >
+          <h3 className="has-text-weight-bold is-flex">
+          <span className="icon box__icon-marker is-medium has-margin-top-none">
+            <i className="fas fa-lg fa-adjust"></i>
+          </span>
+          <span className="is-inline-block qa-supplier-bid-status-message">You have not bid on this auction</span>
+          </h3>
+        </div>;
+      }
+      else if (order == 0) {
+        return <div className = "auction-notification box is-success" >
           <h3 className="has-text-weight-bold is-flex">
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-check-circle"></i>
           </span>
-          <span className="is-inline-block qa-supplier-bid-status-message">You are in lowest bid position number {order + 1}</span>
+          <span className="is-inline-block qa-supplier-bid-status-message">Your bid is currently lowest</span>
           </h3>
         </div>;
       } else {
-        return
- <div className = "auction-notification box is-warning" >
-          <h3 className="has-text-weight-bold is-flex">
-          <span className="icon box__icon-marker is-medium has-margin-top-none">
-            <i className="fas fa-lg fa-times-circle"></i>
-          </span>
-          <span className="is-inline-block qa-supplier-bid-status-message">You have been outbid</span>
-          </h3>
-        </div>;
+        if (order > 0) {
+          return
+  <div className = "auction-notification box is-success" >
+            <h3 className="has-text-weight-bold is-flex">
+            <span className="icon box__icon-marker is-medium has-margin-top-none">
+              <i className="fas fa-lg fa-check-circle"></i>
+            </span>
+            <span className="is-inline-block qa-supplier-bid-status-message">You are in lowest bid position number {order + 1}</span>
+            </h3>
+          </div>;
+        } else {
+          return
+  <div className = "auction-notification box is-warning" >
+            <h3 className="has-text-weight-bold is-flex">
+            <span className="icon box__icon-marker is-medium has-margin-top-none">
+              <i className="fas fa-lg fa-times-circle"></i>
+            </span>
+            <span className="is-inline-block qa-supplier-bid-status-message">You have been outbid</span>
+            </h3>
+          </div>;
+        }
       }
     }
   }
 
   const winningBidListDisplay = () => {
-    if (winningBidList.length > 0) {
+    if (winningBid) {
       return (
         <table className="table is-fullwidth is-striped is-marginless">
           <thead>

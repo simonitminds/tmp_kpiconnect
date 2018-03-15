@@ -25,6 +25,7 @@ export default function(state, action) {
             .filter(['id', action.auction.id])
             .first()
             .value();
+
       let updatedAuction;
       if (action.auction.bid_list) {
         updatedAuction = {...origAuction, state: action.auction.state, bid_list: action.auction.bid_list};

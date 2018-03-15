@@ -145,7 +145,7 @@ defmodule Oceanconnect.AuctionShowTest do
         assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
       end)
 
-      # TODO: Get chrome to run icognito to isolate sessions for this to pass
+      # TODO: Get chrome to run incognito to isolate sessions for this to pass
       # change_session_to(:default)
       # assert AuctionShowPage.auction_bid_status() =~ "You have been outbid"
       # AuctionShowPage.enter_bid(%{amount: 0.50})

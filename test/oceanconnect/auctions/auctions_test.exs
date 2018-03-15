@@ -113,6 +113,23 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "build_auction_state_payload/1" do
+    setup do
+      buyer_company = insert(:company)
+      supplier_company = insert(:company)
+      auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
+      {:ok, %{auction: auction}}
+    end
+
+    test "returns payload for a buyer with supplier names on bid_lists", %{auction: auction} do
+      auction_state = auction
+      |> Auctions.AuctionStore.AuctionState.from_auction()
+
+      payload = auction_state
+      |> Auctions.build_auction_state_payload(auction.buyer_id)
+    end
+  end
+
   describe "ports" do
     alias Oceanconnect.Auctions.Port
 
