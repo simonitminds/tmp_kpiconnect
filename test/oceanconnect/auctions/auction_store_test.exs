@@ -5,9 +5,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
-    auction = insert(:auction, duration: 1_000, decision_duration: 1_000)
+    supplier_company = insert(:company)
+    supplier2_company = insert(:company)
+    auction = insert(:auction, duration: 1_000, decision_duration: 1_000,
+                      suppliers: [supplier_company, supplier2_company])
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    {:ok, %{auction: auction}}
+    {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end
 
   test "starting auction_store for auction", %{auction: auction} do
@@ -88,9 +91,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   describe "winning bid list" do
-    setup %{auction: auction} do
+    setup %{auction: auction, supplier_company: supplier_company} do
       bid = %{"amount" => "1.25"}
-      |> Map.put("supplier_id", hd(auction.suppliers).id)
+      |> Map.put("supplier_id", supplier_company.id)
       |> Map.put("id", UUID.uuid4(:hex))
       |> Map.put("time_entered", DateTime.utc_now())
       |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)

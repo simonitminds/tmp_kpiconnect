@@ -4,9 +4,9 @@ import { formatTime } from '../../utilities';
 
 const BuyerWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const winnningBidList = _.get(auction, 'state.winning_bid', []);
-  const winnningBidListDisplay = () => {
-    if (winnningBidList.length > 0) {
+  const winningBidList = _.get(auction, 'state.winning_bid', []);
+  const winningBidListDisplay = () => {
+    if (winningBidList.length > 0) {
       return (
         <table className="table is-fullwidth is-striped is-marginless">
           <thead>
@@ -17,7 +17,7 @@ const BuyerWinningBid = ({auction}) => {
             </tr>
           </thead>
           <tbody>
-            {_.map(winnningBidList, (bid) => {
+            {_.map(winningBidList, (bid) => {
               return (
                 <tr key={bid.id} className={`qa-auction-winning-bid-${bid.id}`}>
                   <td className="qa-auction-winning-bid-supplier">{bid.supplier}</td>
@@ -40,7 +40,7 @@ const BuyerWinningBid = ({auction}) => {
     <div className="box">
       <div className="box__subsection has-padding-bottom-none">
         <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>
-        {winnningBidListDisplay()}
+        {winningBidListDisplay()}
       </div>
     </div>
   );

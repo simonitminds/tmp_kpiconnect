@@ -27,7 +27,7 @@ export default function(state, action) {
             .value();
       let updatedAuction;
       if (action.auction.bid_list) {
-        updatedAuction = {...origAuction, state: action.auction.state, bidList: action.auction.bid_list};
+        updatedAuction = {...origAuction, state: action.auction.state, bid_list: action.auction.bid_list};
       } else {
         updatedAuction = {...origAuction, state: action.auction.state};
       }

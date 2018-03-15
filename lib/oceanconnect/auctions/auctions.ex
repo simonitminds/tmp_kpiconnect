@@ -94,7 +94,7 @@ defmodule Oceanconnect.Auctions do
   end
   def add_bid_list(auction_state, _user_id), do: auction_state
 
-  defp supplier_bid_list(bid_list, supplier_id) do
+  def supplier_bid_list(bid_list, supplier_id) do
     Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
   end
 

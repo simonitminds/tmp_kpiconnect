@@ -32,7 +32,7 @@ defmodule Oceanconnect.AuctionShowPage do
     value == element |> inner_text
   end
 
-  def has_buyer_bids?(bid_list) do
+  def has_bid_list_bids?(bid_list) do
     Enum.all?(bid_list, fn(bid) ->
       element = find_element(:class, "qa-auction-bid-#{bid["id"]}")
       Enum.all?(bid["data"], fn({k, v}) ->

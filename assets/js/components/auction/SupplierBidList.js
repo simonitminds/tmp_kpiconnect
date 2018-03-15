@@ -25,7 +25,7 @@ const SupplierBidList = ({auction, buyer}) => {
               {_.map(bidList, (bid) => {
                 return (
                   <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                    <td>${bid.amount}</td>
+                    <td className="qa-auction-bid-amount">${bid.amount}</td>
                     <td>{formatTime(bid.time_entered)}</td>
                   </tr>
                 );
@@ -40,7 +40,7 @@ const SupplierBidList = ({auction, buyer}) => {
         <div className="box">
           <h3 className="box__header box__header--bordered">Your Bid History</h3>
           <div className="auction-table-placeholder">
-            <i>You haven't placed a bid on this auction</i>
+            <i>You have not bid on this auction</i>
           </div>
         </div>
       );

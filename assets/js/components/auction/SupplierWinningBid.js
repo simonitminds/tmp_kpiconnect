@@ -4,9 +4,9 @@ import { formatTime } from '../../utilities';
 
 const SupplierWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const bidList = _.get(auction, 'bidList', []);
+  const bidList = _.get(auction, 'bid_list', []);
   const winningBidList = _.get(auction, 'state.winning_bid', []);
-  const winnningBid = _.first(winningBidList);
+  const winningBid = _.first(winningBidList);
   const mostRecentBid = _.first(bidList);
   const order = _.findIndex(winningBidList, ['id', _.get(mostRecentBid, 'id')]);
   const bidStatsDisplay = () => {
@@ -16,7 +16,7 @@ const SupplierWinningBid = ({auction}) => {
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-adjust"></i>
         </span>
-        <span className="is-inline-block qa-supplier-bid-status-message">You haven't bid on this auction.</span>
+        <span className="is-inline-block qa-supplier-bid-status-message">You have not bid on this auction</span>
         </h3>
       </div>;
     }
@@ -26,7 +26,7 @@ const SupplierWinningBid = ({auction}) => {
         <span className="icon box__icon-marker is-medium has-margin-top-none">
           <i className="fas fa-lg fa-check-circle"></i>
         </span>
-        <span className="is-inline-block qa-supplier-bid-status-message">You're currently winning!</span>
+        <span className="is-inline-block qa-supplier-bid-status-message">Your bid is currently lowest</span>
         </h3>
       </div>;
     } else {
@@ -37,7 +37,7 @@ const SupplierWinningBid = ({auction}) => {
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-check-circle"></i>
           </span>
-          <span className="is-inline-block qa-supplier-bid-status-message">You're in lowest bid position number {order + 1}</span>
+          <span className="is-inline-block qa-supplier-bid-status-message">You are in lowest bid position number {order + 1}</span>
           </h3>
         </div>;
       } else {
@@ -47,7 +47,7 @@ const SupplierWinningBid = ({auction}) => {
           <span className="icon box__icon-marker is-medium has-margin-top-none">
             <i className="fas fa-lg fa-times-circle"></i>
           </span>
-          <span className="is-inline-block qa-supplier-bid-status-message">You've been outbid on this auction</span>
+          <span className="is-inline-block qa-supplier-bid-status-message">You have been outbid</span>
           </h3>
         </div>;
       }
@@ -66,8 +66,8 @@ const SupplierWinningBid = ({auction}) => {
           </thead>
           <tbody>
             <tr>
-              <td className="qa-auction-winning-bid-amount">${winnningBid.amount}</td>
-              <td>{formatTime(winnningBid.time_entered)}</td>
+              <td className="qa-auction-winning-bid-amount">${winningBid.amount}</td>
+              <td>{formatTime(winningBid.time_entered)}</td>
             </tr>
           </tbody>
         </table>
@@ -92,4 +92,3 @@ const SupplierWinningBid = ({auction}) => {
   );
 };
 export default SupplierWinningBid;
-

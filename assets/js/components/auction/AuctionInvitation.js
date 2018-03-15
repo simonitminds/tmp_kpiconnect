@@ -83,8 +83,8 @@ const AuctionInvitation = ({auction}) => {
               </select>
             </div>
           </div>
-          <p class="control">
-            <a class="button is-primary">
+          <p className="control">
+            <a className="button is-primary">
               <i className="fas fa-md fa-check"></i>
             </a>
           </p>
