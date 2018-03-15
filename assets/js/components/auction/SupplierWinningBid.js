@@ -5,10 +5,8 @@ import { formatTime } from '../../utilities';
 const SupplierWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
   const bidList = _.get(auction, 'bid_list', []);
-  const winningBidList = _.get(auction, 'state.winning_bid', []);
-  const winningBid = _.first(winningBidList);
-  const mostRecentBid = _.first(bidList);
-  const order = _.findIndex(winningBidList, ['id', _.get(mostRecentBid, 'id')]);
+  const winningBid = _.get(auction, 'state.winning_bid');
+  const order = _.get(auction, 'state.winning_bid_position');
   const bidStatsDisplay = () => {
     if (bidList.length == 0) {
       return <div className = "auction-notification box is-warning" >
@@ -55,7 +53,7 @@ const SupplierWinningBid = ({auction}) => {
   }
 
   const winningBidListDisplay = () => {
-    if (winningBidList.length > 0) {
+    if (winningBid) {
       return (
         <table className="table is-fullwidth is-striped is-marginless">
           <thead>
