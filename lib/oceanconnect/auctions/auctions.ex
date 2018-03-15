@@ -1,16 +1,22 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Port, Vessel, Fuel}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionCommand}
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
   def is_participant?(auction = %Auction{}, company_id) do
-    auction_with_participants = auction
-    |> with_participants
-    suppliers = Enum.map(auction_with_participants.suppliers, fn(supplier) -> supplier.id end)
-    company_id in [auction_with_participants.buyer.id | suppliers]
+    company_id in auction_participant_ids(auction)
+  end
+
+  def auction_participant_ids(auction = %Auction{}) do
+    [auction.buyer_id | auction_supplier_ids(auction)]
+  end
+
+  def auction_supplier_ids(auction = %Auction{}) do
+    auction_with_participants = with_participants(auction)
+    Enum.map(auction_with_participants.suppliers, &(&1.id))
   end
 
   def list_auctions do
@@ -31,7 +37,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   defp supplier_auctions(supplier_id) do
-    query = from as in Oceanconnect.Auctions.AuctionSuppliers,
+    query = from as in AuctionSuppliers,
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
       select: a
@@ -39,22 +45,99 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
   end
 
-  def get_auction!(id) do
-     Repo.get!(Auction, id)
-   end
+  def get_auction(id) do
+    Repo.get(Auction, id)
+  end
 
-  def auction_state(auction = %Auction{id: id}) do
+  def get_auction!(id) do
+    Repo.get!(Auction, id)
+  end
+
+  def get_auction_state(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
-      {:error, "Auction Store Not Started"} -> %{id: id, state: %{status: :pending}}
-      state ->
-        reduced_state = Map.take(state, [:status, :current_server_time, :time_remaining])
-        %{id: id, state: reduced_state}
+      {:error, "Auction Store Not Started"} -> %{auction_id: id, status: :pending}
+      state -> state
     end
+  end
+
+  def build_auction_state_payload(auction_state, nil) do
+    auction_state
+    |> add_bid_list(nil)
+    |> structure_payload
+  end
+  def build_auction_state_payload(auction_state, user_id) when is_integer(user_id) do
+    auction_state
+    |> add_bid_list(user_id)
+    |> structure_payload
+  end
+  def build_auction_state_payload(auction_state, user_id) do
+    auction_state
+    |> add_bid_list(String.to_integer(user_id))
+    |> structure_payload
+  end
+
+  def add_bid_list(auction_state = %{auction_id: auction_id, buyer_id: buyer_id, status: status}, buyer_id)
+    when status != :pending do
+    current_bid_list = AuctionBidList.get_bid_list(auction_id)
+
+    auction_state
+    |> Map.put(:bid_list, current_bid_list)
+    |> add_supplier_names
+  end
+  def add_bid_list(auction_state = %{auction_id: auction_id, status: status}, supplier_id) when status != :pending do
+    supplier_bid_list = auction_id
+    |> AuctionBidList.get_bid_list
+    |> supplier_bid_list(supplier_id)
+
+    auction_state
+    |> Map.put(:bid_list, supplier_bid_list)
+  end
+  def add_bid_list(auction_state, _user_id), do: auction_state
+
+  def supplier_bid_list(bid_list, supplier_id) do
+    Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
+  end
+
+  def structure_payload(auction_state = %{bid_list: bid_list}) do
+    state = Map.drop(auction_state, [:__struct__, :auction_id, :buyer_id, :supplier_ids])
+    %{id: auction_state.auction_id, state: Map.delete(state, :bid_list), bid_list: bid_list}
+  end
+  def structure_payload(auction_state) do
+    state = Map.drop(auction_state, [:__struct__, :auction_id, :buyer_id, :supplier_ids])
+    %{id: auction_state.auction_id, state: state}
+  end
+
+  def add_supplier_names(payload) do
+    bid_list = convert_to_supplier_names(payload.bid_list, payload)
+    winning_bid = convert_to_supplier_names(payload.winning_bid, payload)
+    payload
+    |> Map.put(:bid_list, bid_list)
+    |> Map.put(:winning_bid, winning_bid)
+  end
+
+  def convert_to_supplier_names(bid_list, payload) do
+    Enum.map(bid_list, fn(bid) ->
+      supplier_name = get_name_or_alias(bid.supplier_id, payload)
+      bid
+      |> Map.drop([:__struct__, :supplier_id])
+      |> Map.put(:supplier, supplier_name)
+    end)
+  end
+
+  defp get_name_or_alias(supplier_id, %{auction_id: auction_id, anonymous_bidding: true}) do
+    get_auction_supplier(auction_id, supplier_id).alias_name
+  end
+  defp get_name_or_alias(supplier_id, _) do
+    Oceanconnect.Accounts.get_company!(supplier_id).name
+  end
+
+  defp get_auction_supplier(auction_id, supplier_id) do
+    Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
   def start_auction(auction = %Auction{}) do
     auction
-    |> AuctionCommand.start_auction
+    |> Command.start_auction
     |> AuctionStore.process_command
 
     update_auction(auction, %{auction_start: DateTime.utc_now()})
@@ -67,13 +150,27 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        auction
+        auction_with_participants = auction
         |> with_participants
-        |> AuctionsSupervisor.start_child
+        |> create_supplier_aliases
+
+        AuctionsSupervisor.start_child(auction_with_participants)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  def create_supplier_aliases(auction = %{suppliers: suppliers}) do
+    :random.seed()
+    Enum.reduce(Enum.shuffle(suppliers), 1, fn(supplier, acc) ->
+      AuctionSuppliers
+      |> Repo.get_by(%{auction_id: auction.id, supplier_id: supplier.id})
+      |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
+      |> Repo.update!
+      acc + 1
+    end)
+    auction
   end
 
   def update_auction(%Auction{} = auction, attrs) do
@@ -136,24 +233,6 @@ defmodule Oceanconnect.Auctions do
   defp maybe_replace_non_loaded(value = %DateTime{}), do: value
   defp maybe_replace_non_loaded(value = %{}), do: strip_non_loaded(value)
   defp maybe_replace_non_loaded(value), do: value
-
-  def add_supplier_to_auction(%Auction{} = auction, %Company{} = supplier) do
-    auction_with_suppliers = auction
-    |> Repo.preload(:suppliers)
-
-    auction_with_suppliers
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, [supplier | auction_with_suppliers.suppliers])
-    |> Repo.update!
-  end
-
-  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
-    auction
-    |> Repo.preload(:suppliers)
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
-    |> Repo.update!
-  end
 
   @doc """
   Returns the list of ports.

@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import { formatUTCDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
 
 const AuctionHeader = ({auction, timeRemaining}) => {
   return(
@@ -30,7 +30,7 @@ const AuctionHeader = ({auction, timeRemaining}) => {
                     </div>
                   </div>
                   <div className="auction-header__start-time has-text-left-mobile">
-                    <span className="has-text-weight-bold is-uppercase">Started at</span> {formatGMTDateTime(auction.auction_start)} GMT
+                    <span className="has-text-weight-bold is-uppercase">Started at</span> {formatUTCDateTime(auction.auction_start)} GMT
                   </div>
                   <div className="auction-header__duration has-text-left-mobile">
                     <span className="has-text-weight-bold is-uppercase">Decision Period</span> {auction.decision_duration} minutes
@@ -45,7 +45,7 @@ const AuctionHeader = ({auction, timeRemaining}) => {
         <div className="container">
           <div className="auction-header__ports has-text-weight-bold">
             <span className="qa-auction-port">{auction.port.name}</span>
-            <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> ETA {formatGMTDateTime(auction.eta)} GMT &ndash; ETD {formatGMTDateTime(auction.etd)} GMT</span>
+            <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> ETA {formatUTCDateTime(auction.eta)} GMT &ndash; ETD {formatUTCDateTime(auction.etd)} GMT</span>
           </div>
         </div>
       </section>

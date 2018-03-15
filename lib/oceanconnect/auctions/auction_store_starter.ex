@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreStarter do
   use GenServer
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.AuctionsSupervisor
+  alias Oceanconnect.Auctions.{AuctionBidsSupervisor, AuctionsSupervisor}
 
   def start_link do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -17,7 +17,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
     |> Enum.map(fn(auction) ->
       auction_with_participants = auction
       |> Auctions.with_participants
-      with {:ok, pid} <- AuctionsSupervisor.start_child(auction_with_participants)
+      with {:ok, pid} <- AuctionsSupervisor.start_child(auction_with_participants),
+           {:ok, _bid_pid} <- AuctionBidsSupervisor.start_child(auction.id)
         do
           {auction.id, pid}
         else

@@ -11,7 +11,7 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction = insert(:auction_without_suppliers, @valid_attrs)
+      auction = insert(:auction, @valid_attrs)
       {:ok, %{auction: Auctions.get_auction!(auction.id)}}
     end
 
@@ -35,10 +35,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert decision_duration == 15 * 60_000
     end
 
-    test "#maybe_convert_suppliers" do
+    test "#maybe_load_suppliers" do
       supplier = insert(:company, is_supplier: true)
       params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
-      %{ "suppliers" => suppliers } = Auction.maybe_convert_suppliers(params, "suppliers")
+      %{ "suppliers" => suppliers } = Auction.maybe_load_suppliers(params, "suppliers")
 
       assert List.first(suppliers).id == supplier.id
     end
@@ -64,9 +64,15 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
-      auction_attrs = auction |> Map.take([:fuel_id, :port_id, :vessel_id] ++ Map.keys(@valid_attrs))
+      auction_with_participants = Auctions.with_participants(auction)
+      auction_attrs = auction_with_participants |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
+
       assert all_values_match?(auction_attrs, new_auction)
+
+      supplier = hd(auction_with_participants.suppliers)
+      auction_supplier = Repo.get_by(Auctions.AuctionSuppliers, %{auction_id: new_auction.id, supplier_id: supplier.id})
+      assert auction_supplier.alias_name == "Supplier 1"
     end
 
     test "create_auction/1 with invalid data returns error changeset" do
@@ -93,52 +99,17 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end
 
-    test "add_supplier_to_auction/2 with valid data", %{auction: auction} do
-      supplier = insert(:company)
-      updated_auction = auction |> Auctions.add_supplier_to_auction(supplier)
-      assert updated_auction.suppliers == [supplier]
-    end
-
-    test "add_supplier_to_auction/2 with existing suppliers", %{auction: auction} do
-      [s1, s2] = insert_list(2, :company)
-      updated_auction = auction |> Auctions.add_supplier_to_auction(s1)
-      |> Auctions.add_supplier_to_auction(s2)
-      assert updated_auction.suppliers
-      |> Enum.map(fn(s) -> s.id end)
-      |> MapSet.new
-      |> MapSet.equal?(MapSet.new([s1.id, s2.id]))
-    end
-
-    test "set_suppliers_for_auction/2 with valid data", %{auction: auction} do
-      [s1, s2] = insert_list(2, :company)
-      updated_auction = auction |> Auctions.set_suppliers_for_auction([s1, s2])
-      assert updated_auction.suppliers
-      |> Enum.map(fn(s) -> s.id end)
-      |> MapSet.new
-      |> MapSet.equal?(MapSet.new([s1.id, s2.id]))
-    end
-
-    test "set_suppliers_for_auction/2 overwriting existing suppliers", %{auction: auction} do
-      [s1, s2, s3] = insert_list(3, :company)
-      updated_auction = auction |> Auctions.add_supplier_to_auction(s3)
-      |> Auctions.set_suppliers_for_auction([s1, s2])
-      assert updated_auction.suppliers
-      |> Enum.map(fn(s) -> s.id end)
-      |> MapSet.new
-      |> MapSet.equal?(MapSet.new([s1.id, s2.id]))
-    end
-
     test "auction status" do
       auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
       {:ok, auction} = Auctions.create_auction(auction_attrs)
 
-      assert :pending == Auctions.auction_state(auction).state.status
+      assert :pending == Auctions.get_auction_state(auction).status
 
       Auctions.start_auction(auction)
-      assert :open == Auctions.auction_state(auction).state.status
+      assert :open == Auctions.get_auction_state(auction).status
 
       Auctions.start_auction(auction)
-      assert :open == Auctions.auction_state(auction).state.status
+      assert :open == Auctions.get_auction_state(auction).status
     end
   end
 

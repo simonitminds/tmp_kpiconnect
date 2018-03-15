@@ -18,13 +18,21 @@ export function replaceListItem(list, oldItem, newItem) {
   }
 }
 
-export const formatGMTDateTime = (dateTime) => {
+export const formatUTCDateTime = (dateTime) => {
   return formatDateTime(moment(dateTime).utc());
 }
 
 export const formatDateTime = (dateTime) => {
   if (dateTime) {
     return moment(dateTime).format("DD/MM/YYYY HH:mm");
+  } else {
+    return ""
+  }
+}
+
+export const formatTime = (dateTime) => {
+  if (dateTime) {
+    return moment(dateTime).utc().format("HH:mm");
   } else {
     return ""
   }

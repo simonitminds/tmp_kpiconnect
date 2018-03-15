@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
+  import Plug.Conn
   alias Oceanconnect.Accounts
   alias OceanconnectWeb.Plugs.Auth
 
@@ -35,10 +36,17 @@ defmodule OceanconnectWeb.SessionController do
     |> redirect(to: auction_path(conn, :index))
   end
 
-  def unauthenticated(conn) do
-    conn
-    |> put_flash(:error, "Authentication Required")
-    |> put_status(302)
-    |> redirect(to: session_path(conn, :new))
+  def auth_error(conn = %Plug.Conn{request_path: path}, {_type, _reason}, _opts) do
+    case String.match?(path, ~r/\/api\//) do
+      true ->
+        conn
+        |> put_status(401)
+        |> render(OceanconnectWeb.ErrorView, "401.json", data: %{})
+      false ->
+        conn
+        |> put_flash(:error, "Authentication Required")
+        |> put_status(302)
+        |> redirect(to: session_path(conn, :new))
+    end
   end
 end

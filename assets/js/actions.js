@@ -23,8 +23,10 @@ if(window.userToken && window.userToken != "" && window.companyId && window.comp
 };
 
 const defaultHeaders = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json'
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${window.userToken}`,
+  'x-expires': window.expiration
 };
 
 export function subscribeToAuctionUpdates() {
@@ -41,7 +43,7 @@ export function subscribeToAuctionUpdates() {
 
 export function getAllAuctions() {
   return dispatch => {
-    fetch(`/api/auctions?buyer_id=${window.companyId}`, { headers: defaultHeaders })
+    fetch(`/api/auctions?user_id=${window.companyId}`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
@@ -52,11 +54,31 @@ export function getAllAuctions() {
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {
-    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, {headers: defaultHeaders })
+    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
         return dispatch(receiveSuppliers(port_id, response.data));
+      });
+  };
+}
+export function submitBid(auction_id, formData) {
+  return dispatch => {
+    fetch(`/api/auctions/${auction_id}/bids?supplier_id=${window.companyId}`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(
+        {
+          'bid': {
+            'amount': formData.get('amount')
+          }
+        }
+      )
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return console.log(response);
       });
   };
 }

@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
   alias Oceanconnect.{Auctions}
   alias Oceanconnect.Auctions.AuctionStore
-  alias Oceanconnect.Auctions.AuctionStore.AuctionCommand
+  alias Oceanconnect.Auctions.Command
 
   @registry_name :auction_timers_registry
 
@@ -24,10 +24,17 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:via, Registry, {@registry_name, "#{auction_id}-#{type}"}}
   end
 
+  # Client
   def start_link({auction_id, type_duration, type}) when type in [:duration, :decision_duration] do
     GenServer.start_link(__MODULE__, {auction_id, type_duration, type}, name: get_auction_timer_name(auction_id, type))
   end
 
+  def process_command(%Command{command: :extend_duration, data: %{auction_id: auction_id}}) do
+    with {:ok, pid} <- find_pid(auction_id, :duration),
+      do: GenServer.call(pid, {:extend_duration, pid})
+  end
+
+  # Server
   def init({auction_id, type_duration, type}) do
     if {:ok, pid} = find_pid(auction_id, type) do
       timer = create_timer(pid, type_duration, type)
@@ -37,7 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id, duration: duration}) do
     %Auctions.Auction{id: auction_id, decision_duration: duration}
-    |> AuctionCommand.end_auction
+    |> Command.end_auction
     |> AuctionStore.process_command
 
     {:noreply, state}
@@ -45,7 +52,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_decision_timer, state = %{auction_id: auction_id}) do
     %Auctions.Auction{id: auction_id}
-    |> AuctionCommand.end_auction_decision_period
+    |> Command.end_auction_decision_period
     |> AuctionStore.process_command
 
     {:noreply, state}
@@ -53,6 +60,13 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_call(:read_timer, _from, state = %{timer: timer_ref}) do
     {:reply, timer_ref, state}
+  end
+
+  def handle_call({:extend_duration, pid}, _from, current_state = %{timer: timer}) do
+    Process.cancel_timer(timer)
+    new_timer = create_timer(pid, 3 * 60_000, :duration)
+    new_state = Map.put(current_state, :timer, new_timer)
+    {:reply, :ok, new_state}
   end
 
   defp create_timer(pid, duration, _type = :duration) do
@@ -63,17 +77,16 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   end
 
   # Client
- def get_timer(pid) do
-   GenServer.call(pid, :read_timer)
- end
+  def get_timer(pid) do
+    GenServer.call(pid, :read_timer)
+  end
 
-  # def reset_timer() do
-  #   GenServer.call(__MODULE__, :reset_timer)
-  # end
-
-  # def handle_call(:reset_timer, _from, %{timer: timer}) do
-  #   :timer.cancel(timer)
-  #   timer = Process.send_after(self(), :work, 60_000)
-  #   {:reply, :ok, %{timer: timer})
-  # end
+  def maybe_extend_auction(auction_id) do
+    time_remaining = Process.read_timer(__MODULE__.timer_ref(auction_id, :duration))
+    if time_remaining <= 3 * 60_000 do
+      auction_id
+      |> Command.extend_duration
+      |> __MODULE__.process_command
+    end
+  end
 end

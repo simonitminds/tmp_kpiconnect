@@ -51,7 +51,8 @@
       <main role="main">
         <%= render @view_module, @view_template, assigns %>
       </main>
-      <script> window.userToken = "<%= assigns[:user_token] %>";</script>
+      <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
+      <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>
       <script> window.companyId = "<%= OceanconnectWeb.SessionView.current_user_company_id(@conn) %>";</script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>

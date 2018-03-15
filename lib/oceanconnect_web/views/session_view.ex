@@ -1,20 +1,27 @@
 defmodule OceanconnectWeb.SessionView do
   use OceanconnectWeb, :view
+  alias OceanconnectWeb.Plugs.Auth
 
-  def current_user(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
-    user.email
+  def current_user(conn) do
+    case Auth.current_user(conn) do
+      nil -> ""
+      user -> user.email
+    end
   end
-  def current_user(_conn), do: ""
 
-  def current_user_company_id(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
-    user.company.id
+  def current_user_company_id(conn) do
+    case Auth.current_user(conn) do
+      nil -> ""
+      user -> user.company.id
+    end
   end
-  def current_user_company_id(_conn), do: ""
 
-  def current_company(%Plug.Conn{assigns: %{current_user: user = %Oceanconnect.Accounts.User{}}}) do
-    user.company.name
+  def current_company(conn) do
+    case Auth.current_user(conn) do
+      nil -> ""
+      user -> user.company.name
+    end
   end
-  def current_company(_conn), do: ""
 
   def log_in_logout_link(conn) do
     if current_user(conn) != "" do

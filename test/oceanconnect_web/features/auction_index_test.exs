@@ -28,14 +28,14 @@ defmodule Oceanconnect.AuctionIndexTest do
       login_user(supplier)
       AuctionIndexPage.visit()
       assert AuctionIndexPage.is_current_path?
-      assert AuctionIndexPage.auction_is_status(auction, "pending")
+      assert AuctionIndexPage.auction_is_status?(auction, "pending")
     end)
 
     AuctionIndexPage.start_auction(auction)
 
     in_browser_session "supplier_session", fn ->
       assert AuctionIndexPage.is_current_path?()
-      assert AuctionIndexPage.auction_is_status(auction, "open")
+      assert AuctionIndexPage.auction_is_status?(auction, "open")
       :timer.sleep(500)
       assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
     end
@@ -74,4 +74,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
     refute AuctionIndexPage.has_auctions?(non_participant_auctions)
   end
+
+
 end

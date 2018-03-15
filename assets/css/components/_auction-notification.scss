@@ -1,0 +1,40 @@
+// ========================== //
+// ========================== //
+// AUCTION NOTIFICATION
+// ========================== //
+// ========================== //
+
+
+// Associated Variables
+
+.auction-notification {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  margin-bottom: 1.5rem;
+
+  .icon.is-medium { // Modify height to keep spacing consistent even when invite status text wraps.
+    height: 0.75rem;
+  }
+
+  &__status {
+    h3 { line-height: 1.3;}
+  }
+}
+
+@keyframes fancy-flip {
+  from {
+    color: transparent;
+    background-color: $green;
+    transform: rotateX(-180deg);
+  }
+
+  to {
+    color: #fff;
+    background-color: $gold;
+    transform: rotateX(0deg);
+  }
+}
+
+.new-status {
+  animation: 1s ease-out 0s 1 fancy-flip;
+}

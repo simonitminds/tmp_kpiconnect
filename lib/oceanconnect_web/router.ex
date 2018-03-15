@@ -14,13 +14,15 @@ defmodule OceanconnectWeb.Router do
   end
 
   pipeline :authenticated do
-    plug OceanconnectWeb.Plugs.Auth
+    plug Oceanconnect.Guardian.AuthPipeline
   end
 
   # Other scopes may use custom stacks.
   scope "/api", OceanconnectWeb.Api do
     pipe_through :api
+    pipe_through :authenticated # Routes requiring authentication
     get "/auctions", AuctionController, :index, as: :auction_api
+    post "/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api
     get "/ports/:port_id/suppliers", PortSupplierController, :index
   end
 

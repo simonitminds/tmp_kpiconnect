@@ -7,7 +7,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     buyer_company = insert(:company)
     insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
-    insert(:user, company: supplier_company)
+    supplier_1 = insert(:user, company: supplier_company)
+    supplier_2 = insert(:user, company: supplier_company)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     current_time =  DateTime.utc_now()
@@ -17,9 +18,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
     {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
-    expected_payload = %{id: auction.id, state: %{status: :open, time_remaining: time_remaining, current_server_time: current_time}}
+    expected_payload = %{id: auction.id,
+      state: %{status: :open, time_remaining: time_remaining, winning_bid: [], anonymous_bidding: nil}
+    }
 
     {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
+            supplier_1: supplier_1,
+            supplier_2: supplier_2,
             buyer_id: Integer.to_string(buyer_company.id),
             non_participant_id: Integer.to_string(non_participant_company.id),
             non_participant: non_participant,
@@ -64,9 +69,21 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       refute_broadcast ^event, ^expected_payload
     end
 
-    test "joining another users auction channel is unauthorized", %{supplier_id: supplier_id, non_participant: non_participant} do
+    test "two users from the same company can join their companies channel", %{supplier_id: supplier_company_id, supplier_2: supplier_2} do
+      channel = "user_auctions:#{supplier_company_id}"
+      user_with_company = Oceanconnect.Accounts.load_company_on_user(supplier_2)
+
+      {:ok, supplier_2_participant_token, _claims} = Oceanconnect.Guardian.encode_and_sign(user_with_company)
+
+      {:ok, supplier_2_socket} = connect(OceanconnectWeb.UserSocket, %{"token" => supplier_2_participant_token})
+      assert {:ok, %{}, _socket} = subscribe_and_join(supplier_2_socket, OceanconnectWeb.AuctionsChannel, channel, %{"token" => supplier_2_participant_token})
+    end
+
+    test "joining another companies auction channel is unauthorized", %{supplier_id: supplier_id, non_participant: non_participant} do
       channel = "user_auctions:#{supplier_id}"
-      non_participant_token = OceanconnectWeb.Plugs.Auth.generate_user_token(build_conn(), non_participant)
+      user_with_company = Oceanconnect.Accounts.load_company_on_user(non_participant)
+      {:ok, non_participant_token, _claims} = Oceanconnect.Guardian.encode_and_sign(user_with_company)
+
       {:ok, non_participant_socket} = connect(OceanconnectWeb.UserSocket, %{token: non_participant_token})
 
       assert {:error, %{reason: "unauthorized"}} = subscribe_and_join(non_participant_socket, OceanconnectWeb.AuctionsChannel, channel)
@@ -87,8 +104,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction goes into Decision" do
     setup(%{expected_payload: expected_payload}) do
-      current_time =  DateTime.utc_now()
-      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, current_server_time: current_time})
+      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, winning_bid: [], anonymous_bidding: nil})
       {:ok, %{payload: payload}}
     end
 
@@ -125,8 +141,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction Ends (post Decision Period)" do
     setup(%{expected_payload: expected_payload}) do
-      current_time =  DateTime.utc_now()
-      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, current_server_time: current_time})
+      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, winning_bid: [], anonymous_bidding: nil})
       {:ok, %{payload: payload}}
     end
 

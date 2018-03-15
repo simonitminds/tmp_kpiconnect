@@ -9,6 +9,14 @@
 
 // Adaptations
 
+.table.is-striped tbody tr:not(.is-selected):nth-child(2n) {
+  background-color: #fff;
+}
+
+.table.is-striped tbody tr:not(.is-selected):nth-child(2n-1) {
+  background-color: $gray-1;
+}
+
 // Additions
 
 .table.is-marginless {

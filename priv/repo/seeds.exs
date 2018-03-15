@@ -218,6 +218,17 @@ end)
   Repo.get_or_insert!(Auction, auction_params)
 end)
 
-Auctions.set_suppliers_for_auction(auction1, suppliers)
-Auctions.set_suppliers_for_auction(auction2, [petrochina])
-Auctions.set_suppliers_for_auction(auction3, suppliers)
+defmodule SupplierHelper do
+  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
+    auction
+    |> Repo.preload(:suppliers)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
+    |> Repo.update!
+    |> Auctions.create_supplier_aliases
+  end
+end
+
+SupplierHelper.set_suppliers_for_auction(auction1, suppliers)
+SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
+SupplierHelper.set_suppliers_for_auction(auction3, suppliers)

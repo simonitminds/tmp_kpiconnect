@@ -32,8 +32,49 @@ defmodule Oceanconnect.AuctionShowPage do
     value == element |> inner_text
   end
 
+  def has_bid_list_bids?(bid_list) do
+    Enum.all?(bid_list, fn(bid) ->
+      element = find_element(:class, "qa-auction-bid-#{bid["id"]}")
+      Enum.all?(bid["data"], fn({k, v}) ->
+        text = find_within_element(element, :css, ".qa-auction-bid-#{k}")
+        |> inner_text
+        v == text
+      end)
+    end)
+  end
+
   def time_remaining() do
     find_element(:css, ".qa-auction-time_remaining")
     |> Hound.Helpers.Element.inner_text
+  end
+
+  def enter_bid(params = %{}) do
+    params
+    |> Enum.map(fn({key, value}) ->
+      element = find_element(:class, "qa-auction-bid-#{key}")
+      type = Hound.Helpers.Element.tag_name(element)
+      fill_form_element(key, element, type, value)
+    end)
+  end
+
+  def fill_form_element(:additional_charges, element, _type, _value) do
+    element |> click
+  end
+  def fill_form_element(_key, element, "select", value) do
+    find_within_element(element, :css, "option[value='#{value}']")
+    |> click
+  end
+  def fill_form_element(_key, element, _type, value) do
+    fill_field(element, value)
+  end
+
+  def submit_bid() do
+    find_element(:css, ".qa-auction-bid-submit")
+    |> click
+  end
+
+  def auction_bid_status do
+    find_element(:css, ".qa-supplier-bid-status-message")
+    |> inner_text
   end
 end

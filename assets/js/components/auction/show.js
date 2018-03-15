@@ -1,13 +1,17 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatGMTDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import { formatUTCDateTime, timeRemainingCountdown} from '../../utilities';
 import moment from 'moment';
 import  ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
-import LowestBid from './LowestBid';
-import BidList from './BidList';
+import BuyerWinningBid from './BuyerWinningBid';
+import SupplierWinningBid from './SupplierWinningBid';
+import BuyerBidList from './BuyerBidList';
+import SupplierBidList from './SupplierBidList';
 import BiddingForm from './BiddingForm';
+import MinimumBid from './MinimumBid';
+import MostRecentBid from './MostRecentBid';
 import InvitedSuppliers from './InvitedSuppliers';
 import AuctionInvitation from './AuctionInvitation';
 
@@ -53,6 +57,26 @@ export default class AuctionShow extends React.Component {
       }
     }
 
+
+    const buyerBidComponents = (auction) => {
+      return (
+        <div>
+          <BuyerWinningBid auction={auction} />
+          <BuyerBidList auction={auction} />
+        </div>
+      )
+    }
+
+    const supplierBidComponents = (auction) => {
+      return (
+        <div>
+          <SupplierWinningBid auction={auction} />
+          <BiddingForm {...this.props} />
+          <SupplierBidList auction={auction} />
+        </div>
+      )
+    }
+
     return (
       <div>
         <AuctionBreadCrumbs auction={auction} />
@@ -69,8 +93,7 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  <LowestBid auction={auction} />
-                  {currentUser.isBuyer ? <BidList auction={auction} /> : <BiddingForm auction={auction} />}
+                  { currentUser.isBuyer ? buyerBidComponents(auction) : supplierBidComponents(auction) }
                 </div>
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">
@@ -83,8 +106,8 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} />}
-                  {currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
+                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                  { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                   <div className="box">
                     <div className="box__subsection">
@@ -122,7 +145,7 @@ export default class AuctionShow extends React.Component {
                       <ul className="list has-no-bullets">
                         <li>
                           <strong className="is-block">{auction.port.name}</strong>
-                          <span className="is-size-7"><strong>ETA</strong> {formatGMTDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatGMTDateTime(auction.etd)} GMT</span>
+                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
                         </li>
                       </ul>
                     </div>
