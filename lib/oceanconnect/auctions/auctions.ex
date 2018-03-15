@@ -76,6 +76,7 @@ defmodule Oceanconnect.Auctions do
     |> structure_payload
   end
 
+  def add_bid_list(auction_state, nil), do: auction_state
   def add_bid_list(auction_state = %{auction_id: auction_id, buyer_id: buyer_id, status: status}, buyer_id)
     when status != :pending do
     current_bid_list = AuctionBidList.get_bid_list(auction_id)
