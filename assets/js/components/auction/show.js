@@ -59,22 +59,49 @@ export default class AuctionShow extends React.Component {
 
 
     const buyerBidComponents = (auction) => {
-      return (
-        <div>
-          <BuyerWinningBid auction={auction} />
-          <BuyerBidList auction={auction} />
-        </div>
-      )
+      if (auction.state.status != 'pending') {
+        return (
+          <div>
+            <BuyerWinningBid auction={auction} />
+            <BuyerBidList auction={auction} />
+          </div>
+        )
+      } else {
+        return (
+          <div className = "auction-notification box is-gray-0" >
+            <h3 className="has-text-weight-bold is-flex">
+            <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
+            </h3>
+          </div>
+        )
+      }
     }
 
     const supplierBidComponents = (auction) => {
-      return (
-        <div>
-          <SupplierWinningBid auction={auction} />
-          <BiddingForm {...this.props} />
-          <SupplierBidList auction={auction} />
-        </div>
-      )
+      if (auction.state.status == 'open') {
+        return (
+          <div>
+            <SupplierWinningBid auction={auction} />
+            <BiddingForm {...this.props} />
+            <SupplierBidList auction={auction} />
+          </div>
+        )
+      } else if (auction.state.status != 'pending') {
+        return (
+          <div>
+            <SupplierWinningBid auction={auction} />
+            <SupplierBidList auction={auction} />
+          </div>
+        )
+      } else {
+        return (
+          <div className = "auction-notification box is-gray-0" >
+            <h3 className="has-text-weight-bold is-flex">
+            <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
+            </h3>
+          </div>
+        )
+      }
     }
 
     return (

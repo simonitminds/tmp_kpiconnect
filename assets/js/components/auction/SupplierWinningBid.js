@@ -7,7 +7,6 @@ const SupplierWinningBid = ({auction}) => {
   const bidList = _.get(auction, 'bid_list', []);
   const winningBid = _.get(auction, 'state.winning_bid');
   const order = _.get(auction, 'state.winning_bid_position');
-  console.log(order);
   const bidStatsDisplay = () => {
     if(auction.state.status != "pending") {
       if (bidList.length == 0) {
