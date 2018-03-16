@@ -74,7 +74,7 @@ const SupplierWinningBid = ({auction}) => {
   }
 
   return(
-    <div>
+    <div class="auction-winning-bid">
       {bidStatsDisplay()}
       <div className="box">
         <div className="box__subsection">
