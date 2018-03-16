@@ -22,19 +22,23 @@
 }
 
 @keyframes fancy-flip {
-  from {
+  0% {
     color: transparent;
-    background-color: $green;
+    background-color: $gold;
     transform: rotateX(-180deg);
   }
 
-  to {
+  50% {
+    color: transparent;
+  }
+
+  100% {
     color: #fff;
-    background-color: $gold;
+    background-color: $green;
     transform: rotateX(0deg);
   }
 }
 
-.new-status {
-  animation: 1s ease-out 0s 1 fancy-flip;
+.auction-notification.is-success {
+  transition: 1s ease-out 0s 1 fancy-flip;
 }
