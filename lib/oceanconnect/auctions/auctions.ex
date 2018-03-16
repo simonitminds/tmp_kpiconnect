@@ -65,7 +65,6 @@ defmodule Oceanconnect.Auctions do
     |> add_bid_list(nil)
     |> structure_payload
   end
-
   def build_auction_state_payload(auction_state, user_id) when is_integer(user_id) do
     auction_state
     |> add_bid_list(user_id)

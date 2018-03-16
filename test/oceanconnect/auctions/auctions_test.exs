@@ -114,19 +114,53 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   describe "build_auction_state_payload/1" do
+    alias Oceanconnect.Auctions.{AuctionsSupervisor,
+                                 AuctionBidsSupervisor,
+                                 Command,
+                                 AuctionStore,
+                                 AuctionBidList}
     setup do
       buyer_company = insert(:company)
       supplier_company = insert(:company)
       auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
-      {:ok, %{auction: auction}}
+      #supplier_company 2
+      AuctionsSupervisor.start_child(auction)
+
+      auction
+      |> Command.start_auction
+      |> AuctionStore.process_command
+
+      bid = %{"amount" => "1.25"}
+      |> Map.put("supplier_id", supplier_company.id)
+      |> Map.put("id", UUID.uuid4(:hex))
+      |> Map.put("time_entered", DateTime.utc_now())
+      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
+
+      bid
+      |> Command.process_new_bid
+      |> AuctionStore.process_command
+
+      bid
+      |> Command.enter_bid
+      |> AuctionBidList.process_command
+
+      {:ok, %{auction: auction, supplier: supplier_company}}
     end
 
-    test "returns payload for a buyer with supplier names on bid_lists", %{auction: auction} do
-      auction_state = auction
-      |> Auctions.AuctionStore.AuctionState.from_auction()
-
-      payload = auction_state
+    test "returns state payload for a buyer with supplier names in the bid_list", %{auction: auction, supplier: supplier} do
+      payload = auction
+      |> Auctions.get_auction_state
       |> Auctions.build_auction_state_payload(auction.buyer_id)
+
+      assert supplier.name in Enum.map(payload.bid_list, &(&1.supplier))
+      assert payload.state.status == :open
+      assert supplier.name in Enum.map(payload.state.winning_bid, &(&1.supplier))
+    end
+
+    test "returns payload for a supplier" do
+      # supplier list only includes his own bids in bid list
+      # supplier bid order
+      #
     end
   end
 
