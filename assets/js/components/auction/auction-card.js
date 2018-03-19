@@ -2,9 +2,43 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { formatTimeRemaining, formatTimeRemainingColor } from '../../utilities';
+import SupplierBidStatus from './SupplierBidStatus'
 
 const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
+  const bidStatusDisplay = () => {
+    let winningBid;
+    if (currentUserIsBuyer) {
+      winningBid = _.chain(auction).get('state.winning_bid').first().value();
+      const winningBidCount = _.get(auction, 'state.winning_bid.length');
+      return (
+        <div className="card-content__bid-status">
+          <div className="card-content__best-bidder">
+            Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
+          </div>
+          <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+        </div>
+      );
+    } else {
+      winningBid = _.get(auction, 'state.winning_bid');
+      return (
+        <div>
+          <div className="card-content__bid-status">
+            <SupplierBidStatus auction={auction} />
+            <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+          </div>
+{/*
+          <div className="card-content__bid">
+            <div className="card-content__bid__title has-padding-right-xs">
+              <div>Place Bid</div>
+              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+            </div>
+          </div>
+*/}
+        </div>
+      );
+    }
+  }
 
   function AuctionTimeRemaining(auction, timeRemaining) {
     const auctionStatus = auction.state.status;
@@ -82,10 +116,6 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
               <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
             </div>
           </div>
-          <div className="card-content__bid-status">
-            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
-            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
-          </div>
           {/* <div className="card-content__auction-status">
               <div>Are you ready to post your auction?</div>
               <button className="button is-primary">Schedule Auction</button>
@@ -113,18 +143,11 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
               </div>
             </div>
           </div>
-          <div className="card-content__bid-status">
-            <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>
-            <div className="card-content__best-price"><strong>Their Offer: </strong>PRICE</div>
-          </div>
-          <div className="card-content__bid">
-            <div className="card-content__bid__title has-padding-right-xs">
-              <div>Place Bid</div>
-              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
-            </div>
-          </div>
         </div>
       }
+
+    {bidStatusDisplay()}
+
 
     {/* ADMIN ONLY */}
         {/* <div className="card-content__bid-status">
