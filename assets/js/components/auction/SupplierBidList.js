@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatTime } from '../../utilities';
+import { formatTime, formatPrice } from '../../utilities';
 
 const SupplierBidList = ({auction, buyer}) => {
   const fuel = _.get(auction, 'fuel.name');
@@ -25,7 +25,7 @@ const SupplierBidList = ({auction, buyer}) => {
               {_.map(bidList, (bid) => {
                 return (
                   <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                    <td className="qa-auction-bid-amount">${bid.amount}</td>
+                    <td className="qa-auction-bid-amount">${formatPrice(bid.amount)}</td>
                     <td>{formatTime(bid.time_entered)}</td>
                   </tr>
                 );

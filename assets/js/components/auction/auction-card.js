@@ -11,18 +11,15 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
     if (currentUserIsBuyer) {
       winningBid = _.chain(auction).get('state.winning_bid').first().value();
       const winningBidCount = _.get(auction, 'state.winning_bid.length');
-      if (winningBid) {
-        return (
-          <div className="card-content__bid-status">
-            <div className="card-content__best-bidder">
-              Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
-            </div>
-            <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+      return (
+        <div className="card-content__bid-status">
+          <div className="card-content__best-bidder">
+            {winningBid ? winningBid.supplier : `No bids yet` }
+            Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
           </div>
-        );
-      } else {
-        return "";
-      }
+          <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+        </div>
+      );
     } else {
       winningBid = _.get(auction, 'state.winning_bid');
       if (winningBid) {
@@ -105,7 +102,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         <div className="card-content__products">
           {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
         </div>
-      { currentUserIsBuyer ?
+      { currentUserIsBuyer && auction.state.status == 'pending' ?
         <div className="card-content__products">
           <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
         </div>
@@ -153,9 +150,6 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
           </div>
         </div>
       }
-
-    {bidStatusDisplay()}
-
 
     {/* ADMIN ONLY */}
         {/* <div className="card-content__bid-status">

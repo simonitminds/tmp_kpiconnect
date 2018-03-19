@@ -1,0 +1,37 @@
+// ========================== //
+// ========================== //
+// AUCTION SOLUTION
+// ========================== //
+// ========================== //
+
+// Associated Variables
+
+// Blocks
+
+.auction-solution {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+
+
+
+  &:not(:nth-child(2)) {
+    margin-top: 0;
+  }
+
+  .auction-solution__header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .auction-solution__title {
+    font-weight: 700;
+  }
+  .auction-solution__content {
+    margin-left: auto;
+  }
+
+  &--best { // General style modifications for the calculated "Best Solution"
+    background-color: $highlight !important;
+  }
+}

@@ -116,3 +116,7 @@ export function leftpad (str, len, ch) {
 
   return new_str;
 }
+
+export function formatPrice(rawPrice) {
+  return (+(rawPrice)).toFixed(2)
+}

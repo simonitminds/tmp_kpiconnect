@@ -6,6 +6,7 @@ import  ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
 import BuyerWinningBid from './BuyerWinningBid';
+import BuyerBestSolution from './BuyerBestSolution';
 import SupplierWinningBid from './SupplierWinningBid';
 import BuyerBidList from './BuyerBidList';
 import SupplierBidList from './SupplierBidList';
@@ -59,7 +60,14 @@ export default class AuctionShow extends React.Component {
 
 
     const buyerBidComponents = (auction) => {
-      if (auction.state.status != 'pending') {
+      if (auction.state.status == 'decision' || auction.state.status == 'closed') {
+        return (
+          <div>
+            <BuyerBestSolution auction={auction} />
+            <BuyerBidList auction={auction} />
+          </div>
+        )
+      } else if (auction.state.status != 'pending') {
         return (
           <div>
             <BuyerWinningBid auction={auction} />

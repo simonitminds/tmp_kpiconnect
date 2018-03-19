@@ -43,7 +43,7 @@ const SupplierBidStatus = ({auction}) => {
       );
     }
   } else {
-    return <i>The auciton has not started</i>;
+    return <i>The auction has not started</i>;
   }
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatTime } from '../../utilities';
+import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './SupplierBidStatus'
 
 const SupplierWinningBid = ({auction}) => {
@@ -19,7 +19,7 @@ const SupplierWinningBid = ({auction}) => {
           </thead>
           <tbody>
             <tr>
-              <td className="qa-auction-winning-bid-amount">${winningBid.amount}</td>
+              <td className="qa-auction-winning-bid-amount">${formatPrice(winningBid.amount)}</td>
               <td>{formatTime(winningBid.time_entered)}</td>
             </tr>
           </tbody>
