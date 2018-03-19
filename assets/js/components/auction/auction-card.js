@@ -11,15 +11,16 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
     if (currentUserIsBuyer) {
       winningBid = _.chain(auction).get('state.winning_bid').first().value();
       const winningBidCount = _.get(auction, 'state.winning_bid.length');
-      return (
-        <div className="card-content__bid-status">
-          <div className="card-content__best-bidder">
-            {winningBid ? winningBid.supplier : `No bids yet` }
-            Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
+      if (winningBidCount > 0) {
+        return (
+          <div className="card-content__bid-status">
+            <div className="card-content__best-bidder">
+              {winningBid ? `Lowest Bid: ${winningBid.supplier} (of ${winningBidCount})` : `No bids yet` }
+            </div>
+            <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
           </div>
-          <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
-        </div>
-      );
+        );
+      }
     } else {
       winningBid = _.get(auction, 'state.winning_bid');
       if (winningBid) {
@@ -150,7 +151,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
           </div>
         </div>
       }
-
+      { bidStatusDisplay() }
     {/* ADMIN ONLY */}
         {/* <div className="card-content__bid-status">
           <div className="card-content__best-bidder">Lowest Bidder [Supplier(s)]</div>

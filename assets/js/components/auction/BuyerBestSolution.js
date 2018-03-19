@@ -7,7 +7,6 @@ const BuyerBestSolution = ({auction}) => {
   const bidList = _.get(auction, 'bid_list', []);
   const winningBidList = _.get(auction, 'state.winning_bid', []);
   const bestSolutionDisplay = () => {
-    console.log(auction.state.status)
     if (winningBidList.length > 0) {
       return (
         <div className="box auction-solution auction-solution--best">
