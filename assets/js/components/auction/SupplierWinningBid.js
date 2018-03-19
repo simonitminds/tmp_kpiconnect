@@ -36,7 +36,7 @@ const SupplierWinningBid = ({auction}) => {
           </div>
         );
       }
-      else {
+      else if (bidList.length > 0) {
         return (
           <div className = "auction-notification box is-danger" >
             <h3 className="has-text-weight-bold is-flex">
