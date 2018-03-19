@@ -26,7 +26,6 @@ defmodule OceanconnectWeb.Api.AuctionView do
       auction_start: auction_payload.auction_start,
       duration: display_as_minutes(auction_payload.duration),
       decision_duration: display_as_minutes(auction_payload.decision_duration),
-      anonymous_bidding: auction_payload.anonymous_bidding,
       additional_information: auction_payload.additional_information,
       suppliers: auction_payload.suppliers,
       state: auction_payload.state,

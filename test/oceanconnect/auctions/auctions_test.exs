@@ -2,6 +2,9 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.AuctionBidList.AuctionBid
+  alias Oceanconnect.Auctions.{AuctionsSupervisor, Command, AuctionStore, AuctionBidsSupervisor}
+
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -114,40 +117,26 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   describe "build_auction_state_payload/1" do
-    alias Oceanconnect.Auctions.{AuctionsSupervisor,
-                                 AuctionBidsSupervisor,
-                                 Command,
-                                 AuctionStore,
-                                 AuctionBidList}
     setup do
-      buyer_company = insert(:company)
-      supplier_company = insert(:company)
-      auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
-      #supplier_company 2
+      buyer_company = insert(:company, name: "FooCompany")
+      supplier = insert(:company, name: "BarCompany")
+      supplier_2 = insert(:company, name: "BazCompany")
+      auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
       AuctionsSupervisor.start_child(auction)
+      AuctionBidsSupervisor.start_child(auction.id)
 
       auction
       |> Command.start_auction
       |> AuctionStore.process_command
+      :timer.sleep(500)
+      bid_params = %{"amount" => "1.25"}
 
-      bid = %{"amount" => "1.25"}
-      |> Map.put("supplier_id", supplier_company.id)
-      |> Map.put("id", UUID.uuid4(:hex))
-      |> Map.put("time_entered", DateTime.utc_now())
-      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
-
-      bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
-      bid
-      |> Command.enter_bid
-      |> AuctionBidList.process_command
-
-      {:ok, %{auction: auction, supplier: supplier_company}}
+      {:ok, %{auction: auction, supplier: supplier, bid_params: bid_params, supplier_2: supplier_2}}
     end
 
-    test "returns state payload for a buyer with supplier names in the bid_list", %{auction: auction, supplier: supplier} do
+    test "returns state payload for a buyer with supplier names in the bid_list", %{auction: auction, supplier: supplier, bid_params: bid_params} do
+      Auctions.place_bid(auction, bid_params, supplier.id)
+
       payload = auction
       |> Auctions.get_auction_state
       |> Auctions.build_auction_state_payload(auction.buyer_id)
@@ -157,10 +146,87 @@ defmodule Oceanconnect.AuctionsTest do
       assert supplier.name in Enum.map(payload.state.winning_bid, &(&1.supplier))
     end
 
-    test "returns payload for a supplier" do
-      # supplier list only includes his own bids in bid list
-      # supplier bid order
-      #
+    test "returns payload for a supplier", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
+      Auctions.place_bid(auction, bid_params, supplier.id)
+      Auctions.place_bid(auction, %{"amount" => "1.5"}, supplier_2.id)
+
+      payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier.id)
+
+      assert payload.state.status == :open
+      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert payload.state.winning_bid_position == 0
+      assert length(payload.bid_list) == 1
+      assert hd(payload.bid_list) == payload.state.winning_bid
+      assert [%AuctionBid{amount: ^amount}] = payload.bid_list
+    end
+
+    test "with an existing winning bid", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
+      Auctions.place_bid(auction, %{"amount" => "1.5"}, supplier_2.id)
+
+      payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier.id)
+
+      assert %AuctionBid{amount: "1.5"} = payload.state.winning_bid
+      assert payload.state.winning_bid_position == nil
+      assert length(payload.bid_list) == 0
+
+      Auctions.place_bid(auction, bid_params, supplier.id)
+
+      updated_payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier.id)
+
+      assert updated_payload.state.status == :open
+      assert %AuctionBid{amount: ^amount} = updated_payload.state.winning_bid
+      assert updated_payload.state.winning_bid_position == 0
+    end
+
+    test "matching bids", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
+      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
+
+      Auctions.place_bid(auction, bid_params, supplier.id)
+
+      payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier.id)
+
+      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert payload.state.winning_bid_position == 1
+
+
+      buyer_payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(auction.buyer_id)
+
+      assert supplier.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      assert supplier_2.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      assert supplier_2.name in Enum.map(buyer_payload.state.winning_bid, &(&1.supplier))
+      assert supplier.name in Enum.map(buyer_payload.state.winning_bid, &(&1.supplier))
+    end
+
+    test "auction goes to decision" do
+
+    end
+
+    test "anonymous_bidding", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2}do
+      auction = Oceanconnect.Repo.update!(Ecto.Changeset.change(auction, %{anonymous_bidding: true}))
+
+      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
+      Auctions.place_bid(auction, bid_params, supplier.id)
+
+      buyer_payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(auction.buyer_id)
+
+      refute supplier.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      refute supplier_2.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      refute supplier_2.name in Enum.map(buyer_payload.state.winning_bid, &(&1.supplier))
+      assert Auctions.get_auction_supplier(auction.id, supplier.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
+      assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.state.winning_bid, &(&1.supplier))
     end
   end
 

@@ -8,7 +8,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defmodule AuctionState do
     alias __MODULE__
     defstruct auction_id: nil,
-      anonymous_bidding: false,
       status: :pending,
       current_server_time: nil,
       time_remaining: nil,
@@ -18,7 +17,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     def from_auction(auction) do
       %AuctionState{auction_id: auction.id,
-        anonymous_bidding: auction.anonymous_bidding,
         buyer_id: auction.buyer.id,
         supplier_ids: Enum.map(auction.suppliers, &(&1.id))
       }
@@ -92,7 +90,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
       error -> error
     end
-    AuctionBidsSupervisor.start_child(auction_id)
+
+    # TODO: decouple starting of dependent processes from Auction Store.
+    case AuctionBidsSupervisor.start_child(auction_id) do
+      {:ok, _} -> nil
+      error -> error
+    end
+
     new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :open})
     AuctionNotifier.notify_participants(new_state)
 

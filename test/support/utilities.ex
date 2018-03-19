@@ -1,5 +1,6 @@
 defmodule Oceanconnect.Utilities do
 
+
   def trunc_times(auction_state = %{time_remaining: time_remaining}) do
     reduced_state = Map.drop(auction_state, [:current_server_time])
 
@@ -31,4 +32,5 @@ defmodule Oceanconnect.Utilities do
   def convert_date_time(epoch) do
     DateTime.from_unix!(String.to_integer(epoch))
   end
+
 end
