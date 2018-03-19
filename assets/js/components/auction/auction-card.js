@@ -11,32 +11,40 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
     if (currentUserIsBuyer) {
       winningBid = _.chain(auction).get('state.winning_bid').first().value();
       const winningBidCount = _.get(auction, 'state.winning_bid.length');
-      return (
-        <div className="card-content__bid-status">
-          <div className="card-content__best-bidder">
-            Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
-          </div>
-          <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
-        </div>
-      );
-    } else {
-      winningBid = _.get(auction, 'state.winning_bid');
-      return (
-        <div>
+      if (winningBid) {
+        return (
           <div className="card-content__bid-status">
-            <SupplierBidStatus auction={auction} />
+            <div className="card-content__best-bidder">
+              Lowest Bidder: {winningBid.supplier}{winningBidCount > 1 ? ` (of ${winningBidCount})` : ""}
+            </div>
             <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
           </div>
-{/*
-          <div className="card-content__bid">
-            <div className="card-content__bid__title has-padding-right-xs">
-              <div>Place Bid</div>
-              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+        );
+      } else {
+        return "";
+      }
+    } else {
+      winningBid = _.get(auction, 'state.winning_bid');
+      if (winningBid) {
+        return (
+          <div>
+            <div className="card-content__bid-status">
+              <SupplierBidStatus auction={auction} />
+              <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
             </div>
+  {/*
+            <div className="card-content__bid">
+              <div className="card-content__bid__title has-padding-right-xs">
+                <div>Place Bid</div>
+                <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+              </div>
+            </div>
+  */}
           </div>
-*/}
-        </div>
-      );
+        );
+      } else {
+        return "";
+      }
     }
   }
 
