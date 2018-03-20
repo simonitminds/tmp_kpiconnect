@@ -8,7 +8,11 @@
 
 // Blocks
 
-.auction-solution {
+.auction-solution__container { // Get a reliable margin on the base of Best Solution...
+  margin-bottom: 1.5rem !important;
+}
+
+.auction-solution { // Each line containing an auction solution.
   margin-top: 1rem;
   margin-bottom: 0.5rem !important;
   padding: 0.5rem 1rem !important;
