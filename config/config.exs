@@ -12,12 +12,12 @@ config :oceanconnect,
 # guardian config
 config :oceanconnect, Oceanconnect.Guardian,
   issuer: "ocm",
-  secret_key: "LAwQIGHp4LvQrw9SuXP3c50u1cShZPiT5a5t83dV3E4u/eL3geg69BVTmSC5gm/R"
+  secret_key: "n+2GhSFsoquPltwZ0p6fsE3WAmVzqLtkV5fDsTek8axW3Lcnt072s+S7fEjsUDNV"
 
 # Configures the endpoint
 config :oceanconnect, OceanconnectWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "ci/oy/zlk3YpZpTfBm3CvP+Vw7aQIV1chRpu/ga3rFhoUX8ABlbEYZOWz/UhN9kz",
+  secret_key_base: "VNn8or6QKekZ6Wg74hL/GvtqU7/8E1dx7ckxT7YWsZ702Y2hCgLoYd5ABtKLHqDY",
   render_errors: [view: OceanconnectWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Oceanconnect.PubSub,
            adapter: Phoenix.PubSub.PG2]
