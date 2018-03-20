@@ -19,10 +19,9 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  def notify_updated_bid(auction, bid, _orig_bid_list, supplier_id) do
+  def notify_updated_bid(auction, bid, supplier_id) do
     # TODO: Add event driven setup to ensure that AuctionStore and BidList are updated before notification
     current_auction_state = Auctions.get_auction_state(auction)
-    # if hd(current_bid_list).id == bid.id do
     auction_with_participants = Auctions.with_participants(auction)
 
     buyer_payload = current_auction_state
@@ -46,8 +45,5 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
         send_notification_to_participants("user_auctions", supplier_payload, [supplier_id])
       end)
     end
-    # else
-    #   {:error, "Bid Not Stored"}
-    # end
   end
 end

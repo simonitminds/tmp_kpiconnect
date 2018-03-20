@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionNotifier, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -11,7 +11,6 @@ defmodule Oceanconnect.Auctions do
   def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id) do
     bid = bid_params
     |> Map.put("supplier_id", supplier_id)
-    |> Map.put("time_entered", DateTime.utc_now())
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
     bid
@@ -21,6 +20,10 @@ defmodule Oceanconnect.Auctions do
     bid
     |> Command.enter_bid
     |> AuctionBidList.process_command
+
+    AuctionNotifier.notify_updated_bid(auction, bid, supplier_id)
+
+    bid
   end
 
   def is_participant?(auction = %Auction{}, company_id) do
