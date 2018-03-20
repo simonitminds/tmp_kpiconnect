@@ -207,8 +207,20 @@ defmodule Oceanconnect.AuctionsTest do
       assert supplier.name in Enum.map(buyer_payload.state.winning_bid, &(&1.supplier))
     end
 
-    test "auction goes to decision" do
+    test "auction goes to decision", %{auction: auction, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2, supplier: supplier} do
+      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
+      Auctions.place_bid(auction, bid_params, supplier.id)
 
+      {:ok, _duration_timer_pid} = Auctions.AuctionTimer.find_pid(auction.id, :duration)
+      {:ok, auction_store_pid} = AuctionStore.find_pid(auction.id)
+      GenServer.cast(auction_store_pid, {:end_auction, auction})
+
+      payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier_2.id)
+
+      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert payload.state.winning_bid_position == 0
     end
 
     test "anonymous_bidding", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2}do
