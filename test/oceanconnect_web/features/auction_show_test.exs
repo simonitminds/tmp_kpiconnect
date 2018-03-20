@@ -75,8 +75,8 @@ defmodule Oceanconnect.AuctionShowTest do
     test "buyer can see the bid list", %{auction: auction} do
       [s1, s2] = auction.suppliers
       bid_list = [
-        %{"amount" => 1.25, "supplier_id" => s1.id},
-        %{"amount" => 1, "supplier_id" => s2.id}
+        %{"amount" => 1.75, "supplier_id" => s1.id},
+        %{"amount" => 1.25, "supplier_id" => s2.id}
       ]
       Enum.each(bid_list, fn(bid_params) ->
         create_bid_for_auction(bid_params, auction)
