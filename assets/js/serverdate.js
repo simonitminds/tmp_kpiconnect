@@ -278,9 +278,9 @@ setInterval(function()
 
   offset += delta;
 
-  if (delta)
-    log("Offset adjusted by " + delta + " ms to " + offset + " ms (target: "
-      + target.value + " ms).");
+  // if (delta)
+  //   log("Offset adjusted by " + delta + " ms to " + offset + " ms (target: "
+  //     + target.value + " ms).");
 }, 1000);
 
 // Synchronize whenever the page is shown again after losing focus.

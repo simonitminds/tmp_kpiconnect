@@ -54,7 +54,7 @@ const BuyerBestSolution = ({auction}) => {
   }
 
   return(
-    <div class="auction-solution__container">
+    <div className="auction-solution__container">
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered">Best Solution</h3>

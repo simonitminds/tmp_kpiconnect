@@ -134,14 +134,6 @@ defmodule Oceanconnect.Auctions do
     |> Map.put(:winning_bid, winning_bid)
   end
 
-  defp add_supplier_names(payload) do
-    bid_list = convert_to_supplier_names(payload.bid_list, payload)
-    winning_bid = convert_to_supplier_names(payload.winning_bid, payload)
-    payload
-    |> Map.put(:bid_list, bid_list)
-    |> Map.put(:winning_bid, winning_bid)
-  end
-
   def convert_to_supplier_names(bid_list, payload = %{auction_id: auction_id}) do
     auction = Repo.get(Auction, auction_id)
     Enum.map(bid_list, fn(bid) ->
