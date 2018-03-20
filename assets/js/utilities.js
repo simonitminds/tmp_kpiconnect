@@ -120,3 +120,7 @@ export function leftpad (str, len, ch) {
 export function formatPrice(rawPrice) {
   return (+(rawPrice)).toFixed(2)
 }
+
+export function quickOrdinal(order) {
+  return["st","nd","rd"][((order+90)%100-10)%10-1]||"th"
+}

@@ -40,18 +40,26 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         return (
           <div className="card-content__bid-status">
             {lowestBidMessage()}
-            <div className="card-content__best-price"><strong>Best Offer: </strong>${formatPrice(winningBid.amount)}</div>
+            { auction.state.status != 'pending' ?
+              <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
+              :
+              ''
+            }
           </div>
         );
       }
     } else {
       winningBid = _.get(auction, 'state.winning_bid');
-      if (winningBid) {
+      if (winningBid && auction.state.status != 'pending') {
         return (
           <div>
             <div className="card-content__bid-status">
               <SupplierBidStatus auction={auction} />
-              <div className="card-content__best-price"><strong>Best Offer: </strong>${formatPrice(winningBid.amount)}</div>
+              { auction.state.status != 'pending' ?
+                <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
+                :
+                ''
+              }
             </div>
   {/*
             <div className="card-content__bid">

@@ -47,10 +47,14 @@
 
   &__name { // containing span that'll cut to ellipsis
     display: inline-block;
-    width: 205px;
+    width: 200px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+
+    &:only-child {
+      width: 240px;
+    }
   }
   &__count { // containing span that'll cut to ellipsis
     display: inline-block;

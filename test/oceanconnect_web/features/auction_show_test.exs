@@ -150,7 +150,7 @@ defmodule Oceanconnect.AuctionShowTest do
       # assert AuctionShowPage.auction_bid_status() =~ "You have been outbid"
       # AuctionShowPage.enter_bid(%{amount: 0.50})
       # AuctionShowPage.submit_bid()
-      # assert AuctionShowPage.auction_bid_status() =~ "You are in lowest bid position number 2"
+      # assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (2nd)"
     end
   end
 end
