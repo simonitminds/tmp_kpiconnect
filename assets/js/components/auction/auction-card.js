@@ -1,11 +1,36 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import { formatTimeRemaining, formatTimeRemainingColor } from '../../utilities';
+import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../../utilities';
 import SupplierBidStatus from './SupplierBidStatus'
 
 const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
+  const lowestBidMessage = () => {
+    let winningBid;
+    winningBid = _.chain(auction).get('state.winning_bid').first().value();
+    const winningBidCount = _.get(auction, 'state.winning_bid.length');
+
+    if (winningBid && winningBidCount == 1) {
+      return (
+        <div className="card-content__best-bidder">
+          <span className="card-content__best-bidder__name">Lowest Bid: {winningBid.supplier}</span>
+        </div>
+      )
+    } else if (winningBid && winningBidCount > 1) {
+      return (
+        <div className="card-content__best-bidder">
+          <span className="card-content__best-bidder__name">Lowest Bid: {winningBid.supplier}</span><span className="card-content__best-bidder__count">(of {winningBidCount})</span>
+        </div>
+      )
+    } else {
+      return (
+        <div className="card-content__best-bidder">
+          Lowest Bid: <i>No bids yet</i>
+        </div>
+      )
+    }
+  }
   const bidStatusDisplay = () => {
     let winningBid;
     if (currentUserIsBuyer) {
@@ -14,10 +39,8 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
       if (winningBidCount > 0) {
         return (
           <div className="card-content__bid-status">
-            <div className="card-content__best-bidder">
-              {winningBid ? `Lowest Bid: ${winningBid.supplier} (of ${winningBidCount})` : `No bids yet` }
-            </div>
-            <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+            {lowestBidMessage()}
+            <div className="card-content__best-price"><strong>Best Offer: </strong>${formatPrice(winningBid.amount)}</div>
           </div>
         );
       }
@@ -28,7 +51,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
           <div>
             <div className="card-content__bid-status">
               <SupplierBidStatus auction={auction} />
-              <div className="card-content__best-price"><strong>Best Offer: </strong>${winningBid.amount}</div>
+              <div className="card-content__best-price"><strong>Best Offer: </strong>${formatPrice(winningBid.amount)}</div>
             </div>
   {/*
             <div className="card-content__bid">

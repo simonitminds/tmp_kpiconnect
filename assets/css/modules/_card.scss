@@ -43,6 +43,22 @@
 .card-content__best-bidder {
   display: inline-block;
   vertical-align: middle;
+  padding-top: 0.25rem;
+
+  &__name { // containing span that'll cut to ellipsis
+    display: inline-block;
+    width: 205px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  &__count { // containing span that'll cut to ellipsis
+    display: inline-block;
+    margin-left: 0.25rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
 .card-content__best-price {
