@@ -34,7 +34,7 @@ const BiddingForm = ({auction, formSubmit}) => {
             </div>
             <div className="field-body">
               <div className="control is-expanded has-icons-left">
-                <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" name="amount" />
+                <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" min="0" name="amount" />
                 <span className="icon is-small is-left">
                   <i className="fas fa-dollar-sign"></i>
                 </span>
