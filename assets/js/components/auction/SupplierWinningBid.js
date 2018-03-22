@@ -3,9 +3,9 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './SupplierBidStatus'
 
-const SupplierWinningBid = ({auction}) => {
-  const fuel = _.get(auction, 'fuel.name');
-  const winningBid = _.chain(auction)
+const SupplierWinningBid = ({auctionPayload}) => {
+  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const winningBid = _.chain(auctionPayload)
     .get('state.winning_bids')
     .first()
     .value();
@@ -37,7 +37,7 @@ const SupplierWinningBid = ({auction}) => {
 
   return(
     <div className="auction-winning-bid">
-      <SupplierBidStatus auction={auction} />
+      <SupplierBidStatus auctionPayload={auctionPayload} />
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>

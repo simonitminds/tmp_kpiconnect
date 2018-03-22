@@ -21,7 +21,7 @@ export default class AuctionShow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: timeRemainingCountdown(props.auction, moment().utc())
+      timeRemaining: timeRemainingCountdown(props.auctionPayload, moment().utc())
     }
   }
 
@@ -40,14 +40,16 @@ export default class AuctionShow extends React.Component {
   tick() {
     let time = moment(ServerDate.now()).utc();
     this.setState({
-      timeRemaining: timeRemainingCountdown(this.props.auction, time)
+      timeRemaining: timeRemainingCountdown(this.props.auctionPayload, time)
     });
   }
 
   render() {
-    const auction = this.props.auction;
+    const auctionPayload = this.props.auctionPayload;
+    const auctionState = this.props.auctionPayload.state;
+    const auction = this.props.auctionPayload.auction;
     const currentUser = {
-      isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer.id
+      isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id
     };
 
     const additionInfoDisplay = (auction) => {
@@ -59,19 +61,19 @@ export default class AuctionShow extends React.Component {
     }
 
 
-    const buyerBidComponents = (auction) => {
-      if (auction.state.status == 'decision' || auction.state.status == 'closed') {
+    const buyerBidComponents = () => {
+      if (auctionState.status == 'decision' || auctionState.status == 'closed') {
         return (
           <div>
-            <BuyerBestSolution auction={auction} />
-            <BuyerBidList auction={auction} />
+            <BuyerBestSolution auctionPayload={auctionPayload} />
+            <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auction.state.status != 'pending') {
+      } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <BuyerWinningBid auction={auction} />
-            <BuyerBidList auction={auction} />
+            <BuyerWinningBid auctionPayload={auctionPayload} />
+            <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else {
@@ -85,20 +87,20 @@ export default class AuctionShow extends React.Component {
       }
     }
 
-    const supplierBidComponents = (auction) => {
-      if (auction.state.status == 'open') {
+    const supplierBidComponents = () => {
+      if (auctionState.status == 'open') {
         return (
           <div>
-            <SupplierWinningBid auction={auction} />
-            <BiddingForm {...this.props} />
-            <SupplierBidList auction={auction} />
+            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <BiddingForm formSubmit={this.props.formSubmit} auction={auction} />
+            <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auction.state.status != 'pending') {
+      } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <SupplierWinningBid auction={auction} />
-            <SupplierBidList auction={auction} />
+            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else {
@@ -115,7 +117,7 @@ export default class AuctionShow extends React.Component {
     return (
       <div>
         <AuctionBreadCrumbs auction={auction} />
-        <AuctionHeader auction={auction} timeRemaining={this.state.timeRemaining} />
+        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} />
         <section className="auction-page"> {/* Auction details */}
           <div className="container">
             <div className="auction-content">
@@ -128,7 +130,7 @@ export default class AuctionShow extends React.Component {
                       </li>
                     </ul>
                   </div>
-                  { currentUser.isBuyer ? buyerBidComponents(auction) : supplierBidComponents(auction) }
+                  { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
                 </div>
                 <div className="column is-one-third">
                   <div className="tabs is-fullwidth is-medium">

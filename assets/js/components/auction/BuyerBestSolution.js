@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const BuyerBestSolution = ({auction}) => {
-  const fuel = _.get(auction, 'fuel.name');
-  const bidList = _.get(auction, 'bid_list', []);
-  const winningBidList = _.get(auction, 'state.winning_bids', []);
+const BuyerBestSolution = ({auctionPayload}) => {
+  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const bidList = _.get(auctionPayload, 'bid_list', []);
+  const winningBidList = _.get(auctionPayload, 'state.winning_bids', []);
   const bestSolutionDisplay = () => {
     if (winningBidList.length > 0) {
       return (
@@ -14,7 +14,7 @@ const BuyerBestSolution = ({auction}) => {
             <h3 className="auction-solution__title is-inline-block">{winningBidList[0].supplier}</h3>
             <div className="auction-solution__content">
               <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(winningBidList[0].amount)}</span> ({formatTime(winningBidList[0].time_entered)})
-              <button disabled={auction.state.status == 'closed'} className="button is-small is-success has-margin-left-md">Accept Offer</button>
+              <button disabled={auctionPayload.state.status == 'closed'} className="button is-small is-success has-margin-left-md">Accept Offer</button>
             </div>
           </div>
         </div>
@@ -41,7 +41,7 @@ const BuyerBestSolution = ({auction}) => {
                   <h3 className="auction-solution__title is-inline-block">{bid.supplier}</h3>
                   <div className="auction-solution__content">
                     <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> ({formatTime(bid.time_entered)})
-                    <button disabled={auction.state.status == 'closed'} className="button is-small is-success has-margin-left-md">Accept Offer</button>
+                    <button disabled={auctionPayload.state.status == 'closed'} className="button is-small is-success has-margin-left-md">Accept Offer</button>
                   </div>
                 </div>
               </div>

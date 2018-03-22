@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Utilities
-  alias Oceanconnect.Auctions.{AuctionBidList, AuctionStore, Command}
+  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionStore, Command}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -16,19 +15,14 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "starting auction_store for auction", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
 
-    current = DateTime.utc_now()
-
-    auction
-    |> Command.start_auction
-    |> AuctionStore.process_command
-
+    Oceanconnect.Auctions.start_auction(auction)
 
     expected_state = auction
     |> AuctionState.from_auction()
-    |> Map.merge(%{status: :open, auction_id: auction.id, time_remaining: auction.duration, current_server_time: current})
+    |> Map.merge(%{status: :open, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
 
-    assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
+    assert expected_state == actual_state
   end
 
   test "auction is supervised", %{auction: auction} do
@@ -47,13 +41,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "auction status is decision after duration timeout", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
 
-    current = DateTime.utc_now()
-
     auction
     |> Command.start_auction
     |> AuctionStore.process_command
-
-    AuctionStore.get_current_state(auction)
 
     assert AuctionStore.get_current_state(auction).status == :open
 
@@ -61,10 +51,10 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state = auction
     |> AuctionState.from_auction
-    |> Map.merge(%{status: :decision, auction_id: auction.id, time_remaining: auction.decision_duration, current_server_time: current})
+    |> Map.merge(%{status: :decision, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
 
-    assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
+    assert expected_state == actual_state
   end
 
   test "auction decision period ending", %{auction: auction} do
@@ -80,14 +70,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> Command.end_auction_decision_period
     |> AuctionStore.process_command
 
-    current = DateTime.utc_now()
-
     expected_state = auction
     |> AuctionState.from_auction
-    |> Map.merge(%{status: :closed, auction_id: auction.id, time_remaining: 0, current_server_time: current})
+    |> Map.merge(%{status: :closed, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
 
-    assert Utilities.trunc_times(expected_state) == Utilities.trunc_times(actual_state)
+    assert expected_state == actual_state
   end
 
   describe "winning bid list" do
@@ -109,10 +97,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     end
 
     test "first bid is added and extends duration", %{auction: auction, bid: bid} do
-      actual_state = AuctionStore.get_current_state(auction)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert [bid] == actual_state.winning_bids
-      assert actual_state.time_remaining > 2 * 60_000
+      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
+        winning_bid.id in [bid.id]
+      end)
+      assert auction_payload.time_remaining > 2 * 60_000
     end
 
     test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
@@ -123,10 +113,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> Command.process_new_bid
       |> AuctionStore.process_command
 
-      actual_state = AuctionStore.get_current_state(auction)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert [bid, new_bid] == actual_state.winning_bids
-      assert actual_state.time_remaining > 2 * 60_000
+      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
+        winning_bid.id in [bid.id, new_bid.id]
+      end)
+      assert auction_payload.time_remaining > 2 * 60_000
     end
 
     test "non-winning bid is not added and duration does not extend", %{auction: auction, bid: bid} do
@@ -138,10 +130,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> AuctionStore.process_command
 
       :timer.sleep(1_100)
-      actual_state = AuctionStore.get_current_state(auction)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert [bid] == actual_state.winning_bids
-      assert actual_state.time_remaining < 3 * 60_000 - 1_000
+      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
+        winning_bid.id in [bid.id]
+      end)
+      assert auction_payload.time_remaining < 3 * 60_000 - 1_000
     end
 
     test "new winning bid is added and extends duration", %{auction: auction, bid: bid} do
@@ -152,10 +146,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> Command.process_new_bid
       |> AuctionStore.process_command
 
-      actual_state = AuctionStore.get_current_state(auction)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert [new_bid] == actual_state.winning_bids
-      assert actual_state.time_remaining > 2 * 60_000
+      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
+        winning_bid.id in [new_bid.id]
+      end)
+      assert auction_payload.time_remaining > 2 * 60_000
     end
   end
 end

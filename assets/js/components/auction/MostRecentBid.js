@@ -2,9 +2,9 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime } from '../../utilities';
 
-const MostRecentBid = ({auction}) => {
-  const fuel = _.get(auction, 'fuel.name');
-  const mostRecentBid = _.chain(auction)
+const MostRecentBid = ({auctionPayload}) => {
+  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const mostRecentBid = _.chain(auctionPayload)
     .get('bidlist', [])
     .first()
     .value();

@@ -1,7 +1,8 @@
 defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.Utilities
-  alias Oceanconnect.{Auctions}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   setup do
     buyer_company = insert(:company)
@@ -18,8 +19,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
     {:ok, _store} = Auctions.AuctionStore.start_link(auction)
 
-    expected_payload = %{id: auction.id,
-      state: %{status: :open, time_remaining: time_remaining, winning_bids: []}
+    state = auction
+    |> AuctionState.from_auction
+    |> Map.put(:status, :open)
+    expected_payload = %{
+      time_remaining: time_remaining,
+      state: state,
+      bid_list: []
     }
 
     {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
@@ -104,7 +110,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction goes into Decision" do
     setup(%{expected_payload: expected_payload}) do
-      payload = put_in(expected_payload, [:state], %{status: :decision, time_remaining: 0, winning_bids: []})
+      payload = expected_payload
+      |> Map.put(:time_remaining, 0)
+      |> Map.put(:state, Map.put(expected_payload.state, :status, :decision))
       {:ok, %{payload: payload}}
     end
 
@@ -141,7 +149,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
   describe "Auction Ends (post Decision Period)" do
     setup(%{expected_payload: expected_payload}) do
-      payload = put_in(expected_payload, [:state], %{status: :closed, time_remaining: 0, winning_bids: []})
+      payload = expected_payload
+      |> Map.put(:time_remaining, 0)
+      |> Map.put(:state, Map.put(expected_payload.state, :status, :closed))
       {:ok, %{payload: payload}}
     end
 
@@ -190,8 +200,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
 
       buyer_payload = auction
-      |> Auctions.get_auction_state
-      |> Auctions.build_auction_state_payload(buyer_id)
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
 
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
@@ -203,7 +212,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{id: ^auction_id, state: %{winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{winning_bids: winning_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
             assert buyer_payload.state.winning_bids == winning_bids
@@ -218,11 +227,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
+      Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
 
       supplier_payload = auction
-      |> Auctions.get_auction_state
-      |> Auctions.build_auction_state_payload(supplier_id)
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
 
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
@@ -234,7 +242,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{id: ^auction_id, state: %{winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{winning_bids: winning_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.winning_bids == winning_bids
@@ -249,7 +257,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{id: ^auction_id, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.winning_bids == winning_bids

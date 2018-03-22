@@ -5,9 +5,9 @@ import { polyfill } from 'es6-promise';
 import socket from "./socket";
 
 import {
-  RECEIVE_AUCTIONS,
+  RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_AUCTION_FORM_DATA,
-  UPDATE_AUCTION_STATE,
+  UPDATE_AUCTION_PAYLOAD,
   UPDATE_DATE,
   UPDATE_INFORMATION,
   TOGGLE_SUPPLIER,
@@ -36,18 +36,18 @@ export function subscribeToAuctionUpdates() {
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     channel.on("auctions_update", payload => {
-      dispatch({type: UPDATE_AUCTION_STATE, auction: payload});
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload});
     });
   };
 }
 
-export function getAllAuctions() {
+export function getAllAuctionPayloads() {
   return dispatch => {
     fetch(`/api/auctions?user_id=${window.companyId}`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        return dispatch(receiveAuctions(response.data));
+        return dispatch(receiveAuctionPayloads(response.data));
       });
   };
 }
@@ -62,9 +62,9 @@ export function selectPort(event) {
       });
   };
 }
-export function submitBid(auction_id, formData) {
+export function submitBid(auctionId, formData) {
   return dispatch => {
-    fetch(`/api/auctions/${auction_id}/bids?supplier_id=${window.companyId}`, {
+    fetch(`/api/auctions/${auctionId}/bids?supplier_id=${window.companyId}`, {
       headers: defaultHeaders,
       method: 'POST',
       body: JSON.stringify(
@@ -83,9 +83,9 @@ export function submitBid(auction_id, formData) {
   };
 }
 
-export function receiveAuctions(auctions) {
-  return {type: RECEIVE_AUCTIONS,
-          auctions: auctions};
+export function receiveAuctionPayloads(auctionPayloads) {
+  return {type: RECEIVE_AUCTION_PAYLOADS,
+          auctionPayloads: auctionPayloads};
 }
 
 export function receiveSuppliers(port, suppliers) {

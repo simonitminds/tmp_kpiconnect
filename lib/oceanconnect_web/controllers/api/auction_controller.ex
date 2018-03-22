@@ -3,14 +3,10 @@ defmodule OceanconnectWeb.Api.AuctionController do
   alias Oceanconnect.Auctions
 
   def index(conn, %{"user_id" => user_id}) do
-    auction_payloads = Auctions.list_participating_auctions(user_id)
+    auction_payloads = user_id
+    |> Auctions.list_participating_auctions
     |> Enum.map(fn(auction) ->
-      loaded_auction = auction
-      |> Auctions.fully_loaded
-      auction_payload = loaded_auction
-      |> Auctions.get_auction_state
-      |> Auctions.build_auction_state_payload(user_id)
-      Map.merge(auction_payload, loaded_auction)
+      Auctions.AuctionPayload.get_auction_payload!(auction, String.to_integer(user_id))
     end)
 
     render(conn, "index.json", data: auction_payloads)

@@ -4,12 +4,15 @@ import moment from 'moment';
 import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../../utilities';
 import SupplierBidStatus from './SupplierBidStatus'
 
-const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
+const AuctionCard = ({auctionPayload, timeRemaining, currentUserIsBuyer}) => {
+  const auction = _.get(auctionPayload, 'auction');
+  const auctionStatus = _.get(auctionPayload, 'state.status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
+
   const lowestBidMessage = () => {
     let winningBid;
-    winningBid = _.chain(auction).get('state.winning_bids').first().value();
-    const winningBidCount = _.get(auction, 'state.winning_bids.length');
+    winningBid = _.chain(auctionPayload).get('state.winning_bids').first().value();
+    const winningBidCount = _.get(auctionPayload, 'state.winning_bids.length');
 
     if (winningBid && winningBidCount == 1) {
       return (
@@ -31,6 +34,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
       )
     }
   }
+
   const bidStatusDisplay = () => {
     let winningBid;
     if (currentUserIsBuyer) {
@@ -40,7 +44,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         return (
           <div className="card-content__bid-status">
             {lowestBidMessage()}
-            { auction.state.status != 'pending' ?
+            { auctionStatus != 'pending' ?
               <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
               :
               ''
@@ -50,12 +54,12 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
       }
     } else {
       winningBid = _.get(auction, 'state.winning_bids');
-      if (winningBid && auction.state.status != 'pending') {
+      if (winningBid && auctionStatus != 'pending') {
         return (
           <div>
             <div className="card-content__bid-status">
-              <SupplierBidStatus auction={auction} />
-              { auction.state.status != 'pending' ?
+              <SupplierBidStatus auctionPayload={auctionPayload} />
+              { auctionStatus != 'pending' ?
                 <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
                 :
                 ''
@@ -77,40 +81,39 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
     }
   }
 
-  function AuctionTimeRemaining(auction, timeRemaining) {
-    const auctionStatus = auction.state.status;
-    const auctionTimer = timeRemaining[auction.id];
+  const AuctionTimeRemaining = (auctionTimer) => {
     if (auctionStatus == "open" || auctionStatus == "decision") {
       return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auction, auctionTimer)}`}>
+        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
           <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
           <span
             className="qa-auction-time_remaining"
             id="time-remaining"
           >
-            {formatTimeRemaining(auction, auctionTimer, "index")}
+            {formatTimeRemaining(auctionStatus, auctionTimer, "index")}
           </span>
         </span>
       );
     }
     else {
       return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auction, auctionTimer)}`}>
+        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
           <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-          {cardDateFormat(auction.auction_start)}
+          {cardDateFormat(_.get(auctionPayload, 'auction.auction_start'))}
         </span>
       );
     }
-  };
+  }
+
   return (
     <div className="column is-one-third">
       <div className={`card qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}
-            <div className={`auction-card__status auction-card__status--${auction.state.status}`}>
-              <span className="qa-auction-status">{auction.state.status}</span>
-              {AuctionTimeRemaining(auction, timeRemaining)}
+            <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
+              <span className="qa-auction-status">{auctionStatus}</span>
+              {AuctionTimeRemaining(timeRemaining[auction.id])}
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}
@@ -134,7 +137,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         <div className="card-content__products">
           {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
         </div>
-      { currentUserIsBuyer && auction.state.status == 'pending' ?
+      { currentUserIsBuyer && auctionStatus == 'pending' ?
         <div className="card-content__products">
           <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
         </div>

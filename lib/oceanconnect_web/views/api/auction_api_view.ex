@@ -9,29 +9,12 @@ defmodule OceanconnectWeb.Api.AuctionView do
   end
 
   def render("auction.json", %{data: auction_payload}) do
-    bid_list = case auction_payload do
-      %{bid_list: bid_list} -> bid_list
-      _ -> []
-    end
     %{
-      id: auction_payload.id,
-      port: auction_payload.port,
-      vessel: auction_payload.vessel,
-      fuel: auction_payload.fuel,
-      buyer: auction_payload.buyer,
-      fuel_quantity: auction_payload.fuel_quantity,
-      po: auction_payload.po,
-      eta: auction_payload.eta,
-      etd: auction_payload.etd,
-      auction_start: auction_payload.auction_start,
-      duration: display_as_minutes(auction_payload.duration),
-      decision_duration: display_as_minutes(auction_payload.decision_duration),
-      additional_information: auction_payload.additional_information,
-      suppliers: auction_payload.suppliers,
+      time_remaining: auction_payload.time_remaining,
+      current_server_time: auction_payload.current_server_time,
+      auction: auction_payload.auction,
       state: auction_payload.state,
-      bid_list: bid_list
+      bid_list: auction_payload.bid_list
     }
   end
-
-  defp display_as_minutes(duration), do: round(duration / 60_000)
 end

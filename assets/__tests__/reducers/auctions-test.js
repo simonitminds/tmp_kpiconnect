@@ -3,8 +3,8 @@ import auctionsReducer, {
   initialState
 } from '../../js/reducers/auctions';
 import {
-  RECEIVE_AUCTIONS,
-  UPDATE_AUCTION_STATE
+  RECEIVE_AUCTION_PAYLOADS,
+  UPDATE_AUCTION_PAYLOAD
 } from '../../js/constants';
 
 
@@ -14,7 +14,7 @@ describe('receive_auctions', ()=> {
       auctions: [{ id: 1 }, { id: 2 }]
     });
     const action = {
-      type: RECEIVE_AUCTIONS,
+      type: RECEIVE_AUCTION_PAYLOADS,
       auctions: [{ id: 3 }, { id: 4 }]
     }
 
@@ -28,7 +28,7 @@ describe('receive_auctions', ()=> {
       auctions: [{ id: 1 }, { id: 2 }]
     });
     const action = {
-      type: RECEIVE_AUCTIONS,
+      type: RECEIVE_AUCTION_PAYLOADS,
       auctions: []
     }
 
@@ -54,7 +54,7 @@ describe('update_auction_state', ()=> {
       ]
     });
     const action = {
-      type: UPDATE_AUCTION_STATE,
+      type: UPDATE_AUCTION_PAYLOAD,
       auction: {
         id: 2,
         state: { status: "open" },

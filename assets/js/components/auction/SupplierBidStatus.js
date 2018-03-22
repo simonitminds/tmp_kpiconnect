@@ -2,11 +2,11 @@ import React from 'react';
 import _ from 'lodash';
 import { quickOrdinal } from '../../utilities';
 
-const SupplierBidStatus = ({auction}) => {
-  const bidList = _.get(auction, 'bid_list', []);
-  const order = _.get(auction, 'state.winning_bids_position');
+const SupplierBidStatus = ({auctionPayload}) => {
+  const bidList = _.get(auctionPayload, 'bid_list', []);
+  const order = _.get(auctionPayload, 'state.winning_bids_position');
 
-  if(auction.state.status != "pending") {
+  if(auctionPayload.state.status != "pending") {
     if (bidList.length == 0) {
       return (
         <div className = "auction-notification box is-warning" >

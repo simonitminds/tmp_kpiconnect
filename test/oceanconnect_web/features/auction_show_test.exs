@@ -83,15 +83,11 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
       stored_bid_list = auction.id
       |> Auctions.AuctionBidList.get_bid_list
-      |> Auctions.convert_to_supplier_names(auction.id)
+      |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
       bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
         %{"id" => bid.id,
           "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier}}
       end)
-
-      auction
-      |> Auctions.get_auction_state
-      |> Auctions.build_auction_state_payload(auction.buyer_id)
 
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
@@ -119,7 +115,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       stored_bid_list = auction.id
       |> Auctions.AuctionBidList.get_bid_list
-      |> Auctions.supplier_bid_list(supplier_company.id)
+      |> Auctions.AuctionPayload.supplier_bid_list(supplier_company.id)
       bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
         %{"id" => bid.id,
           "data" => %{"amount" => "$#{bid.amount}"}}

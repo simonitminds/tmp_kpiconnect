@@ -3,15 +3,15 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
-import { getAllAuctions, subscribeToAuctionUpdates, submitBid } from '../actions';
+import { getAllAuctionPayloads, subscribeToAuctionUpdates, submitBid } from '../actions';
 
 const mapStateToProps = (state) => {
-  const auction = _.chain(state.auctionsReducer.auctions)
-    .filter(['id', window.auctionId])
+  const auctionPayload = _.chain(state.auctionsReducer.auctionPayloads)
+    .filter(['auction.id', window.auctionId])
     .first()
     .value();
   return {
-    auction,
+    auctionPayload,
     loading: state.auctionsReducer.loading
   }
 };
@@ -29,7 +29,7 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionContainer extends React.Component {
 
   dispatchItem() {
-    this.props.dispatch(getAllAuctions());
+    this.props.dispatch(getAllAuctionPayloads());
     this.props.dispatch(subscribeToAuctionUpdates());
   }
   componentDidMount() {

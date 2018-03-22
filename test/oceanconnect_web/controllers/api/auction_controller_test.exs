@@ -22,9 +22,9 @@ defmodule OceanconnectWeb.Api.AuctionControllerTest do
       auction_as_supplier = insert(:auction, suppliers: [buyer])
       insert(:auction)
       new_conn = get conn, auction_api_path(conn, :index, %{"user_id" => auction.buyer_id})
-      auctions = new_conn.assigns.data
-      assert Enum.all?(auctions, fn(a) -> a.id in [auction.id, auction_as_supplier.id] end)
-      assert length(auctions) == 2
+      auction_payloads = new_conn.assigns.data
+      assert Enum.all?(auction_payloads, fn(payload) -> payload.auction.id in [auction.id, auction_as_supplier.id] end)
+      assert length(auction_payloads) == 2
     end
   end
 end

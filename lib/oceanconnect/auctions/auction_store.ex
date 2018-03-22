@@ -9,33 +9,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     alias __MODULE__
     defstruct auction_id: nil,
       status: :pending,
-      current_server_time: nil,
-      time_remaining: nil,
-      buyer_id: nil,
       winning_bids: [],
+      buyer_id: nil,
       supplier_ids: []
 
     def from_auction(auction) do
-      %AuctionState{auction_id: auction.id,
+      %AuctionState{
+        auction_id: auction.id,
         buyer_id: auction.buyer.id,
         supplier_ids: Enum.map(auction.suppliers, &(&1.id))
       }
-    end
-
-    def maybe_update_times(auction_state = %AuctionState{status: :open, auction_id: auction_id}) do
-      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
-      update_times(auction_state, time_remaining)
-    end
-    def maybe_update_times(auction_state = %AuctionState{status: :decision, auction_id: auction_id}) do
-      time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :decision_duration))
-      update_times(auction_state, time_remaining)
-    end
-    def maybe_update_times(auction_state), do: auction_state
-
-    defp update_times(auction_state, time_remaining) do
-      auction_state
-      |> Map.put(:time_remaining, time_remaining)
-      |> Map.put(:current_server_time, DateTime.utc_now())
     end
   end
 
@@ -59,7 +42,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def get_current_state(%Auction{id: auction_id}) do
     with {:ok, pid} <- find_pid(auction_id),
-    do: GenServer.call(pid, :get_current_state)
+      do: GenServer.call(pid, :get_current_state)
   end
 
   def process_command(%Command{command: cmd, data: data = %{auction_id: auction_id}}) do
@@ -74,13 +57,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
    # Server
   def init(auction_state) do
     state = Map.put(auction_state, :status, calculate_status(auction_state))
-    updated_state = AuctionState.maybe_update_times(state)
-    {:ok, updated_state}
+    {:ok, state}
   end
 
   def handle_call(:get_current_state, _from, current_state) do
-    updated_state = AuctionState.maybe_update_times(current_state)
-    {:reply, updated_state, updated_state}
+    {:reply, current_state, current_state}
   end
 
   def handle_cast({:start_auction, %{id: auction_id, duration: duration}}, current_state) do
@@ -97,7 +78,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       error -> error
     end
 
-    new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :open})
+    new_state = %AuctionState{current_state | status: :open}
     AuctionNotifier.notify_participants(new_state)
 
     # broadcast to the auction channel
@@ -110,19 +91,18 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
       error -> error
     end
-    new_state = AuctionState.maybe_update_times(%AuctionState{current_state | status: :decision})
+    new_state = %AuctionState{current_state | status: :decision}
     AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end
 
   def handle_cast({:end_auction_decision_period, _data}, current_state) do
-    new_state = %AuctionState{current_state | status: :closed, time_remaining: 0}
+    new_state = %AuctionState{current_state | status: :closed}
     AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end
-
 
   def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{winning_bids: winning_bids}) do
     winning_amount = case winning_bids do

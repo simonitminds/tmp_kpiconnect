@@ -73,95 +73,18 @@ defmodule Oceanconnect.Auctions do
     Repo.get!(Auction, id)
   end
 
-  def get_auction_state(auction = %Auction{id: id}) do
+  def get_auction_state!(auction = %Auction{id: id}) do
     case AuctionStore.get_current_state(auction) do
-      {:error, "Auction Store Not Started"} -> %{auction_id: id, status: :pending}
+      {:error, "Auction Store Not Started"} ->
+        auction
+        |> AuctionStore.AuctionState.from_auction
+        |> Map.put(:status, :pending)
       state -> state
     end
   end
 
-  def build_auction_state_payload(auction_state, user_id) when is_integer(user_id) do
-    auction_state
-    |> add_bid_list(user_id)
-    |> structure_payload
-  end
-  def build_auction_state_payload(auction_state, user_id) do
-    auction_state
-    |> add_bid_list(String.to_integer(user_id))
-    |> structure_payload
-  end
-
-  defp add_bid_list(auction_state = %{auction_id: auction_id, buyer_id: buyer_id, status: status}, buyer_id)
-    when status != :pending do
-    current_bid_list = AuctionBidList.get_bid_list(auction_id)
-    auction_state
-    |> Map.put(:bid_list, current_bid_list)
-    |> add_supplier_names()
-  end
-  defp add_bid_list(auction_state = %{auction_id: auction_id, status: status}, supplier_id) when status != :pending do
-    supplier_bid_list = auction_id
-    |> AuctionBidList.get_bid_list
-    |> supplier_bid_list(supplier_id)
-
-    auction_state
-    |> Map.put(:bid_list, supplier_bid_list)
-    |> convert_winning_bids_for_supplier(supplier_id)
-  end
-  defp add_bid_list(auction_state, _user_id) do
-    auction_state
-    |> Map.put(:bid_list, [])
-  end
-
-  def supplier_bid_list(bid_list, supplier_id) do
-    Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
-  end
-
-  defp convert_winning_bids_for_supplier(auction_state = %{winning_bids: []}, _supplier_id), do: auction_state
-  defp convert_winning_bids_for_supplier(auction_state, supplier_id) do
-    winning_bids_suppliers_ids = Enum.map(auction_state.winning_bids, fn(bid) -> bid.supplier_id end)
-    order = Enum.find_index(winning_bids_suppliers_ids, fn(id) -> id == supplier_id end)
-
-    auction_state
-    |> Map.put(:winning_bids, [hd(auction_state.winning_bids)])
-    |> Map.put(:winning_bids_position, order)
-  end
-
-  defp add_supplier_names(payload) do
-    bid_list = convert_to_supplier_names(payload.bid_list, payload.auction_id)
-    winning_bids = convert_to_supplier_names(payload.winning_bids, payload.auction_id)
-    payload
-    |> Map.put(:bid_list, bid_list)
-    |> Map.put(:winning_bids, winning_bids)
-  end
-
-  def convert_to_supplier_names(bid_list, auction_id) do
-    auction = Repo.get(Auction, auction_id)
-    Enum.map(bid_list, fn(bid) ->
-      supplier_name = get_name_or_alias(bid.supplier_id, auction_id, auction.anonymous_bidding)
-      bid
-      |> Map.drop([:__struct__, :supplier_id])
-      |> Map.put(:supplier, supplier_name)
-    end)
-  end
-
-  defp get_name_or_alias(supplier_id, auction_id, _anonymous_biding = true) do
-    get_auction_supplier(auction_id, supplier_id).alias_name
-  end
-  defp get_name_or_alias(supplier_id, _auction_id,  _anonymous_biding) do
-    Oceanconnect.Accounts.get_company!(supplier_id).name
-  end
-
   def get_auction_supplier(auction_id, supplier_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
-  end
-
-  defp structure_payload(auction_state = %{bid_list: bid_list}) do
-    state = Map.drop(auction_state, [:__struct__, :auction_id, :buyer_id, :supplier_ids])
-    %{id: auction_state.auction_id, state: Map.delete(state, :bid_list), bid_list: bid_list}
-  end
-  defp structure_payload(auction_state) do
-    state = Map.drop(auction_state, [:__struct__, :auction_id, :buyer_id, :supplier_ids])
-    %{id: auction_state.auction_id, state: state}
   end
 
   def start_auction(auction = %Auction{}) do

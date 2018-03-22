@@ -18,6 +18,10 @@ export function replaceListItem(list, oldItem, newItem) {
   }
 }
 
+export const convertToMinutes = (milliseconds) => {
+  return Math.round(milliseconds / 60000, 0);
+}
+
 export const formatUTCDateTime = (dateTime) => {
   return formatDateTime(moment(dateTime).utc());
 }
@@ -49,21 +53,20 @@ export const portLocalTime = (gmtTime, portId, ports) => {
   }
 }
 
-export function timeRemainingCountdown(auction, clientTime) {
-  const status = _.get(auction, 'state.status');
-  if ((status === "open" || status === "decision") && _.get(auction, 'state.time_remaining')) {
-    const serverTime = moment(auction.state.current_server_time);
-    const timeLeft = auction.state.time_remaining - clientTime.diff(serverTime);
+export function timeRemainingCountdown(auctionPayload, clientTime) {
+  const status = _.get(auctionPayload, 'state.status');
+  if ((status === "open" || status === "decision") && auctionPayload.time_remaining) {
+    const serverTime = moment(auctionPayload.current_server_time);
+    const timeLeft = auctionPayload.time_remaining - clientTime.diff(serverTime);
     return timeLeft;
-  } else if (_.get(auction, 'state.status') === "closed") {
+  } else if (status === "closed") {
     return 0;
   }
 }
 
-export function formatTimeRemaining(auction, timeRemaining, page) {
-  const status = _.get(auction, 'state.status');
+export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
   let message;
-  switch (`${status}-${page}`) {
+  switch (`${auctionStatus}-${page}`) {
     case "open-show": {message = "remaining in auction"; break;}
     case "open-index": {message = "remaining"; break;}
     case "decision-show": {message = "remaining in decision period"; break;}
@@ -82,10 +85,8 @@ export function formatTimeRemaining(auction, timeRemaining, page) {
   }
 }
 
-export function formatTimeRemainingColor(auction, timeRemaining) {
-  const status = _.get(auction, 'state.status');
-
-  if (timeRemaining && status === "open") {
+export function formatTimeRemainingColor(auctionStatus, timeRemaining) {
+  if (timeRemaining && auctionStatus === "open") {
     if (timeRemaining <= 60100) { // 1 minute plus time for transition animation.
       return `under-1`;
     }
@@ -96,7 +97,7 @@ export function formatTimeRemainingColor(auction, timeRemaining) {
       return `active`;
     }
   }
-  else if (timeRemaining && status === "decision") {
+  else if (timeRemaining && auctionStatus === "decision") {
     return `in-decision`;
   }
   else {

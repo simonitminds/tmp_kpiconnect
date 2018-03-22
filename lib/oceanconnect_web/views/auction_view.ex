@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def auction_status(auction) do
-    %{status: status} = Oceanconnect.Auctions.get_auction_state(auction)
+    %{status: status} = Oceanconnect.Auctions.get_auction_state!(auction)
     status
   end
 end

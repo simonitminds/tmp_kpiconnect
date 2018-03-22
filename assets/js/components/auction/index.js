@@ -30,8 +30,8 @@ export default class AuctionsIndex extends React.Component {
   tick() {
     let time = moment(ServerDate.now()).utc();
     this.setState({
-      timeRemaining: _.reduce(this.props.auctions, (acc, auction) => {
-        acc[_.get(auction, 'id', 'temp')] = timeRemainingCountdown(auction, time);
+      timeRemaining: _.reduce(this.props.auctionPayloads, (acc, auctionPayload) => {
+        acc[_.get(auctionPayload, 'auction.id', 'temp')] = timeRemainingCountdown(auctionPayload, time);
           return acc
         }, {}),
       serverTime: time
@@ -44,8 +44,10 @@ export default class AuctionsIndex extends React.Component {
 
 
     const filteredAuctionsDisplay = (status) => {
-      const filteredAuctions = _.filter(this.props.auctions, (auction) => { return(auction.state.status === status)});
-      if(_.isEmpty(filteredAuctions)) {
+      const filteredAuctionPayloads = _.filter(this.props.auctionPayloads, (auctionPayload) =>
+        { return(auctionPayload.state.status === status) }
+      );
+      if(_.isEmpty(filteredAuctionPayloads)) {
         return(
           <div className="empty-list">
             <em>{`You have no ${status} auctions`}</em>
@@ -53,8 +55,12 @@ export default class AuctionsIndex extends React.Component {
       } else {
         return(
           <div className="columns is-multiline">
-            { _.map(filteredAuctions, (auction) => {
-              return <AuctionCard key={auction.id} auction={auction} timeRemaining={this.state.timeRemaining} currentUserIsBuyer={currentUserIsBuyer(auction)}/>;
+            { _.map(filteredAuctionPayloads, (auctionPayload) => {
+              return <AuctionCard
+                key={auctionPayload.auction.id}
+                auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining}
+                currentUserIsBuyer={currentUserIsBuyer(auctionPayload.auction)}
+              />;
             }) }
           </div>);
       }
@@ -71,7 +77,9 @@ export default class AuctionsIndex extends React.Component {
             <div className="auction-list__time-box">
               <div className="auction-list__timer">
                 <i className="far fa-clock has-margin-right-xs"></i>
-                <span className="auction-list__timer__clock" id="gmt-time" >{this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}</span>&nbsp;GMT
+                <span className="auction-list__timer__clock" id="gmt-time" >
+                  {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                </span>&nbsp;GMT
               </div>
               <i>Server Time</i>
             </div>

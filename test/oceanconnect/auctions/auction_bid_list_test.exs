@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionStore}
+  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionPayload, AuctionStore}
 
   setup do
     supplier_company = insert(:company)
@@ -60,9 +60,9 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     |> Command.enter_bid
     |> AuctionBidList.process_command
 
-    actual_state = AuctionStore.get_current_state(auction)
+    actual_payload = AuctionPayload.get_auction_payload!(auction, supplier2_company.id)
 
-    assert [bid] == actual_state.winning_bids
-    assert actual_state.time_remaining > 3 * 60_000 - 500
+    assert [bid] == actual_payload.state.winning_bids
+    assert actual_payload.time_remaining > 3 * 60_000 - 500
   end
 end

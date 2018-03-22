@@ -23,7 +23,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
-import { getAllAuctions, receiveAuctionFormData } from './actions';
+import { getAllAuctionPayloads, receiveAuctionFormData } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';

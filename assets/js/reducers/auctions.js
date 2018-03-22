@@ -1,36 +1,38 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
-import { RECEIVE_AUCTIONS, UPDATE_AUCTION_STATE } from "../constants";
+import { RECEIVE_AUCTION_PAYLOADS, UPDATE_AUCTION_PAYLOAD } from "../constants";
 
 const initialState = {
-  auctions: [],
+  auctionPayloads: [],
   loading: true
 };
 
 export default function(state, action) {
   switch(action.type) {
-    case RECEIVE_AUCTIONS: {
-      if(_.isEmpty(action.auctions)) {
+    case RECEIVE_AUCTION_PAYLOADS: {
+      if(_.isEmpty(action.auctionPayloads)) {
         return state;
       } else {
         return {
           ...state,
-          auctions: action.auctions,
+          auctionPayloads: action.auctionPayloads,
           loading: false
         };
       }
     }
-    case UPDATE_AUCTION_STATE: {
-      const origAuction = _.chain(state.auctions)
-            .filter(['id', action.auction.id])
+    case UPDATE_AUCTION_PAYLOAD: {
+      const origAuctionPayload = _.chain(state.auctionPayloads)
+            .filter(['auction.id', action.auctionPayload.auction.id])
             .first()
             .value();
-
-      const updatedAuction = {...origAuction, state: action.auction.state, bid_list: action.auction.bid_list};
-      const newAuctionList = replaceListItem(state.auctions, origAuction, updatedAuction);
+      const newAuctionPayloadList = replaceListItem(
+        state.auctionPayloads,
+        origAuctionPayload,
+        action.auctionPayload
+      );
       return {
         ...state,
-        auctions: newAuctionList,
+        auctionPayloads: newAuctionPayloadList,
         loading: false
       };
     }

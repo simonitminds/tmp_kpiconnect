@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const BuyerBidList = ({auction, buyer}) => {
-  const fuel = _.get(auction, 'fuel.name');
-  const bidList = _.get(auction, 'bid_list', []);
-  const winningBidIds = _.chain(auction)
+const BuyerBidList = ({auctionPayload, buyer}) => {
+  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const bidList = _.get(auctionPayload, 'bid_list', []);
+  const winningBidIds = _.chain(auctionPayload)
     .get('state.winning_bids', [])
     .map('id')
     .value();

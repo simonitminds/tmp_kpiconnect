@@ -2,9 +2,9 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const BuyerWinningBid = ({auction}) => {
-  const fuel = _.get(auction, 'fuel.name');
-  const winningBidList = _.get(auction, 'state.winning_bids', []);
+const BuyerWinningBid = ({auctionPayload}) => {
+  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const winningBidList = _.get(auctionPayload, 'state.winning_bids', []);
   const winningBidListDisplay = () => {
     if (winningBidList.length > 0) {
       return (

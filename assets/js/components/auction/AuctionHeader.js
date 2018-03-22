@@ -1,8 +1,16 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatUTCDateTime, formatTimeRemaining, timeRemainingCountdown, formatTimeRemainingColor} from '../../utilities';
+import {
+  convertToMinutes,
+  formatUTCDateTime,
+  formatTimeRemaining,
+  formatTimeRemainingColor
+} from '../../utilities';
 
-const AuctionHeader = ({auction, timeRemaining}) => {
+const AuctionHeader = ({auctionPayload, timeRemaining}) => {
+  const auction = _.get(auctionPayload, 'auction');
+  const auctionStatus = _.get(auctionPayload, 'state.status');
+
   return(
     <div>
       <section className="auction-page">
@@ -11,8 +19,8 @@ const AuctionHeader = ({auction, timeRemaining}) => {
             <div className="auction-header">
               <div className="columns has-margin-bottom-none">
                 <div className="column">
-                  <div className={`auction-header__status auction-header__status--${auction.state.status} tag is-rounded qa-auction-status`} id="time-remaining">
-                    {auction.state.status}
+                  <div className={`auction-header__status auction-header__status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
+                    {auctionStatus}
                   </div>
                   <div className="auction-header__po is-uppercase">
                     Auction {auction.po}
@@ -23,9 +31,9 @@ const AuctionHeader = ({auction, timeRemaining}) => {
                 </div>
                 <div className="column">
                   <div className="auction-header__timer has-text-left-mobile">
-                    <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auction, timeRemaining)}`}>
+                    <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
                       <span className="qa-auction-time_remaining" id="time-remaining">
-                        {formatTimeRemaining(auction, timeRemaining, "show")}
+                        {formatTimeRemaining(auctionStatus, timeRemaining, "show")}
                       </span>
                     </div>
                   </div>
@@ -33,7 +41,7 @@ const AuctionHeader = ({auction, timeRemaining}) => {
                     <span className="has-text-weight-bold is-uppercase">Started at</span> {formatUTCDateTime(auction.auction_start)} GMT
                   </div>
                   <div className="auction-header__duration has-text-left-mobile">
-                    <span className="has-text-weight-bold is-uppercase">Decision Period</span> {auction.decision_duration} minutes
+                    <span className="has-text-weight-bold is-uppercase">Decision Period</span> {convertToMinutes(auction.decision_duration)} minutes
                   </div>
                 </div>
               </div>
