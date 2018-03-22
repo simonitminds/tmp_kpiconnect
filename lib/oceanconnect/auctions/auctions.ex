@@ -105,7 +105,7 @@ defmodule Oceanconnect.Auctions do
 
     auction_state
     |> Map.put(:bid_list, supplier_bid_list)
-    |> convert_winning_bidss_for_supplier(supplier_id)
+    |> convert_winning_bids_for_supplier(supplier_id)
   end
   defp add_bid_list(auction_state, _user_id) do
     auction_state
@@ -116,8 +116,8 @@ defmodule Oceanconnect.Auctions do
     Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
   end
 
-  defp convert_winning_bidss_for_supplier(auction_state = %{winning_bids: []}, _supplier_id), do: auction_state
-  defp convert_winning_bidss_for_supplier(auction_state, supplier_id) do
+  defp convert_winning_bids_for_supplier(auction_state = %{winning_bids: []}, _supplier_id), do: auction_state
+  defp convert_winning_bids_for_supplier(auction_state, supplier_id) do
     winning_bids_suppliers_ids = Enum.map(auction_state.winning_bids, fn(bid) -> bid.supplier_id end)
     order = Enum.find_index(winning_bids_suppliers_ids, fn(id) -> id == supplier_id end)
 
