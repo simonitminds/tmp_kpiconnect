@@ -83,7 +83,7 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
       stored_bid_list = auction.id
       |> Auctions.AuctionBidList.get_bid_list
-      |> Auctions.convert_to_supplier_names(auction)
+      |> Auctions.convert_to_supplier_names(auction.id)
       bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
         %{"id" => bid.id,
           "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier}}

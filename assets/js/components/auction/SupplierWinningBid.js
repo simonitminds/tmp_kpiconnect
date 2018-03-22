@@ -5,7 +5,10 @@ import SupplierBidStatus from './SupplierBidStatus'
 
 const SupplierWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const winningBid = _.get(auction, 'state.winning_bid');
+  const winningBid = _.chain(auction)
+    .get('state.winning_bid')
+    .first()
+    .value();
 
   const winningBidListDisplay = () => {
     if (_.get(winningBid, 'amount')) {

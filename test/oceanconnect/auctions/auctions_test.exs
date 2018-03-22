@@ -155,10 +155,10 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.build_auction_state_payload(supplier.id)
 
       assert payload.state.status == :open
-      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bid
       assert payload.state.winning_bid_position == 0
       assert length(payload.bid_list) == 1
-      assert hd(payload.bid_list) == payload.state.winning_bid
+      assert payload.bid_list == payload.state.winning_bid
       assert [%AuctionBid{amount: ^amount}] = payload.bid_list
     end
 
@@ -169,7 +169,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.get_auction_state
       |> Auctions.build_auction_state_payload(supplier.id)
 
-      assert %AuctionBid{amount: "1.5"} = payload.state.winning_bid
+      assert [%AuctionBid{amount: "1.5"}] = payload.state.winning_bid
       assert payload.state.winning_bid_position == nil
       assert length(payload.bid_list) == 0
 
@@ -180,7 +180,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.build_auction_state_payload(supplier.id)
 
       assert updated_payload.state.status == :open
-      assert %AuctionBid{amount: ^amount} = updated_payload.state.winning_bid
+      assert [%AuctionBid{amount: ^amount}] = updated_payload.state.winning_bid
       assert updated_payload.state.winning_bid_position == 0
     end
 
@@ -193,7 +193,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.get_auction_state
       |> Auctions.build_auction_state_payload(supplier.id)
 
-      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bid
       assert payload.state.winning_bid_position == 1
 
 
@@ -211,7 +211,6 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       Auctions.place_bid(auction, bid_params, supplier.id)
 
-      {:ok, _duration_timer_pid} = Auctions.AuctionTimer.find_pid(auction.id, :duration)
       {:ok, auction_store_pid} = AuctionStore.find_pid(auction.id)
       GenServer.cast(auction_store_pid, {:end_auction, auction})
 
@@ -219,7 +218,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.get_auction_state
       |> Auctions.build_auction_state_payload(supplier_2.id)
 
-      assert %AuctionBid{amount: ^amount} = payload.state.winning_bid
+      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bid
       assert payload.state.winning_bid_position == 0
     end
 

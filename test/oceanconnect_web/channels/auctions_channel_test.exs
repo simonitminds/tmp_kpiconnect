@@ -175,4 +175,97 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       refute_broadcast ^event, ^payload
     end
   end
+
+  describe "Placing Bids" do
+    setup %{auction: auction} do
+      Auctions.start_auction(auction)
+      :ok
+    end
+
+    test "buyers get notified", %{auction: auction = %{id: auction_id}, buyer_id: buyer_id, supplier_id: supplier_id} do
+      channel = "user_auctions:#{buyer_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
+
+      buyer_payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(buyer_id)
+
+      receive do
+        %Phoenix.Socket.Broadcast{} -> nil
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{id: ^auction_id, state: %{winning_bid: winning_bid}, bid_list: bid_list},
+          topic: ^channel} ->
+            assert buyer_payload.bid_list == bid_list
+            assert buyer_payload.state.winning_bid == winning_bid
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
+    test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id} do
+      channel = "user_auctions:#{supplier_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
+
+      supplier_payload = auction
+      |> Auctions.get_auction_state
+      |> Auctions.build_auction_state_payload(supplier_id)
+
+      receive do
+        %Phoenix.Socket.Broadcast{} -> nil
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{id: ^auction_id, state: %{winning_bid: winning_bid}, bid_list: bid_list},
+          topic: ^channel} ->
+            assert supplier_payload.bid_list == bid_list
+            assert supplier_payload.state.winning_bid == winning_bid
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
+      GenServer.cast(auction_store_pid, {:end_auction, auction})
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{id: ^auction_id, state: %{status: :decision, winning_bid: winning_bid}, bid_list: bid_list},
+          topic: ^channel} ->
+            assert supplier_payload.bid_list == bid_list
+            assert supplier_payload.state.winning_bid == winning_bid
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
+    test "a non participant is not notified", %{non_participant_id: non_participant_id}  do
+      channel = "user_auctions:#{non_participant_id}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+
+      refute_broadcast ^event, %{}
+    end
+  end
 end

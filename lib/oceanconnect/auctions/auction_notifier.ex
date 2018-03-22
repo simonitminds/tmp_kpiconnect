@@ -5,9 +5,11 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(auction_state) do
     participants = [auction_state.buyer_id] ++ auction_state.supplier_ids
-    payload = Auctions.build_auction_state_payload(auction_state, nil)
-
-    send_notification_to_participants("user_auctions", payload, participants)
+    Enum.map(participants, fn(user_id) ->
+      payload = auction_state
+      |> Auctions.build_auction_state_payload(user_id)
+      send_notification_to_participants("user_auctions", payload, [user_id])
+    end)
   end
 
   def send_notification_to_participants(channel, payload, participants) do
