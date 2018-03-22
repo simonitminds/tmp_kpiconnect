@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionStore, Command}
+  alias Oceanconnect.Auctions.Auction
 
   def create(conn, %{"auction_id" => auction_id, "supplier_id" => supplier_id, "bid" => bid_params}) do
     auction_id = String.to_integer(auction_id)
@@ -12,7 +12,7 @@ defmodule OceanconnectWeb.Api.BidController do
          true <- String.to_integer(supplier_id) in Auctions.auction_supplier_ids(auction)
     do
       supplier_id = String.to_integer(supplier_id)
-      Auctions.place_bid(auction, bid_params, supplier_id)
+      Auctions.place_bid(auction, updated_bid_params, supplier_id)
 
       render(conn, "show.json", data: %{})
     else
