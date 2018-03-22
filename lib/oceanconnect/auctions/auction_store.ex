@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       current_server_time: nil,
       time_remaining: nil,
       buyer_id: nil,
-      winning_bid: [],
+      winning_bids: [],
       supplier_ids: []
 
     def from_auction(auction) do
@@ -124,28 +124,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
 
-  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{winning_bid: winning_bid}) do
-    winning_amount = case winning_bid do
+  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{winning_bids: winning_bids}) do
+    winning_amount = case winning_bids do
       [] -> nil
-      _ -> hd(winning_bid).amount
+      _ -> hd(winning_bids).amount
     end
-    new_state = set_winning_bid?(bid, amount, current_state, winning_amount)
+    new_state = set_winning_bids?(bid, amount, current_state, winning_amount)
     {:noreply, new_state}
   end
 
-  defp set_winning_bid?(bid, _amount, current_state, nil) do
+  defp set_winning_bids?(bid, _amount, current_state, nil) do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bid: [bid]}
+    %AuctionState{current_state | winning_bids: [bid]}
   end
-  defp set_winning_bid?(bid, amount, current_state, winning_amount) when winning_amount > amount do
+  defp set_winning_bids?(bid, amount, current_state, winning_amount) when winning_amount > amount do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bid: [bid]}
+    %AuctionState{current_state | winning_bids: [bid]}
   end
-  defp set_winning_bid?(bid, amount, current_state = %{winning_bid: winning_bid}, amount) do
+  defp set_winning_bids?(bid, amount, current_state = %{winning_bids: winning_bids}, amount) do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bid: winning_bid ++[bid]}
+    %AuctionState{current_state | winning_bids: winning_bids ++[bid]}
   end
-  defp set_winning_bid?(_bid, _amount, current_state, _winning_amount), do: current_state
+  defp set_winning_bids?(_bid, _amount, current_state, _winning_amount), do: current_state
 
   defp calculate_status(_auction) do
     :pending

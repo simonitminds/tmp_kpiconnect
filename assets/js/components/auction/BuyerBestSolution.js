@@ -5,7 +5,7 @@ import { formatTime, formatPrice } from '../../utilities';
 const BuyerBestSolution = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
   const bidList = _.get(auction, 'bid_list', []);
-  const winningBidList = _.get(auction, 'state.winning_bid', []);
+  const winningBidList = _.get(auction, 'state.winning_bids', []);
   const bestSolutionDisplay = () => {
     if (winningBidList.length > 0) {
       return (

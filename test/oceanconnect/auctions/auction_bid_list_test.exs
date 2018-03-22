@@ -62,7 +62,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     actual_state = AuctionStore.get_current_state(auction)
 
-    assert [bid] == actual_state.winning_bid
+    assert [bid] == actual_state.winning_bids
     assert actual_state.time_remaining > 3 * 60_000 - 500
   end
 end

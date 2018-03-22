@@ -111,7 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     test "first bid is added and extends duration", %{auction: auction, bid: bid} do
       actual_state = AuctionStore.get_current_state(auction)
 
-      assert [bid] == actual_state.winning_bid
+      assert [bid] == actual_state.winning_bids
       assert actual_state.time_remaining > 2 * 60_000
     end
 
@@ -125,7 +125,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
       actual_state = AuctionStore.get_current_state(auction)
 
-      assert [bid, new_bid] == actual_state.winning_bid
+      assert [bid, new_bid] == actual_state.winning_bids
       assert actual_state.time_remaining > 2 * 60_000
     end
 
@@ -140,7 +140,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       :timer.sleep(1_100)
       actual_state = AuctionStore.get_current_state(auction)
 
-      assert [bid] == actual_state.winning_bid
+      assert [bid] == actual_state.winning_bids
       assert actual_state.time_remaining < 3 * 60_000 - 1_000
     end
 
@@ -154,7 +154,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
       actual_state = AuctionStore.get_current_state(auction)
 
-      assert [new_bid] == actual_state.winning_bid
+      assert [new_bid] == actual_state.winning_bids
       assert actual_state.time_remaining > 2 * 60_000
     end
   end

@@ -6,7 +6,7 @@ import SupplierBidStatus from './SupplierBidStatus'
 const SupplierWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
   const winningBid = _.chain(auction)
-    .get('state.winning_bid')
+    .get('state.winning_bids')
     .first()
     .value();
 

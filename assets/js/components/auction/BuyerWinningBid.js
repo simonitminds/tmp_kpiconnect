@@ -4,7 +4,7 @@ import { formatTime, formatPrice } from '../../utilities';
 
 const BuyerWinningBid = ({auction}) => {
   const fuel = _.get(auction, 'fuel.name');
-  const winningBidList = _.get(auction, 'state.winning_bid', []);
+  const winningBidList = _.get(auction, 'state.winning_bids', []);
   const winningBidListDisplay = () => {
     if (winningBidList.length > 0) {
       return (

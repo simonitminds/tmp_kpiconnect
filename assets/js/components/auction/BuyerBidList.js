@@ -6,7 +6,7 @@ const BuyerBidList = ({auction, buyer}) => {
   const fuel = _.get(auction, 'fuel.name');
   const bidList = _.get(auction, 'bid_list', []);
   const winningBidIds = _.chain(auction)
-    .get('state.winning_bid', [])
+    .get('state.winning_bids', [])
     .map('id')
     .value();
 

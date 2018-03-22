@@ -8,8 +8,8 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const lowestBidMessage = () => {
     let winningBid;
-    winningBid = _.chain(auction).get('state.winning_bid').first().value();
-    const winningBidCount = _.get(auction, 'state.winning_bid.length');
+    winningBid = _.chain(auction).get('state.winning_bids').first().value();
+    const winningBidCount = _.get(auction, 'state.winning_bids.length');
 
     if (winningBid && winningBidCount == 1) {
       return (
@@ -34,8 +34,8 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
   const bidStatusDisplay = () => {
     let winningBid;
     if (currentUserIsBuyer) {
-      winningBid = _.chain(auction).get('state.winning_bid').first().value();
-      const winningBidCount = _.get(auction, 'state.winning_bid.length');
+      winningBid = _.chain(auction).get('state.winning_bids').first().value();
+      const winningBidCount = _.get(auction, 'state.winning_bids.length');
       if (winningBidCount > 0) {
         return (
           <div className="card-content__bid-status">
@@ -49,7 +49,7 @@ const AuctionCard = ({auction, timeRemaining, currentUserIsBuyer}) => {
         );
       }
     } else {
-      winningBid = _.get(auction, 'state.winning_bid');
+      winningBid = _.get(auction, 'state.winning_bids');
       if (winningBid && auction.state.status != 'pending') {
         return (
           <div>
