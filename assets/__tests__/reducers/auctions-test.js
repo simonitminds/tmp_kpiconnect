@@ -7,56 +7,65 @@ import {
   UPDATE_AUCTION_PAYLOAD
 } from '../../js/constants';
 
-
 describe('receive_auctions', ()=> {
   test('overwrites existing', ()=> {
     const state = Object.assign({}, initialState, {
-      auctions: [{ id: 1 }, { id: 2 }]
+      auctionPayloads: [
+        { auction: {id: 1 }},
+        { auction: {id: 2 }}
+      ]
     });
     const action = {
       type: RECEIVE_AUCTION_PAYLOADS,
-      auctions: [{ id: 3 }, { id: 4 }]
+      auctionPayloads: [
+        { auction: {id: 3 }},
+        { auction: {id: 4 }}
+      ]
     }
 
     const output = auctionsReducer(state, action);
 
-    expect(output.auctions.length).toEqual(2);
-    expect(output.auctions[0].id).toEqual(3);
+    expect(output.auctionPayloads.length).toEqual(2);
+    expect(output.auctionPayloads[0].auction.id).toEqual(3);
   });
   test('if no auctions received, state is maintained', ()=> {
     const state = Object.assign({}, initialState, {
-      auctions: [{ id: 1 }, { id: 2 }]
+      auctionPayloads: [
+        { auction: {id: 1 }},
+        { auction: {id: 2 }}
+      ]
     });
     const action = {
       type: RECEIVE_AUCTION_PAYLOADS,
-      auctions: []
+      auctionPayloads: []
     }
 
     const output = auctionsReducer(state, action);
 
-    expect(output.auctions.length).toEqual(2);
-    expect(output.auctions[0].id).toEqual(1);
+    expect(output.auctionPayloads.length).toEqual(2);
+    expect(output.auctionPayloads[0].auction.id).toEqual(1);
   });
 });
 
 describe('update_auction_state', ()=> {
   test('replaces auction from list with updated auction', ()=> {
     const state = Object.assign({}, initialState, {
-      auctions: [
+      auctionPayloads: [
         {
-          id: 1,
+          auction: {id: 1 },
           state: { status: "open" },
           bid_list: []
         }, {
-          id: 2,
-          state: { status: "pending" }
+          auction: {id: 2 },
+          state: { status: "pending" },
+          bid_list: []
         }
       ]
     });
     const action = {
       type: UPDATE_AUCTION_PAYLOAD,
-      auction: {
-        id: 2,
+      auctionPayload: {
+        auction: {id: 2 },
         state: { status: "open" },
         bid_list: [{ id: "first bid" }]
       }
@@ -64,11 +73,11 @@ describe('update_auction_state', ()=> {
 
     const output = auctionsReducer(state, action);
 
-    expect(output.auctions.length).toEqual(2);
-    const target_auction = _.chain(output.auctions)
-      .filter(['id', action.auction.id])
+    expect(output.auctionPayloads.length).toEqual(2);
+    const target_auction = _.chain(output.auctionPayloads)
+      .filter(['auction.id', action.auctionPayload.auction.id])
       .first()
       .value();
-    expect(target_auction).toEqual(action.auction);
+    expect(target_auction).toEqual(action.auctionPayload);
   });
 });
