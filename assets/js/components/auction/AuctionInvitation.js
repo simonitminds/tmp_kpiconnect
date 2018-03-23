@@ -24,7 +24,7 @@ const AuctionInvitation = ({auction}) => {
           </p>
         </div>
       </div>
-      <div className = "auction-invitation__status auction-invitation__status--accepted box" >
+      {/* <div className = "auction-invitation__status auction-invitation__status--accepted box" >
         <div className="auction-invitation__status__marker">
           <i className="fas fa-lg fa-check-circle"></i>
         </div>
@@ -89,7 +89,7 @@ const AuctionInvitation = ({auction}) => {
             </a>
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
