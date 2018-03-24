@@ -267,13 +267,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: %{id: ^auction_id},
-            state: %{winning_bids: winning_bids, winning_bids_position: position},
+            state: %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
             bid_list: bid_list
           },
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.winning_bids == winning_bids
             assert supplier_payload.state.winning_bids_position == position
+            assert supplier_payload.state.multiple == multiple
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
       after
         5000 ->
@@ -300,13 +301,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: %{id: ^auction_id},
-            state: %{winning_bids: winning_bids, winning_bids_position: position},
+            state: %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
             bid_list: bid_list
           },
           topic: ^channel} ->
             assert decision_supplier_payload.bid_list == bid_list
             assert decision_supplier_payload.state.winning_bids == winning_bids
             assert decision_supplier_payload.state.winning_bids_position == position
+            assert decision_supplier_payload.state.multiple == multiple
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
       after
         5000 ->

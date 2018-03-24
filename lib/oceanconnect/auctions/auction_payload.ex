@@ -59,6 +59,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.delete(:supplier_ids)
     |> Map.put(:winning_bids, [winning_bid])
     |> Map.put(:winning_bids_position, order)
+    |> Map.put(:multiple, length(auction_state.winning_bids) > 1)
   end
 
   defp get_name_or_alias(supplier_id, auction_id, _anonymous_biding = true) do

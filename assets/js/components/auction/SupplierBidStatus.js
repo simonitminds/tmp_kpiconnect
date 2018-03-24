@@ -5,6 +5,7 @@ import { quickOrdinal } from '../../utilities';
 const SupplierBidStatus = ({auctionPayload}) => {
   const bidList = _.get(auctionPayload, 'bid_list', []);
   const order = _.get(auctionPayload, 'state.winning_bids_position');
+  const multiple = _.get(auctionPayload, 'state.multiple');
 
   if(auctionPayload.state.status != "pending") {
     if (bidList.length == 0) {
@@ -16,7 +17,7 @@ const SupplierBidStatus = ({auctionPayload}) => {
         </div>
       );
     }
-    else if (order == 0) {
+    else if (order == 0 && !multiple) {
       return (
         <div className = "auction-notification box is-success" >
           <h3 className="has-text-weight-bold is-flex">
@@ -25,7 +26,7 @@ const SupplierBidStatus = ({auctionPayload}) => {
         </div>
       );
     }
-    else if (order > 0) {
+    else if (order >= 0) {
       return (
         <div className = "auction-notification box is-success" >
           <h3 className="has-text-weight-bold is-flex">
