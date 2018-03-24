@@ -62,7 +62,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     actual_payload = AuctionPayload.get_auction_payload!(auction, supplier2_company.id)
 
-    assert [bid] == actual_payload.state.winning_bids
+    assert [bid |> Map.delete(:supplier_id)] == actual_payload.state.winning_bids
     assert actual_payload.time_remaining > 3 * 60_000 - 500
   end
 end

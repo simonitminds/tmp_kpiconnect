@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bids
       assert payload.state.winning_bids_position == 0
       assert length(payload.bid_list) == 1
-      assert payload.bid_list == payload.state.winning_bids
+      assert payload.bid_list |> hd |> Map.delete(:supplier_id) == payload.state.winning_bids |> hd
       assert [%AuctionBid{amount: ^amount}] = payload.bid_list
     end
 

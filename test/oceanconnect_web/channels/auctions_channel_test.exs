@@ -8,12 +8,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     buyer_company = insert(:company)
     insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
+    supplier3_company = insert(:company, is_supplier: true)
     supplier_1 = insert(:user, company: supplier_company)
     supplier_2 = insert(:user, company: supplier_company)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
+    auction = insert(:auction,
+      buyer: buyer_company, duration: 1_000, decision_duration: 1_000,
+      suppliers: [supplier_company, supplier3_company]
+    )
     current_time =  DateTime.utc_now()
-    auction = insert(:auction, buyer: buyer_company, duration: 1_000, decision_duration: 1_000, auction_start: current_time, suppliers: [supplier_company])
     {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
@@ -31,6 +35,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
             supplier_1: supplier_1,
             supplier_2: supplier_2,
+            supplier3: supplier3_company,
             buyer_id: Integer.to_string(buyer_company.id),
             non_participant_id: Integer.to_string(non_participant_company.id),
             non_participant: non_participant,
@@ -240,7 +245,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
     end
 
-    test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id} do
+    test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id, supplier3: supplier3} do
       channel = "user_auctions:#{supplier_id}"
       event = "auctions_update"
 
@@ -269,6 +274,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.winning_bids == winning_bids
             assert supplier_payload.state.winning_bids_position == position
+            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier3.id)
+
+      receive do
+        %Phoenix.Socket.Broadcast{} -> nil
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -291,7 +306,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           topic: ^channel} ->
             assert decision_supplier_payload.bid_list == bid_list
             assert decision_supplier_payload.state.winning_bids == winning_bids
-            assert supplier_payload.state.winning_bids_position == position
+            assert decision_supplier_payload.state.winning_bids_position == position
+            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
       after
         5000 ->
           assert false, "Expected message received nothing."

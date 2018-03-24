@@ -45,14 +45,19 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp convert_winning_bids_for_user(auction_state = %AuctionState{winning_bids: []}, _auction, _user_id), do: auction_state
   defp convert_winning_bids_for_user(auction_state = %AuctionState{}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
     auction_state
+    |> Map.delete(:supplier_ids)
     |> Map.put(:winning_bids, convert_to_supplier_names(auction_state.winning_bids, auction))
   end
   defp convert_winning_bids_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
     winning_bids_suppliers_ids = Enum.map(auction_state.winning_bids, fn(bid) -> bid.supplier_id end)
     order = Enum.find_index(winning_bids_suppliers_ids, fn(id) -> id == supplier_id end)
+    winning_bid = auction_state.winning_bids
+    |> hd
+    |> Map.delete(:supplier_id)
 
     auction_state
-    |> Map.put(:winning_bids, [hd(auction_state.winning_bids)])
+    |> Map.delete(:supplier_ids)
+    |> Map.put(:winning_bids, [winning_bid])
     |> Map.put(:winning_bids_position, order)
   end
 
