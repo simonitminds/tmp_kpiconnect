@@ -220,6 +220,24 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         5000 ->
           assert false, "Expected message received nothing."
       end
+
+      {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
+      GenServer.cast(auction_store_pid, {:end_auction, auction})
+
+      decision_buyer_payload = auction
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
+          topic: ^channel} ->
+            assert decision_buyer_payload.bid_list == bid_list
+            assert decision_buyer_payload.state.winning_bids == winning_bids
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
     test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id} do
@@ -242,10 +260,15 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{
+            auction: %{id: ^auction_id},
+            state: %{winning_bids: winning_bids, winning_bids_position: position},
+            bid_list: bid_list
+          },
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.winning_bids == winning_bids
+            assert supplier_payload.state.winning_bids_position == position
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -254,13 +277,21 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
       GenServer.cast(auction_store_pid, {:end_auction, auction})
 
+      decision_supplier_payload = auction
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
+
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{
+            auction: %{id: ^auction_id},
+            state: %{winning_bids: winning_bids, winning_bids_position: position},
+            bid_list: bid_list
+          },
           topic: ^channel} ->
-            assert supplier_payload.bid_list == bid_list
-            assert supplier_payload.state.winning_bids == winning_bids
+            assert decision_supplier_payload.bid_list == bid_list
+            assert decision_supplier_payload.state.winning_bids == winning_bids
+            assert supplier_payload.state.winning_bids_position == position
       after
         5000 ->
           assert false, "Expected message received nothing."

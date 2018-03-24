@@ -73,7 +73,7 @@ defmodule Oceanconnect.Auctions do
     Repo.get!(Auction, id)
   end
 
-  def get_auction_state!(auction = %Auction{id: id}) do
+  def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
         auction
