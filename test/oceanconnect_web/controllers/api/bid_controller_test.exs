@@ -53,20 +53,19 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       non_participant = insert(:user, company: non_participant_company)
       conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), non_participant)
 
-      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}?supplier_id=#{non_participant_company.id}", params)
+      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}", params)
       assert json_response(conn, 422)
     end
 
     test "creating a bid for an auction as a buyer", %{buyer: buyer, auction: auction, bid_params: params} do
       conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
-      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}?supplier_id=#{auction.buyer_id}", params)
+      conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}", params)
 
       assert json_response(conn, 422)
     end
   end
 
   defp create_post(conn, auction, params) do
-    supplier_id = hd(auction.suppliers).id
-    post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}?supplier_id=#{supplier_id}", params)
+    post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}", params)
   end
 end

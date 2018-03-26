@@ -43,7 +43,7 @@ export function subscribeToAuctionUpdates() {
 
 export function getAllAuctionPayloads() {
   return dispatch => {
-    fetch(`/api/auctions?user_id=${window.companyId}`, { headers: defaultHeaders })
+    fetch('/api/auctions', { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
@@ -54,7 +54,7 @@ export function getAllAuctionPayloads() {
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {
-    fetch(`/api/ports/${port_id}/suppliers?buyer_id=${window.companyId}`, { headers: defaultHeaders })
+    fetch(`/api/ports/${port_id}/suppliers`, { headers: defaultHeaders })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
@@ -64,7 +64,7 @@ export function selectPort(event) {
 }
 export function submitBid(auctionId, formData) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/bids?supplier_id=${window.companyId}`, {
+    fetch(`/api/auctions/${auctionId}/bids`, {
       headers: defaultHeaders,
       method: 'POST',
       body: JSON.stringify(
