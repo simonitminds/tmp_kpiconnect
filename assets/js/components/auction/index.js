@@ -3,7 +3,8 @@ import React from 'react';
 import moment from 'moment';
 import { timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
-import AuctionCard from './auction-card';
+import BuyerAuctionCard from './buyer-auction-card';
+import SupplierAuctionCard from './supplier-auction-card';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -42,7 +43,6 @@ export default class AuctionsIndex extends React.Component {
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
     const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
 
-
     const filteredAuctionsDisplay = (status) => {
       const filteredAuctionPayloads = _.filter(this.props.auctionPayloads, (auctionPayload) =>
         { return(auctionPayload.state.status === status) }
@@ -56,11 +56,19 @@ export default class AuctionsIndex extends React.Component {
         return(
           <div className="columns is-multiline">
             { _.map(filteredAuctionPayloads, (auctionPayload) => {
-              return <AuctionCard
-                key={auctionPayload.auction.id}
-                auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining}
-                currentUserIsBuyer={currentUserIsBuyer(auctionPayload.auction)}
-              />;
+              if (currentUserIsBuyer(auctionPayload.auction)) {
+                return <BuyerAuctionCard
+                  key={auctionPayload.auction.id}
+                  auctionPayload={auctionPayload}
+                  timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
+                />;
+              } else {
+                return <SupplierAuctionCard
+                  key={auctionPayload.auction.id}
+                  auctionPayload={auctionPayload}
+                  timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
+                />;
+              }
             }) }
           </div>);
       }
