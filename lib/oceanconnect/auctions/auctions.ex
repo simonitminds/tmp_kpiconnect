@@ -61,7 +61,8 @@ defmodule Oceanconnect.Auctions do
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
       select: a
-    Repo.all(query)
+    query
+    |> Repo.all
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
   end
 

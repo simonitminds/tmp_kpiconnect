@@ -266,8 +266,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         %Phoenix.Socket.Broadcast{
           event: ^event,
           payload: %{
-            auction: %{id: ^auction_id},
-            state: %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
+            auction: auction = %{id: ^auction_id},
+            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
             bid_list: bid_list
           },
           topic: ^channel} ->
@@ -276,6 +276,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             assert supplier_payload.state.winning_bids_position == position
             assert supplier_payload.state.multiple == multiple
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute state |> Map.has_key?(:supplier_ids)
+            refute auction |> Map.has_key?(:suppliers)
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -300,8 +302,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         %Phoenix.Socket.Broadcast{
           event: ^event,
           payload: %{
-            auction: %{id: ^auction_id},
-            state: %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
+            auction: auction = %{id: ^auction_id},
+            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
             bid_list: bid_list
           },
           topic: ^channel} ->
@@ -310,6 +312,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             assert decision_supplier_payload.state.winning_bids_position == position
             assert decision_supplier_payload.state.multiple == multiple
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute state |> Map.has_key?(:supplier_ids)
+            refute auction |> Map.has_key?(:suppliers)
       after
         5000 ->
           assert false, "Expected message received nothing."

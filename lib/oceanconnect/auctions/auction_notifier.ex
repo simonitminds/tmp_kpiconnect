@@ -1,14 +1,16 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionPayload
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  def notify_participants(auction_state) do
-    participants = [auction_state.buyer_id] ++ auction_state.supplier_ids
+  def notify_participants(auction_state = %AuctionState{auction_id: auction_id}) do
+    auction = Auctions.get_auction!(auction_id)
+    participants = Auctions.auction_participant_ids(auction)
     Enum.map(participants, fn(user_id) ->
-      payload = auction_state
-      |> AuctionPayload.get_auction_payload!(user_id)
+      payload = auction
+      |> AuctionPayload.get_auction_payload!(user_id, auction_state)
       send_notification_to_participants("user_auctions", payload, [user_id])
     end)
   end

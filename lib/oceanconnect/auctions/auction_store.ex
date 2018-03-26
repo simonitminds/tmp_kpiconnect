@@ -9,15 +9,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     alias __MODULE__
     defstruct auction_id: nil,
       status: :pending,
-      winning_bids: [],
-      buyer_id: nil,
-      supplier_ids: []
+      winning_bids: []
 
     def from_auction(auction) do
       %AuctionState{
-        auction_id: auction.id,
-        buyer_id: auction.buyer.id,
-        supplier_ids: Enum.map(auction.suppliers, &(&1.id))
+        auction_id: auction.id
       }
     end
   end
