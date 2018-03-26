@@ -62,18 +62,12 @@ export function selectPort(event) {
       });
   };
 }
-export function submitBid(auctionId, formData) {
+export function submitBid(auctionId, bidData) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/bids`, {
       headers: defaultHeaders,
       method: 'POST',
-      body: JSON.stringify(
-        {
-          'bid': {
-            'amount': formData.get('amount')
-          }
-        }
-      )
+      body: JSON.stringify(bidData)
     })
       .then(checkStatus)
       .then(parseJSON)

@@ -21,7 +21,14 @@ const mapDispatchToProps = (dispatch) => ({
   formSubmit(auction_id, ev) {
     ev.preventDefault();
 
-    dispatch(submitBid(auction_id, new FormData(ev.target)))
+    const elements = ev.target.elements;
+    const bidData = {
+      'bid': {
+        'amount': elements.amount.value
+      }
+    };
+
+    dispatch(submitBid(auction_id, bidData))
   },
   ...bindActionCreators(dispatch)
 });
