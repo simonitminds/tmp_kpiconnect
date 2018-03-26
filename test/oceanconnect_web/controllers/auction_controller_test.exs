@@ -29,15 +29,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn = get conn, auction_path(conn, :index)
       assert html_response(conn, 200)
     end
-
-    test "user can view only auctions they are participating in", %{auction: auction, conn: conn, buyer: buyer} do
-      auction_as_supplier = insert(:auction, suppliers: [buyer])
-      insert(:auction)
-      new_conn = get conn, auction_path(conn, :index)
-      auctions = new_conn.assigns.auctions
-      assert Enum.all?(auctions, fn(a) -> a.id in [auction.id, auction_as_supplier.id] end)
-      assert length(auctions) == 2
-    end
   end
 
   describe "new auction" do

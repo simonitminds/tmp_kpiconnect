@@ -5,9 +5,7 @@ defmodule OceanconnectWeb.AuctionController do
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
-    user = Auth.current_user(conn)
-    auctions = Auctions.list_participating_auctions(user.company_id)
-    render(conn, "index.html", auctions: auctions)
+    render(conn, "index.html")
   end
 
   def start(conn, %{"id" => id}) do
