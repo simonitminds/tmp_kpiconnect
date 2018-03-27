@@ -17,8 +17,8 @@ defmodule Oceanconnect.AuctionShowTest do
     bid_params = %{
       amount: 1.25
     }
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
+    Auctions.AuctionsSupervisor.start_child(auction)
+    Auctions.AuctionBidsSupervisor.start_child(auction.id)
     {:ok, %{auction: auction, bid_params: bid_params, buyer: buyer, supplier: supplier,
             supplier_company: supplier_company, supplier2: supplier2, supplier_company2: supplier_company2}}
   end
@@ -95,10 +95,8 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "supplier login" do
-    setup %{auction: auction, buyer: buyer, supplier: supplier} do
-      login_user(buyer)
-      AuctionIndexPage.visit()
-      AuctionIndexPage.start_auction(auction)
+    setup %{auction: auction, supplier: supplier} do
+      Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       :ok
@@ -141,12 +139,39 @@ defmodule Oceanconnect.AuctionShowTest do
         assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
       end)
 
-      # TODO: Get chrome to run incognito to isolate sessions for this to pass
-      # change_session_to(:default)
-      # assert AuctionShowPage.auction_bid_status() =~ "You have been outbid"
-      # AuctionShowPage.enter_bid(%{amount: 0.50})
-      # AuctionShowPage.submit_bid()
-      # assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (2nd)"
+      change_session_to(:default)
+      assert AuctionShowPage.auction_bid_status() =~ "You have been outbid"
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.enter_bid(%{amount: 0.50})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(500)
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (2nd)"
+    end
+  end
+
+  describe "decision period" do
+    setup %{auction: auction, supplier_company: supplier_company, supplier_company2: supplier_company2} do
+      Auctions.start_auction(auction)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
+      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company2.id)
+
+      {:ok, auction_store_pid} = Auctions.AuctionStore.find_pid(auction.id)
+      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      {:ok, %{bid: bid, bid2: bid2}}
+    end
+
+    test "supplier view of decision period", %{auction: auction, supplier: supplier} do
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.auction_status == "DECISION"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (1st)"
+    end
+
+    test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      assert has_css?(".qa-best-solution-#{bid.id}")
+      assert has_css?(".qa-other-solution-#{bid2.id}")
     end
   end
 end
