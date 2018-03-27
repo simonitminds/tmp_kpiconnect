@@ -43,7 +43,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   end
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id, duration: duration}) do
-    %Auctions.Auction{id: auction_id, decision_duration: duration}
+    %Auctions.Auction{id: auction_id, duration: duration}
     |> Command.end_auction
     |> AuctionStore.process_command
 

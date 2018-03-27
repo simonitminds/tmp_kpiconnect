@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     auction = insert(:auction,
-      buyer: buyer_company, duration: 1_000, decision_duration: 1_000,
+      buyer: buyer_company, duration: 1_000, decision_duration: 3_000,
       suppliers: [supplier_company, supplier3_company]
     )
     current_time =  DateTime.utc_now()
@@ -268,7 +268,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           payload: %{
             auction: auction = %{id: ^auction_id},
             state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
-            bid_list: bid_list
+            bid_list: bid_list,
+            time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
@@ -278,6 +279,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
+            assert time_remaining > 3 * 60_000 - 1_000 #Auction extended
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -304,7 +306,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           payload: %{
             auction: auction = %{id: ^auction_id},
             state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
-            bid_list: bid_list
+            bid_list: bid_list,
+            time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert decision_supplier_payload.bid_list == bid_list
@@ -314,6 +317,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             refute winning_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
+            assert time_remaining > auction.decision_duration - 1_000
       after
         5000 ->
           assert false, "Expected message received nothing."

@@ -9,8 +9,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :start_auction, data: %{id: auction_id, duration: duration}}
   end
 
-  def end_auction(%Auction{id: auction_id, decision_duration: duration}) do
-    %Command{command: :end_auction, data: %{id: auction_id, duration: duration}}
+  def end_auction(%Auction{id: auction_id, duration: decision_duration}) do
+    %Command{command: :end_auction, data: %{id: auction_id, decision_duration: decision_duration}}
   end
 
   def end_auction_decision_period(%Auction{id: auction_id}) do
