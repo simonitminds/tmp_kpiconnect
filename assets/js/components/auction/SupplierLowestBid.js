@@ -3,15 +3,15 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './SupplierBidStatus'
 
-const SupplierWinningBid = ({auctionPayload}) => {
+const SupplierLowestBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const winningBid = _.chain(auctionPayload)
-    .get('state.winning_bids')
+  const lowestBid = _.chain(auctionPayload)
+    .get('state.lowest_bids')
     .first()
     .value();
 
-  const winningBidListDisplay = () => {
-    if (_.get(winningBid, 'amount')) {
+  const lowestBidListDisplay = () => {
+    if (_.get(lowestBid, 'amount')) {
       return (
         <table className="table is-fullwidth is-striped is-marginless">
           <thead>
@@ -22,8 +22,8 @@ const SupplierWinningBid = ({auctionPayload}) => {
           </thead>
           <tbody>
             <tr>
-              <td className="qa-auction-winning-bid-amount">${formatPrice(winningBid.amount)}</td>
-              <td>{formatTime(winningBid.time_entered)}</td>
+              <td className="qa-auction-lowest-bid-amount">${formatPrice(lowestBid.amount)}</td>
+              <td>{formatTime(lowestBid.time_entered)}</td>
             </tr>
           </tbody>
         </table>
@@ -36,15 +36,15 @@ const SupplierWinningBid = ({auctionPayload}) => {
   }
 
   return(
-    <div className="auction-winning-bid">
+    <div className="auction-lowest-bid">
       <SupplierBidStatus auctionPayload={auctionPayload} />
       <div className="box">
         <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>
-          {winningBidListDisplay()}
+          <h3 className="box__header box__header--bordered">Lowest Bid(s)</h3>
+          {lowestBidListDisplay()}
         </div>
       </div>
     </div>
   );
 };
-export default SupplierWinningBid;
+export default SupplierLowestBid;

@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       assert supplier.name in Enum.map(payload.bid_list, &(&1.supplier))
       assert payload.state.status == :open
-      assert supplier.name in Enum.map(payload.state.winning_bids, &(&1.supplier))
+      assert supplier.name in Enum.map(payload.state.lowest_bids, &(&1.supplier))
     end
 
     test "returns payload for a supplier", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
@@ -42,21 +42,21 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       |> AuctionPayload.get_auction_payload!(supplier.id)
 
       assert payload.state.status == :open
-      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bids
-      assert payload.state.winning_bids_position == 0
+      assert [%AuctionBid{amount: ^amount}] = payload.state.lowest_bids
+      assert payload.state.lowest_bids_position == 0
       assert length(payload.bid_list) == 1
-      assert payload.bid_list |> hd |> Map.delete(:supplier_id) == payload.state.winning_bids |> hd
+      assert payload.bid_list |> hd |> Map.delete(:supplier_id) == payload.state.lowest_bids |> hd
       assert [%AuctionBid{amount: ^amount}] = payload.bid_list
     end
 
-    test "with an existing winning bid", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
+    test "with an existing lowest bid", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
       Auctions.place_bid(auction, %{"amount" => "1.5"}, supplier_2.id)
 
       payload = auction
       |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      assert [%AuctionBid{amount: "1.5"}] = payload.state.winning_bids
-      assert payload.state.winning_bids_position == nil
+      assert [%AuctionBid{amount: "1.5"}] = payload.state.lowest_bids
+      assert payload.state.lowest_bids_position == nil
       assert length(payload.bid_list) == 0
 
       Auctions.place_bid(auction, bid_params, supplier.id)
@@ -65,8 +65,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       |> AuctionPayload.get_auction_payload!(supplier.id)
 
       assert updated_payload.state.status == :open
-      assert [%AuctionBid{amount: ^amount}] = updated_payload.state.winning_bids
-      assert updated_payload.state.winning_bids_position == 0
+      assert [%AuctionBid{amount: ^amount}] = updated_payload.state.lowest_bids
+      assert updated_payload.state.lowest_bids_position == 0
     end
 
     test "matching bids", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
@@ -77,8 +77,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       payload = auction
       |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bids
-      assert payload.state.winning_bids_position == 1
+      assert [%AuctionBid{amount: ^amount}] = payload.state.lowest_bids
+      assert payload.state.lowest_bids_position == 1
 
 
       buyer_payload = auction
@@ -86,8 +86,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       assert supplier.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
       assert supplier_2.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
-      assert supplier_2.name in Enum.map(buyer_payload.state.winning_bids, &(&1.supplier))
-      assert supplier.name in Enum.map(buyer_payload.state.winning_bids, &(&1.supplier))
+      assert supplier_2.name in Enum.map(buyer_payload.state.lowest_bids, &(&1.supplier))
+      assert supplier.name in Enum.map(buyer_payload.state.lowest_bids, &(&1.supplier))
     end
 
     test "auction goes to decision", %{auction: auction, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2, supplier: supplier} do
@@ -100,8 +100,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       payload = auction
       |> AuctionPayload.get_auction_payload!(supplier_2.id)
 
-      assert [%AuctionBid{amount: ^amount}] = payload.state.winning_bids
-      assert payload.state.winning_bids_position == 0
+      assert [%AuctionBid{amount: ^amount}] = payload.state.lowest_bids
+      assert payload.state.lowest_bids_position == 0
     end
 
     test "anonymous_bidding", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2}do
@@ -115,10 +115,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       refute supplier.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
       refute supplier_2.name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
-      refute supplier_2.name in Enum.map(buyer_payload.state.winning_bids, &(&1.supplier))
+      refute supplier_2.name in Enum.map(buyer_payload.state.lowest_bids, &(&1.supplier))
       assert Auctions.get_auction_supplier(auction.id, supplier.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
       assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
-      assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.state.winning_bids, &(&1.supplier))
+      assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.state.lowest_bids, &(&1.supplier))
     end
   end
 end

@@ -217,10 +217,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
-            assert buyer_payload.state.winning_bids == winning_bids
+            assert buyer_payload.state.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -235,10 +235,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert decision_buyer_payload.bid_list == bid_list
-            assert decision_buyer_payload.state.winning_bids == winning_bids
+            assert decision_buyer_payload.state.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -267,16 +267,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
+            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
-            assert supplier_payload.state.winning_bids == winning_bids
-            assert supplier_payload.state.winning_bids_position == position
+            assert supplier_payload.state.lowest_bids == lowest_bids
+            assert supplier_payload.state.lowest_bids_position == position
             assert supplier_payload.state.multiple == multiple
-            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
             assert time_remaining > 3 * 60_000 - 1_000 #Auction extended
@@ -305,16 +305,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
+            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert decision_supplier_payload.bid_list == bid_list
-            assert decision_supplier_payload.state.winning_bids == winning_bids
-            assert decision_supplier_payload.state.winning_bids_position == position
+            assert decision_supplier_payload.state.lowest_bids == lowest_bids
+            assert decision_supplier_payload.state.lowest_bids_position == position
             assert decision_supplier_payload.state.multiple == multiple
-            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
             assert time_remaining > auction.decision_duration - 1_000

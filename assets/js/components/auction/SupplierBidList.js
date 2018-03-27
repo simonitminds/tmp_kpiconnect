@@ -5,8 +5,8 @@ import { formatTime, formatPrice } from '../../utilities';
 const SupplierBidList = ({auctionPayload, buyer}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const bidList = _.get(auctionPayload, 'bid_list', []);
-  const winningBidIds = _.chain(auctionPayload)
-    .get('state.winning_bids', [])
+  const lowestBidIds = _.chain(auctionPayload)
+    .get('state.lowest_bids', [])
     .map('id')
     .value();
 

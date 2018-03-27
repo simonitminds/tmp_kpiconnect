@@ -4,10 +4,10 @@ import { formatTime, formatPrice } from '../../utilities';
 
 const BuyerBestSolution = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const winningBid = _.get(auctionPayload, 'state.winning_bids[0]', {});
+  const lowestBid = _.get(auctionPayload, 'state.lowest_bids[0]', {});
   const remainingBids = _.chain(auctionPayload)
     .get('bid_list', [])
-    .reject(['id', winningBid.id])
+    .reject(['id', lowestBid.id])
     .orderBy(['amount', 'time_entered'],['asc', 'asc'])
     .value();
 
@@ -24,10 +24,10 @@ const BuyerBestSolution = ({auctionPayload}) => {
   }
 
   const bestSolutionDisplay = () => {
-    if (winningBid.id) {
+    if (lowestBid.id) {
       return (
-        <div className={`box auction-solution auction-solution--best qa-best-solution-${winningBid.id}`}>
-          {bidDisplay(winningBid)}
+        <div className={`box auction-solution auction-solution--best qa-best-solution-${lowestBid.id}`}>
+          {bidDisplay(lowestBid)}
         </div>
       );
     } else {

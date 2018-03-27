@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     alias __MODULE__
     defstruct auction_id: nil,
       status: :pending,
-      winning_bids: []
+      lowest_bids: []
 
     def from_auction(auction) do
       %AuctionState{
@@ -100,28 +100,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{winning_bids: winning_bids}) do
-    winning_amount = case winning_bids do
+  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{lowest_bids: lowest_bids}) do
+    lowest_amount = case lowest_bids do
       [] -> nil
-      _ -> hd(winning_bids).amount
+      _ -> hd(lowest_bids).amount
     end
-    new_state = set_winning_bids?(bid, amount, current_state, winning_amount)
+    new_state = set_lowest_bids?(bid, amount, current_state, lowest_amount)
     {:noreply, new_state}
   end
 
-  defp set_winning_bids?(bid, _amount, current_state, nil) do
+  defp set_lowest_bids?(bid, _amount, current_state, nil) do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bids: [bid]}
+    %AuctionState{current_state | lowest_bids: [bid]}
   end
-  defp set_winning_bids?(bid, amount, current_state, winning_amount) when winning_amount > amount do
+  defp set_lowest_bids?(bid, amount, current_state, lowest_amount) when lowest_amount > amount do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bids: [bid]}
+    %AuctionState{current_state | lowest_bids: [bid]}
   end
-  defp set_winning_bids?(bid, amount, current_state = %{winning_bids: winning_bids}, amount) do
+  defp set_lowest_bids?(bid, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
     AuctionTimer.maybe_extend_auction(current_state.auction_id)
-    %AuctionState{current_state | winning_bids: winning_bids ++[bid]}
+    %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}
   end
-  defp set_winning_bids?(_bid, _amount, current_state, _winning_amount), do: current_state
+  defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: current_state
 
   defp calculate_status(_auction) do
     :pending

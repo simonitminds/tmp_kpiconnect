@@ -10,14 +10,14 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
   const bidStatusDisplay = () => {
-    const winningBid = _.get(auction, 'state.winning_bids');
-    if (winningBid && auctionStatus != 'pending') {
+    const lowestBid = _.get(auction, 'state.lowest_bids');
+    if (lowestBid && auctionStatus != 'pending') {
       return (
         <div>
           <div className="card-content__bid-status">
             <SupplierBidStatus auctionPayload={auctionPayload} />
             { auctionStatus != 'pending' ?
-              <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
+              <div className="card-content__best-price"><strong>Best Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}</div>
               :
               ''
             }

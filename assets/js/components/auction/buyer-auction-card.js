@@ -10,20 +10,20 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
   const lowestBidMessage = () => {
-    let winningBid;
-    winningBid = _.chain(auctionPayload).get('state.winning_bids').first().value();
-    const winningBidCount = _.get(auctionPayload, 'state.winning_bids.length');
+    let lowestBid;
+    lowestBid = _.chain(auctionPayload).get('state.lowest_bids').first().value();
+    const lowestBidCount = _.get(auctionPayload, 'state.lowest_bids.length');
 
-    if (winningBid && winningBidCount == 1) {
+    if (lowestBid && lowestBidCount == 1) {
       return (
         <div className="card-content__best-bidder">
-          <span className="card-content__best-bidder__name">Lowest Bid: {winningBid.supplier}</span>
+          <span className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}</span>
         </div>
       )
-    } else if (winningBid && winningBidCount > 1) {
+    } else if (lowestBid && lowestBidCount > 1) {
       return (
         <div className="card-content__best-bidder">
-          <span className="card-content__best-bidder__name">Lowest Bid: {winningBid.supplier}</span><span className="card-content__best-bidder__count">(of {winningBidCount})</span>
+          <span className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}</span><span className="card-content__best-bidder__count">(of {lowestBidCount})</span>
         </div>
       )
     } else {
@@ -36,15 +36,15 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   }
 
   const bidStatusDisplay = () => {
-    let winningBid;
-    winningBid = _.chain(auction).get('state.winning_bids').first().value();
-    const winningBidCount = _.get(auction, 'state.winning_bids.length');
-    if (winningBidCount > 0) {
+    let lowestBid;
+    lowestBid = _.chain(auction).get('state.lowest_bids').first().value();
+    const lowestBidCount = _.get(auction, 'state.lowest_bids.length');
+    if (lowestBidCount > 0) {
       return (
         <div className="card-content__bid-status">
           {lowestBidMessage()}
           { auctionStatus != 'pending' ?
-            <div className="card-content__best-price"><strong>Best Offer: </strong>{winningBid.amount == null ? <i>(None)</i> : `$` + formatPrice(winningBid.amount)}</div>
+            <div className="card-content__best-price"><strong>Best Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}</div>
             :
             ''
           }

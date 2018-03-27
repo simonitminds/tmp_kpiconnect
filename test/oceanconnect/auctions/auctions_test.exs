@@ -125,7 +125,7 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end
 
-    test "place_bid/3 enters bid in bid_list and runs winning_bid logic", %{auction: auction, supplier_company: supplier_company} do
+    test "place_bid/3 enters bid in bid_list and runs lowest_bid logic", %{auction: auction, supplier_company: supplier_company} do
       amount = 1.25
       expected_result = %{
         amount: amount,
@@ -144,7 +144,7 @@ defmodule Oceanconnect.AuctionsTest do
       end)
       payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
       assert hd(payload.bid_list).id == bid.id
-      assert hd(payload.state.winning_bids).id == bid.id
+      assert hd(payload.state.lowest_bids).id == bid.id
     end
   end
 

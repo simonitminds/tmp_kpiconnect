@@ -4,7 +4,7 @@ import { quickOrdinal } from '../../utilities';
 
 const SupplierBidStatus = ({auctionPayload}) => {
   const bidList = _.get(auctionPayload, 'bid_list', []);
-  const order = _.get(auctionPayload, 'state.winning_bids_position');
+  const order = _.get(auctionPayload, 'state.lowest_bids_position');
   const multiple = _.get(auctionPayload, 'state.multiple');
 
   if(auctionPayload.state.status != "pending") {
