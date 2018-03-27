@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionStore, Command}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, Command}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -80,19 +81,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   describe "lowest bid list" do
     setup %{auction: auction, supplier_company: supplier_company} do
-      bid = %{"amount" => "1.25"}
-      |> Map.put("supplier_id", supplier_company.id)
-      |> Map.put("id", UUID.uuid4(:hex))
-      |> Map.put("time_entered", DateTime.utc_now())
-      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
-
-      auction
-      |> Command.start_auction
-      |> AuctionStore.process_command
-
-      bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
+      Auctions.start_auction(auction)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       {:ok, %{bid: bid}}
     end
 
@@ -106,30 +96,19 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     end
 
     test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now()})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [bid.id, new_bid.id]
       end)
-      assert auction_payload.time_remaining > 2 * 60_000
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
 
     test "non-lowest bid is not added and duration does not extend", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "1.50"})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
       :timer.sleep(1_100)
+      Auctions.place_bid(auction, %{"amount" => bid.amount + 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
@@ -139,19 +118,14 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     end
 
     test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "0.75"})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [new_bid.id]
       end)
-      assert auction_payload.time_remaining > 2 * 60_000
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
   end
 end
