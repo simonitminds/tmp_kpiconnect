@@ -77,4 +77,9 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-supplier-bid-status-message")
     |> inner_text
   end
+
+  def select_bid(bid_id) do
+    find_element(:css, ".qa-select-bid-#{bid_id}")
+    |> click
+  end
 end

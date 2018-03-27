@@ -2,8 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const BuyerBestSolution = ({auctionPayload}) => {
-  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+const BuyerBestSolution = ({auctionPayload, selectBid}) => {
   const lowestBid = _.get(auctionPayload, 'state.lowest_bids[0]', {});
   const remainingBids = _.chain(auctionPayload)
     .get('bid_list', [])
@@ -17,7 +16,13 @@ const BuyerBestSolution = ({auctionPayload}) => {
         <h3 className="auction-solution__title is-inline-block">{bid.supplier}</h3>
         <div className="auction-solution__content">
           <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> ({formatTime(bid.time_entered)})
-          <button disabled={auctionPayload.state.status == 'closed'} className="button is-small is-success has-margin-left-md">Accept Offer</button>
+          <button
+            disabled={auctionPayload.state.status != 'decision'}
+            className={`button is-small is-success has-margin-left-md qa-select-bid-${bid.id}`}
+            onClick={selectBid.bind(this, auctionPayload.auction.id, bid.id)}
+          >
+            Accept Offer
+          </button>
         </div>
       </div>
     );

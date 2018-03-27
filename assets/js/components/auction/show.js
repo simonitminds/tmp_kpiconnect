@@ -7,6 +7,7 @@ import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
 import BuyerLowestBid from './BuyerLowestBid';
 import BuyerBestSolution from './BuyerBestSolution';
+import WinningSolution from './winning-solution';
 import SupplierLowestBid from './SupplierLowestBid';
 import BuyerBidList from './BuyerBidList';
 import SupplierBidList from './SupplierBidList';
@@ -62,17 +63,25 @@ export default class AuctionShow extends React.Component {
 
 
     const buyerBidComponents = () => {
-      if (auctionState.status == 'decision' || auctionState.status == 'closed') {
+      if (auctionState.status == 'open') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} />
+            <BuyerLowestBid auctionPayload={auctionPayload} />
+            <BuyerBidList auctionPayload={auctionPayload} />
+          </div>
+        )
+      } else if (auctionState.status == 'decision') {
+        return (
+          <div>
+            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <BuyerLowestBid auctionPayload={auctionPayload} />
+            <WinningSolution auctionState={auctionState} />
+            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )

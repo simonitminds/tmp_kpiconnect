@@ -173,5 +173,13 @@ defmodule Oceanconnect.AuctionShowTest do
       assert has_css?(".qa-best-solution-#{bid.id}")
       assert has_css?(".qa-other-solution-#{bid2.id}")
     end
+
+    test "buyer selects best solution", %{auction: auction, bid: bid, buyer: buyer} do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.select_bid(bid.id)
+      assert AuctionShowPage.auction_status == "CLOSED"
+      assert has_css?(".qa-winning-solution-#{bid.id}")
+    end
   end
 end
