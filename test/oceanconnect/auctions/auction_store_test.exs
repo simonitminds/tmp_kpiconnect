@@ -58,7 +58,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     assert expected_state == actual_state
   end
 
-  test "auction decision period ending", %{auction: auction} do
+  test "auction decision period expiring", %{auction: auction} do
     auction
     |> Command.start_auction
     |> AuctionStore.process_command
@@ -73,7 +73,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state = auction
     |> AuctionState.from_auction
-    |> Map.merge(%{status: :closed, auction_id: auction.id})
+    |> Map.merge(%{status: :expired, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
 
     assert expected_state == actual_state
@@ -126,6 +126,24 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
         lowest_bid.id in [new_bid.id]
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
+    end
+  end
+
+  describe "winning bid" do
+    setup %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
+      Auctions.start_auction(auction)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
+      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
+      {:ok, %{bid: bid, bid2: bid2}}
+    end
+
+    test "winning bid can be selected", %{auction: auction, bid: bid} do
+      Auctions.select_winning_bid(bid, "test")
+      auction_state = Auctions.get_auction_state!(auction)
+
+      assert auction_state.winning_bid.id == bid.id
+      assert auction_state.winning_bid.comment == "test"
+      assert auction_state.status == :closed
     end
   end
 end

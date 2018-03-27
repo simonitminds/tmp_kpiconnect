@@ -59,6 +59,11 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
     do: GenServer.call(pid, :get_bid_list)
   end
 
+  def get_bid(auction_id, bid_id) do
+    with {:ok, pid} <- find_pid(auction_id),
+    do: GenServer.call(pid, {:get_bid, bid_id})
+  end
+
   def process_command(%Command{command: :enter_bid, data: bid = %AuctionBid{auction_id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
     do: GenServer.cast(pid, {:enter_bid, bid})
@@ -72,6 +77,13 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
    # Server
   def handle_call(:get_bid_list, _from, current_state) do
     {:reply, current_state, current_state}
+  end
+
+  def handle_call({:get_bid, bid_id}, _from, current_state) do
+    bid = current_state
+    |> Enum.filter(fn(bid) -> bid.id == bid_id end)
+    |> List.first
+    {:reply, bid, current_state}
   end
 
   def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id}}, current_state) do

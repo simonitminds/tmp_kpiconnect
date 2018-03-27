@@ -43,7 +43,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction}}
   end
 
-  describe "Auction Start" do
+  describe "auction start" do
     test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                 auction: auction,
                                                 expected_payload: expected_payload} do
@@ -113,7 +113,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Auction goes into Decision" do
+  describe "auction goes into decision" do
     setup(%{expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
@@ -152,11 +152,11 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Auction Ends (post Decision Period)" do
+  describe "auction expires (decision period runs out with no selection)" do
     setup(%{expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
-      |> Map.put(:state, Map.put(expected_payload.state, :status, :closed))
+      |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
       {:ok, %{payload: payload}}
     end
 
@@ -167,7 +167,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
@@ -177,7 +177,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
     end
 
     test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
@@ -191,7 +191,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Placing Bids" do
+  describe "placing bids" do
     setup %{auction: auction} do
       Auctions.start_auction(auction)
       :ok

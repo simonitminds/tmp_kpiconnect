@@ -26,6 +26,13 @@ defmodule Oceanconnect.Auctions do
     bid
   end
 
+  def select_winning_bid(bid, comment) do
+    bid
+    |> Map.put(:comment, comment)
+    |> Command.select_winning_bid
+    |> AuctionStore.process_command
+  end
+
   def is_participant?(auction = %Auction{}, company_id) do
     company_id in auction_participant_ids(auction)
   end

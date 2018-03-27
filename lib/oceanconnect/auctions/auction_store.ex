@@ -9,7 +9,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     alias __MODULE__
     defstruct auction_id: nil,
       status: :pending,
-      lowest_bids: []
+      lowest_bids: [],
+      winning_bid: nil
 
     def from_auction(auction) do
       %AuctionState{
@@ -81,7 +82,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:end_auction, _}, current_state = %{status: :closed}), do: {:noreply, current_state}
   def handle_cast({:end_auction, %{id: auction_id, decision_duration: decision_duration}}, current_state = %{status: :open}) do
     case TimersSupervisor.start_timer({auction_id, decision_duration, :decision_duration}) do
       {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
@@ -92,9 +92,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     {:noreply, new_state}
   end
+  def handle_cast({:end_auction, _}, current_state), do: {:noreply, current_state}
 
   def handle_cast({:end_auction_decision_period, _data}, current_state) do
-    new_state = %AuctionState{current_state | status: :closed}
+    new_state = %AuctionState{current_state | status: :expired}
     AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
@@ -106,6 +107,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       _ -> hd(lowest_bids).amount
     end
     new_state = set_lowest_bids?(bid, amount, current_state, lowest_amount)
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:select_winning_bid, bid}, current_state) do
+    new_state = current_state
+    |> Map.put(:winning_bid, bid)
+    |> Map.put(:status, :closed)
+    AuctionNotifier.notify_participants(new_state)
+
     {:noreply, new_state}
   end
 

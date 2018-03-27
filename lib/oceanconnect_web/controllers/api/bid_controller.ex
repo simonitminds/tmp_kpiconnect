@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.Auction
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList}
 
   def create(conn, %{"auction_id" => auction_id, "bid" => bid_params}) do
     supplier_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
@@ -14,6 +14,24 @@ defmodule OceanconnectWeb.Api.BidController do
          true <- supplier_id in Auctions.auction_supplier_ids(auction)
     do
       Auctions.place_bid(auction, updated_bid_params, supplier_id)
+
+      render(conn, "show.json", data: %{})
+    else
+      _ -> conn
+           |> put_status(422)
+           |> render(OceanconnectWeb.ErrorView, "422.json", data: %{})
+    end
+  end
+
+  def select_bid(conn, %{"auction_id" => auction_id, "bid_id" => bid_id, "comment" => comment}) do
+    buyer_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    auction_id = String.to_integer(auction_id)
+    with auction = %Auction{} <- Auctions.get_auction(auction_id),
+         true <- auction.buyer_id == buyer_id,
+         %{status: :decision} <- Auctions.get_auction_state!(auction),
+         bid = %AuctionBidList.AuctionBid{} <- AuctionBidList.get_bid(auction.id, bid_id)
+    do
+      Auctions.select_winning_bid(bid, comment)
 
       render(conn, "show.json", data: %{})
     else

@@ -25,6 +25,10 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :process_new_bid, data: bid}
   end
 
+  def select_winning_bid(bid =%AuctionBid{}) do
+    %Command{command: :select_winning_bid, data: bid}
+  end
+
   def extend_duration(auction_id) do
     %Command{command: :extend_duration, data: %{auction_id: auction_id}}
   end
