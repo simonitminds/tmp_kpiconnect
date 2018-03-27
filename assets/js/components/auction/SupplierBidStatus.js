@@ -16,8 +16,7 @@ const SupplierBidStatus = ({auctionPayload}) => {
           </h3>
         </div>
       );
-    }
-    else if (order == 0 && !multiple) {
+    } else if (order == 0 && !multiple) {
       return (
         <div className = "auction-notification box is-success" >
           <h3 className="has-text-weight-bold is-flex">
@@ -25,8 +24,7 @@ const SupplierBidStatus = ({auctionPayload}) => {
           </h3>
         </div>
       );
-    }
-    else if (order >= 0) {
+    } else if (order >= 0 && order != null) {
       return (
         <div className = "auction-notification box is-success" >
           <h3 className="has-text-weight-bold is-flex">
@@ -34,8 +32,7 @@ const SupplierBidStatus = ({auctionPayload}) => {
           </h3>
         </div>
       );
-    }
-    else {
+    } else {
       return (
         <div className = "auction-notification box is-danger" >
           <h3 className="has-text-weight-bold is-flex">
