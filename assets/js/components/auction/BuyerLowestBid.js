@@ -2,11 +2,11 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const BuyerWinningBid = ({auctionPayload}) => {
+const BuyerLowestBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const winningBidList = _.get(auctionPayload, 'state.winning_bids', []);
-  const winningBidListDisplay = () => {
-    if (winningBidList.length > 0) {
+  const lowestBidList = _.get(auctionPayload, 'state.lowest_bids', []);
+  const lowestBidListDisplay = () => {
+    if (lowestBidList.length > 0) {
       return (
         <table className="table is-fullwidth is-striped is-marginless">
           <thead>
@@ -17,11 +17,11 @@ const BuyerWinningBid = ({auctionPayload}) => {
             </tr>
           </thead>
           <tbody>
-            {_.map(winningBidList, (bid) => {
+            {_.map(lowestBidList, (bid) => {
               return (
-                <tr key={bid.id} className={`qa-auction-winning-bid-${bid.id}`}>
-                  <td className="qa-auction-winning-bid-supplier">{bid.supplier}</td>
-                  <td className="qa-auction-winning-bid-amount">${formatPrice(bid.amount)}</td>
+                <tr key={bid.id} className={`qa-auction-lowest-bid-${bid.id}`}>
+                  <td className="qa-auction-lowest-bid-supplier">{bid.supplier}</td>
+                  <td className="qa-auction-lowest-bid-amount">${formatPrice(bid.amount)}</td>
                   <td>{formatTime(bid.time_entered)}</td>
                 </tr>
               );
@@ -39,10 +39,10 @@ const BuyerWinningBid = ({auctionPayload}) => {
   return(
     <div className="box">
       <div className="box__subsection has-padding-bottom-none">
-        <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>
-        {winningBidListDisplay()}
+        <h3 className="box__header box__header--bordered">Lowest Bid(s)</h3>
+        {lowestBidListDisplay()}
       </div>
     </div>
   );
 };
-export default BuyerWinningBid;
+export default BuyerLowestBid;

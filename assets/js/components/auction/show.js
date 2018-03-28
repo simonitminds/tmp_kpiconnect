@@ -5,9 +5,10 @@ import moment from 'moment';
 import  ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './AuctionBreadCrumbs';
 import AuctionHeader from './AuctionHeader';
-import BuyerWinningBid from './BuyerWinningBid';
+import BuyerLowestBid from './BuyerLowestBid';
 import BuyerBestSolution from './BuyerBestSolution';
-import SupplierWinningBid from './SupplierWinningBid';
+import WinningSolution from './winning-solution';
+import SupplierLowestBid from './SupplierLowestBid';
 import BuyerBidList from './BuyerBidList';
 import SupplierBidList from './SupplierBidList';
 import BiddingForm from './BiddingForm';
@@ -62,17 +63,25 @@ export default class AuctionShow extends React.Component {
 
 
     const buyerBidComponents = () => {
-      if (auctionState.status == 'decision' || auctionState.status == 'closed') {
+      if (auctionState.status == 'open') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} />
+            <BuyerLowestBid auctionPayload={auctionPayload} />
+            <BuyerBidList auctionPayload={auctionPayload} />
+          </div>
+        )
+      } else if (auctionState.status == 'decision') {
+        return (
+          <div>
+            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <BuyerWinningBid auctionPayload={auctionPayload} />
+            <WinningSolution auctionState={auctionState} />
+            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -91,7 +100,7 @@ export default class AuctionShow extends React.Component {
       if (auctionState.status == 'open') {
         return (
           <div>
-            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <SupplierLowestBid auctionPayload={auctionPayload} />
             <BiddingForm formSubmit={this.props.formSubmit} auction={auction} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -99,7 +108,7 @@ export default class AuctionShow extends React.Component {
       } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <SupplierLowestBid auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )

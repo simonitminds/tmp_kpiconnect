@@ -76,12 +76,12 @@ export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
     const mins = Math.floor(timeRemaining / 60000);
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
     return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} ${message}`;
+  } else if (auctionStatus === "expired") {
+    return "Auction Expired"
+  } else if (auctionStatus === "closed") {
+    return "Auction Closed"
   } else {
-    if (timeRemaining === 0) {
-      return "Auction Closed"
-    } else {
-      return "Auction has not started";
-    }
+    return "Auction has not started";
   }
 }
 

@@ -5,13 +5,13 @@ import { formatTime, formatPrice } from '../../utilities';
 const BuyerBidList = ({auctionPayload, buyer}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const bidList = _.get(auctionPayload, 'bid_list', []);
-  const winningBidIds = _.chain(auctionPayload)
-    .get('state.winning_bids', [])
+  const lowestBidIds = _.chain(auctionPayload)
+    .get('state.lowest_bids', [])
     .map('id')
     .value();
 
-  const winningBid = (bidId) => {
-    if (_.includes(winningBidIds, bidId)) {
+  const lowestBid = (bidId) => {
+    if (_.includes(lowestBidIds, bidId)) {
       return "is-selected";
     }
   }
@@ -32,7 +32,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
             {_.map(bidList, (bid) => {
               return (
                 <tr key={bid.id}
-                    className={`${winningBid(bid.id)} qa-auction-bid-${bid.id}`}
+                    className={`${lowestBid(bid.id)} qa-auction-bid-${bid.id}`}
                 >
                   <td className="qa-auction-bid-supplier">{bid.supplier}</td>
                   <td className="qa-auction-bid-amount">${formatPrice(bid.amount)}</td>

@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionStore, Command}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, Command}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -57,7 +58,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     assert expected_state == actual_state
   end
 
-  test "auction decision period ending", %{auction: auction} do
+  test "auction decision period expiring", %{auction: auction} do
     auction
     |> Command.start_auction
     |> AuctionStore.process_command
@@ -72,86 +73,77 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state = auction
     |> AuctionState.from_auction
-    |> Map.merge(%{status: :closed, auction_id: auction.id})
+    |> Map.merge(%{status: :expired, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
 
     assert expected_state == actual_state
   end
 
-  describe "winning bid list" do
+  describe "lowest bid list" do
     setup %{auction: auction, supplier_company: supplier_company} do
-      bid = %{"amount" => "1.25"}
-      |> Map.put("supplier_id", supplier_company.id)
-      |> Map.put("id", UUID.uuid4(:hex))
-      |> Map.put("time_entered", DateTime.utc_now())
-      |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
-
-      auction
-      |> Command.start_auction
-      |> AuctionStore.process_command
-
-      bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
+      Auctions.start_auction(auction)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       {:ok, %{bid: bid}}
     end
 
     test "first bid is added and extends duration", %{auction: auction, bid: bid} do
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
-        winning_bid.id in [bid.id]
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [bid.id]
       end)
       assert auction_payload.time_remaining > 2 * 60_000
     end
 
     test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now()})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
-        winning_bid.id in [bid.id, new_bid.id]
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [bid.id, new_bid.id]
       end)
-      assert auction_payload.time_remaining > 2 * 60_000
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
 
-    test "non-winning bid is not added and duration does not extend", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "1.50"})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
+    test "non-lowest bid is not added and duration does not extend", %{auction: auction, bid: bid} do
       :timer.sleep(1_100)
+      Auctions.place_bid(auction, %{"amount" => bid.amount + 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
-        winning_bid.id in [bid.id]
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [bid.id]
       end)
       assert auction_payload.time_remaining < 3 * 60_000 - 1_000
     end
 
-    test "new winning bid is added and extends duration", %{auction: auction, bid: bid} do
-      new_bid = bid
-      |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "0.75"})
-
-      new_bid
-      |> Command.process_new_bid
-      |> AuctionStore.process_command
-
+    test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.winning_bids, fn(winning_bid) ->
-        winning_bid.id in [new_bid.id]
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [new_bid.id]
       end)
-      assert auction_payload.time_remaining > 2 * 60_000
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
+    end
+  end
+
+  describe "winning bid" do
+    setup %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
+      Auctions.start_auction(auction)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
+      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
+      {:ok, %{bid: bid, bid2: bid2}}
+    end
+
+    test "winning bid can be selected", %{auction: auction, bid: bid} do
+      Auctions.select_winning_bid(bid, "test")
+      auction_state = Auctions.get_auction_state!(auction)
+
+      assert auction_state.winning_bid.id == bid.id
+      assert auction_state.winning_bid.comment == "test"
+      assert auction_state.status == :closed
     end
   end
 end

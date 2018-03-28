@@ -16,7 +16,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> maybe_remove_suppliers(user_id)
     auction_state = fully_loaded_auction
     |> Auctions.get_auction_state!
-    |> convert_winning_bids_for_user(fully_loaded_auction, user_id)
+    |> convert_lowest_bids_for_user(fully_loaded_auction, user_id)
+    |> convert_winning_bid_for_user(fully_loaded_auction, user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, auction_state, bid_list)
@@ -25,7 +26,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     fully_loaded_auction = auction
     |> Auctions.fully_loaded
     |> maybe_remove_suppliers(user_id)
-    updated_state = convert_winning_bids_for_user(auction_state, auction, user_id)
+    updated_state = auction_state
+    |> convert_lowest_bids_for_user(auction, user_id)
+    |> convert_winning_bid_for_user(auction, user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, updated_state, bid_list)
@@ -44,25 +47,45 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
   end
 
-  defp convert_winning_bids_for_user(auction_state = %AuctionState{winning_bids: []}, _auction, _user_id), do: auction_state
-  defp convert_winning_bids_for_user(auction_state = %AuctionState{}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{lowest_bids: []}, _auction, _user_id), do: auction_state
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
     auction_state
     |> Map.delete(:supplier_ids)
-    |> Map.put(:winning_bids, convert_to_supplier_names(auction_state.winning_bids, auction))
+    |> Map.put(:lowest_bids, convert_to_supplier_names(auction_state.lowest_bids, auction))
   end
-  defp convert_winning_bids_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
-    winning_bids_suppliers_ids = Enum.map(auction_state.winning_bids, fn(bid) -> bid.supplier_id end)
-    order = Enum.find_index(winning_bids_suppliers_ids, fn(id) -> id == supplier_id end)
-    winning_bid = auction_state.winning_bids
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
+    lowest_bids_suppliers_ids = Enum.map(auction_state.lowest_bids, fn(bid) -> bid.supplier_id end)
+    order = Enum.find_index(lowest_bids_suppliers_ids, fn(id) -> id == supplier_id end)
+    lowest_bid = auction_state.lowest_bids
     |> hd
     |> Map.delete(:supplier_id)
 
     auction_state
     |> Map.delete(:supplier_ids)
-    |> Map.put(:winning_bids, [winning_bid])
-    |> Map.put(:winning_bids_position, order)
-    |> Map.put(:multiple, length(auction_state.winning_bids) > 1)
+    |> Map.put(:lowest_bids, [lowest_bid])
+    |> Map.put(:lowest_bids_position, order)
+    |> Map.put(:multiple, length(auction_state.lowest_bids) > 1)
   end
+
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: nil}, _auction, _user_id), do: auction_state
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
+    converted_winning_bid = [winning_bid]
+    |> convert_to_supplier_names(auction)
+    |> hd
+    auction_state
+    |> Map.put(:winning_bid, converted_winning_bid)
+  end
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid = %{supplier_id: supplier_id}}, %Auction{}, supplier_id) do
+    auction_state
+    |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
+    |> Map.put(:winner, true)
+  end
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, %Auction{}, _supplier_id) do
+    auction_state
+    |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
+    |> Map.put(:winner, false)
+  end
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{}, _auction, _user_id), do: auction_state
 
   defp maybe_remove_suppliers(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
   defp maybe_remove_suppliers(auction = %Auction{}, _supplier_id) do

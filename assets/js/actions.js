@@ -51,6 +51,7 @@ export function getAllAuctionPayloads() {
       });
   };
 }
+
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {
@@ -62,12 +63,28 @@ export function selectPort(event) {
       });
   };
 }
+
 export function submitBid(auctionId, bidData) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/bids`, {
       headers: defaultHeaders,
       method: 'POST',
       body: JSON.stringify(bidData)
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return console.log(response);
+      });
+  };
+}
+
+export function selectBid(auctionId, bidId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/bids/${bidId}/select`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify({'comment': ''})
     })
       .then(checkStatus)
       .then(parseJSON)
@@ -99,7 +116,6 @@ export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels
           }
         };
 }
-
 export function updateInformation(property, value) {
   return {type: UPDATE_INFORMATION,
           data: {
@@ -108,7 +124,6 @@ export function updateInformation(property, value) {
           }
         };
 }
-
 export function updateDate(property, value) {
   return {type: UPDATE_DATE,
           data: {
@@ -123,7 +138,6 @@ export function toggleSupplier(supplier_id) {
            data: {supplier_id: supplier_id}
          };
 }
-
 export function selectAllSuppliers() {
   return {
     type: SELECT_ALL_SUPPLIERS

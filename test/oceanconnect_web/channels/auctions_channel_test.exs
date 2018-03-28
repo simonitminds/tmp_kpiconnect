@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     auction = insert(:auction,
-      buyer: buyer_company, duration: 1_000, decision_duration: 1_000,
+      buyer: buyer_company, duration: 1_000, decision_duration: 3_000,
       suppliers: [supplier_company, supplier3_company]
     )
     current_time =  DateTime.utc_now()
@@ -43,7 +43,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction}}
   end
 
-  describe "Auction Start" do
+  describe "auction start" do
     test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                 auction: auction,
                                                 expected_payload: expected_payload} do
@@ -113,7 +113,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Auction goes into Decision" do
+  describe "auction goes into decision" do
     setup(%{expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
@@ -152,11 +152,11 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Auction Ends (post Decision Period)" do
+  describe "auction expires (decision period runs out with no selection)" do
     setup(%{expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
-      |> Map.put(:state, Map.put(expected_payload.state, :status, :closed))
+      |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
       {:ok, %{payload: payload}}
     end
 
@@ -167,7 +167,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
@@ -177,7 +177,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :closed, channel, payload)
+      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
     end
 
     test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
@@ -191,7 +191,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
   end
 
-  describe "Placing Bids" do
+  describe "placing bids" do
     setup %{auction: auction} do
       Auctions.start_auction(auction)
       :ok
@@ -217,10 +217,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
-            assert buyer_payload.state.winning_bids == winning_bids
+            assert buyer_payload.state.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -235,10 +235,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, winning_bids: winning_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert decision_buyer_payload.bid_list == bid_list
-            assert decision_buyer_payload.state.winning_bids == winning_bids
+            assert decision_buyer_payload.state.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -267,17 +267,19 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
-            bid_list: bid_list
+            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            bid_list: bid_list,
+            time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert supplier_payload.bid_list == bid_list
-            assert supplier_payload.state.winning_bids == winning_bids
-            assert supplier_payload.state.winning_bids_position == position
+            assert supplier_payload.state.lowest_bids == lowest_bids
+            assert supplier_payload.state.lowest_bids_position == position
             assert supplier_payload.state.multiple == multiple
-            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
+            assert time_remaining > 3 * 60_000 - 1_000 #Auction extended
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -303,17 +305,19 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{winning_bids: winning_bids, winning_bids_position: position, multiple: multiple},
-            bid_list: bid_list
+            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            bid_list: bid_list,
+            time_remaining: time_remaining
           },
           topic: ^channel} ->
             assert decision_supplier_payload.bid_list == bid_list
-            assert decision_supplier_payload.state.winning_bids == winning_bids
-            assert decision_supplier_payload.state.winning_bids_position == position
+            assert decision_supplier_payload.state.lowest_bids == lowest_bids
+            assert decision_supplier_payload.state.lowest_bids_position == position
             assert decision_supplier_payload.state.multiple == multiple
-            refute winning_bids |> hd |> Map.has_key?(:supplier_id)
+            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
+            assert time_remaining > auction.decision_duration - 1_000
       after
         5000 ->
           assert false, "Expected message received nothing."

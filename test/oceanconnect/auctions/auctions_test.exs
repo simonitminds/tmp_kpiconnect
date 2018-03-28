@@ -113,6 +113,41 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "bid handling" do
+    alias Oceanconnect.Auctions.AuctionBidList
+
+    setup do
+      supplier_company = insert(:company, is_supplier: true)
+      auction = insert(:auction, suppliers: [supplier_company])
+      Auctions.AuctionsSupervisor.start_child(auction)
+      Auctions.AuctionBidsSupervisor.start_child(auction.id)
+      Auctions.start_auction(auction)
+      {:ok, %{auction: auction, supplier_company: supplier_company}}
+    end
+
+    test "place_bid/3 enters bid in bid_list and runs lowest_bid logic", %{auction: auction, supplier_company: supplier_company} do
+      amount = 1.25
+      expected_result = %{
+        amount: amount,
+        auction_id: auction.id,
+        supplier_id: supplier_company.id,
+        time_entered: DateTime.utc_now()
+      }
+
+      assert bid = %AuctionBidList.AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
+      assert Enum.all?(expected_result, fn({k, v}) ->
+        if k == :time_entered do
+          Map.fetch!(bid, k) >= v
+        else
+          Map.fetch!(bid, k) == v
+        end
+      end)
+      payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+      assert hd(payload.bid_list).id == bid.id
+      assert hd(payload.state.lowest_bids).id == bid.id
+    end
+  end
+
   describe "ports" do
     alias Oceanconnect.Auctions.Port
 

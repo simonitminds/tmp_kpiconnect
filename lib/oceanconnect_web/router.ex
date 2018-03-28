@@ -23,6 +23,7 @@ defmodule OceanconnectWeb.Router do
     pipe_through :authenticated # Routes requiring authentication
     get "/auctions", AuctionController, :index, as: :auction_api
     post "/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api
+    post "/auctions/:auction_id/bids/:bid_id/select", BidController, :select_bid, as: :auction_bid_api
     get "/ports/:port_id/suppliers", PortSupplierController, :index
   end
 
