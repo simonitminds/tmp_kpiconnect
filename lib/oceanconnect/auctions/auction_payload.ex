@@ -67,15 +67,25 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.put(:multiple, length(auction_state.lowest_bids) > 1)
   end
 
-  defp convert_winning_bid_for_user(auction_state = %AuctionState{}, _auction, _user_id), do: auction_state
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: nil}, _auction, _user_id), do: auction_state
   defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
+    converted_winning_bid = [winning_bid]
+    |> convert_to_supplier_names(auction)
+    |> hd
     auction_state
-    |> Map.put(:winning_bid, convert_to_supplier_names([auction_state.winning_bid], auction))
+    |> Map.put(:winning_bid, converted_winning_bid)
   end
-  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, %Auction{}, supplier_id) do
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid = %{supplier_id: supplier_id}}, %Auction{}, supplier_id) do
     auction_state
     |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
+    |> Map.put(:winner, true)
   end
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, %Auction{}, _supplier_id) do
+    auction_state
+    |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
+    |> Map.put(:winner, false)
+  end
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{}, _auction, _user_id), do: auction_state
 
   defp maybe_remove_suppliers(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
   defp maybe_remove_suppliers(auction = %Auction{}, _supplier_id) do

@@ -127,7 +127,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 1.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -136,16 +136,16 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.enter_bid(%{amount: 0.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "Your bid is currently lowest"
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
       end)
 
       change_session_to(:default)
-      assert AuctionShowPage.auction_bid_status() =~ "You have been outbid"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.enter_bid(%{amount: 0.50})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (2nd)"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer (2nd)"
     end
   end
 
@@ -164,7 +164,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status == "DECISION"
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the lowest price (1st)"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer (1st)"
     end
 
     test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
@@ -174,12 +174,26 @@ defmodule Oceanconnect.AuctionShowTest do
       assert has_css?(".qa-other-solution-#{bid2.id}")
     end
 
-    test "buyer selects best solution", %{auction: auction, bid: bid, buyer: buyer} do
+    test "buyer selects best solution", %{auction: auction, bid: bid, buyer: buyer, supplier: supplier, supplier2: supplier2} do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_bid(bid.id)
       assert AuctionShowPage.auction_status == "CLOSED"
       assert has_css?(".qa-winning-solution-#{bid.id}")
+
+      in_browser_session(:supplier2, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You lost the auction"
+        assert AuctionShowPage.auction_status == "CLOSED"
+      end)
+
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
+        assert AuctionShowPage.auction_status == "CLOSED"
+      end)
     end
   end
 end

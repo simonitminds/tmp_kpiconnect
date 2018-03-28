@@ -71,7 +71,6 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
     test "matching bids", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-
       Auctions.place_bid(auction, bid_params, supplier.id)
 
       payload = auction
@@ -79,7 +78,6 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       assert [%AuctionBid{amount: ^amount}] = payload.state.lowest_bids
       assert payload.state.lowest_bids_position == 1
-
 
       buyer_payload = auction
       |> AuctionPayload.get_auction_payload!(auction.buyer_id)
@@ -119,6 +117,33 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert Auctions.get_auction_supplier(auction.id, supplier.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
       assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.bid_list, &(&1.supplier))
       assert Auctions.get_auction_supplier(auction.id, supplier_2.id).alias_name in Enum.map(buyer_payload.state.lowest_bids, &(&1.supplier))
+    end
+
+    test "winning_bid added to payload", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
+      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
+      bid = Auctions.place_bid(auction, bid_params, supplier.id)
+
+      Auctions.select_winning_bid(bid, "test")
+
+      buyer_payload = auction
+      |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+
+      assert bid.id == buyer_payload.state.winning_bid.id
+      assert supplier.name == buyer_payload.state.winning_bid.supplier
+
+      losing_supplier_payload = auction
+      |> AuctionPayload.get_auction_payload!(supplier_2.id)
+
+      assert bid.id == losing_supplier_payload.state.winning_bid.id
+      refute Map.has_key?(losing_supplier_payload, :supplier_id)
+      assert false == losing_supplier_payload.state.winner
+
+      winning_supplier_payload = auction
+      |> AuctionPayload.get_auction_payload!(supplier.id)
+
+      assert bid.id == winning_supplier_payload.state.winning_bid.id
+      refute Map.has_key?(winning_supplier_payload, :supplier_id)
+      assert true == winning_supplier_payload.state.winner
     end
   end
 end

@@ -130,6 +130,15 @@ export default class AuctionsIndex extends React.Component {
             </div>
           </div>
         </section>
+
+        <section className="auction-list qa-completed-auctions-list">
+          <div className="container is-fullhd">
+            <div className="content">
+              <h2>Expired Auctions</h2>
+              { filteredAuctionsDisplay("expired") }
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
