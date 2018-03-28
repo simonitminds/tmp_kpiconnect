@@ -5,6 +5,7 @@ import SupplierBidStatus from './SupplierBidStatus'
 
 const SupplierWinningBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const auctionStatus = _.get(auctionPayload, 'auction.state.status');
   const winningBid = _.chain(auctionPayload)
     .get('state.winning_bids')
     .first()
@@ -40,7 +41,7 @@ const SupplierWinningBid = ({auctionPayload}) => {
       <SupplierBidStatus auctionPayload={auctionPayload} />
       <div className="box">
         <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">Winning Bid(s)</h3>
+          <h3 className="box__header box__header--bordered">{auctionStatus == undefined ? `Winning Bid` : `Best Offer`}</h3>
           {winningBidListDisplay()}
         </div>
       </div>
