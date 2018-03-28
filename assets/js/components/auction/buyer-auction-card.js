@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../../utilities';
-import SupplierBidStatus from './SupplierBidStatus'
+import SupplierBidStatus from './supplier-bid-status'
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');

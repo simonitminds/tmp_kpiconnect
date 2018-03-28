@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AuctionForm from '../components/auction/AuctionForm';
+import AuctionForm from '../components/auction/auction-form';
 import { receiveAuctionFormData,
          updateDate,
          updateInformation,

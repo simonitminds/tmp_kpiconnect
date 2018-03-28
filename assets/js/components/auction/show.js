@@ -3,19 +3,17 @@ import React from 'react';
 import { formatUTCDateTime, timeRemainingCountdown} from '../../utilities';
 import moment from 'moment';
 import  ServerDate from '../../serverdate';
-import AuctionBreadCrumbs from './AuctionBreadCrumbs';
-import AuctionHeader from './AuctionHeader';
-import BuyerLowestBid from './BuyerLowestBid';
-import BuyerBestSolution from './BuyerBestSolution';
+import AuctionBreadCrumbs from './auction-bread-crumbs';
+import AuctionHeader from './auction-header';
+import BuyerLowestBid from './buyer-lowest-bid';
+import BuyerBestSolution from './buyer-best-solution';
 import WinningSolution from './winning-solution';
-import SupplierLowestBid from './SupplierLowestBid';
-import BuyerBidList from './BuyerBidList';
-import SupplierBidList from './SupplierBidList';
-import BiddingForm from './BiddingForm';
-import MinimumBid from './MinimumBid';
-import MostRecentBid from './MostRecentBid';
-import InvitedSuppliers from './InvitedSuppliers';
-import AuctionInvitation from './AuctionInvitation';
+import SupplierLowestBid from './supplier-lowest-bid';
+import BuyerBidList from './buyer-bid-list';
+import SupplierBidList from './supplier-bid-list';
+import BiddingForm from './bidding-form';
+import InvitedSuppliers from './invited-suppliers';
+import AuctionInvitation from './auction-invitation';
 
 
 export default class AuctionShow extends React.Component {

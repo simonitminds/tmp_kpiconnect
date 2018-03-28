@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
-import SupplierBidStatus from './SupplierBidStatus'
+import SupplierBidStatus from './supplier-bid-status'
 
 const SupplierLowestBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');

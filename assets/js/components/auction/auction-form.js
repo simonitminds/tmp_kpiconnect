@@ -1,12 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import InputField from '../InputField';
-import CheckBoxField from '../CheckBoxField';
-import DateInput from '../DateInput';
-import TimeInput from '../TimeInput';
+import InputField from '../input-field';
+import CheckBoxField from '../check-box-field';
+import DateInput from '../date-input';
+import TimeInput from '../time-input';
 import { portLocalTime } from '../../utilities';
-import SupplierList  from './SupplierList';
+import SupplierList  from './supplier-list';
 
 const AuctionForm = (props) => {
   const {
