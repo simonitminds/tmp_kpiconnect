@@ -20,6 +20,14 @@ main {
 
 // ==== SECTIONS/DIVIDERS ==== //
 
+main {
+  position: fixed;
+  top: 3.25rem;
+  width: 100vw;
+  height: calc(100vh - 3.25rem);
+  overflow-y: scroll;
+}
+
 section {
   &.auction-list { // Bunker list divisions based on auction status.
     padding-bottom: 2rem;
@@ -55,15 +63,16 @@ section {
       }
     }
   }
-  &.auction-page { // Form divisions for Auction Show Page
-    padding: 0 1rem;
+}
 
-    &.auction-page--gray {
-      background-color: $gray-0;
+.auction-page { // For container-agnostic classes
+  padding: 0 1rem;
 
-      .empty-list {
-        background-color: white;
-      }
+  &.auction-page--gray {
+    background-color: $gray-0;
+
+    .empty-list {
+      background-color: white;
     }
   }
 }
