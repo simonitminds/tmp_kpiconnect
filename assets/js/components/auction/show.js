@@ -124,7 +124,7 @@ export default class AuctionShow extends React.Component {
 
     return (
       <div>
-        <MediaQuery query="(min-width: 600px)">
+        <MediaQuery query="(min-width: 768px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
         <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} />

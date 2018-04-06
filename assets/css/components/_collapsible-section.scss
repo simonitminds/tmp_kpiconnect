@@ -1,0 +1,40 @@
+// ========================== //
+// ========================== //
+// COLLAPSIBLE SECTION
+// ========================== //
+// ========================== //
+
+.auction-list > .container:last-child .content { // Collapsing container
+  margin-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.auction-list  { // Toggling Icon
+
+  h2 {
+    display: flex;
+  }
+
+  .collapsible-section__toggle-icon {
+    display: inline-block;
+    float: right;
+    &:after {
+      font-family: "FontAwesome";
+    }
+  }
+
+  &.is-open .collapsible-section__toggle-icon:after { // Opened Section Styles
+    content: "\f106";
+  }
+  &.is-closed .collapsible-section__toggle-icon:after { // Closed Section Styles
+    content: "\f107";
+  }
+}
+
+.collapsible-section__counter { // Counter of number of auctions in a given section
+  margin-left: auto;
+  font-weight: bold;
+  margin-right: 1rem;
+  min-width: 2.5rem;
+  border-radius: 14px !important;
+}

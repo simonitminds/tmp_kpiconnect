@@ -5,6 +5,7 @@ import { timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
+import CollapsibleSection from './collapsible-section';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -73,6 +74,9 @@ export default class AuctionsIndex extends React.Component {
           </div>);
       }
     };
+    const filteredAuctionsCount = (status) => {
+      return filteredAuctionsDisplay(status).props.children.length;
+    }
 
     return (
       <div className="has-margin-top-xl has-padding-top-lg">
@@ -94,51 +98,46 @@ export default class AuctionsIndex extends React.Component {
 
           </div>
         </div>
-
-        <section className="auction-list qa-open-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content has-gray-lighter">
-              <h2>Active Auctions</h2>
-              { filteredAuctionsDisplay("open") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Auctions In Decision</h2>
-              { filteredAuctionsDisplay("decision") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-pending-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Upcoming Auctions</h2>
-              { filteredAuctionsDisplay("pending") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Closed Auctions</h2>
-              { filteredAuctionsDisplay("closed") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Expired Auctions</h2>
-              { filteredAuctionsDisplay("expired") }
-            </div>
-          </div>
-        </section>
+        <CollapsibleSection
+          trigger="Active Auctions"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("open")}
+          open={filteredAuctionsCount("open") > 0}
+          >
+          { filteredAuctionsDisplay("open") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Auctions In Decision"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("decision")}
+          open={filteredAuctionsCount("decision") > 0}
+          >
+          { filteredAuctionsDisplay("decision") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Upcoming Auctions"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("pending")}
+          open={filteredAuctionsCount("pending") > 0}
+          >
+          { filteredAuctionsDisplay("pending") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Closed Auctions"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("closed")}
+          open={filteredAuctionsCount("closed") > 0}
+          >
+          { filteredAuctionsDisplay("closed") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Expired Auctions"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("expired")}
+          open={filteredAuctionsCount("expired") > 0}
+          >
+          { filteredAuctionsDisplay("Expired") }
+        </CollapsibleSection>
       </div>
     );
   }

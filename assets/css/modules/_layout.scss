@@ -30,13 +30,13 @@ main {
 
 section {
   &.auction-list { // Bunker list divisions based on auction status.
-    padding-bottom: 2rem;
+    padding-bottom: 1.25rem;
 
     &:last-child {
       padding-bottom: 4rem;
     }
 
-    &> .container {
+    &> .container:first-child {
       padding-top: 2rem !important;
     }
 
