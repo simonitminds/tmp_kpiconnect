@@ -136,7 +136,7 @@ export default class AuctionsIndex extends React.Component {
           contentChildCount={filteredAuctionsCount("expired")}
           open={filteredAuctionsCount("expired") > 0}
           >
-          { filteredAuctionsDisplay("Expired") }
+          { filteredAuctionsDisplay("expired") }
         </CollapsibleSection>
       </div>
     );
