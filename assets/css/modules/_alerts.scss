@@ -1,0 +1,26 @@
+// ========================== //
+// ========================== //
+// Alerts
+// ========================== //
+// ========================== //
+
+.alert {
+  @extend .notification;
+  position: absolute;
+  top: 60px;
+  left: auto;
+  right: auto;
+  margin: 0 1rem;
+  width: calc(100% - 2rem);
+  &:empty {
+    display: none;
+  }
+}
+
+.alert-info {
+  @extend .is-info;
+}
+
+.alert-danger {
+  @extend .is-danger;
+}

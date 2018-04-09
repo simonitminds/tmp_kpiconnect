@@ -6,6 +6,14 @@
 
 // ======= CONTAINER ======= //
 
+main {
+  margin-top: 8rem;
+
+  .alert + &{
+    margin-top: 10rem;
+  }
+}
+
 .container {
   padding: 0 1rem;
 }
