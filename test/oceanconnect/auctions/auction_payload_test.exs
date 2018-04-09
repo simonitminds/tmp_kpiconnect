@@ -123,6 +123,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       bid = Auctions.place_bid(auction, bid_params, supplier.id)
 
+      auction
+      |> Command.end_auction
+      |> AuctionStore.process_command
+
       Auctions.select_winning_bid(bid, "test")
 
       buyer_payload = auction

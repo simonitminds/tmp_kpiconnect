@@ -110,7 +110,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:select_winning_bid, bid}, current_state) do
+  def handle_cast({:select_winning_bid, bid}, current_state = %{auction_id: auction_id}) do
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+
     new_state = current_state
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)

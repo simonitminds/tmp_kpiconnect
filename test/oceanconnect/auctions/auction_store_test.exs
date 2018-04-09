@@ -134,6 +134,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       Auctions.start_auction(auction)
       bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
+
+      auction
+      |> Command.end_auction
+      |> AuctionStore.process_command
+
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
@@ -144,6 +149,10 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_state.winning_bid.id == bid.id
       assert auction_state.winning_bid.comment == "test"
       assert auction_state.status == :closed
+
+      :timer.sleep(1_100)
+      verify_decision_timer_cancelled = Auctions.get_auction_state!(auction)
+      assert verify_decision_timer_cancelled.status == :closed
     end
   end
 end
