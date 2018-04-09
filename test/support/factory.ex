@@ -15,7 +15,7 @@ defmodule Oceanconnect.Factory do
 
   def user_factory() do
     %Oceanconnect.Accounts.User{
-      email: sequence(:email, &("user-#{&1}@example.com")),
+      email: sequence(:email, &("USER-#{&1}@EXAMPLE.COM")),
       password: "password",
       company: build(:company)
     }

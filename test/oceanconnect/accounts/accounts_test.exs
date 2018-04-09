@@ -6,8 +6,8 @@ defmodule Oceanconnect.AccountsTest do
   describe "users" do
     alias Oceanconnect.Accounts.User
 
-    @valid_attrs %{email: "some email", password: "some password"}
-    @update_attrs %{email: "some updated email", password: "some updated password"}
+    @valid_attrs %{email: "SOME EMAIL", password: "some password"}
+    @update_attrs %{email: "SOME UPDATED EMAIL", password: "some updated password"}
     @invalid_attrs %{email: nil, password: nil}
 
     setup do
@@ -25,7 +25,7 @@ defmodule Oceanconnect.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.email == "some email"
+      assert user.email == "SOME EMAIL"
       assert {:ok, %User{}} = Accounts.verify_login(
         %{"email" => user.email, "password" => @valid_attrs.password}
       )
@@ -38,7 +38,7 @@ defmodule Oceanconnect.AccountsTest do
     test "update_user/2 with valid data updates the user", %{user: user} do
       assert {:ok, user} = Accounts.update_user(user, @update_attrs)
       assert %User{} = user
-      assert user.email == "some updated email"
+      assert user.email == "SOME UPDATED EMAIL"
       assert {:ok, %User{}} = Accounts.verify_login(
         %{"email" => user.email, "password" => @update_attrs.password}
       )

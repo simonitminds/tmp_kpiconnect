@@ -54,7 +54,7 @@ end)
 
 # User creation doesn't use get_or_insert! fn due to virtual password field
 Enum.map(companies, fn(c) ->
-  Repo.get_or_insert_user!(Repo.get_by(User, %{email: c.email}), c.email, c)
+  Repo.get_or_insert_user!(Repo.get_by(User, %{email: String.upcase(c.email)}), String.upcase(c.email), c)
 end)
 
 ports = [

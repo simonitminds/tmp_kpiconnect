@@ -2,7 +2,7 @@ defmodule Oceanconnectweb.SessionControllerTest do
   use OceanconnectWeb.ConnCase
 
   setup do
-    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "foo@example.com", password: "password"})
+    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "FOO@EXAMPLE.COM", password: "password"})
     %{user: user, conn: build_conn()}
   end
 
@@ -12,7 +12,12 @@ defmodule Oceanconnectweb.SessionControllerTest do
   end
 
   test "logging in", %{conn: conn} do
-    response = post(conn, "/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
+    response = post(conn, "/sessions", %{"session": %{email: "FOO@EXAMPLE.COM", password: "password"}})
+    assert redirected_to(response, 302) =~ "/auctions"
+  end
+
+  test "logging in with mixed case email", %{conn: conn} do
+    response = post(conn, "/sessions", %{"session": %{email: "Foo@example.com", password: "password"}})
     assert redirected_to(response, 302) =~ "/auctions"
   end
 
