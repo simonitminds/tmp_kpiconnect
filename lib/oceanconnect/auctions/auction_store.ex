@@ -1,6 +1,12 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
-  alias Oceanconnect.Auctions.{Auction, AuctionBidsSupervisor, AuctionNotifier, AuctionTimer, Command, TimersSupervisor}
+  alias Oceanconnect.Auctions.{Auction,
+                               AuctionBidsSupervisor,
+                               AuctionNotifier,
+                               AuctionTimer,
+                               Command,
+                               TimersSupervisor}
+
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   @registry_name :auctions_registry
@@ -76,6 +82,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
 
     new_state = %AuctionState{current_state | status: :open}
+
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id, data: new_state})
     AuctionNotifier.notify_participants(new_state)
 
     # broadcast to the auction channel
