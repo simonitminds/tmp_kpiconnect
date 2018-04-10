@@ -1,5 +1,12 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
-  defstruct type: nil, data: %{}, auction_id: nil
+  use Ecto.Schema
+
+  embedded_schema do
+    field :type
+    field :data
+    field :auction_id
+  end
+
   alias __MODULE__
 
   def emit(event = %AuctionEvent{type: type, auction_id: id, data: data}) do

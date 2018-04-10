@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventsTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionEventStorage}
+  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore}
   # alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     supplier2_company = insert(:company)
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
 
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
 
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end
@@ -30,6 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
   test "events for an auction are persisted", %{auction: auction = %Auction{id: auction_id}} do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     Auctions.start_auction(auction)
-    assert [%AuctionEventStorage{event: %AuctionEvent{type: :auction_started, auction_id: auction_id}}] == AuctionEventStore.event_list(auction)
+    assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
   end
+
 end
