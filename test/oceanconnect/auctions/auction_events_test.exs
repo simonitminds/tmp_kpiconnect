@@ -21,16 +21,27 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     assert_received {:auction_started, [created_at: _]}
   end
 
-  test "starting an auction emits a auction_started event", %{auction: auction = %Auction{id: auction_id}} do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-    Auctions.start_auction(auction)
-    assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
-  end
+  describe "auction event store" do
+    test "starting an auction adds an auction_started event to the event store", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      Auctions.start_auction(auction)
+      assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
+      assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+    end
 
-  test "events for an auction are persisted", %{auction: auction = %Auction{id: auction_id}} do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-    Auctions.start_auction(auction)
-    assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
-  end
+    test "ending an auction add an auction_ended event to the event store", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
+      Auctions.start_auction(auction)
+      Auctions.end_auction(auction)
+
+      # We're sleeping so that the decision_duration timer doesn't expire
+      # TODO: figure out how to avoid this
+      :timer.sleep(1000)
+
+      assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
+      assert [%AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
+              %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+    end
+  end
 end

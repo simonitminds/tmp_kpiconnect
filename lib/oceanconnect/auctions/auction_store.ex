@@ -90,16 +90,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       error -> error
     end
     new_state = %AuctionState{current_state | status: :decision}
+    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state})
     AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end
   def handle_cast({:end_auction, _}, current_state), do: {:noreply, current_state}
 
-  def handle_cast({:end_auction_decision_period, _data}, current_state) do
+  def handle_cast({:end_auction_decision_period, _data}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :expired}
+    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state})
     AuctionNotifier.notify_participants(new_state)
-
     {:noreply, new_state}
   end
 
@@ -118,6 +119,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state = current_state
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)
+
+    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state})
     AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}

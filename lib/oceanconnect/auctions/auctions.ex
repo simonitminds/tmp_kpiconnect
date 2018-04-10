@@ -102,6 +102,12 @@ defmodule Oceanconnect.Auctions do
     update_auction(auction, %{auction_start: DateTime.utc_now()})
   end
 
+  def end_auction(auction = %Auction{}) do
+    auction
+    |> Command.end_auction
+    |> AuctionStore.process_command
+  end
+
   def create_auction(attrs \\ %{}) do
     auction = %Auction{}
     |> Auction.changeset(attrs)
