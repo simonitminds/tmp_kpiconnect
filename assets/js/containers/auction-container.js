@@ -51,7 +51,7 @@ export class AuctionContainer extends React.Component {
 
   render() {
     if (this.props.loading) {
-      return <div>Loading...</div>
+      return <div className="alert is-info">Loading...</div>
     } else {
       return <AuctionShow {...this.props}/>;
     }
