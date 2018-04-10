@@ -267,7 +267,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            state: state = %{status: :open, lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
@@ -294,8 +294,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-      {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      auction
+      |> Oceanconnect.Auctions.Command.end_auction
+      |> Oceanconnect.Auctions.AuctionStore.process_command
 
       decision_supplier_payload = auction
       |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
@@ -305,7 +306,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            state: state = %{status: :decision, lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
