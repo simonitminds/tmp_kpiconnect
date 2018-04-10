@@ -84,8 +84,7 @@ defmodule Oceanconnect.Auctions do
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
-        auction
-        |> AuctionStore.AuctionState.from_auction
+        AuctionStore.AuctionState.from_auction(auction.id)
         |> Map.put(:status, :pending)
       state -> state
     end
@@ -113,8 +112,7 @@ defmodule Oceanconnect.Auctions do
         auction_with_participants = auction
         |> with_participants
         |> create_supplier_aliases
-
-        AuctionsSupervisor.start_child(auction_with_participants)
+        AuctionsSupervisor.start_child(auction_with_participants.id)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}

@@ -14,12 +14,12 @@ defmodule Oceanconnect.Application do
       # Start the endpoint when the application starts
       supervisor(OceanconnectWeb.Endpoint, []),
       supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
+      {Registry, keys: :unique, name: :auction_supervisor_registry},
       {Registry, keys: :unique, name: :auctions_registry},
       {Registry, keys: :unique, name: :auction_timers_registry},
       {Registry, keys: :unique, name: :auction_bids_registry},
       # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
       worker(AuctionsSupervisor, [], restart: :permanent),
-      worker(AuctionBidsSupervisor, [], restart: :permanent),
       worker(TimersSupervisor, [], restart: :permanent),
       worker(AuctionStoreStarter, [])
     ]

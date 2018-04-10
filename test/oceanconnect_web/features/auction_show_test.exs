@@ -18,7 +18,7 @@ defmodule Oceanconnect.AuctionShowTest do
       amount: 1.25
     }
     Auctions.AuctionsSupervisor.start_child(auction)
-    Auctions.AuctionBidsSupervisor.start_child(auction.id)
+    Auctions.AuctionsSupervisor.start_child(auction.id)
     {:ok, %{auction: auction, bid_params: bid_params, buyer: buyer, supplier: supplier,
             supplier_company: supplier_company, supplier2: supplier2, supplier_company2: supplier_company2}}
   end

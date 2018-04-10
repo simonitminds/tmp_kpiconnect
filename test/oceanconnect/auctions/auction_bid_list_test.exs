@@ -13,7 +13,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
     Oceanconnect.Auctions.start_auction(auction)
     {:ok, %{auction: auction, bid: bid, supplier2_company: supplier2_company}}
   end

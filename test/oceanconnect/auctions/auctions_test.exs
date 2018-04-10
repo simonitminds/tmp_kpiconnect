@@ -120,7 +120,7 @@ defmodule Oceanconnect.AuctionsTest do
       supplier_company = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company])
       Auctions.AuctionsSupervisor.start_child(auction)
-      Auctions.AuctionBidsSupervisor.start_child(auction.id)
+      Auctions.AuctionsSupervisor.start_child(auction.id)
       Auctions.start_auction(auction)
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end

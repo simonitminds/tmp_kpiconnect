@@ -1,7 +1,7 @@
-defmodule Oceanconnect.Auctions.AuctionStoreTest do
+defmodule Oceanconnect.Auctions.AuctionEventsTest do
   use Oceanconnect.DataCase
-  # alias Oceanconnect.Auctions
-  # alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, Command}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionEventStorage}
   # alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -21,7 +21,15 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     assert_received {:auction_started, [created_at: _]}
   end
 
-  test "starting an auction emits a auction_started event", %{auction: auction} do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction.id}")
+  test "starting an auction emits a auction_started event", %{auction: auction = %Auction{id: auction_id}} do
+    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    Auctions.start_auction(auction)
+    assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
+  end
+
+  test "events for an auction are persisted", %{auction: auction = %Auction{id: auction_id}} do
+    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    Auctions.start_auction(auction)
+    assert [%AuctionEventStorage{event: %AuctionEvent{type: :auction_started, auction_id: auction_id}}] == AuctionEventStore.event_list(auction)
   end
 end

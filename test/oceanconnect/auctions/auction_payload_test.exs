@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionBidList.AuctionBid
-  alias Oceanconnect.Auctions.{AuctionBidsSupervisor, AuctionPayload, AuctionStore, AuctionsSupervisor, Command}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionsSupervisor, Command}
 
   describe "get_auction_payload!/1" do
     setup do
@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       supplier_2 = insert(:company, name: "BazCompany")
       auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
       AuctionsSupervisor.start_child(auction)
-      AuctionBidsSupervisor.start_child(auction.id)
+      AuctionsSupervisor.start_child(auction.id)
 
       auction
       |> Command.start_auction
@@ -71,8 +71,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
     test "matching bids", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-      Auctions.place_bid(auction, bid_params, supplier.id)
-
+      Auctions.place_bid(auction, bid_params, supplier.id) 
       payload = auction
       |> AuctionPayload.get_auction_payload!(supplier.id)
 

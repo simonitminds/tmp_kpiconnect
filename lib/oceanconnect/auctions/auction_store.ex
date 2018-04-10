@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
   alias Oceanconnect.Auctions.{Auction,
-                               AuctionBidsSupervisor,
+                               AuctionEvent,
                                AuctionNotifier,
                                AuctionTimer,
                                Command,
@@ -18,9 +18,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       lowest_bids: [],
       winning_bid: nil
 
-    def from_auction(auction) do
+    def from_auction(auction_id) do
       %AuctionState{
-        auction_id: auction.id
+        auction_id: auction_id
       }
     end
   end
@@ -38,9 +38,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
    # Client
-  def start_link(auction) do
-    state = AuctionState.from_auction(auction)
-    GenServer.start_link(__MODULE__, state, name: get_auction_store_name(auction.id))
+  def start_link(auction_id) do
+    state = AuctionState.from_auction(auction_id)
+    GenServer.start_link(__MODULE__, state, name: get_auction_store_name(auction_id))
   end
 
   def get_current_state(%Auction{id: auction_id}) do
@@ -75,15 +75,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       error -> error
     end
 
-    # TODO: decouple starting of dependent processes from Auction Store.
-    case AuctionBidsSupervisor.start_child(auction_id) do
-      {:ok, _} -> nil
-      error -> error
-    end
-
     new_state = %AuctionState{current_state | status: :open}
 
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state})
     AuctionNotifier.notify_participants(new_state)
 
     # broadcast to the auction channel
