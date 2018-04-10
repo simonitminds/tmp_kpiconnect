@@ -20,6 +20,7 @@
           <a href="/auctions" class="navbar-item">
             <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
           </a>
+          <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
         </div>
         <%# TODO: Add in actual mobile implementation of nav... %>
         <!-- <button class="button navbar-burger">
