@@ -49,8 +49,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   end
 
   def handle_info(event = %AuctionEvent{auction_id: auction_id}, current_events) do
-    {:ok, _} = Repo.insert(%AuctionEventStorage{event: event, auction_id: auction_id})
-    events = [event | current_events]
+    {:ok, %AuctionEventStorage{event: persisted_event}} = Repo.insert(%AuctionEventStorage{event: event, auction_id: auction_id})
+    events = [persisted_event | current_events]
     {:noreply, events}
   end
 end

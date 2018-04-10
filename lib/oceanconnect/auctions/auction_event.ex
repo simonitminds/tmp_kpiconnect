@@ -5,6 +5,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     field :type
     field :data
     field :auction_id
+
+    timestamps
   end
 
   alias __MODULE__
