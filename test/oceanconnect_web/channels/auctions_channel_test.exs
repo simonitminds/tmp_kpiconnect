@@ -53,7 +53,18 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
     test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
@@ -65,7 +76,18 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
     test "broadcasts are not pushed to a non_participant", %{non_participant_id: non_participant_id,
@@ -109,85 +131,147 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       @endpoint.subscribe(channel)
       Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :open, channel, expected_payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
+          topic: ^channel} ->
+            assert payload.time_remaining < expected_payload.time_remaining
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
   end
 
   describe "auction goes into decision" do
-    setup(%{expected_payload: expected_payload}) do
+    setup(%{auction: auction, expected_payload: expected_payload}) do
       payload = expected_payload
-      |> Map.put(:time_remaining, 0)
+      |> Map.put(:time_remaining, auction.decision_duration)
       |> Map.put(:state, Map.put(expected_payload.state, :status, :decision))
-      {:ok, %{payload: payload}}
+      Auctions.start_auction(auction)
+      {:ok, %{expected_payload: payload}}
     end
 
-    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, payload: payload} do
+    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{buyer_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
+      auction
+      |> Oceanconnect.Auctions.Command.end_auction
+      |> Oceanconnect.Auctions.AuctionStore.process_command
 
-      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :decision}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
-    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
+    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{supplier_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
+      auction
+      |> Oceanconnect.Auctions.Command.end_auction
+      |> Oceanconnect.Auctions.AuctionStore.process_command
 
-      assert_rounded_time_broadcast(auction, event, :decision, channel, payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :decision}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
-    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
+    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, expected_payload: expected_payload}  do
       channel = "user_auctions:#{non_participant_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
+      auction
+      |> Oceanconnect.Auctions.Command.end_auction
+      |> Oceanconnect.Auctions.AuctionStore.process_command
 
-      refute_broadcast ^event, ^payload
+      refute_broadcast ^event, ^expected_payload
     end
   end
 
   describe "auction expires (decision period runs out with no selection)" do
-    setup(%{expected_payload: expected_payload}) do
+    setup(%{auction: auction, expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
       |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
-      {:ok, %{payload: payload}}
+      Auctions.start_auction(auction)
+      auction
+      |> Oceanconnect.Auctions.Command.end_auction
+      |> Oceanconnect.Auctions.AuctionStore.process_command
+      {:ok, %{expected_payload: payload}}
     end
 
-    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, payload: payload} do
+    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{buyer_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :expired}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
-    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, payload: payload} do
+    test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{supplier_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
 
-      assert_rounded_time_broadcast(auction, event, :expired, channel, payload)
+      auction_id = auction.id
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :expired}},
+          topic: ^channel} ->
+            assert Utilities.round_time_remaining(payload.time_remaining) ==
+                    Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
     end
 
-    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, payload: payload}  do
+    test "a non participant is not notified", %{non_participant_id: non_participant_id, expected_payload: expected_payload}  do
       channel = "user_auctions:#{non_participant_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
 
-      refute_broadcast ^event, ^payload
+      refute_broadcast ^event, ^expected_payload
     end
   end
 
