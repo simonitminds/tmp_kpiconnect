@@ -158,9 +158,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -181,9 +179,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -204,9 +200,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       refute_broadcast ^event, ^expected_payload
     end
@@ -217,10 +211,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
       |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
-      Auctions.start_auction(auction)
       auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      |> Auctions.start_auction
+      |> Auctions.end_auction
       {:ok, %{expected_payload: payload}}
     end
 
@@ -285,11 +278,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
-
-      buyer_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
-
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
       after
@@ -297,10 +285,15 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
+
+      buyer_payload = auction
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
+
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: payload = %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
             assert buyer_payload.state.lowest_bids == lowest_bids
@@ -309,8 +302,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-      {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      Auctions.end_auction(auction)
 
       decision_buyer_payload = auction
       |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
@@ -333,17 +325,16 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
-
-      supplier_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
-
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
       after
         5000 ->
           assert false, "Expected message received nothing."
       end
+      Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
+
+      supplier_payload = auction
+      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -369,7 +360,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
 
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier3.id)
-
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
       after

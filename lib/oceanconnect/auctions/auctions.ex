@@ -99,7 +99,7 @@ defmodule Oceanconnect.Auctions do
     |> Command.start_auction
     |> AuctionStore.process_command
 
-    update_auction(auction, %{auction_start: DateTime.utc_now()})
+    update_auction!(auction, %{auction_start: DateTime.utc_now()})
   end
 
   def end_auction(auction = %Auction{}) do
@@ -141,6 +141,12 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update()
+  end
+
+  def update_auction!(%Auction{} = auction, attrs) do
+    auction
+    |> Auction.changeset(attrs)
+    |> Repo.update!()
   end
 
   def delete_auction(%Auction{} = auction) do
