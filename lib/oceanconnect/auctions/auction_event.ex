@@ -2,9 +2,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
   embedded_schema do
-    field :type
-    field :data
-    field :auction_id
+    field :type, :string
+    field :data, :map
+    field :auction_id, :integer
 
     timestamps
   end
