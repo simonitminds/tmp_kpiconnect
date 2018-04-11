@@ -30,7 +30,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
       {:error, "Auction Store Not Started"} ->
         Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(id)
         |> Oceanconnect.Repo.all
-        |> IO.inspect(label: "HYDRATE")
     end
   end
 
