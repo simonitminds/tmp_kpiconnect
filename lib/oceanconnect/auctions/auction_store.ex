@@ -118,6 +118,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Map.put(:status, :closed)
 
     AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state})
 
     {:noreply, new_state}
   end

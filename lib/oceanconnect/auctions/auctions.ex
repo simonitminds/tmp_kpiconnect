@@ -19,8 +19,6 @@ defmodule Oceanconnect.Auctions do
     |> Command.enter_bid
     |> AuctionBidList.process_command
 
-    
-
     bid
   end
 

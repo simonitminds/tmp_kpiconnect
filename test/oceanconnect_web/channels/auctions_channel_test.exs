@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.{AuctionStore.AuctionState, AuctionSupervisor}
 
   setup do
     buyer_company = insert(:company)
@@ -21,7 +21,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
-    {:ok, _pid} = Auctions.AuctionsSupervisor.start_child(auction.id)
+
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction.id})
 
     state = AuctionState.from_auction(auction.id)
     |> Map.put(:status, :open)
@@ -293,7 +294,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
             assert buyer_payload.state.lowest_bids == lowest_bids

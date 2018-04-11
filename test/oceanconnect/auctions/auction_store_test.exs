@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     supplier2_company = insert(:company)
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000,
                       suppliers: [supplier_company, supplier2_company])
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
+    start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end
 

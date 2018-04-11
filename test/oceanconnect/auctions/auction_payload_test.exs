@@ -11,8 +11,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       supplier = insert(:company, name: "BarCompany")
       supplier_2 = insert(:company, name: "BazCompany")
       auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
-      AuctionsSupervisor.start_child(auction)
-      AuctionsSupervisor.start_child(auction.id)
+      start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
+      start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
 
       auction
       |> Command.start_auction

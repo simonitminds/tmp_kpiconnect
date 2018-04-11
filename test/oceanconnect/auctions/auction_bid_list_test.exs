@@ -12,8 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     |> Map.put("time_entered", DateTime.utc_now())
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction.id)
+    start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
     Oceanconnect.Auctions.start_auction(auction)
     {:ok, %{auction: auction, bid: bid, supplier2_company: supplier2_company}}
   end
