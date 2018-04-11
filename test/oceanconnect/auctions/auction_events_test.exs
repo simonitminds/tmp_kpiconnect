@@ -29,7 +29,24 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
     end
 
-    test "ending an auction add an auction_ended event to the event store", %{auction: auction = %Auction{id: auction_id}} do
+    test "placing a bid adds a bid_placed event to the event store", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      Auctions.start_auction(auction)
+      :timer.sleep(500)
+      Auctions.place_bid(auction, %{"amount" => 1.25}, hd(auction.suppliers).id)
+      :timer.sleep(500)
+
+      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
+      assert [
+        %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+      ] = AuctionEventStore.event_list(auction)
+    end
+
+    test "ending an auction adds an auction_ended event to the event store", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
@@ -37,11 +54,14 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       # We're sleeping so that the decision_duration timer doesn't expire
       # TODO: figure out how to avoid this
-      :timer.sleep(1000)
+      :timer.sleep(500)
 
       assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
-      assert [%AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
-              %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+      assert [
+        %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+      ] = AuctionEventStore.event_list(auction)
     end
+
   end
 end

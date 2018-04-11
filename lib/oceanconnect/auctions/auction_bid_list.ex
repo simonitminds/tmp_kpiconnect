@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionBidList do
   use GenServer
-  alias Oceanconnect.Auctions.Command
+  alias Oceanconnect.Auctions.{AuctionEvent, Command}
   alias __MODULE__.AuctionBid
 
   @registry_name :auction_bids_registry
@@ -87,6 +87,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
   end
 
   def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id}}, current_state) do
+    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid})
     current_bid_list_supplier_ids = Enum.map(current_state, fn(bid) -> bid.supplier_id end)
     unless supplier_id in current_bid_list_supplier_ids do
       Oceanconnect.Auctions.AuctionTimer.maybe_extend_auction(auction_id)
