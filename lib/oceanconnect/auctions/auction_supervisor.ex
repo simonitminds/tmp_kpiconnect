@@ -11,6 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {Oceanconnect.Auctions.AuctionStore, auction_id},
       {Oceanconnect.Auctions.AuctionBidList, auction_id},
       {Oceanconnect.Auctions.AuctionEventStore, auction_id},
+      {Oceanconnect.Auctions.AuctionEventHandler, auction_id}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end

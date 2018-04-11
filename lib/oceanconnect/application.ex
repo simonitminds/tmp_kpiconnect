@@ -19,10 +19,11 @@ defmodule Oceanconnect.Application do
       {Registry, keys: :unique, name: :auction_timers_registry},
       {Registry, keys: :unique, name: :auction_bids_registry},
       {Registry, keys: :unique, name: :auction_event_store_registry},
-      # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
+      {Registry, keys: :unique, name: :auction_event_handler_registry},
       worker(AuctionsSupervisor, [], restart: :permanent),
       worker(TimersSupervisor, [], restart: :permanent),
       worker(AuctionStoreStarter, [])
+      # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

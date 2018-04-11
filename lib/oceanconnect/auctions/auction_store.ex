@@ -2,7 +2,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
   alias Oceanconnect.Auctions.{Auction,
                                AuctionEvent,
-                               AuctionNotifier,
                                AuctionTimer,
                                Command,
                                TimersSupervisor}
@@ -78,7 +77,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state = %AuctionState{current_state | status: :open}
 
     AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state})
-    AuctionNotifier.notify_participants(new_state)
 
     # broadcast to the auction channel
     {:noreply, new_state}
@@ -91,7 +89,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
     new_state = %AuctionState{current_state | status: :decision}
     AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state})
-    AuctionNotifier.notify_participants(new_state)
+
 
     {:noreply, new_state}
   end
@@ -100,8 +98,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast({:end_auction_decision_period, _data}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :expired}
     AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state})
-    AuctionEvent.emit(%AuctionEvent{type: :auction_expired, auction_id: auction_id, data: new_state})
-    AuctionNotifier.notify_participants(new_state)
     {:noreply, new_state}
   end
 
@@ -122,8 +118,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Map.put(:status, :closed)
 
     AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state})
-    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state})
-    AuctionNotifier.notify_participants(new_state)
 
     {:noreply, new_state}
   end
