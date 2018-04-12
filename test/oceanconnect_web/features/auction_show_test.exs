@@ -1,6 +1,6 @@
 defmodule Oceanconnect.AuctionShowTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.{AuctionIndexPage, AuctionShowPage}
+  alias Oceanconnect.AuctionShowPage
   alias Oceanconnect.Auctions
 #  import Hound.Helpers.Session
 
@@ -24,9 +24,9 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   test "auction start", %{auction: auction, buyer: buyer} do
+    Auctions.start_auction(auction)
+
     login_user(buyer)
-    AuctionIndexPage.visit()
-    AuctionIndexPage.start_auction(auction)
     AuctionShowPage.visit(auction.id)
 
     assert AuctionShowPage.is_current_path?(auction.id)
@@ -34,31 +34,23 @@ defmodule Oceanconnect.AuctionShowTest do
     assert AuctionShowPage.time_remaining() |> convert_to_millisecs < auction.duration
   end
 
-  test "Auction realtime start", %{auction: auction, supplier: supplier, buyer: buyer} do
-    login_user(buyer)
-    AuctionIndexPage.visit()
+  test "Auction realtime start", %{auction: auction, supplier: supplier} do
+    login_user(supplier)
+    AuctionShowPage.visit(auction.id)
+    assert AuctionShowPage.is_current_path?(auction.id)
+    assert AuctionShowPage.auction_status == "PENDING"
 
-    in_browser_session(:supplier_session, fn ->
-      login_user(supplier)
-      AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.is_current_path?(auction.id)
-      assert AuctionShowPage.auction_status == "PENDING"
-    end)
+    Auctions.start_auction(auction)
 
-    AuctionIndexPage.start_auction(auction)
-
-    in_browser_session :supplier_session, fn ->
-      assert AuctionShowPage.is_current_path?(auction.id)
-      assert AuctionShowPage.auction_status == "OPEN"
-    end
+    assert AuctionShowPage.is_current_path?(auction.id)
+    assert AuctionShowPage.auction_status == "OPEN"
   end
 
 
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
+      Auctions.start_auction(auction)
       login_user(buyer)
-      AuctionIndexPage.visit()
-      AuctionIndexPage.start_auction(auction)
       AuctionShowPage.visit(auction.id)
       :ok
     end
