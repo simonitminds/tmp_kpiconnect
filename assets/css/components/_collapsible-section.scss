@@ -23,12 +23,12 @@
     }
   }
 
-  &.is-open .collapsible-section__toggle-icon:after { // Opened Section Styles
-    content: "\f106";
-  }
-  &.is-closed .collapsible-section__toggle-icon:after { // Closed Section Styles
-    content: "\f107";
-  }
+  // &.is-open .collapsible-section__toggle-icon:after { // Opened Section Styles
+  //   content: "\f106";
+  // }
+  // &.is-closed .collapsible-section__toggle-icon:after { // Closed Section Styles
+  //   content: "\f107";
+  // }
 }
 
 .collapsible-section__counter { // Counter of number of auctions in a given section

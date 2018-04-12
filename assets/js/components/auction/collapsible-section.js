@@ -178,7 +178,7 @@ class CollapsibleSection extends Component {
             >
               <span>{trigger}</span>
               <span className="collapsible-section__counter tag is-medium is-primary">{this.props.contentChildCount}</span>
-              <span className="collapsible-section__toggle-icon"></span>
+              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
             </h2>
           </div>
         </div>
