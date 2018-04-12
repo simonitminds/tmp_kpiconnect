@@ -44,11 +44,15 @@ export default class AuctionsIndex extends React.Component {
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
     const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
 
+    const filteredAuctionPayloads = (status) => {
+      return _.filter(this.props.auctionPayloads, (auctionPayload) => {
+          return(auctionPayload.state.status === status)
+        });
+    }
+
     const filteredAuctionsDisplay = (status) => {
-      const filteredAuctionPayloads = _.filter(this.props.auctionPayloads, (auctionPayload) =>
-        { return(auctionPayload.state.status === status) }
-      );
-      if(_.isEmpty(filteredAuctionPayloads)) {
+      const filteredPayloads = filteredAuctionPayloads(status);
+      if(_.isEmpty(filteredPayloads)) {
         return(
           <div className="empty-list">
             <em>{`You have no ${status} auctions`}</em>
@@ -56,7 +60,7 @@ export default class AuctionsIndex extends React.Component {
       } else {
         return(
           <div className="columns is-multiline">
-            { _.map(filteredAuctionPayloads, (auctionPayload) => {
+            { _.map(filteredPayloads, (auctionPayload) => {
               if (currentUserIsBuyer(auctionPayload.auction)) {
                 return <BuyerAuctionCard
                   key={auctionPayload.auction.id}
@@ -75,7 +79,7 @@ export default class AuctionsIndex extends React.Component {
       }
     };
     const filteredAuctionsCount = (status) => {
-      return filteredAuctionsDisplay(status).props.children.length;
+      return filteredAuctionPayloads(status).length;
     }
 
     return (
