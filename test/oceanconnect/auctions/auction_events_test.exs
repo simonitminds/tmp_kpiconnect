@@ -1,15 +1,14 @@
 defmodule Oceanconnect.Auctions.AuctionEventsTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore}
+  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionSupervisor}
 
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
 
-    start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
-    start_supervised({Oceanconnect.Auctions.TimersSupervisor, []})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end

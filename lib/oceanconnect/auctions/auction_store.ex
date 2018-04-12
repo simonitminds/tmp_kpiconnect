@@ -3,8 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   alias Oceanconnect.Auctions.{Auction,
                                AuctionEvent,
                                AuctionTimer,
-                               Command,
-                               TimersSupervisor}
+                               Command}
 
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
@@ -66,30 +65,24 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:reply, current_state, current_state}
   end
 
-  def handle_cast({:start_auction, %{id: auction_id, duration: duration}}, current_state) do
-    # Get the current Auction State from current_state
-    # process the start_auction command based on that state.
-    case TimersSupervisor.start_timer({auction_id, duration, :duration}) do
-      {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
-      error -> error
-    end
+  def handle_cast({:start_auction, auction = %Auction{id: auction_id}}, current_state) do
+    auction
+    |> Command.start_duration_timer
+    |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :open}
-
     AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state})
 
-    # broadcast to the auction channel
     {:noreply, new_state}
   end
 
-  def handle_cast({:end_auction, %{id: auction_id, decision_duration: decision_duration}}, current_state = %{status: :open}) do
-    case TimersSupervisor.start_timer({auction_id, decision_duration, :decision_duration}) do
-      {:ok, pid} -> _timer_ref = AuctionTimer.get_timer(pid)
-      error -> error
-    end
+  def handle_cast({:end_auction, auction = %Auction{id: auction_id}}, current_state = %{status: :open}) do
+    auction
+    |> Command.start_decision_duration_timer
+    |> AuctionTimer.process_command
+
     new_state = %AuctionState{current_state | status: :decision}
     AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state})
-
 
     {:noreply, new_state}
   end

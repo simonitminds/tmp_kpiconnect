@@ -111,10 +111,10 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        auction_with_participants = auction
+        auction
         |> with_participants
         |> create_supplier_aliases
-        AuctionsSupervisor.start_child(auction_with_participants.id)
+        |> AuctionsSupervisor.start_child
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}

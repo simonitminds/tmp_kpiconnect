@@ -22,7 +22,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
     time_remaining = Time.diff(duration, elapsed_time) * 1_000
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, auction.id})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
     state = AuctionState.from_auction(auction.id)
     |> Map.put(:status, :open)

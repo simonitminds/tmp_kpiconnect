@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionPayload, AuctionStore}
+  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionPayload, AuctionStore, AuctionSupervisor}
 
   setup do
     supplier_company = insert(:company)
@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     |> Map.put("time_entered", DateTime.utc_now())
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
-    start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
     Oceanconnect.Auctions.start_auction(auction)
     {:ok, %{auction: auction, bid: bid, supplier2_company: supplier2_company}}
   end

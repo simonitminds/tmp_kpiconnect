@@ -20,7 +20,7 @@ defmodule Oceanconnect.AuctionIndexTest do
 
   test "auction realtime start", %{auctions: auctions, supplier: supplier} do
     auction = hd(auctions)
-    start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction.id})
+    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
     AuctionIndexPage.visit()
 
     in_browser_session("supplier_session", fn ->
