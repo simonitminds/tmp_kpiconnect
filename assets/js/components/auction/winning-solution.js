@@ -3,11 +3,11 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
 const WinningSolution = ({auctionState}) => {
-  const winningBid = _.get(auctionState, 'winning_bid', {});
+  const winningBid = _.get(auctionState, 'winning_bid');
   console.log(auctionState);
 
   const winningSolutionDisplay = () => {
-    if (winningBid.id) {
+    if (winningBid != null) {
       return (
         <div className={`box auction-solution auction-solution--best qa-winning-solution-${winningBid.id}`}>
           <div className="auction-solution__header">
