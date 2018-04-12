@@ -10,7 +10,7 @@
   &:empty {
     display: none;
   }
-  body >& { // For direct, top-level alerts
+  body >&, #auctions-app >& { // For direct, top-level alerts
     margin: 0 1rem;
     width: calc(100% - 2rem);
     position: absolute;
@@ -21,6 +21,9 @@
     &:empty {
       display: none;
     }
+  }
+  #auctions-app >& { // For show page-specific alerts.
+    top: 13px;
   }
   .content >& {
     margin-bottom: 1rem;
