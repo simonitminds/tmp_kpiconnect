@@ -83,8 +83,8 @@ export default class AuctionsIndex extends React.Component {
     }
 
     return (
-      <div className="has-margin-top-xl has-padding-top-lg">
-        <div className="container is-fullhd">
+      <div>
+        <div className="container is-fullhd has-margin-top-xl">
           <div className="content has-margin-top-lg is-clearfix">
             <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
             <a href="/auctions/new" className="button is-link is-pulled-right">
