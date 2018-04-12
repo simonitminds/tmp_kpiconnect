@@ -52,7 +52,6 @@
     &:checked + .invite-selector__facade:before {
       background-color: $green;
       border: 1px solid darken($green, 5%);
-      content: "\f00c";
     }
 
     // Hover colors for buttons.
@@ -70,8 +69,17 @@
       &+ .invite-selector__facade:before {
         background-color: darken($green, 10%);
         border: 1px solid darken($green, 15%);
-        content: "\f068";
         padding-top: 5px;
+      }
+    }
+    &:checked:hover { // Swap out icons if hovering over checkbox when checked.
+      &+ .invite-selector__facade i {
+        &.default-only {
+          display: none;
+        }
+        &.hover-only {
+          display: inline-block;
+        }
       }
     }
   }
@@ -89,13 +97,27 @@
   z-index: 1;
   transition: all 0.2s ease-in-out;
 
+  i {
+    color: white;
+    position: relative;
+    z-index: 2;
+    margin: 0 auto;
+    top: 4px;
+    left: 9px;
+
+    &.default-only {
+      display: inline-block;
+    }
+    &.hover-only {
+      display: none;
+    }
+  }
+
   &:before {
     display: block;
-    font-family: "FontAwesome";
     background-color: $gray-2;
     border: 1px solid darken($gray-2, 5%);
-    color: white;
-    content: "\f067";
+    content: "";
     width: 31px;
     height: 32px;
     margin: -1px;
