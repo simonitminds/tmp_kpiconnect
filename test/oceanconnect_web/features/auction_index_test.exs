@@ -6,74 +6,80 @@ defmodule Oceanconnect.AuctionIndexTest do
   setup do
     buyer_company = insert(:company)
     buyer = insert(:user, company: buyer_company)
-    login_user(buyer)
     supplier_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     auctions = insert_list(2, :auction, buyer: buyer_company, suppliers: [supplier_company])
-    {:ok, %{auctions: auctions, supplier: supplier}}
+    {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
   end
 
-  test "renders the default auction index page", %{auctions: auctions} do
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.is_current_path?()
-    assert AuctionIndexPage.has_auctions?(auctions)
+  describe "buyer login" do
+    setup %{auctions: auctions, buyer: buyer} do
+      auction = auctions |> hd
+      Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+      login_user(buyer)
+      AuctionIndexPage.visit()
+      {:ok, %{auction: auction}}
+    end
+
+    test "renders the default auction index page", %{auctions: auctions} do
+      assert AuctionIndexPage.is_current_path?()
+      assert AuctionIndexPage.has_auctions?(auctions)
+    end
+
+    test "buyer can see his view of the auction card", %{auction: auction} do
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+    end
+
+    test "buyer/supplier can see his respective view per auction", %{auction: auction} do
+      supplier_auction = insert(:auction, suppliers: [auction.buyer])
+
+      AuctionIndexPage.visit()
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+      assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "invitation-controls")
+    end
+
+    test "user can only see auctions they participate in", %{auctions: auctions} do
+      non_participant_auctions = insert_list(2, :auction)
+      supplier_auction = insert(:auction, suppliers: [hd(auctions).buyer])
+
+      AuctionIndexPage.visit()
+      assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
+      refute AuctionIndexPage.has_auctions?(non_participant_auctions)
+    end
+
+    test "can start auction manually with start auction button", %{auction: auction} do
+      :timer.sleep(1_000) # Ensures auction card is rendered after reveal animation
+      assert AuctionIndexPage.auction_is_status?(auction, "pending")
+      AuctionIndexPage.start_auction(auction)
+      :timer.sleep(1_000) # Ensures auction card is rendered after reveal animation
+      assert AuctionIndexPage.auction_is_status?(auction, "open")
+    end
   end
 
-  test "auction realtime start", %{auctions: auctions, supplier: supplier} do
-    auction = hd(auctions)
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    AuctionIndexPage.visit()
-
-    in_browser_session("supplier_session", fn ->
+  describe "supplier login" do
+    setup %{auctions: auctions, supplier: supplier} do
+      auction = auctions |> hd
+      Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
       login_user(supplier)
       AuctionIndexPage.visit()
+      {:ok, %{auction: auction}}
+    end
+
+    test "supplier can see his view of the auction card", %{auction: auction} do
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "invitation-controls")
+      refute AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+    end
+
+    test "supplier sees realtime start", %{auction: auction} do
       assert AuctionIndexPage.is_current_path?
       assert AuctionIndexPage.auction_is_status?(auction, "pending")
-    end)
 
-    AuctionIndexPage.start_auction(auction)
+      Oceanconnect.Auctions.start_auction(auction)
 
-    in_browser_session "supplier_session", fn ->
       assert AuctionIndexPage.is_current_path?()
       assert AuctionIndexPage.auction_is_status?(auction, "open")
       :timer.sleep(500)
       assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
     end
   end
-
-  test "buyer can see his view of the auction card", %{auctions: auctions} do
-    auction = auctions |> hd
-
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
-  end
-
-  test "supplier can see his view of the auction card", %{auctions: auctions, supplier: supplier} do
-    auction = auctions |> hd
-
-    login_user(supplier)
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.has_field_in_auction?(auction.id, "invitation-controls")
-    refute AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
-  end
-
-  test "supplier/buyer can see his respective view per auction", %{auctions: auctions} do
-    auction = auctions |> hd
-    supplier_auction = insert(:auction, suppliers: [hd(auctions).buyer])
-
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
-    assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "invitation-controls")
-  end
-
-  test "user can only see auctions they participate in", %{auctions: auctions} do
-    non_participant_auctions = insert_list(2, :auction)
-    supplier_auction = insert(:auction, suppliers: [hd(auctions).buyer])
-
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
-    refute AuctionIndexPage.has_auctions?(non_participant_auctions)
-  end
-
-
 end

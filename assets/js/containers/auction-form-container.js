@@ -55,7 +55,7 @@ export class AuctionFormContainer extends React.Component {
 
   render() {
     if (this.props.loading) {
-      return <div className="alert is-info">Loading...</div>
+      return <div className="alert is-info">Loading...</div>;
     } else {
       return <AuctionForm {...this.props} />;
     }

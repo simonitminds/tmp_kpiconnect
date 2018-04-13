@@ -7,10 +7,16 @@
 // ======= CONTAINER ======= //
 
 main {
-  margin-top: 8rem;
+  transition: all 0.2s ease-out;
+  
+  .alert + &, .alert:not(:empty) + .alert:empty + &{
+    top: 6.25rem;
+    height: calc(100% - 6.25rem);
+  }
 
-  .alert + &{
-    margin-top: 10rem;
+  .alert:empty + &{
+    top: 3.25rem;
+    height: calc(100% - 3.25rem);
   }
 }
 
@@ -20,15 +26,23 @@ main {
 
 // ==== SECTIONS/DIVIDERS ==== //
 
+main {
+  position: fixed;
+  top: 3.25rem;
+  width: 100vw;
+  height: calc(100vh - 3.25rem);
+  overflow-y: scroll;
+}
+
 section {
   &.auction-list { // Bunker list divisions based on auction status.
-    padding-bottom: 2rem;
+    padding-bottom: 1.25rem;
 
     &:last-child {
       padding-bottom: 4rem;
     }
 
-    &> .container {
+    &> .container:first-child {
       padding-top: 2rem !important;
     }
 
@@ -55,15 +69,16 @@ section {
       }
     }
   }
-  &.auction-page { // Form divisions for Auction Show Page
-    padding: 0 1rem;
+}
 
-    &.auction-page--gray {
-      background-color: $gray-0;
+.auction-page { // For container-agnostic classes
+  padding: 0 1rem;
 
-      .empty-list {
-        background-color: white;
-      }
+  &.auction-page--gray {
+    background-color: $gray-0;
+
+    .empty-list {
+      background-color: white;
     }
   }
 }

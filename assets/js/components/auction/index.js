@@ -5,6 +5,7 @@ import { timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
+import CollapsibleSection from './collapsible-section';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -43,11 +44,15 @@ export default class AuctionsIndex extends React.Component {
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
     const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
 
+    const filteredAuctionPayloads = (status) => {
+      return _.filter(this.props.auctionPayloads, (auctionPayload) => {
+          return(auctionPayload.state.status === status)
+        });
+    }
+
     const filteredAuctionsDisplay = (status) => {
-      const filteredAuctionPayloads = _.filter(this.props.auctionPayloads, (auctionPayload) =>
-        { return(auctionPayload.state.status === status) }
-      );
-      if(_.isEmpty(filteredAuctionPayloads)) {
+      const filteredPayloads = filteredAuctionPayloads(status);
+      if(_.isEmpty(filteredPayloads)) {
         return(
           <div className="empty-list">
             <em>{`You have no ${status} auctions`}</em>
@@ -55,7 +60,7 @@ export default class AuctionsIndex extends React.Component {
       } else {
         return(
           <div className="columns is-multiline">
-            { _.map(filteredAuctionPayloads, (auctionPayload) => {
+            { _.map(filteredPayloads, (auctionPayload) => {
               if (currentUserIsBuyer(auctionPayload.auction)) {
                 return <BuyerAuctionCard
                   key={auctionPayload.auction.id}
@@ -73,10 +78,13 @@ export default class AuctionsIndex extends React.Component {
           </div>);
       }
     };
+    const filteredAuctionsCount = (status) => {
+      return filteredAuctionPayloads(status).length;
+    }
 
     return (
-      <div className="has-margin-top-xl has-padding-top-lg">
-        <div className="container is-fullhd">
+      <div>
+        <div className="container is-fullhd has-margin-top-xl">
           <div className="content has-margin-top-lg is-clearfix">
             <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
             <a href="/auctions/new" className="button is-link is-pulled-right">
@@ -94,51 +102,46 @@ export default class AuctionsIndex extends React.Component {
 
           </div>
         </div>
-
-        <section className="auction-list qa-open-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content has-gray-lighter">
-              <h2>Active Auctions</h2>
-              { filteredAuctionsDisplay("open") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Auctions In Decision</h2>
-              { filteredAuctionsDisplay("decision") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-pending-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Upcoming Auctions</h2>
-              { filteredAuctionsDisplay("pending") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Closed Auctions</h2>
-              { filteredAuctionsDisplay("closed") }
-            </div>
-          </div>
-        </section>
-
-        <section className="auction-list qa-completed-auctions-list">
-          <div className="container is-fullhd">
-            <div className="content">
-              <h2>Expired Auctions</h2>
-              { filteredAuctionsDisplay("expired") }
-            </div>
-          </div>
-        </section>
+        <CollapsibleSection
+          trigger="Active Auctions"
+          classParentString="auction-list qa-open-auctions-list"
+          contentChildCount={filteredAuctionsCount("open")}
+          open={filteredAuctionsCount("open") > 0}
+          >
+          { filteredAuctionsDisplay("open") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Auctions In Decision"
+          classParentString="auction-list qa-decision-auctions-list"
+          contentChildCount={filteredAuctionsCount("decision")}
+          open={filteredAuctionsCount("decision") > 0}
+          >
+          { filteredAuctionsDisplay("decision") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Upcoming Auctions"
+          classParentString="auction-list qa-pending-auctions-list"
+          contentChildCount={filteredAuctionsCount("pending")}
+          open={filteredAuctionsCount("pending") > 0}
+          >
+          { filteredAuctionsDisplay("pending") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Closed Auctions"
+          classParentString="auction-list qa-closed-auctions-list"
+          contentChildCount={filteredAuctionsCount("closed")}
+          open={filteredAuctionsCount("closed") > 0}
+          >
+          { filteredAuctionsDisplay("closed") }
+        </CollapsibleSection>
+        <CollapsibleSection
+          trigger="Expired Auctions"
+          classParentString="auction-list qa-expired-auctions-list"
+          contentChildCount={filteredAuctionsCount("expired")}
+          open={filteredAuctionsCount("expired") > 0}
+          >
+          { filteredAuctionsDisplay("expired") }
+        </CollapsibleSection>
       </div>
     );
   }

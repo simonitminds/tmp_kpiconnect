@@ -44,7 +44,7 @@ const SupplierList = (props) => {
                           checked={!!isSelected(supplier.id)}
                           onChange={onToggleSupplier.bind(this, supplier.id)}
                         />
-                        <span className="invite-selector__facade"></span>
+                        <span className="invite-selector__facade"><i className={`fas ${isSelected(supplier.id) ? `fa-check` : `fa-plus`} default-only`}></i><i className="fas fa-minus hover-only"></i></span>
                         <span className="invite-selector__label">{supplier.name}</span>
                       </label>
                     </div>

@@ -14,6 +14,7 @@ import SupplierBidList from './supplier-bid-list';
 import BiddingForm from './bidding-form';
 import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
+import MediaQuery from 'react-responsive';
 
 
 export default class AuctionShow extends React.Component {
@@ -123,7 +124,9 @@ export default class AuctionShow extends React.Component {
 
     return (
       <div>
-        <AuctionBreadCrumbs auction={auction} />
+        <MediaQuery query="(min-width: 768px)">
+          <AuctionBreadCrumbs auction={auction} />
+        </MediaQuery>
         <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} />
         <section className="auction-page"> {/* Auction details */}
           <div className="container">

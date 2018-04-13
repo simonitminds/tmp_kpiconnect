@@ -14,7 +14,7 @@ $navbar-background-color: $primary;
 .navbar-brand {
   justify-content: space-between;
 
-  a:last-child { // FIXME: This is a stopgap until we get a more robust nav in place.
+  a:last-child:not(:only-child) { // FIXME: This is a stopgap until we get a more robust nav in place.
     @media (min-width: 1024px) {
       display: none;
     }

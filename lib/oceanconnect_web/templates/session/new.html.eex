@@ -1,4 +1,4 @@
-<div className="container is-fullhd">
+<div class="container is-fullhd">
   <div class="content">
     <div class="columns is-centered">
       <div class="column is-two-fifths has-padding-left-lg has-padding-right-lg">
