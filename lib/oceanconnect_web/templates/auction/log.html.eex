@@ -1,0 +1,24 @@
+<div class="container is-fullhd">
+  <div class="content has-margin-top-lg">
+    <h1 class="title is-3 has-text-weight-bold">Auction Event Log</h1>
+  </div>
+</div>
+
+<table class="table is-fullwidth is-striped is-marginless">
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Type</th>
+      <th>Data</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for event <- @events do %>
+      <tr>
+        <td><%= event.time %></td>
+        <td class="qa-event-type"><%= event.type %></td>
+        <td><%= event.data %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

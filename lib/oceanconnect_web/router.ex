@@ -37,7 +37,8 @@ defmodule OceanconnectWeb.Router do
     pipe_through :authenticated # Routes requiring authentication
     delete "/sessions/logout", SessionController, :delete
     resources "/auctions", AuctionController, except: [:delete]
-    get "/auctions/start/:id", AuctionController, :start
+    get "/auctions/:id/log", AuctionController, :log
+    get "/auctions/:id/start", AuctionController, :start
     resources "/ports", PortController
     resources "/vessels", VesselController
     resources "/fuels", FuelController
