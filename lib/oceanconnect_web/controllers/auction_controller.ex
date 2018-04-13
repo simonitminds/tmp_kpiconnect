@@ -9,12 +9,24 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def log(conn, %{"id" => id}) do
-    events = id
-    |> Auctions.get_auction!
-    |> AuctionEventStore.event_list
-    |> make_data_renderable
 
-    render(conn, "log.html", events: events)
+    current_company_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.with_participants
+
+    with %Auction{} <- auction,
+      true <- current_company_id == auction.buyer_id,
+      false <- Auctions.get_auction_state!(auction).status in [:pending, :open]
+    do
+      events = auction
+      |> AuctionEventStore.event_list
+      |> make_data_renderable
+
+      render(conn, "log.html", events: events)
+    else
+      _ -> redirect(conn, to: auction_path(conn, :index))
+    end
   end
 
   defp make_data_renderable(events) do

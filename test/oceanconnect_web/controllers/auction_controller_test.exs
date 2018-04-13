@@ -153,4 +153,50 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Edit Auction"
     end
   end
+
+  describe "auction log" do
+
+    setup(context) do
+      start_supervised({Oceanconnect.Auctions.AuctionSupervisor, context.auction})
+      {:ok, context}
+    end
+
+    test "a supplier cannot view log", %{auction: auction, supplier: supplier} do
+      auction
+      |> Auctions.start_auction()
+      |> Auctions.end_auction()
+
+      conn = build_conn()
+      |> login_user(supplier)
+      |> get(auction_path(build_conn(), :log, auction))
+
+      assert redirected_to(conn, 302) == "/auctions"
+    end
+
+    test "buyer cannot view log if :pending or :open", %{auction: auction, conn: authed_conn} do
+      conn = authed_conn
+      |> get(auction_path(build_conn(), :log, auction))
+
+      assert redirected_to(conn, 302) == "/auctions"
+
+      auction
+      |> Auctions.start_auction()
+
+      conn = authed_conn
+      |> get(auction_path(build_conn(), :log, auction))
+
+      assert redirected_to(conn, 302) == "/auctions"
+    end
+
+    test "a buyer can view log for an closed auction", %{auction: auction, conn: authed_conn} do
+      auction
+      |> Auctions.start_auction()
+      |> Auctions.end_auction()
+
+      conn = authed_conn
+      |> get(auction_path(build_conn(), :log, auction))
+
+      assert html_response(conn, 200)
+    end
+  end
 end

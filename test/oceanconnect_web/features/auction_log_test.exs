@@ -35,15 +35,4 @@ defmodule Oceanconnect.AuctionLogTest do
     assert AuctionLogPage.has_event_types?(expected_events)
   end
 
-  # test "supplier cannot view log", %{auction: auction, supplier: supplier} do
-  #   login_user(supplier)
-  #   AuctionLogPage.visit(auction.id)
-  #   assert
-  # end
-
-  # test "buyer cannot view log if :pending or :open", %{auction: auction, buyer: buyer} do
-  #   login_user(buyer)
-  #   AuctionLogPage.visit(auction.id)
-  #   assert
-  # end
 end

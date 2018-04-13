@@ -14,7 +14,6 @@ defmodule OceanconnectWeb.Api.BidController do
          true <- supplier_id in Auctions.auction_supplier_ids(auction)
     do
       Auctions.place_bid(auction, updated_bid_params, supplier_id)
-
       render(conn, "show.json", data: %{})
     else
       _ -> conn
