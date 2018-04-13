@@ -9,9 +9,16 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
+To run tests locally:
+
+* Install Selenium with `brew install selenium-server-standalone`
+* Install Chromedriver with  `brew install chromedriver`
+* Start Selenium with `selenium-server`
+* In another terminal window, run `mix test`
+
 ## Nanobox
 
-We use Nanobox for deployments to Azure
+We use Nanobox for deployments to Azure.
 
 * Create an account and install nanobox: https://dashboard.nanobox.io/download
 * Run `nanobox dns add local phoenix.local`
@@ -38,3 +45,15 @@ Nanobox article on phoenix and azure deploys:
 https://content.nanobox.io/how-to-deploy-phoenix-applications-to-microsoft-azure-with-nanobox/#updatethedatabaseconnection
 
 Nanobox guides: https://guides.nanobox.io/elixir/phoenix/existing-app/
+
+### Git Process for Branch Merging
+
+* Run `git checkout master`
+* Run `git pull --rebase`
+* Run `git checkout [branch]`
+* Run `git rebase master`
+* Confirm all tests still pass with `mix test`
+* Run `git push -f`
+* Run `git checkout master`
+* Run `git merge --no-ff [branch]`
+* Run `git push origin master`
