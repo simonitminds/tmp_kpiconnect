@@ -6,12 +6,12 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     field :data, :map
     field :auction_id, :integer
 
-    timestamps
+    timestamps()
   end
 
   alias __MODULE__
 
-  def emit(event = %AuctionEvent{type: type, auction_id: id, data: data}) do
+  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}) do
     Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", event)
   end
 end

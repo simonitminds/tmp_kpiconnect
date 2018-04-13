@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionEventStorage do
   use Ecto.Schema
-  import Ecto.{Changeset, Query}
+  import Ecto.Query
 
   schema "auction_events" do
     belongs_to :auction, Oceanconnect.Auctions.Auction
