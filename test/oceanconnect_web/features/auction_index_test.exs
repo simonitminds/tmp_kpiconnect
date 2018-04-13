@@ -12,19 +12,11 @@ defmodule Oceanconnect.AuctionIndexTest do
     {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
   end
 
-  test "renders the default auction index page", %{auctions: auctions} do
-    AuctionIndexPage.visit()
-    assert AuctionIndexPage.is_current_path?()
-    assert AuctionIndexPage.has_auctions?(auctions)
-  end
-
-  test "auction realtime start", %{auctions: auctions, supplier: supplier} do
-    auction = hd(auctions)
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
-    AuctionIndexPage.visit()
-
-    in_browser_session("supplier_session", fn ->
-      login_user(supplier)
+  describe "buyer login" do
+    setup %{auctions: auctions, buyer: buyer} do
+      auction = auctions |> hd
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+      login_user(buyer)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
     end
@@ -64,10 +56,11 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
   end
 
+
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
       auction = auctions |> hd
-      Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
       login_user(supplier)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
