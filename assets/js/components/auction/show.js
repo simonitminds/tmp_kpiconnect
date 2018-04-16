@@ -162,6 +162,7 @@ export default class AuctionShow extends React.Component {
                         </li>
                       </ul>
                     </div>
+                    { auctionLogLinkDisplay() }
                     { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
                     { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
