@@ -4,6 +4,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
   use GenServer
   @registry_name :auction_event_store_registry
+  @event_storage Application.get_env(:oceanconnect, :event_storage) || AuctionEventStorage
+
   # Client
 
   #TODO try and remove the fetching of events to init.
@@ -28,9 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     case find_pid(id) do
       {:ok, pid} -> GenServer.call(pid, :get_event_list)
       {:error, "Auction Store Not Started"} ->
-        Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(id)
-        |> Oceanconnect.Repo.all
-        |> Enum.sort_by(&(&1.time_entered), &>=/2)
+        @event_storage.events_by_auction(id)
     end
   end
 
@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   end
 
   def handle_info(event = %AuctionEvent{auction_id: auction_id}, current_events) do
-    {:ok, %AuctionEventStorage{event: persisted_event}} = Repo.insert(%AuctionEventStorage{event: event, auction_id: auction_id})
+    {:ok, %AuctionEventStorage{event: persisted_event}} = @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
     events = [persisted_event | current_events]
     {:noreply, events}
   end
