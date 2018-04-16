@@ -4,6 +4,13 @@
   </div>
 </div>
 
+<div className="auction-header__po is-uppercase">
+  Auction <%= @auction.po %>
+</div>
+<h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
+  <%= @auction.vessel.name %> <span className="auction-header__vessel__imo">(<%= @auction.vessel.imo %>)</span>
+</h1>
+
 <table class="table is-fullwidth is-striped is-marginless">
   <thead>
     <tr>

@@ -13,7 +13,7 @@ defmodule OceanconnectWeb.AuctionController do
     current_company_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
     auction = id
     |> Auctions.get_auction!
-    |> Auctions.with_participants
+    |> Auctions.fully_loaded
 
     with %Auction{} <- auction,
       true <- current_company_id == auction.buyer_id,
@@ -23,7 +23,7 @@ defmodule OceanconnectWeb.AuctionController do
       |> AuctionEventStore.event_list
       |> make_data_renderable
 
-      render(conn, "log.html", events: events)
+      render(conn, "log.html", auction: auction, events: events)
     else
       _ -> redirect(conn, to: auction_path(conn, :index))
     end
