@@ -104,14 +104,14 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     GenServer.call(pid, :get_timer_ref)
   end
 
-  def maybe_extend_auction(auction_id) do
+  def maybe_extend_auction(auction_id, time_entered) do
     time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
     if time_remaining <= @extension_time do
       auction_id
       |> Command.extend_duration
       |> AuctionTimer.process_command
 
-      AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: @extension_time}})
+      AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: @extension_time}, time_entered: time_entered})
     end
   end
 

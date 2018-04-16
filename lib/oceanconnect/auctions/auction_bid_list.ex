@@ -19,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       total_price: nil,
       time_entered: nil
 
-    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
+    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id, "time_entered" => time_entered}, auction = %Oceanconnect.Auctions.Auction{}) do
       params = %{
         id: UUID.uuid4(:hex),
         auction_id: auction.id,
@@ -27,7 +27,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
         fuel_id: auction.fuel_id,
         fuel_quantity: auction.fuel_quantity,
         supplier_id: supplier_id,
-        time_entered: DateTime.utc_now()
+        time_entered: time_entered
       }
       Map.merge(%AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}, params)
     end
@@ -86,11 +86,11 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
     {:reply, bid, current_state}
   end
 
-  def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id}}, current_state) do
-    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid})
+  def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id, time_entered: time_entered}}, current_state) do
+    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered})
     current_bid_list_supplier_ids = Enum.map(current_state, fn(bid) -> bid.supplier_id end)
     unless supplier_id in current_bid_list_supplier_ids do
-      Oceanconnect.Auctions.AuctionTimer.maybe_extend_auction(auction_id)
+      Oceanconnect.Auctions.AuctionTimer.maybe_extend_auction(auction_id, time_entered)
     end
     new_state = [bid | current_state]
     {:noreply, new_state}

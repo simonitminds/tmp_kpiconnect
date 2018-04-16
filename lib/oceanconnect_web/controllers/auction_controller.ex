@@ -34,7 +34,7 @@ defmodule OceanconnectWeb.AuctionController do
       updated_data = event.data |> convert_dates
       event
       |> Map.put(:data, updated_data |> Poison.encode!)
-      |> Map.put(:time, event.inserted_at |> convert_date?)
+      |> Map.put(:time, event.time_entered |> convert_date?)
     end)
   end
 

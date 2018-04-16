@@ -59,6 +59,7 @@ defmodule Oceanconnect.Factory do
 
   def create_bid_for_auction(bid_params, auction) do
     bid_params
+    |> Map.put("time_entered", DateTime.utc_now())
     |> Oceanconnect.Auctions.AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
     |> Command.enter_bid
     |> AuctionBidList.process_command

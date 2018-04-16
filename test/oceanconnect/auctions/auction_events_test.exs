@@ -82,5 +82,24 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction)
     end
+
+    test "ensure events are in proper order", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      Auctions.start_auction(auction)
+      Auctions.place_bid(auction, %{"amount" => 1.25}, hd(auction.suppliers).id)
+      Auctions.place_bid(auction, %{"amount" => 1.50}, hd(auction.suppliers).id)
+      Auctions.end_auction(auction)
+      :timer.sleep(500)
+
+      assert [
+        %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+      ] = AuctionEventStore.event_list(auction)
+    end
   end
 end

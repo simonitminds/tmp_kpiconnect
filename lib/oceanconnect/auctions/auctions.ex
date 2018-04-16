@@ -6,9 +6,10 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id) do
+  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id, time_entered \\ DateTime.utc_now()) do
     bid = bid_params
     |> Map.put("supplier_id", supplier_id)
+    |> Map.put("time_entered", time_entered)
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
     bid

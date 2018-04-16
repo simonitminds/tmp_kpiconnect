@@ -30,6 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
       {:error, "Auction Store Not Started"} ->
         Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(id)
         |> Oceanconnect.Repo.all
+        |> Enum.sort_by(&(&1.time_entered), &>=/2)
     end
   end
 
@@ -45,7 +46,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   end
 
   def handle_call(:get_event_list, _from, current_state) do
-    {:reply, current_state, current_state}
+    new_state = Enum.sort_by(current_state, &(&1.time_entered), &>=/2)
+    {:reply, new_state, new_state}
   end
 
   def handle_info(event = %AuctionEvent{auction_id: auction_id}, current_events) do

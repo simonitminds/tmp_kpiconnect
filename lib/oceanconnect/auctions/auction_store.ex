@@ -71,7 +71,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :open}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
 
     {:noreply, new_state}
   end
@@ -82,7 +82,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :decision}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
 
     {:noreply, new_state}
   end
@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:end_auction_decision_period, _data}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :expired}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
     {:noreply, new_state}
   end
 
@@ -110,22 +110,22 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)
 
-    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state})
-    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state})
+    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
 
     {:noreply, new_state}
   end
 
-  defp set_lowest_bids?(bid, _amount, current_state, nil) do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id)
+  defp set_lowest_bids?(bid = %{time_entered: time_entered}, _amount, current_state, nil) do
+    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
     %AuctionState{current_state | lowest_bids: [bid]}
   end
-  defp set_lowest_bids?(bid, amount, current_state, lowest_amount) when lowest_amount > amount do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id)
+  defp set_lowest_bids?(bid = %{time_entered: time_entered}, amount, current_state, lowest_amount) when lowest_amount > amount do
+    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
     %AuctionState{current_state | lowest_bids: [bid]}
   end
-  defp set_lowest_bids?(bid, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id)
+  defp set_lowest_bids?(bid = %{time_entered: time_entered}, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
+    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
     %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}
   end
   defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: current_state
