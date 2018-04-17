@@ -1,0 +1,52 @@
+// ========================== //
+// ========================== //
+// REPORTS
+// ========================== //
+// ========================== //
+
+.report {
+  h1 {
+    @media print {
+      border-top: 2px solid $gray-2;
+      margin-top: 0.5rem;
+      padding-top: 2rem;
+    }
+  }
+  h2 {
+    @media print {
+      border-bottom: 2px solid $gray-2;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem !important;
+    }
+  }
+}
+
+.report__table--log {
+  td:nth-child(3), th:nth-child(3) { // Get the JSON column under control...
+    word-wrap: break-word;
+    max-width: 400px;
+  }
+  td:only-child { // Get the JSON column under control... (mobile)
+    word-wrap: break-word;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+.report__table--auction-details {
+  th {
+    width: 160px;
+  }
+}
+
+table[class*=" report__table"] {
+  .content & {
+    tr:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+
+.report__logo--print {
+  width: 300px;
+}

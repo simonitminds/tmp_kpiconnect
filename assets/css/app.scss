@@ -12,6 +12,7 @@
 @import 'components/collapsible-section';
 @import 'components/invite-checkboxes';
 @import 'components/navbar';
+@import 'components/reports';
 
 // Import Bulma
 @import 'bulma';
@@ -37,6 +38,9 @@
 // Import Vendor Styles
 @import 'vendor/datepicker';
 @import 'vendor/time-picker';
+
+// Import Print Stylesheet
+@import 'print';
 
 // Set overall scaling for rem units
 
