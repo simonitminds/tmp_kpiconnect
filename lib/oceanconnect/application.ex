@@ -16,6 +16,7 @@ defmodule Oceanconnect.Application do
       supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
       {Registry, keys: :unique, name: :auction_supervisor_registry},
       {Registry, keys: :unique, name: :auctions_registry},
+      {Registry, keys: :unique, name: :auction_cache_registry},
       {Registry, keys: :unique, name: :auction_timers_registry},
       {Registry, keys: :unique, name: :auction_bids_registry},
       {Registry, keys: :unique, name: :auction_event_store_registry},

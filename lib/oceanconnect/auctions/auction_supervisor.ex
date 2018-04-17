@@ -1,18 +1,26 @@
 defmodule Oceanconnect.Auctions.AuctionSupervisor do
   use Supervisor
   @registry_name :auction_supervisor_registry
+  alias Oceanconnect.Auctions.{Auction,
+                               AuctionCache,
+                               AuctionBidList,
+                               AuctionEventHandler,
+                               AuctionEventStore,
+                               AuctionStore,
+                               AuctionTimer}
 
-  def start_link(auction_id) do
-    Supervisor.start_link(__MODULE__, auction_id, name: get_auction_supervisor_name(auction_id))
+  def start_link(auction = %Auction{id: auction_id}) do
+    Supervisor.start_link(__MODULE__, auction, name: get_auction_supervisor_name(auction_id))
   end
 
-  def init(%Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}) do
+  def init(auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}) do
     children = [
-      {Oceanconnect.Auctions.AuctionStore, auction_id},
-      {Oceanconnect.Auctions.AuctionBidList, auction_id},
-      {Oceanconnect.Auctions.AuctionEventStore, auction_id},
-      {Oceanconnect.Auctions.AuctionEventHandler, auction_id},
-      {Oceanconnect.Auctions.AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionCache, auction},
+      {AuctionStore, auction_id},
+      {AuctionBidList, auction_id},
+      {AuctionEventStore, auction_id},
+      {AuctionEventHandler, auction_id},
+      {AuctionTimer, {auction_id, duration, decision_duration}},
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end
