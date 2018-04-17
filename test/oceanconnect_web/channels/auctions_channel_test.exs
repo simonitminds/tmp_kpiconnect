@@ -17,17 +17,12 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       buyer: buyer_company, duration: 1_000, decision_duration: 3_000,
       suppliers: [supplier_company, supplier3_company]
     )
-    current_time =  DateTime.utc_now()
-    {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
-    {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
-    time_remaining = Time.diff(duration, elapsed_time) * 1_000
-
     {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
     state = AuctionState.from_auction(auction.id)
     |> Map.put(:status, :open)
     expected_payload = %{
-      time_remaining: time_remaining,
+      time_remaining: auction.duration,
       state: state,
       bid_list: []
     }
@@ -120,28 +115,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       {:ok, non_participant_socket} = connect(OceanconnectWeb.UserSocket, %{token: non_participant_token})
 
       assert {:error, %{reason: "unauthorized"}} = subscribe_and_join(non_participant_socket, OceanconnectWeb.AuctionsChannel, channel)
-    end
-
-    test "auction start begins time remaining countdown", %{buyer_id: buyer_id,
-                                                            auction: auction,
-                                                            expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
-      event = "auctions_update"
-
-      @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
-
-      auction_id = auction.id
-      receive do
-        %Phoenix.Socket.Broadcast{
-          event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
-          topic: ^channel} ->
-            assert payload.time_remaining < expected_payload.time_remaining
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
     end
   end
 
@@ -294,7 +267,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :open, lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
             assert buyer_payload.state.lowest_bids == lowest_bids
@@ -333,7 +306,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
       Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
-
       supplier_payload = auction
       |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
 

@@ -12,7 +12,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   def get_auction_payload!(auction = %Auction{}, user_id) do
     fully_loaded_auction = auction
-    |> Auctions.fully_loaded
     |> maybe_remove_suppliers(user_id)
     auction_state = fully_loaded_auction
     |> Auctions.get_auction_state!
@@ -24,7 +23,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
   def get_auction_payload!(auction = %Auction{}, user_id, auction_state = %AuctionState{}) do
     fully_loaded_auction = auction
-    |> Auctions.fully_loaded
     |> maybe_remove_suppliers(user_id)
     updated_state = auction_state
     |> convert_lowest_bids_for_user(auction, user_id)

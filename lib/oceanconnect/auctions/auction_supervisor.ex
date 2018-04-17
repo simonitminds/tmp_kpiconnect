@@ -18,9 +18,9 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionCache, auction},
       {AuctionStore, auction_id},
       {AuctionBidList, auction_id},
-      {AuctionEventStore, auction_id},
-      {AuctionEventHandler, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionEventStore, auction_id},
+      {AuctionEventHandler, auction_id}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end

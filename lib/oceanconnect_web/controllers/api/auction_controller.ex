@@ -7,7 +7,9 @@ defmodule OceanconnectWeb.Api.AuctionController do
     auction_payloads = user_id
     |> Auctions.list_participating_auctions
     |> Enum.map(fn(auction) ->
-      Auctions.AuctionPayload.get_auction_payload!(auction, user_id)
+      auction
+      |> Auctions.fully_loaded
+      |> Auctions.AuctionPayload.get_auction_payload!(user_id)
     end)
 
     render(conn, "index.json", data: auction_payloads)
