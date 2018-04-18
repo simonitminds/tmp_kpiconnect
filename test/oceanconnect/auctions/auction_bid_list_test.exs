@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
     Oceanconnect.Auctions.start_auction(auction)
-    {:ok, %{auction: auction, supplier_id: supplier_company, supplier2_id: supplier2_company.id}}
+    {:ok, %{auction: auction, supplier_id: supplier_company.id, supplier2_id: supplier2_company.id}}
   end
 
   test "entering a bid for auction", %{auction: auction, supplier_id: supplier_id} do
