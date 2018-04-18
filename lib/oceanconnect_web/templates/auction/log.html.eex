@@ -11,7 +11,7 @@
   <%= @auction_payload.auction.vessel.name %> <span className="auction-header__vessel__imo">(<%= @auction_payload.auction.vessel.imo %>)</span>
 </h1>
 
-WinningBidder <%= @auction_payload.state.winning_bid.supplier %>
+WinningBidder <%= auction_log_supplier(@auction_payload) %>
 
 <table class="table is-fullwidth is-striped is-marginless">
   <thead>
@@ -22,7 +22,7 @@ WinningBidder <%= @auction_payload.state.winning_bid.supplier %>
     </tr>
   </thead>
   <tbody>
-    <%= for event <- @events do %>
+    <%= for event <- auction_log_events(@events) do %>
       <tr>
         <td><%= event.time %></td>
         <td class="qa-event-type"><%= event.type %></td>
