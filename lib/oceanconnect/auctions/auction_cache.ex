@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionCache do
   use GenServer
   @registry_name :auction_cache_registry
-  alias __MODULE__
+  #alias __MODULE__
   alias Oceanconnect.Auctions.{Auction}
   # AuctionStore.AuctionState}
 

@@ -1,5 +1,4 @@
 defmodule Oceanconnect.Auctions.AuctionEventStore do
-  alias Oceanconnect.Repo
   alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStorage}
 
   use GenServer

@@ -32,7 +32,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
     {:noreply, state}
   end
-  def handle_info(event = %AuctionEvent{type: _type, data: auction_state = %AuctionState{}}, state) do
+  def handle_info(%AuctionEvent{type: _type, data: auction_state = %AuctionState{}}, state) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
