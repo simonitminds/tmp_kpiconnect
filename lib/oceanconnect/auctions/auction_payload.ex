@@ -32,9 +32,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     produce_payload(fully_loaded_auction, updated_state, bid_list)
   end
 
-  def convert_to_supplier_names(bid_list, %Auction{id: auction_id, anonymous_bidding: anonymous_bidding}) do
+  def convert_to_supplier_names(bid_list, auction = %Auction{}) do
     Enum.map(bid_list, fn(bid) ->
-      supplier_name = get_name_or_alias(bid.supplier_id, auction_id, anonymous_bidding)
+      supplier_name = get_name_or_alias(bid.supplier_id, auction)
       bid
       |> Map.drop([:__struct__, :supplier_id])
       |> Map.put(:supplier, supplier_name)
@@ -90,11 +90,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     Map.delete(auction, :suppliers)
   end
 
-  defp get_name_or_alias(supplier_id, auction_id, _anonymous_biding = true) do
-    Auctions.get_auction_supplier(auction_id, supplier_id).alias_name
+  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
-  defp get_name_or_alias(supplier_id, _auction_id,  _anonymous_biding) do
-    Oceanconnect.Accounts.get_company!(supplier_id).name
+  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 
   defp get_user_bid_list(%AuctionState{status: :pending}, _auction, _user_id), do: []

@@ -27,12 +27,12 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       bid_list: []
     }
 
-    {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
+    {:ok, %{supplier_id: supplier_company.id,
             supplier_1: supplier_1,
             supplier_2: supplier_2,
             supplier3: supplier3_company,
-            buyer_id: Integer.to_string(buyer_company.id),
-            non_participant_id: Integer.to_string(non_participant_company.id),
+            buyer_id: buyer_company.id,
+            non_participant_id: non_participant_company.id,
             non_participant: non_participant,
             expected_payload: expected_payload,
             auction: auction}}
@@ -42,7 +42,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                 auction: auction,
                                                 expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -65,7 +65,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
                                                     auction: auction,
                                                     expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -108,7 +108,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "joining another companies auction channel is unauthorized", %{supplier_id: supplier_id, non_participant: non_participant} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       user_with_company = Oceanconnect.Accounts.load_company_on_user(non_participant)
       {:ok, non_participant_token, _claims} = Oceanconnect.Guardian.encode_and_sign(user_with_company)
 
@@ -128,7 +128,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -149,7 +149,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -192,7 +192,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -212,7 +212,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -248,21 +248,15 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "buyers get notified", %{auction: auction = %{id: auction_id}, buyer_id: buyer_id, supplier_id: supplier_id} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      receive do
-        %Phoenix.Socket.Broadcast{} -> nil
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
 
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
 
       buyer_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -279,7 +273,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       Auctions.end_auction(auction)
 
       decision_buyer_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -295,19 +289,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id, supplier3: supplier3} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      receive do
-        %Phoenix.Socket.Broadcast{} -> nil
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
-      Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
+
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
       supplier_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -345,7 +334,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       |> Oceanconnect.Auctions.AuctionStore.process_command
 
       decision_supplier_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
       receive do
         %Phoenix.Socket.Broadcast{

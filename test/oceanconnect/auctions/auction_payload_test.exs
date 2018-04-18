@@ -102,6 +102,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
     test "anonymous_bidding", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2}do
       auction = Oceanconnect.Repo.update!(Ecto.Changeset.change(auction, %{anonymous_bidding: true}))
+      |> Auctions.create_supplier_aliases
+      |> Auctions.fully_loaded
+
+      Auctions.AuctionCache.update_cache(auction)
 
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       Auctions.place_bid(auction, bid_params, supplier.id)

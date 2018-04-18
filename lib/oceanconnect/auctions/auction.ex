@@ -6,7 +6,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   @current_time_trunc %DateTime{DateTime.utc_now() | hour: 0, minute: 0, second: 0}
 
-  @derive {Poison.Encoder, except: [:__meta__]}
+  @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
     belongs_to :port, Port
     belongs_to :vessel, Vessel
@@ -23,6 +23,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :additional_information, :string
     many_to_many :suppliers, Oceanconnect.Accounts.Company, join_through: Oceanconnect.Auctions.AuctionSuppliers,
       join_keys: [auction_id: :id, supplier_id: :id], on_replace: :delete, on_delete: :delete_all
+    has_many :auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers
 
     timestamps()
   end

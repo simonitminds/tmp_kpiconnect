@@ -24,7 +24,6 @@ defmodule Oceanconnect.Factory do
 
   def auction_factory() do
     %Oceanconnect.Auctions.Auction{
-       auction_start: DateTime.utc_now(),
        duration: 10 * 60_000,
        decision_duration: 15 * 60_000,
        fuel: build(:fuel),
