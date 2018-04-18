@@ -171,7 +171,7 @@ defmodule Oceanconnect.Auctions do
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
   # is this needed?
-  def fully_loaded(auctions = []) do
+  def fully_loaded(auctions) when is_list(auctions) do
     Enum.map(auctions, fn(auction) ->
       fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
       Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
