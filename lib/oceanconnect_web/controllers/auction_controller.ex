@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEventStore}
+  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload}
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -23,7 +23,9 @@ defmodule OceanconnectWeb.AuctionController do
       |> AuctionEventStore.event_list
       |> make_data_renderable
 
-      render(conn, "log.html", auction: auction, events: events)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      render(conn, "log.html", auction_payload: auction_payload, events: events)
     else
       _ -> redirect(conn, to: auction_path(conn, :index))
     end
