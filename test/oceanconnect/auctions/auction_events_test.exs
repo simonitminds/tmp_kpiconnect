@@ -24,6 +24,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     test "starting an auction adds an auction_started event to the event store", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
+      :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
       assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
     end
