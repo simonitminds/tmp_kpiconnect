@@ -17,10 +17,6 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command
 
     bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    bid
   end
 
   def select_winning_bid(bid, comment) do

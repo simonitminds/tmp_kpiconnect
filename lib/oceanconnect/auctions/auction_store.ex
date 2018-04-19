@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
   alias Oceanconnect.Auctions.{Auction,
+                               AuctionBidList,
                                AuctionEvent,
                                AuctionTimer,
                                Command}
@@ -94,12 +95,21 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{lowest_bids: lowest_bids}) do
+  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{auction_id: auction_id, lowest_bids: lowest_bids}) do
+    supplier_first_bid = bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+
     lowest_amount = case lowest_bids do
       [] -> nil
       _ -> hd(lowest_bids).amount
     end
-    new_state = set_lowest_bids?(bid, amount, current_state, lowest_amount)
+    {lowest_bid, new_state} = set_lowest_bids?(bid, amount, current_state, lowest_amount)
+
+    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered})
+    if lowest_bid or supplier_first_bid do
+      AuctionTimer.maybe_extend_auction(auction_id)
+    end
     {:noreply, new_state}
   end
 
@@ -116,19 +126,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  defp set_lowest_bids?(bid = %{time_entered: time_entered}, _amount, current_state, nil) do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
-    %AuctionState{current_state | lowest_bids: [bid]}
+  defp set_lowest_bids?(bid, _amount, current_state, nil) do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
   end
-  defp set_lowest_bids?(bid = %{time_entered: time_entered}, amount, current_state, lowest_amount) when lowest_amount > amount do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
-    %AuctionState{current_state | lowest_bids: [bid]}
+  defp set_lowest_bids?(bid, amount, current_state, lowest_amount) when lowest_amount > amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
   end
-  defp set_lowest_bids?(bid = %{time_entered: time_entered}, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
-    AuctionTimer.maybe_extend_auction(current_state.auction_id, time_entered)
-    %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}
+  defp set_lowest_bids?(bid, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
+    {true, %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}}
   end
-  defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: current_state
+  defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: {false, current_state}
 
   defp calculate_status(_auction) do
     :pending

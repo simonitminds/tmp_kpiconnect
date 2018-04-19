@@ -17,7 +17,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
       select: storage.event
     query
     |> Oceanconnect.Repo.all
-    |> Enum.sort_by(&(&1.time_entered), &>=/2)
   end
 
   def persist(event = %AuctionEventStorage{}) do
