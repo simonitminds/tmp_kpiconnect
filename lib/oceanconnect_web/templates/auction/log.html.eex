@@ -10,7 +10,7 @@
             <th>Auction Type</th><td>Reverse Auction</td>
           </tr>
           <tr>
-            <th>Auction Created</th><td></td>
+            <th>Auction Created</th><td>&mdash;</td>
           </tr>
           <tr>
             <th>Created By</th><td><%= @auction_payload.auction.buyer.name %></td>
@@ -19,13 +19,13 @@
             <th>Auction Started</th><td><%= @auction_payload.auction.auction_start %></td>
           </tr>
           <tr>
-            <th>Auction Completed</th><td></td>
+            <th>Auction Completed</th><td>&mdash;</td>
           </tr>
           <tr>
             <th>Scheduled Duration</th><td><%= trunc(@auction_payload.auction.duration/60000) %> minutes</td>
           </tr>
           <tr>
-            <th>Actual Duration</th><td></td>
+            <th>Actual Duration</th><td>&mdash;</td>
           </tr>
           <tr>
             <th>Auction Details</th>
@@ -39,7 +39,7 @@
             </td>
           </tr>
           <tr>
-            <th>Winning Bid</th><td></td>
+            <th>Winning Bid</th><td>$<%= :erlang.float_to_binary(@auction_payload.state.winning_bid.amount, [decimals: 2]) %></td>
           </tr>
           <tr>
             <th>Winning Bidder</th><td><%= auction_log_supplier(@auction_payload) %></td>
@@ -78,6 +78,7 @@
             <td>
             <strong><%= event.time %><br/></strong>
             <strong class="qa-event-type"><%= event.type %></strong><br/>
+            <%= event.data %>
             <%= event.data %>
             </td>
           </tr>
