@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
   alias __MODULE__
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionStore, Command}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore, Command}
 
   @registry_name :auction_timers_registry
   @extension_time 3 * 60_000
@@ -85,11 +85,10 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:noreply, new_state}
   end
 
-  def handle_call({:extend_duration, pid}, _from, current_state = %{auction_id: auction_id, duration_timer: duration_timer}) do
+  def handle_call({:extend_duration, pid}, _from, current_state = %{duration_timer: duration_timer}) do
     new_state = case Process.cancel_timer(duration_timer) do
       false -> current_state
       _ ->
-        AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: @extension_time}, time_entered: DateTime.utc_now()})
         new_timer = create_timer(pid, @extension_time, :duration)
         Map.put(current_state, :duration_timer, new_timer)
     end
@@ -108,12 +107,15 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     GenServer.call(pid, :get_timer_ref)
   end
 
-  def maybe_extend_auction(auction_id) do
+  def extend_auction?(auction_id) do
     time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
-    if time_remaining <= @extension_time do
-      auction_id
-      |> Command.extend_duration
-      |> AuctionTimer.process_command
+    case time_remaining <= @extension_time do
+      true ->
+        auction_id
+        |> Command.extend_duration
+        |> AuctionTimer.process_command
+        {true, @extension_time}
+      _ -> {false, time_remaining}
     end
   end
 

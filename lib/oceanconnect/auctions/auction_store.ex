@@ -108,7 +108,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered})
     if lowest_bid or supplier_first_bid do
-      AuctionTimer.maybe_extend_auction(auction_id)
+      maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id))
     end
     {:noreply, new_state}
   end
@@ -125,6 +125,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     {:noreply, new_state}
   end
+
+  defp maybe_emit_extend_auction(auction_id, {true, extension_time}) do
+    AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: extension_time}, time_entered: DateTime.utc_now()})
+  end
+  defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}), do: nil
 
   defp set_lowest_bids?(bid, _amount, current_state, nil) do
     {true, %AuctionState{current_state | lowest_bids: [bid]}}
