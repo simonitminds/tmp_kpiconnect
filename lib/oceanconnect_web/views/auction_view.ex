@@ -13,7 +13,12 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_log_supplier(%{state: %{winning_bid: %{supplier: supplier}}}) do
     supplier
   end
-  def auction_log_supplier(%{state: %{winning_bid: nil}}), do: ""
+  def auction_log_supplier(%{state: %{winning_bid: nil}}), do: "—"
+
+  def auction_log_selected_bid(%{state: %{winning_bid: %{amount: amount}}}) do
+    :erlang.float_to_binary(amount, [decimals: 2])
+  end
+  def auction_log_selected_bid(%{state: %{winning_bid: nil}}), do: "—"
 
   defp convert_dates(data = %{}) do
     Enum.reduce(enumerate_data(data), %{}, fn({k, v}, acc) ->

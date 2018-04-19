@@ -39,7 +39,7 @@
             </td>
           </tr>
           <tr>
-            <th>Winning Bid</th><td>$<%= :erlang.float_to_binary(@auction_payload.state.winning_bid.amount, [decimals: 2]) %></td>
+            <th>Winning Bid</th><td>$<%= auction_log_selected_bid(@auction_payload) %></td>
           </tr>
           <tr>
             <th>Winning Bidder</th><td><%= auction_log_supplier(@auction_payload) %></td>
@@ -57,9 +57,9 @@
         </tr>
       </thead>
       <tbody>
-        <%= for event <- @events do %>
+        <%= for event <- auction_log_events(@events) do %>
           <tr>
-            <td><%= event.time %></td>
+            <td><strong><%= event.time %><br/></strong></td>
             <td class="qa-event-type"><%= event.type %></td>
             <td><%= event.data %></td>
           </tr>
@@ -78,7 +78,6 @@
             <td>
             <strong><%= event.time %><br/></strong>
             <strong class="qa-event-type"><%= event.type %></strong><br/>
-            <%= event.data %>
             <%= event.data %>
             </td>
           </tr>
