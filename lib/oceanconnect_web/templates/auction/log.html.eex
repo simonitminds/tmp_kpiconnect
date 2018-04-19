@@ -31,7 +31,7 @@
             <th>Auction Details</th>
             <td>
               <span class="qa-auction-vessel"><%= @auction_payload.auction.vessel.name %> <span className="auction-header__vessel__imo">(<%= @auction_payload.auction.vessel.imo %>)</span></span></br>
-              <%= @auction_payload.auction.fuel.name %> (<%= @auction.fuel_quantity %>)</br>
+              <%= @auction_payload.auction.fuel.name %> (<%= @auction_payload.auction.fuel_quantity %>)</br>
               <%= @auction_payload.auction.port.name %></br>
               <%= @auction_payload.auction.eta %></br>
               <%= @auction_payload.auction.additional_information %>
