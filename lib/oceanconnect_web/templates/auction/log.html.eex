@@ -60,7 +60,7 @@
         <%= for event <- auction_log_events(@events) do %>
           <tr>
             <td><strong><%= event.time %><br/></strong></td>
-            <td class="qa-event-type"><%= event.type %></td>
+            <td class="qa-mobile-event-type"><%= event.type %></td>
             <td><%= event.data %></td>
           </tr>
         <% end %>

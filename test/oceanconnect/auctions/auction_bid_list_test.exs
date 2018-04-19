@@ -18,6 +18,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
 
+    :timer.sleep(500)
     actual_state = auction.id
     |> AuctionBidList.get_bid_list
     |> hd
