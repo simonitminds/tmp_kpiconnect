@@ -30,6 +30,7 @@ defmodule Oceanconnect.AuctionLogTest do
       "winning_bid_selected",
       "auction_ended",
       "bid_placed",
+      "auction_updated",
       "auction_started"
     ]
     assert AuctionLogPage.has_event_types?(expected_events)

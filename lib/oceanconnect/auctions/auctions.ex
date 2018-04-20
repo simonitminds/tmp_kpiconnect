@@ -135,12 +135,14 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update()
+    |> emit_auction_update
   end
 
   def update_auction!(%Auction{} = auction, attrs) do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update!()
+    |> emit_auction_update
   end
 
   def delete_auction(%Auction{} = auction) do
@@ -191,6 +193,18 @@ defmodule Oceanconnect.Auctions do
     end)
   end
   def strip_non_loaded(struct), do: struct
+
+  defp emit_auction_update({:ok, auction}) do
+    loaded_auction = fully_loaded(auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    {:ok, auction}
+  end
+  defp emit_auction_update({:error, changeset}), do: {:error, changeset}
+  defp emit_auction_update(auction) do
+    loaded_auction = fully_loaded(auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+  end
 
   defp maybe_convert_struct(struct = %{__meta__: _meta}) do
     struct

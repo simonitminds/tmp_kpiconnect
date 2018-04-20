@@ -29,12 +29,33 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [%AuctionEvent{type: :auction_created, auction_id: ^new_auction_id, data: _}] = AuctionEventStore.event_list(new_auction)
     end
 
+    test "update_auction/2 adds an auction_updated event to the event store", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      Auctions.update_auction(auction, %{anonymous_bidding: true})
+      :timer.sleep(500)
+      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+    end
+
+    test "update_auction!/2 adds an auction_updated event to the event store and cache is updated", %{auction: auction = %Auction{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true})
+      :timer.sleep(500)
+      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+      cached_auction = Auctions.AuctionCache.read(auction_id)
+      assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
+    end
+
     test "starting an auction adds an auction_started event to the event store", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
-      assert [%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+      assert [
+        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+      ] = AuctionEventStore.event_list(auction)
     end
 
     test "placing a bid adds a bid_placed event to the event store", %{auction: auction = %Auction{id: auction_id}} do
@@ -48,6 +69,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction)
     end
@@ -61,6 +83,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
       assert [
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction)
     end
@@ -82,6 +105,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction)
     end
@@ -100,6 +124,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction)
     end

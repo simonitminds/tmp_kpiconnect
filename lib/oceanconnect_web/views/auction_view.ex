@@ -21,9 +21,10 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_log_selected_bid(%{state: %{winning_bid: nil}}), do: "—"
 
   defp convert_dates(data = %{}) do
-    Enum.reduce(enumerate_data(data), %{}, fn({k, v}, acc) ->
+    updated_map = Enum.reduce(enumerate_data(data), %{}, fn({k, v}, acc) ->
       Map.put(acc, k, convert_date?(v))
     end)
+    struct(data, Map.to_list(updated_map))
   end
   defp convert_dates(list = []) do
     Enum.map(list, fn(data) ->
