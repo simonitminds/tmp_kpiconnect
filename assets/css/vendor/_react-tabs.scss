@@ -1,0 +1,63 @@
+// Base styles from react-tabs (https://github.com/reactjs/react-tabs)
+
+.react-tabs__tab-list {
+  border-bottom: 1px solid #aaa;
+  margin: 0;
+  padding: 0;
+}
+
+.react-tabs__tab {
+  display: inline-block;
+  border-bottom: 4px solid $gray-2;
+  bottom: auto;
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+  margin-bottom: -4px;
+  padding: 0.5em 1em;
+  vertical-align: top;
+
+  @media (max-width: 768px) { // Align center versus left for mobile tabs.
+    text-align: center;
+  }
+}
+
+.react-tabs__tab--selected {
+  // Borrow from Bulma's selected tab styles.
+  border-bottom-color: $link;
+  color: #363636;
+}
+
+.react-tabs__tab--disabled {
+  color: GrayText;
+  cursor: default;
+}
+
+.react-tabs__tab:focus, .react-tabs__tab:hover {
+  box-shadow: none;
+  border-bottom-color: darken($gray-2, 10%) !important;
+  outline: none;
+}
+
+.react-tabs__tab--selected:focus, .react-tabs__tab--selected:hover {
+  box-shadow: none;
+  border-bottom-color: $link !important;
+  outline: none;
+}
+
+.react-tabs__tab:focus:after, .react-tabs__tab:hover:after  {
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+}
+
+.react-tabs__tab-panel {
+  display: none;
+}
+
+.react-tabs__tab-panel--selected {
+  display: block;
+}

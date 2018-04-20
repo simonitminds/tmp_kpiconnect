@@ -59,7 +59,7 @@
   &__ports { // Auction Ports (i.e. where the vessel will be docking)
     // background-color: $gray-2;
     padding: 0.25rem 1rem;
-    margin: 0 -1rem 1.5rem;
+    margin: 0 -1rem 0;
 
     span {
       font-size: 1rem;
@@ -82,6 +82,15 @@
     @media (max-width: 768px) {
       margin: 0 !important;
     }
+  }
+}
+
+// Auction Tabs (Mobile)
+
+.auction-content .tabs {
+  @media (max-width: 768px) {
+    margin-left: -1rem;
+    margin-right: -1rem;
   }
 }
 
