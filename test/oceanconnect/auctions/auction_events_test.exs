@@ -21,6 +21,14 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
   end
 
   describe "auction event store" do
+    test "creating an auction adds an auction_created event to the event store", %{auction: auction} do
+      auction_attrs = auction |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers])
+      {:ok, new_auction} = Auctions.create_auction(auction_attrs)
+      new_auction_id = new_auction.id
+      :timer.sleep(500)
+      assert [%AuctionEvent{type: :auction_created, auction_id: ^new_auction_id, data: _}] = AuctionEventStore.event_list(new_auction)
+    end
+
     test "starting an auction adds an auction_started event to the event store", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
