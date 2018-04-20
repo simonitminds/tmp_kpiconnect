@@ -4,8 +4,6 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
-  @current_time_trunc %DateTime{DateTime.utc_now() | hour: 0, minute: 0, second: 0}
-
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
     belongs_to :port, Port
@@ -14,9 +12,9 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :buyer, Oceanconnect.Accounts.Company
     field :fuel_quantity, :integer
     field :po, :string
-    field :eta, :utc_datetime, default: @current_time_trunc
-    field :etd, :utc_datetime, default: @current_time_trunc
-    field :auction_start, :utc_datetime, default: @current_time_trunc
+    field :eta, :utc_datetime
+    field :etd, :utc_datetime
+    field :auction_start, :utc_datetime
     field :duration, :integer, default: 10 * 60_000 # milliseconds
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
     field :anonymous_bidding, :boolean

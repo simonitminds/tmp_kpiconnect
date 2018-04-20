@@ -5,6 +5,10 @@ defmodule Oceanconnect.Auctions.Command do
 
   defstruct command: :get_current_state, data: nil
 
+  def update_auction(auction = %Auction{}) do
+    %Command{command: :update_auction, data: auction}
+  end
+
   def start_auction(auction = %Auction{}) do
     %Command{command: :start_auction, data: auction}
   end

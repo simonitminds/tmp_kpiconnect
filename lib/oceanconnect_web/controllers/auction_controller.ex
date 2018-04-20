@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.AuctionController do
       true <- current_company_id == auction.buyer_id,
       false <- Auctions.get_auction_state!(auction).status in [:pending, :open]
     do
-      events = auction
+      events = auction.id
       |> AuctionEventStore.event_list
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)

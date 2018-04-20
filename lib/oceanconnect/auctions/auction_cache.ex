@@ -5,12 +5,12 @@ defmodule Oceanconnect.Auctions.AuctionCache do
   alias Oceanconnect.Auctions.{Auction}
   # AuctionStore.AuctionState}
 
-  def start_link(auction = %Auction{id: id}) do
-    inital_state = %{
-     auction: auction
-     #, auction_state: %AuctionState{}
+  def start_link(auction = %Auction{id: auction_id}) do
+    initial_state = %{
+      auction: auction,
+      available: false
     }
-    GenServer.start_link(__MODULE__, inital_state , name: get_auction_cache_name(id))
+    GenServer.start_link(__MODULE__, initial_state, name: get_auction_cache_name(auction_id))
   end
 
   def init(cache_state) do
@@ -20,6 +20,11 @@ defmodule Oceanconnect.Auctions.AuctionCache do
   def update_cache(auction = %Auction{id: auction_id}) do
     with {:ok, pid} <- find_pid(auction_id),
          do:        GenServer.cast(pid, {:update_cache, auction})
+  end
+
+  def make_cache_available(auction_id) do
+    with {:ok, pid} <- find_pid(auction_id),
+         do:        GenServer.call(pid, {:make_cache_available, auction_id})
   end
 
   def read(auction_id) do
@@ -44,6 +49,11 @@ defmodule Oceanconnect.Auctions.AuctionCache do
     {:noreply, updated_state}
   end
 
+  def handle_call({:make_cache_available, auction_id}, _from, current_state) do
+    new_state = Map.put(current_state, :available, true)
+    {:reply, auction_id, new_state}
+  end
+
+  def handle_call(:read_cache, _from, current_state = %{available: false}), do: {:reply, "Auction Not Available", current_state}
   def handle_call(:read_cache, _from, current_state = %{auction: auction}), do: {:reply, auction, current_state}
 end
-

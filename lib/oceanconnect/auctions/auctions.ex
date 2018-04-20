@@ -195,14 +195,18 @@ defmodule Oceanconnect.Auctions do
   def strip_non_loaded(struct), do: struct
 
   defp emit_auction_update({:ok, auction}) do
-    loaded_auction = fully_loaded(auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+    |> fully_loaded
+    |> Command.update_auction
+    |> AuctionStore.process_command
     {:ok, auction}
   end
   defp emit_auction_update({:error, changeset}), do: {:error, changeset}
   defp emit_auction_update(auction) do
-    loaded_auction = fully_loaded(auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+    |> fully_loaded
+    |> Command.update_auction
+    |> AuctionStore.process_command
     auction
   end
 

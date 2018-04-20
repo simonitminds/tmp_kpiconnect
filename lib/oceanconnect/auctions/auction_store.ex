@@ -2,7 +2,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
   alias Oceanconnect.Auctions.{Auction,
                                AuctionBidList,
+                               AuctionCache,
                                AuctionEvent,
+                               AuctionEventStore,
                                AuctionTimer,
                                Command}
 
@@ -38,8 +40,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
    # Client
   def start_link(auction_id) do
-    state = AuctionState.from_auction(auction_id)
-    GenServer.start_link(__MODULE__, state, name: get_auction_store_name(auction_id))
+    GenServer.start_link(__MODULE__, auction_id, name: get_auction_store_name(auction_id))
   end
 
   def get_current_state(%Auction{id: auction_id}) do
@@ -57,8 +58,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
    # Server
-  def init(auction_state) do
-    state = Map.put(auction_state, :status, calculate_status(auction_state))
+  def init(auction_id) do
+    status = case rebuild_auction(auction_id) do
+      nil -> :pending
+      status -> status
+    end
+
+    state = auction_id
+    |> AuctionState.from_auction
+    |> Map.put(:status, status)
+    AuctionCache.make_cache_available(auction_id)
+
     {:ok, state}
   end
 
@@ -72,9 +82,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :open}
+
     AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
 
     {:noreply, new_state}
+  end
+
+  def handle_cast({:update_auction, auction = %Auction{}}, current_state) do
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()})
+
+    {:noreply, current_state}
   end
 
   def handle_cast({:end_auction, auction = %Auction{id: auction_id}}, current_state = %{status: :open}) do
@@ -142,8 +159,39 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
   defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: {false, current_state}
 
-  defp calculate_status(_auction) do
-    :pending
-    # Go through event log
+  defp rebuild_auction(auction_id) do
+    auction_id
+    |> AuctionEventStore.event_list
+    |> IO.inspect
+    |> Enum.reduce(nil, fn(event, acc) ->
+      acc = case replay_event(event) do
+        :ok -> acc
+        result -> result
+      end
+    end)
+  end
+
+  defp replay_event(%AuctionEvent{type: :auction_created, data: _auction}), do: :pending
+  defp replay_event(%AuctionEvent{type: :auction_started, data: auction}) do
+    GenServer.cast(self(), {:start_auction, auction})
+    :open
+  end
+  defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}) do
+    GenServer.cast(self(), {:update_auction, auction})
+  end
+  defp replay_event(%AuctionEvent{type: :bid_placed, data: bid}) do
+    GenServer.cast(self(), {:process_new_bid, bid})
+  end
+  defp replay_event(%AuctionEvent{type: :auction_ended, data: auction}) do
+    GenServer.cast(self(), {:auction_ended, auction})
+    :decision
+  end
+  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: bid}) do
+    GenServer.cast(self(), {:select_winning_bid, bid})
+    :closed
+  end
+  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: auction}) do
+    GenServer.cast(self(), {:end_auction_decision_period, auction})
+    :expired
   end
 end
