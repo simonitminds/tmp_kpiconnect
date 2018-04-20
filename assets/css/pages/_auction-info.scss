@@ -26,7 +26,7 @@
     color: $gray-3;
   }
   &__vessel { // Auction Vessel (informally the title)
-    font-size: 'xs', 0.25;
+    @extend .is-size-3;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 
@@ -62,7 +62,7 @@
     margin: 0 -1rem 1.5rem;
 
     span {
-      font-size: 0.75rem;
+      font-size: 1rem;
     }
   }
 
