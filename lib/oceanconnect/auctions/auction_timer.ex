@@ -73,6 +73,16 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, timer_ref, state}
   end
 
+  def handle_call({:extend_duration, pid}, _from, current_state = %{duration_timer: duration_timer}) do
+    new_state = case Process.cancel_timer(duration_timer) do
+      false -> current_state
+      _ ->
+        new_timer = create_timer(pid, @extension_time, :duration)
+        Map.put(current_state, :duration_timer, new_timer)
+    end
+    {:reply, new_state, new_state}
+  end
+
   def handle_cast({:start_duration_timer, duration, pid}, current_state) do
     new_timer = create_timer(pid, duration, :duration)
     new_state = Map.put(current_state, :duration_timer, new_timer)
@@ -83,16 +93,6 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     new_timer = create_timer(pid, decision_duration, :decision_duration)
     new_state = Map.put(current_state, :decision_duration_timer, new_timer)
     {:noreply, new_state}
-  end
-
-  def handle_call({:extend_duration, pid}, _from, current_state = %{duration_timer: duration_timer}) do
-    new_state = case Process.cancel_timer(duration_timer) do
-      false -> current_state
-      _ ->
-        new_timer = create_timer(pid, @extension_time, :duration)
-        Map.put(current_state, :duration_timer, new_timer)
-    end
-    {:reply, new_state, new_state}
   end
 
   defp create_timer(pid, duration, _type = :duration) do
