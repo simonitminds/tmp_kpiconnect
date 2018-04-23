@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, Command}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor, Command}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -9,16 +9,16 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     supplier2_company = insert(:company)
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000,
                       suppliers: [supplier_company, supplier2_company])
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end
 
   test "starting auction_store for auction", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
+    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction.id)
 
     Oceanconnect.Auctions.start_auction(auction)
 
-    expected_state = auction
+    expected_state = auction.id
     |> AuctionState.from_auction()
     |> Map.merge(%{status: :open, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
@@ -40,7 +40,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "auction status is decision after duration timeout", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
+    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction.id)
 
     auction
     |> Command.start_auction
@@ -50,7 +50,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     :timer.sleep(1_000)
 
-    expected_state = auction
+    expected_state = auction.id
     |> AuctionState.from_auction
     |> Map.merge(%{status: :decision, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
@@ -71,7 +71,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> Command.end_auction_decision_period
     |> AuctionStore.process_command
 
-    expected_state = auction
+    expected_state = auction.id
     |> AuctionState.from_auction
     |> Map.merge(%{status: :expired, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)

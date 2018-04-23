@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(auction) do
-    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionStore, auction})
+  def start_child(auction = %Oceanconnect.Auctions.Auction{}) do
+    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionSupervisor, auction})
   end
 end

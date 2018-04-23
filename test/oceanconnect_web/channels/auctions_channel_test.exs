@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.{AuctionStore.AuctionState, AuctionSupervisor}
 
   setup do
     buyer_company = insert(:company)
@@ -17,27 +17,22 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       buyer: buyer_company, duration: 1_000, decision_duration: 3_000,
       suppliers: [supplier_company, supplier3_company]
     )
-    current_time =  DateTime.utc_now()
-    {:ok, duration} = Time.new(0, 0, round(auction.duration / 1_000), 0)
-    {:ok, elapsed_time} = Time.new(0, 0, DateTime.diff(current_time, auction.auction_start), 0)
-    time_remaining = Time.diff(duration, elapsed_time) * 1_000
-    {:ok, _store} = Auctions.AuctionStore.start_link(auction)
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
-    state = auction
-    |> AuctionState.from_auction
+    state = AuctionState.from_auction(auction.id)
     |> Map.put(:status, :open)
     expected_payload = %{
-      time_remaining: time_remaining,
+      time_remaining: auction.duration,
       state: state,
       bid_list: []
     }
 
-    {:ok, %{supplier_id: Integer.to_string(supplier_company.id),
+    {:ok, %{supplier_id: supplier_company.id,
             supplier_1: supplier_1,
             supplier_2: supplier_2,
             supplier3: supplier3_company,
-            buyer_id: Integer.to_string(buyer_company.id),
-            non_participant_id: Integer.to_string(non_participant_company.id),
+            buyer_id: buyer_company.id,
+            non_participant_id: non_participant_company.id,
             non_participant: non_participant,
             expected_payload: expected_payload,
             auction: auction}}
@@ -47,7 +42,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     test "broadcasts are pushed to the buyer", %{buyer_id: buyer_id,
                                                 auction: auction,
                                                 expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -70,7 +65,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     test "broadcasts are pushed to the supplier", %{supplier_id: supplier_id,
                                                     auction: auction,
                                                     expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -113,35 +108,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "joining another companies auction channel is unauthorized", %{supplier_id: supplier_id, non_participant: non_participant} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       user_with_company = Oceanconnect.Accounts.load_company_on_user(non_participant)
       {:ok, non_participant_token, _claims} = Oceanconnect.Guardian.encode_and_sign(user_with_company)
 
       {:ok, non_participant_socket} = connect(OceanconnectWeb.UserSocket, %{token: non_participant_token})
 
       assert {:error, %{reason: "unauthorized"}} = subscribe_and_join(non_participant_socket, OceanconnectWeb.AuctionsChannel, channel)
-    end
-
-    test "auction start begins time remaining countdown", %{buyer_id: buyer_id,
-                                                            auction: auction,
-                                                            expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
-      event = "auctions_update"
-
-      @endpoint.subscribe(channel)
-      Auctions.start_auction(auction)
-
-      auction_id = auction.id
-      receive do
-        %Phoenix.Socket.Broadcast{
-          event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
-          topic: ^channel} ->
-            assert payload.time_remaining < expected_payload.time_remaining
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
     end
   end
 
@@ -155,13 +128,11 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -178,13 +149,11 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -205,9 +174,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       refute_broadcast ^event, ^expected_payload
     end
@@ -218,15 +185,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
       |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
-      Auctions.start_auction(auction)
       auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      |> Auctions.start_auction
+      |> Auctions.end_auction
       {:ok, %{expected_payload: payload}}
     end
 
     test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -246,7 +212,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction, supplier_id: supplier_id, expected_payload: expected_payload} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -282,26 +248,20 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "buyers get notified", %{auction: auction = %{id: auction_id}, buyer_id: buyer_id, supplier_id: supplier_id} do
-      channel = "user_auctions:#{buyer_id}"
+      channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
+
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
 
       buyer_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
-
-      receive do
-        %Phoenix.Socket.Broadcast{} -> nil
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
+      |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, state: %{status: :open, lowest_bids: lowest_bids}, bid_list: bid_list},
           topic: ^channel} ->
             assert buyer_payload.bid_list == bid_list
             assert buyer_payload.state.lowest_bids == lowest_bids
@@ -310,11 +270,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-      {:ok, auction_store_pid} = Oceanconnect.Auctions.AuctionStore.find_pid(auction_id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      Auctions.end_auction(auction)
 
       decision_buyer_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(buyer_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -330,21 +289,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "suppliers get notified", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id, supplier3: supplier3} do
-      channel = "user_auctions:#{supplier_id}"
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, String.to_integer(supplier_id))
 
+      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
       supplier_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
-
-      receive do
-        %Phoenix.Socket.Broadcast{} -> nil
-      after
-        5000 ->
-          assert false, "Expected message received nothing."
-      end
+      |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -370,7 +322,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
 
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier3.id)
-
       receive do
         %Phoenix.Socket.Broadcast{} -> nil
       after
@@ -383,7 +334,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       |> Oceanconnect.Auctions.AuctionStore.process_command
 
       decision_supplier_payload = auction
-      |> Auctions.AuctionPayload.get_auction_payload!(String.to_integer(supplier_id))
+      |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
       receive do
         %Phoenix.Socket.Broadcast{

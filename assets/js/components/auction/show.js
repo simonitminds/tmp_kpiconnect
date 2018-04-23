@@ -15,6 +15,7 @@ import BiddingForm from './bidding-form';
 import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
 import MediaQuery from 'react-responsive';
+import AuctionLogLink from './auction-log-link';
 
 
 export default class AuctionShow extends React.Component {
@@ -60,6 +61,13 @@ export default class AuctionShow extends React.Component {
       }
     }
 
+    const auctionLogLinkDisplay = () => {
+      if (currentUser.isBuyer && auctionState.status != 'pending' && auctionState.status != 'open') {
+        return <AuctionLogLink auction={auction} />;
+      } else {
+        return false;
+      }
+    }
 
     const buyerBidComponents = () => {
       if (auctionState.status == 'open') {

@@ -119,8 +119,7 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company])
-      Auctions.AuctionsSupervisor.start_child(auction)
-      Auctions.AuctionBidsSupervisor.start_child(auction.id)
+      start_supervised({Auctions.AuctionSupervisor, auction})
       Auctions.start_auction(auction)
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end
@@ -143,6 +142,7 @@ defmodule Oceanconnect.AuctionsTest do
         end
       end)
       payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+
       assert hd(payload.bid_list).id == bid.id
       assert hd(payload.state.lowest_bids).id == bid.id
     end

@@ -1,44 +1,25 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.{Command, AuctionBidList, AuctionPayload, AuctionStore}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionSupervisor}
 
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
     auction = insert(:auction, suppliers: [supplier_company, supplier2_company])
-    bid = %{"amount" => "1.25"}
-    |> Map.put("supplier_id", supplier_company.id)
-    |> Map.put("id", UUID.uuid4(:hex))
-    |> Map.put("time_entered", DateTime.utc_now())
-    |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    Oceanconnect.Auctions.AuctionBidsSupervisor.start_child(auction.id)
+    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
     Oceanconnect.Auctions.start_auction(auction)
-    {:ok, %{auction: auction, bid: bid, supplier2_company: supplier2_company}}
+    {:ok, %{auction: auction, supplier_id: supplier_company.id, supplier2_id: supplier2_company.id}}
   end
 
-  test "auction is supervised", %{auction: auction} do
-    {:ok, pid} = AuctionBidList.find_pid(auction.id)
-    assert Process.alive?(pid)
+  test "entering a bid for auction", %{auction: auction, supplier_id: supplier_id} do
+    assert AuctionBidList.get_bid_list(auction.id) == []
 
-    Process.exit(pid, :shutdown)
+    bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
 
-    refute Process.alive?(pid)
     :timer.sleep(500)
-
-    {:ok, new_pid} = AuctionBidList.find_pid(auction.id)
-    assert Process.alive?(new_pid)
-  end
-
-  test "entering a bid for auction", %{bid: bid} do
-    assert AuctionBidList.get_bid_list(bid.auction_id) == []
-
-    bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    actual_state = bid.auction_id
+    actual_state = auction.id
     |> AuctionBidList.get_bid_list
     |> hd
 
@@ -47,20 +28,11 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     end)
   end
 
-  test "first bid by supplier in last 3 minutes extends duration", %{auction: auction, bid: bid, supplier2_company: supplier2_company} do
-    bid
-    |> Command.process_new_bid
-    |> AuctionStore.process_command
+  test "first bid by supplier in last 3 minutes extends duration", %{auction: auction, supplier_id: supplier_id, supplier2_id: supplier2_id} do
+    bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_id)
+    Auctions.place_bid(auction, %{"amount" => 3.00}, supplier2_id)
 
-    :timer.sleep(1_000)
-    new_bid = bid
-    |> Map.merge(%{id: UUID.uuid4(:hex), time_entered: DateTime.utc_now(), amount: "3.00", supplier_id: supplier2_company.id})
-
-    new_bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    actual_payload = AuctionPayload.get_auction_payload!(auction, supplier2_company.id)
+    actual_payload = AuctionPayload.get_auction_payload!(auction, supplier2_id)
 
     assert [bid |> Map.delete(:supplier_id)] == actual_payload.state.lowest_bids
     assert actual_payload.time_remaining > 3 * 60_000 - 500

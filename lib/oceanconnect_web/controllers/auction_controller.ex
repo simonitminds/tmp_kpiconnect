@@ -1,11 +1,32 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.Auction
+  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload}
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
     render(conn, "index.html")
+  end
+
+  def log(conn, %{"id" => id}) do
+    current_company_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    auction = id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
+
+    with %Auction{} <- auction,
+      true <- current_company_id == auction.buyer_id,
+      false <- Auctions.get_auction_state!(auction).status in [:pending, :open]
+    do
+      events = auction
+      |> AuctionEventStore.event_list
+
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      render(conn, "log.html", auction_payload: auction_payload, events: events)
+    else
+      _ -> redirect(conn, to: auction_path(conn, :index))
+    end
   end
 
   def start(conn, %{"id" => id}) do

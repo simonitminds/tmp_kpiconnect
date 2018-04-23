@@ -112,7 +112,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
-            <a href={`/auctions/start/${auction.id}`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
+            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
           </div>
           :
           <div className="is-none"></div>

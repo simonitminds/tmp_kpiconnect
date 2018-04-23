@@ -23,6 +23,8 @@ config :oceanconnect, Oceanconnect.Repo,
 config :oceanconnect, :sql_sandbox, true
 
 config :oceanconnect, :task_supervisor, Oceanconnect.FakeTaskSupervisor
+config :oceanconnect, :event_storage, Oceanconnect.FakeEventStorage
+config :oceanconnect, :store_starter, true
 
 config :hound,
   driver: "selenium",

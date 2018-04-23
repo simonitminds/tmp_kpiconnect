@@ -19,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
       total_price: nil,
       time_entered: nil
 
-    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id}, auction = %Oceanconnect.Auctions.Auction{}) do
+    def from_params_to_auction_bid(%{"amount" => amount, "supplier_id" => supplier_id, "time_entered" => time_entered}, auction = %Oceanconnect.Auctions.Auction{}) do
       params = %{
         id: UUID.uuid4(:hex),
         auction_id: auction.id,
@@ -27,7 +27,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
         fuel_id: auction.fuel_id,
         fuel_quantity: auction.fuel_quantity,
         supplier_id: supplier_id,
-        time_entered: DateTime.utc_now()
+        time_entered: time_entered
       }
       Map.merge(%AuctionBid{auction_id: nil, amount: nil, supplier_id: nil}, params)
     end
@@ -66,7 +66,7 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
 
   def process_command(%Command{command: :enter_bid, data: bid = %AuctionBid{auction_id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-    do: GenServer.cast(pid, {:enter_bid, bid})
+    do: GenServer.call(pid, {:enter_bid, bid})
   end
 
   def process_command(%Command{command: cmd, data: bid = %AuctionBid{auction_id: auction_id}}) do
@@ -86,12 +86,12 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
     {:reply, bid, current_state}
   end
 
-  def handle_cast({:enter_bid, bid = %AuctionBid{auction_id: auction_id, supplier_id: supplier_id}}, current_state) do
-    current_bid_list_supplier_ids = Enum.map(current_state, fn(bid) -> bid.supplier_id end)
-    unless supplier_id in current_bid_list_supplier_ids do
-      Oceanconnect.Auctions.AuctionTimer.maybe_extend_auction(auction_id)
-    end
+  def handle_call({:enter_bid, bid = %AuctionBid{supplier_id: supplier_id}}, _from, current_state) do
+    supplier_first_bid = current_state
+    |> Enum.map(fn(bid) -> bid.supplier_id end)
+    |> Enum.member?(supplier_id)
+
     new_state = [bid | current_state]
-    {:noreply, new_state}
+    {:reply, not(supplier_first_bid), new_state}
   end
 end

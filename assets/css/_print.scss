@@ -1,0 +1,22 @@
+@media print {
+  header { display: none; }
+
+  main > .container {
+      padding: 1rem 5rem 0 5rem !important;
+  }
+  .alert {
+    display: none;
+  }
+  main {
+    position: static !important;
+    height: auto !important;
+    width: 100%;
+  }
+  table.is-hidden-desktop {
+    display: none;
+  }
+
+  .report__logo--print {
+    margin-left: -1rem;
+  }
+}

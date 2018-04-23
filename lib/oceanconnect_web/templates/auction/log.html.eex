@@ -1,0 +1,88 @@
+<div class="container is-fullhd">
+  <div class="report content">
+    <img class="report__logo--print is-hidden-screen"src="<%= static_path(@conn, "/images/ocmlogo_print.png") %>">
+    <h1 class="title is-3 has-text-weight-bold has-margin-bottom-lg">Auction Event Log</h1>
+    <h2>Auction Details</h2>
+    <div class="has-margin-bottom-xl">
+      <table class="table report__table--auction-details">
+        <tbody>
+          <tr>
+            <th>Auction Type</th><td>Reverse Auction</td>
+          </tr>
+          <tr>
+            <th>Auction Created</th><td>&mdash;</td>
+          </tr>
+          <tr>
+            <th>Created By</th><td><%= @auction_payload.auction.buyer.name %></td>
+          </tr>
+          <tr>
+            <th>Auction Started</th><td><%= @auction_payload.auction.auction_start %></td>
+          </tr>
+          <tr>
+            <th>Auction Completed</th><td>&mdash;</td>
+          </tr>
+          <tr>
+            <th>Scheduled Duration</th><td><%= trunc(@auction_payload.auction.duration/60000) %> minutes</td>
+          </tr>
+          <tr>
+            <th>Actual Duration</th><td>&mdash;</td>
+          </tr>
+          <tr>
+            <th>Auction Details</th>
+            <td>
+              <span class="qa-auction-vessel"><%= @auction_payload.auction.vessel.name %> <span className="auction-header__vessel__imo">(<%= @auction_payload.auction.vessel.imo %>)</span></span></br>
+              <%= @auction_payload.auction.fuel.name %> (<%= @auction_payload.auction.fuel_quantity %>)</br>
+              <%= @auction_payload.auction.port.name %></br>
+              <%= @auction_payload.auction.eta %></br>
+              <%= @auction_payload.auction.additional_information %>
+
+            </td>
+          </tr>
+          <tr>
+            <th>Winning Bid</th><td>$<%= auction_log_selected_bid(@auction_payload) %></td>
+          </tr>
+          <tr>
+            <th>Winning Bidder</th><td><%= auction_log_supplier(@auction_payload) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Bidding Activity Log</h2>
+    <table class="table is-fullwidth is-striped report__table--log is-hidden-touch">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Event</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for event <- auction_log_events(@events) do %>
+          <tr>
+            <td><strong><%= event.time %><br/></strong></td>
+            <td class="qa-mobile-event-type"><%= event.type %></td>
+            <td><%= event.data %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <table class="table is-fullwidth is-striped report__table--log is-hidden-desktop">
+      <thead>
+        <tr>
+          <th>Log Entry</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for event <- auction_log_events(@events) do %>
+          <tr>
+            <td>
+            <strong><%= event.time %><br/></strong>
+            <strong class="qa-event-type"><%= event.type %></strong><br/>
+            <%= event.data %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

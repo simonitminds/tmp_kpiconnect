@@ -5,16 +5,24 @@ defmodule Oceanconnect.Auctions.Command do
 
   defstruct command: :get_current_state, data: nil
 
-  def start_auction(%Auction{id: auction_id, duration: duration}) do
-    %Command{command: :start_auction, data: %{id: auction_id, duration: duration}}
+  def start_auction(auction = %Auction{}) do
+    %Command{command: :start_auction, data: auction}
   end
 
-  def end_auction(%Auction{id: auction_id, decision_duration: decision_duration}) do
-    %Command{command: :end_auction, data: %{id: auction_id, decision_duration: decision_duration}}
+  def end_auction(auction = %Auction{}) do
+    %Command{command: :end_auction, data: auction}
   end
 
-  def end_auction_decision_period(%Auction{id: auction_id}) do
-    %Command{command: :end_auction_decision_period, data: %{id: auction_id}}
+  def start_duration_timer(auction = %Auction{}) do
+    %Command{command: :start_duration_timer, data: auction}
+  end
+
+  def start_decision_duration_timer(auction = %Auction{}) do
+    %Command{command: :start_decision_duration_timer, data: auction}
+  end
+
+  def end_auction_decision_period(auction = %Auction{}) do
+    %Command{command: :end_auction_decision_period, data: auction}
   end
 
   def enter_bid(bid = %AuctionBid{}) do

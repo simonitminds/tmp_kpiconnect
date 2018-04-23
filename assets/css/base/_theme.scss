@@ -116,3 +116,17 @@ $tag-background-color: $turquoise;
 
 $tabs-link-active-color: $black;
 $tabs-border-bottom-width: 4px;
+
+// ===== Responsivity ===== //
+
+// Associated Utilities
+
+.is-hidden-screen {
+  display: none;
+  @media print { display: block; }
+}
+
+.is-hidden-print {
+  display: block;
+  @media print { display: none; }
+}

@@ -1,27 +1,20 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionNotifier, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-
-
-  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id) do
+  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id, time_entered \\ DateTime.utc_now()) do
     bid = bid_params
     |> Map.put("supplier_id", supplier_id)
+    |> Map.put("time_entered", time_entered)
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
     bid
     |> Command.process_new_bid
     |> AuctionStore.process_command
-
-    bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    AuctionNotifier.notify_updated_bid(auction, bid, supplier_id)
 
     bid
   end
@@ -84,8 +77,7 @@ defmodule Oceanconnect.Auctions do
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
-        auction
-        |> AuctionStore.AuctionState.from_auction
+        AuctionStore.AuctionState.from_auction(auction.id)
         |> Map.put(:status, :pending)
       state -> state
     end
@@ -100,7 +92,13 @@ defmodule Oceanconnect.Auctions do
     |> Command.start_auction
     |> AuctionStore.process_command
 
-    update_auction(auction, %{auction_start: DateTime.utc_now()})
+    update_auction!(auction, %{auction_start: DateTime.utc_now()})
+  end
+
+  def end_auction(auction = %Auction{}) do
+    auction
+    |> Command.end_auction
+    |> AuctionStore.process_command
   end
 
   def create_auction(attrs \\ %{}) do
@@ -110,11 +108,11 @@ defmodule Oceanconnect.Auctions do
 
     case auction do
       {:ok, auction} ->
-        auction_with_participants = auction
-        |> with_participants
+        auction
+        |> fully_loaded
         |> create_supplier_aliases
-
-        AuctionsSupervisor.start_child(auction_with_participants)
+        |> AuctionsSupervisor.start_child
+        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()})
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
@@ -137,6 +135,14 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update()
+    |> emit_auction_update
+  end
+
+  def update_auction!(%Auction{} = auction, attrs) do
+    auction
+    |> Auction.changeset(attrs)
+    |> Repo.update!()
+    |> emit_auction_update
   end
 
   def delete_auction(%Auction{} = auction) do
@@ -152,11 +158,23 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:buyer, :suppliers])
   end
 
-  def fully_loaded(auction = %Auction{}) do
-    Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+  def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
+    Enum.map(suppliers, fn(supplier) ->
+      alias_name = get_auction_supplier(auction.id, supplier.id).alias_name
+      Map.put(supplier, :alias_name, alias_name)
+    end)
   end
-  def fully_loaded(auctions = []) do
-    Repo.preload(auctions, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+
+  def fully_loaded(auction = %Auction{}) do
+    fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+    Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
+  end
+  # is this needed?
+  def fully_loaded(auctions) when is_list(auctions) do
+    Enum.map(auctions, fn(auction) ->
+      fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+      Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
+    end)
   end
   def fully_loaded(company = %Company{}) do
     Repo.preload(company, [:users, :vessels, :ports])
@@ -175,6 +193,18 @@ defmodule Oceanconnect.Auctions do
     end)
   end
   def strip_non_loaded(struct), do: struct
+
+  defp emit_auction_update({:ok, auction}) do
+    loaded_auction = fully_loaded(auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    {:ok, auction}
+  end
+  defp emit_auction_update({:error, changeset}), do: {:error, changeset}
+  defp emit_auction_update(auction) do
+    loaded_auction = fully_loaded(auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+  end
 
   defp maybe_convert_struct(struct = %{__meta__: _meta}) do
     struct
