@@ -112,7 +112,7 @@ defmodule Oceanconnect.Auctions do
         |> fully_loaded
         |> create_supplier_aliases
         |> AuctionsSupervisor.start_child
-        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()})
+        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()}, true)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}

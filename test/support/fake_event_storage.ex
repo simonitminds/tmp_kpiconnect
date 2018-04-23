@@ -43,8 +43,8 @@ defmodule Oceanconnect.FakeEventStorage do
     end
   end
 
-  def persist(event) do
+  def persist(storage = %Oceanconnect.Auctions.AuctionEventStorage{event: event}) do
     FakeEventStorageCache.add_event(event)
-    {:ok, event}
+    {:ok, storage}
   end
 end

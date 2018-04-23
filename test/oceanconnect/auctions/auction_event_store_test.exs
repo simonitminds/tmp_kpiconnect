@@ -24,11 +24,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     Auctions.select_winning_bid(bid, "Winner Winner Chicken Dinner.")
 
     current_cache = AuctionCache.read(auction_id)
-    current_state = AuctionStore.get_current_state(auction)
+    current_state = Auctions.get_auction_state!(auction)
     current_bids = Auctions.AuctionBidList.get_bid_list(auction_id)
     current_event_list = AuctionEventStore.event_list(auction_id)
 
-    # Crash AuctionStore / AuctionSupervisor and let restart
+    # # Crash AuctionStore / AuctionSupervisor and let restart
     {:ok, pid} = AuctionStore.find_pid(auction_id)
     Process.exit(pid, :shutdown)
     refute Process.alive?(pid)
@@ -36,10 +36,10 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
 
-    Oceanconnect.FakeEventStorage.FakeEventStorageCache.read() |> IO.inspect
-    # assert current_cache == AuctionCache.read(auction_id)
-    # assert current_state == AuctionStore.get_current_state(auction)
-    # assert current_bids == Auctions.AuctionBidList.get_bid_list(auction_id)
-    # assert current_event_list == AuctionEventStore.event_list(auction_id)
+    :timer.sleep(1_000)
+    assert current_cache == AuctionCache.read(auction_id)
+    assert current_state == Auctions.get_auction_state!(auction)
+    assert current_bids == Auctions.AuctionBidList.get_bid_list(auction_id)
+    assert current_event_list == AuctionEventStore.event_list(auction_id)
   end
 end

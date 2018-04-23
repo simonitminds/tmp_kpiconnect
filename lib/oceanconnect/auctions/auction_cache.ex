@@ -1,9 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionCache do
   use GenServer
+  alias Oceanconnect.Auctions.{Auction, Command}
   @registry_name :auction_cache_registry
-  #alias __MODULE__
-  alias Oceanconnect.Auctions.{Auction}
-  # AuctionStore.AuctionState}
 
   def start_link(auction = %Auction{id: auction_id}) do
     initial_state = %{
@@ -17,7 +15,7 @@ defmodule Oceanconnect.Auctions.AuctionCache do
     {:ok, cache_state}
   end
 
-  def update_cache(auction = %Auction{id: auction_id}) do
+  def process_command(%Command{command: :update_cache, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
          do:        GenServer.cast(pid, {:update_cache, auction})
   end

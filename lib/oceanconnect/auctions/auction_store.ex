@@ -50,23 +50,24 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def process_command(%Command{command: cmd, data: data = %{auction_id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {cmd, data})
+      do: GenServer.cast(pid, {cmd, data, true})
   end
-  def process_command(%Command{command: cmd, data: data}) do
-    with {:ok, pid} <- find_pid(data.id),
-      do: GenServer.cast(pid, {cmd, data})
+  def process_command(%Command{command: :update_auction, data: auction = %Auction{id: auction_id}}) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {:update_auction, auction, true})
+  end
+  def process_command(%Command{command: cmd, data: %Auction{id: auction_id}}) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {cmd, auction_id, true})
   end
 
    # Server
   def init(auction_id) do
-    status = case rebuild_auction(auction_id) do
-      nil -> :pending
-      status -> status
-    end
+    Process.send_after(self(), :replay_events, 500)
 
     state = auction_id
     |> AuctionState.from_auction
-    |> Map.put(:status, status)
+    |> Map.put(:status, :pending)
     AuctionCache.make_cache_available(auction_id)
 
     {:ok, state}
@@ -76,43 +77,50 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:reply, current_state, current_state}
   end
 
-  def handle_cast({:start_auction, auction = %Auction{id: auction_id}}, current_state) do
-    auction
+  def handle_cast({:start_auction, auction_id, emit}, current_state) do
+    auction_id
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :open}
 
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
 
     {:noreply, new_state}
   end
 
-  def handle_cast({:update_auction, auction = %Auction{}}, current_state) do
-    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()})
+  def handle_cast({:update_auction, auction = %Auction{}, emit}, current_state) do
+    auction
+    |> Command.update_times
+    |> AuctionTimer.process_command
+
+    auction
+    |> Command.update_cache
+    |> AuctionCache.process_command
+
+    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()}, emit)
 
     {:noreply, current_state}
   end
 
-  def handle_cast({:end_auction, auction = %Auction{id: auction_id}}, current_state = %{status: :open}) do
-    auction
+  def handle_cast({:end_auction, auction_id, emit}, current_state = %{status: :open}) do
+    auction_id
     |> Command.start_decision_duration_timer
     |> AuctionTimer.process_command
 
     new_state = %AuctionState{current_state | status: :decision}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
 
     {:noreply, new_state}
   end
-  def handle_cast({:end_auction, _}, current_state), do: {:noreply, current_state}
 
-  def handle_cast({:end_auction_decision_period, _data}, current_state = %{auction_id: auction_id}) do
+  def handle_cast({:end_auction_decision_period, _data, emit}, current_state = %{auction_id: auction_id}) do
     new_state = %AuctionState{current_state | status: :expired}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_new_bid, bid = %{amount: amount}}, current_state = %{auction_id: auction_id, lowest_bids: lowest_bids}) do
+  def handle_cast({:process_new_bid, bid = %{amount: amount}, emit}, current_state = %{auction_id: auction_id, lowest_bids: lowest_bids}) do
     supplier_first_bid = bid
     |> Command.enter_bid
     |> AuctionBidList.process_command
@@ -123,30 +131,45 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
     {lowest_bid, new_state} = set_lowest_bids?(bid, amount, current_state, lowest_amount)
 
-    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered})
+    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered}, emit)
     if lowest_bid or supplier_first_bid do
-      maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id))
+      maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
     {:noreply, new_state}
   end
 
-  def handle_cast({:select_winning_bid, bid}, current_state = %{auction_id: auction_id}) do
+  def handle_cast({:select_winning_bid, bid, emit}, current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
     new_state = current_state
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)
 
-    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
-    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()})
+    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: bid, time_entered: DateTime.utc_now()}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
 
     {:noreply, new_state}
   end
 
-  defp maybe_emit_extend_auction(auction_id, {true, extension_time}) do
-    AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: extension_time}, time_entered: DateTime.utc_now()})
+  def handle_info(:replay_events, current_state = %{auction_id: auction_id}) do
+    status = auction_id
+    |> AuctionEventStore.event_list
+    |> Enum.reverse
+    |> Enum.reduce(nil, fn(event, acc) ->
+      case replay_event(event) do
+        :ok -> acc
+        result -> result
+      end
+    end)
+
+    new_state = Map.put(current_state, :status, status)
+    {:noreply, new_state}
   end
-  defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}), do: nil
+
+  defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
+    AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: extension_time}, time_entered: DateTime.utc_now()}, emit)
+  end
+  defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}, _emit), do: nil
 
   defp set_lowest_bids?(bid, _amount, current_state, nil) do
     {true, %AuctionState{current_state | lowest_bids: [bid]}}
@@ -159,39 +182,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
   defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: {false, current_state}
 
-  defp rebuild_auction(auction_id) do
-    auction_id
-    |> AuctionEventStore.event_list
-    |> IO.inspect
-    |> Enum.reduce(nil, fn(event, acc) ->
-      acc = case replay_event(event) do
-        :ok -> acc
-        result -> result
-      end
-    end)
-  end
-
   defp replay_event(%AuctionEvent{type: :auction_created, data: _auction}), do: :pending
-  defp replay_event(%AuctionEvent{type: :auction_started, data: auction}) do
-    GenServer.cast(self(), {:start_auction, auction})
+  defp replay_event(%AuctionEvent{type: :auction_started, data: %{auction_id: auction_id}}) do
+    GenServer.cast(self(), {:start_auction, auction_id, false})
     :open
   end
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}) do
-    GenServer.cast(self(), {:update_auction, auction})
+    GenServer.cast(self(), {:update_auction, auction, false})
   end
   defp replay_event(%AuctionEvent{type: :bid_placed, data: bid}) do
-    GenServer.cast(self(), {:process_new_bid, bid})
+    GenServer.cast(self(), {:process_new_bid, bid, false})
   end
-  defp replay_event(%AuctionEvent{type: :auction_ended, data: auction}) do
-    GenServer.cast(self(), {:auction_ended, auction})
+  defp replay_event(%AuctionEvent{type: :duration_extended, data: _}), do: nil
+  defp replay_event(%AuctionEvent{type: :auction_ended, data: %{auction_id: auction_id}}) do
+    GenServer.cast(self(), {:end_auction, auction_id, false})
     :decision
   end
   defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: bid}) do
-    GenServer.cast(self(), {:select_winning_bid, bid})
-    :closed
+    GenServer.cast(self(), {:select_winning_bid, bid, false})
   end
-  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: auction}) do
-    GenServer.cast(self(), {:end_auction_decision_period, auction})
+  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: %{auction_id: auction_id}}) do
+    GenServer.cast(self(), {:end_auction_decision_period, auction_id, false})
     :expired
   end
+  defp replay_event(%AuctionEvent{type: :auction_closed, data: _}), do: :closed
 end

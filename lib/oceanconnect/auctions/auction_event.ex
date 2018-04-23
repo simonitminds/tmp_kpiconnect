@@ -10,7 +10,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   alias __MODULE__
 
-  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}) do
+  def emit(%AuctionEvent{}, false), do: nil
+  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}, _emit) do
     Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", event)
   end
 end

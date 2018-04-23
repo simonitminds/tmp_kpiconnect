@@ -29,14 +29,19 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     GenServer.start_link(__MODULE__, {auction_id, duration, decision_duration}, name: get_auction_timer_name(auction_id))
   end
 
-  def process_command(%Command{command: :start_duration_timer, data: %{id: auction_id, duration: duration}}) do
+  def process_command(%Command{command: :update_times, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:start_duration_timer, duration, pid})
+      do: GenServer.cast(pid, {:update_times, auction})
   end
 
-  def process_command(%Command{command: :start_decision_duration_timer, data: %{id: auction_id, decision_duration: decision_duration}}) do
+  def process_command(%Command{command: :start_duration_timer, data: auction_id}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:start_decision_duration_timer, decision_duration, pid})
+      do: GenServer.cast(pid, {:start_duration_timer, pid})
+  end
+
+  def process_command(%Command{command: :start_decision_duration_timer, data: auction_id}) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {:start_decision_duration_timer, pid})
   end
 
   def process_command(%Command{command: :extend_duration, data: %{auction_id: auction_id}}) do
@@ -83,13 +88,20 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, new_state, new_state}
   end
 
-  def handle_cast({:start_duration_timer, duration, pid}, current_state) do
+  def handle_cast({:update_times, %{duration: duration, decision_duration: decision_duration}}, current_state) do
+    new_state = current_state
+    |> Map.put(:duration, duration)
+    |> Map.put(:decision_duration, decision_duration)
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:start_duration_timer, pid}, current_state = %{duration: duration}) do
     new_timer = create_timer(pid, duration, :duration)
     new_state = Map.put(current_state, :duration_timer, new_timer)
     {:noreply, new_state}
   end
 
-  def handle_cast({:start_decision_duration_timer, decision_duration, pid}, current_state) do
+  def handle_cast({:start_decision_duration_timer, pid}, current_state = %{decision_duration: decision_duration}) do
     new_timer = create_timer(pid, decision_duration, :decision_duration)
     new_state = Map.put(current_state, :decision_duration_timer, new_timer)
     {:noreply, new_state}
