@@ -56,7 +56,6 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   end
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id, decision_duration: decision_duration}) do
-    IO.inspect "HERE"
     %Auction{id: auction_id, decision_duration: decision_duration}
     |> Command.end_auction
     |> AuctionStore.process_command

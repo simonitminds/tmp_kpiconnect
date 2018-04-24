@@ -90,8 +90,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       Auctions.place_bid(auction, bid_params, supplier.id)
 
-      {:ok, auction_store_pid} = AuctionStore.find_pid(auction.id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      Auctions.end_auction(auction)
 
       payload = auction
       |> AuctionPayload.get_auction_payload!(supplier_2.id)

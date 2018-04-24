@@ -76,9 +76,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
       authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
-
-      {:ok, auction_store_pid} = Auctions.AuctionStore.find_pid(auction.id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      Auctions.end_auction(auction)
       {:ok, %{conn: authed_conn, bid: bid}}
     end
 
