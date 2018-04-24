@@ -14,7 +14,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   def events_by_auction(auction_id) do
     query = from storage in __MODULE__,
       where: storage.auction_id == ^auction_id,
-      select: storage.event
+      select: storage.event,
+      order_by: [desc: :id]
     query
     |> Oceanconnect.Repo.all
   end
