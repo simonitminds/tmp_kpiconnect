@@ -56,6 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   end
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id, decision_duration: decision_duration}) do
+    IO.inspect "HERE"
     %Auction{id: auction_id, decision_duration: decision_duration}
     |> Command.end_auction
     |> AuctionStore.process_command
@@ -101,7 +102,8 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:noreply, new_state}
   end
 
-  def handle_cast({:start_decision_duration_timer, pid}, current_state = %{decision_duration: decision_duration}) do
+  def handle_cast({:start_decision_duration_timer, pid}, current_state = %{decision_duration: decision_duration, duration_timer: duration_timer}) do
+    Process.cancel_timer(duration_timer)
     new_timer = create_timer(pid, decision_duration, :decision_duration)
     new_state = Map.put(current_state, :decision_duration_timer, new_timer)
     {:noreply, new_state}

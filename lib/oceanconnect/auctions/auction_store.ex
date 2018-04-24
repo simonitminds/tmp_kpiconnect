@@ -38,7 +38,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:via, Registry, {@registry_name, auction_id}}
   end
 
-   # Client
+  # Client
   def start_link(auction_id) do
     GenServer.start_link(__MODULE__, auction_id, name: get_auction_store_name(auction_id))
   end
@@ -61,13 +61,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       do: GenServer.cast(pid, {cmd, auction_id, true})
   end
 
-   # Server
+  # Server
   def init(auction_id) do
-    Process.send_after(self(), :replay_events, 500)
-
-    state = auction_id
-    |> AuctionState.from_auction
-    |> Map.put(:status, :pending)
+    state = case replay_events(auction_id) do
+      nil -> AuctionState.from_auction(auction_id)
+      state -> state
+    end
     AuctionCache.make_cache_available(auction_id)
 
     {:ok, state}
@@ -107,7 +106,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast({:process_new_bid, bid = %{amount: amount}, emit}, current_state = %{auction_id: auction_id, lowest_bids: lowest_bids}) do
     {lowest_bid, supplier_first_bid, new_state} = process_new_bid(bid, current_state)
 
-    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: bid, time_entered: bid.time_entered}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: bid.time_entered}, emit)
     if lowest_bid or supplier_first_bid do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
@@ -116,14 +115,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:select_winning_bid, bid, emit}, current_state = %{auction_id: auction_id}) do
     new_state = select_winning_bid(bid, current_state)
-    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: bid, time_entered: DateTime.utc_now()}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :winning_bid_selected, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: DateTime.utc_now()}, emit)
     AuctionEvent.emit(%AuctionEvent{type: :auction_closed, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
 
     {:noreply, new_state}
   end
 
-  def handle_info(:replay_events, current_state = %{auction_id: auction_id}) do
-    status = auction_id
+  defp replay_events(auction_id) do
+    auction_id
     |> AuctionEventStore.event_list
     |> Enum.reverse
     |> Enum.reduce(nil, fn(event, acc) ->
@@ -132,35 +131,27 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         result -> result
       end
     end)
-
-    new_state = Map.put(current_state, :status, status)
-    {:noreply, new_state}
   end
 
   defp replay_event(%AuctionEvent{type: :auction_created, data: _auction}), do: :pending
-  defp replay_event(%AuctionEvent{type: :auction_started, data: %{auction_id: auction_id}}) do
-    GenServer.cast(self(), {:start_auction, auction_id, false})
-    :open
+  defp replay_event(%AuctionEvent{type: :auction_started, data: state}) do
+    start_auction(state)
   end
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}) do
-    GenServer.cast(self(), {:update_auction, auction, false})
+    update_auction(auction)
   end
-  defp replay_event(%AuctionEvent{type: :bid_placed, data: bid}) do
-    GenServer.cast(self(), {:process_new_bid, bid, false})
+  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid, state: state}}) do
+    process_new_bid(bid, state)
   end
   defp replay_event(%AuctionEvent{type: :duration_extended, data: _}), do: nil
-  defp replay_event(%AuctionEvent{type: :auction_ended, data: %{auction_id: auction_id}}) do
-    GenServer.cast(self(), {:end_auction, auction_id, false})
-    :decision
+  defp replay_event(%AuctionEvent{type: :auction_ended, data: state}) do
+    end_auction(state)
   end
-  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: bid}) do
-    GenServer.cast(self(), {:select_winning_bid, bid, false})
+  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid, state: state}}) do
+    select_winning_bid(bid, state)
   end
-  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: %{auction_id: auction_id}}) do
-    GenServer.cast(self(), {:end_auction_decision_period, auction_id, false})
-    :expired
-  end
-  defp replay_event(%AuctionEvent{type: :auction_closed, data: _}), do: :closed
+  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: state}), do: state
+  defp replay_event(%AuctionEvent{type: :auction_closed, data: state}), do: state
 
   defp start_auction(current_state = %{auction_id: auction_id}) do
     auction_id
