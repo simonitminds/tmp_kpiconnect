@@ -114,7 +114,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   defp produce_payload(auction = %Auction{id: auction_id}, auction_state = %AuctionState{status: :open}, bid_list) do
-    time_remaining = Process.read_timer(AuctionTimer.timer_ref(auction_id, :duration))
+    time_remaining = Process.read_timer(ref = AuctionTimer.timer_ref(auction_id, :duration))
+    ref
     current_server_time = DateTime.utc_now()
     %AuctionPayload{time_remaining: time_remaining, current_server_time: current_server_time, auction: auction, state: auction_state, bid_list: bid_list}
   end

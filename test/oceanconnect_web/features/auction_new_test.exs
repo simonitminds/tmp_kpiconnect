@@ -17,14 +17,15 @@ defmodule Oceanconnect.AuctionNewTest do
     selected_company1 = Enum.at(supplier_companies, 0)
     selected_company2 = Enum.at(supplier_companies, 2)
 
+    date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
     auction_params = %{
-      auction_start_date: DateTime.utc_now(),
-      auction_start_time: DateTime.utc_now(),
-      eta_date: DateTime.utc_now(),
-      eta_time: DateTime.utc_now(),
-      etd_date: DateTime.utc_now(),
-      etd_time: DateTime.utc_now(),
+      auction_start_date: date_time,
+      auction_start_time: date_time,
+      eta_date: date_time,
+      eta_time: date_time,
+      etd_date: date_time,
+      etd_time: date_time,
       decision_duration: 15,
       duration: 10,
       fuel_id: fuel.id,

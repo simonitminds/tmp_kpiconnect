@@ -16,11 +16,11 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
   def init(auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}) do
     children = [
       {AuctionCache, auction},
-      {AuctionStore, auction_id},
       {AuctionBidList, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
       {AuctionEventStore, auction_id},
-      {AuctionEventHandler, auction_id}
+      {AuctionEventHandler, auction_id},
+      {AuctionStore, auction_id}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end

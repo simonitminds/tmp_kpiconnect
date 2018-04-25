@@ -10,13 +10,13 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
-    {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
+    {:ok, %{auction: auction}}
   end
 
   test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}})
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}}, true)
     assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}
   end
 
@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       {:ok, new_auction} = Auctions.create_auction(auction_attrs)
       new_auction_id = new_auction.id
       :timer.sleep(500)
-      assert [%AuctionEvent{type: :auction_created, auction_id: ^new_auction_id, data: _}] = AuctionEventStore.event_list(new_auction)
+      assert [%AuctionEvent{type: :auction_created, auction_id: ^new_auction_id, data: _}] = AuctionEventStore.event_list(new_auction.id)
     end
 
     test "update_auction/2 adds an auction_updated event to the event store", %{auction: auction = %Auction{id: auction_id}} do
@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.update_auction(auction, %{anonymous_bidding: true})
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction.id)
     end
 
     test "update_auction!/2 adds an auction_updated event to the event store and cache is updated", %{auction: auction = %Auction{id: auction_id}} do
@@ -42,7 +42,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true})
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction)
+      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction.id)
       cached_auction = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
     end
@@ -55,7 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [
         %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-      ] = AuctionEventStore.event_list(auction)
+      ] = AuctionEventStore.event_list(auction.id)
     end
 
     test "placing a bid adds a bid_placed event to the event store", %{auction: auction = %Auction{id: auction_id}} do
@@ -71,7 +71,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-      ] = AuctionEventStore.event_list(auction)
+      ] = AuctionEventStore.event_list(auction.id)
     end
 
     test "ending an auction adds an auction_ended event to the event store", %{auction: auction = %Auction{id: auction_id}} do
@@ -85,7 +85,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-      ] = AuctionEventStore.event_list(auction)
+      ] = AuctionEventStore.event_list(auction.id)
     end
 
     test "selecting the winning bid", %{auction: auction = %Auction{id: auction_id}} do
@@ -107,7 +107,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-      ] = AuctionEventStore.event_list(auction)
+      ] = AuctionEventStore.event_list(auction.id)
     end
 
     test "ensure events are in proper order", %{auction: auction = %Auction{id: auction_id}} do
@@ -126,7 +126,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-      ] = AuctionEventStore.event_list(auction)
+      ] = AuctionEventStore.event_list(auction.id)
     end
   end
 end

@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -101,6 +101,12 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command
   end
 
+  def update_cache(auction = %Auction{}) do
+    auction
+    |> Command.update_cache
+    |> AuctionCache.process_command
+  end
+
   def create_auction(attrs \\ %{}) do
     auction = %Auction{}
     |> Auction.changeset(attrs)
@@ -112,7 +118,7 @@ defmodule Oceanconnect.Auctions do
         |> fully_loaded
         |> create_supplier_aliases
         |> AuctionsSupervisor.start_child
-        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()})
+        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()}, true)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
@@ -195,14 +201,18 @@ defmodule Oceanconnect.Auctions do
   def strip_non_loaded(struct), do: struct
 
   defp emit_auction_update({:ok, auction}) do
-    loaded_auction = fully_loaded(auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+    |> fully_loaded
+    |> Command.update_auction
+    |> AuctionStore.process_command
     {:ok, auction}
   end
   defp emit_auction_update({:error, changeset}), do: {:error, changeset}
   defp emit_auction_update(auction) do
-    loaded_auction = fully_loaded(auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_updated, auction_id: auction.id, data: loaded_auction, time_entered: DateTime.utc_now()})
+    auction
+    |> fully_loaded
+    |> Command.update_auction
+    |> AuctionStore.process_command
     auction
   end
 

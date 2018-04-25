@@ -146,8 +146,7 @@ defmodule Oceanconnect.AuctionShowTest do
       bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company2.id)
 
-      {:ok, auction_store_pid} = Auctions.AuctionStore.find_pid(auction.id)
-      GenServer.cast(auction_store_pid, {:end_auction, auction})
+      Auctions.end_auction(auction)
       {:ok, %{bid: bid, bid2: bid2}}
     end
 

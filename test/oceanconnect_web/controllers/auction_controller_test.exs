@@ -155,10 +155,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   end
 
   describe "auction log" do
-
-    setup(context) do
-      start_supervised({Oceanconnect.Auctions.AuctionSupervisor, context.auction})
-      {:ok, context}
+    setup(%{auction: auction}) do
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+      :ok
     end
 
     test "a supplier cannot view log", %{auction: auction, supplier: supplier} do

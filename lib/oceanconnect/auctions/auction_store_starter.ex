@@ -12,6 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
     {:ok, []}
   end
 
+  require Logger
   def handle_info(:start_auction_stores, _) do
     results = Auctions.list_auctions()
     |> Enum.map(fn(auction) ->
@@ -19,7 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
           {auction.id, pid}
         else
           {:error,  {:already_started, pid}} ->  {auction.id, pid}
-          error -> IO.inspect error ; raise("Could Not Start AuctionStore for auction #{auction.id}")
+          error -> Logger.error(inspect(error)) ; raise("Could Not Start AuctionStore for auction #{auction.id}")
       end
     end)
     {:noreply, results}

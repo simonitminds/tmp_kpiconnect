@@ -5,6 +5,18 @@ defmodule Oceanconnect.Auctions.Command do
 
   defstruct command: :get_current_state, data: nil
 
+  def update_auction(auction = %Auction{}) do
+    %Command{command: :update_auction, data: auction}
+  end
+
+  def update_cache(auction = %Auction{}) do
+    %Command{command: :update_cache, data: auction}
+  end
+
+  def update_times(auction = %Auction{}) do
+    %Command{command: :update_times, data: auction}
+  end
+
   def start_auction(auction = %Auction{}) do
     %Command{command: :start_auction, data: auction}
   end
@@ -13,12 +25,12 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :end_auction, data: auction}
   end
 
-  def start_duration_timer(auction = %Auction{}) do
-    %Command{command: :start_duration_timer, data: auction}
+  def start_duration_timer(auction_id) do
+    %Command{command: :start_duration_timer, data: auction_id}
   end
 
-  def start_decision_duration_timer(auction = %Auction{}) do
-    %Command{command: :start_decision_duration_timer, data: auction}
+  def start_decision_duration_timer(auction_id) do
+    %Command{command: :start_decision_duration_timer, data: auction_id}
   end
 
   def end_auction_decision_period(auction = %Auction{}) do

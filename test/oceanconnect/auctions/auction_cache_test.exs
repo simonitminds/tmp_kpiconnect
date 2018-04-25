@@ -4,12 +4,12 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
   alias Oceanconnect.Auctions.{Auction, AuctionCache, AuctionSupervisor}
 
   setup do
-    buyer_company = insert(:company, name: "FooCompany")
-    supplier = insert(:company, name: "BarCompany")
-    supplier_2 = insert(:company, name: "BazCompany")
+    buyer_company = insert(:company)
+    supplier = insert(:company, is_supplier: true)
+    supplier_2 = insert(:company, is_supplier: true)
     auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
 
-    AuctionSupervisor.start_link(auction)
+    {:ok, _pid} = AuctionSupervisor.start_link(auction)
     {:ok, %{auction: auction}}
   end
 
@@ -20,7 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
   test "updating the cache", %{auction: auction} do
     auction
     |> Auctions.update_auction!(%{po: "TEST STRING"})
-    |> AuctionCache.update_cache()
+    :timer.sleep(500)
 
     assert %Auction{po: "TEST STRING"} = AuctionCache.read(auction.id)
   end
