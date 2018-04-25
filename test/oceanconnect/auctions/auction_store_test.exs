@@ -45,6 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     auction
     |> Command.start_auction
     |> AuctionStore.process_command
+    :timer.sleep(500)
 
     assert AuctionStore.get_current_state(auction).status == :open
 

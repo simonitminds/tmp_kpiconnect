@@ -104,7 +104,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       |> Auctions.create_supplier_aliases
       |> Auctions.fully_loaded
 
-      Auctions.AuctionCache.update_cache(auction)
+      Auctions.update_cache(auction)
 
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       Auctions.place_bid(auction, bid_params, supplier.id)
