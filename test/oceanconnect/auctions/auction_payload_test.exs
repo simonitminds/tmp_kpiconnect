@@ -46,6 +46,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert length(payload.bid_list) == 1
       assert payload.bid_list |> hd |> Map.delete(:supplier_id) == payload.state.lowest_bids |> hd
       assert [%AuctionBid{amount: ^amount}] = payload.bid_list
+
+      lowest_bid = hd(payload.state.lowest_bids)
+      refute Map.has_key?(lowest_bid, :supplier)
+      refute Map.has_key?(lowest_bid, :supplier_id)
     end
 
     test "with an existing lowest bid", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
