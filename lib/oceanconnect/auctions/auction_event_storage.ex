@@ -10,6 +10,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     timestamps()
   end
 
+  def persist(event_storage = %AuctionEventStorage{event: event}) do
+    persisted_storage = Map.put(event_storage, :event, :erlang.term_to_binary(event))
+    {:ok, stored} = Oceanconnect.Repo.insert(persisted_storage)
+    {:ok, Map.put(stored, :event, event)}
+  end
 
   def events_by_auction(auction_id) do
     query = from storage in __MODULE__,
@@ -21,13 +26,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     |> Enum.map(fn(event) -> hydrate_event(event) end)
   end
 
-  def hydrate_event(nil), do: nil
-  def hydrate_event(event) do
+  defp hydrate_event(nil), do: nil
+  defp hydrate_event(event) do
     :erlang.binary_to_term(event)
-  end
-
-  def persist(event_storage = %AuctionEventStorage{event: event}) do
-    persisted_storage = Map.put(event_storage, :event, :erlang.term_to_binary(event))
-    Oceanconnect.Repo.insert(persisted_storage)
   end
 end
