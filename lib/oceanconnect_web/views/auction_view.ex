@@ -20,7 +20,9 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_log_winning_bid(%{state: %{winning_bid: nil}}), do: "—"
 
   defp convert_date?(date_time = %{}) do
-    "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year} #{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}"
+    time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}"
+    date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
+    "#{date} #{time}"
   end
 
   defp leftpad(integer) do
