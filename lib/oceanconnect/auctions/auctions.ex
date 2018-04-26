@@ -102,7 +102,7 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def expire_auction(auction = %Auction{id: auction_id}) do
+  def expire_auction(auction = %Auction{}) do
     auction
     |> Command.end_auction_decision_period
     |> AuctionStore.process_command

@@ -27,16 +27,10 @@ defmodule Oceanconnect.AuctionLogTest do
     {:ok, %{auction: updated_auction, buyer_id: buyer_company.id}}
   end
 
-  test "auction log has log details" do
-    expected_events = [
-      "auction_closed",
-      "winning_bid_selected",
-      "auction_ended",
-      "bid_placed",
-      "auction_updated",
-      "auction_started"
-    ]
-    assert AuctionLogPage.has_event_types?(expected_events)
+  test "auction log has log details", %{auction: auction} do
+    event_list = Auctions.AuctionEventStore.event_list(auction.id)
+    |> IO.inspect
+    assert AuctionLogPage.has_events?(event_list)
   end
 
   test "page has auction details", %{auction: auction, buyer_id: buyer_id} do

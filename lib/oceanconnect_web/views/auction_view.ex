@@ -1,13 +1,6 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
-
-  def auction_log_events(events) do
-    Enum.map(events, fn(event) ->
-      event
-      |> Map.put(:data, event.data |> Poison.encode!)
-      |> Map.put(:time, event.time_entered |> convert_date?)
-    end)
-  end
+  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent}
 
   def auction_log_supplier(%{state: %{winning_bid: %{supplier: supplier}}}) do
     supplier
@@ -28,6 +21,14 @@ defmodule OceanconnectWeb.AuctionView do
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
+  def convert_date?(data), do: data
+
+  def event_bid_amount(%AuctionEvent{data: %AuctionBidList.AuctionBid{amount: amount}}), do: "$#{amount}"
+  def event_bid_amount(_event), do: "-"
+
+  def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
+  def event_company(%AuctionEvent{data: %Auction{buyer: buyer}}), do: buyer.name
+  def event_company(_), do: "-"
 
   defp leftpad(integer) do
     String.pad_leading(Integer.to_string(integer), 2, "0")

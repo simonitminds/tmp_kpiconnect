@@ -42,7 +42,6 @@
               <%= @auction_payload.auction.port.name %></br>
               <%= @auction_payload.auction.eta %></br>
               <%= @auction_payload.auction.additional_information %>
-
             </td>
           </tr>
           <tr>
@@ -60,17 +59,19 @@
     <table class="table is-fullwidth is-striped report__table--log is-hidden-touch">
       <thead>
         <tr>
-          <th>Time</th>
           <th>Event</th>
-          <th>Data</th>
+          <th>Company</th>
+          <th>Time</th>
+          <th>Bid Amount</th>
         </tr>
       </thead>
       <tbody>
-        <%= for event <- auction_log_events(@events) do %>
-          <tr>
-            <td><strong><%= event.time %><br/></strong></td>
-            <td class="qa-mobile-event-type"><%= event.type %></td>
-            <td><%= event.data %></td>
+        <%= for event <- @events do %>
+          <tr class=<%= "qa-event-#{event.id}" %>>
+            <td class="qa-event-type"><%= event.type %></td>
+            <td class="qa-event-company"><%= event_company(event) %></td>
+            <td><%= convert_date?(event.time_entered) %></td>
+            <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -82,12 +83,13 @@
         </tr>
       </thead>
       <tbody>
-        <%= for event <- auction_log_events(@events) do %>
+        <%= for event <- @events do %>
           <tr>
             <td>
-            <strong><%= event.time %><br/></strong>
-            <strong class="qa-event-type"><%= event.type %></strong><br/>
-            <%= event.data %>
+            <strong class="qa-mobile-event-type"><%= event.type %></strong><br/>
+            <strong><%= event_company(event) %><br/></strong>
+            <strong><%= convert_date?(event.time_entered) %><br/></strong>
+            <strong><%= event_bid_amount(event) %><br/></strong>
             </td>
           </tr>
         <% end %>

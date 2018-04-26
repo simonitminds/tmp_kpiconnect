@@ -1,16 +1,19 @@
 defmodule Oceanconnect.AuctionLogPage do
   use Oceanconnect.Page
+  alias OceanconnectWeb.AuctionView
 
   def visit(id) do
     navigate_to("/auctions/#{id}/log")
   end
 
-  def has_event_types?(events) do
-    elements = find_all_elements(:class, "qa-event-type")
-    rendered_events = Enum.map(elements, fn(element) ->
-      element |> inner_text
+  def has_events?(events) do
+    Enum.all?(events, fn(event) ->
+      element = find_element(:class, "qa-event-#{event.id}")
+      with true <- Atom.to_string(event.type) == element |> find_within_element(:class, "qa-event-type") |> inner_text,
+           true <- AuctionView.event_company(event) == element |> find_within_element(:class, "qa-event-company") |> inner_text,
+           true <- AuctionView.event_bid_amount(event) == element |> find_within_element(:class, "qa-event-bid-amount") |> inner_text,
+           do: true
     end)
-    events == rendered_events
   end
 
   def has_details?(details) do

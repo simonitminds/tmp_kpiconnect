@@ -213,12 +213,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :open, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :duration)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, auction_id: auction_id}, true)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, time_entered: DateTime.utc_now(), auction_id: auction_id}, true)
     state
   end
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :decision, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :decision_duration)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, auction_id: auction_id}, true)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, time_entered: DateTime.utc_now(), auction_id: auction_id}, true)
     state
   end
 
