@@ -128,40 +128,36 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionEventStore.event_list
     |> Enum.reverse
     |> Enum.reduce(nil, fn(event, acc) ->
-      case replay_event(event) do
-        :ok -> acc
+      case replay_event(event, acc) do
+        nil -> acc
         result -> result
       end
     end)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created, data: _auction}), do: :pending
-  defp replay_event(%AuctionEvent{type: :auction_started, data: state}) do
+  defp replay_event(%AuctionEvent{type: :auction_created}, _previous_state), do: nil
+  defp replay_event(%AuctionEvent{type: :auction_started, data: state}, _previous_state) do
     start_auction(state)
   end
-  defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}) do
+  defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, _previous_state) do
     update_auction(auction)
+    nil
   end
-  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid, state: state = %{lowest_bids: lowest_bids}}}) do
-    if bid in lowest_bids do
-      orig_state = Map.put(state, :lowest_bids, List.delete(lowest_bids, bid))
-      process_new_bid(bid, orig_state)
-    else
-      process_new_bid(bid, state)
-    end
-    state
+  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
+    {_lowest_bid, _supplier_first_bid, new_state} = process_new_bid(bid, previous_state)
+    new_state
   end
-  defp replay_event(%AuctionEvent{type: :duration_extended, data: _}), do: nil
-  defp replay_event(%AuctionEvent{type: :auction_ended, data: state}) do
-    end_auction(state)
+  defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
+  defp replay_event(%AuctionEvent{type: :auction_ended}, previous_state) do
+    end_auction(previous_state)
   end
-  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid, state: state}}) do
-    select_winning_bid(bid, state)
+  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid}}, previous_state) do
+    select_winning_bid(bid, previous_state)
   end
-  defp replay_event(%AuctionEvent{type: :auction_expired, data: state}) do
-    expire_auction(state)
+  defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
+    expire_auction(previous_state)
   end
-  defp replay_event(%AuctionEvent{type: :auction_closed, data: state}), do: state
+  defp replay_event(%AuctionEvent{type: :auction_closed, data: state}, _previous_state), do: state
 
   defp start_auction(current_state = %{auction_id: auction_id}) do
     auction_id
