@@ -25,7 +25,9 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:ok, auction_id}
   end
 
-  # TODO narrow the scope of which events we respond to with better pattern matching.
+  def handle_info(%AuctionEvent{type: type}, state) when type in [:auction_updated, :auction_state_rebuilt] do
+    {:noreply, state}
+  end
   def handle_info(%AuctionEvent{auction_id: auction_id, type: _type, data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}}, state) do
     auction_id
     |> Auctions.AuctionCache.read
@@ -36,7 +38,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
-
   def handle_info(_event, state) do
     {:noreply, state}
   end

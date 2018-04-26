@@ -65,7 +65,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def init(auction_id) do
     state = case replay_events(auction_id) do
       nil -> AuctionState.from_auction(auction_id)
-      state -> state
+      state -> maybe_emit_rebuilt_event(state)
     end
     AuctionCache.make_cache_available(auction_id)
 
@@ -210,6 +210,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
     %AuctionState{current_state | status: :expired}
   end
+
+  defp maybe_emit_rebuilt_event(state = %AuctionState{status: :open, auction_id: auction_id}) do
+    time_remaining = AuctionTimer.read_timer(auction_id, :duration)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, auction_id: auction_id}, true)
+    state
+  end
+  defp maybe_emit_rebuilt_event(state = %AuctionState{status: :decision, auction_id: auction_id}) do
+    time_remaining = AuctionTimer.read_timer(auction_id, :decision_duration)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, auction_id: auction_id}, true)
+    state
+  end
+
+  defp maybe_emit_rebuilt_event(state), do: state
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
     AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: extension_time}, time_entered: DateTime.utc_now()}, emit)
