@@ -39,7 +39,7 @@
             </td>
           </tr>
           <tr>
-            <th>Winning Bid</th><td>$<%= auction_log_selected_bid(@auction_payload) %></td>
+            <th>Winning Bid</th><td>$<%= auction_log_winning_bid(@auction_payload) %></td>
           </tr>
           <tr>
             <th>Winning Bidder</th><td><%= auction_log_supplier(@auction_payload) %></td>
