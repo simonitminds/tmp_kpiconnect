@@ -98,8 +98,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction_decision_period, _data, emit}, current_state = %{auction_id: auction_id}) do
-    new_state = %AuctionState{current_state | status: :expired}
-    AuctionEvent.emit(%AuctionEvent{type: :auction_decision_period_ended, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
+    new_state = expire_auction(current_state)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_expired, auction_id: auction_id, data: new_state, time_entered: DateTime.utc_now()}, emit)
+
     {:noreply, new_state}
   end
   def handle_cast({:end_auction, _auction_id, _emit}, current_state), do: {:noreply, current_state}
@@ -157,7 +158,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid, state: state}}) do
     select_winning_bid(bid, state)
   end
-  defp replay_event(%AuctionEvent{type: :auction_decision_period_ended, data: state}), do: state
+  defp replay_event(%AuctionEvent{type: :auction_expired, data: state}) do
+    expire_auction(state)
+  end
   defp replay_event(%AuctionEvent{type: :auction_closed, data: state}), do: state
 
   defp start_auction(current_state = %{auction_id: auction_id}) do
@@ -205,6 +208,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     current_state
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)
+  end
+
+  defp expire_auction(current_state = %{auction_id: auction_id}) do
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+    %AuctionState{current_state | status: :expired}
   end
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
