@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     auction = insert(:auction,
-      buyer: buyer_company, duration: 1_000, decision_duration: 3_000,
+      buyer: buyer_company, duration: 1_000, decision_duration: 1_000,
       suppliers: [supplier_company, supplier3_company]
     )
     {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
@@ -127,12 +127,11 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       {:ok, %{expected_payload: payload}}
     end
 
-    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
+    test "buyers get notified with timer timeout", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
-      Auctions.end_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -191,7 +190,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       {:ok, %{expected_payload: payload}}
     end
 
-    test "buyers get notified", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
+    test "buyers get notified with timer timeout", %{auction: auction, buyer_id: buyer_id, expected_payload: expected_payload} do
       channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
@@ -216,6 +215,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
+      Auctions.expire_auction(auction)
 
       auction_id = auction.id
       receive do
@@ -231,11 +231,12 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
     end
 
-    test "a non participant is not notified", %{non_participant_id: non_participant_id, expected_payload: expected_payload}  do
+    test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, expected_payload: expected_payload}  do
       channel = "user_auctions:#{non_participant_id}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
+      Auctions.expire_auction(auction)
 
       refute_broadcast ^event, ^expected_payload
     end

@@ -46,9 +46,9 @@ defmodule OceanconnectWeb.Api.BidController do
   end
 
   defp duration_time_remaining?(auction_id) do
-    case AuctionTimer.timer_ref(auction_id, :duration) do
-      nil -> false
-      timer_ref -> Process.read_timer(timer_ref) > 0
+    case AuctionTimer.read_timer(auction_id, :duration) do
+      false -> false
+      time_remaining -> time_remaining > 0
     end
   end
 end

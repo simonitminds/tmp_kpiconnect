@@ -13,11 +13,11 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
-    ref = AuctionTimer.timer_ref(auction.id, :duration)
-    assert round(Float.round(Process.read_timer(ref) / 10) * 10) == auction.duration
+    time_remaining = AuctionTimer.read_timer(auction.id, :duration)
+    assert round(Float.round(time_remaining / 10) * 10) == auction.duration
 
     :timer.sleep(500)
-    assert Process.read_timer(ref) < auction.duration
+    assert AuctionTimer.read_timer(auction.id, :duration) < auction.duration
   end
 
   test "start auction_decision_duration_timer for auction", %{auction: auction} do
@@ -29,10 +29,23 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
     |> Command.start_decision_duration_timer
     |> AuctionTimer.process_command
 
-    ref = AuctionTimer.timer_ref(auction.id, :decision_duration)
-    assert round(Float.round(Process.read_timer(ref) / 10) * 10) == auction.decision_duration
+    time_remaining = AuctionTimer.read_timer(auction.id, :decision_duration)
+    assert round(Float.round(time_remaining / 10) * 10) == auction.decision_duration
 
     :timer.sleep(500)
-    assert Process.read_timer(ref) < auction.decision_duration
+    assert AuctionTimer.read_timer(auction.id, :decision_duration) < auction.decision_duration
+  end
+
+  test "cancel_timer/2 cancels the specified timer", %{auction: auction} do
+    Oceanconnect.Auctions.start_auction(auction)
+    refute AuctionTimer.timer_ref(auction.id, :duration) == false
+
+    AuctionTimer.cancel_timer(auction.id, :duration)
+    assert AuctionTimer.timer_ref(auction.id, :duration) == false
+  end
+
+  test "cancel_timer/2 gracefully continues if timer doesn't exist", %{auction: auction} do
+    AuctionTimer.cancel_timer(auction.id, :duration)
+    assert AuctionTimer.timer_ref(auction.id, :duration) == false
   end
 end

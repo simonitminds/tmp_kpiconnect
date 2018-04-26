@@ -99,12 +99,13 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Command.end_auction
     |> AuctionStore.process_command
+    auction
   end
 
-  def update_cache(auction = %Auction{}) do
+  def expire_auction(auction = %Auction{id: auction_id}) do
     auction
-    |> Command.update_cache
-    |> AuctionCache.process_command
+    |> Command.end_auction_decision_period
+    |> AuctionStore.process_command
   end
 
   def create_auction(attrs \\ %{}) do
@@ -123,6 +124,12 @@ defmodule Oceanconnect.Auctions do
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  def update_cache(auction = %Auction{}) do
+    auction
+    |> Command.update_cache
+    |> AuctionCache.process_command
   end
 
   def create_supplier_aliases(auction = %{suppliers: suppliers}) do
