@@ -12,4 +12,13 @@ defmodule Oceanconnect.AuctionLogPage do
     end)
     events == rendered_events
   end
+
+  def has_details?(details) do
+    Enum.all?(details, fn({k, v}) ->
+      text = :class
+      |> find_element("qa-auction-detail-#{k}")
+      |> inner_text
+      text == v
+    end)
+  end
 end

@@ -7,25 +7,32 @@
       <table class="table report__table--auction-details">
         <tbody>
           <tr>
-            <th>Auction Type</th><td>Reverse Auction</td>
+            <th>Auction Type</th>
+            <td>Reverse Auction</td>
           </tr>
           <tr>
-            <th>Auction Created</th><td>&mdash;</td>
+            <th>Auction Created</th>
+            <td class="qa-auction-detail-created"><%= convert_date?(@auction_payload.auction.inserted_at) %></td>
           </tr>
           <tr>
-            <th>Created By</th><td><%= @auction_payload.auction.buyer.name %></td>
+            <th>Created By</th>
+            <td class="qa-auction-detail-buyer-name"><%= @auction_payload.auction.buyer.name %></td>
           </tr>
           <tr>
-            <th>Auction Started</th><td><%= @auction_payload.auction.auction_start %></td>
+            <th>Auction Started</th>
+            <td class="qa-auction-detail-auction_started"><%= convert_date?(@auction_payload.auction.auction_start) %></td>
           </tr>
           <tr>
-            <th>Auction Completed</th><td>&mdash;</td>
+            <th>Auction Completed</th>
+            <td class="qa-auction-detail-auction_ended">&mdash;</td>
           </tr>
           <tr>
-            <th>Scheduled Duration</th><td><%= trunc(@auction_payload.auction.duration/60000) %> minutes</td>
+            <th>Scheduled Duration</th>
+            <td class="qa-auction-detail-duration"><%= convert_duration(@auction_payload.auction.duration) %></td>
           </tr>
           <tr>
-            <th>Actual Duration</th><td>&mdash;</td>
+            <th>Actual Duration</th>
+            <td class="qa-auction-detail-actual-duration">&mdash;</td>
           </tr>
           <tr>
             <th>Auction Details</th>
@@ -39,10 +46,12 @@
             </td>
           </tr>
           <tr>
-            <th>Winning Bid</th><td>$<%= auction_log_winning_bid(@auction_payload) %></td>
+            <th>Winning Bid</th>
+            <td class="qa-auction-detail-winning-bid-amount"><%= auction_log_winning_bid(@auction_payload) %></td>
           </tr>
           <tr>
-            <th>Winning Bidder</th><td><%= auction_log_supplier(@auction_payload) %></td>
+            <th>Winning Bidder</th>
+            <td class="qa-auction-detail-winning-supplier"><%= auction_log_supplier(@auction_payload) %></td>
           </tr>
         </tbody>
       </table>

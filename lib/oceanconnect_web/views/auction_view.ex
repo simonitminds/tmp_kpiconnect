@@ -15,11 +15,15 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_log_supplier(%{state: %{winning_bid: nil}}), do: "—"
 
   def auction_log_winning_bid(%{state: %{winning_bid: %{amount: amount}}}) do
-    :erlang.float_to_binary(amount, [decimals: 2])
+    "$#{:erlang.float_to_binary(amount, [decimals: 2])}"
   end
   def auction_log_winning_bid(%{state: %{winning_bid: nil}}), do: "—"
 
-  defp convert_date?(date_time = %{}) do
+  def convert_duration(duration) do
+    "#{trunc(duration / 60_000)} minutes"
+  end
+
+  def convert_date?(date_time = %{}) do
     time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}"
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
