@@ -17,6 +17,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :eta, :utc_datetime, default: @current_time_trunc
     field :etd, :utc_datetime, default: @current_time_trunc
     field :auction_start, :utc_datetime, default: @current_time_trunc
+    field :auction_ended, :utc_datetime
     field :duration, :integer, default: 10 * 60_000 # milliseconds
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
     field :anonymous_bidding, :boolean
@@ -39,6 +40,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :additional_information,
     :anonymous_bidding,
     :auction_start,
+    :auction_ended,
     :duration,
     :decision_duration,
     :eta,

@@ -88,6 +88,20 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       ] = AuctionEventStore.event_list(auction.id)
     end
 
+    test "ending an auction saves the auction_ended timestamp on the auction", %{auction: auction = %Auction{id: auction_id}} do
+      Auctions.start_auction(auction)
+      Auctions.end_auction(auction)
+      :timer.sleep(500)
+
+      auction_ended_event = auction.id
+      |> AuctionEventStore.event_list
+      |> Enum.filter(fn(event) -> event.type == :auction_ended end)
+      |> hd
+
+      updated_auction = Auctions.get_auction(auction.id)
+      assert auction_ended_event.time_entered == updated_auction.auction_ended
+    end
+
     test "selecting the winning bid", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 

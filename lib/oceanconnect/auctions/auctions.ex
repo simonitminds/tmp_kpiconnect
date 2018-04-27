@@ -158,6 +158,12 @@ defmodule Oceanconnect.Auctions do
     |> emit_auction_update
   end
 
+  def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
+    auction
+    |> Auction.changeset(attrs)
+    |> Repo.update!()
+  end
+
   def delete_auction(%Auction{} = auction) do
     Repo.delete(auction)
   end

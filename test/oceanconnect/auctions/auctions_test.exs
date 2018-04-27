@@ -79,6 +79,16 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
 
+    test "update_auction_without_event_storage!/2 with valid data updates the auction", %{auction: auction} do
+      assert auction = %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
+      assert auction.po == "some updated po"
+    end
+
+    test "update_auction!/2 with valid data updates the auction", %{auction: auction} do
+      assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs)
+      assert auction.po == "some updated po"
+    end
+
     test "update_auction/2 with valid data updates the auction", %{auction: auction} do
       assert {:ok, auction} = Auctions.update_auction(auction, @update_attrs)
       assert %Auction{} = auction
