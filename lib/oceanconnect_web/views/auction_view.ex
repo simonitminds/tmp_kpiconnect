@@ -28,10 +28,12 @@ defmodule OceanconnectWeb.AuctionView do
   end
   def convert_date?(_), do: "-"
 
-  def event_bid_amount(%AuctionEvent{data: %AuctionBidList.AuctionBid{amount: amount}}), do: "$#{amount}"
+  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: amount}}}), do: "$#{amount}"
   def event_bid_amount(_event), do: "-"
 
+  def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
+  def event_company(%AuctionEvent{data: %{auction: %Auction{buyer: buyer}}}), do: buyer.name
   def event_company(%AuctionEvent{data: %Auction{buyer: buyer}}), do: buyer.name
   def event_company(_), do: "-"
 
