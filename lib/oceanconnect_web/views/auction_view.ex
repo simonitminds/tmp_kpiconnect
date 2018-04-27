@@ -2,6 +2,11 @@ defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
   alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent}
 
+  def actual_duration(%Auction{auction_ended: nil}), do: "-"
+  def actual_duration(%Auction{auction_start: started, auction_ended: ended}) do
+    "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
+  end
+
   def auction_log_supplier(%{state: %{winning_bid: %{supplier: supplier}}}) do
     supplier
   end
@@ -21,7 +26,7 @@ defmodule OceanconnectWeb.AuctionView do
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
-  def convert_date?(data), do: data
+  def convert_date?(_), do: "-"
 
   def event_bid_amount(%AuctionEvent{data: %AuctionBidList.AuctionBid{amount: amount}}), do: "$#{amount}"
   def event_bid_amount(_event), do: "-"
