@@ -31,15 +31,15 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "update_auction/2 adds an auction_updated event to the event store", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-      Auctions.update_auction(auction, %{anonymous_bidding: true})
+      Auctions.update_auction(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
       assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction.id)
     end
 
-    test "update_auction!/2 adds an auction_updated event to the event store and cache is updated", %{auction: auction = %Auction{id: auction_id}} do
+    test "update_auction!/3 adds an auction_updated event to the event store and cache is updated", %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-      updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true})
+      updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
       assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] = AuctionEventStore.event_list(auction.id)
@@ -93,12 +93,12 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.end_auction(auction)
       :timer.sleep(500)
 
-      auction_ended_event = auction.id
+      auction_ended_event = auction_id
       |> AuctionEventStore.event_list
       |> Enum.filter(fn(event) -> event.type == :auction_ended end)
       |> hd
 
-      updated_auction = Auctions.get_auction(auction.id)
+      updated_auction = Auctions.get_auction(auction_id)
       assert auction_ended_event.time_entered == updated_auction.auction_ended
     end
 

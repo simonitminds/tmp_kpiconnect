@@ -60,6 +60,7 @@
       <thead>
         <tr>
           <th>Event</th>
+          <th>User</th>
           <th>Company</th>
           <th>Time</th>
           <th>Bid Amount</th>
@@ -69,6 +70,7 @@
         <%= for event <- @events do %>
           <tr class=<%= "qa-event-#{event.id}" %>>
             <td class="qa-event-type"><%= event.type %></td>
+            <td class="qa-event-user"><%= event_user(event) %></td>
             <td class="qa-event-company"><%= event_company(event) %></td>
             <td><%= convert_date?(event.time_entered) %></td>
             <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>

@@ -6,23 +6,23 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id, time_entered \\ DateTime.utc_now()) do
+  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
     bid = bid_params
     |> Map.put("supplier_id", supplier_id)
     |> Map.put("time_entered", time_entered)
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
 
     bid
-    |> Command.process_new_bid
+    |> Command.process_new_bid(user)
     |> AuctionStore.process_command
 
     bid
   end
 
-  def select_winning_bid(bid, comment) do
+  def select_winning_bid(bid, comment, user \\ nil) do
     bid
     |> Map.put(:comment, comment)
-    |> Command.select_winning_bid
+    |> Command.select_winning_bid(user)
     |> AuctionStore.process_command
   end
 
@@ -87,12 +87,12 @@ defmodule Oceanconnect.Auctions do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
-  def start_auction(auction = %Auction{}) do
+  def start_auction(auction = %Auction{}, user \\ nil) do
     auction
-    |> Command.start_auction
+    |> Command.start_auction(user)
     |> AuctionStore.process_command
 
-    update_auction!(auction, %{auction_start: DateTime.utc_now()})
+    update_auction!(auction, %{auction_start: DateTime.utc_now()}, user)
   end
 
   def end_auction(auction = %Auction{}) do
@@ -108,18 +108,23 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command
   end
 
-  def create_auction(attrs \\ %{}) do
+  def create_auction(attrs \\ %{}, user \\ nil) do
     auction = %Auction{}
     |> Auction.changeset(attrs)
     |> Repo.insert()
 
     case auction do
       {:ok, auction} ->
+        user_on_record = case user do
+          nil -> auction |> Repo.preload([:buyer]) |> Map.fetch!(:buyer)
+          user -> user
+        end
         auction
         |> fully_loaded
         |> create_supplier_aliases
         |> AuctionsSupervisor.start_child
-        AuctionEvent.emit(%AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now()}, true)
+        event = %AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now(), user: user_on_record}
+        AuctionEvent.emit(event, true)
         {:ok, auction}
       {:error, changeset} ->
         {:error, changeset}
@@ -144,18 +149,18 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def update_auction(%Auction{} = auction, attrs) do
+  def update_auction(%Auction{} = auction, attrs, user) do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update()
-    |> emit_auction_update
+    |> emit_auction_update(user)
   end
 
-  def update_auction!(%Auction{} = auction, attrs) do
+  def update_auction!(%Auction{} = auction, attrs, user) do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update!()
-    |> emit_auction_update
+    |> emit_auction_update(user)
   end
 
   def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
@@ -213,18 +218,18 @@ defmodule Oceanconnect.Auctions do
   end
   def strip_non_loaded(struct), do: struct
 
-  defp emit_auction_update({:ok, auction}) do
+  defp emit_auction_update({:ok, auction}, user) do
     auction
     |> fully_loaded
-    |> Command.update_auction
+    |> Command.update_auction(user)
     |> AuctionStore.process_command
     {:ok, auction}
   end
-  defp emit_auction_update({:error, changeset}), do: {:error, changeset}
-  defp emit_auction_update(auction) do
+  defp emit_auction_update({:error, changeset}, _user), do: {:error, changeset}
+  defp emit_auction_update(auction, user) do
     auction
     |> fully_loaded
-    |> Command.update_auction
+    |> Command.update_auction(user)
     |> AuctionStore.process_command
     auction
   end

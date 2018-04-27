@@ -28,9 +28,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
   describe "open auction" do
     setup %{auction: auction} do
-      auction
-      |> Oceanconnect.Auctions.Command.start_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.start_auction(auction)
       :ok
     end
 

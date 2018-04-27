@@ -56,7 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
       do: GenServer.cast(pid, {:start_decision_duration_timer, pid})
   end
 
-  def process_command(%Command{command: :extend_duration, data: %{auction_id: auction_id}}) do
+  def process_command(%Command{command: :extend_duration, data: auction_id}) do
     with {:ok, pid} <- find_pid(auction_id),
       do: GenServer.call(pid, {:extend_duration, pid})
   end

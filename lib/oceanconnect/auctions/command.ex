@@ -5,8 +5,8 @@ defmodule Oceanconnect.Auctions.Command do
 
   defstruct command: :get_current_state, data: nil
 
-  def update_auction(auction = %Auction{}) do
-    %Command{command: :update_auction, data: auction}
+  def update_auction(auction = %Auction{}, user) do
+    %Command{command: :update_auction, data: %{auction: auction, user: user}}
   end
 
   def update_cache(auction = %Auction{}) do
@@ -17,8 +17,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :update_times, data: auction}
   end
 
-  def start_auction(auction = %Auction{}) do
-    %Command{command: :start_auction, data: auction}
+  def start_auction(auction = %Auction{}, user) do
+    %Command{command: :start_auction, data: %{auction: auction, user: user}}
   end
 
   def end_auction(auction = %Auction{}) do
@@ -41,15 +41,15 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :enter_bid, data: bid}
   end
 
-  def process_new_bid(bid = %AuctionBid{}) do
-    %Command{command: :process_new_bid, data: bid}
+  def process_new_bid(bid = %AuctionBid{}, user) do
+    %Command{command: :process_new_bid, data: %{bid: bid, user: user}}
   end
 
-  def select_winning_bid(bid = %AuctionBid{}) do
-    %Command{command: :select_winning_bid, data: bid}
+  def select_winning_bid(bid = %AuctionBid{}, user) do
+    %Command{command: :select_winning_bid, data: %{bid: bid, user: user}}
   end
 
   def extend_duration(auction_id) do
-    %Command{command: :extend_duration, data: %{auction_id: auction_id}}
+    %Command{command: :extend_duration, data: auction_id}
   end
 end

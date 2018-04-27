@@ -35,6 +35,10 @@ defmodule OceanconnectWeb.AuctionView do
   def event_company(%AuctionEvent{data: %Auction{buyer: buyer}}), do: buyer.name
   def event_company(_), do: "-"
 
+  def event_user(%AuctionEvent{user: nil}), do: "-"
+  def event_user(%AuctionEvent{user: user}), do: user.email
+  def event_user(_), do: "-"
+
   defp leftpad(integer) do
     String.pad_leading(Integer.to_string(integer), 2, "0")
   end

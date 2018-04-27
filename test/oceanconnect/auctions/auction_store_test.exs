@@ -42,9 +42,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "auction status is decision after duration timeout", %{auction: auction} do
     assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction.id)
 
-    auction
-    |> Command.start_auction
-    |> AuctionStore.process_command
+    Auctions.start_auction(auction)
     :timer.sleep(500)
 
     assert AuctionStore.get_current_state(auction).status == :open
@@ -61,16 +59,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   test "auction decision period expiring", %{auction: auction} do
     auction
-    |> Command.start_auction
-    |> AuctionStore.process_command
-
-    auction
-    |> Command.end_auction
-    |> AuctionStore.process_command
-
-    auction
-    |> Command.end_auction_decision_period
-    |> AuctionStore.process_command
+    |> Auctions.start_auction
+    |> Auctions.end_auction
+    |> Auctions.expire_auction
 
     expected_state = auction.id
     |> AuctionState.from_auction
@@ -135,10 +126,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       Auctions.start_auction(auction)
       bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
       bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
-
-      auction
-      |> Command.end_auction
-      |> AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       {:ok, %{bid: bid, bid2: bid2}}
     end

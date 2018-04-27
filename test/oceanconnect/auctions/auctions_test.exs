@@ -84,19 +84,19 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction.po == "some updated po"
     end
 
-    test "update_auction!/2 with valid data updates the auction", %{auction: auction} do
-      assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs)
+    test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
+      assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs, nil)
       assert auction.po == "some updated po"
     end
 
-    test "update_auction/2 with valid data updates the auction", %{auction: auction} do
-      assert {:ok, auction} = Auctions.update_auction(auction, @update_attrs)
+    test "update_auction/3 with valid data updates the auction", %{auction: auction} do
+      assert {:ok, auction} = Auctions.update_auction(auction, @update_attrs, nil)
       assert %Auction{} = auction
       assert auction.po == "some updated po"
     end
 
-    test "update_auction/2 with invalid data returns error changeset", %{auction: auction} do
-      assert {:error, %Ecto.Changeset{}} = Auctions.update_auction(auction, @invalid_attrs)
+    test "update_auction/3 with invalid data returns error changeset", %{auction: auction} do
+      assert {:error, %Ecto.Changeset{}} = Auctions.update_auction(auction, @invalid_attrs, nil)
       assert auction == Auctions.get_auction!(auction.id)
     end
 
