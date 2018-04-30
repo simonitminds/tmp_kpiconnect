@@ -131,6 +131,20 @@ defmodule Oceanconnect.AuctionsTest do
       auction = insert(:auction, suppliers: [supplier_company])
       {:ok, _pid} = start_supervised({Auctions.AuctionSupervisor, auction})
       Auctions.start_auction(auction)
+      on_exit(fn ->
+        case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+          [] -> nil
+          children ->
+            Enum.map(children, fn({_, pid, _, _}) ->
+              Process.unlink(pid)
+              Process.exit(pid, :shutdown)
+              ref = Process.monitor(pid)
+              assert_receive {:DOWN, ^ref, _, _, _}, 1_000
+            end)
+        end
+      end)
+
+
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end
 

@@ -36,6 +36,18 @@ defmodule OceanconnectWeb.ConnCase do
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(Oceanconnect.Repo, {:shared, self()})
     end
+
+    on_exit(fn ->
+      case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+        [] -> nil
+        children ->
+          Enum.map(children, fn({_, pid, _, _}) ->
+            Process.unlink(pid)
+            Process.exit(pid, :shutdown)
+          end)
+      end
+    end)
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
