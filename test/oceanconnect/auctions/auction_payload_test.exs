@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionBidList.AuctionBid
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor, Command}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
 
   describe "get_auction_payload!/1" do
     setup do

@@ -20,7 +20,7 @@ defmodule Oceanconnect.AuctionLogPage do
     bid_event = events
     |> Enum.filter(fn(event) -> event.type == :bid_placed end)
     |> hd
-    user_text(bid_event.id) == bid_event.user.email
+    user_text(bid_event.id) == supplier.email
   end
 
   def event_user_displayed?(events) do
