@@ -30,9 +30,10 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def start(conn, %{"id" => id}) do
+    user = Auth.current_user(conn)
     id
     |> Auctions.get_auction!
-    |> Auctions.start_auction
+    |> Auctions.start_auction(user)
 
     redirect(conn, to: auction_path(conn, :index))
   end
@@ -49,9 +50,11 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def create(conn, %{"auction" => auction_params}) do
-    auction_params = Auction.from_params(auction_params)
-    |> Map.put("buyer_id", Auth.current_user(conn).company.id)
-    case Auctions.create_auction(auction_params) do
+    user = Auth.current_user(conn)
+    updated_params = auction_params
+    |> Auction.from_params
+    |> Map.put("buyer_id", user.company.id)
+    case Auctions.create_auction(updated_params, user) do
       {:ok, auction} ->
         conn
         |> put_flash(:info, "Auction created successfully.")
@@ -109,11 +112,12 @@ defmodule OceanconnectWeb.AuctionController do
     auction = id
     |> Auctions.get_auction!
     |> Auctions.fully_loaded
-    auction_params = Auction.from_params(auction_params)
-    if(auction.buyer_id != Auth.current_user(conn).company_id) do
+    updated_params = Auction.from_params(auction_params)
+    user = Auth.current_user(conn)
+    if(auction.buyer_id != user.company_id) do
       redirect(conn, to: auction_path(conn, :index))
     else
-      case Auctions.update_auction(auction, auction_params) do
+      case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->
           conn
           |> put_flash(:info, "Auction updated successfully.")

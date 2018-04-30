@@ -5,7 +5,8 @@ defmodule OceanconnectWeb.Api.BidController do
 
   def create(conn, %{"auction_id" => auction_id, "bid" => bid_params}) do
     time_entered = DateTime.utc_now()
-    supplier_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    user = OceanconnectWeb.Plugs.Auth.current_user(conn)
+    supplier_id = user.company_id
     updated_bid_params = convert_amount(bid_params)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true  <- duration_time_remaining?(auction.id),
@@ -13,7 +14,7 @@ defmodule OceanconnectWeb.Api.BidController do
          0.0   <- (updated_bid_params["amount"] / 0.25) - Float.floor(updated_bid_params["amount"] / 0.25),
          true  <- supplier_id in Auctions.auction_supplier_ids(auction)
     do
-      Auctions.place_bid(auction, updated_bid_params, supplier_id, time_entered)
+      Auctions.place_bid(auction, updated_bid_params, supplier_id, time_entered, user)
       render(conn, "show.json", data: %{})
     else
       _ -> conn
@@ -23,14 +24,15 @@ defmodule OceanconnectWeb.Api.BidController do
   end
 
   def select_bid(conn, %{"auction_id" => auction_id, "bid_id" => bid_id, "comment" => comment}) do
-    buyer_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    user = OceanconnectWeb.Plugs.Auth.current_user(conn)
+    buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
          %{status: :decision} <- Auctions.get_auction_state!(auction),
          bid = %AuctionBidList.AuctionBid{} <- AuctionBidList.get_bid(auction.id, bid_id)
     do
-      Auctions.select_winning_bid(bid, comment)
+      Auctions.select_winning_bid(bid, comment, user)
 
       render(conn, "show.json", data: %{})
     else

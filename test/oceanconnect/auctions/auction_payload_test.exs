@@ -13,9 +13,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
       {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
 
-      auction
-      |> Command.start_auction
-      |> AuctionStore.process_command
+      Auctions.start_auction(auction)
       :timer.sleep(500)
       bid_params = %{"amount" => "1.25"}
 
@@ -46,6 +44,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert length(payload.bid_list) == 1
       assert payload.bid_list |> hd |> Map.delete(:supplier_id) == payload.state.lowest_bids |> hd
       assert [%AuctionBid{amount: ^amount}] = payload.bid_list
+
+      lowest_bid = hd(payload.state.lowest_bids)
+      refute Map.has_key?(lowest_bid, :supplier)
+      refute Map.has_key?(lowest_bid, :supplier_id)
     end
 
     test "with an existing lowest bid", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
@@ -123,11 +125,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "winning_bid added to payload", %{auction: auction, supplier: supplier, bid_params: bid_params = %{"amount" => amount}, supplier_2: supplier_2} do
       Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
       bid = Auctions.place_bid(auction, bid_params, supplier.id)
-
-      auction
-      |> Command.end_auction
-      |> AuctionStore.process_command
-
+      Auctions.end_auction(auction)
       Auctions.select_winning_bid(bid, "test")
 
       buyer_payload = auction

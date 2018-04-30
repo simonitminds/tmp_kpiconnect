@@ -330,9 +330,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-      auction
-      |> Oceanconnect.Auctions.Command.end_auction
-      |> Oceanconnect.Auctions.AuctionStore.process_command
+      Auctions.end_auction(auction)
 
       decision_supplier_payload = auction
       |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
