@@ -9,11 +9,11 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
                                AuctionStore,
                                AuctionTimer}
 
-  def start_link(auction = %Auction{id: auction_id}) do
-    Supervisor.start_link(__MODULE__, auction, name: get_auction_supervisor_name(auction_id))
+  def start_link({auction = %Auction{id: auction_id}, config}) do
+    Supervisor.start_link(__MODULE__, {auction, config}, name: get_auction_supervisor_name(auction_id))
   end
 
-  def init(auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}) do
+  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, %{handle_events: true}}) do
     children = [
       {AuctionCache, auction},
       {AuctionBidList, auction_id},
@@ -24,6 +24,17 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end
+  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, %{handle_events: false}}) do
+    children = [
+      {AuctionCache, auction},
+      {AuctionBidList, auction_id},
+      {AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionEventStore, auction_id},
+      {AuctionStore, auction_id}
+    ]
+    Supervisor.init(children, strategy: :one_for_all)
+  end
+
 
   defp get_auction_supervisor_name(auction_id) do
     {:via, Registry, {@registry_name, auction_id}}

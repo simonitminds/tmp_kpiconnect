@@ -4,7 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   setup do
     auction = insert(:auction, duration: 15 * 60_000, decision_duration: 10 * 60_000)
-    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: false}}})
     {:ok, %{auction: auction}}
   end
 

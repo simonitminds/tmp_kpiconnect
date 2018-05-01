@@ -13,7 +13,7 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company, supplier_company2], duration: 600_000)
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
     Auctions.start_auction(auction)
     bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id, DateTime.utc_now(), supplier)
     Auctions.end_auction(auction)

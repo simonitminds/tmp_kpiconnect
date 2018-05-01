@@ -11,6 +11,6 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
   end
 
   def start_child(auction = %Oceanconnect.Auctions.Auction{}) do
-    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionSupervisor, auction})
+    DynamicSupervisor.start_child(__MODULE__, {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
   end
 end

@@ -17,7 +17,7 @@ defmodule Oceanconnect.AuctionShowTest do
     bid_params = %{
       amount: 1.25
     }
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
     {:ok, %{auction: auction, bid_params: bid_params, buyer: buyer, supplier: supplier,
             supplier_company: supplier_company, supplier2: supplier2, supplier_company2: supplier_company2}}
   end

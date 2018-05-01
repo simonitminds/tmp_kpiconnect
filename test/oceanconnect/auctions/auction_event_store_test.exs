@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     |> Auctions.create_supplier_aliases
     |> Auctions.fully_loaded
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, auction})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: false}}})
     Oceanconnect.FakeEventStorage.FakeEventStorageCache.start_link()
 
     {:ok, %{auction: auction}}

@@ -129,7 +129,7 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company])
-      {:ok, _pid} = start_supervised({Auctions.AuctionSupervisor, auction})
+      {:ok, _pid} = start_supervised({Auctions.AuctionSupervisor, {auction, %{handle_events: false}}})
       Auctions.start_auction(auction)
       on_exit(fn ->
         case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do

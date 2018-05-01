@@ -15,7 +15,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   describe "buyer login" do
     setup %{auctions: auctions, buyer: buyer} do
       auction = auctions |> hd
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
       login_user(buyer)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
@@ -60,7 +60,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
       auction = auctions |> hd
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, auction})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
       login_user(supplier)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
