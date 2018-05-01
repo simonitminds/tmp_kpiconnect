@@ -123,6 +123,35 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "ending an auction" do
+    alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
+
+    setup do
+      supplier_company = insert(:company)
+      supplier2_company = insert(:company)
+      auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
+
+      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
+
+      {:ok, %{auction: auction}}
+    end
+
+
+    test "ending an auction saves the auction_ended timestamp on the auction", %{auction: auction = %Auction{id: auction_id}} do
+      Auctions.start_auction(auction)
+      Auctions.end_auction(auction)
+      :timer.sleep(500)
+
+      auction_ended_event = auction_id
+      |> AuctionEventStore.event_list
+      |> Enum.filter(fn(event) -> event.type == :auction_ended end)
+      |> hd
+
+      updated_auction = Auctions.get_auction(auction_id)
+      assert auction_ended_event.time_entered == updated_auction.auction_ended
+    end
+  end
+
   describe "bid handling" do
     alias Oceanconnect.Auctions.AuctionBidList
 
