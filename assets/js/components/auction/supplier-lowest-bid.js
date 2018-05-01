@@ -41,7 +41,7 @@ const SupplierLowestBid = ({auctionPayload}) => {
       <SupplierBidStatus auctionPayload={auctionPayload} />
       <div className="box">
         <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">{auctionStatus == undefined ? `Winning Bid` : `Best Offer`}</h3>
+          <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Bid` : `Best Offer`}</h3>
           {lowestBidListDisplay()}
         </div>
       </div>

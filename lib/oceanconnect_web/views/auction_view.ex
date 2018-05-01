@@ -28,7 +28,15 @@ defmodule OceanconnectWeb.AuctionView do
   end
   def convert_date?(_), do: "-"
 
-  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: amount}}}), do: "$#{amount}"
+  def convert_event_type(type) do
+    ~r/_/
+    |> Regex.replace(Atom.to_string(type), " ")
+    |> String.capitalize
+  end
+
+  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: amount}}}) do
+    "$#{:erlang.float_to_binary(amount, decimals: 2)}"
+  end
   def event_bid_amount(_event), do: "-"
 
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name

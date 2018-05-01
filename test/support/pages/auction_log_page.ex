@@ -9,7 +9,7 @@ defmodule Oceanconnect.AuctionLogPage do
   def has_events?(events) do
     Enum.all?(events, fn(event) ->
       element = find_element(:class, "qa-event-#{event.id}")
-      with true <- Atom.to_string(event.type) == element |> find_within_element(:class, "qa-event-type") |> inner_text,
+      with true <- AuctionView.convert_event_type(event.type) == element |> find_within_element(:class, "qa-event-type") |> inner_text,
            true <- AuctionView.event_company(event) == element |> find_within_element(:class, "qa-event-company") |> inner_text,
            true <- AuctionView.event_bid_amount(event) == element |> find_within_element(:class, "qa-event-bid-amount") |> inner_text,
            do: true

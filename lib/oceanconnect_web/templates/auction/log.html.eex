@@ -69,7 +69,7 @@
       <tbody>
         <%= for event <- @events do %>
           <tr class=<%= "qa-event-#{event.id}" %>>
-            <td class="qa-event-type"><%= event.type %></td>
+            <td class="qa-event-type"><%= convert_event_type(event.type) %></td>
             <td class="qa-event-user"><%= event_user(event) %></td>
             <td class="qa-event-company"><%= event_company(event) %></td>
             <td><%= convert_date?(event.time_entered) %></td>
@@ -88,10 +88,13 @@
         <%= for event <- @events do %>
           <tr>
             <td>
-            <strong class="qa-mobile-event-type"><%= event.type %></strong><br/>
+            <strong class="qa-mobile-event-type"><%= convert_event_type(event.type) %></strong><br/>
+            <strong><%= event_user(event) %></strong></br>
             <strong><%= event_company(event) %><br/></strong>
             <strong><%= convert_date?(event.time_entered) %><br/></strong>
-            <strong><%= event_bid_amount(event) %><br/></strong>
+            <strong>
+              <%= event_bid_amount(event) %>
+            </strong>
             </td>
           </tr>
         <% end %>
