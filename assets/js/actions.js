@@ -1,12 +1,13 @@
 import _ from "lodash";
+import {Socket} from "phoenix"
 import thunk from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
-import socket from "./socket";
-
 import {
-  RECEIVE_AUCTION_PAYLOADS,
+  CHANNEL_CONNECTED,
+  CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_FORM_DATA,
+  RECEIVE_AUCTION_PAYLOADS,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_DATE,
   UPDATE_INFORMATION,
@@ -17,8 +18,11 @@ import {
   RECEIVE_SUPPLIERS
 } from "./constants";
 
-let channel;
+let channel, socket;
 if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
+  socket = new Socket("/socket", {params: {token: window.userToken}});
+  socket.connect();
+
   channel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
 };
 
@@ -30,13 +34,21 @@ const defaultHeaders = {
 };
 
 export function subscribeToAuctionUpdates() {
-  return dispatch => {
+  return (dispatch, getState) => {
     channel.join()
-      .receive("ok", resp => { console.log("Joined successful", resp); })
+      .receive("ok", resp => {
+        console.log("Joined successful", resp);
+        dispatch({type: CHANNEL_CONNECTED});
+      })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     channel.on("auctions_update", payload => {
       dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload});
+    });
+
+    channel.onError( () => {
+      const { connection } = getState().auctionsReducer;
+      if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
     });
   };
 }
