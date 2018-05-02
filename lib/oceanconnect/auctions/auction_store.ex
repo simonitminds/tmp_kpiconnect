@@ -158,6 +158,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     expire_auction(previous_state)
   end
   defp replay_event(%AuctionEvent{type: :auction_closed, data: state}, _previous_state), do: state
+  defp replay_event(%AuctionEvent{type: :auction_state_rebuilt, data: state}, _previous_state), do: state
 
   defp start_auction(current_state = %{auction_id: auction_id}) do
     auction_id
