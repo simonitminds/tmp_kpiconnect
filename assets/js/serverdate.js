@@ -34,7 +34,7 @@ const ServerDate = ((serverNow => {
   // synchronization.
   scripts = document.getElementsByTagName("script");
 
-  const URL = "/images/ocm_transparentlogo_reverse.png"
+  const URL = "/time_sync.txt"
   // scripts[scripts.length - 1].src;
   let synchronizationIntervalDelay;
   let synchronizationInterval;
@@ -115,7 +115,7 @@ const ServerDate = ((serverNow => {
 
   // After the initial synchronization the two clocks may drift so we
   // automatically synchronize again every synchronizationIntervalDelay.
-  ServerDate.synchronizationIntervalDelay = 60 * 60 * 1000; // ms
+  ServerDate.synchronizationIntervalDelay = 30 * 1000; // ms
 
   /// PRIVATE
 

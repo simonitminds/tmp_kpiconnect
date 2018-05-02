@@ -17,7 +17,6 @@ const mapDispatchToProps = (dispatch) => ({
 
 export class AuctionsContainer extends React.Component {
   dispatchItem() {
-    this.props.dispatch(getAllAuctionPayloads());
     this.props.dispatch(subscribeToAuctionUpdates());
   }
   componentDidMount() {

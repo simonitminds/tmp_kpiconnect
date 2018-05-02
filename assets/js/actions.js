@@ -39,6 +39,7 @@ export function subscribeToAuctionUpdates() {
       .receive("ok", resp => {
         console.log("Joined successful", resp);
         dispatch({type: CHANNEL_CONNECTED});
+        dispatch(getAllAuctionPayloads());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
