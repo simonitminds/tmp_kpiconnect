@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
     .value();
   return {
     auctionPayload,
+    connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
   }
 };

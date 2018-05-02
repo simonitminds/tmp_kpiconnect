@@ -6,8 +6,9 @@ import {
   formatTimeRemaining,
   formatTimeRemainingColor
 } from '../../utilities';
+import ChannelConnectionStatus from './channel-connection-status';
 
-const AuctionHeader = ({auctionPayload, timeRemaining}) => {
+const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
 
@@ -19,6 +20,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining}) => {
             <div className="auction-header">
               <div className="columns has-margin-bottom-none">
                 <div className="column">
+                  <ChannelConnectionStatus connection={connection} />
                   <div className={`auction-header__status auction-header__status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
                     {auctionStatus}
                   </div>

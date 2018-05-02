@@ -22,6 +22,17 @@ defmodule Oceanconnect.AuctionShowTest do
             supplier_company: supplier_company, supplier2: supplier2, supplier_company2: supplier_company2}}
   end
 
+  test "channel disconnected status is detected/displayed", %{auction: auction, buyer: buyer} do
+    login_user(buyer)
+    AuctionShowPage.visit(auction.id)
+    assert AuctionShowPage.has_css?(".qa-channel-connected")
+
+    # Disconnect user channel
+    OceanconnectWeb.Endpoint.broadcast("user_socket:#{buyer.id}", "disconnect", %{})
+
+    assert AuctionShowPage.has_css?(".qa-channel-disconnected")
+  end
+
   test "auction start", %{auction: auction, buyer: buyer} do
     Auctions.start_auction(auction)
 

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { formatUTCDateTime, timeRemainingCountdown} from '../../utilities';
 import moment from 'moment';
-import  ServerDate from '../../serverdate';
+import ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './auction-bread-crumbs';
 import AuctionHeader from './auction-header';
 import BuyerLowestBid from './buyer-lowest-bid';
@@ -135,7 +135,7 @@ export default class AuctionShow extends React.Component {
         <MediaQuery query="(min-width: 768px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
-        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} />
+        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} connection={this.props.connection} />
         <MediaQuery query="(min-width: 768px)">
           <section className="auction-page"> {/* Auction details */}
             <div className="container">
