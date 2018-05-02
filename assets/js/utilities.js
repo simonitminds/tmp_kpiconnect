@@ -72,7 +72,7 @@ export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
     case "decision-show": {message = "remaining in decision period"; break;}
     case "decision-index": {message = "remaining"; break;}
   }
-  if (timeRemaining && timeRemaining != 0) {
+  if (timeRemaining && timeRemaining > 0) {
     const mins = Math.floor(timeRemaining / 60000);
     const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
     return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} ${message}`;
@@ -80,8 +80,10 @@ export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
     return "Auction Expired"
   } else if (auctionStatus === "closed") {
     return "Auction Closed"
-  } else {
+  } else if(auctionStatus === "pending"){
     return "Auction has not started";
+  } else {
+    return "00:00 Remaining";
   }
 }
 
