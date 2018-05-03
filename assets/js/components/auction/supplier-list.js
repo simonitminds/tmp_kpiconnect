@@ -82,7 +82,7 @@ const SupplierList = (props) => {
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4">Invited Suppliers</legend>
-              <i> Select Port to invite Suppliers</i>
+              <i className="qa-auction-select-port"> Select Port to invite Suppliers</i>
             </fieldset>
           </div>
         </div>

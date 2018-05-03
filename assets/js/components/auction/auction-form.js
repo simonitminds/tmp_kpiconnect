@@ -38,6 +38,19 @@ const AuctionForm = (props) => {
                         .first()
                         .value();
 
+  const portAgentDisplay = () => {
+    if (auction.port_id) {
+      return <InputField
+        model={'auction'}
+        field={'port_agent'}
+        labelText={'Port Agent'}
+        value={auction.port_agent}
+        opts={{type: 'text', label: "Port Agent"}}
+        onChange={updateInformation.bind(this, 'auction.port_agent')}
+      />;
+    }
+  };
+
   return (
     <div>
       <input type="hidden" name="auction[auction_start]" className="qa-auction-auction_start" value={moment(auction.auction_start).utc()} />
@@ -158,6 +171,7 @@ const AuctionForm = (props) => {
                   </div>
                 </div>
               </div>
+              {portAgentDisplay()}
             </fieldset>
           </div>
         </div>

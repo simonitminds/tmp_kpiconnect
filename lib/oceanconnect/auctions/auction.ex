@@ -14,6 +14,7 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :buyer, Oceanconnect.Accounts.Company
     field :fuel_quantity, :integer
     field :po, :string
+    field :port_agent, :string
     field :eta, :utc_datetime, default: @current_time_trunc
     field :etd, :utc_datetime, default: @current_time_trunc
     field :auction_start, :utc_datetime, default: @current_time_trunc
@@ -46,7 +47,8 @@ defmodule Oceanconnect.Auctions.Auction do
     :eta,
     :etd,
     :fuel_quantity,
-    :po
+    :po,
+    :port_agent
   ]
 
   @doc false
