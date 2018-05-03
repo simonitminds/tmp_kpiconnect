@@ -245,6 +245,7 @@ export default class AuctionShow extends React.Component {
                   { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
                 </TabPanel>
                 <TabPanel>
+                  { auctionLogLinkDisplay() }
                   { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
                   { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
                   <div className="box">

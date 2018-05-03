@@ -20,7 +20,6 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
             <div className="auction-header">
               <div className="columns has-margin-bottom-none">
                 <div className="column">
-                  <ChannelConnectionStatus connection={connection} />
                   <div className={`auction-header__status auction-header__status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
                     {auctionStatus}
                   </div>
@@ -39,6 +38,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                       </span>
                     </div>
                   </div>
+                  <ChannelConnectionStatus connection={connection} />
                   <div className="auction-header__start-time has-text-left-mobile">
                     <span className="has-text-weight-bold is-uppercase">Started at</span> {formatUTCDateTime(auction.auction_start)} GMT
                   </div>
