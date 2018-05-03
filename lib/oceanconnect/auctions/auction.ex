@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   @required_fields [
-    :fuel_id,
+    :eta,
     :port_id,
     :vessel_id
   ]
@@ -44,8 +44,8 @@ defmodule Oceanconnect.Auctions.Auction do
     :auction_ended,
     :duration,
     :decision_duration,
-    :eta,
     :etd,
+    :fuel_id,
     :fuel_quantity,
     :po,
     :port_agent

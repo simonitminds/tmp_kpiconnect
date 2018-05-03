@@ -182,6 +182,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:buyer, :suppliers])
   end
 
+  def suppliers_with_alias_names(%Auction{id: nil, suppliers: suppliers}), do: suppliers
   def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
     Enum.map(suppliers, fn(supplier) ->
       alias_name = get_auction_supplier(auction.id, supplier.id).alias_name
@@ -193,12 +194,8 @@ defmodule Oceanconnect.Auctions do
     fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
-  # is this needed?
   def fully_loaded(auctions) when is_list(auctions) do
-    Enum.map(auctions, fn(auction) ->
-      fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
-      Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
-    end)
+    Enum.map(auctions, fn(auction) -> fully_loaded(auction) end)
   end
   def fully_loaded(company = %Company{}) do
     Repo.preload(company, [:users, :vessels, :ports])

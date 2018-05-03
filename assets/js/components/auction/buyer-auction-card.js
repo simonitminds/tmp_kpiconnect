@@ -5,6 +5,7 @@ import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../.
 import SupplierBidStatus from './supplier-bid-status'
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
+  const fuel = _.get(auction, 'fuel.name');
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
@@ -108,7 +109,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
         </div>
         <div className="card-content__products">
-          {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+          {fuel} ({auction.fuel_quantity}&nbsp;MT)
         </div>
         { auctionStatus == 'pending' ?
           <div className="card-content__products">

@@ -8,6 +8,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
+  const fuel = _.get(auction, 'fuel.name');
 
   const bidStatusDisplay = () => {
     const lowestBid = _.get(auction, 'state.lowest_bids');
@@ -83,7 +84,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
         </div>
         <div className="card-content__products">
-          {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+          {fuel} ({auction.fuel_quantity}&nbsp;MT)
         </div>
 
         <div>

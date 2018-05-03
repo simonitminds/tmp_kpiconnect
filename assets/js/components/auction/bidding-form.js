@@ -19,7 +19,7 @@ const BiddingForm = ({auction, formSubmit}) => {
                 <div className="select is-fullwidth">
                   <select className="" name="fuel" id="fuel_type">
                     <option value="">Fuel Type</option>
-                    <option value={auction.fuel.id}>{auction.fuel.name}</option>
+                    <option value={auction.fuel_id}>{fuel}</option>
                   </select>
                 </div>
               </div>
