@@ -15,9 +15,9 @@ defmodule Oceanconnect.Auctions.Auction do
     field :fuel_quantity, :integer
     field :po, :string
     field :port_agent, :string
-    field :eta, :utc_datetime, default: @current_time_trunc
-    field :etd, :utc_datetime, default: @current_time_trunc
-    field :auction_start, :utc_datetime, default: @current_time_trunc
+    field :eta, :utc_datetime
+    field :etd, :utc_datetime
+    field :auction_start, :utc_datetime
     field :auction_ended, :utc_datetime
     field :duration, :integer, default: 10 * 60_000 # milliseconds
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds

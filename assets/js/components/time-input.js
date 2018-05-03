@@ -6,14 +6,14 @@ export default class TimeInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: moment(props.value).utc()
+      time: props.value ? moment(props.value).utc() : null
     }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.value !== prevProps.value) {
       this.setState({
-        time: moment(this.props.value).utc()
+        time: this.props.value ? moment(this.props.value).utc() : null
       })
     }
   }
@@ -27,7 +27,7 @@ export default class TimeInput extends React.Component {
       <div className={`qa-${model}-${field}_time`}>
         <TimePicker
           id={`${model}_${field}_time`}
-          value={this.state.time || "00:00"}
+          value={this.state.time}
           showSecond={false}
           minuteStep={5}
           allowEmpty={false}
