@@ -9,16 +9,42 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     supplier2_company = insert(:company)
     auction = insert(:auction, duration: 1_000, decision_duration: 1_000,
                       suppliers: [supplier_company, supplier2_company])
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: false}}})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
+    on_exit(fn ->
+      case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+        [] -> nil
+        children ->
+          Enum.map(children, fn({_, pid, _, _}) ->
+            Process.unlink(pid)
+            Process.exit(pid, :shutdown)
+          end)
+      end
+    end)
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
   end
 
+  test "draft status of draft auction" do
+    auction_attrs = insert(:auction)
+    |> Map.take([:eta, :port_id, :vessel_id])
+    {:ok, auction} = Auctions.create_auction(auction_attrs)
+
+    assert :draft == Auctions.get_auction_state!(auction).status
+  end
+
+  test "pending status of schedulable auction" do
+    auction_attrs = insert(:auction)
+    |> Map.drop([:__struct__, :id, :buyer, :fuel, :port, :suppliers, :vessel])
+    {:ok, auction} = Auctions.create_auction(auction_attrs)
+
+    assert :pending == Auctions.get_auction_state!(auction).status
+  end
+
   test "starting auction_store for auction", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction.id)
+    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
 
     Oceanconnect.Auctions.start_auction(auction)
 
-    expected_state = auction.id
+    expected_state = auction
     |> AuctionState.from_auction()
     |> Map.merge(%{status: :open, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
@@ -40,8 +66,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "auction status is decision after duration timeout", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction.id)
-
     Auctions.start_auction(auction)
     :timer.sleep(500)
 
@@ -49,7 +73,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     :timer.sleep(1_000)
 
-    expected_state = auction.id
+    expected_state = auction
     |> AuctionState.from_auction
     |> Map.merge(%{status: :decision, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)
@@ -63,7 +87,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> Auctions.end_auction
     |> Auctions.expire_auction
 
-    expected_state = auction.id
+    expected_state = auction
     |> AuctionState.from_auction
     |> Map.merge(%{status: :expired, auction_id: auction.id})
     actual_state = AuctionStore.get_current_state(auction)

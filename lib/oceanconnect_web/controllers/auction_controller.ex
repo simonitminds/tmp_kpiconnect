@@ -70,7 +70,6 @@ defmodule OceanconnectWeb.AuctionController do
 
   def show(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
-    |> Auctions.fully_loaded
     if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) do
       render(conn, "show.html", auction: auction)
     else

@@ -23,7 +23,11 @@ export const convertToMinutes = (milliseconds) => {
 }
 
 export const formatUTCDateTime = (dateTime) => {
-  return formatDateTime(moment(dateTime).utc());
+  if (dateTime) {
+    return `${formatDateTime(moment(dateTime).utc())} GMT`;
+  } else {
+    return "Not Scheduled"
+  }
 }
 
 export const formatDateTime = (dateTime) => {
@@ -80,6 +84,8 @@ export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
     return "Auction Expired"
   } else if (auctionStatus === "closed") {
     return "Auction Closed"
+  } else if(auctionStatus === "draft"){
+    return "Auction not scheduled";
   } else if(auctionStatus === "pending"){
     return "Auction has not started";
   } else {

@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../../utilities';
+import { formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
+import AuctionTimeRemaining from './auction-time-remaining';
 
 const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
@@ -38,30 +39,6 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
     }
   }
 
-  const AuctionTimeRemaining = (auctionTimer) => {
-    if (auctionStatus == "open" || auctionStatus == "decision") {
-      return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
-          <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-          <span
-            className="qa-auction-time_remaining"
-            id="time-remaining"
-          >
-            {formatTimeRemaining(auctionStatus, auctionTimer, "index")}
-          </span>
-        </span>
-      );
-    }
-    else {
-      return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
-          <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-          {cardDateFormat(_.get(auctionPayload, 'auction.auction_start'))}
-        </span>
-      );
-    }
-  }
-
   return (
     <div className="column is-one-third">
       <div className={`card qa-auction-${auction.id}`}>
@@ -70,7 +47,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining}) => {
             {/* Start Status/Time Bubble */}
             <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
               <span className="qa-auction-status">{auctionStatus}</span>
-              {AuctionTimeRemaining(timeRemaining)}
+              <AuctionTimeRemaining auctionPayload={auctionPayload} auctionTimer={timeRemaining} />
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}

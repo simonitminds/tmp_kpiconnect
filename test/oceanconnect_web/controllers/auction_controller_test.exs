@@ -91,7 +91,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects to show when creating a draft auction", %{conn: conn, valid_auction_params: valid_auction_params} do
-      draft_attrs = Map.drop(valid_auction_params, ["duration", "decision_duration", "fuel_id", "fuel_quantity"])
+      draft_attrs = Map.drop(valid_auction_params, ["auction_start", "duration", "decision_duration", "fuel_id", "fuel_quantity"])
       conn = post conn, auction_path(conn, :create), auction: draft_attrs
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)

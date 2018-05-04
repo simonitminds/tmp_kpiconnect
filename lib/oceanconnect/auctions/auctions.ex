@@ -77,8 +77,7 @@ defmodule Oceanconnect.Auctions do
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
-        AuctionStore.AuctionState.from_auction(auction.id)
-        |> Map.put(:status, :pending)
+        AuctionStore.AuctionState.from_auction(auction)
       state -> state
     end
   end

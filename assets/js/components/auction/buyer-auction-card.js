@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import { formatTimeRemaining, formatTimeRemainingColor, formatPrice } from '../../utilities';
-import SupplierBidStatus from './supplier-bid-status'
+import { formatPrice } from '../../utilities';
+import SupplierBidStatus from './supplier-bid-status';
+import AuctionTimeRemaining from './auction-time-remaining';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const fuel = _.get(auction, 'fuel.name');
@@ -56,30 +57,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     }
   }
 
-  const AuctionTimeRemaining = (auctionTimer) => {
-    if (auctionStatus == "open" || auctionStatus == "decision") {
-      return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
-          <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-          <span
-            className="qa-auction-time_remaining"
-            id="time-remaining"
-          >
-            {formatTimeRemaining(auctionStatus, auctionTimer, "index")}
-          </span>
-        </span>
-      );
-    }
-    else {
-      return (
-        <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
-          <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-          {cardDateFormat(_.get(auctionPayload, 'auction.auction_start'))}
-        </span>
-      );
-    }
-  }
-
   return (
     <div className="column is-one-third">
       <div className={`card qa-auction-${auction.id}`}>
@@ -88,7 +65,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             {/* Start Status/Time Bubble */}
             <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
               <span className="qa-auction-status">{auctionStatus}</span>
-              {AuctionTimeRemaining(timeRemaining)}
+              <AuctionTimeRemaining auctionPayload={auctionPayload} auctionTimer={timeRemaining} />
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}
@@ -111,9 +88,11 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         <div className="card-content__products">
           {fuel} ({auction.fuel_quantity}&nbsp;MT)
         </div>
-        { auctionStatus == 'pending' ?
+        { auctionStatus == 'pending' || auctionStatus == 'draft' ?
           <div className="card-content__products">
-            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start"><span className="icon"><i className="fas fa-play"></i></span> Start Auction</a>
+            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
+              <span className="icon"><i className="fas fa-play"></i></span> Start Auction
+            </a>
           </div>
           :
           <div className="is-none"></div>

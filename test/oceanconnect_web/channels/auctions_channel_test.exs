@@ -19,7 +19,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     )
     {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
 
-    state = AuctionState.from_auction(auction.id)
+    state = AuctionState.from_auction(auction)
     |> Map.put(:status, :open)
     expected_payload = %{
       time_remaining: auction.duration,

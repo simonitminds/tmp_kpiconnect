@@ -204,7 +204,7 @@ export default class AuctionShow extends React.Component {
                           <ul className="list has-no-bullets">
                             <li>
                               <strong className="is-block">{auction.port.name}</strong>
-                              <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
+                              <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                             </li>
                           </ul>
                         </div>
@@ -285,7 +285,7 @@ export default class AuctionShow extends React.Component {
                       <ul className="list has-no-bullets">
                         <li>
                           <strong className="is-block">{auction.port.name}</strong>
-                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
+                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                         </li>
                       </ul>
                     </div>
