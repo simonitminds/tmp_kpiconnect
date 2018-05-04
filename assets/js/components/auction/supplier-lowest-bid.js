@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 
-const SupplierLowestBid = ({auctionPayload}) => {
+const SupplierLowestBid = ({auctionPayload, connection}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const auctionStatus = _.get(auctionPayload, 'auction.state.status');
   const lowestBid = _.chain(auctionPayload)
@@ -38,7 +38,7 @@ const SupplierLowestBid = ({auctionPayload}) => {
 
   return(
     <div className="auction-lowest-bid">
-      <SupplierBidStatus auctionPayload={auctionPayload} />
+      <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} />
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Bid` : `Best Offer`}</h3>

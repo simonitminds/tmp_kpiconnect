@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { quickOrdinal } from '../../utilities';
 
-const SupplierBidStatus = ({auctionPayload}) => {
+const SupplierBidStatus = ({auctionPayload, connection}) => {
   const bidList = _.get(auctionPayload, 'bid_list', []);
   const order = _.get(auctionPayload, 'state.lowest_bids_position');
   const multiple = _.get(auctionPayload, 'state.multiple');
@@ -39,6 +39,13 @@ const SupplierBidStatus = ({auctionPayload}) => {
         {messageDisplay("You lost the auction")}
       </div>
     );
+  } else if (auctionStatus == "open" && !connection) {
+    return (
+      <div className = "auction-notification box is-gray-2" >
+        {console.log(connection)}
+        {messageDisplay("Your connection to the server has been lost")}
+      </div>
+    )
   } else if (bidList.length == 0) {
     return (
       <div className = "auction-notification box is-warning" >

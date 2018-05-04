@@ -107,7 +107,7 @@ export default class AuctionShow extends React.Component {
       if (auctionState.status == 'open') {
         return (
           <div>
-            <SupplierLowestBid auctionPayload={auctionPayload} />
+            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
             <BiddingForm formSubmit={this.props.formSubmit} auction={auction} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
