@@ -108,28 +108,34 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command
   end
 
-  def create_auction(attrs \\ %{}, user \\ nil) do
-    auction = %Auction{}
+  def create_auction(attrs \\ %{}, user \\ nil)
+  def create_auction(attrs = %{"auction_start" => start}, user) when start != "" do
+    %Auction{}
+    |> Auction.changeset_for_scheduled_auction(attrs)
+    |> Repo.insert()
+    |> handle_auction_creation(user)
+  end
+  def create_auction(attrs, user) do
+    %Auction{}
     |> Auction.changeset(attrs)
     |> Repo.insert()
-
-    case auction do
-      {:ok, auction} ->
-        user_on_record = case user do
-          nil -> auction |> Repo.preload([:buyer]) |> Map.fetch!(:buyer)
-          user -> user
-        end
-        auction
-        |> fully_loaded
-        |> create_supplier_aliases
-        |> AuctionsSupervisor.start_child
-        event = %AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now(), user: user_on_record}
-        AuctionEvent.emit(event, true)
-        {:ok, auction}
-      {:error, changeset} ->
-        {:error, changeset}
-    end
+    |> handle_auction_creation(user)
   end
+
+  defp handle_auction_creation({:ok, auction}, user) do
+    user_on_record = case user do
+      nil -> auction |> Repo.preload([:buyer]) |> Map.fetch!(:buyer)
+      user -> user
+    end
+    auction
+    |> fully_loaded
+    |> create_supplier_aliases
+    |> AuctionsSupervisor.start_child
+    event = %AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now(), user: user_on_record}
+    AuctionEvent.emit(event, true)
+    {:ok, auction}
+  end
+  defp handle_auction_creation({:error, changeset}, _user), do: {:error, changeset}
 
   def update_cache(auction = %Auction{}) do
     auction

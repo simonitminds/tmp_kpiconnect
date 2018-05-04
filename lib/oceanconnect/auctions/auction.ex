@@ -63,6 +63,17 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_add_suppliers(attrs)
   end
 
+  def changeset_for_scheduled_auction(%Auction{} = auction, attrs) do
+    auction
+    |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields ++ [:auction_start, :fuel_id, :fuel_quantity])
+    |> cast_assoc(:buyer)
+    |> cast_assoc(:port)
+    |> cast_assoc(:vessel)
+    |> cast_assoc(:fuel)
+    |> maybe_add_suppliers(attrs)
+  end
+
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
   end
