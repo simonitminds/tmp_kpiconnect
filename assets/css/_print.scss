@@ -1,8 +1,12 @@
 @media print {
+  body {
+    font-size: 75%;
+  }
+
   header { display: none; }
 
   main > .container {
-      padding: 1rem 5rem 0 5rem !important;
+      padding: 1rem 2rem 0 2rem !important;
   }
   .alert {
     display: none;
@@ -17,6 +21,8 @@
   }
 
   .report__logo--print {
+    height: 0.5in;
+    width: auto;
     margin-left: -1rem;
   }
 }
