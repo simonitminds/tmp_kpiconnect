@@ -65,7 +65,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
-      auction_attrs = auction_with_participants |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
+      auction_attrs = auction_with_participants |> Map.take([:eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
 
       assert all_values_match?(auction_attrs, new_auction)
@@ -110,7 +110,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "auction status" do
-      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
+      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :eta, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
       {:ok, auction} = Auctions.create_auction(auction_attrs)
 
       assert :pending == Auctions.get_auction_state!(auction).status
