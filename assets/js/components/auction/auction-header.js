@@ -23,9 +23,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                   <div className={`auction-header__status auction-header__status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
                     {auctionStatus}
                   </div>
-                  <div className="auction-header__po is-uppercase">
-                    Auction {auction.po}
-                  </div>
+
                   <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
                     {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})</span>
                   </h1>
