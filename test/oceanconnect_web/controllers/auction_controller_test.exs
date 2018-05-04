@@ -83,11 +83,26 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert List.first(auction.suppliers).id == supplier_company.id
     end
 
-    #TODO Refactor test to assert on specific errors
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
       conn = post conn, auction_path(conn, :create), auction: invalid_attrs
 
       assert conn.assigns[:auction] == struct(Auctions.Auction, invalid_attrs) |> Auctions.fully_loaded
+      assert html_response(conn, 200) =~ "New Auction"
+    end
+
+    test "redirects to show when creating a draft auction", %{conn: conn, valid_auction_params: valid_auction_params} do
+      draft_attrs = Map.drop(valid_auction_params, ["auction_start", "duration", "decision_duration", "fuel_id", "fuel_quantity"])
+      conn = post conn, auction_path(conn, :create), auction: draft_attrs
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == auction_path(conn, :show, id)
+    end
+
+    test "renders errors when adding auction_start without fuel details", %{conn: conn, valid_auction_params: valid_auction_params} do
+      invalid_attrs = valid_auction_params
+      |> Map.drop(["duration", "decision_duration", "fuel_id", "fuel_quantity"])
+      |> Map.put("auction_start", DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string())
+      conn = post conn, auction_path(conn, :create), auction: invalid_attrs
+
       assert html_response(conn, 200) =~ "New Auction"
     end
   end

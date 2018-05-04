@@ -59,13 +59,19 @@ defmodule Oceanconnect.AuctionsTest do
       |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
     end
 
+    test "list_participating_auctions/1 doesn't return draft auctions" do
+      supplier_company = insert(:company, is_supplier: true)
+      insert(:auction, auction_start: nil, suppliers: [supplier_company])
+      assert Auctions.list_participating_auctions(supplier_company.id) == []
+    end
+
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
-      auction_attrs = auction_with_participants |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
+      auction_attrs = auction_with_participants |> Map.take([:auction_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
 
       assert all_values_match?(auction_attrs, new_auction)
@@ -108,19 +114,6 @@ defmodule Oceanconnect.AuctionsTest do
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end
-
-    test "auction status" do
-      auction_attrs = insert(:auction)|> Map.take([:buyer_id, :fuel_id, :port_id, :vessel_id, :duration] ++ Map.keys(@valid_attrs))
-      {:ok, auction} = Auctions.create_auction(auction_attrs)
-
-      assert :pending == Auctions.get_auction_state!(auction).status
-
-      Auctions.start_auction(auction)
-      assert :open == Auctions.get_auction_state!(auction).status
-
-      Auctions.start_auction(auction)
-      assert :open == Auctions.get_auction_state!(auction).status
-    end
   end
 
   describe "ending an auction" do
@@ -132,10 +125,19 @@ defmodule Oceanconnect.AuctionsTest do
       auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
 
       {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
+      on_exit(fn ->
+        case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+          [] -> nil
+          children ->
+            Enum.map(children, fn({_, pid, _, _}) ->
+              Process.unlink(pid)
+              Process.exit(pid, :shutdown)
+            end)
+        end
+      end)
 
       {:ok, %{auction: auction}}
     end
-
 
     test "ending an auction saves the auction_ended timestamp on the auction", %{auction: auction = %Auction{id: auction_id}} do
       Auctions.start_auction(auction)
@@ -170,7 +172,6 @@ defmodule Oceanconnect.AuctionsTest do
             end)
         end
       end)
-
 
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end

@@ -64,7 +64,8 @@ defmodule Oceanconnect.AuctionNewTest do
       "fuel_quantity",
       "po",
       "port_id",
-      "vessel_id"
+      "vessel_id",
+      "select-port"
     ])
   end
 
@@ -75,6 +76,16 @@ defmodule Oceanconnect.AuctionNewTest do
     company_vessels = MapSet.new(buyer_vessels)
 
     assert MapSet.equal?(vessels_on_page, company_vessels)
+  end
+
+  test "port selection reveals port agent and supplier list", %{port: port} do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+
+    assert AuctionNewPage.has_fields?([
+      "port_agent",
+      "suppliers"
+    ])
   end
 
   test "supplier list is filtered by port", %{suppliers: suppliers, port: port} do

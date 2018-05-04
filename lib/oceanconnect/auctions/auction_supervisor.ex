@@ -20,7 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionTimer, {auction_id, duration, decision_duration}},
       {AuctionEventStore, auction_id},
       {AuctionEventHandler, auction_id},
-      {AuctionStore, auction_id}
+      {AuctionStore, auction}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end
@@ -30,7 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionBidList, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
       {AuctionEventStore, auction_id},
-      {AuctionStore, auction_id}
+      {AuctionStore, auction}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end

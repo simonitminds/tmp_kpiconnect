@@ -7,7 +7,7 @@ export default class DateInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: moment(props.value).utc(),
+      date: props.value ? moment(props.value).utc() : null,
       focused: false,
       numberOfMonths: 1
     }
@@ -16,7 +16,7 @@ export default class DateInput extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.value !== prevProps.value) {
       this.setState({
-        date: moment(this.props.value).utc()
+        date: this.props.value ? moment(this.props.value).utc() : null
       })
     }
   }

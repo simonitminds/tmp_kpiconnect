@@ -52,6 +52,7 @@ export default class AuctionShow extends React.Component {
     const currentUser = {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id
     };
+    const fuel = _.get(auction, 'fuel.name');
 
     const additionInfoDisplay = (auction) => {
       if (auction.additional_information) {
@@ -194,7 +195,7 @@ export default class AuctionShow extends React.Component {
                           <h3 className="box__header">Fuel Requirements</h3>
                           <ul className="list has-no-bullets">
                             <li>
-                              <strong>{auction.fuel.name}</strong> {auction.fuel_quantity} MT
+                              <strong>{fuel}</strong> {auction.fuel_quantity} MT
                             </li>
                           </ul>
                         </div>
@@ -203,7 +204,7 @@ export default class AuctionShow extends React.Component {
                           <ul className="list has-no-bullets">
                             <li>
                               <strong className="is-block">{auction.port.name}</strong>
-                              <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
+                              <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                             </li>
                           </ul>
                         </div>
@@ -275,7 +276,7 @@ export default class AuctionShow extends React.Component {
                       <h3 className="box__header">Fuel Requirements</h3>
                       <ul className="list has-no-bullets">
                         <li>
-                          <strong>{auction.fuel.name}</strong> {auction.fuel_quantity} MT
+                          <strong>{fuel}</strong> {auction.fuel_quantity} MT
                         </li>
                       </ul>
                     </div>
@@ -284,7 +285,7 @@ export default class AuctionShow extends React.Component {
                       <ul className="list has-no-bullets">
                         <li>
                           <strong className="is-block">{auction.port.name}</strong>
-                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} GMT &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)} GMT</span>
+                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                         </li>
                       </ul>
                     </div>

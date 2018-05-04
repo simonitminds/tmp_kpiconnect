@@ -42,10 +42,10 @@ defmodule Oceanconnect.Application do
   end
 
   defp maybe_start_store(children) do
-    if(Application.get_env(:occeanconnect, :store_starter)) do
+    if(Application.get_env(:oceanconnect, :store_starter)) do
       children
     else
-     children ++ [worker(AuctionStoreStarter, [])]
+      children ++ [worker(AuctionStoreStarter, [])]
     end
   end
 end

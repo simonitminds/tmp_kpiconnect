@@ -97,7 +97,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 
-  defp get_user_bid_list(%AuctionState{status: :pending}, _auction, _user_id), do: []
+  defp get_user_bid_list(%AuctionState{status: status}, _auction, _user_id) when status in [:draft, :pending], do: []
   defp get_user_bid_list(%AuctionState{}, auction = %Auction{}, user_id) do
     auction.id
     |> AuctionBidList.get_bid_list

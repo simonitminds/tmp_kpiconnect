@@ -22,7 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
   describe "auction event store" do
     test "creating an auction adds an auction_created event to the event store", %{auction: auction} do
-      auction_attrs = auction |> Map.take([:fuel_id, :port_id, :vessel_id, :suppliers])
+      auction_attrs = auction |> Map.take([:auction_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers])
       {:ok, new_auction} = Auctions.create_auction(auction_attrs)
       new_auction_id = new_auction.id
       :timer.sleep(500)

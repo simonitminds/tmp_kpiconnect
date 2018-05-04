@@ -27,8 +27,10 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
-  def fill_form_element(_key, element, _type, _value = %DateTime{}) do
-    find_within_element(element, :css, "input")
+  def fill_form_element(_key, element, _type, value = %DateTime{}) do
+    element
+    |> find_within_element(:css, "input")
+    |> fill_field(value)
   end
   def fill_form_element(_key, _element, _type, value) when is_list(value) do
     Enum.map(value, fn(supplier) ->

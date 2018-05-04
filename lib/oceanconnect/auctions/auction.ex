@@ -14,9 +14,10 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to :buyer, Oceanconnect.Accounts.Company
     field :fuel_quantity, :integer
     field :po, :string
-    field :eta, :utc_datetime, default: @current_time_trunc
-    field :etd, :utc_datetime, default: @current_time_trunc
-    field :auction_start, :utc_datetime, default: @current_time_trunc
+    field :port_agent, :string
+    field :eta, :utc_datetime
+    field :etd, :utc_datetime
+    field :auction_start, :utc_datetime
     field :auction_ended, :utc_datetime
     field :duration, :integer, default: 10 * 60_000 # milliseconds
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
@@ -30,7 +31,7 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   @required_fields [
-    :fuel_id,
+    :eta,
     :port_id,
     :vessel_id
   ]
@@ -43,10 +44,11 @@ defmodule Oceanconnect.Auctions.Auction do
     :auction_ended,
     :duration,
     :decision_duration,
-    :eta,
     :etd,
+    :fuel_id,
     :fuel_quantity,
-    :po
+    :po,
+    :port_agent
   ]
 
   @doc false
@@ -54,6 +56,17 @@ defmodule Oceanconnect.Auctions.Auction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> cast_assoc(:buyer)
+    |> cast_assoc(:port)
+    |> cast_assoc(:vessel)
+    |> cast_assoc(:fuel)
+    |> maybe_add_suppliers(attrs)
+  end
+
+  def changeset_for_scheduled_auction(%Auction{} = auction, attrs) do
+    auction
+    |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields ++ [:auction_start, :fuel_id, :fuel_quantity])
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
