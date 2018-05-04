@@ -60,6 +60,7 @@ defmodule Oceanconnect.Auctions do
     query = from as in AuctionSuppliers,
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
+      where: not is_nil(a.auction_start),
       select: a
     query
     |> Repo.all

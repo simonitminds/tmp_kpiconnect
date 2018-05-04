@@ -59,6 +59,12 @@ defmodule Oceanconnect.AuctionsTest do
       |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
     end
 
+    test "list_participating_auctions/1 doesn't return draft auctions" do
+      supplier_company = insert(:company, is_supplier: true)
+      insert(:auction, auction_start: nil, suppliers: [supplier_company])
+      assert Auctions.list_participating_auctions(supplier_company.id) == []
+    end
+
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end
