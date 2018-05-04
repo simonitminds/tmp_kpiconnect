@@ -6,6 +6,7 @@ import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
 import CollapsibleSection from './collapsible-section';
+import ChannelConnectionStatus from './channel-connection-status';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -41,6 +42,7 @@ export default class AuctionsIndex extends React.Component {
   }
 
   render() {
+    const connection = this.props.connection;
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
     const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
 
@@ -91,6 +93,7 @@ export default class AuctionsIndex extends React.Component {
               New Auction
             </a>
             <div className="auction-list__time-box">
+              <ChannelConnectionStatus connection={connection} />
               <div className="auction-list__timer">
                 <i className="far fa-clock has-margin-right-xs"></i>
                 <span className="auction-list__timer__clock" id="gmt-time" >

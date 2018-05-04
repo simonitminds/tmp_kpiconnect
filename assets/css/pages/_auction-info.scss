@@ -50,6 +50,37 @@
 
     &> div {
       display: inline-flex;
+      width: 1.675rem;
+      border-radius: 50%;
+    }
+  }
+
+  &__connection-button {
+    display: inline-flex;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    &> div {
+      display: inline-flex;
+      width: 1.675rem;
+      border-radius: 50%;
+
+      &.is-danger > i {
+        position: relative;
+
+        &:after { // Disconnected from server state
+          display: block;
+          content: "|";
+          transform: rotate(43deg);
+          position: absolute;
+          top: -5px;
+          left: 6px;
+          font-weight: bold;
+          font-size: 1.3rem;
+          text-shadow: -1px -1px 0 $red, 1px -1px 0 $red, -1px 1px 0 $red, 1px 1px 0 $red;
+        }
+      }
     }
   }
 

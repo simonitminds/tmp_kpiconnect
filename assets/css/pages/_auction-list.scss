@@ -9,7 +9,7 @@
 .auction-list {
   &__time-box { // Container for clock and server time warning.
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     float: right;
 
     &> i {
@@ -19,6 +19,10 @@
       margin-bottom: 0.5rem;
       color: #888;
       text-align: right;
+    }
+    
+    &> .auction-header__connection-button { // Uhh... contextually tweak connection marker
+      margin-top: 0.25rem;
     }
   }
   &__timer { // Date and time stamp at top of the page.

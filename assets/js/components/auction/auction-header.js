@@ -32,13 +32,13 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                 </div>
                 <div className="column">
                   <div className="auction-header__timer has-text-left-mobile">
+                    <ChannelConnectionStatus connection={connection} />
                     <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
                       <span className="qa-auction-time_remaining" id="time-remaining">
                         {formatTimeRemaining(auctionStatus, timeRemaining, "show")}
                       </span>
                     </div>
                   </div>
-                  <ChannelConnectionStatus connection={connection} />
                   <div className="auction-header__start-time has-text-left-mobile">
                     <span className="has-text-weight-bold is-uppercase">Started at</span> {formatUTCDateTime(auction.auction_start)} GMT
                   </div>

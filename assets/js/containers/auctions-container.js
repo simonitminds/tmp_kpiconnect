@@ -6,7 +6,8 @@ import { getAllAuctionPayloads, subscribeToAuctionUpdates } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
-    auctionPayloads: state.auctionsReducer.auctionPayloads
+    auctionPayloads: state.auctionsReducer.auctionPayloads,
+    connection: state.auctionsReducer.connection
   }
 };
 
