@@ -9,17 +9,22 @@ defmodule OceanconnectWeb.Api.BidController do
     supplier_id = user.company_id
     updated_bid_params = convert_amount(bid_params)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
-         true  <- duration_time_remaining?(auction.id),
+         :ok  <- duration_time_remaining?(auction),
          false <- updated_bid_params["amount"] < 0,
          0.0   <- (updated_bid_params["amount"] / 0.25) - Float.floor(updated_bid_params["amount"] / 0.25),
          true  <- supplier_id in Auctions.auction_supplier_ids(auction)
     do
       Auctions.place_bid(auction, updated_bid_params, supplier_id, time_entered, user)
-      render(conn, "show.json", data: %{})
+      render(conn, "show.json", %{success: true, message: "Bid successfully placed"})
     else
-      _ -> conn
-           |> put_status(422)
-           |> render(OceanconnectWeb.ErrorView, "422.json", data: %{})
+      {"late_bid", message} ->
+        conn
+        |> put_status(409)
+        |> render("show.json", %{success: false, message: message})
+      _ ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: "Invalid bid"})
     end
   end
 
@@ -34,7 +39,7 @@ defmodule OceanconnectWeb.Api.BidController do
     do
       Auctions.select_winning_bid(bid, comment, user)
 
-      render(conn, "show.json", data: %{})
+      render(conn, "show.json", %{success: true, message: ""})
     else
       _ -> conn
            |> put_status(422)
@@ -47,10 +52,15 @@ defmodule OceanconnectWeb.Api.BidController do
     Map.put(bid_params, "amount", float_amount)
   end
 
-  defp duration_time_remaining?(auction_id) do
+  defp duration_time_remaining?(auction = %Auction{id: auction_id}) do
     case AuctionTimer.read_timer(auction_id, :duration) do
-      false -> false
-      time_remaining -> time_remaining > 0
+      false -> error_response(Auctions.get_auction_state!(auction))
+      _ -> :ok
     end
   end
+
+  defp error_response(%{status: :decision}) do
+    {"late_bid", "Auction moved to decision before bid was received"}
+  end
+  defp error_response(_), do: :error
 end

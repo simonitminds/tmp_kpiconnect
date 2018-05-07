@@ -18,12 +18,12 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
   test "creating a bid for a non-existing auction", %{conn: conn, auction: auction, bid_params: params} do
     fake_auction = %{id: auction.id + 9999, suppliers: auction.suppliers}
     conn = create_post(conn, fake_auction, params)
-    assert json_response(conn, 422)
+    assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
   end
 
   test "creating a bid for a auction that is not open", %{conn: conn, auction: auction, bid_params: params} do
     conn = create_post(conn, auction, params)
-    assert json_response(conn, 422)
+    assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
   end
 
   describe "open auction" do
@@ -40,12 +40,12 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "cannot enter bids of non $0.25 increments ", %{conn: conn, auction: auction, bid_params: params} do
       updated_params = Map.put(params, "bid", %{"amount" => "2.95"})
       conn = create_post(conn, auction, updated_params)
-      assert json_response(conn, 422)
+      assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
     end
 
     test "creating a bid for an auction", %{auction: auction, conn: conn, bid_params: params} do
       conn = create_post(conn, auction, params)
-      assert json_response(conn, 200)
+      assert json_response(conn, 200) == %{"success" => true, "message" => "Bid successfully placed"}
     end
 
     test "creating a bid for an auction as a non supplier", %{auction: auction, bid_params: params} do
@@ -54,14 +54,20 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), non_participant)
 
       conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}", params)
-      assert json_response(conn, 422)
+      assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
     end
 
     test "creating a bid for an auction as a buyer", %{buyer: buyer, auction: auction, bid_params: params} do
       conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
       conn = post(conn, "#{auction_bid_api_path(conn, :create, auction.id)}", params)
 
-      assert json_response(conn, 422)
+      assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
+    end
+
+    test "creating a bid for an auction in decision", %{auction: auction, conn: conn, bid_params: params} do
+      Auctions.end_auction(auction)
+      conn = create_post(conn, auction, params)
+      assert json_response(conn, 409) == %{"success" => false, "message" => "Auction moved to decision before bid was received"}
     end
   end
 
