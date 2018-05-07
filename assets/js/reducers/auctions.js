@@ -4,7 +4,8 @@ import {
   CHANNEL_CONNECTED,
   CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_PAYLOADS,
-  UPDATE_AUCTION_PAYLOAD
+  UPDATE_AUCTION_PAYLOAD,
+  UPDATE_BID_STATUS
 } from "../constants";
 
 const initialState = {
@@ -12,6 +13,9 @@ const initialState = {
   connection: false,
   loading: true
 };
+
+let newAuctionPayloadList;
+let updatedAuctionPayload;
 
 export default function(state, action) {
   switch(action.type) {
@@ -31,10 +35,36 @@ export default function(state, action) {
             .filter(['auction.id', action.auctionPayload.auction.id])
             .first()
             .value();
-      const newAuctionPayloadList = replaceListItem(
+      updatedAuctionPayload = {
+        ...action.auctionPayload,
+        success: origAuctionPayload.success,
+        message: origAuctionPayload.message
+      }
+      newAuctionPayloadList = replaceListItem(
         state.auctionPayloads,
         origAuctionPayload,
-        action.auctionPayload
+        updatedAuctionPayload
+      );
+      return {
+        ...state,
+        auctionPayloads: newAuctionPayloadList,
+        loading: false
+      };
+    }
+    case UPDATE_BID_STATUS: {
+      const origAuctionPayload = _.chain(state.auctionPayloads)
+            .filter(['auction.id', action.auctionId])
+            .first()
+            .value();
+      const updatedAuctionPayload = {
+        ...origAuctionPayload,
+        success: action.success,
+        message: action.message
+      }
+      newAuctionPayloadList = replaceListItem(
+        state.auctionPayloads,
+        origAuctionPayload,
+        updatedAuctionPayload
       );
       return {
         ...state,

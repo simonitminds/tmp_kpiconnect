@@ -3,7 +3,13 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
-import { getAllAuctionPayloads, subscribeToAuctionUpdates, submitBid, selectBid } from '../actions';
+import {
+  getAllAuctionPayloads,
+  selectBid,
+  subscribeToAuctionUpdates,
+  submitBid,
+  updateBidStatus
+} from '../actions';
 
 const mapStateToProps = (state) => {
   const auctionPayload = _.chain(state.auctionsReducer.auctionPayloads)
@@ -31,7 +37,7 @@ const mapDispatchToProps = (dispatch) => ({
 
     dispatch(submitBid(auctionId, bidData))
   },
-  ...bindActionCreators({ selectBid }, dispatch)
+  ...bindActionCreators({ selectBid, updateBidStatus }, dispatch)
 });
 
 export class AuctionContainer extends React.Component {

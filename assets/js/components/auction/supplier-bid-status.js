@@ -42,7 +42,6 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
   } else if (auctionStatus == "open" && !connection) {
     return (
       <div className = "auction-notification box is-gray-2" >
-        {console.log(connection)}
         {messageDisplay("Your connection to the server has been lost")}
       </div>
     )

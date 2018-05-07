@@ -118,6 +118,7 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
       assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
       assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
+      assert AuctionShowPage.has_bid_message?("Bid successfully placed")
     end
 
     test "index displays bid status to suppliers", %{supplier2: supplier2, auction: auction} do

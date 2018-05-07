@@ -16,6 +16,7 @@ import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
 import MediaQuery from 'react-responsive';
 import AuctionLogLink from './auction-log-link';
+import BidStatus from './bid-status';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 export default class AuctionShow extends React.Component {
@@ -33,10 +34,19 @@ export default class AuctionShow extends React.Component {
     );
   }
 
-  componentWillUnmount() {
-    clearInterval(this.timerID);
+  componentDidUpdate() {
+    if (this.props.auctionPayload.message && !this.bidStatusID) {
+      return this.bidStatusID = setInterval(
+        () => this.resetBidStatus(),
+        1500
+      );
+    }
   }
 
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+    clearInterval(this.bidStatusID);
+  }
 
   tick() {
     let time = moment(ServerDate.now()).utc();
@@ -45,10 +55,22 @@ export default class AuctionShow extends React.Component {
     });
   }
 
+  resetBidStatus() {
+    this.props.updateBidStatus(this.props.auctionPayload.auction.id, {'success': null, 'message': null});
+    clearInterval(this.bidStatusID);
+    this.bidStatusID = null;
+  }
+
   render() {
     const auctionPayload = this.props.auctionPayload;
     const auctionState = this.props.auctionPayload.state;
     const auction = this.props.auctionPayload.auction;
+    const bidStatusDisplay = () => {
+      if (auctionPayload.message) {
+        return <BidStatus success={auctionPayload.success} message={auctionPayload.message} />;
+      }
+    };
+
     const currentUser = {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id
     };
@@ -108,6 +130,7 @@ export default class AuctionShow extends React.Component {
       if (auctionState.status == 'open') {
         return (
           <div>
+            {bidStatusDisplay()}
             <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
             <BiddingForm formSubmit={this.props.formSubmit} auction={auction} />
             <SupplierBidList auctionPayload={auctionPayload} />
@@ -116,6 +139,7 @@ export default class AuctionShow extends React.Component {
       } else if (auctionState.status != 'pending') {
         return (
           <div>
+            {bidStatusDisplay()}
             <SupplierLowestBid auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>

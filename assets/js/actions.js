@@ -9,6 +9,7 @@ import {
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
   UPDATE_AUCTION_PAYLOAD,
+  UPDATE_BID_STATUS,
   UPDATE_DATE,
   UPDATE_INFORMATION,
   TOGGLE_SUPPLIER,
@@ -84,11 +85,13 @@ export function submitBid(auctionId, bidData) {
       method: 'POST',
       body: JSON.stringify(bidData)
     })
-      .then(checkStatus)
-      .then(parseJSON)
-      .then((response) => {
-        return console.log(response);
-      });
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      return dispatch(updateBidStatus(auctionId, response));
+    }, (error)=> {
+      return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
+    });
   };
 }
 
@@ -105,6 +108,13 @@ export function selectBid(auctionId, bidId) {
         return console.log(response);
       });
   };
+}
+
+export function updateBidStatus(auctionId, response) {
+  return {type: UPDATE_BID_STATUS,
+          auctionId,
+          success: response.success,
+          message: response.message};
 }
 
 export function receiveAuctionPayloads(auctionPayloads) {

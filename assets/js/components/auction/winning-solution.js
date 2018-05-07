@@ -4,7 +4,6 @@ import { formatTime, formatPrice } from '../../utilities';
 
 const WinningSolution = ({auctionState}) => {
   const winningBid = _.get(auctionState, 'winning_bid');
-  console.log(auctionState);
 
   const winningSolutionDisplay = () => {
     if (winningBid != null) {
