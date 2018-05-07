@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Factory do
   use ExMachina.Ecto, repo: Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Command, AuctionBidList}
+  alias Oceanconnect.Auctions.AuctionBidList
 
   def set_password(user) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)

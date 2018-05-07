@@ -4,8 +4,6 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel}
 
-  @current_time_trunc %DateTime{DateTime.utc_now() | hour: 0, minute: 0, second: 0}
-
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
     belongs_to :port, Port
