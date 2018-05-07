@@ -20,7 +20,7 @@
       color: #888;
       text-align: right;
     }
-    
+
     &> .auction-header__connection-button { // Uhh... contextually tweak connection marker
       margin-top: 0.25rem;
     }
@@ -54,6 +54,7 @@
 
     // Color Auction Status tags based on... auction status.
     &--open { background-color: $green !important; }
+    &--draft { background-color: $gray-3 !important; }
     &--pending { background-color: $teal !important; }
     &--closed { background-color: $gray-3 !important; }
   }

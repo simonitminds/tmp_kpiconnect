@@ -59,7 +59,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
 
   return (
     <div className="column is-one-third">
-      <div className={`card qa-auction-${auction.id}`}>
+      <div className={`card ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}
@@ -85,10 +85,14 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
         </div>
-        <div className="card-content__products">
-          {fuel} ({auction.fuel_quantity}&nbsp;MT)
-        </div>
-        { auctionStatus == 'pending' || auctionStatus == 'draft' ?
+        {fuel != null ?
+          <div className="card-content__products">
+            {fuel} ({auction.fuel_quantity}&nbsp;MT)
+          </div>
+          :
+          <div className="is-none"></div>
+        }
+        { auctionStatus == 'pending' ?
           <div className="card-content__products">
             <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
               <span className="icon"><i className="fas fa-play"></i></span> Start Auction
@@ -99,15 +103,19 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }
 
         <div>
-          <div className="card-content__auction-status has-margin-top-md">
-            <div>Suppliers Participating</div>
-            <div className="card-content__rsvp qa-auction-suppliers">
-              <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
-              <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
-              <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
-              <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+          {auctionStatus == 'pending' || auctionStatus == 'open' ?
+            <div className="card-content__auction-status has-margin-top-md">
+              <div>Suppliers Participating</div>
+              <div className="card-content__rsvp qa-auction-suppliers">
+                <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
+                <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
+                <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
+                <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+              </div>
             </div>
-          </div>
+            :
+            <div className="is-none"></div>
+          }
           {/* <div className="card-content__auction-status">
               <div>Are you ready to post your auction?</div>
               <button className="button is-primary">Schedule Auction</button>
