@@ -28,14 +28,9 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     GenServer.start_link(__MODULE__, {auction_id, auction_start}, name: get_auction_scheduler_name(auction_id))
   end
 
-  def process_command(%Command{command: :update_timer, data: auction = %Auction{id: auction_id}}) do
+  def process_command(%Command{command: :update_scheduled_start, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:update_timer, auction})
-  end
-
-  def process_command(%Command{command: :cancel_timer, data: auction_id}) do
-    with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, :cancel_timer)
+      do: GenServer.cast(pid, {:update_scheduled_start, auction})
   end
 
   # Server
@@ -56,28 +51,21 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   def handle_call(:get_timer_ref, _from, state = %{timer_ref: timer_ref}), do: {:reply, timer_ref, state}
 
-  def handle_cast({:update_timer, %{auction_start: auction_start}}, state = %{auction_start: auction_start}), do: {:noreply, state}
-  def handle_cast({:update_timer, %{auction_start: nil}}, state = %{timer_ref: timer_ref}) do
+  def handle_cast({:update_scheduled_start, %{auction_start: auction_start}}, state = %{auction_start: auction_start}), do: {:noreply, state}
+  def handle_cast({:update_scheduled_start, %{auction_start: nil}}, state = %{timer_ref: timer_ref}) do
     Process.cancel_timer(timer_ref)
     new_state = state
     |> Map.put(:timer_ref, nil)
     |> Map.put(:auction_start, nil)
     {:noreply, new_state}
   end
-  def handle_cast({:update_timer, %{auction_start: auction_start}}, state = %{timer_ref: timer_ref}) do
+  def handle_cast({:update_scheduled_start, %{auction_start: auction_start}}, state = %{timer_ref: timer_ref}) do
     Process.cancel_timer(timer_ref)
     delay = get_schedule_delay(DateTime.diff(auction_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :schedule_auction_start, delay)
     new_state = state
     |> Map.put(:timer_ref, new_timer_ref)
     |> Map.put(:auction_start, auction_start)
-    {:noreply, new_state}
-  end
-
-  def handle_cast(:cancel_timer, state = %{timer_ref: nil}), do: {:noreply, state}
-  def handle_cast(:cancel_timer, state = %{timer_ref: timer_ref}) do
-    Process.cancel_timer(timer_ref)
-    new_state = Map.put(state, :timer_ref, nil)
     {:noreply, new_state}
   end
 

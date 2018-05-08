@@ -5,19 +5,31 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
 
   setup do
     now = DateTime.utc_now()
-    start = Map.put(now, :second, now.second + 2)
+    start = Map.put(now, :second, now.second + 3)
     auction = insert(:auction, auction_start: start)
     {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
     {:ok, %{auction: auction}}
   end
 
-  test "start auction based on scheduler", %{auction: auction = %Auction{id: auction_id}} do
+  test "start auction based on scheduler", %{auction: auction = %Auction{id: auction_id, auction_start: start}} do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     assert Auctions.get_auction_state!(auction).status == :pending
     receive do
-      %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}} ->
-          assert true
-      any -> IO.inspect any
+      %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}, time_entered: start_time} ->
+        assert DateTime.compare(Map.put(start, :second, start.second + 1), start_time) == :gt
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
+    end
+  end
+
+  test "update start time", %{auction: auction = %Auction{id: auction_id}} do
+    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    now = DateTime.utc_now()
+    Auctions.update_auction(auction, %{auction_start: now}, nil)
+    receive do
+      %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}, time_entered: start_time} ->
+        assert DateTime.compare(Map.put(now, :second, now.second + 1), start_time) == :gt
     after
       5000 ->
         assert false, "Expected message received nothing."

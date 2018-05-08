@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
                                AuctionCache,
                                AuctionEvent,
                                AuctionEventStore,
+                               AuctionScheduler,
                                AuctionTimer,
                                Command}
 
@@ -175,16 +176,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp update_auction(auction = %Auction{auction_start: start}, current_state = %{status: :draft}) when start != nil do
-    auction
-    |> Command.update_times
-    |> AuctionTimer.process_command
-
-    auction
-    |> Command.update_cache
-    |> AuctionCache.process_command
+    update_auction_side_effects(auction)
     Map.put(current_state, :status, :pending)
   end
   defp update_auction(auction, current_state) do
+    update_auction_side_effects(auction)
+    current_state
+  end
+
+  defp update_auction_side_effects(auction) do
     auction
     |> Command.update_times
     |> AuctionTimer.process_command
@@ -192,7 +192,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction
     |> Command.update_cache
     |> AuctionCache.process_command
-    current_state
+
+    auction
+    |> Command.update_scheduled_start
+    |> AuctionScheduler.process_command
   end
 
   defp end_auction(current_state = %{auction_id: auction_id}) do

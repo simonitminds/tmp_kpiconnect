@@ -17,6 +17,10 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :update_times, data: auction}
   end
 
+  def update_scheduled_start(auction = %Auction{}) do
+    %Command{command: :update_scheduled_start, data: auction}
+  end
+
   def start_auction(auction = %Auction{}, user) do
     %Command{command: :start_auction, data: %{auction: auction, user: user}}
   end
