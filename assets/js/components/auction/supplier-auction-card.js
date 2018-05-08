@@ -44,7 +44,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
 
   return (
     <div className="column is-one-third">
-      <div className={`card qa-auction-${auction.id}`}>
+      <div className={`card card--auction qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}

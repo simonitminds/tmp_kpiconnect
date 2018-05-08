@@ -24,7 +24,7 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
   } else if (auctionStatus == "expired") {
     return (
       <div className = "auction-notification box is-gray-3" >
-        {messageDisplay("The auction has expired with no offer selected")}
+        {messageDisplay("No offer was selected")}
       </div>
     );
   } else if (auctionStatus == "closed" && winner) {

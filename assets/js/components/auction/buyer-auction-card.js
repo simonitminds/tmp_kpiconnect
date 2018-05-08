@@ -54,7 +54,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
 
   return (
     <div className="column is-one-third">
-      <div className={`card ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
+      <div className={`card card--auction ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}
