@@ -88,10 +88,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    auction
-    |> Command.start_auction(user)
-    |> AuctionStore.process_command
-
     update_auction!(auction, %{auction_start: DateTime.utc_now()}, user)
   end
 

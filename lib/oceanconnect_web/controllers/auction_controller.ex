@@ -33,7 +33,7 @@ defmodule OceanconnectWeb.AuctionController do
     user = Auth.current_user(conn)
     id
     |> Auctions.get_auction!
-    |> Auctions.start_auction(user)
+    |> Auctions.update_auction!(%{auction_start: DateTime.utc_now()}, user)
 
     redirect(conn, to: auction_path(conn, :index))
   end

@@ -4,8 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
   alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionSupervisor}
 
   setup do
-    now = DateTime.utc_now()
-    start = Map.put(now, :second, now.second + 3)
+    start = DateTime.utc_now() |> DateTime.to_naive |> NaiveDateTime.add(3) |> DateTime.from_naive!("Etc/UTC")
     auction = insert(:auction, auction_start: start)
     {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
     {:ok, %{auction: auction}}
@@ -16,7 +15,8 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
     assert Auctions.get_auction_state!(auction).status == :pending
     receive do
       %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}, time_entered: start_time} ->
-        assert DateTime.compare(Map.put(start, :second, start.second + 1), start_time) == :gt
+        gt_start = start |> DateTime.to_naive |> NaiveDateTime.add(1) |> DateTime.from_naive!("Etc/UTC")
+        assert DateTime.compare(gt_start, start_time) == :gt
     after
       5000 ->
         assert false, "Expected message received nothing."
@@ -29,23 +29,11 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
     Auctions.update_auction(auction, %{auction_start: now}, nil)
     receive do
       %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}, time_entered: start_time} ->
-        assert DateTime.compare(Map.put(now, :second, now.second + 1), start_time) == :gt
+        gt_start = now |> DateTime.to_naive |> NaiveDateTime.add(1) |> DateTime.from_naive!("Etc/UTC")
+        assert DateTime.compare(gt_start, start_time) == :gt
     after
       5000 ->
         assert false, "Expected message received nothing."
     end
   end
-
-  # test "cancel_timer/2 cancels the specified timer", %{auction: auction} do
-  #   Oceanconnect.Auctions.start_auction(auction)
-  #   refute AuctionTimer.timer_ref(auction.id, :duration) == false
-  #
-  #   AuctionTimer.cancel_timer(auction.id, :duration)
-  #   assert AuctionTimer.timer_ref(auction.id, :duration) == false
-  # end
-  #
-  # test "cancel_timer/2 gracefully continues if timer doesn't exist", %{auction: auction} do
-  #   AuctionTimer.cancel_timer(auction.id, :duration)
-  #   assert AuctionTimer.timer_ref(auction.id, :duration) == false
-  # end
 end

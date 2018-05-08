@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Factory do
   use ExMachina.Ecto, repo: Oceanconnect.Repo
-  alias Oceanconnect.Auctions.AuctionBidList
 
   def set_password(user) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)
@@ -23,8 +22,9 @@ defmodule Oceanconnect.Factory do
   end
 
   def auction_factory() do
+    start = DateTime.utc_now() |> DateTime.to_naive |> NaiveDateTime.add(20) |> DateTime.from_naive!("Etc/UTC")
     %Oceanconnect.Auctions.Auction{
-      auction_start: DateTime.utc_now(),
+      auction_start: start,
       duration: 10 * 60_000,
       decision_duration: 15 * 60_000,
       eta: DateTime.utc_now(),
