@@ -10,12 +10,10 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
+  const lowestBid = _.chain(auctionPayload).get('state.lowest_bids').first().value();
+  const lowestBidCount = _.get(auctionPayload, 'state.lowest_bids.length');
 
   const lowestBidMessage = () => {
-    let lowestBid;
-    lowestBid = _.chain(auctionPayload).get('state.lowest_bids').first().value();
-    const lowestBidCount = _.get(auctionPayload, 'state.lowest_bids.length');
-
     if (lowestBid && lowestBidCount == 1) {
       return (
         <div className="card-content__best-bidder">
@@ -38,9 +36,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   }
 
   const bidStatusDisplay = () => {
-    let lowestBid;
-    lowestBid = _.chain(auction).get('state.lowest_bids').first().value();
-    const lowestBidCount = _.get(auction, 'state.lowest_bids.length');
     if (lowestBidCount > 0) {
       return (
         <div className="card-content__bid-status">

@@ -74,6 +74,7 @@ export default class AuctionsIndex extends React.Component {
                   key={auctionPayload.auction.id}
                   auctionPayload={auctionPayload}
                   timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
+                  connection={connection}
                 />;
               }
             }) }
