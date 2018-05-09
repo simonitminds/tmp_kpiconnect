@@ -24,26 +24,128 @@
   }
 }
 
-@keyframes fancy-flip {
+.auction-notification__container {
+  animation: 3s ease-out 0s 1 fancy-flip-container;
+}
+
+.auction-notification--flash { // Variant for flash messages
+  height: 0px;
+  margin-bottom: 0;
+  color: transparent;
+  background-color: transparent;
+  transform: rotateX(-180deg);
+  padding: 0 1.25rem;
+  border-radius: 5px;
+}
+
+@keyframes fancy-flip-container {
   0% {
-    color: transparent;
-    background-color: $gold;
-    transform: rotateX(-180deg);
+    height: 0;
   }
 
-  50% {
-    color: transparent;
+  20% {
+    height: 66px;
+  }
+
+  80% {
+    height: 66px;
   }
 
   100% {
+    height: 0px;
+  }
+}
+
+@keyframes fancy-flip--success {
+  0% {
+    height: 0;
+    margin-bottom: 0;
+    color: transparent;
+    background-color: transparent;
+    transform: rotateX(-180deg);
+  }
+
+  10% {
+    color: transparent;
+  }
+
+  20% {
+    height: 50px;
+    margin-bottom: 1rem;
     color: #fff;
     background-color: $green;
     transform: rotateX(0deg);
   }
+
+  80% {
+    height: 50px;
+    margin-bottom: 1rem;
+    color: #fff;
+    background-color: $green;
+    transform: rotateX(0deg);
+  }
+
+  90% {
+    color: transparent;
+  }
+
+  100% {
+    height: 0px;
+    margin-bottom: 0;
+    color: transparent;
+    background-color: transparent;
+    transform: rotateX(-180deg);
+  }
 }
 
-.auction-notification.is-success {
-  transition: 1s ease-out 0s 1 fancy-flip;
+@keyframes fancy-flip--danger {
+  0% {
+    height: 0;
+    margin-bottom: 0;
+    color: transparent;
+    background-color: transparent;
+    transform: rotateX(-180deg);
+  }
+
+  10% {
+    color: transparent;
+  }
+
+  20% {
+    height: 50px;
+    margin-bottom: 1rem;
+    color: #fff;
+    background-color: $red;
+    transform: rotateX(0deg);
+  }
+
+  80% {
+    height: 50px;
+    margin-bottom: -1rem;
+    color: #fff;
+    background-color: $red;
+    transform: rotateX(0deg);
+  }
+
+  90% {
+    color: transparent;
+  }
+
+  100% {
+    height: 0px;
+    margin-bottom: 0;
+    color: transparent;
+    background-color: transparent;
+    transform: rotateX(-180deg);
+  }
+}
+
+.auction-notification--flash.is-success {
+  animation: 3s ease-out 0s 1 fancy-flip--success;
+}
+
+.auction-notification--flash.is-danger {
+  animation: 3s ease-out 0s 1 fancy-flip--danger;
 }
 
 // Variant in Auction List Context...

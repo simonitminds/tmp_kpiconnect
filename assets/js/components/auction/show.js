@@ -34,18 +34,8 @@ export default class AuctionShow extends React.Component {
     );
   }
 
-  componentDidUpdate() {
-    if (this.props.auctionPayload.message && !this.bidStatusID) {
-      return this.bidStatusID = setInterval(
-        () => this.resetBidStatus(),
-        1500
-      );
-    }
-  }
-
   componentWillUnmount() {
     clearInterval(this.timerID);
-    clearInterval(this.bidStatusID);
   }
 
   tick() {
@@ -55,19 +45,13 @@ export default class AuctionShow extends React.Component {
     });
   }
 
-  resetBidStatus() {
-    this.props.updateBidStatus(this.props.auctionPayload.auction.id, {'success': null, 'message': null});
-    clearInterval(this.bidStatusID);
-    this.bidStatusID = null;
-  }
-
   render() {
     const auctionPayload = this.props.auctionPayload;
     const auctionState = this.props.auctionPayload.state;
     const auction = this.props.auctionPayload.auction;
     const bidStatusDisplay = () => {
       if (auctionPayload.message) {
-        return <BidStatus success={auctionPayload.success} message={auctionPayload.message} />;
+        return <BidStatus auctionPayload={auctionPayload} updateBidStatus={this.props.updateBidStatus} />
       }
     };
 

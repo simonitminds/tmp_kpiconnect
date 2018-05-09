@@ -1,19 +1,44 @@
 import React from 'react';
 
-const BidStatus = ({success, message}) => {
-  const statusDisplay = () => {
-    if (success) {
-      return <div className="qa-auction-bid-status is-success">{message}</div>;
-    } else {
-      return <div className="qa-auction-bid-status is-danger">{message}</div>;
-    }
+export default class BidStatus extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  handleAnimationEnd(event) {
+    this.props.updateBidStatus(this.props.auctionPayload.auction.id, {'success': null, 'message': null});
+  }
+
+  render() {
+    const success = this.props.auctionPayload.success;
+    const message = this.props.auctionPayload.message;
+
+    const statusDisplay = () => {
+      if (success) {
+        return (
+          <div
+            className="auction-notification auction-notification--flash qa-auction-bid-status is-success"
+            onAnimationEnd={this.handleAnimationEnd.bind(this)}
+          >
+            <h3 className="has-text-weight-bold is-flex">{message}</h3>
+          </div>
+        )
+      } else {
+        return (
+          <div
+            className="auction-notification auction-notification--flash qa-auction-bid-status is-danger"
+            onAnimationEnd={this.handleAnimationEnd.bind(this)}
+          >
+            <h3 className="has-text-weight-bold is-flex">{message}</h3>
+          </div>
+        )
+      }
+    };
+
+    return(
+      <div className="auction-notification__container">
+        {statusDisplay()}
+      </div>
+    );
   };
-
-  return(
-    <div>
-      {statusDisplay()}
-    </div>
-  );
-};
-
-export default BidStatus;
+}
