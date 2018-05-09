@@ -260,6 +260,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
       receive do
+        _ -> nil
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
           payload: %{auction: %{id: ^auction_id}, state: %{status: :open, lowest_bids: lowest_bids}, bid_list: bid_list},

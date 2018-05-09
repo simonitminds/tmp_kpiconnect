@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
                                AuctionBidList,
                                AuctionEventHandler,
                                AuctionEventStore,
+                               AuctionScheduler,
                                AuctionStore,
                                AuctionTimer}
 
@@ -18,6 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionCache, auction},
       {AuctionBidList, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionScheduler, auction},
       {AuctionEventStore, auction_id},
       {AuctionEventHandler, auction_id},
       {AuctionStore, auction}
@@ -29,6 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionCache, auction},
       {AuctionBidList, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionScheduler, auction},
       {AuctionEventStore, auction_id},
       {AuctionStore, auction}
     ]

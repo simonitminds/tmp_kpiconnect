@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
                                AuctionCache,
                                AuctionEvent,
                                AuctionEventStore,
+                               AuctionScheduler,
                                AuctionTimer,
                                Command}
 
@@ -82,9 +83,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:reply, current_state, current_state}
   end
 
-  def handle_cast({:start_auction, %{auction: auction, user: user}, emit}, current_state) do
+  def handle_cast({:start_auction, %{auction: auction = %Auction{auction_start: auction_start}, user: user}, emit}, current_state) do
     new_state = start_auction(current_state)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: new_state, time_entered: DateTime.utc_now(), user: user}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: new_state, time_entered: auction_start, user: user}, emit)
 
     {:noreply, new_state}
   end
@@ -171,20 +172,23 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
+    auction_id
+    |> Command.cancel_scheduled_start
+    |> AuctionScheduler.process_command
+
     %AuctionState{current_state | status: :open}
   end
 
   defp update_auction(auction = %Auction{auction_start: start}, current_state = %{status: :draft}) when start != nil do
-    auction
-    |> Command.update_times
-    |> AuctionTimer.process_command
-
-    auction
-    |> Command.update_cache
-    |> AuctionCache.process_command
+    update_auction_side_effects(auction)
     Map.put(current_state, :status, :pending)
   end
   defp update_auction(auction, current_state) do
+    update_auction_side_effects(auction)
+    current_state
+  end
+
+  defp update_auction_side_effects(auction) do
     auction
     |> Command.update_times
     |> AuctionTimer.process_command
@@ -192,7 +196,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction
     |> Command.update_cache
     |> AuctionCache.process_command
-    current_state
+
+    auction
+    |> Command.update_scheduled_start
+    |> AuctionScheduler.process_command
   end
 
   defp end_auction(current_state = %{auction_id: auction_id}) do

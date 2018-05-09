@@ -38,6 +38,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   test "cancel_timer/2 cancels the specified timer", %{auction: auction} do
     Oceanconnect.Auctions.start_auction(auction)
+    :timer.sleep(500)
     refute AuctionTimer.timer_ref(auction.id, :duration) == false
 
     AuctionTimer.cancel_timer(auction.id, :duration)

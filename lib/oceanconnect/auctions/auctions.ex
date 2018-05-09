@@ -88,11 +88,11 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    auction
+    updated_auction = update_auction_without_event_storage!(auction, %{auction_start: DateTime.utc_now()})
+    updated_auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command
-
-    update_auction!(auction, %{auction_start: DateTime.utc_now()}, user)
+    updated_auction
   end
 
   def end_auction(auction = %Auction{}) do
@@ -159,14 +159,14 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update()
-    |> emit_auction_update(user)
+    |> auction_update_command(user)
   end
 
   def update_auction!(%Auction{} = auction, attrs, user) do
     auction
     |> Auction.changeset(attrs)
     |> Repo.update!()
-    |> emit_auction_update(user)
+    |> auction_update_command(user)
   end
 
   def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
@@ -221,15 +221,15 @@ defmodule Oceanconnect.Auctions do
   end
   def strip_non_loaded(struct), do: struct
 
-  defp emit_auction_update({:ok, auction}, user) do
+  defp auction_update_command({:ok, auction}, user) do
     auction
     |> fully_loaded
     |> Command.update_auction(user)
     |> AuctionStore.process_command
     {:ok, auction}
   end
-  defp emit_auction_update({:error, changeset}, _user), do: {:error, changeset}
-  defp emit_auction_update(auction, user) do
+  defp auction_update_command({:error, changeset}, _user), do: {:error, changeset}
+  defp auction_update_command(auction, user) do
     auction
     |> fully_loaded
     |> Command.update_auction(user)

@@ -20,6 +20,7 @@ defmodule Oceanconnect.Application do
       {Registry, keys: :unique, name: :auctions_registry},
       {Registry, keys: :unique, name: :auction_cache_registry},
       {Registry, keys: :unique, name: :auction_timers_registry},
+      {Registry, keys: :unique, name: :auction_scheduler_registry},
       {Registry, keys: :unique, name: :auction_bids_registry},
       {Registry, keys: :unique, name: :auction_event_store_registry},
       {Registry, keys: :unique, name: :auction_event_handler_registry},
