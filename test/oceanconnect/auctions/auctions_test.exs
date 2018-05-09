@@ -65,6 +65,25 @@ defmodule Oceanconnect.AuctionsTest do
       assert Auctions.list_participating_auctions(supplier_company.id) == []
     end
 
+    test "list_participating_auctions/1 orders on auction_start" do
+      supplier_company = insert(:company, is_supplier: true)
+
+      {:ok, first_date, _} = DateTime.from_iso8601("2018-01-01T00:00:00Z")
+      {:ok, second_date, _} = DateTime.from_iso8601("2018-01-02T00:00:00Z")
+      {:ok, third_date, _} = DateTime.from_iso8601("2018-01-03T00:00:00Z")
+      {:ok, fourth_date, _} = DateTime.from_iso8601("2018-01-04T00:00:00Z")
+
+      auction_one = insert(:auction, auction_start: third_date, suppliers: [supplier_company])
+      auction_two = insert(:auction, auction_start: first_date, suppliers: [supplier_company])
+      auction_three = insert(:auction, auction_start: second_date, suppliers: [supplier_company])
+      auction_four = insert(:auction, auction_start: fourth_date, buyer: supplier_company)
+      auction_five = insert(:auction, auction_start: third_date, buyer: supplier_company)
+      auction_six = insert(:auction, auction_start: first_date, buyer: supplier_company)
+      auctions = Enum.map(Auctions.list_participating_auctions(supplier_company.id), fn(a) -> a.id end)
+
+      assert  [auction_six.id, auction_five.id, auction_four.id, auction_two.id, auction_three.id, auction_one.id] == auctions
+    end
+
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end

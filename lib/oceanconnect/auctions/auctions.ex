@@ -50,7 +50,8 @@ defmodule Oceanconnect.Auctions do
 
   defp buyer_auctions(buyer_id) do
     query = from a in Auction,
-      where: a.buyer_id == ^buyer_id
+      where: a.buyer_id == ^buyer_id,
+      order_by: a.auction_start
     query
     |> Repo.all
     |> fully_loaded
@@ -61,7 +62,8 @@ defmodule Oceanconnect.Auctions do
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
       where: not is_nil(a.auction_start),
-      select: a
+      select: a,
+      order_by: a.auction_start
     query
     |> Repo.all
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
