@@ -31,6 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       {AuctionCache, auction},
       {AuctionBidList, auction_id},
       {AuctionTimer, {auction_id, duration, decision_duration}},
+      {AuctionScheduler, auction},
       {AuctionEventStore, auction_id},
       {AuctionStore, auction}
     ]

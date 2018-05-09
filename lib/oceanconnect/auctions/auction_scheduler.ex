@@ -33,6 +33,11 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
       do: GenServer.cast(pid, {:update_scheduled_start, auction})
   end
 
+  def process_command(%Command{command: :cancel_scheduled_start, data: auction_id}) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, :cancel_scheduled_start)
+  end
+
   # Server
   def init({auction_id, nil}), do: {:ok, %{auction_id: auction_id, auction_start: nil, timer_ref: nil}}
   def init({auction_id, auction_start}) do
@@ -42,7 +47,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_info(:schedule_auction_start, state = %{auction_id: auction_id}) do
-    %Auction{id: auction_id}
+    %Auction{id: auction_id, auction_start: DateTime.utc_now()}
     |> Command.start_auction(nil)
     |> AuctionStore.process_command
 
@@ -66,6 +71,13 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     new_state = state
     |> Map.put(:timer_ref, new_timer_ref)
     |> Map.put(:auction_start, auction_start)
+    {:noreply, new_state}
+  end
+
+  def handle_cast(:cancel_scheduled_start, state = %{timer_ref: nil}), do: {:noreply, state}
+  def handle_cast(:cancel_scheduled_start, state = %{timer_ref: timer_ref}) do
+    Process.cancel_timer(timer_ref)
+    new_state = Map.put(state, :timer_ref, nil)
     {:noreply, new_state}
   end
 

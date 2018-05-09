@@ -142,7 +142,6 @@ defmodule Oceanconnect.AuctionsTest do
     test "ending an auction saves the auction_ended timestamp on the auction", %{auction: auction = %Auction{id: auction_id}} do
       auction
       |> Auctions.start_auction
-      |> IO.inspect
       |> Auctions.end_auction
       :timer.sleep(500)
 

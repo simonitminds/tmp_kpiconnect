@@ -53,7 +53,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
       assert [
-        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction.id)
     end
@@ -69,7 +68,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
-        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction.id)
     end
@@ -83,7 +81,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
       assert [
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
-        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction.id)
     end
@@ -105,7 +102,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
-        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction.id)
     end
@@ -124,7 +120,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
-        %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
       ] = AuctionEventStore.event_list(auction.id)
     end

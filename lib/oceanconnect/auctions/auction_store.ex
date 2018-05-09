@@ -83,9 +83,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:reply, current_state, current_state}
   end
 
-  def handle_cast({:start_auction, %{auction: auction, user: user}, emit}, current_state) do
+  def handle_cast({:start_auction, %{auction: auction = %Auction{auction_start: auction_start}, user: user}, emit}, current_state) do
     new_state = start_auction(current_state)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: new_state, time_entered: DateTime.utc_now(), user: user}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: new_state, time_entered: auction_start, user: user}, emit)
 
     {:noreply, new_state}
   end
@@ -171,6 +171,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction_id
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
+
+    auction_id
+    |> Command.cancel_scheduled_start
+    |> AuctionScheduler.process_command
 
     %AuctionState{current_state | status: :open}
   end
