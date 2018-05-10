@@ -7,6 +7,8 @@ defmodule Oceanconnect.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :first_name, :string
+    field :last_name, :string
     field :password_hash, :string
     field :password, :string, virtual: true
     belongs_to :company, Oceanconnect.Accounts.Company
@@ -17,7 +19,7 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :company_id])
+    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id])
     |> validate_required([:email, :password])
     |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)

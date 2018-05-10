@@ -46,7 +46,7 @@ defmodule OceanconnectWeb.AuctionView do
   def event_company(_), do: "-"
 
   def event_user(%AuctionEvent{user: nil}), do: "-"
-  def event_user(%AuctionEvent{user: user}), do: user.email
+  def event_user(%AuctionEvent{user: user}), do: "#{user.first_name} #{user.last_name}"
   def event_user(_), do: "-"
 
   defp leftpad(integer) do

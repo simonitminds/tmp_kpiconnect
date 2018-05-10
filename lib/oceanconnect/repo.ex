@@ -21,7 +21,15 @@ defmodule Oceanconnect.Repo do
   end
 
   def get_or_insert_user!(nil, email, company) do
-    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: String.upcase(email), password: "ocmtest", company_id: company.id})
+    [first_name, last_name] = String.split(company.contact_name)
+    user_params = %{
+      email: String.upcase(email),
+      first_name: first_name,
+      last_name: last_name,
+      password: "ocmtest",
+      company_id: company.id
+    }
+    {:ok, user} = Oceanconnect.Accounts.create_user(user_params)
     user
   end
   def get_or_insert_user!(user, _email, _company), do: user

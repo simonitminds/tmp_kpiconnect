@@ -32,7 +32,7 @@ companies = [
     main_phone: "+974 4452 3043", mobile_phone: "+44 7803 632226", postal_code: "22666"},
   %{name: "Petrochina International (Singapore) Pte Ltd", address1: "One Temasek Avenue",
     address2: "#27-00 Millenia Tower", city: "Singapore", is_supplier: true,
-    country: "Singapore", contact_name: "Wee Tee Ng", email: "petrochina@example.com",
+    country: "Singapore", contact_name: "Wee-Tee Ng", email: "petrochina@example.com",
     main_phone: "+65 6411 7513", mobile_phone: "+65 9119 0771", postal_code: "039192"},
   %{name: "Global Energy Trading Pte Ltd", address1: "Alexandra Point",
     address2: "4438 Alexandra Road, #13-01", city: "Singapore",
@@ -44,7 +44,7 @@ companies = [
     main_phone: "+65 6505 2612", mobile_phone: "+65 9727 8577", postal_code: "138588"},
   %{name: "Chemoil Internatinoal Pte Ltd", address1: "1 Temasek Avenue",
     address2: "#34-01 Mellenia Tower", city: "Singapore", is_supplier: true,
-    country: "Singapore", contact_name: "Hwee Cheng Chua", email: "chemoil@example.com",
+    country: "Singapore", contact_name: "Hwee-Cheng Chua", email: "chemoil@example.com",
     main_phone: "+65 6415 7653", mobile_phone: "+65 9672 1065", postal_code: "039192"}
 ]
 |> Enum.map(fn(company) ->
