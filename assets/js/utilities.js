@@ -93,6 +93,31 @@ export function formatTimeRemaining(auctionStatus, timeRemaining, page) {
   }
 }
 
+export function formatTimeRemainingMobile(auctionStatus, timeRemaining, page) {
+  let message;
+  switch (`${auctionStatus}-${page}`) {
+    case "open-show": {message = "remaining"; break;}
+    case "open-index": {message = "remaining"; break;}
+    case "decision-show": {message = "remaining"; break;}
+    case "decision-index": {message = "remaining"; break;}
+  }
+  if (timeRemaining && timeRemaining > 0) {
+    const mins = Math.floor(timeRemaining / 60000);
+    const secs = Math.trunc((timeRemaining - mins * 60000) / 1000);
+    return `${leftpad(mins, 2, "0")}:${leftpad(secs, 2, "0")} ${message}`;
+  } else if (auctionStatus === "expired") {
+    return "Auction Expired"
+  } else if (auctionStatus === "closed") {
+    return "Auction Closed"
+  } else if(auctionStatus === "draft"){
+    return "Unscheduled";
+  } else if(auctionStatus === "pending"){
+    return "Not started";
+  } else {
+    return "00:00 Remaining";
+  }
+}
+
 export function formatTimeRemainingColor(auctionStatus, timeRemaining) {
   if (timeRemaining && auctionStatus === "open") {
     if (timeRemaining <= 60100) { // 1 minute plus time for transition animation.

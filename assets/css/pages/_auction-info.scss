@@ -12,9 +12,20 @@
 
   // LEFT COLUMN
 
+  &> .columns > .column:first-child { // Tweak spacing from top for mobile.
+    @media (max-width: 768px) {
+      padding-top: 0;
+    }
+  }
+
   &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
     margin-bottom: 0.5rem;
     color: $white !important;
+
+    @media (max-width: 768px) {
+      margin-left: -0.5rem; // Visual adjustment to align edge of tag copy with vessel name
+      margin-bottom: 0.75rem; // Give re-placed auction timer more space
+    }
 
     // Color Auction Status tags based on... auction status.
     &--open { background-color: $green !important; }
@@ -35,12 +46,30 @@
     }
   }
 
+  &__company { // Name of the Buyer (MOBILE ONLY)
+    display: none;
+
+    @media (max-width: 768px) {
+      display: block;
+      font-size: 0.85rem;
+      margin: 0.25rem 0 0 0;
+      font-weight: normal !important;
+    }
+  }
+
   // RIGHT COLUMN
 
   &__timer { // Auction Countdown Timer
     margin-bottom: 0.25rem;
     font-weight: normal !important;
     text-align: right;
+
+    &--mobile {
+      width: 161px;
+      float: right;
+      margin-right: -8px;
+      margin-top: -6px;
+    }
   }
 
   &__connection { // Auction Connectivity Indicator
@@ -60,6 +89,10 @@
     margin-right: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+      margin-bottom: 0;
+    }
 
     &> div {
       display: inline-flex;
@@ -95,6 +128,12 @@
     text-align: right;
   }
 
+  // EMPTY MOBILE COLUMN...?
+
+  .column:empty {
+    display: none;
+  }
+
   // FOOTER... OF... HEADER?
 
   &__ports { // Auction Ports (i.e. where the vessel will be docking)
@@ -104,6 +143,13 @@
 
     span {
       font-size: 1rem;
+    }
+
+    &--mobile { // Styles for relocated mobile variant of the port and ETA.
+      padding: 0.25rem 1.5rem;
+      margin: 0.5rem -1.5rem 0;
+      background-color: $gray-2;
+      font-size: $size-6;
     }
   }
 
@@ -128,10 +174,13 @@
 
 // Auction Tabs (Mobile)
 
-.auction-content .tabs {
+.auction-content[data-tabs] { // Target auction content tab container
   @media (max-width: 768px) {
-    margin-left: -1rem;
-    margin-right: -1rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
 }
 
@@ -152,6 +201,14 @@
   &--active { background-color: $gray-3 !important; }
   &--in-decision { background-color: $gray-3 !important; width: 310px !important; }
   &--inactive { background-color: $gray-2 !important; color: $black !important; }
+}
+
+.auction-timer--mobile {
+  width: 130px;
+  font-size: 0.85rem !important;
+  &.auction-timer--in-decision {
+    width: 130px !important;
+  }
 }
 
 // Auction Tables

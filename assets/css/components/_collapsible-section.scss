@@ -11,8 +11,12 @@
 
 .auction-list  { // Toggling Icon
 
-  h2 {
+  h2.auction-list__trigger {
     display: flex;
+    @media(max-width: 768px) {
+      font-size: 1.25rem;
+      margin: 0.25rem 0 0.75rem 0;
+    }
   }
 
   .collapsible-section__toggle-icon {
@@ -37,4 +41,8 @@
   margin-right: 1rem;
   min-width: 2.5rem;
   border-radius: 14px !important;
+  @media(max-width: 768px) {
+    font-size: 0.85rem !important;
+    min-width: 2rem;
+  }
 }

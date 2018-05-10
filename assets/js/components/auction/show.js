@@ -161,72 +161,91 @@ export default class AuctionShow extends React.Component {
     }
 
     return (
-      <div>
-        <MediaQuery query="(min-width: 768px)">
+      <div className="auction-app">
+        <MediaQuery query="(min-width: 769px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
         <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} connection={this.props.connection} />
-        <MediaQuery query="(min-width: 768px)">
-          <section className="auction-page"> {/* Auction details */}
-            <div className="container">
-              <div className="auction-content">
-                <div className="columns is-gapless">
-                  <div className="column is-two-thirds">
-                    <div className="tabs is-fullwidth is-medium">
-                      <ul>
-                        <li className="is-active">
-                          <h2 className="title is-size-5"><a className="has-text-left">Auction Monitor</a></h2>
-                        </li>
-                      </ul>
+        <MediaQuery query="(min-width: 769px)">
+          <div className="auction-app__body">
+            <section className="auction-page"> {/* Auction details */}
+              <div className="container">
+                <div className="auction-content">
+                  <div className="columns is-gapless">
+                    <div className="column is-two-thirds">
+                      <div className="tabs is-fullwidth is-medium">
+                        <ul>
+                          <li className="is-active">
+                            <h2 className="title is-size-5"><a className="has-text-left">Auction Monitor</a></h2>
+                          </li>
+                        </ul>
+                      </div>
+                      { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
                     </div>
-                    { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
-                  </div>
-                  <Tabs className="column is-one-third">
-                    <div className="tabs is-fullwidth is-medium">
-                      <TabList>
-                        <Tab>
-                          <h2 className="title is-size-5">Auction Details</h2>
-                        </Tab>
-                        {/* <Tab>
-                          <h2 className="title is-size-5">Messages</h2>
-                        </Tab> */}
-                      </TabList>
-                    </div>
-                    <TabPanel>
-                      { auctionLogLinkDisplay() }
-                      { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
-                      { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
+                    <Tabs className="column is-one-third">
+                      <div className="tabs is-fullwidth is-medium">
+                        <TabList>
+                          <Tab>
+                            <h2 className="title is-size-5">Auction Details</h2>
+                          </Tab>
+                          {/* <Tab>
+                            <h2 className="title is-size-5">Messages</h2>
+                          </Tab> */}
+                        </TabList>
+                      </div>
+                      <TabPanel>
+                        { auctionLogLinkDisplay() }
+                        { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                        { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
-                      <div className="box">
-                        <div className="box__subsection">
-                          <h3 className="box__header">Buyer Information
-                            <div className="field is-inline-block is-pulled-right">
-                              { currentUser.isBuyer ?
-                                <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
-                                :
-                                <div> </div>
-                              }
-                            </div>
-                          </h3>
-                          <ul className="list has-no-bullets">
-                            <li>
-                              <strong>Organization</strong> {auction.buyer.name}
+                        <div className="box">
+                          <div className="box__subsection">
+                            <h3 className="box__header">Buyer Information
+                              <div className="field is-inline-block is-pulled-right">
+                                { currentUser.isBuyer ?
+                                  <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
+                                  :
+                                  <div> </div>
+                                }
+                              </div>
+                            </h3>
+                            <ul className="list has-no-bullets">
+                              <li>
+                                <strong>Organization</strong> {auction.buyer.name}
+                              </li>
+                              <li>
+                                <strong>Buyer</strong> Buyer Name
+                              </li>
+                              <li>
+                                <strong>Buyer Reference Number</strong> BRN
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="box__subsection">
+                            <h3 className="box__header">Fuel Requirements</h3>
+                            <ul className="list has-no-bullets">
+                              <li>
+                                <strong>{fuel}</strong> {auction.fuel_quantity} MT
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="box__subsection">
+                            <h3 className="box__header">Port Information</h3>
+                            <ul className="list has-no-bullets">
+                              <li>
+                                <strong className="is-block">{auction.port.name}</strong>
+                                <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="box__subsection">
+                            <h3 className="box__header">Additional Information</h3>
+                            <ul className="list has-no-bullets">
+                              <li>
+                                {additionInfoDisplay(auction)}
                             </li>
-                            <li>
-                              <strong>Buyer</strong> Buyer Name
-                            </li>
-                            <li>
-                              <strong>Buyer Reference Number</strong> BRN
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="box__subsection">
-                          <h3 className="box__header">Fuel Requirements</h3>
-                          <ul className="list has-no-bullets">
-                            <li>
-                              <strong>{fuel}</strong> {auction.fuel_quantity} MT
-                            </li>
-                          </ul>
+                            </ul>
+                          </div>
                         </div>
                         <div className="box__subsection">
                           <h3 className="box__header">Port Information</h3>
@@ -245,101 +264,102 @@ export default class AuctionShow extends React.Component {
                               {additionInfoDisplay(auction)}
                           </li>
                           </ul>
-                        </div>
-                      </div>
-                    </TabPanel>
-                    {/* <TabPanel>
-                      <div className = "auction-notification box is-gray-0" >
-                        <h3 className="has-text-weight-bold is-flex">
-                        <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
-                        </h3>
-                      </div>
-                    </TabPanel> */}
-                  </Tabs>
+                        </TabPanel>
+                        {/* <TabPanel>
+                          <div className = "auction-notification box is-gray-0" >
+                            <h3 className="has-text-weight-bold is-flex">
+                            <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
+                            </h3>
+                          </div>
+                        </TabPanel> */}
+                    </Tabs>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </MediaQuery>
         <MediaQuery query="(max-width: 768px)">
-          <section className="auction-page"> {/* Auction details */}
-            <div className="container has-padding-left-none has-padding-right-none">
-              <Tabs className="auction-content">
-                <div className="tabs is-fullwidth is-medium">
-                  <TabList>
-                    <Tab><h2 className="title is-size-5">Monitor</h2></Tab>
-                    <Tab><h2 className="title is-size-5">Details</h2></Tab>
-                    {/* <Tab><h2 className="title is-size-5">Messages</h2></Tab> */}
-                  </TabList>
-                </div>
-                <TabPanel>
-                  { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
-                </TabPanel>
-                <TabPanel>
-                  { auctionLogLinkDisplay() }
-                  { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
-                  { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-                  <div className="box">
-                    <div className="box__subsection">
-                      <h3 className="box__header">Buyer Information
-                        <div className="field is-inline-block is-pulled-right">
-                          { currentUser.isBuyer ?
-                            <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
-                            :
-                            <div> </div>
-                          }
-                        </div>
+          <div className="auction-app__body">
+            <section className="auction-page"> {/* Auction details */}
+              <div className="container has-padding-left-none has-padding-right-none">
+                <Tabs className="auction-content">
+                  <div className="tabs is-fullwidth is-medium">
+                    <TabList>
+                      <Tab><h2 className="title is-size-5">Monitor</h2></Tab>
+                      <Tab><h2 className="title is-size-5">Details</h2></Tab>
+                      {/* <Tab><h2 className="title is-size-5">Messages</h2></Tab> */}
+                    </TabList>
+                  </div>
+                  <TabPanel>
+                    { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
+                  </TabPanel>
+                  <TabPanel>
+                    { auctionLogLinkDisplay() }
+                    { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                    { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
+                    <div className="box">
+                      <div className="box__subsection">
+                        <h3 className="box__header">Buyer Information
+                          <div className="field is-inline-block is-pulled-right">
+                            { currentUser.isBuyer ?
+                              <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
+                              :
+                              <div> </div>
+                            }
+                          </div>
+                        </h3>
+                        <ul className="list has-no-bullets">
+                          <li>
+                            <strong>Organization</strong> {auction.buyer.name}
+                          </li>
+                          <li>
+                            <strong>Buyer</strong> Buyer Name
+                          </li>
+                          <li>
+                            <strong>Buyer Reference Number</strong> BRN
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="box__subsection">
+                        <h3 className="box__header">Fuel Requirements</h3>
+                        <ul className="list has-no-bullets">
+                          <li>
+                            <strong>{fuel}</strong> {auction.fuel_quantity} MT
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="box__subsection">
+                        <h3 className="box__header">Port Information</h3>
+                        <ul className="list has-no-bullets">
+                          <li>
+                            <strong className="is-block">{auction.port.name}</strong>
+                            <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
+                          </li>
+                          { portAgentDisplay() }
+                        </ul>
+                      </div>
+                      <div className="box__subsection">
+                        <h3 className="box__header">Additional Information</h3>
+                        <ul className="list has-no-bullets">
+                          <li>
+                            {additionInfoDisplay(auction)}
+                        </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </TabPanel>
+                  {/* <TabPanel>
+                    <div className = "auction-notification box is-gray-0" >
+                      <h3 className="has-text-weight-bold is-flex">
+                      <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
                       </h3>
-                      <ul className="list has-no-bullets">
-                        <li>
-                          <strong>Organization</strong> {auction.buyer.name}
-                        </li>
-                        <li>
-                          <strong>Buyer</strong> Buyer Name
-                        </li>
-                        <li>
-                          <strong>Buyer Reference Number</strong> BRN
-                        </li>
-                      </ul>
                     </div>
-                    <div className="box__subsection">
-                      <h3 className="box__header">Fuel Requirements</h3>
-                      <ul className="list has-no-bullets">
-                        <li>
-                          <strong>{fuel}</strong> {auction.fuel_quantity} MT
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="box__subsection">
-                      <h3 className="box__header">Port Information</h3>
-                      <ul className="list has-no-bullets">
-                        <li>
-                          <strong className="is-block">{auction.port.name}</strong>
-                          <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
-                        </li>
-                        { portAgentDisplay() }
-                      </ul>
-                    </div>
-                    <div className="box__subsection">
-                      <h3 className="box__header">Additional Information</h3>
-                      <ul className="list has-no-bullets">
-                        <li>
-                          { additionInfoDisplay(auction) }
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </TabPanel>
-                {/* <TabPanel>
-                  <div className = "auction-notification box is-gray-0" >
-                    <h3 className="has-text-weight-bold is-flex">
-                    <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
-                    </h3>
-                  </div>
-                </TabPanel> */}
-              </Tabs>
-            </div>
-          </section>
+                  </TabPanel> */}
+                </Tabs>
+              </div>
+            </section>
+          </div>
         </MediaQuery>
       </div>
     );

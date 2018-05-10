@@ -11,12 +11,12 @@ main {
 
   .alert + &, .alert:not(:empty) + .alert:empty + &{
     top: 6.25rem;
-    height: calc(100% - 6.25rem);
+    height: calc(100vh - 6.25rem);
   }
 
   .alert:empty + &{
     top: 3.25rem;
-    height: calc(100% - 3.25rem);
+    height: calc(100vh - 3.25rem);
   }
 }
 
@@ -34,9 +34,20 @@ main {
   overflow-y: scroll;
 }
 
+main > div { // #auctions-app
+  @media (max-width: 768px) { // Sticky header for mobile.
+    height: calc(100vh - 3.25rem);
+    overflow-y: hidden;
+  }
+}
+
 section {
   &.auction-list { // Bunker list divisions based on auction status.
     padding-bottom: 1.25rem;
+
+    @media (max-width: 768px) {
+      padding-bottom: 0;
+    }
 
     &:last-child {
       padding-bottom: 4rem;
@@ -44,6 +55,7 @@ section {
 
     &> .container:first-child {
       padding-top: 2rem !important;
+      @media (max-width: 768px) { padding-top: 0.5rem !important; }
     }
 
     .empty-list {
@@ -74,11 +86,52 @@ section {
 .auction-page { // For container-agnostic classes
   padding: 0 1rem;
 
+  @media (max-width: 768px) {
+    padding: 0 0.5rem;
+  }
+
   &.auction-page--gray {
     background-color: $gray-0;
 
     .empty-list {
       background-color: white;
+    }
+  }
+}
+
+// ==== STICKY MOBILE LAYOUT ==== //
+
+.auction-app { // Not to be confused with the ID... probably going to rename in a bit.
+  overflow-y: scroll;
+  height: calc(100vh - 46px);
+  top: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &> div:first-child {
+    @media (max-width: 768px) { // Kill aesthetic top padding in layout
+      margin-top: 0 !important;
+    }
+  }
+}
+
+.auction-app__header {
+  @media (max-width: 768px) {
+    flex-shrink: 0;
+  }
+}
+
+.auction-app__body {
+  @media (max-width: 768px) {
+    border-top: 2px solid $gray-1;
+    flex-shrink: 1;
+    overflow-x: scroll;
+    overflow-y: scroll;
+
+    &> .auction-page {
+      width: 100vw;
+      padding: 0;
     }
   }
 }

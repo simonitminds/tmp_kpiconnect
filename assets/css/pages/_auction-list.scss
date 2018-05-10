@@ -31,6 +31,10 @@
     float: right;
     font-weight: bold;
 
+    @media (max-width: 768px) {
+      font-size: 0.85rem !important;
+    }
+
     &__clock {
       display: inline-block;
       width: 156px;

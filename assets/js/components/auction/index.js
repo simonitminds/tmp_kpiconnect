@@ -7,6 +7,7 @@ import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
 import CollapsibleSection from './collapsible-section';
 import ChannelConnectionStatus from './channel-connection-status';
+import MediaQuery from 'react-responsive';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -86,7 +87,7 @@ export default class AuctionsIndex extends React.Component {
     }
 
     return (
-      <div>
+      <div className="auction-app">
         <div className="container is-fullhd has-margin-top-xl">
           <div className="content has-margin-top-lg is-clearfix">
             <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
@@ -101,14 +102,16 @@ export default class AuctionsIndex extends React.Component {
                   {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
                 </span>&nbsp;GMT
               </div>
-              <i>Server Time</i>
+              <MediaQuery query="(min-width: 769px)">
+                <i>Server Time</i>
+              </MediaQuery>
             </div>
 
           </div>
         </div>
         <CollapsibleSection
           trigger="Active Auctions"
-          classParentString="auction-list qa-open-auctions-list"
+          classParentString="qa-open-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("open")}
           open={filteredAuctionsCount("open") > 0}
           >
@@ -116,7 +119,7 @@ export default class AuctionsIndex extends React.Component {
         </CollapsibleSection>
         <CollapsibleSection
           trigger="Auctions In Decision"
-          classParentString="auction-list qa-decision-auctions-list"
+          classParentString="qa-decision-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("decision")}
           open={filteredAuctionsCount("decision") > 0}
           >
@@ -124,7 +127,7 @@ export default class AuctionsIndex extends React.Component {
         </CollapsibleSection>
         <CollapsibleSection
           trigger="Unscheduled Auctions"
-          classParentString="auction-list qa-draft-auctions-list"
+          classParentString="qa-draft-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("draft")}
           open={filteredAuctionsCount("draft") > 0}
           >
@@ -132,7 +135,7 @@ export default class AuctionsIndex extends React.Component {
         </CollapsibleSection>
         <CollapsibleSection
           trigger="Upcoming Auctions"
-          classParentString="auction-list qa-pending-auctions-list"
+          classParentString="qa-pending-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("pending")}
           open={filteredAuctionsCount("pending") > 0}
           >
@@ -140,7 +143,7 @@ export default class AuctionsIndex extends React.Component {
         </CollapsibleSection>
         <CollapsibleSection
           trigger="Closed Auctions"
-          classParentString="auction-list qa-closed-auctions-list"
+          classParentString="qa-closed-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("closed")}
           open={filteredAuctionsCount("closed") > 0}
           >
@@ -148,7 +151,7 @@ export default class AuctionsIndex extends React.Component {
         </CollapsibleSection>
         <CollapsibleSection
           trigger="Expired Auctions"
-          classParentString="auction-list qa-expired-auctions-list"
+          classParentString="qa-expired-auctions-list auction-list"
           contentChildCount={filteredAuctionsCount("expired")}
           open={filteredAuctionsCount("expired") > 0}
           >
