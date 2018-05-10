@@ -58,14 +58,14 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   def handle_cast({:update_scheduled_start, %{auction_start: auction_start}}, state = %{auction_start: auction_start}), do: {:noreply, state}
   def handle_cast({:update_scheduled_start, %{auction_start: nil}}, state = %{timer_ref: timer_ref}) do
-    Process.cancel_timer(timer_ref)
+    cancel_timer(timer_ref)
     new_state = state
     |> Map.put(:timer_ref, nil)
     |> Map.put(:auction_start, nil)
     {:noreply, new_state}
   end
   def handle_cast({:update_scheduled_start, %{auction_start: auction_start}}, state = %{timer_ref: timer_ref}) do
-    Process.cancel_timer(timer_ref)
+    cancel_timer(timer_ref)
     delay = get_schedule_delay(DateTime.diff(auction_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :schedule_auction_start, delay)
     new_state = state
@@ -76,7 +76,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   def handle_cast(:cancel_scheduled_start, state = %{timer_ref: nil}), do: {:noreply, state}
   def handle_cast(:cancel_scheduled_start, state = %{timer_ref: timer_ref}) do
-    Process.cancel_timer(timer_ref)
+    cancel_timer(timer_ref)
     new_state = Map.put(state, :timer_ref, nil)
     {:noreply, new_state}
   end
@@ -88,4 +88,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   defp get_schedule_delay(delay) when delay < 0, do: 0
   defp get_schedule_delay(delay), do: delay
+
+  defp cancel_timer(nil), do: :ok
+  defp cancel_timer(timer_ref), do: Process.cancel_timer(timer_ref)
 end
