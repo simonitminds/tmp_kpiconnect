@@ -58,6 +58,7 @@
 
 @keyframes fancy-flip--success {
   0% {
+    opacity: 0;
     height: 0;
     margin-bottom: 0;
     color: transparent;
@@ -66,10 +67,12 @@
   }
 
   10% {
+    opacity: 0;
     color: transparent;
   }
 
   20% {
+    opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
     color: #fff;
@@ -78,6 +81,7 @@
   }
 
   80% {
+    opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
     color: #fff;
@@ -86,10 +90,12 @@
   }
 
   90% {
+    opacity: 0;
     color: transparent;
   }
 
   100% {
+    opacity: 0;
     height: 0px;
     margin-bottom: 0;
     color: transparent;
@@ -100,6 +106,7 @@
 
 @keyframes fancy-flip--danger {
   0% {
+    opacity: 0;
     height: 0;
     margin-bottom: 0;
     color: transparent;
@@ -108,10 +115,12 @@
   }
 
   10% {
+    opacity: 0;
     color: transparent;
   }
 
   20% {
+    opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
     color: #fff;
@@ -120,6 +129,7 @@
   }
 
   80% {
+    opacity: 1;
     height: 50px;
     margin-bottom: -1rem;
     color: #fff;
@@ -128,10 +138,12 @@
   }
 
   90% {
+    opacity: 0;
     color: transparent;
   }
 
   100% {
+    opacity: 0;
     height: 0px;
     margin-bottom: 0;
     color: transparent;
