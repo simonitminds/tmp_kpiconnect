@@ -23,6 +23,9 @@
 
     &> .auction-header__connection-button { // Uhh... contextually tweak connection marker
       margin-top: 0.25rem;
+      @media (max-width: 768px) {
+        margin-top: 0;
+      }
     }
   }
   &__timer { // Date and time stamp at top of the page.
@@ -38,6 +41,9 @@
     &__clock {
       display: inline-block;
       width: 156px;
+      @media (max-width: 768px) {
+        width: 130px;
+      }
     }
   }
 }

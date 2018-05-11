@@ -88,7 +88,7 @@ export default class AuctionsIndex extends React.Component {
 
     return (
       <div className="auction-app">
-        <div className="container is-fullhd has-margin-top-xl">
+        <div className="auction-app__header auction-app__header--list container is-fullhd">
           <div className="content has-margin-top-lg is-clearfix">
             <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
             <a href="/auctions/new" className="button is-link is-pulled-right">
@@ -109,54 +109,56 @@ export default class AuctionsIndex extends React.Component {
 
           </div>
         </div>
-        <CollapsibleSection
-          trigger="Active Auctions"
-          classParentString="qa-open-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("open")}
-          open={filteredAuctionsCount("open") > 0}
-          >
-          { filteredAuctionsDisplay("open") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Auctions In Decision"
-          classParentString="qa-decision-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("decision")}
-          open={filteredAuctionsCount("decision") > 0}
-          >
-          { filteredAuctionsDisplay("decision") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Unscheduled Auctions"
-          classParentString="qa-draft-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("draft")}
-          open={filteredAuctionsCount("draft") > 0}
-          >
-          { filteredAuctionsDisplay("draft") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Upcoming Auctions"
-          classParentString="qa-pending-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("pending")}
-          open={filteredAuctionsCount("pending") > 0}
-          >
-          { filteredAuctionsDisplay("pending") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Closed Auctions"
-          classParentString="qa-closed-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("closed")}
-          open={filteredAuctionsCount("closed") > 0}
-          >
-          { filteredAuctionsDisplay("closed") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Expired Auctions"
-          classParentString="qa-expired-auctions-list auction-list"
-          contentChildCount={filteredAuctionsCount("expired")}
-          open={filteredAuctionsCount("expired") > 0}
-          >
-          { filteredAuctionsDisplay("expired") }
-        </CollapsibleSection>
+        <div className="auction-app__body">
+          <CollapsibleSection
+            trigger="Active Auctions"
+            classParentString="qa-open-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("open")}
+            open={filteredAuctionsCount("open") > 0}
+            >
+            { filteredAuctionsDisplay("open") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Auctions In Decision"
+            classParentString="qa-decision-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("decision")}
+            open={filteredAuctionsCount("decision") > 0}
+            >
+            { filteredAuctionsDisplay("decision") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Unscheduled Auctions"
+            classParentString="qa-draft-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("draft")}
+            open={filteredAuctionsCount("draft") > 0}
+            >
+            { filteredAuctionsDisplay("draft") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Upcoming Auctions"
+            classParentString="qa-pending-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("pending")}
+            open={filteredAuctionsCount("pending") > 0}
+            >
+            { filteredAuctionsDisplay("pending") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Closed Auctions"
+            classParentString="qa-closed-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("closed")}
+            open={filteredAuctionsCount("closed") > 0}
+            >
+            { filteredAuctionsDisplay("closed") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Expired Auctions"
+            classParentString="qa-expired-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("expired")}
+            open={filteredAuctionsCount("expired") > 0}
+            >
+            { filteredAuctionsDisplay("expired") }
+          </CollapsibleSection>
+        </div>
       </div>
     );
   }
