@@ -90,23 +90,33 @@ export default class AuctionsIndex extends React.Component {
       <div className="auction-app">
         <div className="auction-app__header auction-app__header--list container is-fullhd">
           <div className="content has-margin-top-lg is-clearfix">
-            <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
+            <MediaQuery query="(max-width: 768px)">
+              <div className="auction-list__time-box">
+                <ChannelConnectionStatus connection={connection} />
+                <div className="auction-list__timer">
+                  <i className="far fa-clock has-margin-right-xs"></i>
+                  <span className="auction-list__timer__clock" id="gmt-time" >
+                    {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                  </span>&nbsp;GMT
+                </div>
+              </div>
+            </MediaQuery>
+            <h1 className="auction-list__title title is-3">Auction Listing</h1>
             <a href="/auctions/new" className="button is-link is-pulled-right">
               New Auction
             </a>
-            <div className="auction-list__time-box">
-              <ChannelConnectionStatus connection={connection} />
-              <div className="auction-list__timer">
-                <i className="far fa-clock has-margin-right-xs"></i>
-                <span className="auction-list__timer__clock" id="gmt-time" >
-                  {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                </span>&nbsp;GMT
+            <MediaQuery query="(min-width: 769px)">
+              <div className="auction-list__time-box">
+                <ChannelConnectionStatus connection={connection} />
+                <div className="auction-list__timer">
+                  <i className="far fa-clock has-margin-right-xs"></i>
+                  <span className="auction-list__timer__clock" id="gmt-time" >
+                    {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                  </span>&nbsp;GMT
+                </div>
+                  <i>Server Time</i>
               </div>
-              <MediaQuery query="(min-width: 769px)">
-                <i>Server Time</i>
-              </MediaQuery>
-            </div>
-
+            </MediaQuery>
           </div>
         </div>
         <div className="auction-app__body">

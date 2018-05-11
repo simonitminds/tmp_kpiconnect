@@ -1,10 +1,12 @@
-<div class="container is-fullhd">
-  <div class="content has-margin-top-lg">
-    <h1 class="title is-3 has-text-weight-bold">Edit Auction</h1>
+<div class="auction-app">
+  <div class="auction-app__header auction-app__header--form container is-fullhd">
+    <div class="content has-margin-top-lg">
+      <h1 class="title is-3 has-text-weight-bold">Edit Auction</h1>
+    </div>
   </div>
+
+  <script> window.container = "edit";</script>
+  <script> window.auctionId = <%= @auction.id %>;</script>
+
+  <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :update, @auction)) %>
 </div>
-
-<script> window.container = "edit";</script>
-<script> window.auctionId = <%= @auction.id %>;</script>
-
-<%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :update, @auction)) %>

@@ -12,6 +12,11 @@
     flex-direction: row;
     float: right;
 
+    @media (max-width: 768px) {
+      margin-bottom: 1rem;
+      margin-top: -0.5rem;
+    }
+
     &> i {
       display: inline-block;
       margin-top: 0.25rem;
@@ -28,6 +33,13 @@
       }
     }
   }
+  &__title {
+    float: left;
+    font-weight: bold !important;
+    @media (max-width: 768px) {
+      margin-top: 0.25rem !important;
+    }
+  }
   &__timer { // Date and time stamp at top of the page.
     @extend .tag, .is-rounded, .is-highlit, .is-medium;
     margin-right: 1rem;
@@ -36,6 +48,7 @@
 
     @media (max-width: 768px) {
       font-size: 0.85rem !important;
+      margin-right: 0;
     }
 
     &__clock {
