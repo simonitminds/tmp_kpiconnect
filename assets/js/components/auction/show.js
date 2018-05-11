@@ -39,6 +39,12 @@ export default class AuctionShow extends React.Component {
     clearInterval(this.timerID);
   }
 
+  componentDidUpdate() {
+    // For adjusting the auction app body and header
+    // portions based on header content
+    updateAuctionBodySize();
+  }
+
   tick() {
     let time = moment(ServerDate.now()).utc();
     this.setState({
@@ -364,4 +370,14 @@ export default class AuctionShow extends React.Component {
       </div>
     );
   }
+}
+
+function updateAuctionBodySize() {
+  const auctionHeaderSection = document.querySelector('.auction-app__header'),
+        auctionHeaderOffsetHeight = auctionHeaderSection ? auctionHeaderSection.offsetHeight : 0,
+        auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48}px)`,
+        auctionTabContent = document.querySelector('.react-tabs__tab-panel--selected');
+  console.log(`The offset of the header is ${auctionHeaderOffsetHeight}`)
+
+  auctionTabContent.style.height = auctionTabContentHeight;
 }
