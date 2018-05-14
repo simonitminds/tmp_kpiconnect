@@ -88,4 +88,27 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-select-bid-#{bid_id}")
     |> click
   end
+
+  def accept_bid() do
+    find_element(:css, ".qa-accept-bid")
+    |> click
+  end
+
+  def enter_bid_comment(comment) do
+    fill_field({:css, ".qa-bid-comment"}, comment)
+  end
+
+  def bid_comment() do
+    find_element(:css, ".qa-bid-comment")
+    |> inner_text
+  end
+
+  def enter_port_agent(name) do
+    fill_field({:css, ".qa-auction-port-agent"}, name)
+  end
+
+  def port_agent() do
+    find_element(:css, ".qa-port-agent")
+    |> inner_text
+  end
 end

@@ -45,8 +45,9 @@ const AuctionForm = (props) => {
         field={'port_agent'}
         labelText={'Port Agent'}
         value={auction.port_agent}
-        opts={{type: 'text', label: "Port Agent"}}
+        opts={{type: 'text'}}
         onChange={updateInformation.bind(this, 'auction.port_agent')}
+        isHorizontal={true}
       />;
     }
   };
@@ -223,7 +224,8 @@ const AuctionForm = (props) => {
                 field={'fuel_quantity'}
                 labelText={'Fuel Quantity (MT)'}
                 value={auction.fuel_quantity}
-                opts={{type: 'number', label: "Fuel Quantity (MT)"}}
+                isHorizontal={true}
+                opts={{type: 'number'}}
                 onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
               />
             </fieldset>
@@ -262,6 +264,7 @@ const AuctionForm = (props) => {
                 field={'po'}
                 labelText={'po'}
                 value={auction.po}
+                isHorizontal={true}
                 opts={{ labelClass: 'label is-uppercase' }}
                 onChange={updateInformation.bind(this, 'auction.po')}
               />

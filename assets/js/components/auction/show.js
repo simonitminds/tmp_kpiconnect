@@ -9,6 +9,7 @@ import BuyerLowestBid from './buyer-lowest-bid';
 import BuyerBestSolution from './buyer-best-solution';
 import WinningSolution from './winning-solution';
 import SupplierLowestBid from './supplier-lowest-bid';
+import SupplierWinningBid from './supplier-winning-bid';
 import BuyerBidList from './buyer-bid-list';
 import SupplierBidList from './supplier-bid-list';
 import BiddingForm from './bidding-form';
@@ -76,6 +77,19 @@ export default class AuctionShow extends React.Component {
       }
     }
 
+    const portAgentDisplay = () => {
+      if (auction.port_agent) {
+        return (
+          <li>
+            <strong className="is-block">Port Agent</strong>
+            <span className="qa-port-agent">{auction.port_agent}</span>
+          </li>
+        );
+      } else {
+        return "";
+      }
+    }
+
     const buyerBidComponents = () => {
       if (auctionState.status == 'open') {
         return (
@@ -87,15 +101,15 @@ export default class AuctionShow extends React.Component {
       } else if (auctionState.status == 'decision') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else if (auctionState.status != 'pending') {
         return (
           <div>
-            <WinningSolution auctionState={auctionState} />
-            <BuyerBestSolution auctionPayload={auctionPayload} selectBid={this.props.selectBid}/>
+            <WinningSolution auctionPayload={auctionPayload} />
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -120,11 +134,18 @@ export default class AuctionShow extends React.Component {
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
+      } else if (auctionState.status == 'decision') {
+        return (
+          <div>
+            <SupplierLowestBid auctionPayload={auctionPayload} />
+            <SupplierBidList auctionPayload={auctionPayload} />
+          </div>
+        )
       } else if (auctionState.status != 'pending') {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierLowestBid auctionPayload={auctionPayload} />
+            <SupplierWinningBid auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -214,6 +235,7 @@ export default class AuctionShow extends React.Component {
                               <strong className="is-block">{auction.port.name}</strong>
                               <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                             </li>
+                            { portAgentDisplay() }
                           </ul>
                         </div>
                         <div className="box__subsection">
@@ -295,14 +317,15 @@ export default class AuctionShow extends React.Component {
                           <strong className="is-block">{auction.port.name}</strong>
                           <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                         </li>
+                        { portAgentDisplay() }
                       </ul>
                     </div>
                     <div className="box__subsection">
                       <h3 className="box__header">Additional Information</h3>
                       <ul className="list has-no-bullets">
                         <li>
-                          {additionInfoDisplay(auction)}
-                      </li>
+                          { additionInfoDisplay(auction) }
+                        </li>
                       </ul>
                     </div>
                   </div>

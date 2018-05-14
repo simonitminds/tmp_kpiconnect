@@ -1,22 +1,28 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
+import SolutionComment from './solution-comment';
 
-const WinningSolution = ({auctionState}) => {
-  const winningBid = _.get(auctionState, 'winning_bid');
+const WinningSolution = ({auctionPayload}) => {
+  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const lowestBidId = _.get(auctionPayload, 'state.lowest_bids[0].id');
+  const winningBid = _.get(auctionPayload, 'state.winning_bid');
 
   const winningSolutionDisplay = () => {
-    if (winningBid != null) {
+    if (winningBid) {
       return (
-        <div className={`box auction-solution auction-solution--best qa-winning-solution-${winningBid.id}`}>
-          <div className="auction-solution__header">
-            <h3 className="auction-solution__title is-inline-block">{winningBid.supplier}</h3>
-            <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">
-                ${formatPrice(winningBid.amount)}
-              </span> ({formatTime(winningBid.time_entered)})
+        <div>
+          <div className={`box auction-solution auction-solution--best qa-winning-solution-${winningBid.id}`}>
+            <div className="auction-solution__header">
+              <h3 className="auction-solution__title is-inline-block">{winningBid.supplier}</h3>
+              <div className="auction-solution__content">
+                <span className="has-text-weight-bold has-padding-right-xs">
+                  ${formatPrice(winningBid.amount)}
+                </span> ({formatTime(winningBid.time_entered)})
+              </div>
             </div>
           </div>
+          <SolutionComment showInput={lowestBidId != winningBid.id} bid={winningBid} auctionStatus={auctionStatus} />
         </div>
       );
     } else {

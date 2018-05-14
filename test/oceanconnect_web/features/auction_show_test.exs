@@ -11,15 +11,17 @@ defmodule Oceanconnect.AuctionShowTest do
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
+    supplier_company3 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     supplier2 = insert(:user, company: supplier_company2)
-    auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company, supplier_company2])
+    supplier3 = insert(:user, company: supplier_company3)
+    auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company, supplier_company2, supplier_company3])
     bid_params = %{
       amount: 1.25
     }
     {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
     {:ok, %{auction: auction, bid_params: bid_params, buyer: buyer, supplier: supplier,
-            supplier_company: supplier_company, supplier2: supplier2, supplier_company2: supplier_company2}}
+            supplier2: supplier2,  supplier3: supplier3}}
   end
 
   test "channel disconnected status is detected/displayed", %{auction: auction, buyer: buyer} do
@@ -75,7 +77,7 @@ defmodule Oceanconnect.AuctionShowTest do
     end
 
     test "buyer can see the bid list", %{auction: auction} do
-      [s1, s2] = auction.suppliers
+      [s1, s2, _s3] = auction.suppliers
       Auctions.place_bid(auction, %{"amount" => 1.75}, s1.id)
       Auctions.place_bid(auction, %{"amount" => 1.25}, s2.id)
 
@@ -105,13 +107,13 @@ defmodule Oceanconnect.AuctionShowTest do
       refute has_css?(".qa-auction-suppliers")
     end
 
-    test "supplier can enter a bid", %{auction: auction, bid_params: bid_params, supplier_company: supplier_company} do
+    test "supplier can enter a bid", %{auction: auction, bid_params: bid_params, supplier: supplier} do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
 
       stored_bid_list = auction.id
       |> Auctions.AuctionBidList.get_bid_list
-      |> Auctions.AuctionPayload.supplier_bid_list(supplier_company.id)
+      |> Auctions.AuctionPayload.supplier_bid_list(supplier.company_id)
       bid_list_params = Enum.map(stored_bid_list, fn(bid) ->
         %{"id" => bid.id,
           "data" => %{"amount" => "$#{bid.amount}"}}
@@ -149,10 +151,10 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "decision period" do
-    setup %{auction: auction, supplier_company: supplier_company, supplier_company2: supplier_company2} do
+    setup %{auction: auction, supplier: supplier, supplier2: supplier2} do
       Auctions.start_auction(auction)
-      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
-      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company2.id)
+      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier.company_id)
+      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2.company_id)
 
       Auctions.end_auction(auction)
       {:ok, %{bid: bid, bid2: bid2}}
@@ -176,6 +178,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_bid(bid.id)
+      AuctionShowPage.accept_bid()
       assert AuctionShowPage.auction_status == "CLOSED"
       assert has_css?(".qa-winning-solution-#{bid.id}")
 
@@ -193,5 +196,50 @@ defmodule Oceanconnect.AuctionShowTest do
         assert AuctionShowPage.auction_status == "CLOSED"
       end)
     end
+
+    test "buyer selects other solution and provides comment", %{auction: auction, bid2: bid2, buyer: buyer, supplier: supplier, supplier2: supplier2, supplier3: supplier3} do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.select_bid(bid2.id)
+      AuctionShowPage.enter_bid_comment("Screw you!")
+      AuctionShowPage.accept_bid()
+
+      assert AuctionShowPage.auction_status == "CLOSED"
+      assert has_css?(".qa-winning-solution-#{bid2.id}")
+      assert AuctionShowPage.bid_comment == "Screw you!"
+
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You lost the auction"
+        assert AuctionShowPage.bid_comment == "Screw you!"
+        assert AuctionShowPage.auction_status == "CLOSED"
+      end)
+
+      in_browser_session(:supplier2, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
+        assert AuctionShowPage.bid_comment == "Screw you!"
+        assert AuctionShowPage.auction_status == "CLOSED"
+      end)
+
+      in_browser_session(:supplier3, fn ->
+        login_user(supplier3)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.bid_comment == ""
+        assert AuctionShowPage.auction_status == "CLOSED"
+      end)
+    end
+
+    # test "buyer selects best solution and specifies port agent", %{auction: auction, bid: bid, buyer: buyer} do
+    #   login_user(buyer)
+    #   AuctionShowPage.visit(auction.id)
+    #   AuctionShowPage.select_bid(bid.id)
+    #   AuctionShowPage.enter_port_agent("Test Agent")
+    #   AuctionShowPage.accept_bid()
+    #
+    #   assert AuctionShowPage.port_agent() == "Test Agent"
+    # end
   end
 end

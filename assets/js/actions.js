@@ -105,6 +105,38 @@ export function selectBid(auctionId, bidId) {
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
+        return dispatch(updateBidStatus(auctionId, response));
+      }, (error)=> {
+        return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
+      });
+  };
+}
+
+export function acceptWinningBid(auctionId, bidId, bidComment) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/bids/${bidId}/select`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(bidComment)
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return console.log(response);
+      });
+  };
+}
+
+export function setPortAgent(auctionId, portAgent) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/port_agent`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(portAgent)
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
         return console.log(response);
       });
   };

@@ -5,7 +5,8 @@ import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import {
   getAllAuctionPayloads,
-  selectBid,
+  acceptWinningBid,
+  setPortAgent,
   subscribeToAuctionUpdates,
   submitBid,
   updateBidStatus
@@ -35,9 +36,23 @@ const mapDispatchToProps = (dispatch) => ({
       }
     };
 
-    dispatch(submitBid(auctionId, bidData))
+    dispatch(submitBid(auctionId, bidData));
   },
-  ...bindActionCreators({ selectBid, updateBidStatus }, dispatch)
+  acceptBid(auctionId, bidId, ev) {
+    ev.preventDefault();
+
+    const elements = ev.target.elements;
+    let bidComment = {'comment': ''};
+    if(elements.comment) {
+      bidComment = {
+        'comment': elements.comment.value
+      };
+    }
+    const portAgent = {'port_agent': elements.auction_port_agent.value};
+
+    dispatch(acceptWinningBid(auctionId, bidId, bidComment));
+  },
+  ...bindActionCreators({ updateBidStatus }, dispatch)
 });
 
 export class AuctionContainer extends React.Component {

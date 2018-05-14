@@ -74,4 +74,21 @@
   &--base { // Get last .box__subsection flush with the base of the box.
     margin-bottom: -1.25rem;
   }
+
+  &--extra-nested { // Box nested in a nested box... I need a new name
+    margin-top: -7px;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.box--best-solution-comment { // Ehhh, React wrangling for the nested best solution comment field.
+  margin: 0.5rem -1rem -0.5rem -1rem;
+  border: 0px solid transparent;
+  box-shadow: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+
+  &--completed { // For the completed auctions with comments.
+    margin: 1rem -1.25rem -1.25rem -1.25rem;
+  }
 }

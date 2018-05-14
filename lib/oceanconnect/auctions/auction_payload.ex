@@ -15,8 +15,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> maybe_remove_suppliers(user_id)
     auction_state = fully_loaded_auction
     |> Auctions.get_auction_state!
+    |> convert_winning_bid_for_user(auction, user_id)
     |> convert_lowest_bids_for_user(fully_loaded_auction, user_id)
-    |> convert_winning_bid_for_user(fully_loaded_auction, user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, auction_state, bid_list)
@@ -25,8 +25,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     fully_loaded_auction = auction
     |> maybe_remove_suppliers(user_id)
     updated_state = auction_state
-    |> convert_lowest_bids_for_user(auction, user_id)
     |> convert_winning_bid_for_user(auction, user_id)
+    |> convert_lowest_bids_for_user(auction, user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, updated_state, bid_list)
@@ -78,12 +78,19 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
     |> Map.put(:winner, true)
   end
-  defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: winning_bid}, %Auction{}, _supplier_id) do
+  defp convert_winning_bid_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
     auction_state
-    |> Map.put(:winning_bid, Map.delete(winning_bid, :supplier_id))
+    |> maybe_remove_comment(supplier_id)
     |> Map.put(:winner, false)
   end
   defp convert_winning_bid_for_user(auction_state = %AuctionState{}, _auction, _user_id), do: auction_state
+
+  defp maybe_remove_comment(auction_state = %AuctionState{lowest_bids: lowest_bids, winning_bid: winning_bid}, supplier_id) do
+    case hd(lowest_bids).supplier_id == supplier_id do
+      true -> Map.put(auction_state, :winning_bid, Map.delete(winning_bid, :supplier_id))
+      false -> Map.put(auction_state, :winning_bid, Map.drop(winning_bid, [:comment, :supplier_id]))
+    end
+  end
 
   defp maybe_remove_suppliers(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
   defp maybe_remove_suppliers(auction = %Auction{}, _supplier_id) do

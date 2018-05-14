@@ -17,12 +17,6 @@
   margin-bottom: 0.5rem !important;
   padding: 0.5rem 1rem !important;
 
-
-
-  &:not(:nth-child(2)) {
-    margin-top: 0;
-  }
-
   .auction-solution__header {
     display: flex;
     align-items: center;
@@ -38,4 +32,8 @@
   &--best { // General style modifications for the calculated "Best Solution"
     background-color: $highlight !important;
   }
+}
+
+.auction-comment {
+  margin-bottom: -2.25rem !important;
 }
