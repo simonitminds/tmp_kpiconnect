@@ -11,7 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       supplier = insert(:company, name: "BarCompany")
       supplier_2 = insert(:company, name: "BazCompany")
       auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
 
       Auctions.start_auction(auction)
       :timer.sleep(500)

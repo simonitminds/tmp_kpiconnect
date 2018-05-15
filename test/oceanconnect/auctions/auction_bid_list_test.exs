@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     supplier2_company = insert(:company)
     auction = insert(:auction, suppliers: [supplier_company, supplier2_company])
 
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
     Oceanconnect.Auctions.start_auction(auction)
     {:ok, %{auction: auction, supplier_id: supplier_company.id, supplier2_id: supplier2_company.id}}
   end
