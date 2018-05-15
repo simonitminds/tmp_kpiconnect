@@ -201,7 +201,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
+                        { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                         <div className="box has-margin-bottom-md">
@@ -270,14 +270,15 @@ export default class AuctionShow extends React.Component {
                               {additionInfoDisplay(auction)}
                           </li>
                           </ul>
-                        </TabPanel>
-                        {/* <TabPanel>
-                          <div className = "auction-notification box is-gray-0" >
-                            <h3 className="has-text-weight-bold is-flex">
-                            <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
-                            </h3>
-                          </div>
-                        </TabPanel> */}
+                        </div>
+                      </TabPanel>
+                      {/* <TabPanel>
+                        <div className = "auction-notification box is-gray-0" >
+                          <h3 className="has-text-weight-bold is-flex">
+                          <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
+                          </h3>
+                        </div>
+                      </TabPanel> */}
                     </Tabs>
                   </div>
                 </div>
