@@ -143,7 +143,7 @@ defmodule Oceanconnect.AuctionsTest do
       supplier2_company = insert(:company)
       auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
 
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
       on_exit(fn ->
         case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
           [] -> nil
@@ -180,7 +180,7 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company])
-      {:ok, _pid} = start_supervised({Auctions.AuctionSupervisor, {auction, %{handle_events: false}}})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
       Auctions.start_auction(auction)
       on_exit(fn ->
         case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do

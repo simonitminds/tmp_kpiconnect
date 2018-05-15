@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Utilities do
-
-  def round_time_remaining(time_remaining) do
+  def round_time_remaining(time_remaining) when is_integer(time_remaining) do
     round(Float.round((time_remaining / 1_000), 0) * 1_000)
   end
 

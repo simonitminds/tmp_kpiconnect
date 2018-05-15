@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
     supplier_2 = insert(:company, is_supplier: true)
     auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: false}}})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
     {:ok, %{auction: auction}}
   end
 
