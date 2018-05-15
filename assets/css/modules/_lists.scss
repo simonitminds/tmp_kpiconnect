@@ -23,11 +23,31 @@ ul.list {
        display: inline-block;
        margin-right: 0.5rem;
      }
+
+     .icon { // Keep icon bullets positioned evenly.
+       width: 20px;
+       justify-content: left;
+       flex-shrink: 0;
+     }
+
+     @media (max-width: 768px) {
+       font-size: 1rem;
+
+       strong {
+         display: block;
+       }
+       span strong {
+         display: inline-block;
+       }
+     }
+
+     &.is-not-flex { // For list items that should just be inline with their labels.
+       display: block;
+     }
    }
 
    & li:not(:last-child) {
      margin-bottom: 0.25rem;
    }
  }
-
 }

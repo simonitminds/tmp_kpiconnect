@@ -40,7 +40,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                     {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})</span>
                     <span className="auction-header__company">{auction.buyer.name}</span>
                   </h1>
-                  <div className="auction-header__ports--mobile is-hidden-desktop">
+                  <div className="auction-header__ports--mobile">
                     <span className="qa-auction-port has-text-weight-bold">{auction.port.name}</span>
                     <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> (ETA {formatUTCDateTime(auction.eta)})</span>
                   </div>

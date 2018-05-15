@@ -121,6 +121,10 @@
     margin-bottom: 0.25rem;
     font-weight: normal !important;
     text-align: right;
+
+    @media (max-width: 768px) {
+      margin-top: -0.5rem;
+    }
   }
 
   &__duration { // Auction Duration
@@ -150,6 +154,10 @@
       margin: 0.5rem -1.5rem 0;
       background-color: $gray-2;
       font-size: $size-6;
+
+      @media (min-width: 769px) {
+        display: none;
+      }
     }
   }
 

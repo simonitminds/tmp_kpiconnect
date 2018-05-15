@@ -204,7 +204,7 @@ export default class AuctionShow extends React.Component {
                         { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
-                        <div className="box">
+                        <div className="box has-margin-bottom-md">
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
                               <div className="field is-inline-block is-pulled-right">
@@ -216,8 +216,8 @@ export default class AuctionShow extends React.Component {
                               </div>
                             </h3>
                             <ul className="list has-no-bullets">
-                              <li>
-                                <strong>Organization</strong> {auction.buyer.name}
+                              <li className="is-not-flex">
+                                <strong className="is-block">Organization</strong> {auction.buyer.name}
                               </li>
                               <li>
                                 <strong>Buyer</strong> Buyer Name
@@ -230,18 +230,18 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Fuel Requirements</h3>
                             <ul className="list has-no-bullets">
-                              <li>
-                                <strong>{fuel}</strong> {auction.fuel_quantity} MT
+                              <li className="is-not-flex">
+                                <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
                               </li>
                             </ul>
                           </div>
                           <div className="box__subsection">
                             <h3 className="box__header">Port Information</h3>
                             <ul className="list has-no-bullets">
-                              <li>
+                              <li className="is-not-flex">
                                 <strong className="is-block">{auction.port.name}</strong>
-                                <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
-                              </li>
+                                <span className="is-block"><strong>ETA</strong> {formatUTCDateTime(auction.eta)}</span>
+                                <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>                              </li>
                             </ul>
                           </div>
                           <div className="box__subsection">
@@ -304,7 +304,7 @@ export default class AuctionShow extends React.Component {
                     { auctionLogLinkDisplay() }
                     { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
                     { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-                    <div className="box">
+                    <div className="box has-margin-bottom-md">
                       <div className="box__subsection">
                         <h3 className="box__header">Buyer Information
                           <div className="field is-inline-block is-pulled-right">
@@ -316,8 +316,8 @@ export default class AuctionShow extends React.Component {
                           </div>
                         </h3>
                         <ul className="list has-no-bullets">
-                          <li>
-                            <strong>Organization</strong> {auction.buyer.name}
+                          <li className="is-not-flex">
+                            <strong className="is-block">Organization</strong> {auction.buyer.name}
                           </li>
                           <li>
                             <strong>Buyer</strong> Buyer Name
@@ -330,17 +330,18 @@ export default class AuctionShow extends React.Component {
                       <div className="box__subsection">
                         <h3 className="box__header">Fuel Requirements</h3>
                         <ul className="list has-no-bullets">
-                          <li>
-                            <strong>{fuel}</strong> {auction.fuel_quantity} MT
+                          <li className="is-not-flex">
+                            <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
                           </li>
                         </ul>
                       </div>
                       <div className="box__subsection">
                         <h3 className="box__header">Port Information</h3>
                         <ul className="list has-no-bullets">
-                          <li>
+                          <li className="is-not-flex">
                             <strong className="is-block">{auction.port.name}</strong>
-                            <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
+                            <span className="is-block"><strong>ETA</strong> {formatUTCDateTime(auction.eta)}</span>
+                            <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
                           </li>
                           { portAgentDisplay() }
                         </ul>
