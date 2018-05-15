@@ -12,7 +12,7 @@
     flex-direction: row;
     float: right;
 
-    @media (max-width: 768px) {
+    @media (max-width: 599px) {
       margin-bottom: 1rem;
       margin-top: -0.5rem;
     }
@@ -46,7 +46,7 @@
     float: right;
     font-weight: bold;
 
-    @media (max-width: 768px) {
+    @media (max-width: 599px) {
       font-size: 0.85rem !important;
       margin-right: 0;
     }
@@ -54,9 +54,14 @@
     &__clock {
       display: inline-block;
       width: 156px;
-      @media (max-width: 768px) {
+      @media (max-width: 599px) {
         width: 130px;
       }
+    }
+  }
+  &__new-auction {
+    @media (max-width: 599px) {
+      clear: both;
     }
   }
 }

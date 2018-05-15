@@ -90,31 +90,38 @@ export default class AuctionsIndex extends React.Component {
       <div className="auction-app">
         <div className="auction-app__header auction-app__header--list container is-fullhd">
           <div className="content has-margin-top-lg is-clearfix">
-            <MediaQuery query="(max-width: 768px)">
-              <div className="auction-list__time-box">
-                <ChannelConnectionStatus connection={connection} />
-                <div className="auction-list__timer">
-                  <i className="far fa-clock has-margin-right-xs"></i>
-                  <span className="auction-list__timer__clock" id="gmt-time" >
-                    {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                  </span>&nbsp;GMT
+            <MediaQuery query="(max-width: 599px)">
+              <div>
+                <div className="auction-list__time-box">
+                  <ChannelConnectionStatus connection={connection} />
+                  <div className="auction-list__timer">
+                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <span className="auction-list__timer__clock" id="gmt-time" >
+                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                    </span>&nbsp;GMT
+                  </div>
                 </div>
+                <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small">
+                  New Auction
+                </a>
               </div>
             </MediaQuery>
             <h1 className="auction-list__title title is-3">Auction Listing</h1>
-            <a href="/auctions/new" className="button is-link is-pulled-right">
-              New Auction
-            </a>
-            <MediaQuery query="(min-width: 769px)">
-              <div className="auction-list__time-box">
-                <ChannelConnectionStatus connection={connection} />
-                <div className="auction-list__timer">
-                  <i className="far fa-clock has-margin-right-xs"></i>
-                  <span className="auction-list__timer__clock" id="gmt-time" >
-                    {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                  </span>&nbsp;GMT
+            <MediaQuery query="(min-width: 600px)">
+              <div>
+                <a href="/auctions/new" className="button is-link is-pulled-right">
+                  New Auction
+                </a>
+                <div className="auction-list__time-box">
+                  <ChannelConnectionStatus connection={connection} />
+                  <div className="auction-list__timer">
+                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <span className="auction-list__timer__clock" id="gmt-time" >
+                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                    </span>&nbsp;GMT
+                  </div>
+                    <i className="is-hidden-mobile">Server Time</i>
                 </div>
-                  <i>Server Time</i>
               </div>
             </MediaQuery>
           </div>

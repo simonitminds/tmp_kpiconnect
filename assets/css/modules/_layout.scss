@@ -64,7 +64,7 @@ section {
       text-align: center;
     }
 
-    &:nth-child(even) {
+    &:nth-child(odd) {
       background-color: $gray-0;
 
       .empty-list {
@@ -149,6 +149,9 @@ section {
         margin-top: 1.5rem !important;
       }
     }
+  }
+  &--list {
+    width: 100vw !important;
   }
   &--form {
     margin: 0;
