@@ -171,7 +171,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   describe "auction log" do
     setup(%{auction: auction}) do
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: false}}})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
       :ok
     end
 

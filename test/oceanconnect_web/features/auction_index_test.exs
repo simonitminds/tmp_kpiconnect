@@ -60,7 +60,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
       auction = auctions |> hd
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
       login_user(supplier)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}

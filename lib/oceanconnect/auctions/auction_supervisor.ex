@@ -14,30 +14,20 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     Supervisor.start_link(__MODULE__, {auction, config}, name: get_auction_supervisor_name(auction_id))
   end
 
-  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, %{handle_events: true}}) do
-    children = [
-      {AuctionCache, auction},
-      {AuctionBidList, auction_id},
-      {AuctionTimer, {auction_id, duration, decision_duration}},
-      {AuctionScheduler, auction},
-      {AuctionEventStore, auction_id},
-      {AuctionEventHandler, auction_id},
-      {AuctionStore, auction}
-    ]
-    Supervisor.init(children, strategy: :one_for_all)
-  end
-  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, %{handle_events: false}}) do
-    children = [
-      {AuctionCache, auction},
-      {AuctionBidList, auction_id},
-      {AuctionTimer, {auction_id, duration, decision_duration}},
-      {AuctionScheduler, auction},
-      {AuctionEventStore, auction_id},
-      {AuctionStore, auction}
-    ]
-    Supervisor.init(children, strategy: :one_for_all)
-  end
 
+  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, options}) do
+    all_children = %{
+      auction_cache: {AuctionCache, auction},
+      auction_bid_list: {AuctionBidList, auction_id},
+      auction_timer: {AuctionTimer, {auction_id, duration, decision_duration}},
+      auction_scheduler: {AuctionScheduler, auction},
+      auction_event_store: {AuctionEventStore, auction_id},
+      auction_event_handler: {AuctionEventHandler, auction_id},
+      auction_store: {AuctionStore, auction}
+    }
+    children = exclude_children(all_children, options)
+    Supervisor.init(children, strategy: :one_for_all)
+  end
 
   defp get_auction_supervisor_name(auction_id) do
     {:via, Registry, {@registry_name, auction_id}}
@@ -49,5 +39,12 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     else
       [] -> {:error, "Auction Supervisor Not Started"}
     end
+  end
+
+  defp exclude_children(all_children, %{}), do: all_children |> Map.values
+  defp exclude_children(all_children, %{exclude_children: exclusions}) do
+    all_children
+    |> Enum.filter(fn({k, _v}) -> not k in exclusions end)
+    |> Map.values
   end
 end

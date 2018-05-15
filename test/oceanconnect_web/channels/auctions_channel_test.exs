@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       buyer: buyer_company, duration: 1_000, decision_duration: 1_000,
       suppliers: [supplier_company, supplier3_company]
     )
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{handle_events: true}}})
+    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
 
     state = AuctionState.from_auction(auction)
     |> Map.put(:status, :open)
