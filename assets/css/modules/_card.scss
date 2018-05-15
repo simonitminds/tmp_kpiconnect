@@ -15,7 +15,12 @@
 
 .card--auction { // Card elements on the auction index page
   &> div:last-child {
-    margin-bottom: -0.5rem;
+
+    // For when we have invite acceptance and invited supplier listings implemented...
+    // margin-bottom: -0.5rem;
+
+    // ... but in the meantime...
+    margin-bottom: 0.5rem;
   }
 }
 

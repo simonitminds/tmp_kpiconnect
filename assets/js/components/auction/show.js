@@ -201,7 +201,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                        {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                         <div className="box has-margin-bottom-md">
@@ -302,7 +302,7 @@ export default class AuctionShow extends React.Component {
                   </TabPanel>
                   <TabPanel>
                     { auctionLogLinkDisplay() }
-                    { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                    {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                     { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
                     <div className="box has-margin-bottom-md">
                       <div className="box__subsection">

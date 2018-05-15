@@ -65,7 +65,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
           {fuel} ({auction.fuel_quantity}&nbsp;MT)
         </div>
 
-        <div>
+        {/* <div>
           <div className="card-content__auction-status has-margin-top-md">
             <div>Respond to Invitation</div>
             <div className="field has-addons qa-auction-invitation-controls">
@@ -86,7 +86,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         { bidStatusDisplay() }
       </div>
     </div>
