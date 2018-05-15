@@ -17,12 +17,12 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
 
   def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, options}) do
     all_children = %{
-      auction_cache: {AuctionCache, auction},
+      auction_a_timer: {AuctionTimer, {auction_id, duration, decision_duration}},
       auction_bid_list: {AuctionBidList, auction_id},
-      auction_timer: {AuctionTimer, {auction_id, duration, decision_duration}},
-      auction_scheduler: {AuctionScheduler, auction},
-      auction_event_store: {AuctionEventStore, auction_id},
+      auction_cache: {AuctionCache, auction},
       auction_event_handler: {AuctionEventHandler, auction_id},
+      auction_event_store: {AuctionEventStore, auction_id},
+      auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction}
     }
     children = exclude_children(all_children, options)
@@ -41,10 +41,10 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     end
   end
 
-  defp exclude_children(all_children, %{}), do: all_children |> Map.values
   defp exclude_children(all_children, %{exclude_children: exclusions}) do
     all_children
     |> Enum.filter(fn({k, _v}) -> not k in exclusions end)
-    |> Map.values
+    |> Enum.map(fn({_, v}) -> v end)
   end
+  defp exclude_children(all_children, %{}), do: all_children |> Map.values
 end
