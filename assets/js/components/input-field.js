@@ -8,7 +8,7 @@ const InputField = ({model, field, labelText, value, opts, onChange, expandedInp
   return (
     <div className={`field ${isHorizontal ? 'is-horizontal' : ''}`}>
       <div className="field-label">
-        <label htmlFor={`${model}_${field}`} className={labelClass}>
+        <label htmlFor={`${model}_${field}`} className={`${labelClass} is-capitalized`}>
         {labelDisplay}
         </label>
       </div>

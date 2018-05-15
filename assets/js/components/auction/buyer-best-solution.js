@@ -38,12 +38,12 @@ export default class BuyerBestSolution extends React.Component {
           <form className="box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bid.id)}>
             {lowestBidId != bid.id ?
             "" :
-            <span><strong>Are you sure that you want to accept this offer?</strong></span>
+            <span className="is-inline-block has-margin-bottom-lg"><strong>Are you sure that you want to accept this offer?</strong></span>
             }
 
             <SolutionComment showInput={lowestBidId != bid.id} bid={bid} auctionStatus={auctionStatus} />
 
-            <div className="has-margin-top-md has-margin-bottom-sm"><i>Specify the Port Agent handling delivery (optional)</i></div>
+            <div className="has-margin-top-md has-margin-bottom-sm"><i>Optional: Specify the Port Agent handling delivery</i></div>
             <InputField
               model={'auction'}
               field={'port_agent'}
@@ -83,8 +83,7 @@ export default class BuyerBestSolution extends React.Component {
             <div className="auction-solution__content">
               <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> ({formatTime(bid.time_entered)})
               <button
-                className={`button is-small has-margin-left-md qa-select-bid-${bid.id}`}
-                disabled={auctionPayload.state.status != 'decision'}
+                className={`button is-small has-margin-left-md qa-select-bid-${bid.id} ${auctionPayload.state.status != 'decision' ? 'is-hidden' : ''}`}
                 onClick={
                   this.state.solutionCommentBidId == bid.id ? this.setSolutionCommentBidId.bind(this, null)
                                                             : this.setSolutionCommentBidId.bind(this, bid.id)
