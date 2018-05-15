@@ -14,10 +14,16 @@ $tabs-border-bottom-width: 4px;
 
 .tabs {
   margin-top: 1rem;
+  @media (max-width: 768px) {
+    margin-top: 0;
+  }
 }
 
 .tabs:not(:last-child) {
   margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+  }
 }
 
 .tabs a {
@@ -27,3 +33,29 @@ $tabs-border-bottom-width: 4px;
 }
 
 // Additions
+
+.auction-content > .tabs {
+  @media (max-width: 768px) { // Fix tabs in place on mobile.
+    flex-shrink: 0;
+    height: 37px;
+    // width: 100vw;
+    // margin: 0 -1.5rem;
+    overflow-x: hidden;
+  }
+}
+
+.auction-content > .tabs > .react-tabs__tab-list {
+  @media (max-width: 768px) { // Fix tabs in place on mobile.
+    margin: 0;
+  }
+}
+
+.auction-content > .tabs ~ .react-tabs__tab-panel {
+  @media (max-width: 768px) { // Fix tabs in place on mobile.
+    overflow-y: scroll;
+    flex-shrink: 1;
+    overflow-y: scroll;
+    height: calc(100vh - 221px);
+    padding: 1rem;
+  }
+}

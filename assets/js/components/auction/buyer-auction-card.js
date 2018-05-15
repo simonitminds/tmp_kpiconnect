@@ -125,10 +125,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             :
             <div className="is-none"></div>
           }
-          {/* <div className="card-content__auction-status">
-              <div>Are you ready to post your auction?</div>
-              <button className="button is-primary">Schedule Auction</button>
-          </div> */}
         </div>
         { bidStatusDisplay() }
     {/* ADMIN ONLY */}

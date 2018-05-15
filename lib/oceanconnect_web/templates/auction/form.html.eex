@@ -1,4 +1,4 @@
-<div class="form">
+<div class="form auction-app__body">
 <%= form_for @changeset, @action,[class: "control"], fn _f -> %>
 
   <%= if @changeset.action do %>
@@ -21,8 +21,8 @@
     ></div>
   </div>
 
-  <section class="auction-info has-margin-top-lg is-white">
-    <div class="container is-fullhd has-padding-top-lg has-padding-bottom-xxl">
+  <section class="auction-info is-white">
+    <div class="container is-fullhd">
       <div class="content">
         <div class="field">
           <%= link "Back", to: auction_path(@conn, :index), class: "button has-margin-right-sm" %>

@@ -7,6 +7,7 @@ import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
 import CollapsibleSection from './collapsible-section';
 import ChannelConnectionStatus from './channel-connection-status';
+import MediaQuery from 'react-responsive';
 
 
 export default class AuctionsIndex extends React.Component {
@@ -86,74 +87,95 @@ export default class AuctionsIndex extends React.Component {
     }
 
     return (
-      <div>
-        <div className="container is-fullhd has-margin-top-xl">
+      <div className="auction-app">
+        <div className="auction-app__header auction-app__header--list container is-fullhd">
           <div className="content has-margin-top-lg is-clearfix">
-            <h1 className="title is-3 is-pulled-left has-text-weight-bold">Auction Listing</h1>
-            <a href="/auctions/new" className="button is-link is-pulled-right">
-              New Auction
-            </a>
-            <div className="auction-list__time-box">
-              <ChannelConnectionStatus connection={connection} />
-              <div className="auction-list__timer">
-                <i className="far fa-clock has-margin-right-xs"></i>
-                <span className="auction-list__timer__clock" id="gmt-time" >
-                  {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                </span>&nbsp;GMT
+            <MediaQuery query="(max-width: 599px)">
+              <div>
+                <div className="auction-list__time-box">
+                  <ChannelConnectionStatus connection={connection} />
+                  <div className="auction-list__timer">
+                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <span className="auction-list__timer__clock" id="gmt-time" >
+                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                    </span>&nbsp;GMT
+                  </div>
+                </div>
+                <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small">
+                  New Auction
+                </a>
               </div>
-              <i>Server Time</i>
-            </div>
-
+            </MediaQuery>
+            <h1 className="auction-list__title title is-3">Auction Listing</h1>
+            <MediaQuery query="(min-width: 600px)">
+              <div>
+                <a href="/auctions/new" className="button is-link is-pulled-right">
+                  New Auction
+                </a>
+                <div className="auction-list__time-box">
+                  <ChannelConnectionStatus connection={connection} />
+                  <div className="auction-list__timer">
+                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <span className="auction-list__timer__clock" id="gmt-time" >
+                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
+                    </span>&nbsp;GMT
+                  </div>
+                    <i className="is-hidden-mobile">Server Time</i>
+                </div>
+              </div>
+            </MediaQuery>
           </div>
         </div>
-        <CollapsibleSection
-          trigger="Active Auctions"
-          classParentString="auction-list qa-open-auctions-list"
-          contentChildCount={filteredAuctionsCount("open")}
-          open={filteredAuctionsCount("open") > 0}
-          >
-          { filteredAuctionsDisplay("open") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Auctions In Decision"
-          classParentString="auction-list qa-decision-auctions-list"
-          contentChildCount={filteredAuctionsCount("decision")}
-          open={filteredAuctionsCount("decision") > 0}
-          >
-          { filteredAuctionsDisplay("decision") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Unscheduled Auctions"
-          classParentString="auction-list qa-draft-auctions-list"
-          contentChildCount={filteredAuctionsCount("draft")}
-          open={filteredAuctionsCount("draft") > 0}
-          >
-          { filteredAuctionsDisplay("draft") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Upcoming Auctions"
-          classParentString="auction-list qa-pending-auctions-list"
-          contentChildCount={filteredAuctionsCount("pending")}
-          open={filteredAuctionsCount("pending") > 0}
-          >
-          { filteredAuctionsDisplay("pending") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Closed Auctions"
-          classParentString="auction-list qa-closed-auctions-list"
-          contentChildCount={filteredAuctionsCount("closed")}
-          open={filteredAuctionsCount("closed") > 0}
-          >
-          { filteredAuctionsDisplay("closed") }
-        </CollapsibleSection>
-        <CollapsibleSection
-          trigger="Expired Auctions"
-          classParentString="auction-list qa-expired-auctions-list"
-          contentChildCount={filteredAuctionsCount("expired")}
-          open={filteredAuctionsCount("expired") > 0}
-          >
-          { filteredAuctionsDisplay("expired") }
-        </CollapsibleSection>
+        <div className="auction-app__body">
+          <CollapsibleSection
+            trigger="Active Auctions"
+            classParentString="qa-open-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("open")}
+            open={filteredAuctionsCount("open") > 0}
+            >
+            { filteredAuctionsDisplay("open") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Auctions In Decision"
+            classParentString="qa-decision-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("decision")}
+            open={filteredAuctionsCount("decision") > 0}
+            >
+            { filteredAuctionsDisplay("decision") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Unscheduled Auctions"
+            classParentString="qa-draft-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("draft")}
+            open={filteredAuctionsCount("draft") > 0}
+            >
+            { filteredAuctionsDisplay("draft") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Upcoming Auctions"
+            classParentString="qa-pending-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("pending")}
+            open={filteredAuctionsCount("pending") > 0}
+            >
+            { filteredAuctionsDisplay("pending") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Closed Auctions"
+            classParentString="qa-closed-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("closed")}
+            open={filteredAuctionsCount("closed") > 0}
+            >
+            { filteredAuctionsDisplay("closed") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Expired Auctions"
+            classParentString="qa-expired-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("expired")}
+            open={filteredAuctionsCount("expired") > 0}
+            >
+            { filteredAuctionsDisplay("expired") }
+          </CollapsibleSection>
+        </div>
       </div>
     );
   }

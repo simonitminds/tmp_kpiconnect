@@ -12,6 +12,11 @@
     flex-direction: row;
     float: right;
 
+    @media (max-width: 599px) {
+      margin-bottom: 1rem;
+      margin-top: -0.5rem;
+    }
+
     &> i {
       display: inline-block;
       margin-top: 0.25rem;
@@ -23,6 +28,16 @@
 
     &> .auction-header__connection-button { // Uhh... contextually tweak connection marker
       margin-top: 0.25rem;
+      @media (max-width: 768px) {
+        margin-top: 0;
+      }
+    }
+  }
+  &__title {
+    float: left;
+    font-weight: bold !important;
+    @media (max-width: 768px) {
+      margin-top: 0.25rem !important;
     }
   }
   &__timer { // Date and time stamp at top of the page.
@@ -31,9 +46,22 @@
     float: right;
     font-weight: bold;
 
+    @media (max-width: 599px) {
+      font-size: 0.85rem !important;
+      margin-right: 0;
+    }
+
     &__clock {
       display: inline-block;
       width: 156px;
+      @media (max-width: 599px) {
+        width: 130px;
+      }
+    }
+  }
+  &__new-auction {
+    @media (max-width: 599px) {
+      clear: both;
     }
   }
 }
