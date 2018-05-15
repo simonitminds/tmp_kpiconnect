@@ -82,7 +82,7 @@ export default class AuctionShow extends React.Component {
         return (
           <li>
             <strong className="is-block">Port Agent</strong>
-            <span className="qa-port-agent">{auction.port_agent}</span>
+            <span className="qa-port_agent">{auction.port_agent}</span>
           </li>
         );
       } else {

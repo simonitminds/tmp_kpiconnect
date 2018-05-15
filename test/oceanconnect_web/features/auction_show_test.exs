@@ -232,14 +232,14 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
     end
 
-    # test "buyer selects best solution and specifies port agent", %{auction: auction, bid: bid, buyer: buyer} do
-    #   login_user(buyer)
-    #   AuctionShowPage.visit(auction.id)
-    #   AuctionShowPage.select_bid(bid.id)
-    #   AuctionShowPage.enter_port_agent("Test Agent")
-    #   AuctionShowPage.accept_bid()
-    #
-    #   assert AuctionShowPage.port_agent() == "Test Agent"
-    # end
+    test "buyer selects best solution and specifies port agent", %{auction: auction, bid: bid, buyer: buyer} do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.select_bid(bid.id)
+      AuctionShowPage.enter_port_agent("Test Agent")
+      AuctionShowPage.accept_bid()
+
+      assert AuctionShowPage.port_agent() == "Test Agent"
+    end
   end
 end

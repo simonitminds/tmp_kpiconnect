@@ -104,11 +104,11 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def enter_port_agent(name) do
-    fill_field({:css, ".qa-auction-port-agent"}, name)
+    fill_field({:css, ".qa-auction-port_agent"}, name)
   end
 
   def port_agent() do
-    find_element(:css, ".qa-port-agent")
+    find_element(:css, ".qa-port_agent")
     |> inner_text
   end
 end

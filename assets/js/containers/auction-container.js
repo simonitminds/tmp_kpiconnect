@@ -50,6 +50,7 @@ const mapDispatchToProps = (dispatch) => ({
     }
     const portAgent = {'port_agent': elements.auction_port_agent.value};
 
+    dispatch(setPortAgent(auctionId, portAgent));
     dispatch(acceptWinningBid(auctionId, bidId, bidComment));
   },
   ...bindActionCreators({ updateBidStatus }, dispatch)
