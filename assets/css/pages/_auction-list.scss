@@ -133,5 +133,11 @@
   &__link-to-auction-edit {
     float: right;
     color: $gray-3;
+
+    @media (max-width: 350px) {
+      &.is-hidden-350 {
+        display: none;
+      }
+    }
   }
 }

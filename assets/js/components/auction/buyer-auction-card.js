@@ -67,7 +67,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   }
 
   return (
-    <div className="column is-one-third">
+    <div className="column is-one-third-desktop is-half-tablet">
       <div className={`card card--auction ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
@@ -81,7 +81,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
               <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
             {/* Start Link to Auction Edit */}
-              <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit">
+              <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit is-hidden-350">
                 <span className="icon is-medium has-text-right">
                   <i className="fas fa-lg fa-edit"></i>
                 </span>
@@ -92,11 +92,11 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
-          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
+          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>
-        {fuel != null ?
+        {auction.fuel.name != null ?
           <div className="card-content__products">
-            {fuel} ({auction.fuel_quantity}&nbsp;MT)
+            {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
           </div>
           :
           <div className="is-none"></div>

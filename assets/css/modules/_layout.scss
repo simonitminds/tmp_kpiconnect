@@ -141,15 +141,6 @@ section {
     flex-shrink: 0;
   }
 
-  &--list, &--form {
-    .content:first-child {
-      margin-top: 2rem !important;
-
-      @media (max-width: 768px) {
-        margin-top: 1.5rem !important;
-      }
-    }
-  }
   &--list {
     width: 100vw !important;
   }

@@ -41,7 +41,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
   }
 
   return (
-    <div className="column is-one-third">
+    <div className="column is-one-third-desktop is-half-tablet">
       <div className={`card card--auction qa-auction-${auction.id}`}>
         <div className="card-content">
           <div className="is-clearfix">
@@ -59,7 +59,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">{auction.vessel.name}</h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
-          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)} &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)})</p>
+          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong>{cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>
         <div className="card-content__products">
           {fuel} ({auction.fuel_quantity}&nbsp;MT)

@@ -253,24 +253,6 @@ export default class AuctionShow extends React.Component {
                             </ul>
                           </div>
                         </div>
-                        <div className="box__subsection">
-                          <h3 className="box__header">Port Information</h3>
-                          <ul className="list has-no-bullets">
-                            <li>
-                              <strong className="is-block">{auction.port.name}</strong>
-                              <span className="is-size-7"><strong>ETA</strong> {formatUTCDateTime(auction.eta)} &ndash; <strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
-                            </li>
-                            { portAgentDisplay() }
-                          </ul>
-                        </div>
-                        <div className="box__subsection">
-                          <h3 className="box__header">Additional Information</h3>
-                          <ul className="list has-no-bullets">
-                            <li>
-                              {additionInfoDisplay(auction)}
-                          </li>
-                          </ul>
-                        </div>
                       </TabPanel>
                       {/* <TabPanel>
                         <div className = "auction-notification box is-gray-0" >

@@ -45,6 +45,14 @@
 .card-title {
   margin: 1rem 0;
   padding: 0 1rem;
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0.5rem 0;
+  }
 }
 
 .card-content__bid-status {
@@ -98,6 +106,14 @@
   margin-top: 1rem;
   padding: 0 1rem;
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    margin-top: 0.5rem;
+
+    &+ .card-content__products {
+      margin-top: 0.75rem;
+    }
+  }
 }
 
 .card-content__bid {

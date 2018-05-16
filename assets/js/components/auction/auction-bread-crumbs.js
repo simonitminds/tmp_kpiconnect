@@ -5,7 +5,7 @@ const AuctionBreadCrumbs = ({auction}) => {
   const auction_id = _.get(auction, 'id');
   return(
     <section className="auction-page"> {/* Breadcrumb information */}
-      <div className="container has-margin-top-lg">
+      <div className="container has-margin-top-xl">
         <nav className="breadcrumb has-succeeds-separator has-family-header has-text-weight-bold has-padding-top-md" aria-label="breadcrumbs">
           <ul>
             <li><a href="/auctions">Auctions</a></li>
