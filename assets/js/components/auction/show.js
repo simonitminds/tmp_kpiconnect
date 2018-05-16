@@ -92,7 +92,7 @@ export default class AuctionShow extends React.Component {
           </li>
         );
       } else {
-        return "";
+        return <span className="qa-port_agent"></span>;
       }
     }
 
@@ -361,7 +361,6 @@ function updateAuctionBodySize() {
         auctionHeaderOffsetHeight = auctionHeaderSection ? auctionHeaderSection.offsetHeight : 0,
         auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48}px)`,
         auctionTabContent = document.querySelector('.react-tabs__tab-panel--selected');
-  console.log(`The offset of the header is ${auctionHeaderOffsetHeight}`)
 
   auctionTabContent.style.height = auctionTabContentHeight;
 }
