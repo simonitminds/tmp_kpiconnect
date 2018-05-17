@@ -15,9 +15,9 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
   end
 
 
-  def init({auction = %Oceanconnect.Auctions.Auction{id: auction_id, duration: duration, decision_duration: decision_duration}, options}) do
+  def init({auction = %Auction{id: auction_id}, options}) do
     all_children = %{
-      auction_a_timer: {AuctionTimer, {auction_id, duration, decision_duration}},
+      auction_a_timer: {AuctionTimer, auction_id},
       auction_bid_list: {AuctionBidList, auction_id},
       auction_cache: {AuctionCache, auction},
       auction_event_handler: {AuctionEventHandler, auction_id},

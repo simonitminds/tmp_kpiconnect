@@ -90,17 +90,19 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    auction
+    updated_auction = Map.put(auction, :auction_start, DateTime.utc_now())
+    updated_auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command
-    auction
+    updated_auction
   end
 
   def end_auction(auction = %Auction{}) do
-    auction
+    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
+    updated_auction
     |> Command.end_auction
     |> AuctionStore.process_command
-    auction
+    updated_auction
   end
 
   def expire_auction(auction = %Auction{}) do

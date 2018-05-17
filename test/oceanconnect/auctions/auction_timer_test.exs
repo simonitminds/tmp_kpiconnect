@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
   end
 
   test "start auction_duration_timer for auction", %{auction: auction} do
-    auction.id
+    auction
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
@@ -21,11 +21,11 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
   end
 
   test "start auction_decision_duration_timer for auction", %{auction: auction} do
-    auction.id
+    auction
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
-    auction.id
+    auction
     |> Command.start_decision_duration_timer
     |> AuctionTimer.process_command
 

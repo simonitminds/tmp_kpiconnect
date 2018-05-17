@@ -107,6 +107,7 @@ defmodule Oceanconnect.AuctionsTest do
     test "update_auction_without_event_storage!/2 with valid data updates the auction", %{auction: auction} do
       assert auction = %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
       assert auction.po == "some updated po"
+      assert auction == Auctions.get_auction(auction.id)
     end
 
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do

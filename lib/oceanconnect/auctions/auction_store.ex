@@ -88,9 +88,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:start_auction, %{auction: auction = %Auction{}, user: user}, emit}, current_state) do
-    updated_auction = Map.put(auction, :auction_start, DateTime.utc_now())
-    new_state = start_auction(current_state, updated_auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: %{state: new_state, auction: updated_auction}, time_entered: updated_auction.auction_start, user: user}, emit)
+    new_state = start_auction(current_state, auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: %{state: new_state, auction: auction}, time_entered: auction.auction_start, user: user}, emit)
 
     {:noreply, new_state}
   end
@@ -103,12 +102,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction, auction = %Auction{id: auction_id}, emit}, current_state = %{status: :open}) do
-    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
-    new_state = end_auction(current_state, updated_auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: %{state: new_state, auction: updated_auction}, time_entered: updated_auction.auction_ended}, emit)
+    new_state = end_auction(current_state, auction)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: %{state: new_state, auction: auction}, time_entered: auction.auction_ended}, emit)
 
     {:noreply, new_state}
   end
+  def handle_cast({:end_auction, _auction_id, _emit}, current_state), do: {:noreply, current_state}
 
   def handle_cast({:end_auction_decision_period, _data, emit}, current_state = %{auction_id: auction_id}) do
     new_state = expire_auction(current_state)
@@ -116,7 +115,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     {:noreply, new_state}
   end
-  def handle_cast({:end_auction, _auction_id, _emit}, current_state), do: {:noreply, current_state}
 
   def handle_cast({:process_new_bid, %{bid: bid, user: user}, emit}, current_state = %{auction_id: auction_id}) do
     {lowest_bid, supplier_first_bid, new_state} = process_new_bid(bid, current_state)
@@ -178,7 +176,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.update_cache
     |> AuctionCache.process_command
 
-    auction_id
+    auction
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
@@ -200,10 +198,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp update_auction_side_effects(auction) do
     auction
-    |> Command.update_times
-    |> AuctionTimer.process_command
-
-    auction
     |> Command.update_cache
     |> AuctionCache.process_command
 
@@ -212,12 +206,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionScheduler.process_command
   end
 
-  defp end_auction(current_state = %{auction_id: auction_id}, auction = %Auction{}) do
+  defp end_auction(current_state, auction = %Auction{}) do
     auction
     |> Command.update_cache
     |> AuctionCache.process_command
 
-    auction_id
+    auction
     |> Command.start_decision_duration_timer
     |> AuctionTimer.process_command
 
