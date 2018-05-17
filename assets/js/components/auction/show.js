@@ -243,7 +243,9 @@ export default class AuctionShow extends React.Component {
                               <li className="is-not-flex">
                                 <strong className="is-block">{auction.port.name}</strong>
                                 <span className="is-block"><strong>ETA</strong> {formatUTCDateTime(auction.eta)}</span>
-                                <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>                              </li>
+                                <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(auction.etd)}</span>
+                              </li>
+                              { portAgentDisplay() }
                             </ul>
                           </div>
                           <div className="box__subsection">

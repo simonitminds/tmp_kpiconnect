@@ -88,7 +88,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:start_auction, %{auction: auction = %Auction{}, user: user}, emit}, current_state) do
-    {new_state, updated_auction} = start_auction(current_state, auction)
+    updated_auction = Map.put(auction, :auction_start, DateTime.utc_now())
+    new_state = start_auction(current_state, updated_auction)
     AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: %{state: new_state, auction: updated_auction}, time_entered: updated_auction.auction_start, user: user}, emit)
 
     {:noreply, new_state}
@@ -102,7 +103,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:end_auction, auction = %Auction{id: auction_id}, emit}, current_state = %{status: :open}) do
-    {new_state, updated_auction} = end_auction(current_state, auction)
+    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
+    new_state = end_auction(current_state, updated_auction)
     AuctionEvent.emit(%AuctionEvent{type: :auction_ended, auction_id: auction_id, data: %{state: new_state, auction: updated_auction}, time_entered: updated_auction.auction_ended}, emit)
 
     {:noreply, new_state}
@@ -148,8 +150,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(%AuctionEvent{type: :auction_created}, _previous_state), do: nil
   defp replay_event(%AuctionEvent{type: :auction_started, data: %{state: state, auction: auction}}, _previous_state) do
-    {new_state, _updated_auction} = start_auction(state, auction)
-    new_state
+    start_auction(state, auction)
   end
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
     update_auction(auction, previous_state)
@@ -160,8 +161,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
   defp replay_event(%AuctionEvent{type: :auction_ended, data: %{auction: auction}}, previous_state) do
-    {new_state, _updated_auction} = end_auction(previous_state, auction)
-    new_state
+    end_auction(previous_state, auction)
   end
   defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid}}, previous_state) do
     select_winning_bid(bid, previous_state)
@@ -174,9 +174,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defp replay_event(_event, _previous_state), do: nil
 
   defp start_auction(current_state = %{auction_id: auction_id}, auction = %Auction{}) do
-    updated_auction = Map.put(auction, :auction_start, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.update_cache
     |> AuctionCache.process_command
 
@@ -188,7 +186,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start
     |> AuctionScheduler.process_command
 
-    {%AuctionState{current_state | status: :open}, updated_auction}
+    %AuctionState{current_state | status: :open}
   end
 
   defp update_auction(auction = %Auction{auction_start: start}, current_state = %{status: :draft}) when start != nil do
@@ -215,9 +213,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp end_auction(current_state = %{auction_id: auction_id}, auction = %Auction{}) do
-    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.update_cache
     |> AuctionCache.process_command
 
@@ -225,7 +221,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.start_decision_duration_timer
     |> AuctionTimer.process_command
 
-    {%AuctionState{current_state | status: :decision}, updated_auction}
+    %AuctionState{current_state | status: :decision}
   end
 
   defp process_new_bid(bid = %{amount: amount}, current_state = %{lowest_bids: lowest_bids}) do

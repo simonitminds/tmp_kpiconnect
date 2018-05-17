@@ -35,16 +35,20 @@ export default function(state, action) {
             .filter(['auction.id', action.auctionPayload.auction.id])
             .first()
             .value();
-      updatedAuctionPayload = {
-        ...action.auctionPayload,
-        success: origAuctionPayload.success,
-        message: origAuctionPayload.message
+      if (origAuctionPayload) {
+        updatedAuctionPayload = {
+          ...action.auctionPayload,
+          success: origAuctionPayload.success,
+          message: origAuctionPayload.message
+        };
+        newAuctionPayloadList = replaceListItem(
+          state.auctionPayloads,
+          origAuctionPayload,
+          updatedAuctionPayload
+        );
+      } else {
+        newAuctionPayloadList = _.concat(state.auctionPayloads, action.auctionPayload);
       }
-      newAuctionPayloadList = replaceListItem(
-        state.auctionPayloads,
-        origAuctionPayload,
-        updatedAuctionPayload
-      );
       return {
         ...state,
         auctionPayloads: newAuctionPayloadList,
