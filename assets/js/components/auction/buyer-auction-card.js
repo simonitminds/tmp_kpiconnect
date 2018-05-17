@@ -6,8 +6,8 @@ import SupplierBidStatus from './supplier-bid-status';
 import AuctionTimeRemaining from './auction-time-remaining';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
-  const fuel = _.get(auction, 'fuel.name');
   const auction = _.get(auctionPayload, 'auction');
+  const fuel = _.get(auction, 'fuel.name');
   const auctionStatus = _.get(auctionPayload, 'state.status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const lowestBid = _.chain(auctionPayload).get('state.lowest_bids').first().value();
@@ -94,9 +94,9 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>
-        {auction.fuel.name != null ?
+        {fuel != null ?
           <div className="card-content__products">
-            {auction.fuel.name} ({auction.fuel_quantity}&nbsp;MT)
+            {fuel} ({auction.fuel_quantity}&nbsp;MT)
           </div>
           :
           <div className="is-none"></div>
