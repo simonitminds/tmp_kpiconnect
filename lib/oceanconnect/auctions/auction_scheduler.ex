@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionScheduler do
   use GenServer
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Command}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Auction, AuctionCache, Command}
 
   @registry_name :auction_scheduler_registry
 
@@ -47,9 +48,9 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_info(:schedule_auction_start, state = %{auction_id: auction_id}) do
-    %Auction{id: auction_id, auction_start: DateTime.utc_now()}
-    |> Command.start_auction(nil)
-    |> AuctionStore.process_command
+    auction_id
+    |> AuctionCache.read
+    |> Auctions.start_auction
 
     {:noreply, state}
   end
