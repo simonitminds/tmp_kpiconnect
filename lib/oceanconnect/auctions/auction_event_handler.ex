@@ -34,9 +34,14 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
     {:noreply, state}
   end
-  def handle_info(%AuctionEvent{type: :auction_ended, data: auction_state = %AuctionState{auction_id: auction_id}, time_entered: time_entered}, state) do
-    auction_id
-    |> Auctions.AuctionCache.read
+  def handle_info(%AuctionEvent{type: :auction_started, data: %{state: auction_state = %AuctionState{}, auction: auction}, time_entered: time_entered}, state) do
+    auction
+    |> Auctions.update_auction_without_event_storage!(%{auction_start: time_entered})
+    AuctionNotifier.notify_participants(auction_state)
+    {:noreply, state}
+  end
+  def handle_info(%AuctionEvent{type: :auction_ended, data: %{state: auction_state = %AuctionState{}, auction: auction}, time_entered: time_entered}, state) do
+    auction
     |> Auctions.update_auction_without_event_storage!(%{auction_ended: time_entered})
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
