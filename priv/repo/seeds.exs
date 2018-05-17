@@ -167,20 +167,21 @@ fuels = [
 end)
 
 [fuel1, vessel1, port1] = [[%{name: "RMG 380 - Sulphur max 3.50% (ISO 2005)"}, Fuel],
-  [%{name: "Boaty McBoatFace", imo: 1234567, company_id: chevron.id}, Vessel],
+  [%{name: "Boaty McBoatFace", imo: 1234567, company_id: nigeria.id}, Vessel],
   [%{name: "Singapore", country: "Singapore", gmt_offset: 8}, Port]]
 |> Enum.map(fn([data, module]) -> Repo.get_or_insert!(module, data) end)
 
 fujairah = Repo.get_by(Port, name: "Fujairah")
 
+date_time = DateTime.utc_now() |> DateTime.to_naive |> NaiveDateTime.add(3_600 * 24 * 30) |> DateTime.from_naive!("Etc/UTC")
 auctions_params = [
   %{
     vessel_id: vessel1.id,
     port_id: port1.id,
     fuel_id: fuel1.id,
     fuel_quantity: 1000,
-    auction_start: DateTime.utc_now(),
-    eta: DateTime.utc_now(),
+    auction_start: date_time,
+    eta: date_time,
     po: "1234567",
     buyer_id: nigeria.id,
     duration: 1 * 60_000,
@@ -191,8 +192,8 @@ auctions_params = [
     port_id: fujairah.id,
     fuel_id: List.first(fuels).id,
     fuel_quantity: 1000,
-    auction_start: DateTime.utc_now(),
-    eta: DateTime.utc_now(),
+    auction_start: date_time,
+    eta: date_time,
     po: "2345678",
     buyer_id: chevron.id,
     duration: 4 * 60_000,
@@ -203,8 +204,8 @@ auctions_params = [
     port_id: port1.id,
     fuel_id: List.last(fuels).id,
     fuel_quantity: 1000,
-    auction_start: DateTime.utc_now(),
-    eta: DateTime.utc_now(),
+    auction_start: date_time,
+    eta: date_time,
     po: "3456789",
     buyer_id: qatargas.id,
     duration: 10 * 60_000,
