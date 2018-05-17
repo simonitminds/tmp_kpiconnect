@@ -43,7 +43,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
   return (
     <div className="column is-one-third-desktop is-half-tablet">
       <div className={`card card--auction qa-auction-${auction.id}`}>
-        <div className="card-content">
+        <div className="card-content qa-auction-supplier-card">
           <div className="is-clearfix">
             {/* Start Status/Time Bubble */}
             <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
@@ -65,7 +65,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
           {fuel} ({auction.fuel_quantity}&nbsp;MT)
         </div>
 
-        <div>
+        {/* <div>
           <div className="card-content__auction-status has-margin-top-md">
             <div>Respond to Invitation</div>
             <div className="field has-addons qa-auction-invitation-controls">
@@ -86,7 +86,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         { bidStatusDisplay() }
       </div>
     </div>

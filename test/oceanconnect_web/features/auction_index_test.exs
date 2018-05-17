@@ -27,15 +27,15 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
 
     test "buyer can see his view of the auction card", %{auction: auction} do
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
     end
 
     test "buyer/supplier can see his respective view per auction", %{auction: auction} do
       supplier_auction = insert(:auction, suppliers: [auction.buyer])
 
       AuctionIndexPage.visit()
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
-      assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "invitation-controls")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
+      assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "supplier-card")  # Temporarily removed parameter "invitation-controls"
     end
 
     test "user can only see auctions they participate in", %{auctions: auctions} do
@@ -67,8 +67,8 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
 
     test "supplier can see his view of the auction card", %{auction: auction} do
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "invitation-controls")
-      refute AuctionIndexPage.has_field_in_auction?(auction.id, "suppliers")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card") # Temporarily removed parameter "invitation-controls"
+      refute AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
     end
 
     test "supplier sees realtime start", %{auction: auction} do
