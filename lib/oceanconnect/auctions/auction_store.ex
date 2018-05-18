@@ -171,7 +171,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defp replay_event(%AuctionEvent{type: :auction_state_rebuilt, data: _state}, _previous_state), do: nil
   defp replay_event(_event, _previous_state), do: nil
 
-  defp start_auction(current_state = %{auction_id: auction_id}, auction = %Auction{}) do
+  defp start_auction(current_state, auction = %Auction{}) do
     auction
     |> Command.update_cache
     |> AuctionCache.process_command
@@ -180,7 +180,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.start_duration_timer
     |> AuctionTimer.process_command
 
-    auction_id
+    auction
     |> Command.cancel_scheduled_start
     |> AuctionScheduler.process_command
 

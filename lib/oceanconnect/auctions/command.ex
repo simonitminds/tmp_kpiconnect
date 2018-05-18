@@ -17,8 +17,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :update_scheduled_start, data: auction}
   end
 
-  def cancel_scheduled_start(auction_id) when is_integer(auction_id) do
-    %Command{command: :cancel_scheduled_start, data: auction_id}
+  def cancel_scheduled_start(auction = %Auction{}) do
+    %Command{command: :cancel_scheduled_start, data: auction}
   end
 
   def start_auction(auction = %Auction{}, user) when not is_integer(user) do
