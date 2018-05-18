@@ -20,8 +20,8 @@ defmodule Oceanconnect.AuctionsTest do
       epoch = expected_date
       |> DateTime.to_unix(:milliseconds)
       |> Integer.to_string
-      params = %{"auction_start" => epoch}
-      %{ "auction_start" => parsed_date } = Auction.maybe_parse_date_field(params, "auction_start")
+      params = %{"scheduled_start" => epoch}
+      %{ "scheduled_start" => parsed_date } = Auction.maybe_parse_date_field(params, "scheduled_start")
 
       assert parsed_date == expected_date |> DateTime.to_string()
     end
@@ -61,11 +61,11 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "list_participating_auctions/1 doesn't return draft auctions" do
       supplier_company = insert(:company, is_supplier: true)
-      insert(:auction, auction_start: nil, suppliers: [supplier_company])
+      insert(:auction, scheduled_start: nil, suppliers: [supplier_company])
       assert Auctions.list_participating_auctions(supplier_company.id) == []
     end
 
-    test "list_participating_auctions/1 orders on auction_start" do
+    test "list_participating_auctions/1 orders on scheduled_start" do
       supplier_company = insert(:company, is_supplier: true)
 
       {:ok, first_date, _} = DateTime.from_iso8601("2018-01-01T00:00:00Z")
@@ -73,12 +73,12 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, third_date, _} = DateTime.from_iso8601("2018-01-03T00:00:00Z")
       {:ok, fourth_date, _} = DateTime.from_iso8601("2018-01-04T00:00:00Z")
 
-      auction_one = insert(:auction, auction_start: third_date, suppliers: [supplier_company])
-      auction_two = insert(:auction, auction_start: first_date, suppliers: [supplier_company])
-      auction_three = insert(:auction, auction_start: second_date, suppliers: [supplier_company])
-      auction_four = insert(:auction, auction_start: fourth_date, buyer: supplier_company)
-      auction_five = insert(:auction, auction_start: third_date, buyer: supplier_company)
-      auction_six = insert(:auction, auction_start: first_date, buyer: supplier_company)
+      auction_one = insert(:auction, scheduled_start: third_date, suppliers: [supplier_company])
+      auction_two = insert(:auction, scheduled_start: first_date, suppliers: [supplier_company])
+      auction_three = insert(:auction, scheduled_start: second_date, suppliers: [supplier_company])
+      auction_four = insert(:auction, scheduled_start: fourth_date, buyer: supplier_company)
+      auction_five = insert(:auction, scheduled_start: third_date, buyer: supplier_company)
+      auction_six = insert(:auction, scheduled_start: first_date, buyer: supplier_company)
       auctions = Enum.map(Auctions.list_participating_auctions(supplier_company.id), fn(a) -> a.id end)
 
       assert  [auction_six.id, auction_five.id, auction_four.id, auction_two.id, auction_three.id, auction_one.id] == auctions
@@ -90,7 +90,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
-      auction_attrs = auction_with_participants |> Map.take([:auction_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
+      auction_attrs = auction_with_participants |> Map.take([:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
 
       assert all_values_match?(auction_attrs, new_auction)

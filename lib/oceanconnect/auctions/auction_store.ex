@@ -20,7 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       lowest_bids: [],
       winning_bid: nil
 
-    def from_auction(%Auction{id: auction_id, auction_start: nil}) do
+    def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
       %AuctionState{
         auction_id: auction_id,
         status: :draft
@@ -89,7 +89,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_cast({:start_auction, %{auction: auction = %Auction{}, user: user}, emit}, current_state) do
     new_state = start_auction(current_state, auction)
-    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: %{state: new_state, auction: auction}, time_entered: auction.auction_start, user: user}, emit)
+    AuctionEvent.emit(%AuctionEvent{type: :auction_started, auction_id: auction.id, data: %{state: new_state, auction: auction}, time_entered: auction.scheduled_start, user: user}, emit)
 
     {:noreply, new_state}
   end
@@ -187,7 +187,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     %AuctionState{current_state | status: :open}
   end
 
-  defp update_auction(auction = %Auction{auction_start: start}, current_state = %{status: :draft}) when start != nil do
+  defp update_auction(auction = %Auction{scheduled_start: start}, current_state = %{status: :draft}) when start != nil do
     update_auction_side_effects(auction)
     Map.put(current_state, :status, :pending)
   end

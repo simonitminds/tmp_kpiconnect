@@ -12,8 +12,8 @@ import { RECEIVE_AUCTION_FORM_DATA,
 
 const initialState = {
   auction: null,
-  auction_start_date: null,
-  auction_start_time: null,
+  scheduled_start_date: null,
+  scheduled_start_time: null,
   eta_date: null,
   eta_time: null,
   etd_date: null,
@@ -45,8 +45,8 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
-          auction_start_date: setUTCDateTime(action.data.auction.auction_start),
-          auction_start_time: setUTCDateTime(action.data.auction.auction_start),
+          scheduled_start_date: setUTCDateTime(action.data.auction.scheduled_start),
+          scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           eta_date: setUTCDateTime(action.data.auction.eta),
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),

@@ -13,6 +13,13 @@ import MediaQuery from 'react-responsive';
 const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
+  const displayAuctionStartTime = () => {
+    if (auctionStatus == 'pending') {
+      return formatUTCDateTime(auction.scheduled_start);
+    } else {
+      return formatUTCDateTime(auction.auction_started);
+    }
+  }
 
   return(
     <div className="auction-app__header">
@@ -78,7 +85,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                   </MediaQuery>
 
                   <div className={`auction-header__start-time has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>
-                    <span className="has-text-weight-bold is-uppercase">Start time</span> {formatUTCDateTime(auction.auction_start)}
+                    <span className="has-text-weight-bold is-uppercase">Start time</span> {displayAuctionStartTime()}
                   </div>
                   <div className={`auction-header__duration has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>
                     <span className="has-text-weight-bold is-uppercase">Decision Period</span> {convertToMinutes(auction.decision_duration)} minutes

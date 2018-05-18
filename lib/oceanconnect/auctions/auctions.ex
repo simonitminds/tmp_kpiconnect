@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions do
   defp buyer_auctions(buyer_id) do
     query = from a in Auction,
       where: a.buyer_id == ^buyer_id,
-      order_by: a.auction_start
+      order_by: a.scheduled_start
     query
     |> Repo.all
     |> fully_loaded
@@ -61,9 +61,9 @@ defmodule Oceanconnect.Auctions do
     query = from as in AuctionSuppliers,
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
-      where: not is_nil(a.auction_start),
+      where: not is_nil(a.scheduled_start),
       select: a,
-      order_by: a.auction_start
+      order_by: a.scheduled_start
     query
     |> Repo.all
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    updated_auction = Map.put(auction, :auction_start, DateTime.utc_now())
+    updated_auction = Map.put(auction, :auction_started, DateTime.utc_now())
     updated_auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command
@@ -112,7 +112,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
-  def create_auction(attrs = %{"auction_start" => start}, user) when start != "" do
+  def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
     %Auction{}
     |> Auction.changeset_for_scheduled_auction(attrs)
     |> Repo.insert()

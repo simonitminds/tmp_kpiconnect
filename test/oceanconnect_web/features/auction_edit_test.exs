@@ -18,7 +18,7 @@ defmodule Oceanconnect.AuctionEditTest do
     assert AuctionEditPage.has_fields?([
       "additional_information",
       "anonymous_bidding",
-      "auction_start",
+      "scheduled_start",
       "duration",
       "decision_duration",
       "eta",
