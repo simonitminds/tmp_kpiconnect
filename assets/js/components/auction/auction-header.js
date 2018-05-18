@@ -26,20 +26,24 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                     {auctionStatus}
                   </div>
                   <MediaQuery query="(max-width: 768px)">
-                    <div className="auction-list__timer">
-                      <i className="far fa-clock has-margin-right-xs"></i>
-                      <span className="auction-list__timer__clock" id="gmt-time" >
-                        {serverTime.format("DD MMM YYYY, k:mm:ss")}
-                      </span>&nbsp;GMT
-                    </div>
-                    <div className="auction-header__timer auction-header__timer--mobile has-text-left-mobile">
-                      <ChannelConnectionStatus connection={connection} />
-                      <div className={`auction-timer auction-timer--mobile auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
-                        <span className="qa-auction-time_remaining" id="time-remaining">
-                          {formatTimeRemainingMobile(auctionStatus, timeRemaining, "show")}
-                        </span>
+                    {auctionStatus == "pending" ?
+                      <div className="auction-list__timer auction-list__timer--show">
+                        <i className="far fa-clock has-margin-right-xs"></i>
+                        <span className="auction-list__timer__clock" id="gmt-time" >
+                          {serverTime.format("DD MMM YYYY, k:mm:ss")}
+                        </span>&nbsp;GMT
                       </div>
-                    </div>
+                      :
+                      ""
+                    }
+                      <div className={`auction-header__timer auction-header__timer--mobile ${auctionStatus == "pending" ? "auction-header__timer--mobile--pending" : ""} has-text-left-mobile`}>
+                        <ChannelConnectionStatus connection={connection} />
+                        <div className={`auction-timer auction-timer--mobile auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
+                          <span className="qa-auction-time_remaining" id="time-remaining">
+                            {formatTimeRemainingMobile(auctionStatus, timeRemaining, "show")}
+                          </span>
+                        </div>
+                      </div>
                   </MediaQuery>
 
                   <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
@@ -51,14 +55,18 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                     <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> (ETA {formatUTCDateTime(auction.eta)})</span>
                   </div>
                 </div>
-                <div className={`column ${auctionStatus != 'pending'? 'is-hidden-touch' : ''}`}>
+                <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
                   <MediaQuery query="(min-width: 769px)">
-                    <div className="auction-list__timer">
-                      <i className="far fa-clock has-margin-right-xs"></i>
-                      <span className="auction-list__timer__clock" id="gmt-time" >
-                        {serverTime.format("DD MMM YYYY, k:mm:ss")}
-                      </span>&nbsp;GMT
-                    </div>
+                    { auctionStatus == "pending" ?
+                      <div className="auction-list__timer">
+                        <i className="far fa-clock has-margin-right-xs"></i>
+                        <span className="auction-list__timer__clock" id="gmt-time" >
+                          {serverTime.format("DD MMM YYYY, k:mm:ss")}
+                        </span>&nbsp;GMT
+                      </div>
+                      :
+                      ""
+                    }
                     <div className="auction-header__timer has-text-left-mobile">
                       <ChannelConnectionStatus connection={connection} />
                       <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
@@ -69,10 +77,10 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                     </div>
                   </MediaQuery>
 
-                  <div className={`auction-header__start-time has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-touch' : ''}`}>
+                  <div className={`auction-header__start-time has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>
                     <span className="has-text-weight-bold is-uppercase">Start time</span> {formatUTCDateTime(auction.auction_start)}
                   </div>
-                  <div className={`auction-header__duration has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-touch' : ''}`}>
+                  <div className={`auction-header__duration has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>
                     <span className="has-text-weight-bold is-uppercase">Decision Period</span> {convertToMinutes(auction.decision_duration)} minutes
                   </div>
                 </div>

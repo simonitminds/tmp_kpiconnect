@@ -46,6 +46,11 @@
     float: right;
     font-weight: bold;
 
+    &--show {
+      margin-left: 1rem;
+      margin-right: -0.5rem !important;
+    }
+
     @media (max-width: 599px) {
       font-size: 0.85rem !important;
       margin-right: 0;
@@ -139,5 +144,13 @@
         display: none;
       }
     }
+  }
+}
+
+// Auction Listing Elements Ported to Auction Info
+
+.auction-header .auction-list__timer {
+  @media (min-width: 769px) {
+    margin-top: -36px;
   }
 }

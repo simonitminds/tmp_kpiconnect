@@ -31,6 +31,13 @@
     &--open { background-color: $green !important; }
     &--pending { background-color: $teal !important; }
     &--completed { background-color: $gray-3 !important; }
+
+    // Additional adjustments for mobile pending auction view...
+    &--pending {
+      @media (max-width: 496px) {
+        margin-top: 30px;
+      }
+    }
   }
   &__po { // Auction PO
     margin-bottom: 0.125rem;
@@ -69,6 +76,17 @@
       float: right;
       margin-right: -8px;
       margin-top: -6px;
+
+      &--pending { // When you've got a pending auction in mobile...
+        @media (max-width: 496px) and (min-width: 468px) {
+          margin-top: 0px;
+          clear: both;
+        }
+        @media (max-width: 467px) {
+          margin-top: -42px;
+          clear: both;
+        }
+      }
     }
   }
 
@@ -160,7 +178,6 @@
       }
     }
   }
-
 }
 
 // Auction Main Content Block
