@@ -24,7 +24,8 @@ export default class AuctionShow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: timeRemainingCountdown(props.auctionPayload, moment().utc())
+      timeRemaining: timeRemainingCountdown(props.auctionPayload, moment().utc()),
+      serverTime: moment().utc()
     }
   }
 
@@ -48,7 +49,8 @@ export default class AuctionShow extends React.Component {
   tick() {
     let time = moment(ServerDate.now()).utc();
     this.setState({
-      timeRemaining: timeRemainingCountdown(this.props.auctionPayload, time)
+      timeRemaining: timeRemainingCountdown(this.props.auctionPayload, time),
+      serverTime: time
     });
   }
 
@@ -171,7 +173,7 @@ export default class AuctionShow extends React.Component {
         <MediaQuery query="(min-width: 769px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
-        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} connection={this.props.connection} />
+        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} connection={this.props.connection} serverTime={this.state.serverTime} />
         <MediaQuery query="(min-width: 769px)">
           <div className="auction-app__body">
             <section className="auction-page"> {/* Auction details */}

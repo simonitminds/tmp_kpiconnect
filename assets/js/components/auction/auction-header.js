@@ -10,7 +10,7 @@ import {
 import ChannelConnectionStatus from './channel-connection-status';
 import MediaQuery from 'react-responsive';
 
-const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
+const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'state.status');
 
@@ -26,6 +26,12 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                     {auctionStatus}
                   </div>
                   <MediaQuery query="(max-width: 768px)">
+                    <div className="auction-list__timer">
+                      <i className="far fa-clock has-margin-right-xs"></i>
+                      <span className="auction-list__timer__clock" id="gmt-time" >
+                        {serverTime.format("DD MMM YYYY, k:mm:ss")}
+                      </span>&nbsp;GMT
+                    </div>
                     <div className="auction-header__timer auction-header__timer--mobile has-text-left-mobile">
                       <ChannelConnectionStatus connection={connection} />
                       <div className={`auction-timer auction-timer--mobile auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
@@ -47,6 +53,12 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection}) => {
                 </div>
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-touch' : ''}`}>
                   <MediaQuery query="(min-width: 769px)">
+                    <div className="auction-list__timer">
+                      <i className="far fa-clock has-margin-right-xs"></i>
+                      <span className="auction-list__timer__clock" id="gmt-time" >
+                        {serverTime.format("DD MMM YYYY, k:mm:ss")}
+                      </span>&nbsp;GMT
+                    </div>
                     <div className="auction-header__timer has-text-left-mobile">
                       <ChannelConnectionStatus connection={connection} />
                       <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
