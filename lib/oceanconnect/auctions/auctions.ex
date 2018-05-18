@@ -173,9 +173,22 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
+    cleaned_attrs = clean_timestamps(attrs)
     auction
-    |> Auction.changeset(attrs)
+    |> Auction.changeset(cleaned_attrs)
     |> Repo.update!()
+  end
+
+  defp clean_timestamps(attrs = %{auction_started: auction_started}) do
+    Map.put(attrs, :auction_started, fix_time_weirdness(auction_started))
+  end
+  defp clean_timestamps(attrs = %{auction_ended: auction_ended}) do
+    Map.put(attrs, :auction_ended, fix_time_weirdness(auction_ended))
+  end
+  defp clean_timestamps(attrs), do: attrs
+
+  defp fix_time_weirdness(date_time = %DateTime{microsecond: microsecond}) do
+    Map.put(date_time, :microsecond, {elem(microsecond, 0), 5})
   end
 
   def delete_auction(%Auction{} = auction) do
