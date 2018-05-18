@@ -89,7 +89,7 @@ export default class AuctionsIndex extends React.Component {
     return (
       <div className="auction-app">
         <div className="auction-app__header auction-app__header--list container is-fullhd">
-          <div className="content has-margin-top-xl is-clearfix">
+          <div className="content is-clearfix">
             <MediaQuery query="(max-width: 599px)">
               <div>
                 <div className="auction-list__time-box">
