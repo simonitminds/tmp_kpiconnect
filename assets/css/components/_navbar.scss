@@ -20,3 +20,55 @@ $navbar-background-color: $primary;
     }
   }
 }
+
+.navbar-item.has-dropdown { // Menu
+  &> .navbar-link:after {
+    border-color: transparent !important;
+  }
+}
+
+.navbar-dropdown { // Set the nav dropdown to be flush right
+  right: 0;
+  left: auto !important;
+  font-size: 1rem !important;
+
+  .navbar-item {
+    padding: 0.5rem 1rem !important;
+
+    @media (max-width: 768px) { // Have some user name distinction in hamburger menu
+      &:hover, &:focus {
+        width: 100vw;
+        color: $black;
+      }
+    }
+  }
+}
+
+.navbar-burger {
+  // Remove box-shadow from hamburger button
+  &.button.is-primary:focus:not(:active),
+  .button.is-primary.is-focused:not(:active) {
+    box-shadow: none;
+  }
+}
+
+// Additions
+
+.navbar-item {
+
+  &--user {
+
+    @media (max-width: 1024px) { // Have some user name distinction in hamburger menu
+      background-color: $gray-1;
+      padding: 1rem 1.25rem !important;
+      margin-top: -0.5rem;
+    }
+  }
+  &--burger {
+    width: 152px;
+
+    &> .navbar-link {
+      width: 152px;
+    }
+  }
+}

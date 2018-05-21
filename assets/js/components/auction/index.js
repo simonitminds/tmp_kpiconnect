@@ -144,20 +144,20 @@ export default class AuctionsIndex extends React.Component {
             { filteredAuctionsDisplay("decision") }
           </CollapsibleSection>
           <CollapsibleSection
-            trigger="Unscheduled Auctions"
-            classParentString="qa-draft-auctions-list auction-list"
-            contentChildCount={filteredAuctionsCount("draft")}
-            open={filteredAuctionsCount("draft") > 0}
-            >
-            { filteredAuctionsDisplay("draft") }
-          </CollapsibleSection>
-          <CollapsibleSection
             trigger="Upcoming Auctions"
             classParentString="qa-pending-auctions-list auction-list"
             contentChildCount={filteredAuctionsCount("pending")}
             open={filteredAuctionsCount("pending") > 0}
             >
             { filteredAuctionsDisplay("pending") }
+          </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Unscheduled Auctions"
+            classParentString="qa-draft-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("draft")}
+            open={filteredAuctionsCount("draft") > 0}
+            >
+            { filteredAuctionsDisplay("draft") }
           </CollapsibleSection>
           <CollapsibleSection
             trigger="Closed Auctions"

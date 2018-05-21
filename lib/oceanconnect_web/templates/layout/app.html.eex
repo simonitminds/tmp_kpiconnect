@@ -20,28 +20,36 @@
           <a href="/auctions" class="navbar-item">
             <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
           </a>
-          <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
+          <!-- <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %> -->
+          <%# TODO: Add in actual mobile implementation of nav... %>
+          <button class="button navbar-burger is-primary" data-target="navMenubd-example">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
-        <%# TODO: Add in actual mobile implementation of nav... %>
-        <!-- <button class="button navbar-burger">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button> -->
-        <div class="navbar-menu">
+        <div id="navMenubd-example" class="navbar-menu">
           <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
-            <span class="navbar-item has-text-weight-bold">
+            <div class="navbar-item navbar-item--user has-text-weight-bold">
               <%= OceanconnectWeb.SessionView.current_user(@conn) %>
               <%= if OceanconnectWeb.SessionView.current_company(@conn) !== "" do %>
-                <i class="is-size-6 is-block has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
+                <i class="is-size-6 is-block-desktop has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
               <% end %>
-            </span>
-            <!-- <a href="#" class="navbar-item">Account Settings</a>
-            <a href="#" class="navbar-item">Messages</a>
-            <a href="#" class="navbar-item">Log Out</a> -->
-            <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
-          </div>
+            </div>
+            <div class="navbar-item navbar-item--burger has-dropdown is-hoverable">
+              <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
+              <div class="navbar-dropdown">
+                <a href="/auctions" class="navbar-item">Current Auctions</a>
+                <!-- <a href="#" class="navbar-item">Auction History</a>
+                <a href="#" class="navbar-item">Claims</a>
+                <a href="#" class="navbar-item">Invoices</a>
+                <a href="#" class="navbar-item">Messages</a>
+                <a href="#" class="navbar-item">Account Settings</a> -->
+                <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
+              </div>
+            </div>
+            <!-- <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>          --></div>
         </div>
       </nav>
     </header>
@@ -55,6 +63,32 @@
       <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
       <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>
       <script> window.companyId = "<%= OceanconnectWeb.SessionView.current_user_company_id(@conn) %>";</script>
+      <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+          // Get all "navbar-burger" elements
+          var $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+          // Check if there are any nav burgers
+          if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(function ($el) {
+              $el.addEventListener('click', function () {
+
+                // Get the target from the "data-target" attribute
+                var target = $el.dataset.target;
+                var $target = document.getElementById(target);
+
+                // Toggle the class on both the "navbar-burger" and the "navbar-menu"
+                $el.classList.toggle('is-active');
+                $target.classList.toggle('is-active');
+
+              });
+            });
+          }
+        });
+      </script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
