@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions do
   defp buyer_auctions(buyer_id) do
     query = from a in Auction,
       where: a.buyer_id == ^buyer_id,
-      order_by: a.auction_start
+      order_by: a.scheduled_start
     query
     |> Repo.all
     |> fully_loaded
@@ -61,9 +61,9 @@ defmodule Oceanconnect.Auctions do
     query = from as in AuctionSuppliers,
       join: a in Auction, on: a.id == as.auction_id,
       where: as.supplier_id == ^supplier_id,
-      where: not is_nil(a.auction_start),
+      where: not is_nil(a.scheduled_start),
       select: a,
-      order_by: a.auction_start
+      order_by: a.scheduled_start
     query
     |> Repo.all
     |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    updated_auction = update_auction_without_event_storage!(auction, %{auction_start: DateTime.utc_now()})
+    updated_auction = Map.put(auction, :auction_started, DateTime.utc_now())
     updated_auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command
@@ -98,10 +98,11 @@ defmodule Oceanconnect.Auctions do
   end
 
   def end_auction(auction = %Auction{}) do
-    auction
+    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
+    updated_auction
     |> Command.end_auction
     |> AuctionStore.process_command
-    auction
+    updated_auction
   end
 
   def expire_auction(auction = %Auction{}) do
@@ -111,7 +112,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
-  def create_auction(attrs = %{"auction_start" => start}, user) when start != "" do
+  def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
     %Auction{}
     |> Auction.changeset_for_scheduled_auction(attrs)
     |> Repo.insert()
@@ -172,9 +173,22 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
+    cleaned_attrs = clean_timestamps(attrs)
     auction
-    |> Auction.changeset(attrs)
+    |> Auction.changeset(cleaned_attrs)
     |> Repo.update!()
+  end
+
+  defp clean_timestamps(attrs = %{auction_started: auction_started}) do
+    Map.put(attrs, :auction_started, fix_time_weirdness(auction_started))
+  end
+  defp clean_timestamps(attrs = %{auction_ended: auction_ended}) do
+    Map.put(attrs, :auction_ended, fix_time_weirdness(auction_ended))
+  end
+  defp clean_timestamps(attrs), do: attrs
+
+  defp fix_time_weirdness(date_time = %DateTime{microsecond: microsecond}) do
+    Map.put(date_time, :microsecond, {elem(microsecond, 0), 5})
   end
 
   def delete_auction(%Auction{} = auction) do

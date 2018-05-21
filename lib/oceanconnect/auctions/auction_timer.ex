@@ -1,7 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
   alias __MODULE__
-  alias Oceanconnect.Auctions.{Auction, AuctionStore, Command}
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Auction, AuctionCache, Command}
 
   @registry_name :auction_timers_registry
   @extension_time 3 * 60_000
@@ -37,23 +38,18 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
         do: GenServer.cast(pid, {:cancel_timer, timer_type})
   end
 
-  def start_link({auction_id, duration, decision_duration}) do
-    GenServer.start_link(__MODULE__, {auction_id, duration, decision_duration}, name: get_auction_timer_name(auction_id))
+  def start_link(auction_id) do
+    GenServer.start_link(__MODULE__, auction_id, name: get_auction_timer_name(auction_id))
   end
 
-  def process_command(%Command{command: :update_times, data: auction = %Auction{id: auction_id}}) do
+  def process_command(%Command{command: :start_duration_timer, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:update_times, auction})
+      do: GenServer.cast(pid, {:start_duration_timer, auction, pid})
   end
 
-  def process_command(%Command{command: :start_duration_timer, data: auction_id}) do
+  def process_command(%Command{command: :start_decision_duration_timer, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:start_duration_timer, pid})
-  end
-
-  def process_command(%Command{command: :start_decision_duration_timer, data: auction_id}) do
-    with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {:start_decision_duration_timer, pid})
+      do: GenServer.cast(pid, {:start_decision_duration_timer, auction, pid})
   end
 
   def process_command(%Command{command: :extend_duration, data: auction_id}) do
@@ -74,23 +70,22 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   end
 
   # Server
-  def init({auction_id, duration, decision_duration}) do
-    {:ok, %{auction_id: auction_id, duration: duration, duration_timer: nil,
-            decision_duration: decision_duration, decision_duration_timer: nil}}
+  def init(auction_id) do
+    {:ok, %{auction_id: auction_id, duration_timer: nil, decision_duration_timer: nil}}
   end
 
-  def handle_info(:end_auction_timer, state = %{auction_id: auction_id, decision_duration: decision_duration}) do
-    %Auction{id: auction_id, decision_duration: decision_duration}
-    |> Command.end_auction
-    |> AuctionStore.process_command
+  def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
+    auction_id
+    |> AuctionCache.read
+    |> Auctions.end_auction
 
     {:noreply, state}
   end
 
   def handle_info(:end_auction_decision_timer, state = %{auction_id: auction_id}) do
-    %Auction{id: auction_id}
-    |> Command.end_auction_decision_period
-    |> AuctionStore.process_command
+    auction_id
+    |> AuctionCache.read
+    |> Auctions.expire_auction
 
     new_state = Map.put(state, :decision_duration_timer, nil)
     {:noreply, new_state}
@@ -116,20 +111,13 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, new_state, new_state}
   end
 
-  def handle_cast({:update_times, %{duration: duration, decision_duration: decision_duration}}, current_state) do
-    new_state = current_state
-    |> Map.put(:duration, duration)
-    |> Map.put(:decision_duration, decision_duration)
-    {:noreply, new_state}
-  end
-
-  def handle_cast({:start_duration_timer, pid}, current_state = %{duration: duration}) do
+  def handle_cast({:start_duration_timer, %Auction{duration: duration}, pid}, current_state) do
     new_timer = create_timer(pid, duration, :duration)
     new_state = Map.put(current_state, :duration_timer, new_timer)
     {:noreply, new_state}
   end
 
-  def handle_cast({:start_decision_duration_timer, pid}, current_state = %{decision_duration: decision_duration, duration_timer: duration_timer}) do
+  def handle_cast({:start_decision_duration_timer, %Auction{decision_duration: decision_duration}, pid}, current_state = %{duration_timer: duration_timer}) do
     Process.cancel_timer(duration_timer)
     new_timer = create_timer(pid, decision_duration, :decision_duration)
     new_state = current_state

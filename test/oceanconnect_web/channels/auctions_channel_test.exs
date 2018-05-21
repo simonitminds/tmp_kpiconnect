@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionStore.AuctionState, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionStore.AuctionState, AuctionSupervisor}
 
   setup do
     buyer_company = insert(:company)
@@ -36,6 +36,72 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             non_participant: non_participant,
             expected_payload: expected_payload,
             auction: auction}}
+  end
+
+  describe "auction create/update" do
+    test "supplier does not get notified for draft auction", %{auction: auction, supplier_id: supplier_id} do
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
+      # event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+
+      auction_attrs = auction |> Map.take([:eta, :port_id, :vessel_id, :suppliers])
+      Auctions.create_auction(auction_attrs)
+
+      receive do
+        _ -> assert false, "Received an update for draft auction"
+      after
+        1000 ->
+          assert true
+      end
+    end
+
+    test "supplier gets notified for created schedulable auction", %{auction: auction, supplier_id: supplier_id} do
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+
+      auction_attrs = auction |> Map.take([:scheduled_start, :eta, :fuel_id, :fuel_quantity, :port_id, :vessel_id, :suppliers])
+      {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{
+            auction: %{id: ^auction_id},
+            state: %{status: :pending}
+          },
+          topic: ^channel} ->
+            assert true
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
+    test "supplier gets notified for updated schedulable auction", %{auction: auction = %{id: auction_id}, supplier_id: supplier_id}  do
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+
+      Auctions.update_auction(auction, %{port_agent: "TEST AGENT"}, auction.buyer)
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{
+            auction: %{id: ^auction_id, port_agent: port_agent},
+            state: %{status: :pending}
+          },
+          topic: ^channel} ->
+            assert port_agent == "TEST AGENT"
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
   end
 
   describe "auction start" do
@@ -88,7 +154,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     test "broadcasts are not pushed to a non_participant", %{non_participant_id: non_participant_id,
                                                         auction: auction,
                                                         expected_payload: expected_payload} do
-      channel = "user_auctions:#{non_participant_id}"
+      channel = "user_auctions:#{Integer.to_string(non_participant_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -169,7 +235,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, expected_payload: expected_payload}  do
-      channel = "user_auctions:#{non_participant_id}"
+      channel = "user_auctions:#{Integer.to_string(non_participant_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -232,7 +298,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "a non participant is not notified", %{auction: auction, non_participant_id: non_participant_id, expected_payload: expected_payload}  do
-      channel = "user_auctions:#{non_participant_id}"
+      channel = "user_auctions:#{Integer.to_string(non_participant_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -367,7 +433,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     end
 
     test "a non participant is not notified", %{non_participant_id: non_participant_id}  do
-      channel = "user_auctions:#{non_participant_id}"
+      channel = "user_auctions:#{Integer.to_string(non_participant_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)

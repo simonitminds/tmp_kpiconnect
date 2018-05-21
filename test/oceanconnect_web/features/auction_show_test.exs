@@ -239,6 +239,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_port_agent("Test Agent")
       AuctionShowPage.accept_bid()
 
+      :timer.sleep(500)
       assert AuctionShowPage.port_agent() == "Test Agent"
     end
   end

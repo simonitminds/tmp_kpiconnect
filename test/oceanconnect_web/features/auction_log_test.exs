@@ -41,7 +41,7 @@ defmodule Oceanconnect.AuctionLogTest do
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
       "buyer-name" => auction.buyer.name,
-      "auction_started" => AuctionView.convert_date?(auction.auction_start),
+      "auction_started" => AuctionView.convert_date?(auction.scheduled_start),
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),

@@ -13,16 +13,12 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :update_cache, data: auction}
   end
 
-  def update_times(auction = %Auction{}) do
-    %Command{command: :update_times, data: auction}
-  end
-
   def update_scheduled_start(auction = %Auction{}) do
     %Command{command: :update_scheduled_start, data: auction}
   end
 
-  def cancel_scheduled_start(auction_id) when is_integer(auction_id) do
-    %Command{command: :cancel_scheduled_start, data: auction_id}
+  def cancel_scheduled_start(auction = %Auction{}) do
+    %Command{command: :cancel_scheduled_start, data: auction}
   end
 
   def start_auction(auction = %Auction{}, user) when not is_integer(user) do
@@ -33,12 +29,12 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :end_auction, data: auction}
   end
 
-  def start_duration_timer(auction_id) when is_integer(auction_id) do
-    %Command{command: :start_duration_timer, data: auction_id}
+  def start_duration_timer(auction = %Auction{}) do
+    %Command{command: :start_duration_timer, data: auction}
   end
 
-  def start_decision_duration_timer(auction_id) when is_integer(auction_id) do
-    %Command{command: :start_decision_duration_timer, data: auction_id}
+  def start_decision_duration_timer(auction = %Auction{})  do
+    %Command{command: :start_decision_duration_timer, data: auction}
   end
 
   def end_auction_decision_period(auction = %Auction{}) do

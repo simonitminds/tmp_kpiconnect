@@ -15,7 +15,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field :port_agent, :string
     field :eta, :utc_datetime
     field :etd, :utc_datetime
-    field :auction_start, :utc_datetime
+    field :scheduled_start, :utc_datetime
     field :auction_ended, :utc_datetime
     field :duration, :integer, default: 10 * 60_000 # milliseconds
     field :decision_duration, :integer, default: 15 * 60_000 # milliseconds
@@ -38,7 +38,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :buyer_id,
     :additional_information,
     :anonymous_bidding,
-    :auction_start,
+    :scheduled_start,
     :auction_ended,
     :duration,
     :decision_duration,
@@ -64,7 +64,7 @@ defmodule Oceanconnect.Auctions.Auction do
   def changeset_for_scheduled_auction(%Auction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
-    |> validate_required(@required_fields ++ [:auction_start, :fuel_id, :fuel_quantity])
+    |> validate_required(@required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity])
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> cast_assoc(:vessel)
@@ -82,7 +82,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def from_params(params) do
     params
-    |> maybe_parse_date_field("auction_start")
+    |> maybe_parse_date_field("scheduled_start")
     |> maybe_parse_date_field("eta")
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")

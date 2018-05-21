@@ -19,20 +19,18 @@ const AuctionTimeRemaining = ({auctionPayload, auctionTimer, time}) => {
         </span>
       </span>
     );
-  }
-  else if (auctionStatus == "draft") {
+  } else if (auctionStatus == "draft") {
     return (
       <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
         <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
         Not Scheduled
       </span>
     );
-  }
-  else {
+  } else {
     return (
       <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
         <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-        {cardDateFormat(_.get(auctionPayload, 'auction.auction_start'))}
+        {cardDateFormat(_.get(auctionPayload, 'auction.auction_started'))}
       </span>
     );
   }

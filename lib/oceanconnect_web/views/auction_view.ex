@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionView do
   alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent}
 
   def actual_duration(%Auction{auction_ended: nil}), do: "-"
-  def actual_duration(%Auction{auction_start: started, auction_ended: ended}) do
+  def actual_duration(%Auction{scheduled_start: started, auction_ended: ended}) do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 

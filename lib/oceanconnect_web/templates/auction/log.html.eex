@@ -20,7 +20,7 @@
           </tr>
           <tr>
             <th>Auction Started</th>
-            <td class="qa-auction-detail-auction_started"><%= convert_date?(@auction_payload.auction.auction_start) %></td>
+            <td class="qa-auction-detail-auction_started"><%= convert_date?(@auction_payload.auction.scheduled_start) %></td>
           </tr>
           <tr>
             <th>Auction Completed</th>

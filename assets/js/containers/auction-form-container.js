@@ -15,8 +15,8 @@ import { receiveAuctionFormData,
 const mapStateToProps = (state, props) => {
   return {
     auction: state.auctionFormReducer.auction || props.auction,
-    auction_start_date: state.auctionFormReducer.auction_start_date,
-    auction_start_time: state.auctionFormReducer.auction_start_time,
+    scheduled_start_date: state.auctionFormReducer.scheduled_start_date,
+    scheduled_start_time: state.auctionFormReducer.scheduled_start_time,
     eta_date: state.auctionFormReducer.eta_date,
     eta_time: state.auctionFormReducer.eta_time,
     etd_date: state.auctionFormReducer.etd_date,

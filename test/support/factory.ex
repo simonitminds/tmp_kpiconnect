@@ -26,7 +26,7 @@ defmodule Oceanconnect.Factory do
   def auction_factory() do
     start = DateTime.utc_now() |> DateTime.to_naive |> NaiveDateTime.add(20) |> DateTime.from_naive!("Etc/UTC")
     %Oceanconnect.Auctions.Auction{
-      auction_start: start,
+      scheduled_start: start,
       duration: 10 * 60_000,
       decision_duration: 15 * 60_000,
       eta: DateTime.utc_now(),

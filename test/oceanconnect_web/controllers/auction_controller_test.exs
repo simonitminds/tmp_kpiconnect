@@ -91,16 +91,16 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects to show when creating a draft auction", %{conn: conn, valid_auction_params: valid_auction_params} do
-      draft_attrs = Map.drop(valid_auction_params, ["auction_start", "duration", "decision_duration", "fuel_id", "fuel_quantity"])
+      draft_attrs = Map.drop(valid_auction_params, ["scheduled_start", "duration", "decision_duration", "fuel_id", "fuel_quantity"])
       conn = post conn, auction_path(conn, :create), auction: draft_attrs
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
     end
 
-    test "renders errors when adding auction_start without fuel details", %{conn: conn, valid_auction_params: valid_auction_params} do
+    test "renders errors when adding scheduled_start without fuel details", %{conn: conn, valid_auction_params: valid_auction_params} do
       invalid_attrs = valid_auction_params
       |> Map.drop(["duration", "decision_duration", "fuel_id", "fuel_quantity"])
-      |> Map.put("auction_start", DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string())
+      |> Map.put("scheduled_start", DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string())
       conn = post conn, auction_path(conn, :create), auction: invalid_attrs
 
       assert html_response(conn, 200) =~ "New Auction"

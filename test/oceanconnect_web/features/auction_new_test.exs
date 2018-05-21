@@ -20,8 +20,8 @@ defmodule Oceanconnect.AuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
     auction_params = %{
-      auction_start_date: date_time,
-      auction_start_time: date_time,
+      scheduled_start_date: date_time,
+      scheduled_start_time: date_time,
       eta_date: date_time,
       eta_time: date_time,
       etd_date: date_time,
@@ -55,7 +55,7 @@ defmodule Oceanconnect.AuctionNewTest do
     assert AuctionNewPage.has_fields?([
       "additional_information",
       "anonymous_bidding",
-      "auction_start",
+      "scheduled_start",
       "duration",
       "decision_duration",
       "eta",

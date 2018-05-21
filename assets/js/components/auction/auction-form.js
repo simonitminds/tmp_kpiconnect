@@ -11,8 +11,8 @@ import SupplierList  from './supplier-list';
 const AuctionForm = (props) => {
   const {
     auction,
-    auction_start_date,
-    auction_start_time,
+    scheduled_start_date,
+    scheduled_start_time,
     eta_date,
     eta_time,
     etd_date,
@@ -54,7 +54,7 @@ const AuctionForm = (props) => {
 
   return (
     <div>
-      <input type="hidden" name="auction[auction_start]" className="qa-auction-auction_start" value={auction.auction_start ? moment(auction.auction_start).utc() : ""} />
+      <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
       <input type="hidden" name="auction[eta]" className="qa-auction-eta" value={auction.eta ? moment(auction.eta).utc() : ""} />
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={auction.etd ? moment(auction.etd).utc() : ""} />
 
@@ -275,10 +275,10 @@ const AuctionForm = (props) => {
                 </div>
                 <div className="field-body">
                   <div className="control">
-                    <DateInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_date')} />
+                    <DateInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_date')} />
                   </div>
                   <div className="control">
-                    <TimeInput value={auction.auction_start} model={'auction'} field={'auction_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'auction_start_time')} />
+                    <TimeInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_time')} />
                   </div>
                 </div>
               </div>
@@ -286,7 +286,7 @@ const AuctionForm = (props) => {
                 <div className="field-label"></div>
                 <div className="field-body">
                   <div className="control">
-                    <i className="is-caption">Port Local Time: {portLocalTime(auction.auction_start, port_id, ports)}</i>
+                    <i className="is-caption">Port Local Time: {portLocalTime(auction.scheduled_start, port_id, ports)}</i>
                   </div>
                 </div>
               </div>

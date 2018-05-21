@@ -5,7 +5,7 @@ defmodule Oceanconnect.Utilities do
 
   def maybe_convert_date_times(auction = %{}) do
     Enum.reduce(auction, %{}, fn({k, v}, acc) ->
-      value = case k in ["auction_start", "eta", "etd"] do
+      value = case k in ["scheduled_start", "eta", "etd"] do
         true -> convert_date_time(v)
         false -> v
       end
