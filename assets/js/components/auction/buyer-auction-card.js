@@ -81,11 +81,15 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
               <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
             {/* Start Link to Auction Edit */}
+            { auctionStatus != 'open' && auctionStatus != 'decision' ?
               <a href={`/auctions/${auction.id}/edit`} className="auction-card__link-to-auction-edit is-hidden-350">
                 <span className="icon is-medium has-text-right">
                   <i className="fas fa-lg fa-edit"></i>
                 </span>
               </a>
+              :
+              <div></div>
+            }
             {/* End Link to Auction Edit */}
           </div>
         </div>

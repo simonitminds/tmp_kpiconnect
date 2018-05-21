@@ -79,31 +79,28 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    auction = id
-    |> Auctions.get_auction!
-    |> Auctions.fully_loaded
-
-    if(auction.buyer_id != Auth.current_user(conn).company_id) do
-      redirect(conn, to: auction_path(conn, :index))
-    else
+    with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded,
+         true <- auction.buyer_id == Auth.current_user(conn).company_id,
+         false <- Auctions.get_auction_state!(auction).status in [:open, :decision]
+    do
       changeset = Auctions.change_auction(auction)
       [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
       [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
       render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
         fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
+    else
+      _ -> redirect(conn, to: auction_path(conn, :index))
     end
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
-    auction = id
-    |> Auctions.get_auction!
-    |> Auctions.fully_loaded
-    updated_params = Auction.from_params(auction_params)
     user = Auth.current_user(conn)
-    if(auction.buyer_id != user.company_id) do
-      redirect(conn, to: auction_path(conn, :index))
-    else
+    with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded,
+         true <- auction.buyer_id == user.company_id,
+         false <- Auctions.get_auction_state!(auction).status in [:open, :decision]
+    do
+      updated_params = Auction.from_params(auction_params)
       case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->
           conn
@@ -116,6 +113,8 @@ defmodule OceanconnectWeb.AuctionController do
           render(conn, "edit.html", changeset: changeset, auction: auction, json_auction: json_auction,
             fuels: fuels, ports: ports, vessels: vessels, suppliers: suppliers)
       end
+    else
+      _ -> redirect(conn, to: auction_path(conn, :index))
     end
   end
 

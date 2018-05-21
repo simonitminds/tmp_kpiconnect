@@ -137,6 +137,17 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Edit Auction"
     end
 
+    test "redirects if auction is in open or decision state", %{conn: conn, auction: auction} do
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+      Auctions.start_auction(auction)
+      conn = get conn, auction_path(conn, :edit, auction)
+      assert redirected_to(conn, 302) == "/auctions"
+
+      Auctions.end_auction(auction)
+      conn = get conn, auction_path(conn, :edit, auction)
+      assert redirected_to(conn, 302) == "/auctions"
+    end
+
     test "confirms buyer is not in supplier list", %{conn: conn, auction: auction} do
       conn = get conn, auction_path(conn, :edit, auction)
       refute conn.assigns.suppliers =~ auction.buyer.name
@@ -148,6 +159,17 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       supplier_conn = login_user(build_conn(), supplier)
       |> put(auction_path(build_conn(), :update, auction), auction: @update_attrs)
       assert redirected_to(supplier_conn, 302) == "/auctions"
+    end
+
+    test "redirects if auction in open or decision state", %{conn: conn, auction: auction} do
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+      Auctions.start_auction(auction)
+      conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
+      assert redirected_to(conn, 302) == "/auctions"
+
+      Auctions.end_auction(auction)
+      conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
+      assert redirected_to(conn, 302) == "/auctions"
     end
 
     test "renders form for editing chosen auction", %{conn: conn, auction: auction} do

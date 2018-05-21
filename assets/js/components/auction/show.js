@@ -210,7 +210,7 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
                               <div className="field is-inline-block is-pulled-right">
-                                { currentUser.isBuyer ?
+                                { currentUser.isBuyer && auctionState.status != 'open' && auctionState.status != 'decision' ?
                                   <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
                                   :
                                   <div> </div>
