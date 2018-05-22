@@ -18,6 +18,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     defstruct auction_id: nil,
       status: :pending,
       lowest_bids: [],
+      minimum_bids: [],
       winning_bid: nil
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
@@ -218,17 +219,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     %AuctionState{current_state | status: :decision}
   end
 
-  defp process_new_bid(bid = %{amount: amount}, current_state = %{lowest_bids: lowest_bids}) do
-    supplier_first_bid = bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
+  def process_new_bid(bid, current_state = %{lowest_bids: lowest_bids}) do
+    new_state = maybe_add_minimum_bid(current_state, bid)
 
     lowest_amount = case lowest_bids do
       [] -> nil
       _ -> hd(lowest_bids).amount
     end
-    {lowest_bid, new_state} = set_lowest_bids?(bid, amount, current_state, lowest_amount)
-    {lowest_bid, supplier_first_bid, new_state}
+    {lowest_bid, updated_state} = maybe_set_lowest_bids(bid, new_state, lowest_amount)
+
+    supplier_first_bid = bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+    {lowest_bid, supplier_first_bid, updated_state}
   end
 
   defp select_winning_bid(bid, current_state = %{auction_id: auction_id}) do
@@ -254,7 +257,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, time_entered: DateTime.utc_now(), auction_id: auction_id}, true)
     state
   end
-
   defp maybe_emit_rebuilt_event(state), do: state
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
@@ -262,14 +264,67 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
   defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}, _emit), do: nil
 
-  defp set_lowest_bids?(bid, _amount, current_state, nil) do
+  defp maybe_add_minimum_bid(current_state, %{min_amount: nil}), do: current_state
+  defp maybe_add_minimum_bid(current_state = %{minimum_bids: minimum_bids}, bid = %{supplier_id: supplier_id}) do
+    updated_minimum_bids = minimum_bids
+    |> maybe_remove_existing_supplier_bid(supplier_id)
+    |> add_minimum_bid(bid)
+    Map.put(current_state, :minimum_bids, updated_minimum_bids)
+  end
+
+  defp maybe_remove_existing_supplier_bid(minimum_bids, supplier_id) do
+    Enum.reject(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id end)
+  end
+
+  defp add_minimum_bid([], bid), do: [bid]
+  defp add_minimum_bid(minimum_bids, bid = %{min_amount: min_amount}) do
+    case Enum.find_index(minimum_bids |> Enum.reverse, fn(x) -> x.min_amount <= min_amount end) do
+      nil -> [bid | minimum_bids]
+      index -> List.insert_at(minimum_bids, index + 1, bid)
+    end
+  end
+
+  defp maybe_set_lowest_bids(bid, current_state, nil) do
     {true, %AuctionState{current_state | lowest_bids: [bid]}}
   end
-  defp set_lowest_bids?(bid, amount, current_state, lowest_amount) when lowest_amount > amount do
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{minimum_bids: []}, lowest_amount) when amount < lowest_amount do
     {true, %AuctionState{current_state | lowest_bids: [bid]}}
   end
-  defp set_lowest_bids?(bid, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{status: :pending}, lowest_amount) when amount < lowest_amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{lowest_bids: lowest_bids, minimum_bids: []}, amount) do
     {true, %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}}
   end
-  defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: {false, current_state}
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{lowest_bids: lowest_bids, status: :pending}, amount) do
+    {true, %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}}
+  end
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{minimum_bids: minimum_bids}, lowest_amount) when amount < lowest_amount do
+    maybe_resolve_minimum_bid(bid, hd(minimum_bids), current_state)
+  end
+  defp maybe_set_lowest_bids(_bid, current_state, _lowest_amount), do: {false, current_state}
+
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, min_bid = %{min_amount: min_amount}, current_state) when amount < min_amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end
+  defp maybe_resolve_minimum_bid(bid = %{min_amount: new_min_amount}, min_bid = %{min_amount: min_amount}, current_state) when new_min_amount < min_amount do
+    auto_bid = bid
+    |> Map.put(:amount, min_amount - 0.25)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    # Emit auto_bid
+    {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
+  end
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, min_bid = %{min_amount: amount}, current_state) do
+    auto_bid = min_bid
+    |> Map.put(:amount, amount)
+    # Emit auto_bid
+    {false, %AuctionState{current_state | lowest_bids: [auto_bid, bid]}}
+  end
+  defp maybe_resolve_minimum_bid(%{amount: amount}, min_bid, current_state) do
+    auto_bid = min_bid
+    |> Map.put(:amount, amount - 0.25)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    # Emit auto_bid
+    {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
+  end
 end

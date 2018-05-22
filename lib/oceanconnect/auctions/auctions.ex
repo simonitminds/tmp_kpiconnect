@@ -6,8 +6,10 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def place_bid(auction, bid_params = %{"amount" => _amount}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
+  def place_bid(auction, bid_params, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
     bid = bid_params
+    |> maybe_add_amount
+    |> maybe_add_min_amount
     |> Map.put("supplier_id", supplier_id)
     |> Map.put("time_entered", time_entered)
     |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
@@ -18,6 +20,12 @@ defmodule Oceanconnect.Auctions do
 
     bid
   end
+
+  defp maybe_add_amount(params = %{"amount" => _}), do: params
+  defp maybe_add_amount(params), do: Map.put(params, "amount", nil)
+
+  defp maybe_add_min_amount(params = %{"min_amount" => _}), do: params
+  defp maybe_add_min_amount(params), do: Map.put(params, "min_amount", nil)
 
   def select_winning_bid(bid, comment, user \\ nil) do
     bid
