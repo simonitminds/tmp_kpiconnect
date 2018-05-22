@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionStore, AuctionSupervisor}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   setup do
@@ -21,6 +21,78 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       end
     end)
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
+  end
+
+  describe "process_new_bid/2" do
+    setup %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
+      bid_params = %{
+        "amount" => 2.50,
+        "min_amount" => 2.00,
+        "supplier_id" => supplier_company.id,
+        "time_entered" => DateTime.utc_now()
+      }
+      bid = AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params, auction)
+      bid_params2 = %{
+        "amount" => 2.25,
+        "min_amount" => nil,
+        "supplier_id" => supplier2_company.id,
+        "time_entered" => DateTime.utc_now()
+      }
+      bid2 = AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params2, auction)
+      {:ok, %{bid: bid, bid2: bid2}}
+    end
+
+    test "autobid not triggered when a new lowest bid is placed when auction pending", %{auction: auction, bid: bid, bid2: bid2} do
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :pending,
+        lowest_bids: [bid],
+        minimum_bids: [bid]
+      }
+
+      {lowest_bid, _supplier_first_bid, updated_state} = AuctionStore.process_new_bid(bid2, current_state)
+      refute lowest_bid
+      assert updated_state.lowest_bids == [bid2, bid]
+      assert updated_state.minimum_bids == [bid, bid2]
+    end
+
+    test "autobid is placed when a new lowest bid is placed when auction open", %{auction: auction, bid: bid, bid2: bid2} do
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid],
+        minimum_bids: [bid]
+      }
+      expected_lowest = bid2
+      |> Map.put(:supplier_id, bid.supplier_id)
+      |> Map.put(:amount, 2.00)
+
+      {lowest_bid, supplier_first_bid, updated_state} = AuctionStore.process_new_bid(bid2, current_state)
+      refute lowest_bid
+      assert supplier_first_bid
+      assert updated_state.lowest_bids == [expected_lowest]
+    end
+
+    test "minimum bid war is triggered when auction open", %{auction: auction, bid: bid, bid2: bid2} do
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid],
+        minimum_bids: [bid]
+      }
+      updated_bid2 = bid2
+      |> Map.put(:min_amount, 2.00)
+
+      {lowest_bid?, _supplier_first_bid, updated_state} = AuctionStore.process_new_bid(updated_bid2, current_state)
+      first_bid = updated_state.lowest_bids |> hd
+      second_bid = updated_state.lowest_bids |> List.last
+
+      refute lowest_bid?
+      IO.inspect(updated_state.lowest_bids)
+      assert [first_bid.amount, first_bid.supplier_id] == [2.00, bid.supplier_id]
+      assert [second_bid.amount, second_bid.supplier_id] == [2.00, bid2.supplier_id]
+      assert updated_state.minimum_bids == [bid, updated_bid2]
+    end
   end
 
   test "draft status of draft auction" do
@@ -122,6 +194,17 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
 
+    test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [new_bid.id]
+      end)
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
+    end
+
     test "non-lowest bid is not added and duration does not extend", %{auction: auction, bid: bid} do
       :timer.sleep(1_100)
       Auctions.place_bid(auction, %{"amount" => bid.amount + 1}, bid.supplier_id)
@@ -133,13 +216,16 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining < 3 * 60_000 - 1_000
     end
 
-    test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
+    test "new lowest bid is placed and minimum bid is activated and duration extends", %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
       :timer.sleep(1_100)
-      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
+      Auctions.place_bid(auction, %{"amount" => 1.00, "min_amount" => 0.50}, supplier_company.id)
+      Auctions.place_bid(auction, %{"amount" => 0.75}, supplier2_company.id)
+
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
-        lowest_bid.id in [new_bid.id]
+        assert lowest_bid.amount == 0.75
+        assert lowest_bid.supplier == supplier_company.name
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end

@@ -21,8 +21,11 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
   end
 
-  test "creating a bid for a auction that is not open", %{conn: conn, auction: auction, bid_params: params} do
-    conn = create_post(conn, auction, params)
+  test "creating a bid for a auction that is not open or pending", %{conn: conn, auction: auction, bid_params: params} do
+    updated_auction = auction
+    |> Auctions.start_acution
+    |> Auctions.end_auction
+    conn = create_post(conn, updated_auction, params)
     assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
   end
 

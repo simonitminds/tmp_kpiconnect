@@ -148,6 +148,27 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer (2nd)"
     end
+
+    test "supplier places minimum bid and maintains winning position", %{supplier2: supplier2, auction: auction} do
+      AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(500)
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+
+      in_browser_session(:second_supplier, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+        AuctionShowPage.enter_bid(%{amount: 9.50})
+        AuctionShowPage.submit_bid()
+        :timer.sleep(500)
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
+      end)
+
+      change_session_to(:default)
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+    end
   end
 
   describe "decision period" do
