@@ -175,22 +175,21 @@
 
   &> h3 { // Copy container...
     margin-bottom: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
     width: calc(100% - 150px);
   }
 
   .auction-notification__copy {
-    display: inline-block;
+    display: block;
     color: #fff;
     font-size: 1rem;
     margin-top: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   &+ .card-content__best-price {
     position: absolute;
     right: 12px;
-    bottom: 10px;
   }
 }

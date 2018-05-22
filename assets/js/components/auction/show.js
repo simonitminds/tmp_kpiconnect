@@ -367,12 +367,17 @@ function updateAuctionBodySize() {
         auctionTabBidContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 185}px)`,
         auctionTabWithAlertHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 42}px)`,
         auctionTabContent = document.querySelector('.react-tabs__tab-panel--selected'),
-        alertPresence = document.querySelector('.alert:not(:empty)');
+        alertPresence = document.querySelector('.alert:not(:empty)'),
+        bidPresence = document.querySelector('.auction-bidding');
 
 
   if(alertPresence) {
     auctionTabContent.style.height = auctionTabWithAlertHeight;
   } else {
     auctionTabContent.style.height = auctionTabContentHeight;
+  }
+
+  if(bidPresence && window.screen.width <= 768) {
+    auctionTabContent.style.height = auctionTabBidContentHeight;
   }
 }
