@@ -46,3 +46,42 @@
     min-width: 2rem;
   }
 }
+
+// BID BOX VARIANT
+
+.collapsing-auction-bidding {
+  margin: -1rem -1.25rem;
+
+  h3.title { // Hide default header
+    display: none;
+  }
+
+  .collapsing-auction-bidding__trigger { // Style collapsing section title
+    margin: 0 -1rem;
+    padding: 0.75rem 1rem 0.5rem 1rem;
+    border-top: none;
+    border-bottom: 1px solid $gray-2;
+    text-transform: uppercase;
+    font-family: $family-header;
+    font-weight: bold;
+    font-size: 1rem;
+
+    &.is-closed {
+      border-top: none;
+      border-bottom: none;
+    }
+  }
+
+  .collapsible-section__counter { display: none; }
+  .collapsible-section__toggle-icon { float: right; }
+
+  .container:nth-child(2) { // Target non-collapsing section trigger
+    margin-top: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  &.is-closed .container:nth-child(2) { // Target non-collapsing section trigger
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+}

@@ -363,8 +363,10 @@ export default class AuctionShow extends React.Component {
 function updateAuctionBodySize() {
   const auctionHeaderSection = document.querySelector('.auction-app__header'),
         auctionHeaderOffsetHeight = auctionHeaderSection ? auctionHeaderSection.offsetHeight : 0,
+        collapsingBidBox = document.querySelector('.collapsing-auction-bidding'),
+        collapsingBidHeight = collapsingBidBox ? collapsingBidBox.offsetHeight : 0,
         auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48}px)`,
-        auctionTabBidContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 185}px)`,
+        auctionTabBidContentHeight = collapsingBidHeight ? `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + collapsingBidHeight}px)` : `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48}px)`,
         auctionTabWithAlertHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 42}px)`,
         auctionTabContent = document.querySelector('.react-tabs__tab-panel--selected'),
         alertPresence = document.querySelector('.alert:not(:empty)'),
