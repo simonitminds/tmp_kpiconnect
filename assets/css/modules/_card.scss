@@ -63,8 +63,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  overflow: hidden;
+  // overflow: hidden;
   font-weight: bold;
+  // max-width: 425px;
   background-color: $gray-3;
   color: $white;
   padding: 0.5rem 1rem;
@@ -74,34 +75,31 @@
 }
 
 .card-content__best-bidder {
-  display: inline-block;
+  display: flex;
+  flex-grow: 2;
+  flex-shrink: 2;
+  flex-basis: 265px;
   vertical-align: middle;
-  padding-top: 0.25rem;
+  padding-right: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 
   &__name { // containing span that'll cut to ellipsis
     display: inline-block;
-    width: 200px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-
-    &:only-child {
-      width: 100%;
-      padding-right: 1rem;
-    }
+    margin-left: 0.25rem;
   }
+
   &__count { // containing span that'll cut to ellipsis
     display: inline-block;
     margin-left: 0.25rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 }
 
 .card-content__best-price {
   display: inline-block;
   float: right;
+  flex: none;
   background-color: $highlight;
   color: $black !important;
   padding: 0.25rem 0.75rem;

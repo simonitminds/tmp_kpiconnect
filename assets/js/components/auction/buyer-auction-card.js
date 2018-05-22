@@ -18,7 +18,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     if (winningBid) {
       return (
         <div className="card-content__best-bidder">
-          <span className="card-content__best-bidder__name">Winner: {winningBid.supplier}</span>
+          <span className="card-content__best-bidder__name">Winner: {winningBid.supplier} <span className="card-content__best-bidder__count">(of 2)</span></span>
         </div>
       )
     } else if (auctionStatus == 'expired') {
@@ -36,7 +36,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     } else if (lowestBid && lowestBidCount > 1) {
       return (
         <div className="card-content__best-bidder">
-          <span className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}</span><span className="card-content__best-bidder__count">(of {lowestBidCount})</span>
+          <span className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}<span className="card-content__best-bidder__count">(of {lowestBidCount})</span></span>
         </div>
       )
     } else {

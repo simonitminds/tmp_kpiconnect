@@ -11,7 +11,7 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
 
   const messageDisplay = (message) => {
     return (
-      <h3 className="has-text-weight-bold is-flex">
+      <h3 className="has-text-weight-bold">
         <span className="auction-notification__copy qa-supplier-bid-status-message">
           {message}
         </span>

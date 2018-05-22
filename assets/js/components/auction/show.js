@@ -124,7 +124,7 @@ export default class AuctionShow extends React.Component {
       } else {
         return (
           <div className = "auction-notification box is-gray-0" >
-            <h3 className="has-text-weight-bold is-flex">
+            <h3 className="has-text-weight-bold">
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
             </h3>
           </div>

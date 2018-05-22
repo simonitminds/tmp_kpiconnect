@@ -89,6 +89,6 @@
   border-top-right-radius: 0;
 
   &--completed { // For the completed auctions with comments.
-    margin: 1rem -1.25rem -1.25rem -1.25rem;
+    margin: 1rem -1.25rem -1.25rem -1.25rem !important;
   }
 }
