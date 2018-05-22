@@ -36,4 +36,8 @@
 
 .auction-comment {
   margin-bottom: -2.25rem !important;
+
+  &:empty {
+    margin-bottom: 0 !important;
+  }
 }
