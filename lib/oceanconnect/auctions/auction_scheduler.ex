@@ -58,6 +58,10 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   def handle_call(:get_timer_ref, _from, state = %{timer_ref: timer_ref}), do: {:reply, timer_ref, state}
 
   def handle_cast({:update_scheduled_start, %{scheduled_start: scheduled_start}}, state = %{scheduled_start: scheduled_start}), do: {:noreply, state}
+  def handle_cast({:update_scheduled_start, %{scheduled_start: scheduled_start}}, state = %{timer_ref: nil}) do
+    new_state = Map.put(state, :scheduled_start, scheduled_start)
+    {:noreply, new_state}
+  end
   def handle_cast({:update_scheduled_start, %{scheduled_start: scheduled_start, auction_started: auction_started}}, state) when auction_started != nil do
     new_state = Map.put(state, :scheduled_start, scheduled_start)
     {:noreply, new_state}
