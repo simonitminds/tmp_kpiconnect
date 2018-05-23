@@ -1,8 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionStore, AuctionSupervisor}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor}
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   setup do
     supplier_company = insert(:company)
@@ -21,78 +21,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       end
     end)
     {:ok, %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company}}
-  end
-
-  describe "process_new_bid/2" do
-    setup %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
-      bid_params = %{
-        "amount" => 2.50,
-        "min_amount" => 2.00,
-        "supplier_id" => supplier_company.id,
-        "time_entered" => DateTime.utc_now()
-      }
-      bid = AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params, auction)
-      bid_params2 = %{
-        "amount" => 2.25,
-        "min_amount" => nil,
-        "supplier_id" => supplier2_company.id,
-        "time_entered" => DateTime.utc_now()
-      }
-      bid2 = AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params2, auction)
-      {:ok, %{bid: bid, bid2: bid2}}
-    end
-
-    test "autobid not triggered when a new lowest bid is placed when auction pending", %{auction: auction, bid: bid, bid2: bid2} do
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :pending,
-        lowest_bids: [bid],
-        minimum_bids: [bid]
-      }
-
-      {lowest_bid, _supplier_first_bid, updated_state} = AuctionStore.process_new_bid(bid2, current_state)
-      refute lowest_bid
-      assert updated_state.lowest_bids == [bid2, bid]
-      assert updated_state.minimum_bids == [bid, bid2]
-    end
-
-    test "autobid is placed when a new lowest bid is placed when auction open", %{auction: auction, bid: bid, bid2: bid2} do
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [bid],
-        minimum_bids: [bid]
-      }
-      expected_lowest = bid2
-      |> Map.put(:supplier_id, bid.supplier_id)
-      |> Map.put(:amount, 2.00)
-
-      {lowest_bid, supplier_first_bid, updated_state} = AuctionStore.process_new_bid(bid2, current_state)
-      refute lowest_bid
-      assert supplier_first_bid
-      assert updated_state.lowest_bids == [expected_lowest]
-    end
-
-    test "minimum bid war is triggered when auction open", %{auction: auction, bid: bid, bid2: bid2} do
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [bid],
-        minimum_bids: [bid]
-      }
-      updated_bid2 = bid2
-      |> Map.put(:min_amount, 2.00)
-
-      {lowest_bid?, _supplier_first_bid, updated_state} = AuctionStore.process_new_bid(updated_bid2, current_state)
-      first_bid = updated_state.lowest_bids |> hd
-      second_bid = updated_state.lowest_bids |> List.last
-
-      refute lowest_bid?
-      IO.inspect(updated_state.lowest_bids)
-      assert [first_bid.amount, first_bid.supplier_id] == [2.00, bid.supplier_id]
-      assert [second_bid.amount, second_bid.supplier_id] == [2.00, bid2.supplier_id]
-      assert updated_state.minimum_bids == [bid, updated_bid2]
-    end
   end
 
   test "draft status of draft auction" do

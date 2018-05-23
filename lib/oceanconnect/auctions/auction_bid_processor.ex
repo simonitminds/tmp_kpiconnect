@@ -1,0 +1,118 @@
+defmodule Oceanconnect.Auctions.AuctionBidProcessor do
+  alias Oceanconnect.Auctions.{AuctionBidList, AuctionEvent, Command}
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+
+  def process_new_bid(bid, current_state = %{lowest_bids: lowest_bids}) do
+    supplier_first_bid? = bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+
+    new_state = maybe_add_minimum_bid(current_state, bid)
+
+    lowest_amount = case lowest_bids do
+      [] -> nil
+      _ -> hd(lowest_bids).amount
+    end
+    {lowest_bid?, updated_state} = maybe_set_lowest_bids(bid, new_state, lowest_amount)
+    {lowest_bid?, supplier_first_bid?, updated_state}
+  end
+
+  defp maybe_add_minimum_bid(current_state = %{minimum_bids: minimum_bids}, bid) do
+    updated_minimum_bids = minimum_bids
+    |> maybe_remove_existing_supplier_bid(bid)
+    |> add_minimum_bid(bid)
+    Map.put(current_state, :minimum_bids, updated_minimum_bids)
+  end
+
+  defp maybe_remove_existing_supplier_bid(minimum_bids, %{supplier_id: supplier_id, min_amount: min_amount}) do
+    Enum.reject(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id and bid.min_amount != min_amount end)
+  end
+
+  defp add_minimum_bid(minimum_bids, %{min_amount: nil}), do: minimum_bids # test "supplier can clear minimum bid"
+  defp add_minimum_bid([], bid), do: [bid]
+  defp add_minimum_bid(minimum_bids, bid = %{supplier_id: supplier_id}) do
+    add_minimum_bid(minimum_bids, bid, Enum.any?(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id end))
+  end
+  defp add_minimum_bid(minimum_bids, bid = %{min_amount: min_amount}, false) do
+    case Enum.find_index(minimum_bids |> Enum.reverse, fn(x) -> x.min_amount <= min_amount end) do
+      nil -> [bid | minimum_bids]
+      index -> List.insert_at(minimum_bids, index + 1, bid)
+    end
+  end
+  defp add_minimum_bid(minimum_bids, _bid, _true), do: minimum_bids
+
+  defp maybe_set_lowest_bids(bid, current_state, nil) do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end # test "first bid is added to lowest_bids"
+  defp maybe_set_lowest_bids(%{amount: amount, min_amount: nil}, current_state, lowest_amount) when amount > lowest_amount do
+    {false, current_state}
+  end # test "new higher bid with no minimum is not added"
+  defp maybe_set_lowest_bids(bid = %{amount: amount}, current_state = %{status: :pending}, lowest_amount) when amount < lowest_amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end # test "new lowest bid replaces existing"
+  defp maybe_set_lowest_bids(bid = %{supplier_id: supplier_id}, current_state = %{minimum_bids: minimum_bids}, lowest_amount) do
+    minimum_bids_without_current_supplier = Enum.reject(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id end)
+    maybe_resolve_minimum_bid(bid, List.first(minimum_bids_without_current_supplier), current_state, lowest_amount)
+  end
+  defp maybe_set_lowest_bids(_bid, current_state, _lowest_amount), do: {false, current_state}
+
+  defp maybe_resolve_minimum_bid(bid = %{min_amount: amount, time_entered: time_entered}, nil, current_state = %{lowest_bids: lowest_bids}, amount) do
+    auto_bid = bid
+    |> Map.put(:amount, amount)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    |> Map.put(:time_entered, time_entered)
+    |> process_auto_bid
+
+    {false, %AuctionState{current_state | lowest_bids: lowest_bids ++ [auto_bid]}}
+  end # test "new higher bid with matching minimum is appended"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount, min_amount: min_amount, time_entered: time_entered}, nil, current_state, amount) when min_amount < amount do
+    auto_bid = bid
+    |> Map.put(:amount, amount - 0.25)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    |> Map.put(:time_entered, time_entered)
+    |> process_auto_bid
+
+    {true, %AuctionState{current_state | lowest_bids: [auto_bid]}}
+  end # test "new match to lowest bid with lower minimum replaces existing with auto_bid"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount, min_amount: nil}, nil, current_state = %{lowest_bids: lowest_bids}, amount) do
+    {false, %AuctionState{current_state | lowest_bids: lowest_bids ++ [bid]}}
+  end # test "new match to lowest bid with no minimum is appended"
+  defp maybe_resolve_minimum_bid(bid, nil, current_state, _lowest_amount), do: {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  # test "new lower bid with minimum replaces existing"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, %{min_amount: min_amount}, current_state, _lowest_amount) when amount < min_amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end # test "new lower bid beats minimum"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, %{min_amount: amount}, current_state = %{lowest_bids: lowest_bids}, amount) do
+    {false, %AuctionState{current_state | lowest_bids: lowest_bids ++ [bid]}}
+  end # test "minimum bid threshold is matched and min_bid supplier wins with auto_bid"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount, time_entered: time_entered}, min_bid = %{min_amount: amount}, current_state, _lowest_amount) do
+    auto_bid = min_bid
+    |> Map.put(:amount, amount)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    |> Map.put(:time_entered, time_entered)
+    |> process_auto_bid
+
+    {false, %AuctionState{current_state | lowest_bids: [auto_bid, bid]}}
+  end # test "minimum bid threshold is matched and min_bid supplier wins"
+  defp maybe_resolve_minimum_bid(%{amount: amount, time_entered: time_entered}, min_bid = %{min_amount: min_amount}, current_state, _lowest_amount) when amount > min_amount do
+    auto_bid = min_bid
+    |> Map.put(:amount, amount - 0.25)
+    |> Map.put(:id, UUID.uuid4(:hex))
+    |> Map.put(:time_entered, time_entered)
+    |> process_auto_bid
+
+    {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
+  end # test "matching bid triggers auto_bid", test "lower bid triggers auto_bid"
+  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, %{min_amount: min_amount}, current_state, _lowest_amount) when amount < min_amount do
+    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  end
+
+  defp process_auto_bid(bid) do
+    bid
+    |> Command.enter_bid
+    |> AuctionBidList.process_command
+
+    AuctionEvent.emit(%AuctionEvent{type: :auto_bid_placed, auction_id: bid.auction_id, data: bid, time_entered: bid.time_entered, user: nil}, true)
+    bid
+  end
+end
