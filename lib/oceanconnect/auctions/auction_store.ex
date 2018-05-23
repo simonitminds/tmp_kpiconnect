@@ -186,7 +186,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start
     |> AuctionScheduler.process_command
 
-    %AuctionState{current_state | status: :open}
+    updated_state = %AuctionState{current_state | status: :open}
+    AuctionBidProcessor.resolve_existing_bids(updated_state)
   end
 
   defp update_auction(auction = %Auction{scheduled_start: start}, current_state = %{status: :draft}) when start != nil do

@@ -2,6 +2,14 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
   alias Oceanconnect.Auctions.{AuctionBidList, AuctionEvent, Command}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
+  def resolve_existing_bids(current_state = %{minimum_bids: minimum_bids}) do
+    resolve_existing_bids(current_state, length(minimum_bids) < 2)
+  end
+  def resolve_existing_bids(current_state, true), do: current_state
+  def resolve_existing_bids(current_state = %{minimum_bids: minimum_bids}, _false) do
+    current_state
+  end
+
   def process_new_bid(bid, current_state = %{lowest_bids: lowest_bids}) do
     supplier_first_bid? = bid
     |> Command.enter_bid
