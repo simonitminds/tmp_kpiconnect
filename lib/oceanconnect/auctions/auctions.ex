@@ -117,6 +117,7 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Command.end_auction_decision_period
     |> AuctionStore.process_command
+    auction
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
