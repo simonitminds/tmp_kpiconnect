@@ -17,6 +17,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Auctions.get_auction_state!
     |> convert_winning_bid_for_user(auction, user_id)
     |> convert_lowest_bids_for_user(fully_loaded_auction, user_id)
+    |> convert_minimum_bids_for_user(user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, auction_state, bid_list)
@@ -27,6 +28,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     updated_state = auction_state
     |> convert_winning_bid_for_user(auction, user_id)
     |> convert_lowest_bids_for_user(auction, user_id)
+    |> convert_minimum_bids_for_user(user_id)
     bid_list = get_user_bid_list(auction_state, fully_loaded_auction, user_id)
 
     produce_payload(fully_loaded_auction, updated_state, bid_list)
@@ -43,26 +45,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   def supplier_bid_list(bid_list, supplier_id) do
     Enum.filter(bid_list, fn(bid) -> bid.supplier_id == supplier_id end)
-  end
-
-  defp convert_lowest_bids_for_user(auction_state = %AuctionState{lowest_bids: []}, _auction, _user_id), do: auction_state
-  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
-    auction_state
-    |> Map.delete(:supplier_ids)
-    |> Map.put(:lowest_bids, convert_to_supplier_names(auction_state.lowest_bids, auction))
-  end
-  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
-    lowest_bids_suppliers_ids = Enum.map(auction_state.lowest_bids, fn(bid) -> bid.supplier_id end)
-    order = Enum.find_index(lowest_bids_suppliers_ids, fn(id) -> id == supplier_id end)
-    lowest_bid = auction_state.lowest_bids
-    |> hd
-    |> Map.delete(:supplier_id)
-
-    auction_state
-    |> Map.delete(:supplier_ids)
-    |> Map.put(:lowest_bids, [lowest_bid])
-    |> Map.put(:lowest_bids_position, order)
-    |> Map.put(:multiple, length(auction_state.lowest_bids) > 1)
   end
 
   defp convert_winning_bid_for_user(auction_state = %AuctionState{winning_bid: nil}, _auction, _user_id), do: auction_state
@@ -84,6 +66,30 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.put(:winner, false)
   end
   defp convert_winning_bid_for_user(auction_state = %AuctionState{}, _auction, _user_id), do: auction_state
+
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{lowest_bids: []}, _auction, _user_id), do: auction_state
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, auction = %Auction{buyer_id: buyer_id}, buyer_id) do
+    auction_state
+    |> Map.delete(:supplier_ids)
+    |> Map.put(:lowest_bids, convert_to_supplier_names(auction_state.lowest_bids, auction))
+  end
+  defp convert_lowest_bids_for_user(auction_state = %AuctionState{}, %Auction{}, supplier_id) do
+    lowest_bids_suppliers_ids = Enum.map(auction_state.lowest_bids, fn(bid) -> bid.supplier_id end)
+    order = Enum.find_index(lowest_bids_suppliers_ids, fn(id) -> id == supplier_id end)
+    lowest_bid = auction_state.lowest_bids
+    |> hd
+    |> Map.delete(:supplier_id)
+
+    auction_state
+    |> Map.delete(:supplier_ids)
+    |> Map.put(:lowest_bids, [lowest_bid])
+    |> Map.put(:lowest_bids_position, order)
+    |> Map.put(:multiple, length(auction_state.lowest_bids) > 1)
+  end
+
+  defp convert_minimum_bids_for_user(auction_state = %AuctionState{minimum_bids: minimum_bids}, user_id) do
+    Map.put(auction_state, :minimum_bids, Enum.filter(minimum_bids, fn(bid) -> bid.supplier_id == user_id end))
+  end
 
   defp maybe_remove_comment(auction_state = %AuctionState{lowest_bids: lowest_bids, winning_bid: winning_bid}, supplier_id) do
     case hd(lowest_bids).supplier_id == supplier_id do

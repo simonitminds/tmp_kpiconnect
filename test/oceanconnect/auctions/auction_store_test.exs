@@ -111,9 +111,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining > 2 * 60_000
     end
 
-    test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
+    test "matching bid is added and extends duration", %{auction: auction, bid: bid, supplier2_company: supplier2_company} do
       :timer.sleep(1_100)
-      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, bid.supplier_id)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, supplier2_company.id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
@@ -152,7 +152,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
-        assert lowest_bid.amount == 0.75
+        assert lowest_bid.amount == 0.50
         assert lowest_bid.supplier == supplier_company.name
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000

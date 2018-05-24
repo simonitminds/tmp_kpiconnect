@@ -3,7 +3,9 @@ import _ from 'lodash';
 import MediaQuery from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
 
-const BiddingForm = ({auction, formSubmit}) => {
+const BiddingForm = ({auctionPayload, formSubmit}) => {
+  const auction = auctionPayload.auction;
+  const minimumBidAmount = _.get(auctionPayload, 'state.minimum_bids[0].min_amount');
   const fuel = _.get(auction, 'fuel.name');
   return(
     <div className="auction-bidding box box--nested-base box--nested-base--base">
@@ -43,7 +45,15 @@ const BiddingForm = ({auction, formSubmit}) => {
             </div>
             <div className="field-body">
               <div className="control is-expanded has-icons-left">
-                <input className="input qa-auction-bid-min_amount" type="number" id="minimumBid" step="0.25" min="0" name="min_amount" value="" />
+                <input
+                  className="input qa-auction-bid-min_amount"
+                  type="number"
+                  id="minimumBid"
+                  step="0.25"
+                  min="0"
+                  name="min_amount"
+                  value={minimumBidAmount}
+                />
                 <span className="icon is-small is-left">
                   <i className="fas fa-dollar-sign"></i>
                 </span>

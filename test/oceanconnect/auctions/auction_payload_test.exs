@@ -15,7 +15,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.start_auction(auction)
       :timer.sleep(500)
-      bid_params = %{"amount" => "1.25"}
+      bid_params = %{"amount" => 1.25}
 
       {:ok, %{auction: auction, supplier: supplier, bid_params: bid_params, supplier_2: supplier_2}}
     end
