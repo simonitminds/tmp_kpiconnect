@@ -54,13 +54,14 @@ defmodule OceanconnectWeb.Api.BidController do
 
   defp duration_time_remaining?(auction = %Auction{id: auction_id}) do
     case AuctionTimer.read_timer(auction_id, :duration) do
-      false -> error_response(Auctions.get_auction_state!(auction))
+      false -> maybe_pending(Auctions.get_auction_state!(auction))
       _ -> :ok
     end
   end
 
-  defp error_response(%{status: :decision}) do
+  defp maybe_pending(%{status: :pending}), do: :ok
+  defp maybe_pending(%{status: :decision}) do
     {"late_bid", "Auction moved to decision before bid was received"}
   end
-  defp error_response(_), do: :error
+  defp maybe_pending(_), do: :error
 end

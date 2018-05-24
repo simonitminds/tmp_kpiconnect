@@ -16,13 +16,55 @@ const BiddingForm = ({auction, formSubmit}) => {
                     <label className="label" htmlFor="bid">Bid Amount</label>
                   </div>
                 </div>
-                <div className="field-body">
-                  <div className="control is-expanded has-icons-left">
-                    <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" min="0" name="amount" />
-                    <span className="icon is-small is-left">
-                      <i className="fas fa-dollar-sign"></i>
-                    </span>
-                  </div>
+              </div>
+            </div>
+          </div>
+  */}
+          <div className="field is-horizontal is-expanded">
+            <div className="field-label">
+              <div className="control">
+                <label className="label" htmlFor="bid">Bid Amount</label>
+              </div>
+            </div>
+            <div className="field-body">
+              <div className="control is-expanded has-icons-left">
+                <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" min="0" name="amount" />
+                <span className="icon is-small is-left">
+                  <i className="fas fa-dollar-sign"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="field is-horizontal is-expanded">
+            <div className="field-label">
+              <div className="control">
+                <label className="label" htmlFor="bid">Minimum Bid</label>
+              </div>
+            </div>
+            <div className="field-body">
+              <div className="control is-expanded has-icons-left">
+                <input className="input qa-auction-bid-min_amount" type="number" id="minimumBid" step="0.25" min="0" name="min_amount" value="" />
+                <span className="icon is-small is-left">
+                  <i className="fas fa-dollar-sign"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+  {/*
+          <div className="field is-horizontal is-expanded">
+            <div className="field-label">
+              <div className="control">
+                <label className="label" htmlFor="expiration">Expiration</label>
+              </div>
+            </div>
+            <div className="field-body">
+              <div className="control is-expanded">
+                <div className="select is-fullwidth">
+                  <select className="" name="expiration" id="expiration">
+                    <option value="">None</option>
+                    <option value="10">10 mins</option>
+                    <option value="15">15 mins</option>
+                  </select>
                 </div>
               </div>
               <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">

@@ -161,8 +161,10 @@ export default class AuctionShow extends React.Component {
         return (
           <div className = "auction-notification box is-gray-0" >
             <h3 className="has-text-weight-bold is-flex">
-            <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
+              <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
             </h3>
+            <BiddingForm formSubmit={this.props.formSubmit} auction={auction} />
+            <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
       }
