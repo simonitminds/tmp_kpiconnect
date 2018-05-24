@@ -159,6 +159,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
     new_state
   end
+  defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
+    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
+    new_state
+  end
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
   defp replay_event(%AuctionEvent{type: :auction_ended, data: %{auction: auction}}, previous_state) do
     end_auction(previous_state, auction)
