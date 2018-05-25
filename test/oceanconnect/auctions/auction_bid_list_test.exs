@@ -85,5 +85,26 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
       assert hd(actual_payload.state.lowest_bids).supplier == supplier_company.name
       assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [9.00, nil, 8.50]
     end
+
+    test "minimum bid war is resolved with correct auto_bids placed", %{auction: auction, supplier_company: supplier_company, supplier2_id: supplier2_id} do
+      Auctions.place_bid(auction, %{"amount" => 9.50, "min_amount" => 8.00}, supplier_company.id)
+      Auctions.place_bid(auction, %{"amount" => 9.25, "min_amount" => 8.50}, supplier2_id)
+
+      actual_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert hd(actual_payload.state.lowest_bids).amount == 8.25
+      assert hd(actual_payload.state.lowest_bids).supplier == supplier_company.name
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.25, 8.50, 9.25, 9.50]
+    end
+
+    test "new lower bid beats minimum and correct auto_bid placed", %{auction: auction, supplier_company: supplier_company, supplier2_id: supplier2_id} do
+      Auctions.place_bid(auction, %{"amount" => 9.50, "min_amount" => 8.00}, supplier_company.id)
+      bid = Auctions.place_bid(auction, %{"amount" => 7.50, "min_amount" => nil}, supplier2_id)
+
+      actual_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert bid |> Map.drop([:__struct__, :supplier_id]) == actual_payload.state.lowest_bids |> hd |> Map.drop([:supplier])
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.00, 7.50, 9.50]
+    end
   end
 end

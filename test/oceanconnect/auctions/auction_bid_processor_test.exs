@@ -12,6 +12,106 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessorTest do
     {:ok, %{auction: auction, supplier1: supplier_company.id, supplier2: supplier2_company.id}}
   end
 
+  describe "resolve_existing_bids/1" do
+    test "empty minimum bid list is handled", %{auction: auction} do
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [],
+        minimum_bids: []
+      }
+
+      assert current_state == AuctionBidProcessor.resolve_existing_bids(current_state)
+    end
+
+    test "single minimum bid is resolved", %{auction: auction, supplier1: supplier1} do
+      bid = create_bid(9.25, 8.00, supplier1, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid],
+        minimum_bids: [bid]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert updated_state.lowest_bids == [bid]
+    end
+
+    test "minimum bid war with matching is resolved", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.25, 8.00, supplier1, auction)
+      bid2 = create_bid(9.00, 8.00, supplier2, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid2],
+        minimum_bids: [bid, bid2]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.00, 8.00]
+      assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1, supplier2]
+    end
+
+    test "minimum bid war is resolved", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.25, 8.00, supplier1, auction)
+      bid2 = create_bid(9.00, 8.50, supplier2, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid2],
+        minimum_bids: [bid, bid2]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.25]
+      assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
+    end
+
+    test "opening bid maintains winning position", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.00, 8.00, supplier1, auction)
+      bid2 = create_bid(9.50, 9.25, supplier2, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid],
+        minimum_bids: [bid, bid2]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert updated_state.lowest_bids == [bid]
+    end
+
+    test "matched opening bid triggers minimum bid war", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.50, 8.00, supplier1, auction)
+      bid2 = create_bid(9.50, 8.75, supplier2, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid2, bid],
+        minimum_bids: [bid, bid2]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.50]
+      assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
+    end
+
+    test "auto_bid bid triggered on match to opening bid", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(8.75, 8.00, supplier1, auction)
+      bid2 = create_bid(9.50, 8.75, supplier2, auction)
+      current_state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        lowest_bids: [bid],
+        minimum_bids: [bid, bid2]
+      }
+
+      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.50]
+      assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
+    end
+  end
+
   describe "process_new_bid/2 when auction is pending" do
     test "auto_bid not triggered when a new lowest bid is placed", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
       bid = create_bid(10.00, 8.00, supplier1, auction)
@@ -355,104 +455,55 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessorTest do
       assert updated_state.lowest_bids == [new_bid]
       assert updated_state.minimum_bids == [bid, bid2] # Ensures matching minimum bid doesn't replace original (chron order is maintained)
     end
-  end
 
-  describe "resolve_existing_bids/1" do
-    test "empty minimum bid list is handled", %{auction: auction} do
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [],
-        minimum_bids: []
-      }
-
-      assert current_state == AuctionBidProcessor.resolve_existing_bids(current_state)
-    end
-
-    test "single minimum bid is resolved", %{auction: auction, supplier1: supplier1} do
-      bid = create_bid(9.25, 8.00, supplier1, auction)
+    test "higher bid with minimum triggers minimum bid war", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.50, 8.00, supplier1, auction)
       current_state = %AuctionState{
         auction_id: auction.id,
         status: :open,
         lowest_bids: [bid],
         minimum_bids: [bid]
       }
+      bid2 = create_bid(9.75, 8.50, supplier2, auction)
 
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
-      assert updated_state.lowest_bids == [bid]
-    end
+      {lowest_bid?, _supplier_first_bid?, updated_state} = AuctionBidProcessor.process_new_bid(bid2, current_state)
 
-    test "minimum bid war with matching is resolved", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
-      bid = create_bid(9.25, 8.00, supplier1, auction)
-      bid2 = create_bid(9.00, 8.00, supplier2, auction)
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [bid2],
-        minimum_bids: [bid, bid2]
-      }
-
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
-      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.00, 8.00]
-      assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1, supplier2]
-    end
-
-    test "minimum bid war is resolved", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
-      bid = create_bid(9.25, 8.00, supplier1, auction)
-      bid2 = create_bid(9.00, 8.50, supplier2, auction)
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [bid2],
-        minimum_bids: [bid, bid2]
-      }
-
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
+      refute lowest_bid?
       assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.25]
       assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
     end
 
-    test "opening bid maintains winning position", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
-      bid = create_bid(9.00, 8.00, supplier1, auction)
-      bid2 = create_bid(9.50, 9.25, supplier2, auction)
+    test "matching bid with minimum triggers minimum bid war", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.50, 8.00, supplier1, auction)
       current_state = %AuctionState{
         auction_id: auction.id,
         status: :open,
         lowest_bids: [bid],
-        minimum_bids: [bid, bid2]
+        minimum_bids: [bid]
       }
+      bid2 = create_bid(9.50, 8.50, supplier2, auction)
 
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
-      assert updated_state.lowest_bids == [bid]
-    end
+      {lowest_bid?, _supplier_first_bid?, updated_state} = AuctionBidProcessor.process_new_bid(bid2, current_state)
 
-    test "matched opening bid triggers minimum bid war", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
-      bid = create_bid(9.50, 8.00, supplier1, auction)
-      bid2 = create_bid(9.50, 8.75, supplier2, auction)
-      current_state = %AuctionState{
-        auction_id: auction.id,
-        status: :open,
-        lowest_bids: [bid2, bid],
-        minimum_bids: [bid, bid2]
-      }
-
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
-      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.50]
+      refute lowest_bid?
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.25]
       assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
     end
 
-    test "auto_bid bid triggered on match to opening bid", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
-      bid = create_bid(8.75, 8.00, supplier1, auction)
-      bid2 = create_bid(9.50, 8.75, supplier2, auction)
+    test "lower bid with minimum triggers minimum bid war", %{auction: auction, supplier1: supplier1, supplier2: supplier2} do
+      bid = create_bid(9.50, 8.00, supplier1, auction)
       current_state = %AuctionState{
         auction_id: auction.id,
         status: :open,
         lowest_bids: [bid],
-        minimum_bids: [bid, bid2]
+        minimum_bids: [bid]
       }
+      bid2 = create_bid(9.25, 8.50, supplier2, auction)
 
-      updated_state = AuctionBidProcessor.resolve_existing_bids(current_state)
-      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.50]
+      {lowest_bid?, _supplier_first_bid?, updated_state} = AuctionBidProcessor.process_new_bid(bid2, current_state)
+
+      refute lowest_bid?
+      assert Enum.map(updated_state.lowest_bids, &(&1.amount)) == [8.25]
       assert Enum.map(updated_state.lowest_bids, &(&1.supplier_id)) == [supplier1]
     end
   end
