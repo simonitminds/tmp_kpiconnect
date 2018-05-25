@@ -52,7 +52,7 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
                   step="0.25"
                   min="0"
                   name="min_amount"
-                  value={minimumBidAmount}
+                  defaultValue={minimumBidAmount}
                 />
                 <span className="icon is-small is-left">
                   <i className="fas fa-dollar-sign"></i>

@@ -8,11 +8,12 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
     updated_bid_params = convert_amount(bid_params)
+    amount = updated_bid_params["amount"]
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
-         :ok  <- duration_time_remaining?(auction),
-         false <- updated_bid_params["amount"] < 0,
-         0.0   <- (updated_bid_params["amount"] / 0.25) - Float.floor(updated_bid_params["amount"] / 0.25),
-         true  <- supplier_id in Auctions.auction_supplier_ids(auction)
+         :ok    <- duration_time_remaining?(auction),
+         false  <- amount < 0, # false if amount == nil or negative
+         true   <- quarter_increment?(amount),
+         true   <- supplier_id in Auctions.auction_supplier_ids(auction)
     do
       Auctions.place_bid(auction, updated_bid_params, supplier_id, time_entered, user)
       render(conn, "show.json", %{success: true, message: "Bid successfully placed"})
@@ -55,6 +56,7 @@ defmodule OceanconnectWeb.Api.BidController do
   defp convert_amount(bid_params), do: bid_params
 
   defp convert_currency_input(""), do: nil
+  defp convert_currency_input(amount) when is_float(amount), do: amount
   defp convert_currency_input(amount) do
     {float_amount, _} = Float.parse(amount)
     float_amount
@@ -72,4 +74,9 @@ defmodule OceanconnectWeb.Api.BidController do
     {"late_bid", "Auction moved to decision before bid was received"}
   end
   defp maybe_pending(_), do: :error
+
+  defp quarter_increment?(nil), do: true
+  defp quarter_increment?(amount) do
+    (amount / 0.25) - Float.floor(amount / 0.25) == 0.0
+  end
 end
