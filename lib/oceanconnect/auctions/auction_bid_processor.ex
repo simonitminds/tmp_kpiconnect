@@ -95,14 +95,14 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     auto_bid = place_auto_bid(bid, min_amount, DateTime.utc_now())
     {true, %AuctionState{current_state | lowest_bids: [auto_bid]}}
   end # "bid with only minimum can be added"
-  defp maybe_set_lowest_bids(bid = %{amount: nil, supplier_id: supplier_id}, current_state = %{lowest_bids: [%{supplier_id: supplier_id} | _]}, _lowest_amount) do
+  defp maybe_set_lowest_bids(%{amount: nil, supplier_id: supplier_id}, current_state = %{lowest_bids: [%{supplier_id: supplier_id} | _]}, _lowest_amount) do
     {false, current_state}
   end # "supplier can change minimum with no bid"
   defp maybe_set_lowest_bids(bid = %{amount: nil, min_amount: min_amount}, current_state, lowest_amount) when min_amount > lowest_amount do
     place_auto_bid(bid, min_amount, DateTime.utc_now())
     {false, current_state}
   end # "auto_bid wins when only minimum provided"
-  defp maybe_set_lowest_bids(bid = %{amount: nil, min_amount: amount, supplier_id: supplier_id}, current_state = %{lowest_bids: lowest_bids, minimum_bids: minimum_bids}, amount) do
+  defp maybe_set_lowest_bids(bid = %{amount: nil, min_amount: amount, supplier_id: supplier_id}, current_state = %{minimum_bids: minimum_bids}, amount) do
     auto_bid = place_auto_bid(bid, amount, DateTime.utc_now())
     minimum_bids_without_current_supplier = Enum.reject(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id end)
     maybe_resolve_minimum_bid(auto_bid, List.first(minimum_bids_without_current_supplier), current_state, amount)
@@ -157,8 +157,8 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
 
     {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
   end # "matching bid triggers auto_bid",  "lower bid triggers auto_bid"
-  defp maybe_resolve_minimum_bid(bid = %{amount: amount}, %{min_amount: min_amount}, current_state, _lowest_amount) when amount < min_amount do
-    {true, %AuctionState{current_state | lowest_bids: [bid]}}
+  defp maybe_resolve_minimum_bid(_bid, _min_bid, current_state, _lowest_amount) do
+    {false, current_state}
   end
 
   defp place_auto_bid(bid, amount, time_entered) do
