@@ -157,11 +157,22 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     auto_bid = place_auto_bid(min_bid, amount, time_entered)
     {false, %AuctionState{current_state | lowest_bids: [auto_bid, bid]}}
   end # "minimum bid threshold is matched and min_bid supplier wins"
-  defp maybe_resolve_minimum_bid(%{amount: new_amount, min_amount: new_min_amount, time_entered: time_entered}, min_bid = %{amount: old_amount, min_amount: old_min_amount}, current_state, _lowest_amount) do
+  defp maybe_resolve_minimum_bid(bid = %{amount: new_amount, min_amount: new_min_amount, time_entered: time_entered}, min_bid = %{amount: old_amount, min_amount: old_min_amount}, current_state, _lowest_amount) when not is_nil(new_min_amount) and not is_nil(old_min_amount) do
     amount_to_bid = cond do
-      new_min_amount && old_min_amount < new_min_amount && new_min_amount <= old_amount -> new_min_amount - 0.25
+      new_min_amount && old_min_amount < new_min_amount && new_min_amount <= old_amount ->
+        new_min_amount - 0.25
       old_min_amount < new_amount && new_amount <= old_amount -> new_amount - 0.25
     end
+    other_bid = place_auto_bid(bid, new_min_amount, time_entered)
+    auto_bid = place_auto_bid(min_bid, amount_to_bid, time_entered)
+    if(other_bid.amount > auto_bid.amount) do
+      {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
+    else
+      {false, %AuctionState{current_state | lowest_bids: [auto_bid, other_bid]}}
+    end
+  end # "matching bid triggers auto_bid",  "lower bid triggers auto_bid"
+  defp maybe_resolve_minimum_bid(bid = %{amount: new_amount, min_amount: nil, time_entered: time_entered}, min_bid = %{amount: old_amount, min_amount: old_min_amount}, current_state, _lowest_amount) do
+    amount_to_bid = new_amount - 0.25
     auto_bid = place_auto_bid(min_bid, amount_to_bid, time_entered)
     {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
   end # "matching bid triggers auto_bid",  "lower bid triggers auto_bid"
