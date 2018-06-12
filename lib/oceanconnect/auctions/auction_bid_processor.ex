@@ -77,8 +77,7 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
   defp maybe_remove_existing_supplier_bid(minimum_bids, %{supplier_id: supplier_id, min_amount: min_amount}) do
     Enum.reject(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id and bid.min_amount != min_amount end)
   end
-
-  defp add_minimum_bid(minimum_bids, %{min_amount: nil}), do: minimum_bids # "supplier can clear minimum bid"
+    defp add_minimum_bid(minimum_bids, %{min_amount: min_amount}) when is_nil(min_amount) or min_amount == "", do: minimum_bids # "supplier can clear minimum bid"
   defp add_minimum_bid([], bid), do: [bid]
   defp add_minimum_bid(minimum_bids, bid = %{supplier_id: supplier_id}) do
     add_minimum_bid(minimum_bids, bid, Enum.any?(minimum_bids, fn(bid) -> bid.supplier_id == supplier_id end))
