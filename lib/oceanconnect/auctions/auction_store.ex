@@ -2,6 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
   alias Oceanconnect.Auctions.{Auction,
                                AuctionBidList,
+                               AuctionBidProcessor,
                                AuctionCache,
                                AuctionEvent,
                                AuctionEventStore,
@@ -18,6 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     defstruct auction_id: nil,
       status: :pending,
       lowest_bids: [],
+      minimum_bids: [],
       winning_bid: nil
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
@@ -117,10 +119,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:process_new_bid, %{bid: bid, user: user}, emit}, current_state = %{auction_id: auction_id}) do
-    {lowest_bid, supplier_first_bid, new_state} = process_new_bid(bid, current_state)
+    {lowest_bid?, supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, current_state)
     AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: bid.time_entered, user: user}, emit)
 
-    if lowest_bid or supplier_first_bid do
+    if lowest_bid? or supplier_first_bid? do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
     {:noreply, new_state}
@@ -154,7 +156,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     update_auction(auction, previous_state)
   end
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
-    {_lowest_bid, _supplier_first_bid, new_state} = process_new_bid(bid, previous_state)
+    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
+    new_state
+  end
+  defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
+    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
     new_state
   end
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
@@ -184,7 +190,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start
     |> AuctionScheduler.process_command
 
-    %AuctionState{current_state | status: :open}
+    updated_state = %AuctionState{current_state | status: :open}
+    AuctionBidProcessor.resolve_existing_bids(updated_state)
   end
 
   defp update_auction(auction = %Auction{scheduled_start: start}, current_state = %{status: :draft}) when start != nil do
@@ -218,19 +225,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     %AuctionState{current_state | status: :decision}
   end
 
-  defp process_new_bid(bid = %{amount: amount}, current_state = %{lowest_bids: lowest_bids}) do
-    supplier_first_bid = bid
-    |> Command.enter_bid
-    |> AuctionBidList.process_command
-
-    lowest_amount = case lowest_bids do
-      [] -> nil
-      _ -> hd(lowest_bids).amount
-    end
-    {lowest_bid, new_state} = set_lowest_bids?(bid, amount, current_state, lowest_amount)
-    {lowest_bid, supplier_first_bid, new_state}
-  end
-
   defp select_winning_bid(bid, current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
@@ -254,22 +248,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionEvent.emit(%AuctionEvent{type: :auction_state_rebuilt, data: %{state: state, time_remaining: time_remaining}, time_entered: DateTime.utc_now(), auction_id: auction_id}, true)
     state
   end
-
   defp maybe_emit_rebuilt_event(state), do: state
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
     AuctionEvent.emit(%AuctionEvent{type: :duration_extended, auction_id: auction_id, data: %{extension_time: extension_time}, time_entered: DateTime.utc_now()}, emit)
   end
   defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}, _emit), do: nil
-
-  defp set_lowest_bids?(bid, _amount, current_state, nil) do
-    {true, %AuctionState{current_state | lowest_bids: [bid]}}
-  end
-  defp set_lowest_bids?(bid, amount, current_state, lowest_amount) when lowest_amount > amount do
-    {true, %AuctionState{current_state | lowest_bids: [bid]}}
-  end
-  defp set_lowest_bids?(bid, amount, current_state = %{lowest_bids: lowest_bids}, amount) do
-    {true, %AuctionState{current_state | lowest_bids: lowest_bids ++[bid]}}
-  end
-  defp set_lowest_bids?(_bid, _amount, current_state, _lowest_amount), do: {false, current_state}
 end

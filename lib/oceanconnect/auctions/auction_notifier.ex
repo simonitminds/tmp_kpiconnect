@@ -33,7 +33,6 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def notify_updated_bid(auction, bid, supplier_id) do
-    # TODO: Add event driven setup to ensure that AuctionStore and BidList are updated before notification
     buyer_payload = auction
     |> AuctionPayload.get_auction_payload!(auction.buyer_id)
 

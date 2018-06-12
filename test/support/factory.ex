@@ -59,4 +59,14 @@ defmodule Oceanconnect.Factory do
        company: build(:company)
     }
   end
+
+  def create_bid(amount, min_amount, supplier_id, auction) do
+    bid_params = %{
+      "amount" => amount,
+      "min_amount" => min_amount,
+      "supplier_id" => supplier_id,
+      "time_entered" => DateTime.utc_now()
+    }
+    Oceanconnect.Auctions.AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params, auction)
+  end
 end

@@ -32,7 +32,8 @@ const mapDispatchToProps = (dispatch) => ({
     const elements = ev.target.elements;
     const bidData = {
       'bid': {
-        'amount': elements.amount.value
+        'amount': elements.amount.value,
+        'min_amount': elements.min_amount.value
       }
     };
 

@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   setup do
     supplier_company = insert(:company)
@@ -111,13 +111,24 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining > 2 * 60_000
     end
 
-    test "matching bid is added and extends duration", %{auction: auction, bid: bid} do
+    test "matching bid is added and extends duration", %{auction: auction, bid: bid, supplier2_company: supplier2_company} do
       :timer.sleep(1_100)
-      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, bid.supplier_id)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, supplier2_company.id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [bid.id, new_bid.id]
+      end)
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
+    end
+
+    test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
+      :timer.sleep(1_100)
+      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+        lowest_bid.id in [new_bid.id]
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
@@ -133,13 +144,16 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining < 3 * 60_000 - 1_000
     end
 
-    test "new lowest bid is added and extends duration", %{auction: auction, bid: bid} do
+    test "new lowest bid is placed and minimum bid is activated and duration extends", %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
       :timer.sleep(1_100)
-      new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
+      Auctions.place_bid(auction, %{"amount" => 1.00, "min_amount" => 0.50}, supplier_company.id)
+      Auctions.place_bid(auction, %{"amount" => 0.75}, supplier2_company.id)
+
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
-        lowest_bid.id in [new_bid.id]
+        assert lowest_bid.amount == 0.50
+        assert lowest_bid.supplier == supplier_company.name
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
