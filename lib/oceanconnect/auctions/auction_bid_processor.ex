@@ -30,7 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     [lowest_minimum_bid | remaining_bids] = minimum_bids
     time_entered = DateTime.utc_now()
     first_bid = case lowest_minimum_bid.min_amount == hd(remaining_bids).min_amount do
-      true -> place_auto_bid(lowest_minimum_bid, lowest_minimum_bid.min_amount, time_entered)
+                  true -> place_auto_bid(lowest_minimum_bid, lowest_minimum_bid.min_amount, time_entered)
       _ -> place_auto_bid(lowest_minimum_bid, hd(remaining_bids).min_amount - 0.25, time_entered)
     end
     [first_bid | Enum.map(remaining_bids, fn(bid) -> place_auto_bid(bid, bid.min_amount, time_entered) end)]
@@ -67,7 +67,7 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     {lowest_bid?, supplier_first_bid?, updated_state}
   end
 
-  defp maybe_add_minimum_bid(current_state = %{minimum_bids: minimum_bids}, bid) do
+  defp maybe_add_minimum_bid(current_state = %{minimum_bids: minimum_bids}, bid = %{min_amount: min_amount}) do
     updated_minimum_bids = minimum_bids
     |> maybe_remove_existing_supplier_bid(bid)
     |> add_minimum_bid(bid)
@@ -170,7 +170,7 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
       {false, %AuctionState{current_state | lowest_bids: [auto_bid, other_bid]}}
     end
   end # "matching bid triggers auto_bid",  "lower bid triggers auto_bid"
-  defp maybe_resolve_minimum_bid(bid = %{amount: new_amount, min_amount: nil, time_entered: time_entered}, min_bid = %{amount: old_amount, min_amount: old_min_amount}, current_state, _lowest_amount) do
+  defp maybe_resolve_minimum_bid(%{amount: new_amount, min_amount: nil, time_entered: time_entered}, min_bid = %{amount: _old_amount, min_amount: _old_min_amount}, current_state, _lowest_amount) do
     amount_to_bid = new_amount - 0.25
     auto_bid = place_auto_bid(min_bid, amount_to_bid, time_entered)
     {false, %AuctionState{current_state | lowest_bids: [auto_bid]}}
@@ -191,7 +191,6 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     bid
     |> Command.enter_bid
     |> AuctionBidList.process_command
-
     AuctionEvent.emit(%AuctionEvent{type: :auto_bid_placed, auction_id: bid.auction_id, data: bid, time_entered: bid.time_entered, user: nil}, true)
     bid
   end

@@ -47,17 +47,18 @@ defmodule OceanconnectWeb.Api.BidController do
            |> render(OceanconnectWeb.ErrorView, "422.json", data: %{})
     end
   end
+
+  defp convert_amount(bid_params = %{"amount" => amount, "min_amount" => min_amount}) do
+    bid_params
+    |> Map.put("amount", convert_currency_input(amount))
+    |> Map.put("min_amount", convert_currency_input(min_amount))
+  end
   defp convert_amount(bid_params = %{"amount" => amount}) do
     bid_params
     |> Map.put("amount", convert_currency_input(amount))
   end
   defp convert_amount(bid_params = %{"min_amount" => min_amount}) do
     bid_params
-    |> Map.put("min_amount", convert_currency_input(min_amount))
-  end
-  defp convert_amount(bid_params = %{"amount" => amount, "min_amount" => min_amount}) do
-    bid_params
-    |> Map.put("amount", convert_currency_input(amount))
     |> Map.put("min_amount", convert_currency_input(min_amount))
   end
   defp convert_amount(bid_params) do
