@@ -14,7 +14,7 @@ alias Oceanconnect.Repo
 alias Oceanconnect.Accounts
 alias Oceanconnect.Accounts.{Company, User}
 alias Oceanconnect.Auctions
-alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel}
+alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel, AuctionEvent, AuctionEventStorage}
 
 
 companies = [
@@ -227,6 +227,13 @@ end)
 [auction1, auction2, auction3] = Enum.map(auctions_params, fn(auction_params) ->
   Repo.get_or_insert!(Auction, auction_params)
 end)
+
+[auction1, auction2, auction3]
+|> Enum.map(fn(auction) ->
+    event = %AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now(), user: nil}
+    event_storage = %AuctionEventStorage{event: event, auction_id: auction.id}
+    AuctionEventStorage.persist(event_storage)
+  end)
 
 defmodule SupplierHelper do
   def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do

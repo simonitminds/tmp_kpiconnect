@@ -118,9 +118,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_new_bid, %{bid: bid, user: user}, emit}, current_state = %{auction_id: auction_id}) do
+  def handle_cast({:process_new_bid, %{bid: bid = %{min_amount: min_amount}, user: user}, emit}, current_state = %{auction_id: auction_id}) do
     {lowest_bid?, supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, current_state)
-    AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: bid.time_entered, user: user}, emit)
+    if min_amount != "" and min_amount != nil and min_amount > 0 do
+      AuctionEvent.emit(%AuctionEvent{type: :auto_bid_placed, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: bid.time_entered, user: user}, emit)
+    else
+      AuctionEvent.emit(%AuctionEvent{type: :bid_placed, auction_id: auction_id, data: %{bid: bid, state: new_state}, time_entered: bid.time_entered, user: user}, emit)
+    end
 
     if lowest_bid? or supplier_first_bid? do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
@@ -148,7 +152,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created}, _previous_state), do: nil
+  defp replay_event(%AuctionEvent{type: :auction_created, data: auction}, _previous_state) do
+    Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+  end
   defp replay_event(%AuctionEvent{type: :auction_started, data: %{state: state, auction: auction}}, _previous_state) do
     start_auction(state, auction)
   end
@@ -156,11 +162,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     update_auction(auction, previous_state)
   end
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
-    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
+    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state, false)
     new_state
   end
   defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
-    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state)
+    {_lowest_bid?, _supplier_first_bid?, new_state} = AuctionBidProcessor.process_new_bid(bid, previous_state, false)
     new_state
   end
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
