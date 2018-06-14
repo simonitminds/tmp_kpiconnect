@@ -42,7 +42,9 @@ defmodule OceanconnectWeb.AuctionView do
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
   def event_company(%AuctionEvent{data: %{auction: %Auction{buyer: buyer}}}), do: buyer.name
-  def event_company(%AuctionEvent{data: %Auction{buyer: buyer}}), do: buyer.name
+  def event_company(%AuctionEvent{data: auction = %Auction{buyer_id: buyer_id}}) do
+    Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, buyer_id).name
+  end
   def event_company(_), do: "-"
 
   def event_user(%AuctionEvent{user: nil}), do: "-"
