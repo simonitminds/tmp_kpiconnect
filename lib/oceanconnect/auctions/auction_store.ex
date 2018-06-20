@@ -22,9 +22,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     defstruct auction_id: nil,
               status: :pending,
+              winning_bid: nil,
               lowest_bids: [],
               minimum_bids: [],
-              winning_bid: nil
+              bids: [],
+              active_bids: [],
+              inactive_bids: []
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
       %AuctionState{

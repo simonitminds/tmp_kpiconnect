@@ -17,7 +17,8 @@ defmodule Oceanconnect.Auctions.AuctionBidList do
               min_amount: nil,
               supplier_id: nil,
               total_price: nil,
-              time_entered: nil
+              time_entered: DateTime.utc_now(),
+              active: true
 
     def from_params_to_auction_bid(
           %{
