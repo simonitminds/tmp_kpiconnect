@@ -18,8 +18,42 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     |> decrement_auto_bids
   end
 
+  def process(
+        current_state = %AuctionState{
+          auction_id: _auction_id,
+          status: :open,
+          minimum_bids: _min_bids,
+          bids: _bids,
+          lowest_bids: _lowest_bids,
+          active_bids: _active_bids,
+          inactive_bids: _inactive_bids
+        }
+      ) do
+    current_state
+    |> sort_lowest_bids
+    |> decrement_auto_bids
+  end
+
   defp enter_opening_bids(state = %AuctionState{minimum_bids: min_bids}) do
     enter_auto_bids(state, min_bids)
+  end
+
+  def enter_auto_bid(
+        current_state = %AuctionState{
+          bids: bids,
+          minimum_bids: min_bids,
+          active_bids: active_bids
+        },
+        bid = %AuctionBid{min_amount: min_amount}
+      )
+      when is_float(min_amount) do
+      %AuctionState{
+        current_state
+        | bids: [bid | bids],
+          minimum_bids: [bid | min_bids],
+          active_bids: [bid | active_bids]
+      }
+      |> process
   end
 
   defp enter_auto_bids(state = %AuctionState{bids: bids}, []) do
@@ -104,6 +138,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       when is_float(min_amount) do
     current_state
     |> invalidate_previous_bids(bid)
+    |> sort_lowest_bids
     |> add_auto_bid(bid)
   end
 
