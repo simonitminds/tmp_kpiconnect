@@ -47,13 +47,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         bid = %AuctionBid{min_amount: min_amount}
       )
       when is_float(min_amount) do
-      %AuctionState{
-        current_state
-        | bids: [bid | bids],
-          minimum_bids: [bid | min_bids],
-          active_bids: [bid | active_bids]
-      }
-      |> process
+    %AuctionState{
+      current_state
+      | bids: [bid | bids],
+        minimum_bids: [bid | min_bids],
+        active_bids: [bid | active_bids]
+    }
+    |> process
   end
 
   defp enter_auto_bids(state = %AuctionState{bids: bids}, []) do
@@ -98,11 +98,15 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
 
     min_bids
     |> Enum.filter(fn bid = %AuctionBid{amount: amount, min_amount: min_amount} ->
-      amount >= lowest_amount && min_amount < lowest_amount &&
+      amount >= lowest_amount && min_amount <= lowest_amount &&
         lowest_bid.supplier_id != bid.supplier_id
     end)
     |> Enum.map(fn bid ->
-      %AuctionBid{bid | amount: bid.amount - 0.25}
+      if bid.amount - 0.25 >= bid.min_amount do
+        %AuctionBid{bid | amount: bid.amount - 0.25}
+      else
+        %AuctionBid{bid | amount: bid.min_amount}
+      end
     end)
   end
 

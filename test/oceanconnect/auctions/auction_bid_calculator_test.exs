@@ -309,7 +309,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
              ] = inactive_bids
     end
 
-    test "minimum bids get processed after auction start", %{
+    test "minimum bids get processed after auction start with matching lowest bid", %{
       auction: auction,
       supplier1: supplier1,
       supplier2: supplier2
@@ -354,10 +354,60 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         %AuctionState{initial_state | status: :open}
         |> AuctionBidCalculator.process()
         |> AuctionBidCalculator.enter_auto_bid(supplier2_bid2)
-        #|> IO.inspect()
 
       lowest_bids = Enum.map(next_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids
     end
+
+    test "after auction start with lower bid than current lowest", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid2 = %AuctionBid{
+        amount: 1.00,
+        min_amount: 0.75,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      next_state =
+        %AuctionState{initial_state | status: :open}
+        |> AuctionBidCalculator.process()
+        |> AuctionBidCalculator.enter_auto_bid(supplier2_bid2)
+
+      lowest_bids = Enum.map(next_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids
+    end
+
   end
 end
