@@ -102,10 +102,9 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         lowest_bid.supplier_id != bid.supplier_id
     end)
     |> Enum.map(fn bid ->
-      if bid.amount - 0.25 >= bid.min_amount do
-        %AuctionBid{bid | amount: bid.amount - 0.25}
-      else
-        %AuctionBid{bid | amount: bid.min_amount}
+      cond do
+        bid.amount - 0.25 >= bid.min_amount -> %AuctionBid{bid | amount: bid.amount - 0.25}
+        bid.amount - 0.25 < bid.min_amount -> %AuctionBid{bid | amount: bid.min_amount}
       end
     end)
   end
