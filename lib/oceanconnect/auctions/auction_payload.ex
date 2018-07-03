@@ -111,10 +111,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   defp get_user_bid_list(%AuctionState{status: status}, _auction, _user_id) when status in [:draft, :pending], do: []
-  defp get_user_bid_list(%AuctionState{}, auction = %Auction{}, user_id) do
-    auction.id
-    |> AuctionBidList.get_bid_list
-    |> transform_bid_list_for_user(auction, user_id)
+  defp get_user_bid_list(%AuctionState{active_bids: bids}, auction = %Auction{}, user_id) do
+    transform_bid_list_for_user(bids, auction, user_id)
   end
 
   defp transform_bid_list_for_user(bid_list, auction = %Auction{buyer_id: buyer_id}, buyer_id) do

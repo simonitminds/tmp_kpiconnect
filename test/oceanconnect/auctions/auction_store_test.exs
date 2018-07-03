@@ -133,16 +133,29 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
 
-    test "non-lowest bid is not added and duration does not extend", %{auction: auction, bid: bid} do
+    test "lowest (and only) bidder raises bid and duration extends", %{auction: auction, bid: bid} do
+      :timer.sleep(1_100)
+      increased_bid_amount = bid.amount + 1
+      Auctions.place_bid(auction, %{"amount" => increased_bid_amount}, bid.supplier_id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      lowest_bid = hd(auction_payload.state.lowest_bids)
+      assert increased_bid_amount = lowest_bid.amount
+      assert auction_payload.time_remaining > 3 * 60_000 - 1_000
+    end
+
+    test "lowest bidder raises bid above next lowest bidder and duration does not extend", %{auction: auction, bid: bid, supplier2_company: supplier2_company} do
+      Auctions.place_bid(auction, %{"amount" => bid.amount + 0.5}, supplier2_company.id)
       :timer.sleep(1_100)
       Auctions.place_bid(auction, %{"amount" => bid.amount + 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
-        lowest_bid.id in [bid.id]
-      end)
+      lowest_bid = hd(auction_payload.state.lowest_bids)
+      other_lowest_bid = bid.amount + 0.5
+      assert ^other_lowest_bid = lowest_bid.amount
       assert auction_payload.time_remaining < 3 * 60_000 - 1_000
     end
+
 
     test "new lowest bid is placed and minimum bid is activated and duration extends", %{auction: auction, supplier_company: supplier_company, supplier2_company: supplier2_company} do
       :timer.sleep(1_100)
@@ -151,10 +164,10 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
-        assert lowest_bid.amount == 0.50
-        assert lowest_bid.supplier == supplier_company.name
-      end)
+      lowest_bid = hd(auction_payload.state.lowest_bids)
+      assert lowest_bid.amount == 0.50
+      assert lowest_bid.supplier == supplier_company.name
+
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
   end

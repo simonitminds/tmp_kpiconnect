@@ -3,8 +3,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   alias Oceanconnect.Auctions.{
     Auction,
-    AuctionBidList,
-    AuctionBidProcessor,
+    AuctionBidList.AuctionBid,
+    AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,
     AuctionEventStore,
@@ -67,7 +67,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def process_command(%Command{
         command: cmd,
-        data: data = %{bid: %AuctionBidList.AuctionBid{auction_id: auction_id}}
+        data: data = %{bid: %AuctionBid{auction_id: auction_id}}
       }) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
@@ -184,42 +184,58 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:process_new_bid, %{bid: bid = %{min_amount: min_amount}, user: user}, emit},
+        {:process_new_bid, %{bid: bid = %{min_amount: nil}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    {lowest_bid?, supplier_first_bid?, new_state} =
-      AuctionBidProcessor.process_new_bid(bid, current_state)
+    is_first_bid = is_suppliers_first_bid?(current_state, bid)
+    new_state = AuctionBidCalculator.enter_bid(current_state, bid)
+                |> AuctionBidCalculator.process()
 
-    if min_amount != "" and min_amount != nil and min_amount > 0 do
-      AuctionEvent.emit(
-        %AuctionEvent{
-          type: :auto_bid_placed,
-          auction_id: auction_id,
-          data: %{bid: bid, state: new_state},
-          time_entered: bid.time_entered,
-          user: user
-        },
-        emit
-      )
-    else
-      AuctionEvent.emit(
-        %AuctionEvent{
-          type: :bid_placed,
-          auction_id: auction_id,
-          data: %{bid: bid, state: new_state},
-          time_entered: bid.time_entered,
-          user: user
-        },
-        emit
-      )
-    end
+    AuctionEvent.emit(
+      %AuctionEvent{
+        type: :bid_placed,
+        auction_id: auction_id,
+        data: %{bid: bid, state: new_state},
+        time_entered: bid.time_entered,
+        user: user
+      },
+      emit
+    )
 
-    if lowest_bid? or supplier_first_bid? do
+    if is_lowest_bid?(new_state, bid) or is_first_bid do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
 
     {:noreply, new_state}
   end
+
+
+  def handle_cast(
+        {:process_new_bid, %{bid: bid = %{min_amount: min_amount}, user: user}, emit},
+        current_state = %{auction_id: auction_id}
+      ) do
+    is_first_bid = is_suppliers_first_bid?(current_state, bid)
+    new_state = AuctionBidCalculator.enter_auto_bid(current_state, bid)
+                |> AuctionBidCalculator.process()
+
+    AuctionEvent.emit(
+      %AuctionEvent{
+        type: :auto_bid_placed,
+        auction_id: auction_id,
+        data: %{bid: bid, state: new_state},
+        time_entered: bid.time_entered,
+        user: user
+      },
+      emit
+    )
+
+    if is_lowest_bid?(new_state, bid) or is_first_bid do
+      maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
+    end
+
+    {:noreply, new_state}
+  end
+
 
   def handle_cast(
         {:select_winning_bid, %{bid: bid, user: user}, emit},
@@ -251,6 +267,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  defp is_suppliers_first_bid?(%AuctionState{bids: bids}, %AuctionBid{supplier_id: supplier_id}) do
+    !Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
+  end
+
+  defp is_lowest_bid?(%AuctionState{lowest_bids: []}, bid = %AuctionBid{}), do: true
+
+  defp is_lowest_bid?(%AuctionState{lowest_bids: lowest_bids}, bid = %AuctionBid{}) do
+    hd(lowest_bids).supplier_id == bid.supplier_id
+  end
+
   defp replay_events(auction_id) do
     auction_id
     |> AuctionEventStore.event_list()
@@ -279,17 +305,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
-    {_lowest_bid?, _supplier_first_bid?, new_state} =
-      AuctionBidProcessor.process_new_bid(bid, previous_state, false)
-
-    new_state
+    AuctionBidCalculator.enter_bid(previous_state, bid)
+    |> AuctionBidCalculator.process()
   end
 
   defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
-    {_lowest_bid?, _supplier_first_bid?, new_state} =
-      AuctionBidProcessor.process_new_bid(bid, previous_state, false)
-
-    new_state
+    AuctionBidCalculator.enter_auto_bid(previous_state, bid)
+    |> AuctionBidCalculator.process()
   end
 
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
@@ -329,8 +351,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start()
     |> AuctionScheduler.process_command()
 
-    updated_state = %AuctionState{current_state | status: :open}
-    AuctionBidProcessor.resolve_existing_bids(updated_state)
+    %AuctionState{current_state | status: :open}
+    |> AuctionBidCalculator.process()
   end
 
   defp update_auction(
