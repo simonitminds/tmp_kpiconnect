@@ -5,10 +5,11 @@ import CollapsibleSection from './collapsible-section';
 
 const BiddingForm = ({auctionPayload, formSubmit}) => {
   const auction = auctionPayload.auction;
+  const auctionState = auctionPayload.state.status;
   const minimumBidAmount = _.get(auctionPayload, 'state.minimum_bids[0].min_amount');
   const fuel = _.get(auction, 'fuel.name');
   return(
-    <div className="auction-bidding box box--nested-base box--nested-base--base">
+    <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
       <MediaQuery query="(min-width: 769px)">
         <form onSubmit={formSubmit.bind(this, auction.id)}>
           <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
@@ -88,9 +89,33 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
                 </div>
               </div>
             </div>
-            <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
-              <div className="control">
-                <button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button>
+            <div className="field is-horizontal is-expanded">
+              <div className="field-label">
+                <div className="control">
+                  <label className="label" htmlFor="bid">Minimum Bid</label>
+                </div>
+              </div>
+              <div className="field-body">
+                <div className="control is-expanded has-icons-left">
+                  <input
+                    className="input qa-auction-bid-min_amount"
+                    type="number"
+                    id="minimumBid"
+                    step="0.25"
+                    min="0"
+                    name="min_amount"
+                    defaultValue={minimumBidAmount} />
+                  <span className="icon is-small is-left">
+                    <i className="fas fa-dollar-sign"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="field is-horizontal is-expanded">
+              <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
+                <div className="control">
+                  <button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button>
+                </div>
               </div>
             </div>
           </form>

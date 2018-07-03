@@ -259,3 +259,13 @@
     background-color: $gray-1;
   }
 }
+
+.auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
+  margin: 1.25rem -1.275rem -1rem -1.275rem;
+  box-shadow: none;
+  border-top: 1px solid $gray-2;
+
+  @media (max-width: 768px) {
+    margin: 0 -2.25rem;
+  }
+}
