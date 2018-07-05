@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionBidList, AuctionPayload, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor, AuctionBidList.AuctionBid}
 
   setup do
     supplier_company = insert(:company)
@@ -47,7 +47,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
       actual_payload = AuctionPayload.get_auction_payload!(auction, supplier_id)
 
       assert [bid |> Map.delete(:supplier_id)] == actual_payload.state.lowest_bids
-      assert actual_payload.bid_list == [bid2, bid]
+      assert actual_payload.bid_list == [%AuctionBid{bid2 | amount: 10.00}, bid]
     end
 
     test "supplier can raise minimum with no bid above their lowest", %{auction: auction, supplier_id: supplier_id} do
@@ -65,7 +65,6 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
       Auctions.place_bid(auction, %{"amount" => nil, "min_amount" => 9.00}, supplier2_id)
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
-
       assert hd(actual_payload.state.lowest_bids).amount == 8.50
       assert hd(actual_payload.state.lowest_bids).supplier == supplier_company.name
       assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [9.00, 8.50]
@@ -88,7 +87,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert bid |> Map.drop([:__struct__, :supplier_id]) == actual_payload.state.lowest_bids |> hd |> Map.drop([:supplier])
+      assert bid.id == hd(actual_payload.state.lowest_bids).id
       assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [7.50, 8.00]
     end
   end

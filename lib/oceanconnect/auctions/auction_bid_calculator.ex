@@ -2,7 +2,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   alias Oceanconnect.Auctions.{AuctionBidList.AuctionBid}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
-
   def process(current_state = %AuctionState{status: :pending}) do
     current_state
   end
@@ -25,8 +24,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         current_state = %AuctionState{
           auction_id: _auction_id,
           status: :open,
-          minimum_bids: _min_bids,
-          bids: [],
+          minimum_bids: _min_bids, bids: [],
           lowest_bids: [],
           active_bids: [],
           inactive_bids: []
@@ -36,6 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     |> enter_opening_bids
     |> decrement_auto_bids
   end
+
   def process(
         current_state = %AuctionState{
           auction_id: _auction_id,
@@ -47,7 +46,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
           inactive_bids: _inactive_bids
         }
       ) do
-
     current_state
     |> sort_lowest_bids
     |> decrement_auto_bids
@@ -61,11 +59,21 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         current_state = %AuctionState{
           bids: bids,
           minimum_bids: min_bids,
+          lowest_bids: lowest_bids,
           active_bids: active_bids
         },
         bid = %AuctionBid{min_amount: min_amount}
       )
       when is_float(min_amount) do
+    existing_min_amount =
+      case lowest_bids do
+        [] -> min_amount
+        [head | _] -> head.amount
+      end
+
+    matching_lowest_amount = Enum.max([existing_min_amount, min_amount])
+    bid = %AuctionBid{bid | amount: bid.amount || matching_lowest_amount}
+
     %AuctionState{
       current_state
       | bids: [bid | bids],
@@ -94,8 +102,11 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp decrement_auto_bids(state = %AuctionState{minimum_bids: min_bids}) do
-    decremented_auto_bids = decrement_auto_bids_that_can_be_decremented(state, min_bids)
-
+#    decremented_auto_bids = decrement_auto_bids_that_can_be_decremented(state, min_bids)
+    min_of_min_bids = Enum.map(min_bids, &(&1.min_amount))
+                      |> Enum.min
+    lowest_amount = hd(state.lowest_bids).amount
+    absolute_lowest_amount = Enum.min([min_of_min_bids, lowest_amount])
     if length(decremented_auto_bids) > 0 do
       enter_auto_bids(state, decremented_auto_bids)
       |> decrement_auto_bids
@@ -178,6 +189,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     |> invalidate_previous_bids(bid)
     |> add_bid(bid)
     |> sort_lowest_bids
+    |> IO.inspect(label: "END OF ENTER BID")
   end
 
   defp add_bid(state = %AuctionState{bids: bids, active_bids: active_bids}, bid = %AuctionBid{}) do
@@ -228,6 +240,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       end)
 
     inactive_bids = Enum.filter(updated_bids, &(&1.active == false))
+
     %AuctionState{
       state
       | inactive_bids: inactive_bids,
@@ -253,6 +266,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       end)
 
     inactive_bids = Enum.filter(updated_bids, &(&1.active == false))
+
     %AuctionState{
       state
       | inactive_bids: inactive_bids,
