@@ -12,7 +12,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
 
     if (bidList.length > 0 ) {
       return(
-        <div className="box has-margin-top-lg">
+        <div className="qa-supplier-bid-history box has-margin-top-lg">
           <h3 className="box__header box__header--bordered">Your Bid History</h3>
           <table className="table is-fullwidth is-striped is-marginless qa-auction-bids">
             <thead>
@@ -37,7 +37,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
     }
     else {
       return(
-        <div className="box">
+        <div className="qa-supplier-bid-history box">
           <h3 className="box__header box__header--bordered">Your Bid History</h3>
           <div className="auction-table-placeholder">
             <i>You have not bid on this auction</i>

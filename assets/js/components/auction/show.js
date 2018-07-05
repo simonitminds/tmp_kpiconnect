@@ -207,7 +207,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> }
+                        {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
 
                         <div className="box has-margin-bottom-md">

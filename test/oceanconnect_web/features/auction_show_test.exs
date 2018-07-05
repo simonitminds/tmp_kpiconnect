@@ -123,7 +123,7 @@ defmodule Oceanconnect.AuctionShowTest do
     end
 
     test "supplier can see his view of the auction card" do
-      assert has_css?(".qa-auction-invitation-controls")
+      assert has_css?(".qa-supplier-bid-history")
       refute has_css?(".qa-auction-suppliers")
     end
 

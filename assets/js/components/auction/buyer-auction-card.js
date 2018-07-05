@@ -49,16 +49,11 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   }
 
   const bidStatusDisplay = () => {
-    if (lowestBidCount > 0) {
+    if (auctionStatus != 'pending' && lowestBidCount > 0) {
       return (
         <div className="card-content__bid-status">
           {lowestBidMessage()}
-
-          { auctionStatus != 'pending' ?
-            <div className="card-content__best-price"><strong>{ auctionStatus == 'closed' ? '' : 'Best'} Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}</div>
-            :
-            ''
-          }
+          <div className="card-content__best-price"><strong>{ auctionStatus == 'closed' ? '' : 'Best'} Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}</div>
         </div>
       );
     } else {
