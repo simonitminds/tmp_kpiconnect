@@ -19,13 +19,6 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
                 <label className="label" htmlFor="bid">Bid Amount</label>
               </div>
             </div>
-          </div>
-          <div className="field is-horizontal is-expanded">
-            <div className="field-label">
-              <div className="control">
-                <label className="label" htmlFor="bid">Bid Amount</label>
-              </div>
-            </div>
             <div className="field-body">
               <div className="control is-expanded has-icons-left">
                 <input className="input qa-auction-bid-amount" type="number" id="bid" step="0.25" min="0" name="amount" />

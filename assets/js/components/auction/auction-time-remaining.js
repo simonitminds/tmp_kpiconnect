@@ -5,6 +5,7 @@ import { formatTimeRemaining, formatTimeRemainingColor } from '../../utilities';
 
 const AuctionTimeRemaining = ({auctionPayload, auctionTimer, time}) => {
   const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStartTime = _.get(auctionPayload, 'auction.scheduled_start');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
   if (auctionStatus == "open" || auctionStatus == "decision") {
@@ -26,7 +27,15 @@ const AuctionTimeRemaining = ({auctionPayload, auctionTimer, time}) => {
         Not Scheduled
       </span>
     );
-  } else {
+  } else if (auctionStatus == "pending") {
+    return (
+      <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
+        <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
+        {cardDateFormat(auctionStartTime)}
+      </span>
+    );
+  }
+   else {
     return (
       <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
         <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
