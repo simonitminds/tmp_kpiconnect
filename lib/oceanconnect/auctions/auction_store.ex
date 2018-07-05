@@ -216,7 +216,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
     new_state = AuctionBidCalculator.enter_auto_bid(current_state, bid)
-                |> AuctionBidCalculator.process()
+    |> AuctionBidCalculator.process()
 
     AuctionEvent.emit(
       %AuctionEvent{

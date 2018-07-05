@@ -21,7 +21,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
     assert hd(actual_payload.state.lowest_bids).amount == 8.25
     assert hd(actual_payload.state.lowest_bids).supplier == supplier_company.name
-    assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.25, 8.50]
+    assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.50, 8.25]
   end
 
   describe "started auction" do
@@ -46,8 +46,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, supplier_id)
 
-      assert [bid |> Map.delete(:supplier_id)] == actual_payload.state.lowest_bids
-      assert actual_payload.bid_list == [%AuctionBid{bid2 | amount: 10.00}, bid]
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [10.00]
     end
 
     test "supplier can raise minimum with no bid above their lowest", %{auction: auction, supplier_id: supplier_id} do
@@ -56,8 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, supplier_id)
 
-      assert [bid |> Map.delete(:supplier_id)] == actual_payload.state.lowest_bids
-      assert actual_payload.bid_list == [bid2, bid]
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [11.00]
     end
 
     test "losing auto_bid placed", %{auction: auction, supplier_company: supplier_company, supplier2_id: supplier2_id} do
@@ -78,7 +76,7 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
 
       assert hd(actual_payload.state.lowest_bids).amount == 8.25
       assert hd(actual_payload.state.lowest_bids).supplier == supplier_company.name
-      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.25, 8.50]
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.50, 8.25]
     end
 
     test "new lower bid beats minimum and correct auto_bid placed", %{auction: auction, supplier_company: supplier_company, supplier2_id: supplier2_id} do
@@ -86,9 +84,8 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
       bid = Auctions.place_bid(auction, %{"amount" => 7.50, "min_amount" => nil}, supplier2_id)
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
-
       assert bid.id == hd(actual_payload.state.lowest_bids).id
-      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [7.50, 8.00]
+      assert Enum.map(actual_payload.bid_list, &(&1.amount)) == [8.00, 7.50]
     end
   end
 end
