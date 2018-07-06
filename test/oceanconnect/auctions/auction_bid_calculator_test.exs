@@ -212,7 +212,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   describe "auto bidding" do
     test "entering a auto bid before the auction starts", %{
       auction: auction,
-      supplier1: supplier1
+      supplier1: supplier1,
+      supplier2: supplier2
     } do
       auction_id = auction.id
 
@@ -227,7 +228,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       supplier2_bid = %AuctionBid{
         amount: 2.00,
         min_amount: 1.50,
-        supplier_id: supplier1,
+        supplier_id: supplier2,
         auction_id: auction_id,
         time_entered: DateTime.utc_now()
       }
@@ -300,12 +301,10 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       inactive_bids =
         Enum.map(new_state.inactive_bids, fn bid -> {bid.amount, bid.supplier_id} end)
 
+      # both initial auto bids get lowered, so the originals are invalidated.
       assert [
-               {1.5, supplier1},
-               {1.75, supplier2},
-               {1.75, supplier1},
-               {2.0, supplier1},
-               {2.0, supplier2}
+               {2.0, ^supplier1},
+               {2.0, ^supplier2}
              ] = inactive_bids
     end
 
@@ -354,6 +353,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         %AuctionState{initial_state | status: :open}
         |> AuctionBidCalculator.process()
         |> AuctionBidCalculator.enter_auto_bid(supplier2_bid2)
+        |> AuctionBidCalculator.process()
 
       lowest_bids = Enum.map(next_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids
@@ -404,6 +404,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         %AuctionState{initial_state | status: :open}
         |> AuctionBidCalculator.process()
         |> AuctionBidCalculator.enter_auto_bid(supplier2_bid2)
+        |> AuctionBidCalculator.process()
 
       lowest_bids = Enum.map(next_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids

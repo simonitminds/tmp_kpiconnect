@@ -80,11 +80,19 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> hd
     |> Map.delete(:supplier_id)
 
+    bids_at_lowest_amount = Enum.filter(auction_state.lowest_bids, fn(bid) -> bid.amount == lowest_bid.amount end)
+
+    matches_best =
+      if length(bids_at_lowest_amount) > 1 && order do
+        suppliers_lowest_bid = Enum.at(auction_state.lowest_bids, order, nil)
+        suppliers_lowest_bid && lowest_bid.amount == suppliers_lowest_bid.amount
+      end
+
     auction_state
     |> Map.delete(:supplier_ids)
     |> Map.put(:lowest_bids, [lowest_bid])
     |> Map.put(:lowest_bids_position, order)
-    |> Map.put(:multiple, length(auction_state.lowest_bids) > 1)
+    |> Map.put(:matches_best, matches_best)
   end
 
   defp convert_minimum_bids_for_user(auction_state = %AuctionState{minimum_bids: minimum_bids}, user_id) do

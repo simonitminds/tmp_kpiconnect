@@ -117,6 +117,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       assert [
         %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
+        %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},

@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionBidListTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor, AuctionBidList.AuctionBid}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
 
   setup do
     supplier_company = insert(:company)
@@ -41,8 +41,8 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     end
 
     test "supplier can change minimum with no bid to match their lowest", %{auction: auction, supplier_id: supplier_id} do
-      bid = Auctions.place_bid(auction, %{"amount" => 10.00, "min_amount" => 8.00}, supplier_id)
-      bid2 = Auctions.place_bid(auction, %{"amount" => nil, "min_amount" => 10.00}, supplier_id)
+      Auctions.place_bid(auction, %{"amount" => 10.00, "min_amount" => 8.00}, supplier_id)
+      Auctions.place_bid(auction, %{"amount" => nil, "min_amount" => 10.00}, supplier_id)
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, supplier_id)
 
@@ -50,8 +50,8 @@ defmodule Oceanconnect.Auctions.AuctionBidListTest do
     end
 
     test "supplier can raise minimum with no bid above their lowest", %{auction: auction, supplier_id: supplier_id} do
-      bid = Auctions.place_bid(auction, %{"amount" => 10.00, "min_amount" => 8.00}, supplier_id)
-      bid2 = Auctions.place_bid(auction, %{"amount" => nil, "min_amount" => 11.00}, supplier_id)
+      Auctions.place_bid(auction, %{"amount" => 10.00, "min_amount" => 8.00}, supplier_id)
+      Auctions.place_bid(auction, %{"amount" => nil, "min_amount" => 11.00}, supplier_id)
 
       actual_payload = AuctionPayload.get_auction_payload!(auction, supplier_id)
 
