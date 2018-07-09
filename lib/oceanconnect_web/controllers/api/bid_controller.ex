@@ -35,8 +35,8 @@ defmodule OceanconnectWeb.Api.BidController do
     auction_id = String.to_integer(auction_id)
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
-         %{status: :decision} <- Auctions.get_auction_state!(auction),
-         bid = %AuctionBidList.AuctionBid{} <- AuctionBidList.get_bid(auction.id, bid_id)
+         %{status: :decision, active_bids: bids} <- Auctions.get_auction_state!(auction),
+         bid = %AuctionBidList.AuctionBid{} <- Enum.find(bids, fn(bid) -> bid.id == bid_id end)
     do
       Auctions.select_winning_bid(bid, comment, user)
 

@@ -117,7 +117,8 @@ defmodule Oceanconnect.Auctions.AuctionBidProcessor do
     {lowest_bid?, updated_state} =
       maybe_set_lowest_bids(bid, new_state, lowest_amount, emit_events)
 
-    {lowest_bid?, supplier_first_bid?, updated_state} end
+    {lowest_bid?, supplier_first_bid?, updated_state}
+  end
 
   defp maybe_add_minimum_bid(
          current_state = %{minimum_bids: minimum_bids},
