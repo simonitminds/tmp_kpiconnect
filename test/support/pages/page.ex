@@ -8,14 +8,14 @@ defmodule Oceanconnect.Page do
       end
 
       def has_css?(css) do
-        case search_element(:css, css) do
+        case Hound.Helpers.Page.search_element(:css, css) do
           {:ok, _} -> true
           {:error, _} -> false
         end
       end
 
       def has_no_css?(css) do
-        case search_element(:css, css) do
+        case Hound.Helpers.Page.search_element(:css, css) do
           {:ok, _} -> false
           {:error, _} -> true
         end

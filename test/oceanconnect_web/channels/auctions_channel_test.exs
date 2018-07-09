@@ -377,7 +377,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{status: :open, lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            state: state = %{status: :open, lowest_bids: lowest_bids, lowest_bids_position: position, matches_best: matches_best},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
@@ -385,7 +385,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             assert supplier_payload.bid_list == bid_list
             assert supplier_payload.state.lowest_bids == lowest_bids
             assert supplier_payload.state.lowest_bids_position == position
-            assert supplier_payload.state.multiple == multiple
+            assert supplier_payload.state.matches_best == matches_best
             refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
@@ -413,7 +413,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{status: :decision, lowest_bids: lowest_bids, lowest_bids_position: position, multiple: multiple},
+            state: state = %{status: :decision, lowest_bids: lowest_bids, lowest_bids_position: position, matches_best: matches_best},
             bid_list: bid_list,
             time_remaining: time_remaining
           },
@@ -421,7 +421,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             assert decision_supplier_payload.bid_list == bid_list
             assert decision_supplier_payload.state.lowest_bids == lowest_bids
             assert decision_supplier_payload.state.lowest_bids_position == position
-            assert decision_supplier_payload.state.multiple == multiple
+            assert decision_supplier_payload.state.matches_best == matches_best
             refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)

@@ -4,8 +4,8 @@ import { quickOrdinal } from '../../utilities';
 
 const SupplierBidStatus = ({auctionPayload, connection}) => {
   const bidList = _.get(auctionPayload, 'bid_list', []);
-  const order = _.get(auctionPayload, 'state.lowest_bids_position');
-  const multiple = _.get(auctionPayload, 'state.multiple');
+  const rank = _.get(auctionPayload, 'state.lowest_bids_position');
+  const matches_best = _.get(auctionPayload, 'state.matches_best');
   const auctionStatus = _.get(auctionPayload, 'state.status');
   const winner = _.get(auctionPayload, 'state.winner');
 
@@ -51,16 +51,16 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
         {messageDisplay("You have not bid on this auction")}
       </div>
     );
-  } else if (order == 0 && !multiple) {
+  } else if (matches_best && rank != null) {
+    return (
+      <div className = "auction-notification box is-success" >
+        {messageDisplay(`Your bid matches the best offer (${rank + 1}${quickOrdinal(rank + 1)})`)}
+      </div>
+    );
+  } else if (rank == 0) {
     return (
       <div className = "auction-notification box is-success" >
         {messageDisplay("Your bid is the best offer")}
-      </div>
-    );
-  } else if (order >= 0 && order != null) {
-    return (
-      <div className = "auction-notification box is-success" >
-        {messageDisplay(`Your bid matches the best offer (${order + 1}${quickOrdinal(order + 1)})`)}
       </div>
     );
   } else {
