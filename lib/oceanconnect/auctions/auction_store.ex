@@ -188,9 +188,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         current_state = %{auction_id: auction_id}
       ) do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
-    new_state = AuctionBidCalculator.enter_bid(current_state, bid)
-                |> AuctionBidCalculator.process()
-
+    {new_state, events} = AuctionBidCalculator.process(current_state, bid)
+    Enum.map(events, &(AuctionEvent.emit(&1, true)))
     AuctionEvent.emit(
       %AuctionEvent{
         type: :bid_placed,
@@ -215,9 +214,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         current_state = %{auction_id: auction_id}
       ) do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
-    new_state = AuctionBidCalculator.enter_auto_bid(current_state, bid)
-                |> AuctionBidCalculator.process()
-
+    {new_state, events} = AuctionBidCalculator.process(current_state, bid)
+    Enum.map(events, &(AuctionEvent.emit(&1, true)))
     AuctionEvent.emit(
       %AuctionEvent{
         type: :auto_bid_placed,
@@ -271,8 +269,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     !Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
   end
 
-  defp is_lowest_bid?(%AuctionState{lowest_bids: []}, bid = %AuctionBid{}), do: true
-
+  defp is_lowest_bid?(%AuctionState{lowest_bids: []}, %AuctionBid{}), do: true
   defp is_lowest_bid?(%AuctionState{lowest_bids: lowest_bids}, bid = %AuctionBid{}) do
     hd(lowest_bids).supplier_id == bid.supplier_id
   end
@@ -305,13 +302,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
-    AuctionBidCalculator.enter_bid(previous_state, bid)
-    |> AuctionBidCalculator.process()
+    {next_state, _} = AuctionBidCalculator.process(previous_state, bid)
+    next_state
   end
 
   defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
-    AuctionBidCalculator.enter_auto_bid(previous_state, bid)
-    |> AuctionBidCalculator.process()
+    {next_state, _} = AuctionBidCalculator.process(previous_state, bid)
+    next_state
   end
 
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
@@ -351,8 +348,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start()
     |> AuctionScheduler.process_command()
 
-    %AuctionState{current_state | status: :open}
+    {next_state, _} = %AuctionState{current_state | status: :open}
     |> AuctionBidCalculator.process()
+    next_state
   end
 
   defp update_auction(
