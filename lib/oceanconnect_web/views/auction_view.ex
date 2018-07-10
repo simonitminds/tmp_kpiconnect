@@ -34,6 +34,7 @@ defmodule OceanconnectWeb.AuctionView do
     |> String.capitalize
   end
 
+  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: nil}}}), do: ""
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: amount}}}) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
@@ -41,8 +42,9 @@ defmodule OceanconnectWeb.AuctionView do
 
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
+  def event_company(%AuctionEvent{data: %{bid: %{supplier_id: supplier_id}}}), do: Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, supplier_id).name
   def event_company(%AuctionEvent{data: %{auction: %Auction{buyer: buyer}}}), do: buyer.name
-  def event_company(%AuctionEvent{data: auction = %Auction{buyer_id: buyer_id}}) do
+  def event_company(%AuctionEvent{data: %Auction{buyer_id: buyer_id}}) do
     Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, buyer_id).name
   end
   def event_company(_), do: "-"
