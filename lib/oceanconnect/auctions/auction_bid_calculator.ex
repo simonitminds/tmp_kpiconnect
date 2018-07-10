@@ -150,7 +150,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
           auction_id: bid.auction_id,
           data: %{bid: bid, state: next_state},
           time_entered: bid.time_entered,
-          user: nil
+          user: :auto_decremented
         }
       end)
 

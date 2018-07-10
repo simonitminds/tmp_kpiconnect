@@ -210,12 +210,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
 
   def handle_cast(
-        {:process_new_bid, %{bid: bid = %{min_amount: min_amount}, user: user}, emit},
+        {:process_new_bid, %{bid: bid = %{min_amount: _min_amount}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
     {new_state, events} = AuctionBidCalculator.process(current_state, bid)
-    Enum.map(events, &(AuctionEvent.emit(&1, true)))
+
     AuctionEvent.emit(
       %AuctionEvent{
         type: :auto_bid_placed,
@@ -226,6 +226,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       },
       emit
     )
+    Enum.map(events, &(AuctionEvent.emit(&1, true)))
 
     if is_lowest_bid?(new_state, bid) or is_first_bid do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)

@@ -140,7 +140,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       lowest_bid = hd(auction_payload.state.lowest_bids)
-      assert increased_bid_amount = lowest_bid.amount
+      assert increased_bid_amount == lowest_bid.amount
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
 
