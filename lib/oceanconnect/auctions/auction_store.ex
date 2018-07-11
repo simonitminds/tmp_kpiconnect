@@ -111,16 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     new_state = start_auction(current_state, auction)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_started,
-        auction_id: auction.id,
-        data: %{state: new_state, auction: auction},
-        time_entered: auction.scheduled_start,
-        user: user
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.auction_started(auction, new_state, user), emit)
 
     {:noreply, new_state}
   end
@@ -128,16 +119,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast({:update_auction, %{auction: auction, user: user}, emit}, current_state) do
     state = update_auction(auction, current_state)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_updated,
-        auction_id: auction.id,
-        data: auction,
-        time_entered: DateTime.utc_now(),
-        user: user
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.auction_updated(auction, user), emit)
 
     {:noreply, state}
   end
@@ -148,15 +130,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     new_state = end_auction(current_state, auction)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_ended,
-        auction_id: auction_id,
-        data: %{state: new_state, auction: auction},
-        time_entered: auction.auction_ended
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.auction_ended(auction, new_state), emit)
 
     {:noreply, new_state}
   end
@@ -170,15 +144,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     new_state = expire_auction(current_state)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_expired,
-        auction_id: auction_id,
-        data: new_state,
-        time_entered: DateTime.utc_now()
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.auction_expired(auction_id, new_state), emit)
 
     {:noreply, new_state}
   end
@@ -190,16 +156,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
     {new_state, events} = AuctionBidCalculator.process(current_state, bid)
     Enum.map(events, &(AuctionEvent.emit(&1, true)))
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :bid_placed,
-        auction_id: auction_id,
-        data: %{bid: bid, state: new_state},
-        time_entered: bid.time_entered,
-        user: user
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.bid_placed(bid, new_state, user), emit)
 
     if is_lowest_bid?(new_state, bid) or is_first_bid do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
@@ -216,16 +173,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
     {new_state, events} = AuctionBidCalculator.process(current_state, bid)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auto_bid_placed,
-        auction_id: auction_id,
-        data: %{bid: bid, state: new_state},
-        time_entered: bid.time_entered,
-        user: user
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.auto_bid_placed(bid, new_state, user), emit)
     Enum.map(events, &(AuctionEvent.emit(&1, true)))
 
     if is_lowest_bid?(new_state, bid) or is_first_bid do
@@ -242,26 +190,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     new_state = select_winning_bid(bid, current_state)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :winning_bid_selected,
-        auction_id: auction_id,
-        data: %{bid: bid, state: current_state},
-        time_entered: DateTime.utc_now(),
-        user: user
-      },
-      emit
-    )
-
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_closed,
-        auction_id: auction_id,
-        data: new_state,
-        time_entered: DateTime.utc_now()
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.winning_bid_selected(bid, current_state, user), emit)
+    AuctionEvent.emit(AuctionEvent.auction_closed(auction_id, new_state), emit)
 
     {:noreply, new_state}
   end
@@ -406,45 +336,21 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :open, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :duration)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_state_rebuilt,
-        data: %{state: state, time_remaining: time_remaining},
-        time_entered: DateTime.utc_now(),
-        auction_id: auction_id
-      },
-      true
-    )
+    AuctionEvent.emit(AuctionEvent.auction_state_rebuilt(auction_id, state, time_remaining), true)
 
     state
   end
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :decision, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :decision_duration)
 
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :auction_state_rebuilt,
-        data: %{state: state, time_remaining: time_remaining},
-        time_entered: DateTime.utc_now(),
-        auction_id: auction_id
-      },
-      true
-    )
+    AuctionEvent.emit(AuctionEvent.auction_state_rebuilt(auction_id, state, time_remaining), true)
 
     state
   end
   defp maybe_emit_rebuilt_event(state), do: state
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
-    AuctionEvent.emit(
-      %AuctionEvent{
-        type: :duration_extended,
-        auction_id: auction_id,
-        data: %{extension_time: extension_time},
-        time_entered: DateTime.utc_now()
-      },
-      emit
-    )
+    AuctionEvent.emit(AuctionEvent.duration_extended(auction_id, extension_time), emit)
   end
   defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}, _emit), do: nil
 end
