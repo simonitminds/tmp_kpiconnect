@@ -165,7 +165,7 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   describe "bid handling" do
-    alias Oceanconnect.Auctions.AuctionBidList
+    alias Oceanconnect.Auctions.AuctionBid
 
     setup do
       supplier_company = insert(:company, is_supplier: true)
@@ -195,7 +195,7 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: DateTime.utc_now()
       }
 
-      assert bid = %AuctionBidList.AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
+      assert bid = %AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
       assert Enum.all?(expected_result, fn({k, v}) ->
         if k == :time_entered do
           Map.fetch!(bid, k) >= v

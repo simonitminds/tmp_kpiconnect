@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.AuctionBidList.AuctionBid
+  alias Oceanconnect.Auctions.AuctionBid
   alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
 
   describe "get_auction_payload!/1" do

@@ -99,9 +99,12 @@ defmodule Oceanconnect.AuctionShowTest do
       Auctions.place_bid(auction, %{"amount" => 1.75}, s1.id)
       Auctions.place_bid(auction, %{"amount" => 1.25}, s2.id)
 
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!
+
       stored_bid_list =
-        auction.id
-        |> Auctions.AuctionBidList.get_bid_list()
+        auction_state.bids
         |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
 
       bid_list_params =
@@ -135,10 +138,13 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
 
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!
+
       stored_bid_list =
-        auction.id
-        |> Auctions.AuctionBidList.get_bid_list()
-        |> Auctions.AuctionPayload.supplier_bid_list(supplier.company_id)
+        auction_state.bids
+        |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->

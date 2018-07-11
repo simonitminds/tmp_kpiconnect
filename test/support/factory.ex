@@ -80,10 +80,6 @@ defmodule Oceanconnect.Factory do
       "supplier_id" => supplier_id,
       "time_entered" => DateTime.utc_now()
     }
-
-    Oceanconnect.Auctions.AuctionBidList.AuctionBid.from_params_to_auction_bid(
-      bid_params,
-      auction
-    )
+    Oceanconnect.Auctions.AuctionBid.from_params_to_auction_bid(bid_params, auction)
   end
 end
