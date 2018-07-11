@@ -230,7 +230,7 @@ end)
 
 [auction1, auction2, auction3]
 |> Enum.map(fn(auction) ->
-    event = %AuctionEvent{type: :auction_created, auction_id: auction.id, data: auction, time_entered: DateTime.utc_now(), user: nil}
+    event = AuctionEvent.auction_created(auction, nil)
     event_storage = %AuctionEventStorage{event: event, auction_id: auction.id}
     AuctionEventStorage.persist(event_storage)
   end)

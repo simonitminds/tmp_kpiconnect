@@ -145,13 +145,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
 
     events =
       Enum.map(decremented_auto_bids, fn bid ->
-        %AuctionEvent{
-          type: :auto_bid_placed,
-          auction_id: bid.auction_id,
-          data: %{bid: bid, state: next_state},
-          time_entered: bid.time_entered,
-          user: :auto_decremented
-        }
+        AuctionEvent.auto_bid_placed(bid, next_state, nil)
       end)
 
     {next_state, events}
@@ -195,13 +189,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     next_state = enter_auto_bids(state, decremented_auto_bids)
     events =
       Enum.map(decremented_auto_bids, fn bid ->
-        %AuctionEvent{
-          type: :auto_bid_placed,
-          auction_id: bid.auction_id,
-          data: %{bid: bid, state: next_state},
-          time_entered: bid.time_entered,
-          user: nil
-    }
+        AuctionEvent.auto_bid_placed(bid, next_state, nil)
       end)
 
     {next_state, events}
