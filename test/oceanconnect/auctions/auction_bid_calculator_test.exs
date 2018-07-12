@@ -457,7 +457,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert [{1.00, ^supplier1}, {1.00, ^supplier2} | _rest] = lowest_bids
     end
 
-  test "after auction start with higher bid that is normal bid", %{
+    test "after auction start with higher bid that is normal bid", %{
       auction: auction,
       supplier1: supplier1,
       supplier2: supplier2
@@ -505,6 +505,146 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
       lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{1.25, ^supplier1}, {2.50, ^supplier2} | _rest] = lowest_bids
+    end
+
+    test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid2 = %AuctionBid{
+        amount: 1.25,
+        min_amount: nil,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      state =  %AuctionState{initial_state | status: :open}
+      {state, _events} = AuctionBidCalculator.process(state)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid2)
+      {final_state, _events} = AuctionBidCalculator.process(state)
+
+      lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{1.00, ^supplier1}, {1.25, ^supplier2} | _rest] = lowest_bids
+    end
+
+    test "after auction start with lower, unbeatable normal bid lowers all auto bids", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid2 = %AuctionBid{
+        amount: 0.75,
+        min_amount: nil,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      state =  %AuctionState{initial_state | status: :open}
+      {state, _events} = AuctionBidCalculator.process(state)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid2)
+      {final_state, _events} = AuctionBidCalculator.process(state)
+
+      lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids
+    end
+  end
+
+  describe "pending auction" do
+    test "does not lower auto bids", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state)
+
+      assert initial_state == state
     end
   end
 end
