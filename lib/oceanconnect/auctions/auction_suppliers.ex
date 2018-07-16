@@ -20,5 +20,6 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     |> validate_required([:auction_id, :supplier_id])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:supplier_id)
+    |> foreign_key_constraint(:barge_id)
   end
 end

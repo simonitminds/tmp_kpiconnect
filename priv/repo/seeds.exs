@@ -14,7 +14,27 @@ alias Oceanconnect.Repo
 alias Oceanconnect.Accounts
 alias Oceanconnect.Accounts.{Company, User}
 alias Oceanconnect.Auctions
-alias Oceanconnect.Auctions.{Auction, Fuel, Port, Vessel, AuctionEvent, AuctionEventStorage}
+alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStorage, Barge, Fuel, Port, Vessel}
+
+defmodule SupplierHelper do
+  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
+    auction
+    |> Repo.preload(:suppliers)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
+    |> Repo.update!
+    |> Auctions.create_supplier_aliases
+  end
+
+  def british_date_string_to_naive_date_time(string) do
+    [day, month, year]= string
+    |> String.split("/")
+    |> Enum.map(&(String.to_integer(&1)))
+    {:ok, date} = NaiveDateTime.new(year, month, day, 0, 0, 0)
+    date
+  end
+end
+
 
 
 companies = [
@@ -50,8 +70,8 @@ companies = [
 |> Enum.map(fn(company) ->
   Repo.get_or_insert!(Company, company)
 end)
-[chevron, nigeria, qatargas | suppliers] = companies
-
+[chevron, nigeria, qatargas, petrochina, global, shell, chemoil] = companies
+suppliers = companies
 # User creation doesn't use get_or_insert! fn due to virtual password field
 Enum.map(companies, fn(c) ->
   Repo.get_or_insert_user!(Repo.get_by(User, %{email: String.upcase(c.email)}), String.upcase(c.email), c)
@@ -77,7 +97,7 @@ ports = [
 |> Enum.map(fn(port) ->
   Repo.get_or_insert!(Port, port)
 end)
-
+[algeciras, balboa, christobal, dubai, fujairah, gibraltar, hong_kong, khor_fakkan, las_palmas, port_elizabeth, port_gentil, port_louis, santa_cruz, singapore, skaw] = ports
 vessels = [
   %{name: "Andromeda Voyager", imo: 9288875, company_id: chevron.id},
   %{name: "Hercules Voyager", imo: 9583732, company_id: chevron.id},
@@ -153,6 +173,367 @@ vessels = [
 ]
 |> Enum.map(fn(vessel) ->
   Repo.get_or_insert!(Vessel, vessel)
+end)
+
+barges = [
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "24/04/2018",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "2962",
+  imo_number: "9515163",
+  name: "ALPHA",
+  port_id: singapore.id,
+  sire_inspection_date: "3/4/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "1/5/18",
+  bvq_validity: "VALID",
+  supplier_id: chemoil.id,
+  dwt: "6510",
+  imo_number: "9571117",
+  name: "AQUA 6",
+  port_id: singapore.id,
+  sire_inspection_date: "11/4/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "1/5/18",
+  bvq_validity: "VALID",
+  supplier_id: chemoil.id,
+  dwt: "6510",
+  imo_number: "9648790",
+  name: "AQUA TERRA 7",
+  port_id: singapore.id,
+  sire_inspection_date: "12/4/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "28/04/2017",
+  bvq_validity: "DUE",
+  supplier_id: global.id,
+  dwt: "7376",
+  imo_number: "9430612",
+  name: "AVON",
+  port_id: singapore.id,
+  sire_inspection_date: "27/11/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "13/06/2017",
+  bvq_validity: "ALERT",
+  supplier_id: global.id,
+  dwt: "70343",
+  imo_number: "9661443",
+  name: "BRIGHTOIL 639",
+  port_id: singapore.id,
+  sire_inspection_date: "30/04/2017",
+  sire_inspection_validity: "DUE"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "10/1/18",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "3861",
+  imo_number: "394307",
+  name: "COMO",
+  port_id: singapore.id,
+  sire_inspection_date: "20/06/2017",
+  sire_inspection_validity: "ALERT"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "4/1/18",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "4200",
+  imo_number: "9680267",
+  name: "CONGO",
+  port_id: singapore.id,
+  sire_inspection_date: "27/09/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "4/1/18",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "4459",
+  imo_number: "9730191",
+  name: "DESNA",
+  port_id: singapore.id,
+  sire_inspection_date: "30/01/2018",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "30/08/2017",
+  bvq_validity: "VALID",
+  supplier_id: shell.id,
+  dwt: "9480",
+  imo_number: "9378694",
+  name: "EAGER",
+  port_id: singapore.id,
+  sire_inspection_date: "28/07/2017",
+  sire_inspection_validity: "ALERT"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "11/1/18",
+  bvq_validity: "VALID",
+  supplier_id: shell.id,
+  dwt: "6284",
+  imo_number: "9603659",
+  name: "EMISSARY",
+  port_id: singapore.id,
+  sire_inspection_date: "25/08/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "23/07/2017",
+  bvq_validity: "ALERT",
+  supplier_id: petrochina.id,
+  dwt: "7285",
+  imo_number: "9437971",
+  name: "FELLOWSHIP",
+  port_id: singapore.id,
+  sire_inspection_date: "2/1/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "3/5/18",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "7000",
+  imo_number: "9515424",
+  name: "FLAGSHIP",
+  port_id: singapore.id,
+  sire_inspection_date: "20/12/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "4/1/18",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "4476",
+  imo_number: "9680279",
+  name: "HUMBER",
+  port_id: singapore.id,
+  sire_inspection_date: "18/12/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "14/04/2017",
+  bvq_validity: "DUE",
+  supplier_id: shell.id,
+  dwt: "8679",
+  imo_number: "9462081",
+  name: "ISSELIA",
+  port_id: singapore.id,
+  sire_inspection_date: "27/10/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "12/1/18",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "4708",
+  imo_number: "9655389",
+  name: "MARINE NOEL",
+  port_id: singapore.id,
+  sire_inspection_date: "31/08/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "12/1/18",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "4708",
+  imo_number: "9655391",
+  name: "MARINE ORACLE",
+  port_id: singapore.id,
+  sire_inspection_date: "7/10/17",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "12/2/18",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "649400",
+  imo_number: "9812676",
+  name: "MARINE ROSE",
+  port_id: singapore.id,
+  sire_inspection_date: "12/10/17",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "12/2/18",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "653300",
+  imo_number: "9813412",
+  name: "MARINE SELENA",
+  port_id: singapore.id,
+  sire_inspection_date: "4/1/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "22/02/2018",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "1121",
+  imo_number: "9817664",
+  name: "MARINE UNIQUE",
+  port_id: singapore.id,
+  sire_inspection_date: "24/01/2018",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "18/01/2018",
+  bvq_validity: "VALID",
+  supplier_id: petrochina.id,
+  dwt: "5684",
+  imo_number: "9639385",
+  name: "NEPAMORA",
+  port_id: singapore.id,
+  sire_inspection_date: "20/03/2018",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "29/08/2017",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "7376",
+  imo_number: "9434242",
+  name: "OIGAWA",
+  port_id: singapore.id,
+  sire_inspection_date: "27/09/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "31/05/2018",
+  bvq_validity: "VALID",
+  supplier_id: chemoil.id,
+  dwt: "6942",
+  imo_number: "9384071",
+  name: "PACIFIC FAITH",
+  port_id: singapore.id,
+  sire_inspection_date: "9/4/18",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "7/6/17",
+  bvq_validity: "ALERT",
+  supplier_id: chemoil.id,
+  dwt: "6941",
+  imo_number: "9384083",
+  name: "PACIFIC SPIRIT",
+  port_id: singapore.id,
+  sire_inspection_date: "25/08/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "17/11/2017",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "7440",
+  imo_number: "9503689",
+  name: "PERL",
+  port_id: singapore.id,
+  sire_inspection_date: "5/7/17",
+  sire_inspection_validity: "ALERT"
+},
+%{
+  acceptability: "ON HOLD",
+  approval_status: "OK",
+  bvq_date: "27/04/2017",
+  bvq_validity: "DUE",
+  supplier_id: petrochina.id,
+  dwt: "4791",
+  imo_number: "9662708",
+  name: "PETRO ASIA",
+  port_id: singapore.id,
+  sire_inspection_date: "6/6/17",
+  sire_inspection_validity: "ALERT"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "22/01/2018",
+  bvq_validity: "VALID",
+  supplier_id: global.id,
+  dwt: "1303",
+  imo_number: "9677480",
+  name: "SEA TANKER",
+  port_id: singapore.id,
+  sire_inspection_date: "24/11/2017",
+  sire_inspection_validity: "VALID"
+},
+%{
+  acceptability: "ACCEPTED",
+  approval_status: "OK",
+  bvq_date: "31/10/2017",
+  bvq_validity: "VALID",
+  supplier_id: shell.id,
+  dwt: "4700",
+  imo_number: "9397767",
+  name: "ZEMIRA",
+  port_id: singapore.id,
+  sire_inspection_date: "26/09/2017",
+  sire_inspection_validity: "VALID"
+}
+]
+|> Enum.map(fn(barge) -> %{barge | bvq_date: SupplierHelper.british_date_string_to_naive_date_time(barge.bvq_date),
+                                   sire_inspection_date: SupplierHelper.british_date_string_to_naive_date_time(barge.sire_inspection_date)
+                          }
+end)
+|> Enum.map(fn(barge) ->
+  Repo.get_or_insert!(Barge, barge)
 end)
 
 fuels = [
@@ -234,17 +615,6 @@ end)
     event_storage = %AuctionEventStorage{event: event, auction_id: auction.id}
     AuctionEventStorage.persist(event_storage)
   end)
-
-defmodule SupplierHelper do
-  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
-    auction
-    |> Repo.preload(:suppliers)
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
-    |> Repo.update!
-    |> Auctions.create_supplier_aliases
-  end
-end
 
 SupplierHelper.set_suppliers_for_auction(auction1, suppliers)
 SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
