@@ -116,4 +116,8 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-port_agent")
     |> inner_text
   end
+
+  def has_available_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    "#{name} (#{imo_number})" in find_element(:css, ".qa-barge-header") |> inner_text
+  end
 end

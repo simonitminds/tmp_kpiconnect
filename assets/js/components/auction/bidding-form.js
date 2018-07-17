@@ -75,6 +75,7 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
               trigger="Barge Name (IMO Number)"
               classParentString="auction-barging__barge"
               open={false}
+              className="qa-barge-header"
             >
               {/* START PLACEHOLDER BARGE TITLE */}
               <h2 className="auction-barging__barge">

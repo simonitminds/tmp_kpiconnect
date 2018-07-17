@@ -14,7 +14,7 @@ defmodule Oceanconnect.Factory do
 
   def user_factory() do
     %Oceanconnect.Accounts.User{
-      email: sequence(:email, &("USER-#{&1}@EXAMPLE.COM")),
+      email: sequence(:email, &"USER-#{&1}@EXAMPLE.COM"),
       first_name: "test",
       last_name: "user",
       password: "password",
@@ -24,7 +24,12 @@ defmodule Oceanconnect.Factory do
   end
 
   def auction_factory() do
-    start = DateTime.utc_now() |> DateTime.to_naive |> NaiveDateTime.add(20) |> DateTime.from_naive!("Etc/UTC")
+    start =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(20)
+      |> DateTime.from_naive!("Etc/UTC")
+
     %Oceanconnect.Auctions.Auction{
       scheduled_start: start,
       duration: 10 * 60_000,
@@ -41,22 +46,30 @@ defmodule Oceanconnect.Factory do
 
   def fuel_factory() do
     %Oceanconnect.Auctions.Fuel{
-       name: "New Fuel"
+      name: "New Fuel"
     }
   end
 
   def port_factory() do
     %Oceanconnect.Auctions.Port{
-       name: "New Port",
-       country: "Timbuktu"
+      name: "New Port",
+      country: "Timbuktu"
+    }
+  end
+
+  def barge_factory() do
+    %Oceanconnect.Auctions.Barge{
+      companies: [build(:company, is_supplier: true)]
+      port: build(:port),
+      name: sequence(:barge_name, &"Barge-#{&1}")
     }
   end
 
   def vessel_factory() do
     %Oceanconnect.Auctions.Vessel{
-       imo: 1234567,
-       name: sequence(:vessel_name, &"Vessel-#{&1}"),
-       company: build(:company)
+      imo: 1_234_567,
+      name: sequence(:vessel_name, &"Vessel-#{&1}"),
+      company: build(:company)
     }
   end
 
@@ -67,6 +80,10 @@ defmodule Oceanconnect.Factory do
       "supplier_id" => supplier_id,
       "time_entered" => DateTime.utc_now()
     }
-    Oceanconnect.Auctions.AuctionBidList.AuctionBid.from_params_to_auction_bid(bid_params, auction)
+
+    Oceanconnect.Auctions.AuctionBidList.AuctionBid.from_params_to_auction_bid(
+      bid_params,
+      auction
+    )
   end
 end

@@ -7,6 +7,8 @@ defmodule Oceanconnect.Repo.Migrations.AddAuctionBarges do
       add :auction_id, references("auctions")
       add :supplier_id, references("auction_suppliers")
       add :approval_status, :string
+
+      timestamps()
     end
   end
 end
