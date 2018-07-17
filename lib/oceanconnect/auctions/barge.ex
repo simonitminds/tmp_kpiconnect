@@ -20,7 +20,6 @@ defmodule Oceanconnect.Auctions.Barge do
     barge
     |> cast(attrs, [
       :name,
-      :supplier_id,
       :port_id,
       :imo_number,
       :dwt,

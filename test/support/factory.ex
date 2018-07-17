@@ -59,7 +59,7 @@ defmodule Oceanconnect.Factory do
 
   def barge_factory() do
     %Oceanconnect.Auctions.Barge{
-      companies: [build(:company, is_supplier: true)]
+      companies: [build(:company, is_supplier: true)],
       port: build(:port),
       name: sequence(:barge_name, &"Barge-#{&1}")
     }

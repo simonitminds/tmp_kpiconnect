@@ -315,7 +315,7 @@ defmodule Oceanconnect.AuctionShowTest do
     auction: auction,
     supplier: supplier
   } do
-    barge = insert(:barge, supplier: supplier.company)
+    barge = insert(:barge, companies: [supplier.company])
     AuctionShowPage.visit(auction.id)
     assert AuctionShowPage.has_available_barge?(barge)
   end
