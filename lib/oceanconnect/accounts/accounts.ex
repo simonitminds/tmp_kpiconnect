@@ -7,6 +7,7 @@ defmodule Oceanconnect.Accounts do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Auctions.{Barge}
 
   @doc """
   Returns the list of users.
@@ -222,5 +223,25 @@ defmodule Oceanconnect.Accounts do
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:ports, ports)
     |> Repo.update!
+  end
+
+  @doc """
+  Returns true when the given user belongs to the company with the given id.
+  """
+  def authorized_for_company?(nil, _company_id), do: false
+  def authorized_for_company?(_user, nil), do: false
+  def authorized_for_company?(%User{company_id: company_id}, company_id), do: true
+  def authorized_for_company?(_, _), do: false
+
+
+  @doc """
+  Returns a list of Barges that are associated to the company with the given
+  id. If no barges are associated with the company, an empty list is returned.
+  """
+  def list_company_barges(company_id) do
+    query = company_id
+    |> Barge.by_company()
+    |> Repo.all()
+    |> Repo.preload(:port)
   end
 end

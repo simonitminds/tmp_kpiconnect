@@ -6,28 +6,27 @@ defmodule Oceanconnect.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
 
-
   def start(_type, _args) do
-
     # Define workers and child supervisors to be supervised
-    children = [
-      # Start the Ecto repository
-      supervisor(Oceanconnect.Repo, []),
-      # Start the endpoint when the application starts
-      supervisor(OceanconnectWeb.Endpoint, []),
-      supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
-      {Registry, keys: :unique, name: :auction_supervisor_registry},
-      {Registry, keys: :unique, name: :auctions_registry},
-      {Registry, keys: :unique, name: :auction_cache_registry},
-      {Registry, keys: :unique, name: :auction_timers_registry},
-      {Registry, keys: :unique, name: :auction_scheduler_registry},
-      {Registry, keys: :unique, name: :auction_bids_registry},
-      {Registry, keys: :unique, name: :auction_event_store_registry},
-      {Registry, keys: :unique, name: :auction_event_handler_registry},
-      worker(AuctionsSupervisor, [], restart: :permanent),
-      # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
-    ]
-    |> maybe_start_store()
+    children =
+      [
+        # Start the Ecto repository
+        supervisor(Oceanconnect.Repo, []),
+        # Start the endpoint when the application starts
+        supervisor(OceanconnectWeb.Endpoint, []),
+        supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
+        {Registry, keys: :unique, name: :auction_supervisor_registry},
+        {Registry, keys: :unique, name: :auctions_registry},
+        {Registry, keys: :unique, name: :auction_cache_registry},
+        {Registry, keys: :unique, name: :auction_timers_registry},
+        {Registry, keys: :unique, name: :auction_scheduler_registry},
+        {Registry, keys: :unique, name: :auction_bids_registry},
+        {Registry, keys: :unique, name: :auction_event_store_registry},
+        {Registry, keys: :unique, name: :auction_event_handler_registry},
+        worker(AuctionsSupervisor, [], restart: :permanent)
+        # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
+      ]
+      |> maybe_start_store()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

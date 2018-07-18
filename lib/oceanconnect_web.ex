@@ -28,8 +28,9 @@ defmodule OceanconnectWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/oceanconnect_web/templates",
-                        namespace: OceanconnectWeb
+      use Phoenix.View,
+        root: "lib/oceanconnect_web/templates",
+        namespace: OceanconnectWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
@@ -40,7 +41,6 @@ defmodule OceanconnectWeb do
       import OceanconnectWeb.Router.Helpers
       import OceanconnectWeb.ErrorHelpers
       import OceanconnectWeb.Gettext
-
     end
   end
 

@@ -10,6 +10,7 @@ defmodule Oceanconnect.Guardian do
     sub = to_string(resource.id)
     {:ok, sub}
   end
+
   # def subject_for_token(_, _) do
   #   {:error, :reason_for_error}
   # end
@@ -19,10 +20,14 @@ defmodule Oceanconnect.Guardian do
     # found in the `"sub"` key. In `above subject_for_token/2` we returned
     # the resource id so here we'll rely on that to look it up.
     id = claims["sub"]
-    resource = Oceanconnect.Accounts.get_user!(id)
-    |> Oceanconnect.Accounts.load_company_on_user()
-    {:ok,  resource}
+
+    resource =
+      Oceanconnect.Accounts.get_user!(id)
+      |> Oceanconnect.Accounts.load_company_on_user()
+
+    {:ok, resource}
   end
+
   # def resource_from_claims(_claims) do
   #   {:error, :reason_for_error}
   # end

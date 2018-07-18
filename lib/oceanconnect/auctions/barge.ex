@@ -4,6 +4,8 @@ defmodule Oceanconnect.Auctions.Barge do
   alias Oceanconnect.Accounts.Company
   alias __MODULE__
 
+  @derive {Poison.Encoder, except: [:__meta__, :companies]}
+
   schema "barges" do
     belongs_to :port, Oceanconnect.Auctions.Port
     field :name, :string
@@ -15,6 +17,7 @@ defmodule Oceanconnect.Auctions.Barge do
 
     timestamps()
   end
+
 
   def changeset(%Barge{} = barge, attrs) do
     barge
@@ -28,5 +31,12 @@ defmodule Oceanconnect.Auctions.Barge do
       ])
     |> foreign_key_constraint(:port_id)
     |> validate_required([:name, :port_id])
+  end
+
+  def by_company(company_id) do
+    from b in Barge,
+      distinct: b.id,
+      join: cb in "company_barges", where: cb.barge_id == b.id,
+      join: c in Company, where: cb.company_id == ^company_id
   end
 end
