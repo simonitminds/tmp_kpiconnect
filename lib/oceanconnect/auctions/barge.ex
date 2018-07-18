@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.Barge do
     field :imo_number, :string
     field :dwt, :string
     field :sire_inspection_date, :naive_datetime
-    field :sire_inspection_validity, :string
+    field :sire_inspection_validity, :boolean
     many_to_many :companies, Oceanconnect.Accounts.Company, join_through: "company_barges", on_replace: :delete
 
     timestamps()

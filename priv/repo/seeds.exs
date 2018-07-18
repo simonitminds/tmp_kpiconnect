@@ -275,259 +275,263 @@ vessels =
 barges =
   [
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "2962",
       imo_number: "9515163",
       name: "ALPHA",
       port_id: singapore.id,
       sire_inspection_date: "3/4/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: chemoil.id,
+      companies: [chemoil],
       dwt: "6510",
       imo_number: "9571117",
       name: "AQUA 6",
       port_id: singapore.id,
       sire_inspection_date: "11/4/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: chemoil.id,
+      companies: [chemoil],
       dwt: "6510",
       imo_number: "9648790",
       name: "AQUA TERRA 7",
       port_id: singapore.id,
       sire_inspection_date: "12/4/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "7376",
       imo_number: "9430612",
       name: "AVON",
       port_id: singapore.id,
       sire_inspection_date: "27/11/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "70343",
       imo_number: "9661443",
       name: "BRIGHTOIL 639",
       port_id: singapore.id,
       sire_inspection_date: "30/04/2017",
-      sire_inspection_validity: "DUE"
+      sire_inspection_validity: false
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "3861",
       imo_number: "394307",
       name: "COMO",
       port_id: singapore.id,
       sire_inspection_date: "20/06/2017",
-      sire_inspection_validity: "ALERT"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "4200",
       imo_number: "9680267",
       name: "CONGO",
       port_id: singapore.id,
       sire_inspection_date: "27/09/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "4459",
       imo_number: "9730191",
       name: "DESNA",
       port_id: singapore.id,
       sire_inspection_date: "30/01/2018",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: shell.id,
+      companies: [shell],
       dwt: "9480",
       imo_number: "9378694",
       name: "EAGER",
       port_id: singapore.id,
       sire_inspection_date: "28/07/2017",
-      sire_inspection_validity: "ALERT"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: shell.id,
+      companies: [shell],
       dwt: "6284",
       imo_number: "9603659",
       name: "EMISSARY",
       port_id: singapore.id,
       sire_inspection_date: "25/08/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "7285",
       imo_number: "9437971",
       name: "FELLOWSHIP",
       port_id: singapore.id,
       sire_inspection_date: "2/1/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "7000",
       imo_number: "9515424",
       name: "FLAGSHIP",
       port_id: singapore.id,
       sire_inspection_date: "20/12/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "4476",
       imo_number: "9680279",
       name: "HUMBER",
       port_id: singapore.id,
       sire_inspection_date: "18/12/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: shell.id,
+      companies: [shell],
       dwt: "8679",
       imo_number: "9462081",
       name: "ISSELIA",
       port_id: singapore.id,
       sire_inspection_date: "27/10/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "4708",
       imo_number: "9655389",
       name: "MARINE NOEL",
       port_id: singapore.id,
       sire_inspection_date: "31/08/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "4708",
       imo_number: "9655391",
       name: "MARINE ORACLE",
       port_id: singapore.id,
       sire_inspection_date: "7/10/17",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "649400",
       imo_number: "9812676",
       name: "MARINE ROSE",
       port_id: singapore.id,
       sire_inspection_date: "12/10/17",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "653300",
       imo_number: "9813412",
       name: "MARINE SELENA",
       port_id: singapore.id,
       sire_inspection_date: "4/1/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "1121",
       imo_number: "9817664",
       name: "MARINE UNIQUE",
       port_id: singapore.id,
       sire_inspection_date: "24/01/2018",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "5684",
       imo_number: "9639385",
       name: "NEPAMORA",
       port_id: singapore.id,
       sire_inspection_date: "20/03/2018",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "7376",
       imo_number: "9434242",
       name: "OIGAWA",
       port_id: singapore.id,
       sire_inspection_date: "27/09/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: chemoil.id,
+      companies: [chemoil],
       dwt: "6942",
       imo_number: "9384071",
       name: "PACIFIC FAITH",
       port_id: singapore.id,
       sire_inspection_date: "9/4/18",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: chemoil.id,
+      companies: [chemoil],
       dwt: "6941",
       imo_number: "9384083",
       name: "PACIFIC SPIRIT",
       port_id: singapore.id,
       sire_inspection_date: "25/08/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "7440",
       imo_number: "9503689",
       name: "PERL",
       port_id: singapore.id,
       sire_inspection_date: "5/7/17",
-      sire_inspection_validity: "ALERT"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: petrochina.id,
+      companies: [petrochina],
       dwt: "4791",
       imo_number: "9662708",
       name: "PETRO ASIA",
       port_id: singapore.id,
       sire_inspection_date: "6/6/17",
-      sire_inspection_validity: "ALERT"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: global.id,
+      companies: [global],
       dwt: "1303",
       imo_number: "9677480",
       name: "SEA TANKER",
       port_id: singapore.id,
       sire_inspection_date: "24/11/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     },
     %{
-      supplier_id: shell.id,
+      companies: [shell],
       dwt: "4700",
       imo_number: "9397767",
       name: "ZEMIRA",
       port_id: singapore.id,
       sire_inspection_date: "26/09/2017",
-      sire_inspection_validity: "VALID"
+      sire_inspection_validity: true
     }
   ]
   |> Enum.map(fn barge ->
     %{
       barge
-      | bvq_date: SupplierHelper.british_date_string_to_naive_date_time(barge.bvq_date),
-        sire_inspection_date:
+      | sire_inspection_date:
           SupplierHelper.british_date_string_to_naive_date_time(barge.sire_inspection_date)
     }
   end)
-  |> Enum.map(fn barge ->
-    Repo.get_or_insert!(Barge, barge)
+  |> Enum.map(fn barge_attrs ->
+    data = Repo.get_or_insert!(Barge, Map.delete(barge_attrs, :companies))
+    |> Repo.preload(:companies)
+
+    Barge.changeset(data, barge_attrs)
+    |> Ecto.Changeset.put_assoc(:companies, MapSet.new(barge_attrs.companies ++ data.companies) |> MapSet.to_list())
+    |> Repo.update()
   end)
 
 fuels =

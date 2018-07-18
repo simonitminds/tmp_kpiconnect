@@ -3,7 +3,7 @@ defmodule Oceanconnect.Accounts.Company do
   import Ecto.Changeset
   alias Oceanconnect.Accounts.Company
 
-  @derive {Poison.Encoder, except: [:__meta__, :users, :vessels, :ports]}
+  @derive {Poison.Encoder, except: [:__meta__, :barges, :users, :vessels, :ports]}
 
   schema "companies" do
     field :address1, :string
