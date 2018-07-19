@@ -10,7 +10,7 @@ defmodule OceanconnectWeb.Api.CompanyBargesController do
     company_id = String.to_integer(company_id)
     if Accounts.authorized_for_company?(current_user, company_id) do
       barges = Accounts.list_company_barges(company_id)
-      render(conn, "index.json", data: barges)
+      render(conn, "index.json", %{data: barges})
     else
       conn
       |> put_status(401)

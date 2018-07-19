@@ -315,7 +315,8 @@ defmodule Oceanconnect.AuctionShowTest do
     auction: auction,
     supplier: supplier
   } do
-    barge = insert(:barge, companies: [supplier.company])
+    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+    login_user(supplier)
     AuctionShowPage.visit(auction.id)
     assert AuctionShowPage.has_available_barge?(barge)
   end

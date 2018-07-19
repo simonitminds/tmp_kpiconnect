@@ -1,4 +1,10 @@
 import {combineReducers} from "redux";
 import auctionsReducer from "./auctions";
 import auctionFormReducer from "./auction-form";
-export default combineReducers({auctionsReducer, auctionFormReducer});
+import companyProfileReducer from "./company-profile";
+
+export default combineReducers({
+  auctionsReducer,
+  auctionFormReducer,
+  companyProfileReducer
+});

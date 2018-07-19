@@ -4,7 +4,7 @@ import MediaQuery from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
 import { formatPrice } from '../../utilities';
 
-const BiddingForm = ({auctionPayload, formSubmit}) => {
+const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.state.status;
   const currentBidAmount = _.get(auctionPayload, 'bid_list[0].amount');
@@ -65,43 +65,33 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
           </div>
         </form>
         {/* BEGIN SUBMIT BARGING SECTION */}
-        <CollapsibleSection
-          trigger="Submit Barges"
-          classParentString="collapsing-auction-barging"
-          open={false}
-        >
-          <form className="auction-barging__container">
-            <CollapsibleSection
-              trigger="Barge Name (IMO Number)"
-              classParentString="auction-barging__barge"
-              open={false}
-              className="qa-barge-header"
-            >
-              {/* START PLACEHOLDER BARGE TITLE */}
-              <h2 className="auction-barging__barge">
-                <span className="auction-barging__barge__toggle collapsible-section__toggle-icon"><i className="fas fa-angle-down"></i></span>
-                <i className="auction-barging__barge__status fas fa-question-circle"></i>
-                <span className="auction-barging__barge__title">Barge Name <span className="has-text-gray-3">(IMO Number)</span></span>
-                <span className="collapsible-section__counter tag is-medium is-primary">0</span>
-                <button className="button is-small is-primary">Add</button>
-              </h2>
-              {/* END PLACEHOLDER BARGE TITLE */}
-              <div className="auction-barging__barge__header">
-                <div className="auction-barging__barge__content">
-                  <p><strong>Port</strong> (Port)</p>
-                  <p><strong>Approved for</strong> (Approved for)</p>
-                  <p><strong>Capacity (MT)</strong> (Capacity)</p>
-                  <p><strong>Pumping Rate</strong> (Pumping Rate)</p>
-                  <p><strong>Double Hull</strong> (Double Hull)</p>
-                  <p><strong>Last SIRE Inspection</strong> (SIRE Date)</p>
-                  <p><strong>&lt; 25 Years Old</strong> (True/False)</p>
-                  <p><strong>Fit for STS</strong> (True/False)</p>
-                  <p><strong>Comments</strong> (Comments)</p>
+        <div class="qa-submit-barges-panel">
+          <CollapsibleSection
+            trigger="Submit Barges"
+            classParentString="collapsing-auction-barging"
+            open={false}
+          >
+            <form className="auction-barging__container">
+              { barges.map((barge) =>
+                <div class="qa-barge-header">
+                  <CollapsibleSection
+                    trigger={ `${barge.name} (${barge.imo_number})` }
+                    classParentString="auction-barging__barge"
+                    open={false}
+                  >
+                    <div className="auction-barging__barge__header">
+                      <div className="auction-barging__barge__content">
+                        <p><strong>Port</strong> {barge.port}</p>
+                        <p><strong>Approved for</strong> (Approved for)</p>
+                        <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+                      </div>
+                    </div>
+                  </CollapsibleSection>
                 </div>
-              </div>
-            </CollapsibleSection>
-          </form>
-        </CollapsibleSection>
+              )}
+            </form>
+          </CollapsibleSection>
+        </div>
         {/* END SUBMIT BARGING SECTION */}
       </MediaQuery>
       <MediaQuery query="(max-width: 768px)">
@@ -167,34 +157,22 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
           open={false}
         >
           <form className="auction-barging__container">
-            <CollapsibleSection
-              trigger="Barge Name (IMO Number)"
-              classParentString="auction-barging__barge"
-              open={false}
-            >
-              {/* START PLACEHOLDER BARGE TITLE */}
-              <h2 className="auction-barging__barge">
-                <span className="auction-barging__barge__toggle collapsible-section__toggle-icon"><i className="fas fa-angle-down"></i></span>
-                <i className="auction-barging__barge__status fas fa-question-circle"></i>
-                <span className="auction-barging__barge__title">Barge Name <span className="has-text-gray-3">(IMO Number)</span></span>
-                <span className="collapsible-section__counter tag is-medium is-primary">0</span>
-                <button className="button is-small is-primary">Add</button>
-              </h2>
-              {/* END PLACEHOLDER BARGE TITLE */}
-              <div className="auction-barging__barge__header">
-                <div className="auction-barging__barge__content">
-                  <p><strong>Port</strong> (Port)</p>
-                  <p><strong>Approved for</strong> (Approved for)</p>
-                  <p><strong>Capacity (MT)</strong> (Capacity)</p>
-                  <p><strong>Pumping Rate</strong> (Pumping Rate)</p>
-                  <p><strong>Double Hull</strong> (Double Hull)</p>
-                  <p><strong>Last SIRE Inspection</strong> (SIRE Date)</p>
-                  <p><strong>&lt; 25 Years Old</strong> (True/False)</p>
-                  <p><strong>Fit for STS</strong> (True/False)</p>
-                  <p><strong>Comments</strong> (Comments)</p>
+            { barges.map((barge) =>
+              <CollapsibleSection
+                trigger={ `${barge.name} (${barge.imo_number})` }
+                classParentString="auction-barging__barge"
+                open={false}
+                className="qa-barge-header"
+              >
+                <div className="auction-barging__barge__header">
+                  <div className="auction-barging__barge__content">
+                    <p><strong>Port</strong> {barge.port}</p>
+                    <p><strong>Approved for</strong> (Approved for)</p>
+                    <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+                  </div>
                 </div>
-              </div>
-            </CollapsibleSection>
+              </CollapsibleSection>
+            )}
           </form>
         </CollapsibleSection>
         {/* END SUBMIT BARGING SECTION */}
