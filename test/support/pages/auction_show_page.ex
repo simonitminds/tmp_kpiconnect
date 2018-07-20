@@ -126,4 +126,18 @@ defmodule Oceanconnect.AuctionShowPage do
 
     "#{name} (#{imo_number})" in available_names
   end
+
+  def convert_to_supplier_names(bid_list, auction = %Auction{}) do
+    Enum.map(bid_list, fn bid ->
+      supplier_name = get_name_or_alias(bid.supplier_id, auction)
+
+      bid
+      |> Map.drop([:__struct__, :supplier_id])
+      |> Map.put(:supplier, supplier_name)
+    end)
+  end
+
+  def supplier_bid_list(bid_list, supplier_id) do
+    Enum.filter(bid_list, fn bid -> bid.supplier_id == supplier_id end)
+  end
 end

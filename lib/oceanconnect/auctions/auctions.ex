@@ -28,8 +28,7 @@ defmodule Oceanconnect.Auctions do
   defp maybe_add_min_amount(params), do: Map.put(params, "min_amount", nil)
 
   def select_winning_bid(bid, comment, user \\ nil) do
-    bid
-    |> Map.put(:comment, comment)
+    %{bid | comment: comment}
     |> Command.select_winning_bid(user)
     |> AuctionStore.process_command
   end

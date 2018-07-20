@@ -105,7 +105,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       stored_bid_list =
         auction_state.bids
-        |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
+        |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
@@ -144,7 +144,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       stored_bid_list =
         auction_state.bids
-        |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
+        |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
