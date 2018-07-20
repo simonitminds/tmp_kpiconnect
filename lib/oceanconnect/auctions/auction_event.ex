@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList.AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   defstruct id: nil,

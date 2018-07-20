@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions do
     |> maybe_add_min_amount
     |> Map.put("supplier_id", supplier_id)
     |> Map.put("time_entered", time_entered)
-    |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
+    |> AuctionBid.from_params_to_auction_bid(auction)
 
     bid
     |> Command.process_new_bid(user)

@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.Command do
   alias Oceanconnect.Auctions.{Auction}
-  alias Oceanconnect.Auctions.AuctionBidList.{AuctionBid}
+  alias Oceanconnect.Auctions.{AuctionBid}
   alias __MODULE__
 
   defstruct command: :get_current_state, data: nil

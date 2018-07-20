@@ -26,7 +26,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
 
     current_cache = AuctionCache.read(auction_id)
     current_state = Auctions.get_auction_state!(auction)
-    current_bids = Auctions.AuctionBidList.get_bid_list(auction_id)
     current_event_list = AuctionEventStore.event_list(auction_id)
 
     # # Crash AuctionStore / AuctionSupervisor and let restart
@@ -40,7 +39,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     :timer.sleep(500)
     assert current_cache == AuctionCache.read(auction_id)
     assert current_state == Auctions.get_auction_state!(auction)
-    assert current_bids == Auctions.AuctionBidList.get_bid_list(auction_id)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end
 

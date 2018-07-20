@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer}
 
   def create(conn, %{"auction_id" => auction_id, "bid" => bid_params}) do
     time_entered = DateTime.utc_now()
@@ -36,7 +36,7 @@ defmodule OceanconnectWeb.Api.BidController do
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
          %{status: :decision, active_bids: bids} <- Auctions.get_auction_state!(auction),
-         bid = %AuctionBidList.AuctionBid{} <- Enum.find(bids, fn(bid) -> bid.id == bid_id end)
+         bid = %AuctionBid{} <- Enum.find(bids, fn(bid) -> bid.id == bid_id end)
     do
       Auctions.select_winning_bid(bid, comment, user)
 

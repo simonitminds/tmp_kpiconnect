@@ -1,5 +1,5 @@
 defmodule Oceanconnect.Auctions.AuctionBidCalculator do
-  alias Oceanconnect.Auctions.{AuctionBidList.AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   def process(current_state = %AuctionState{}, bid = %AuctionBid{min_amount: min_amount})

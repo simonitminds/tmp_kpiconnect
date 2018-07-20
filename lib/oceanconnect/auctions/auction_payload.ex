@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionTimer}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   defstruct time_remaining: nil,
