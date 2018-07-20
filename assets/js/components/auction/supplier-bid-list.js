@@ -25,7 +25,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
               {_.map(bidList, (bid) => {
                 return (
                   <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                    <td className="qa-auction-bid-amount">${formatPrice(bid.amount)}</td>
+                    <td className="qa-auction-bid-amount">${formatPrice(bid.amount)} <br/> ${formatPrice(bid.min_amount)}</td>
                     <td>{formatTime(bid.time_entered)}</td>
                   </tr>
                 );

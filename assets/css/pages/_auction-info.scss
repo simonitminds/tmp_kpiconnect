@@ -260,6 +260,23 @@
   }
 }
 
+.auction-bidding.box {
+  background-color: $gray-1;
+}
+
+.auction-bidding__label-addendum {
+  display: inline-block;
+  color: $gray-3;
+  font-weight: normal;
+  font-style: italic;
+  font-size: $size-6;
+  line-height: 1.25;
+
+  @media (max-width: 768px) {
+    margin-left: 0.5rem;
+  }
+}
+
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
   margin: 1.25rem -1.275rem -1rem -1.275rem;
   box-shadow: none;

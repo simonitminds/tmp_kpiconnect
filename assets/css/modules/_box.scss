@@ -67,9 +67,6 @@
   &:first-child {
     padding-top: 0;
   }
-  &:nth-child(even) {
-    background-color: $gray-1;
-  }
 
   &--base { // Get last .box__subsection flush with the base of the box.
     margin-bottom: -1.25rem;

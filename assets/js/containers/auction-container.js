@@ -37,6 +37,8 @@ const mapDispatchToProps = (dispatch) => ({
       }
     };
 
+    elements.amount.value = '';
+    elements.min_amount.value = '';
     dispatch(submitBid(auctionId, bidData));
   },
   acceptBid(auctionId, bidId, ev) {

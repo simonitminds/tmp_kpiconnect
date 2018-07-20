@@ -2,11 +2,13 @@ import React from 'react';
 import _ from 'lodash';
 import MediaQuery from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
+import { formatPrice } from '../../utilities';
 
 const BiddingForm = ({auctionPayload, formSubmit}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.state.status;
-  const minimumBidAmount = _.get(auctionPayload, 'state.minimum_bids[0].min_amount');
+  const currentBidAmount = _.get(auctionPayload, 'bid_list[0].amount');
+  const minimumBidAmount = _.get(auctionPayload, 'bid_list[0].min_amount');
   const fuel = _.get(auction, 'fuel.name');
   return(
     <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
@@ -16,7 +18,9 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
           <div className="field is-horizontal is-expanded">
             <div className="field-label">
               <div className="control">
-                <label className="label" htmlFor="bid">Bid Amount</label>
+                <label className="label" htmlFor="bid">Bid Amount<br/>
+                  <span className="auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'} </span>
+                </label>
               </div>
             </div>
             <div className="field-body">
@@ -31,7 +35,9 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
           <div className="field is-horizontal is-expanded">
             <div className="field-label">
               <div className="control">
-                <label className="label" htmlFor="bid">Minimum Bid</label>
+                <label className="label" htmlFor="bid">Minimum Bid<br/>
+                  <span className="auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'} </span>
+                </label>
               </div>
             </div>
             <div className="field-body">
@@ -70,7 +76,8 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
             <div className="field is-horizontal is-expanded">
               <div className="field-label">
                 <div className="control">
-                  <label className="label" htmlFor="bid">Bid Amount</label>
+                  <label className="label" htmlFor="bid">Bid Amount
+                    <span className="auction-bidding__label-addendum">Current:  {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'} </span></label>
                 </div>
               </div>
               <div className="field-body">
@@ -85,7 +92,8 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
             <div className="field is-horizontal is-expanded">
               <div className="field-label">
                 <div className="control">
-                  <label className="label" htmlFor="bid">Minimum Bid</label>
+                  <label className="label" htmlFor="bid">Minimum Bid
+                    <span className="auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</span></label>
                 </div>
               </div>
               <div className="field-body">
