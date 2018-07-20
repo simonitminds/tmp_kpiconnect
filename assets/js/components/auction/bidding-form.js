@@ -4,7 +4,7 @@ import MediaQuery from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
 import { formatPrice } from '../../utilities';
 
-const BiddingForm = ({auctionPayload, formSubmit}) => {
+const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.state.status;
   const currentBidAmount = _.get(auctionPayload, 'bid_list[0].amount');
@@ -64,6 +64,35 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
             </div>
           </div>
         </form>
+        {/* BEGIN SUBMIT BARGING SECTION */}
+        <div class="qa-submit-barges-panel">
+          <CollapsibleSection
+            trigger="Submit Barges"
+            classParentString="collapsing-auction-barging"
+            open={false}
+          >
+            <form className="auction-barging__container">
+              { barges.map((barge) =>
+                <div class="qa-barge-header">
+                  <CollapsibleSection
+                    trigger={ `${barge.name} (${barge.imo_number})` }
+                    classParentString="auction-barging__barge"
+                    open={false}
+                  >
+                    <div className="auction-barging__barge__header">
+                      <div className="auction-barging__barge__content">
+                        <p><strong>Port</strong> {barge.port}</p>
+                        <p><strong>Approved for</strong> (Approved for)</p>
+                        <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+                </div>
+              )}
+            </form>
+          </CollapsibleSection>
+        </div>
+        {/* END SUBMIT BARGING SECTION */}
       </MediaQuery>
       <MediaQuery query="(max-width: 768px)">
         <CollapsibleSection
@@ -121,6 +150,32 @@ const BiddingForm = ({auctionPayload, formSubmit}) => {
             </div>
           </form>
         </CollapsibleSection>
+        {/* BEGIN SUBMIT BARGING SECTION */}
+        <CollapsibleSection
+          trigger="Submit Barges"
+          classParentString="collapsing-auction-barging"
+          open={false}
+        >
+          <form className="auction-barging__container">
+            { barges.map((barge) =>
+              <CollapsibleSection
+                trigger={ `${barge.name} (${barge.imo_number})` }
+                classParentString="auction-barging__barge"
+                open={false}
+                className="qa-barge-header"
+              >
+                <div className="auction-barging__barge__header">
+                  <div className="auction-barging__barge__content">
+                    <p><strong>Port</strong> {barge.port}</p>
+                    <p><strong>Approved for</strong> (Approved for)</p>
+                    <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+                  </div>
+                </div>
+              </CollapsibleSection>
+            )}
+          </form>
+        </CollapsibleSection>
+        {/* END SUBMIT BARGING SECTION */}
       </MediaQuery>
     </div>
   );

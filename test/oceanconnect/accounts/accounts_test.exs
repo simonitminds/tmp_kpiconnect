@@ -134,5 +134,25 @@ defmodule Oceanconnect.AccountsTest do
       |> Accounts.set_ports_on_company([port2])
       assert updated_company.ports == [port2]
     end
+
+    test "authorized_for_company? checks the presence of a user in a company", %{company: company} do
+      company_user = insert(:user, company: company)
+      assert Accounts.authorized_for_company?(company_user, company.id)
+      refute Accounts.authorized_for_company?(company_user, nil)
+
+      non_company_user = insert(:user)
+      refute Accounts.authorized_for_company?(non_company_user, company.id)
+      refute Accounts.authorized_for_company?(nil, company.id)
+    end
+
+    test "list_company_barges/1 returns all barges associated with the company", %{company: company} do
+      barges = [
+        insert(:barge, companies: [company]),
+        insert(:barge, companies: [company]),
+        insert(:barge, companies: [company])
+      ]
+
+      assert Enum.map(barges, &(&1.id)) == Enum.map(Accounts.list_company_barges(company.id), &(&1.id))
+    end
   end
 end

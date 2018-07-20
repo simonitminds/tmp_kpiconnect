@@ -8,6 +8,7 @@ import {
   CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
+  RECEIVE_COMPANY_BARGES,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
   UPDATE_DATE,
@@ -62,6 +63,17 @@ export function getAllAuctionPayloads() {
       .then(parseJSON)
       .then((response) => {
         return dispatch(receiveAuctionPayloads(response.data));
+      });
+  };
+}
+
+export function getCompanyBarges(companyId) {
+  return dispatch => {
+    fetch(`/api/companies/${companyId}/barges`, { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveCompanyBarges(response.data));
       });
   };
 }
@@ -142,6 +154,7 @@ export function setPortAgent(auctionId, portAgent) {
   };
 }
 
+
 export function updateBidStatus(auctionId, response) {
   return {type: UPDATE_BID_STATUS,
           auctionId,
@@ -171,6 +184,12 @@ export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels
           }
         };
 }
+
+export function receiveCompanyBarges(barges) {
+  return {type: RECEIVE_COMPANY_BARGES,
+          barges: barges};
+}
+
 export function updateInformation(property, value) {
   return {type: UPDATE_INFORMATION,
           data: {

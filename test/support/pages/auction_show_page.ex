@@ -116,4 +116,14 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-port_agent")
     |> inner_text
   end
+
+  def has_available_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    find_element(:css, ".qa-submit-barges-panel") |> find_within_element(:tag, "section") |> click
+
+    available_names = find_all_elements(:css, ".qa-barge-header")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    "#{name} (#{imo_number})" in available_names
+  end
 end

@@ -1,0 +1,81 @@
+// ========================== //
+// ========================== //
+// AUCTION BARGING
+// ========================== //
+// ========================== //
+
+// Associated Variables
+
+// Blocks
+
+.auction-barging {
+  border-top: 1px solid $gray-2;
+  margin: 1rem -1rem 0;
+  padding: 1rem;
+}
+
+.auction-barging__barge { // Each line containing an auction solution.
+  margin-top: 1rem;
+  margin-bottom: 1rem !important;
+  padding: 0.75rem 0 !important;
+  background-color: $white;
+  border-radius: 3px;
+
+  &.is-open .container:nth-child(2) {
+    border-top: 1px solid $gray-1;
+  }
+
+  &.is-closed .content h2 {
+    margin-bottom: 0 !important;
+  }
+  &.is-closed .content h2 {
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .auction-barging__barge__trigger {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .auction-barging__barge__trigger > span:first-child { // Ersatz header. Probably a little brittle.
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .auction-barging__barge__trigger > span:last-child { // Toggle button. Probably a little brittle.
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+  .auction-barging__barge__toggle {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+  .auction-barging__barge__title {
+    margin-right: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .auction-barging__barge__status {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+  .auction-barging__barge__content {
+    margin-top: 1rem;
+    margin-left: auto;
+
+    p {
+      margin-left: 1.25rem;
+      margin-bottom: 0.25rem !important;
+    }
+  }
+}
+
+h2.auction-barging__barge { // Ehhh, just playing around here to see what happens.
+  display: flex;
+  align-items: center;
+
+  &> *:last-child {
+    margin-left: auto;
+  }
+}

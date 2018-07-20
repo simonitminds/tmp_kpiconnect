@@ -85,3 +85,36 @@
     padding-bottom: 0;
   }
 }
+
+// BARGING BOX VARIANT
+
+.collapsing-auction-barging {
+  margin: -1rem -1.25rem;
+
+  h3.title { // Hide default header
+    display: none;
+  }
+
+  .container {
+    width: 100% !important;
+  }
+
+  .collapsing-auction-barging__trigger { // Style collapsing section title
+    margin: 1.5rem -1rem 0 -1rem;
+    padding: 0.75rem 1rem 0.5rem 1rem;
+    border-top: 1px solid $gray-2;
+    border-bottom: 1px solid $gray-2;
+    text-transform: uppercase;
+    font-family: $family-header;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .collapsible-section__counter { display: none; }
+  .collapsible-section__toggle-icon { float: right; }
+
+  & .container:nth-child(2) { // Target non-collapsing section trigger
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+}

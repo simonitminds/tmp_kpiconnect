@@ -56,8 +56,11 @@ export default class AuctionShow extends React.Component {
 
   render() {
     const auctionPayload = this.props.auctionPayload;
+    const companyProfile = this.props.companyProfile;
+
     const auctionState = auctionPayload.state;
     const auction = auctionPayload.auction;
+
     const bidStatusDisplay = () => {
       if (auctionPayload.message) {
         return <BidStatus auctionPayload={auctionPayload} updateBidStatus={this.props.updateBidStatus} />
@@ -138,7 +141,7 @@ export default class AuctionShow extends React.Component {
           <div>
             {bidStatusDisplay()}
             <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
-            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
+            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -164,7 +167,7 @@ export default class AuctionShow extends React.Component {
               <h3 className="has-text-weight-bold is-flex">
                 <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
               </h3>
-              <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
+              <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} />
             </div>
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
