@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.Utilities
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionStore.AuctionState, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor}
 
   setup do
     buyer_company = insert(:company)
@@ -19,12 +19,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     )
     {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
 
-    state = AuctionState.from_auction(auction)
-    |> Map.put(:status, :open)
     expected_payload = %{
       time_remaining: auction.duration,
-      state: state,
-      bid_list: []
+      bid_history: [],
+      status: :open
     }
 
     {:ok, %{supplier_id: supplier_company.id,
@@ -70,7 +68,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: %{id: ^auction_id},
-            state: %{status: :pending}
+            status: :pending
           },
           topic: ^channel} ->
             assert true
@@ -93,7 +91,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: %{id: ^auction_id, port_agent: port_agent},
-            state: %{status: :pending}
+            status: :pending
           },
           topic: ^channel} ->
             assert port_agent == "TEST AGENT"
@@ -118,7 +116,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :open},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -141,7 +139,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :open}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :open},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -188,7 +186,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     setup(%{auction: auction, expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, auction.decision_duration)
-      |> Map.put(:state, Map.put(expected_payload.state, :status, :decision))
+      |> Map.put(:status, :decision)
       Auctions.start_auction(auction)
       {:ok, %{expected_payload: payload}}
     end
@@ -203,7 +201,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :decision}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :decision},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -224,7 +222,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :decision}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :decision},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -249,7 +247,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     setup(%{auction: auction, expected_payload: expected_payload}) do
       payload = expected_payload
       |> Map.put(:time_remaining, 0)
-      |> Map.put(:state, Map.put(expected_payload.state, :status, :expired))
+      |> Map.put(:status, :expired)
       auction
       |> Auctions.start_auction
       |> Auctions.end_auction
@@ -266,7 +264,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :expired}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :expired},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -287,7 +285,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: payload = %{auction: %{id: ^auction_id}, state: %{status: :expired}},
+          payload: payload = %{auction: %{id: ^auction_id}, status: :expired},
           topic: ^channel} ->
             assert Utilities.round_time_remaining(payload.time_remaining) ==
                     Utilities.round_time_remaining(expected_payload.time_remaining)
@@ -335,10 +333,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{status: :open, lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, status: :open, lowest_bids: lowest_bids, bid_history: bid_history},
           topic: ^channel} ->
-            assert buyer_payload.bid_list == bid_list
-            assert buyer_payload.state.lowest_bids == lowest_bids
+            assert buyer_payload.bid_history == bid_history
+            assert buyer_payload.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -352,10 +350,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
-          payload: %{auction: %{id: ^auction_id}, state: %{status: :decision, lowest_bids: lowest_bids}, bid_list: bid_list},
+          payload: %{auction: %{id: ^auction_id}, status: :decision, lowest_bids: lowest_bids, bid_history: bid_history},
           topic: ^channel} ->
-            assert decision_buyer_payload.bid_list == bid_list
-            assert decision_buyer_payload.state.lowest_bids == lowest_bids
+            assert decision_buyer_payload.bid_history == bid_history
+            assert decision_buyer_payload.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -377,15 +375,20 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{status: :open, lowest_bids: lowest_bids, lowest_bids_position: position, matches_best: matches_best},
-            bid_list: bid_list,
+            status: :open,
+            lowest_bids: lowest_bids,
+            lowest_bids_position: position,
+            is_leading: is_leading,
+            lead_is_tied: lead_is_tied,
+            bid_history: bid_history,
             time_remaining: time_remaining
           },
           topic: ^channel} ->
-            assert supplier_payload.bid_list == bid_list
-            assert supplier_payload.state.lowest_bids == lowest_bids
-            assert supplier_payload.state.lowest_bids_position == position
-            assert supplier_payload.state.matches_best == matches_best
+            assert supplier_payload.bid_history == bid_history
+            assert supplier_payload.lowest_bids == lowest_bids
+            assert supplier_payload.lowest_bids_position == position
+            assert supplier_payload.is_leading == is_leading
+            assert supplier_payload.lead_is_tied == lead_is_tied
             refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
@@ -413,15 +416,20 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           event: ^event,
           payload: %{
             auction: auction = %{id: ^auction_id},
-            state: state = %{status: :decision, lowest_bids: lowest_bids, lowest_bids_position: position, matches_best: matches_best},
-            bid_list: bid_list,
+            status: :decision,
+            lowest_bids: lowest_bids,
+            lowest_bids_position: position,
+            is_leading: is_leading,
+            lead_is_tied: lead_is_tied,
+            bid_history: bid_history,
             time_remaining: time_remaining
           },
           topic: ^channel} ->
-            assert decision_supplier_payload.bid_list == bid_list
-            assert decision_supplier_payload.state.lowest_bids == lowest_bids
-            assert decision_supplier_payload.state.lowest_bids_position == position
-            assert decision_supplier_payload.state.matches_best == matches_best
+            assert decision_supplier_payload.bid_history == bid_history
+            assert decision_supplier_payload.lowest_bids == lowest_bids
+            assert decision_supplier_payload.lowest_bids_position == position
+            assert decision_supplier_payload.is_leading == is_leading
+            assert decision_supplier_payload.lead_is_tied == lead_is_tied
             refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
             refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)

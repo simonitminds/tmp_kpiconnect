@@ -132,8 +132,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier can enter a bid", %{
       auction: auction,
-      bid_params: bid_params,
-      supplier: supplier
+      bid_params: bid_params
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()

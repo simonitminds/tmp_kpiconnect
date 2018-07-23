@@ -73,7 +73,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           >
             <form className="auction-barging__container">
               { barges.map((barge) =>
-                <div className="qa-barge-header">
+                <div className="qa-barge-header" key={barge.id}>
                   <CollapsibleSection
                     trigger={ `${barge.name} (${barge.imo_number})` }
                     classParentString="auction-barging__barge"
@@ -159,6 +159,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           <form className="auction-barging__container">
             { barges.map((barge) =>
               <CollapsibleSection
+                key={barge.id}
                 trigger={ `${barge.name} (${barge.imo_number})` }
                 classParentString="auction-barging__barge"
                 open={false}

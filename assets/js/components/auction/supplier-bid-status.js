@@ -7,11 +7,12 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
   const lowestBids = _.get(auctionPayload, 'lowest_bids');
   const auctionStatus = _.get(auctionPayload, 'status');
   const companyId = window.companyId;
-  // TODO: calculate all based on `payload.lowest_bids`.
   const suppliersLowestBid = lowestBids.find((bid) => bid.supplier_id == companyId);
   const rank = lowestBids.indexOf(suppliersLowestBid);
-  const matches_best = lowestBids.length > 0 && (lowestBids[0].amount == suppliersLowestBid.amount);
-  const winner = rank == 0;
+  const isLeading = _.get(auctionPayload, 'is_leading');
+  const leadIsTied = _.get(auctionPayload, 'lead_is_tied');
+  const winning_bid = _.get(auctionPayload, 'winning_bid')
+  const winner = winning_bid && winning_bid.supplier_id == companyId;
 
   const messageDisplay = (message) => {
     return (
@@ -55,13 +56,13 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
         {messageDisplay("You have not bid on this auction")}
       </div>
     );
-  } else if (matches_best && rank != null) {
+  } else if (isLeading && leadIsTied) {
     return (
       <div className = "auction-notification box is-success" >
         {messageDisplay(`Your bid matches the best offer (${rank + 1}${quickOrdinal(rank + 1)})`)}
       </div>
     );
-  } else if (rank == 0) {
+  } else if (isLeading) {
     return (
       <div className = "auction-notification box is-success" >
         {messageDisplay("Your bid is the best offer")}
