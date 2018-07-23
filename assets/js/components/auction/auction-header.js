@@ -12,7 +12,7 @@ import MediaQuery from 'react-responsive';
 
 const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const displayAuctionStartTime = () => {
     if (auctionStatus == 'pending') {
       return formatUTCDateTime(auction.scheduled_start);

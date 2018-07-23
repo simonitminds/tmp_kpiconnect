@@ -53,6 +53,7 @@ defmodule Oceanconnect.Auctions do
 
   def list_participating_auctions(company_id) do
     buyer_auctions(company_id) ++ supplier_auctions(company_id)
+    |> Enum.uniq_by(&(&1.id))
   end
 
   defp buyer_auctions(buyer_id) do

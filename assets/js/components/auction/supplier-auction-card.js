@@ -7,7 +7,7 @@ import AuctionTimeRemaining from './auction-time-remaining';
 
 const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const fuel = _.get(auction, 'fuel.name');
 

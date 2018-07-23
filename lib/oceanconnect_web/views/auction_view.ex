@@ -7,15 +7,15 @@ defmodule OceanconnectWeb.AuctionView do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 
-  def auction_log_supplier(%{state: %{winning_bid: %{supplier: supplier}}}) do
+  def auction_log_supplier(%{winning_bid: %{supplier: supplier}}) do
     supplier
   end
-  def auction_log_supplier(%{state: %{winning_bid: nil}}), do: "—"
+  def auction_log_supplier(%{winning_bid: nil}), do: "—"
 
-  def auction_log_winning_bid(%{state: %{winning_bid: %{amount: amount}}}) do
+  def auction_log_winning_bid(%{winning_bid: %{amount: amount}}) do
     "$#{:erlang.float_to_binary(amount, [decimals: 2])}"
   end
-  def auction_log_winning_bid(%{state: %{winning_bid: nil}}), do: "—"
+  def auction_log_winning_bid(%{winning_bid: nil}), do: "—"
 
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"

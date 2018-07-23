@@ -4,7 +4,7 @@ import { formatTime, formatPrice } from '../../utilities';
 
 const BuyerLowestBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const lowestBidList = _.get(auctionPayload, 'state.lowest_bids', []);
+  const lowestBidList = _.get(auctionPayload, 'lowest_bids', []);
   const lowestBidListDisplay = () => {
     if (lowestBidList.length > 0) {
       return (

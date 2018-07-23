@@ -39,7 +39,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     supplier_payload = auction
     |> AuctionPayload.get_auction_payload!(supplier_id)
 
-    lowest_bids_ids = Enum.reduce(buyer_payload.state.lowest_bids, [], fn(bid, acc) ->
+    lowest_bids_ids = Enum.reduce(buyer_payload.lowest_bids, [], fn(bid, acc) ->
       [bid.id | acc]
     end)
 

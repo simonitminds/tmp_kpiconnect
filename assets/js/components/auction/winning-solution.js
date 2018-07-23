@@ -4,9 +4,9 @@ import { formatTime, formatPrice } from '../../utilities';
 import SolutionComment from './solution-comment';
 
 const WinningSolution = ({auctionPayload}) => {
-  const auctionStatus = _.get(auctionPayload, 'state.status');
-  const lowestBidId = _.get(auctionPayload, 'state.lowest_bids[0].id');
-  const winningBid = _.get(auctionPayload, 'state.winning_bid');
+  const auctionStatus = _.get(auctionPayload, 'status');
+  const lowestBidId = _.get(auctionPayload, 'lowest_bids[0].id');
+  const winningBid = _.get(auctionPayload, 'winning_bid');
 
   const winningSolutionDisplay = () => {
     if (winningBid) {

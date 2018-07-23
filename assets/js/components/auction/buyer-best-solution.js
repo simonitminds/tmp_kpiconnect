@@ -17,13 +17,13 @@ export default class BuyerBestSolution extends React.Component {
 
   render() {
     const auctionPayload = this.props.auctionPayload;
-    const auctionStatus = _.get(auctionPayload, 'state.status');
+    const auctionStatus = _.get(auctionPayload, 'status');
     const acceptBid = this.props.acceptBid;
-    const lowestBid = _.get(auctionPayload, 'state.lowest_bids[0]');
+    const lowestBid = _.get(auctionPayload, 'lowest_bids[0]');
     const lowestBidId = _.get(lowestBid, 'id');
-    const winningBidId = _.get(auctionPayload, 'state.winning_bid.id');
+    const winningBidId = _.get(auctionPayload, 'winning_bid.id');
     const remainingBids = _.chain(auctionPayload)
-      .get('bid_list', [])
+      .get('bid_history', [])
       .reject(['id', lowestBidId])
       .reject(['id', winningBidId])
       .orderBy(['amount', 'time_entered'],['asc', 'asc'])
@@ -60,7 +60,7 @@ export default class BuyerBestSolution extends React.Component {
               </div>
               <div className="control">
                   <button
-                    disabled={auctionPayload.state.status != 'decision'}
+                    disabled={auctionPayload.status != 'decision'}
                     className={`button is-success qa-accept-bid`}
                     type="submit"
                   >
@@ -83,7 +83,7 @@ export default class BuyerBestSolution extends React.Component {
             <div className="auction-solution__content">
               <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> ({formatTime(bid.time_entered)})
               <button
-                className={`button is-small has-margin-left-md qa-select-bid-${bid.id} ${auctionPayload.state.status != 'decision' ? 'is-hidden' : ''}`}
+                className={`button is-small has-margin-left-md qa-select-bid-${bid.id} ${auctionPayload.status != 'decision' ? 'is-hidden' : ''}`}
                 onClick={
                   this.state.solutionCommentBidId == bid.id ? this.setSolutionCommentBidId.bind(this, null)
                                                             : this.setSolutionCommentBidId.bind(this, bid.id)

@@ -3,11 +3,15 @@ import _ from 'lodash';
 import { quickOrdinal } from '../../utilities';
 
 const SupplierBidStatus = ({auctionPayload, connection}) => {
-  const bidList = _.get(auctionPayload, 'bid_list', []);
-  const rank = _.get(auctionPayload, 'state.lowest_bids_position');
-  const matches_best = _.get(auctionPayload, 'state.matches_best');
-  const auctionStatus = _.get(auctionPayload, 'state.status');
-  const winner = _.get(auctionPayload, 'state.winner');
+  const bidList = _.get(auctionPayload, 'bid_history', []);
+  const lowestBids = _.get(auctionPayload, 'lowest_bids');
+  const auctionStatus = _.get(auctionPayload, 'status');
+  const companyId = window.companyId;
+  // TODO: calculate all based on `payload.lowest_bids`.
+  const suppliersLowestBid = lowestBids.find((bid) => bid.supplier_id == companyId);
+  const rank = lowestBids.indexOf(suppliersLowestBid);
+  const matches_best = lowestBids.length > 0 && (lowestBids[0].amount == suppliersLowestBid.amount);
+  const winner = rank == 0;
 
   const messageDisplay = (message) => {
     return (

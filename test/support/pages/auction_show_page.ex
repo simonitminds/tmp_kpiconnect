@@ -1,6 +1,8 @@
 defmodule Oceanconnect.AuctionShowPage do
   use Oceanconnect.Page
 
+  alias Oceanconnect.Auctions.Auction
+
   def visit(id) do
     navigate_to("/auctions/#{id}")
   end
@@ -139,5 +141,13 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def supplier_bid_list(bid_list, supplier_id) do
     Enum.filter(bid_list, fn bid -> bid.supplier_id == supplier_id end)
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 end

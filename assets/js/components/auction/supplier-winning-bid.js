@@ -5,9 +5,9 @@ import SupplierBidStatus from './supplier-bid-status'
 import SolutionComment from './solution-comment';
 
 const SupplierWinningBid = ({auctionPayload, connection}) => {
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const winningBid = _.get(auctionPayload, 'state.winning_bid');
+  const winningBid = _.get(auctionPayload, 'winning_bid');
 
   const winningBidDisplay = () => {
     if (winningBid) {

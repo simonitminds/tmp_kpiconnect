@@ -4,7 +4,7 @@ import moment from 'moment';
 import { formatTimeRemaining, formatTimeRemainingColor } from '../../utilities';
 
 const AuctionTimeRemaining = ({auctionPayload, auctionTimer, time}) => {
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const auctionStartTime = _.get(auctionPayload, 'auction.scheduled_start');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 

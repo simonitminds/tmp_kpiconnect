@@ -8,11 +8,11 @@ import AuctionTimeRemaining from './auction-time-remaining';
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const fuel = _.get(auction, 'fuel.name');
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
-  const lowestBid = _.chain(auctionPayload).get('state.lowest_bids').first().value();
-  const lowestBidCount = _.get(auctionPayload, 'state.lowest_bids.length');
-  const winningBid = _.get(auctionPayload, 'state.winning_bid');
+  const lowestBid = _.chain(auctionPayload).get('lowest_bids').first().value();
+  const lowestBidCount = _.get(auctionPayload, 'lowest_bids.length');
+  const winningBid = _.get(auctionPayload, 'winning_bid');
 
   const lowestBidMessage = () => {
     if (winningBid) {
