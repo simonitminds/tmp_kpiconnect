@@ -150,6 +150,7 @@ defmodule Oceanconnect.AuctionShowTest do
           %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
         end)
 
+      :timer.sleep(1000)
       assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
       assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
       assert AuctionShowPage.has_bid_message?("Bid successfully placed")
