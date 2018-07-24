@@ -41,7 +41,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time:  DateTime.utc_now(),
-      auction: auction,
+      auction: scrub_auction(auction, supplier_id),
       status: status,
       lowest_bids: Enum.map(lowest_bids, &(scrub_bid_for_supplier(&1, supplier_id, auction))),
       bid_history: Enum.filter(bids, &(&1.supplier_id == supplier_id)) |> Enum.map(&(scrub_bid_for_supplier(&1, supplier_id, auction))),
@@ -55,7 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time:  DateTime.utc_now(),
-      auction: auction,
+      auction: scrub_auction(auction, buyer_id),
       status: status,
       lowest_bids: Enum.map(lowest_bids, &(scrub_bid_for_buyer(&1, buyer_id, auction))),
       bid_history: bids |> Enum.map(&(scrub_bid_for_buyer(&1, buyer_id, auction))),
@@ -72,6 +72,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     AuctionTimer.read_timer(auction.id, :decision_duration)
   end
   defp get_time_remaining(_auction = %Auction{}, %AuctionState{}), do: 0
+
+  defp scrub_auction(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
+  defp scrub_auction(auction = %Auction{}, _supplier_id) do
+    Map.delete(auction, :suppliers)
+  end
 
   defp scrub_bid_for_supplier(nil, _supplier_id, _auction), do: nil
   defp scrub_bid_for_supplier(bid = %AuctionBid{supplier_id: supplier_id}, supplier_id, _auction = %Auction{}) do

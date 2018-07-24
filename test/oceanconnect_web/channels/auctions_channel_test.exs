@@ -370,6 +370,15 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       supplier_payload = auction
       |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
+      # NOTE: There seems to be an extra event that gets sent when bids are
+      # placed that does not contain the bids. Unsure of where this event is
+      # coming from.
+      receive do
+        %Phoenix.Socket.Broadcast{topic: ^channel} -> nil
+      after
+        5000 -> assert false, "Expected message received nothing."
+      end
+
       receive do
         %Phoenix.Socket.Broadcast{
           event: ^event,
@@ -377,7 +386,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction = %{id: ^auction_id},
             status: :open,
             lowest_bids: lowest_bids,
-            lowest_bids_position: position,
             is_leading: is_leading,
             lead_is_tied: lead_is_tied,
             bid_history: bid_history,
@@ -386,11 +394,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           topic: ^channel} ->
             assert supplier_payload.bid_history == bid_history
             assert supplier_payload.lowest_bids == lowest_bids
-            assert supplier_payload.lowest_bids_position == position
             assert supplier_payload.is_leading == is_leading
             assert supplier_payload.lead_is_tied == lead_is_tied
-            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
-            refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
             assert time_remaining > 3 * 60_000 - 1_000 #Auction extended
       after
@@ -400,7 +405,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       Auctions.place_bid(auction, %{"amount" => 1.25}, supplier3.id)
       receive do
-        %Phoenix.Socket.Broadcast{} -> nil
+        %Phoenix.Socket.Broadcast{topic: ^channel} -> nil
       after
         5000 ->
           assert false, "Expected message received nothing."
@@ -418,7 +423,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction = %{id: ^auction_id},
             status: :decision,
             lowest_bids: lowest_bids,
-            lowest_bids_position: position,
             is_leading: is_leading,
             lead_is_tied: lead_is_tied,
             bid_history: bid_history,
@@ -427,11 +431,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           topic: ^channel} ->
             assert decision_supplier_payload.bid_history == bid_history
             assert decision_supplier_payload.lowest_bids == lowest_bids
-            assert decision_supplier_payload.lowest_bids_position == position
             assert decision_supplier_payload.is_leading == is_leading
             assert decision_supplier_payload.lead_is_tied == lead_is_tied
-            refute lowest_bids |> hd |> Map.has_key?(:supplier_id)
-            refute state |> Map.has_key?(:supplier_ids)
             refute auction |> Map.has_key?(:suppliers)
             assert time_remaining > auction.decision_duration - 1_000
       after

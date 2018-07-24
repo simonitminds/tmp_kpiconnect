@@ -280,7 +280,7 @@ defmodule Oceanconnect.AuctionShowTest do
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
         assert AuctionShowPage.auction_bid_status() =~ "You lost the auction"
-        assert AuctionShowPage.bid_comment() == "Screw you!"
+        assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 

@@ -50,7 +50,7 @@ defmodule Oceanconnect.Auctions.AuctionCache do
 
   def handle_call({:make_cache_available, auction_id}, _from, current_state) do
     new_state = Map.put(current_state, :available, true)
-    
+
     {:reply, auction_id, new_state}
   end
 
