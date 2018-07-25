@@ -327,4 +327,19 @@ defmodule Oceanconnect.AuctionShowTest do
     AuctionShowPage.visit(auction.id)
     assert AuctionShowPage.has_available_barge?(barge)
   end
+
+  test "supplier can submit barge for approval", %{
+    auction: auction,
+    supplier: supplier
+  } do
+    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+    login_user(supplier)
+    AuctionShowPage.visit(auction.id)
+    :timer.sleep(1000)
+    assert AuctionShowPage.has_available_barge?(barge)
+
+    AuctionShowPage.submit_barge(barge)
+    :timer.sleep(1000)
+    assert AuctionShowPage.has_submitted_barge?(barge)
+  end
 end

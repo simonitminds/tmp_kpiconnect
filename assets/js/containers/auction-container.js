@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import {
   getAllAuctionPayloads,
-  getCompanyBarges,
   acceptWinningBid,
   setPortAgent,
   subscribeToAuctionUpdates,
@@ -19,13 +18,8 @@ const mapStateToProps = (state) => {
     .first()
     .value();
 
-  const companyProfile = {
-    companyBarges: state.companyProfileReducer.barges
-  };
-
   return {
     auctionPayload,
-    companyProfile,
     connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
   }
@@ -70,7 +64,6 @@ export class AuctionContainer extends React.Component {
 
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
-    this.props.dispatch(getCompanyBarges(window.companyId));
   }
   componentDidMount() {
     this.dispatchItem();

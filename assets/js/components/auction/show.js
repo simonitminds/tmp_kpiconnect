@@ -141,7 +141,7 @@ export default class AuctionShow extends React.Component {
           <div>
             {bidStatusDisplay()}
             <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
-            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} />
+            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -167,7 +167,7 @@ export default class AuctionShow extends React.Component {
               <h3 className="has-text-weight-bold is-flex">
                 <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
               </h3>
-              <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} />
+              <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             </div>
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -212,7 +212,7 @@ export default class AuctionShow extends React.Component {
                         { auctionLogLinkDisplay() }
                         {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-                        { !currentUser.isSupplier ? <BargeSubmission formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} /> : "" }
+                        { !currentUser.isSupplier ? <BargeSubmission formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} /> : "" }
                         <div className="box has-margin-bottom-md">
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information

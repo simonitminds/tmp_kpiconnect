@@ -140,5 +140,35 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert bid.id == winning_supplier_payload.winning_bid.id
       refute Map.has_key?(winning_supplier_payload, :supplier_id)
     end
+
+    test "includes available barges for supplier", %{auction: auction, supplier: supplier} do
+      barge = insert(:barge, companies: [supplier])
+
+      payload = auction
+      |> AuctionPayload.get_auction_payload!(supplier.id)
+
+      assert length(payload.available_barges) == 1
+
+      first_barge = hd(payload.available_barges)
+      assert first_barge.id == barge.id
+    end
+
+    test "does not include available barges from other suppliers", %{auction: auction, supplier: supplier, supplier_2: supplier2} do
+      _barge = insert(:barge, companies: [supplier])
+
+      payload = auction
+      |> AuctionPayload.get_auction_payload!(supplier2.id)
+
+      assert length(payload.available_barges) == 0
+    end
+
+    test "does not include available barges for buyer", %{auction: auction, supplier: supplier} do
+      _barge = insert(:barge, companies: [supplier])
+
+      payload = auction
+      |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+
+      assert length(payload.available_barges) == 0
+    end
   end
 end

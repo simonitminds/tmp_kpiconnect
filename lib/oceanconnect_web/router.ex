@@ -33,6 +33,8 @@ defmodule OceanconnectWeb.Router do
       as: :auction_bid_api
     )
 
+    post("/auctions/:auction_id/barges/:barge_id/submit", AuctionBargesController, :submit, as: :auction_barges_api_submit)
+
     get("/ports/:port_id/suppliers", PortSupplierController, :index)
     get("/companies/:company_id/barges", CompanyBargesController, :index, as: :company_barges_api)
   end
