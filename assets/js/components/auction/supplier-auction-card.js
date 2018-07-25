@@ -13,7 +13,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
 
   const bidStatusDisplay = () => {
     const lowestBid = _.chain(auctionPayload)
-      .get('state.lowest_bids')
+      .get('lowest_bids')
       .first()
       .value();
     if (lowestBid && auctionStatus != 'pending') {
