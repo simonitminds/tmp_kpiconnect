@@ -59,7 +59,6 @@ export default class AuctionShow extends React.Component {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
 
-    const auctionState = auctionPayload.state;
     const auction = auctionPayload.auction;
 
     const bidStatusDisplay = () => {
@@ -82,7 +81,7 @@ export default class AuctionShow extends React.Component {
     }
 
     const auctionLogLinkDisplay = () => {
-      if (currentUser.isBuyer && auctionState.status != 'pending' && auctionState.status != 'open') {
+      if (currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open') {
         return <AuctionLogLink auction={auction} />;
       } else {
         return false;
@@ -103,21 +102,21 @@ export default class AuctionShow extends React.Component {
     }
 
     const buyerBidComponents = () => {
-      if (auctionState.status == 'open') {
+      if (auctionPayload.status == 'open') {
         return (
           <div>
             <BuyerLowestBid auctionPayload={auctionPayload} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auctionState.status == 'decision') {
+      } else if (auctionPayload.status == 'decision') {
         return (
           <div>
             <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auctionState.status != 'pending') {
+      } else if (auctionPayload.status != 'pending') {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
@@ -137,7 +136,7 @@ export default class AuctionShow extends React.Component {
     }
 
     const supplierBidComponents = () => {
-      if (auctionState.status == 'open') {
+      if (auctionPayload.status == 'open') {
         return (
           <div>
             {bidStatusDisplay()}
@@ -146,14 +145,14 @@ export default class AuctionShow extends React.Component {
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auctionState.status == 'decision') {
+      } else if (auctionPayload.status == 'decision') {
         return (
           <div>
             <SupplierLowestBid auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
-      } else if (auctionState.status != 'pending') {
+      } else if (auctionPayload.status != 'pending') {
         return (
           <div>
             {bidStatusDisplay()}
@@ -218,7 +217,7 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
                               <div className="field is-inline-block is-pulled-right">
-                                { currentUser.isBuyer && auctionState.status != 'open' && auctionState.status != 'decision' ?
+                                { currentUser.isBuyer && auctionPayload.status != 'open' && auctionPayload.status != 'decision' ?
                                   <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
                                   :
                                   <div> </div>

@@ -3,7 +3,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
   @registry_name :auction_supervisor_registry
   alias Oceanconnect.Auctions.{Auction,
                                AuctionCache,
-                               AuctionBidList,
                                AuctionEventHandler,
                                AuctionEventStore,
                                AuctionScheduler,
@@ -18,7 +17,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
   def init({auction = %Auction{id: auction_id}, options}) do
     all_children = %{
       auction_a_timer: {AuctionTimer, auction_id},
-      auction_bid_list: {AuctionBidList, auction_id},
       auction_cache: {AuctionCache, auction},
       auction_event_handler: {AuctionEventHandler, auction_id},
       auction_event_store: {AuctionEventStore, auction_id},

@@ -1,21 +1,21 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent}
 
   def actual_duration(%Auction{auction_ended: nil}), do: "-"
   def actual_duration(%Auction{scheduled_start: started, auction_ended: ended}) do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 
-  def auction_log_supplier(%{state: %{winning_bid: %{supplier: supplier}}}) do
+  def auction_log_supplier(%{winning_bid: %{supplier: supplier}}) do
     supplier
   end
-  def auction_log_supplier(%{state: %{winning_bid: nil}}), do: "—"
+  def auction_log_supplier(%{winning_bid: nil}), do: "—"
 
-  def auction_log_winning_bid(%{state: %{winning_bid: %{amount: amount}}}) do
+  def auction_log_winning_bid(%{winning_bid: %{amount: amount}}) do
     "$#{:erlang.float_to_binary(amount, [decimals: 2])}"
   end
-  def auction_log_winning_bid(%{state: %{winning_bid: nil}}), do: "—"
+  def auction_log_winning_bid(%{winning_bid: nil}), do: "—"
 
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"
@@ -34,8 +34,8 @@ defmodule OceanconnectWeb.AuctionView do
     |> String.capitalize
   end
 
-  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: nil}}}), do: ""
-  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBidList.AuctionBid{amount: amount}}}) do
+  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: ""
+  def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: amount}}}) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
   def event_bid_amount(_event), do: "-"

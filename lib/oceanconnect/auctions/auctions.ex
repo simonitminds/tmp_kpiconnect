@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions do
     |> maybe_add_min_amount
     |> Map.put("supplier_id", supplier_id)
     |> Map.put("time_entered", time_entered)
-    |> AuctionBidList.AuctionBid.from_params_to_auction_bid(auction)
+    |> AuctionBid.from_params_to_auction_bid(auction)
 
     bid
     |> Command.process_new_bid(user)
@@ -28,8 +28,7 @@ defmodule Oceanconnect.Auctions do
   defp maybe_add_min_amount(params), do: Map.put(params, "min_amount", nil)
 
   def select_winning_bid(bid, comment, user \\ nil) do
-    bid
-    |> Map.put(:comment, comment)
+    %{bid | comment: comment}
     |> Command.select_winning_bid(user)
     |> AuctionStore.process_command
   end
@@ -54,6 +53,7 @@ defmodule Oceanconnect.Auctions do
 
   def list_participating_auctions(company_id) do
     buyer_auctions(company_id) ++ supplier_auctions(company_id)
+    |> Enum.uniq_by(&(&1.id))
   end
 
   defp buyer_auctions(buyer_id) do

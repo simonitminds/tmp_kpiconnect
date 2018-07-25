@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   alias Oceanconnect.Auctions.{
     Auction,
-    AuctionBidList.AuctionBid,
+    AuctionBid,
     AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,

@@ -5,9 +5,9 @@ import SupplierBidStatus from './supplier-bid-status'
 
 const SupplierLowestBid = ({auctionPayload, connection}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
-  const auctionStatus = _.get(auctionPayload, 'auction.state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const lowestBid = _.chain(auctionPayload)
-    .get('state.lowest_bids')
+    .get('lowest_bids')
     .first()
     .value();
 

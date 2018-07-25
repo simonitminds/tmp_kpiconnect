@@ -99,10 +99,13 @@ defmodule Oceanconnect.AuctionShowTest do
       Auctions.place_bid(auction, %{"amount" => 1.75}, s1.id)
       Auctions.place_bid(auction, %{"amount" => 1.25}, s2.id)
 
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!
+
       stored_bid_list =
-        auction.id
-        |> Auctions.AuctionBidList.get_bid_list()
-        |> Auctions.AuctionPayload.convert_to_supplier_names(auction)
+        auction_state.bids
+        |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
@@ -129,16 +132,20 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier can enter a bid", %{
       auction: auction,
-      bid_params: bid_params,
-      supplier: supplier
+      bid_params: bid_params
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
 
+      :timer.sleep(500)
+
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!
+
       stored_bid_list =
-        auction.id
-        |> Auctions.AuctionBidList.get_bid_list()
-        |> Auctions.AuctionPayload.supplier_bid_list(supplier.company_id)
+        auction_state.bids
+        |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
@@ -275,7 +282,7 @@ defmodule Oceanconnect.AuctionShowTest do
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
         assert AuctionShowPage.auction_bid_status() =~ "You lost the auction"
-        assert AuctionShowPage.bid_comment() == "Screw you!"
+        assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 

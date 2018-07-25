@@ -6,9 +6,9 @@ import { formatPrice } from '../../utilities';
 
 const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const auction = auctionPayload.auction;
-  const auctionState = auctionPayload.state.status;
-  const currentBidAmount = _.get(auctionPayload, 'bid_list[0].amount');
-  const minimumBidAmount = _.get(auctionPayload, 'bid_list[0].min_amount');
+  const auctionState = auctionPayload.status;
+  const currentBidAmount = _.get(auctionPayload, 'bid_history[0].amount');
+  const minimumBidAmount = _.get(auctionPayload, 'bid_history[0].min_amount');
   const fuel = _.get(auction, 'fuel.name');
   return(
     <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
@@ -65,7 +65,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           </div>
         </form>
         {/* BEGIN SUBMIT BARGING SECTION */}
-        <div class="qa-submit-barges-panel">
+        <div className="qa-submit-barges-panel">
           <CollapsibleSection
             trigger="Submit Barges"
             classParentString="collapsing-auction-barging"
@@ -73,7 +73,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           >
             <form className="auction-barging__container">
               { barges.map((barge) =>
-                <div class="qa-barge-header">
+                <div className="qa-barge-header" key={barge.id}>
                   <CollapsibleSection
                     trigger={ `${barge.name} (${barge.imo_number})` }
                     classParentString="auction-barging__barge"
@@ -159,6 +159,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           <form className="auction-barging__container">
             { barges.map((barge) =>
               <CollapsibleSection
+                key={barge.id}
                 trigger={ `${barge.name} (${barge.imo_number})` }
                 classParentString="auction-barging__barge"
                 open={false}

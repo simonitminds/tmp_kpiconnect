@@ -165,7 +165,7 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   describe "bid handling" do
-    alias Oceanconnect.Auctions.AuctionBidList
+    alias Oceanconnect.Auctions.AuctionBid
 
     setup do
       supplier_company = insert(:company, is_supplier: true)
@@ -195,7 +195,7 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: DateTime.utc_now()
       }
 
-      assert bid = %AuctionBidList.AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
+      assert bid = %AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
       assert Enum.all?(expected_result, fn({k, v}) ->
         if k == :time_entered do
           Map.fetch!(bid, k) >= v
@@ -205,8 +205,8 @@ defmodule Oceanconnect.AuctionsTest do
       end)
       payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
 
-      assert hd(payload.bid_list).id == bid.id
-      assert hd(payload.state.lowest_bids).id == bid.id
+      assert hd(payload.bid_history).id == bid.id
+      assert hd(payload.lowest_bids).id == bid.id
     end
   end
 

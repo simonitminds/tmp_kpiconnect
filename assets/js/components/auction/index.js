@@ -49,7 +49,7 @@ export default class AuctionsIndex extends React.Component {
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.props.auctionPayloads, (auctionPayload) => {
-          return(auctionPayload.state.status === status)
+          return(auctionPayload.status === status)
         });
     }
 

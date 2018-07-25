@@ -13,8 +13,12 @@ defmodule OceanconnectWeb.Api.AuctionView do
       time_remaining: auction_payload.time_remaining,
       current_server_time: auction_payload.current_server_time,
       auction: auction_payload.auction,
-      state: auction_payload.state,
-      bid_list: auction_payload.bid_list
+      status: auction_payload.status,
+      winning_bid: auction_payload.winning_bid,
+      lowest_bids: auction_payload.lowest_bids,
+      bid_history: auction_payload.bid_history,
+      is_leading: auction_payload.is_leading,
+      lead_is_tied: auction_payload.lead_is_tied
     }
   end
 end

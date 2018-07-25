@@ -559,7 +559,7 @@ fujairah = Repo.get_by(Port, name: "Fujairah")
 date_time =
   DateTime.utc_now()
   |> DateTime.to_naive()
-  |> NaiveDateTime.add(3_600 * 24 * 30)
+  |> NaiveDateTime.add(5 * 60)
   |> DateTime.from_naive!("Etc/UTC")
 
 auctions_params = [

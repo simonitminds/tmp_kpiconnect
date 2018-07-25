@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventHandler do
   use GenServer
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBidList.AuctionBid, AuctionEvent, AuctionNotifier, AuctionStore.AuctionState}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionNotifier, AuctionStore.AuctionState}
 
   @registry_name :auction_event_handler_registry
 
@@ -29,12 +29,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:noreply, state}
   end
   def handle_info(%AuctionEvent{auction_id: auction_id, type: _type, data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}}, state) do
-    auction_id
-    |> Auctions.AuctionCache.read
-    |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
-    {:noreply, state}
-  end
-  def handle_info(%AuctionEvent{auction_id: auction_id, type: :auto_bid_placed, data: bid = %AuctionBid{supplier_id: supplier_id}}, state) do
     auction_id
     |> Auctions.AuctionCache.read
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)

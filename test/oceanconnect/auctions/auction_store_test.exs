@@ -105,7 +105,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     test "first bid is added and extends duration", %{auction: auction, bid: bid} do
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+      assert Enum.all?(auction_payload.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [bid.id]
       end)
       assert auction_payload.time_remaining > 2 * 60_000
@@ -116,7 +116,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount}, supplier2_company.id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+      assert Enum.all?(auction_payload.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [bid.id, new_bid.id]
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
@@ -127,7 +127,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       new_bid = Auctions.place_bid(auction, %{"amount" => bid.amount - 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert Enum.all?(auction_payload.state.lowest_bids, fn(lowest_bid) ->
+      assert Enum.all?(auction_payload.lowest_bids, fn(lowest_bid) ->
         lowest_bid.id in [new_bid.id]
       end)
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
@@ -139,7 +139,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       Auctions.place_bid(auction, %{"amount" => increased_bid_amount}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      lowest_bid = hd(auction_payload.state.lowest_bids)
+      lowest_bid = hd(auction_payload.lowest_bids)
       assert increased_bid_amount == lowest_bid.amount
       assert auction_payload.time_remaining > 3 * 60_000 - 1_000
     end
@@ -150,7 +150,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       Auctions.place_bid(auction, %{"amount" => bid.amount + 1}, bid.supplier_id)
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      lowest_bid = hd(auction_payload.state.lowest_bids)
+      lowest_bid = hd(auction_payload.lowest_bids)
       other_lowest_bid = bid.amount + 0.5
       assert ^other_lowest_bid = lowest_bid.amount
       assert auction_payload.time_remaining < 3 * 60_000 - 1_000
@@ -164,7 +164,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      lowest_bid = hd(auction_payload.state.lowest_bids)
+      lowest_bid = hd(auction_payload.lowest_bids)
       assert lowest_bid.amount == 0.50
       assert lowest_bid.supplier == supplier_company.name
 

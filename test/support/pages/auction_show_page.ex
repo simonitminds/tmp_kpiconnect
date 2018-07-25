@@ -1,6 +1,8 @@
 defmodule Oceanconnect.AuctionShowPage do
   use Oceanconnect.Page
 
+  alias Oceanconnect.Auctions.Auction
+
   def visit(id) do
     navigate_to("/auctions/#{id}")
   end
@@ -44,7 +46,7 @@ defmodule Oceanconnect.AuctionShowPage do
       Enum.all?(bid["data"], fn({k, v}) ->
         text = find_within_element(element, :css, ".qa-auction-bid-#{k}")
         |> inner_text
-        v == text
+        text =~ v
       end)
     end)
   end
@@ -125,5 +127,27 @@ defmodule Oceanconnect.AuctionShowPage do
     |> Enum.map(&String.trim/1)
 
     "#{name} (#{imo_number})" in available_names
+  end
+
+  def convert_to_supplier_names(bid_list, auction = %Auction{}) do
+    Enum.map(bid_list, fn bid ->
+      supplier_name = get_name_or_alias(bid.supplier_id, auction)
+
+      bid
+      |> Map.drop([:__struct__, :supplier_id])
+      |> Map.put(:supplier, supplier_name)
+    end)
+  end
+
+  def supplier_bid_list(bid_list, supplier_id) do
+    Enum.filter(bid_list, fn bid -> bid.supplier_id == supplier_id end)
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 end

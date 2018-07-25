@@ -7,13 +7,13 @@ import AuctionTimeRemaining from './auction-time-remaining';
 
 const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const auctionStatus = _.get(auctionPayload, 'state.status');
+  const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const fuel = _.get(auction, 'fuel.name');
 
   const bidStatusDisplay = () => {
     const lowestBid = _.chain(auctionPayload)
-      .get('state.lowest_bids')
+      .get('lowest_bids')
       .first()
       .value();
     if (lowestBid && auctionStatus != 'pending') {
