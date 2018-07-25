@@ -46,7 +46,7 @@ defmodule Oceanconnect.AuctionShowPage do
       Enum.all?(bid["data"], fn({k, v}) ->
         text = find_within_element(element, :css, ".qa-auction-bid-#{k}")
         |> inner_text
-        v == text
+        text =~ v
       end)
     end)
   end
