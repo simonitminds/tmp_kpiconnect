@@ -28,7 +28,7 @@ class CollapsibleSection extends Component {
         isClosed: true,
         shouldSwitchAutoOnNextCycle: false,
         height: 0,
-        transition: `height ${props.transitionTime}ms ${props.easing}`,
+        transition: `height ${props.transitionTime}ms ${props.easing}, border-top-color 0ms ease-in 300ms`,
         hasBeenOpened: false,
         overflow: 'hidden',
         inTransition: false,
@@ -68,7 +68,7 @@ class CollapsibleSection extends Component {
     this.setState({
       shouldSwitchAutoOnNextCycle: true,
       height: this.refs.inner.offsetHeight,
-      transition: `height ${this.props.transitionTime}ms ${this.props.easing}`,
+      transition: `height ${this.props.transitionTime}ms ${this.props.easing}, border-top-color 200ms ease-in`,
       inTransition: true,
     });
   }
@@ -83,7 +83,7 @@ class CollapsibleSection extends Component {
   continueOpenCollapsible() {
     this.setState({
       height: this.refs.inner.offsetHeight,
-      transition: `height ${this.props.transitionTime}ms ${this.props.easing}`,
+      transition: `height ${this.props.transitionTime}ms ${this.props.easing}, border-top-color 100ms ease-in`,
       isClosed: false,
       hasBeenOpened: true,
       inTransition: true,

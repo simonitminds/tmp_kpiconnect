@@ -14,6 +14,13 @@
   padding: 1rem;
 }
 
+.auction-barging__container {
+  background-color: $gray-1;
+  margin: 0 -1.32rem;
+  border-radius: 0;
+  padding: 0.25rem 1rem;
+}
+
 .auction-barging__barge { // Each line containing an auction solution.
   margin-top: 1rem;
   margin-bottom: 1rem !important;
@@ -21,16 +28,31 @@
   background-color: $white;
   border-radius: 3px;
 
-  &.is-open .container:nth-child(2) {
+  > .container {
+    width: auto;
+  }
+
+  & .container:nth-child(2) {
     border-top: 1px solid $gray-1;
+    transition: all 300ms ease-in !important, border-top-color 100ms ease-in !important;
+  }
+
+  &.is-open .container:nth-child(2) {
+    border-top-color: $gray-1;
+  }
+
+  &.is-closed .container:nth-child(2) {
+    border-top-color: transparent;
   }
 
   &.is-closed .content h2 {
     margin-bottom: 0 !important;
-  }
-  &.is-closed .content h2 {
     margin-top: 0 !important;
     padding-bottom: 0 !important;
+  }
+
+  & .content h2 {
+    transition: margin-bottom 300ms ease-in;
   }
 
   .auction-barging__barge__trigger {
@@ -38,6 +60,9 @@
     flex-direction: row-reverse;
     align-items: center;
     justify-content: flex-end;
+  }
+  .auction-barging__barge__trigger > span.collapsible-section__counter {
+    display: none;
   }
   .auction-barging__barge__trigger > span:first-child { // Ersatz header. Probably a little brittle.
     font-size: 1rem;

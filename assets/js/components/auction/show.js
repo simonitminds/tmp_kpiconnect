@@ -15,6 +15,7 @@ import SupplierBidList from './supplier-bid-list';
 import BiddingForm from './bidding-form';
 import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
+import BargeSubmission from './barge-submission';
 import MediaQuery from 'react-responsive';
 import AuctionLogLink from './auction-log-link';
 import BidStatus from './bid-status';
@@ -212,7 +213,7 @@ export default class AuctionShow extends React.Component {
                         { auctionLogLinkDisplay() }
                         {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                         { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-
+                        { !currentUser.isSupplier ? <BargeSubmission formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} barges={companyProfile.companyBarges} /> : "" }
                         <div className="box has-margin-bottom-md">
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
