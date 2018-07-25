@@ -1,8 +1,9 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer, Barge}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Accounts
 
   defstruct time_remaining: nil,
             current_server_time: nil,
@@ -12,7 +13,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             lowest_bids: [],
             bid_history: [],
             is_leading: false,
-            lead_is_tied: false
+            lead_is_tied: false,
+            available_barges: [],
+            submitted_barges: []
 
 
   def get_auction_payload!(auction = %Auction{buyer_id: buyer_id}, buyer_id) do
@@ -47,7 +50,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: Enum.filter(bids, &(&1.supplier_id == supplier_id)) |> Enum.map(&(scrub_bid_for_supplier(&1, supplier_id, auction))),
       winning_bid: scrub_bid_for_supplier(winning_bid, supplier_id, auction),
       is_leading: is_leading?(state, supplier_id),
-      lead_is_tied: lead_is_tied?(state)
+      lead_is_tied: lead_is_tied?(state),
+      available_barges: available_barges_for_supplier(supplier_id)
     }
   end
 
@@ -61,7 +65,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: bids |> Enum.map(&(scrub_bid_for_buyer(&1, buyer_id, auction))),
       winning_bid: scrub_bid_for_buyer(winning_bid, buyer_id, auction),
       is_leading: false,
-      lead_is_tied: lead_is_tied?(state)
+      lead_is_tied: lead_is_tied?(state),
+      available_barges: []
     }
   end
 
@@ -121,5 +126,15 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Enum.count(fn(bid) -> bid.amount == lowest.amount end)
 
     tied_bids > 1
+  end
+
+  defp available_barges_for_supplier(supplier_id) do
+    Accounts.list_company_barges(supplier_id)
+    |> Enum.map(&(scrub_barge_for_supplier(&1, supplier_id)))
+  end
+
+  defp scrub_barge_for_supplier(barge = %Barge{port: port}, supplier_id) do
+    %{ barge | port: port.name }
+    |> Map.delete(:port_id)
   end
 end

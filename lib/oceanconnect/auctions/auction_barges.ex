@@ -22,5 +22,4 @@ defmodule Oceanconnect.Auctions.AuctionBarges do
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:barge_id)
   end
-
 end
