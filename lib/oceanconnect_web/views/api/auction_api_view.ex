@@ -19,7 +19,6 @@ defmodule OceanconnectWeb.Api.AuctionView do
       bid_history: auction_payload.bid_history,
       is_leading: auction_payload.is_leading,
       lead_is_tied: auction_payload.lead_is_tied,
-      available_barges: auction_payload.available_barges,
       submitted_barges: auction_payload.submitted_barges
     }
   end

@@ -78,6 +78,21 @@ export function getCompanyBarges(companyId) {
   };
 }
 
+export function submitBargeForApproval(auctionId, bargeId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/submit`, {
+        headers: defaultHeaders,
+        method: 'POST'
+      })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        console.log(response);
+        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+      });
+  };
+}
+
 export function selectPort(event) {
   const port_id = event.target.value;
   return dispatch => {

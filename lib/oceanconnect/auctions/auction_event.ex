@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   defstruct id: nil,
@@ -127,6 +127,24 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       data: %{bid: bid, state: state},
       time_entered: DateTime.utc_now(),
       user: user
+    }
+  end
+
+  def barge_submitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}) do
+    %AuctionEvent{
+      type: :barge_submitted,
+      auction_id: auction_barge.auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
+  def barge_approved(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}) do
+    %AuctionEvent{
+      type: :barge_approved,
+      auction_id: auction_barge.auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now()
     }
   end
 end

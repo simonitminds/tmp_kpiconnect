@@ -1,8 +1,6 @@
 defmodule OceanconnectWeb.Api.CompanyBargesController do
   use OceanconnectWeb, :controller
-  alias Oceanconnect.{Accounts}
-  alias Oceanconnect.Accounts.{Company}
-  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload}
+  alias Oceanconnect.Accounts
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, %{"company_id" => company_id}) do

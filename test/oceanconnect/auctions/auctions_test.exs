@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -137,8 +138,6 @@ defmodule Oceanconnect.AuctionsTest do
   end
 
   describe "ending an auction" do
-    alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
-
     setup do
       supplier_company = insert(:company)
       supplier2_company = insert(:company)
@@ -401,6 +400,96 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "change_fuel/1 returns a fuel changeset", %{fuel: fuel} do
       assert %Ecto.Changeset{} = Auctions.change_fuel(fuel)
+    end
+  end
+
+  describe "barges" do
+    setup do
+      supplier_company = insert(:company, is_supplier: true)
+      supplier_company2 = insert(:company, is_supplier: true)
+      auction = insert(:auction, suppliers: [supplier_company, supplier_company2])
+
+      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      {:ok, %{auction: auction, supplier: supplier_company, supplier2: supplier_company2}}
+    end
+
+    test "list_auction_barges/1 lists all barges submitted to an auction", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+      barge1 = insert(:barge, companies: [supplier])
+      barge2 = insert(:barge, companies: [supplier2])
+
+      insert(:auction_barge, auction: auction, barge: barge1, supplier: supplier)
+      insert(:auction_barge, auction: auction, barge: barge2, supplier: supplier2)
+
+      [first, second] = Auctions.list_auction_barges(auction)
+      assert first.barge_id == barge1.id
+      assert second.barge_id == barge2.id
+    end
+
+    test "list_auction_barges/1 allows the same barge to be submitted by multiple suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+      barge = insert(:barge, companies: [supplier, supplier2])
+      barge_id = barge.id
+      supplier_id = supplier.id
+      supplier2_id = supplier2.id
+
+      insert(:auction_barge, auction: auction, barge: barge, supplier: supplier)
+      insert(:auction_barge, auction: auction, barge: barge, supplier: supplier2)
+
+      [first, second] = Auctions.list_auction_barges(auction)
+      assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier_id} = first
+      assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier2_id} = second
+    end
+
+    test "submit_barge/3 adds given barge to auction for the supplier", %{auction: auction, supplier: supplier} do
+      barge = insert(:barge, companies: [supplier])
+      barge_id = barge.id
+      supplier_id = supplier.id
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      auction_state = Auctions.get_auction_state!(auction)
+
+      assert length(auction_state.submitted_barges) == 1
+      assert %Auctions.AuctionBarge{
+        barge_id: ^barge_id,
+        supplier_id: ^supplier_id,
+        approval_status: "PENDING"} = hd(auction_state.submitted_barges)
+    end
+
+    test "submit_barge/3 allows multiple suppliers to submit the same barge", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+      barge = insert(:barge, companies: [supplier, supplier2])
+      barge_id = barge.id
+      supplier_id = supplier.id
+      supplier2_id = supplier2.id
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.submit_barge(auction, barge, supplier2.id)
+      auction_state = Auctions.get_auction_state!(auction)
+
+      [first, second] = auction_state.submitted_barges
+      assert %Auctions.AuctionBarge{
+        barge_id: ^barge_id,
+        supplier_id: ^supplier_id,
+        approval_status: "PENDING"} = first
+      assert %Auctions.AuctionBarge{
+        barge_id: ^barge_id,
+        supplier_id: ^supplier2_id,
+        approval_status: "PENDING"} = second
+    end
+
+    test "approve_barge/3 updates the approval status of a submitted barge" ,%{auction: auction, supplier: supplier} do
+      barge = insert(:barge, companies: [supplier])
+
+      barge_id = barge.id
+      supplier_id = supplier.id
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.approve_barge(auction, barge, supplier.id)
+      auction_state = Auctions.get_auction_state!(auction)
+
+      [submitted_barge] = auction_state.submitted_barges
+      assert %Auctions.AuctionBarge{
+        barge_id: ^barge_id,
+        supplier_id: ^supplier_id,
+        approval_status: "APPROVED"} = submitted_barge
     end
   end
 
