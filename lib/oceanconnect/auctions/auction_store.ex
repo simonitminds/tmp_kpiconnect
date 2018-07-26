@@ -3,6 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   alias Oceanconnect.Auctions.{
     Auction,
+    AuctionBarge,
     AuctionBid,
     AuctionBidCalculator,
     AuctionCache,
@@ -27,7 +28,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
               minimum_bids: [],
               bids: [],
               active_bids: [],
-              inactive_bids: []
+              inactive_bids: [],
+              submitted_barges: []
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
       %AuctionState{
@@ -71,6 +73,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
+  end
+
+  def process_command(%Command{
+        command: cmd,
+        data: data = %{auction_barge: %AuctionBarge{auction_id: auction_id}}
+      }) do
+    with {:ok, pid} <- find_pid(auction_id),
+      do: GenServer.cast(pid, {cmd, data, true})
   end
 
   def process_command(%Command{command: cmd, data: data = %{auction: %Auction{id: auction_id}}}) do
@@ -125,7 +135,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:end_auction, auction = %Auction{id: auction_id}, emit},
+        {:end_auction, auction = %Auction{}, emit},
         current_state = %{status: :open}
       ) do
     new_state = end_auction(current_state, auction)
@@ -165,7 +175,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-
   def handle_cast(
         {:process_new_bid, %{bid: bid = %{min_amount: _min_amount}, user: user}, emit},
         current_state = %{auction_id: auction_id}
@@ -183,7 +192,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-
   def handle_cast(
         {:select_winning_bid, %{bid: bid, user: user}, emit},
         current_state = %{auction_id: auction_id}
@@ -192,6 +200,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     AuctionEvent.emit(AuctionEvent.winning_bid_selected(bid, current_state, user), emit)
     AuctionEvent.emit(AuctionEvent.auction_closed(auction_id, new_state), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+        {:submit_barge, %{auction_barge: auction_barge}, emit},
+        current_state
+      ) do
+    new_state = submit_barge(auction_barge, current_state)
+
+    AuctionEvent.emit(AuctionEvent.barge_submitted(auction_barge, current_state), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+        {:approve_barge, %{auction_barge: auction_barge}, emit},
+        current_state
+      ) do
+    new_state = approve_barge(auction_barge, current_state)
+
+    AuctionEvent.emit(AuctionEvent.barge_approved(auction_barge, current_state), emit)
 
     {:noreply, new_state}
   end
@@ -253,6 +283,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid}}, previous_state) do
     select_winning_bid(bid, previous_state)
+  end
+
+  defp replay_event(%AuctionEvent{type: :submit_barge, data: %{auction_barge: auction_barge}}, previous_state) do
+    submit_barge(auction_barge, previous_state)
+  end
+
+  defp replay_event(%AuctionEvent{type: :approve_barge, data: %{auction_barge: auction_barge}}, previous_state) do
+    approve_barge(auction_barge, previous_state)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
@@ -326,6 +364,48 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     current_state
     |> Map.put(:winning_bid, bid)
     |> Map.put(:status, :closed)
+  end
+
+  defp submit_barge(
+        auction_barge = %AuctionBarge{
+          auction_id: auction_id,
+          barge_id: barge_id,
+          supplier_id: supplier_id
+        },
+        current_state = %AuctionState{submitted_barges: submitted_barges}
+      ) do
+    barge_is_submitted = Enum.any?(submitted_barges, fn(barge) ->
+      match?(%AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id}, barge)
+    end)
+
+    if barge_is_submitted do
+      current_state
+    else
+      %AuctionState{ current_state |
+        submitted_barges: submitted_barges ++ [auction_barge]
+      }
+    end
+  end
+
+  defp approve_barge(
+        auction_barge = %AuctionBarge{
+          auction_id: auction_id,
+          barge_id: barge_id,
+          supplier_id: supplier_id,
+          approval_status: "APPROVED"
+        },
+        current_state = %AuctionState{submitted_barges: submitted_barges}
+      ) do
+    new_submitted_barges = Enum.map(submitted_barges, fn(barge) ->
+      case barge do
+        %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
+        _ -> barge
+      end
+    end)
+
+    %AuctionState{ current_state |
+      submitted_barges: new_submitted_barges
+    }
   end
 
   defp expire_auction(current_state = %{auction_id: auction_id}) do

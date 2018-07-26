@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, Port, Vessel, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionCache, AuctionEvent, AuctionStore, AuctionSuppliers, AuctionBarge, Port, Vessel, Fuel, Barge}
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -590,5 +590,51 @@ defmodule Oceanconnect.Auctions do
   """
   def change_fuel(%Fuel{} = fuel) do
     Fuel.changeset(fuel, %{})
+  end
+
+  def get_barge(id) do
+    Repo.get(Barge, id)
+  end
+
+  def get_barge!(id) do
+    Repo.get!(Barge, id)
+  end
+
+  def list_auction_barges(%Auction{id: auction_id}) do
+    query = auction_id
+    |> AuctionBarge.by_auction()
+    |> Repo.all()
+    |> Repo.preload(barge: [:port])
+  end
+
+  def submit_barge(%Auction{id: auction_id}, barge = %Barge{id: barge_id}, supplier_id) do
+    {:ok, auction_barge} = %AuctionBarge{}
+    |> AuctionBarge.changeset(%{
+        auction_id: auction_id,
+        barge_id: barge_id,
+        supplier_id: supplier_id,
+        approval_status: "PENDING"
+      })
+    |> Repo.insert()
+
+    auction_barge
+    |> Map.put(:barge, barge)
+    |> Command.submit_barge()
+    |> AuctionStore.process_command()
+  end
+
+  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id) do
+    {:ok, auction_barge} = Repo.get_by!(AuctionBarge,
+        barge_id: barge_id,
+        auction_id: auction_id,
+        supplier_id: supplier_id
+      )
+    |> Repo.preload(barge: [:port])
+    |> AuctionBarge.changeset(%{approval_status: "APPROVED"})
+    |> Repo.update()
+
+    auction_barge
+    |> Command.approve_barge()
+    |> AuctionStore.process_command()
   end
 end

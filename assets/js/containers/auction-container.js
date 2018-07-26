@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import {
   getAllAuctionPayloads,
+  getCompanyBarges,
   acceptWinningBid,
   setPortAgent,
   subscribeToAuctionUpdates,
+  submitBargeForApproval,
   submitBid,
   updateBidStatus
 } from '../actions';
@@ -18,8 +20,13 @@ const mapStateToProps = (state) => {
     .first()
     .value();
 
+  const companyProfile = {
+    companyBarges: state.companyProfileReducer.barges
+  };
+
   return {
     auctionPayload,
+    companyProfile,
     connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
   }
@@ -41,6 +48,11 @@ const mapDispatchToProps = (dispatch) => ({
     elements.amount.value = '';
     elements.min_amount.value = '';
     dispatch(submitBid(auctionId, bidData));
+  },
+  submitBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+
+    dispatch(submitBargeForApproval(auctionId, bargeId));
   },
   acceptBid(auctionId, bidId, ev) {
     ev.preventDefault();
@@ -64,6 +76,7 @@ export class AuctionContainer extends React.Component {
 
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
+    this.props.dispatch(getCompanyBarges(window.companyId));
   }
   componentDidMount() {
     this.dispatchItem();

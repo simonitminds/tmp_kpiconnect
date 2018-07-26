@@ -65,6 +65,15 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def auction_barge_factory() do
+    %Oceanconnect.Auctions.AuctionBarge{
+      auction: build(:auction),
+      barge: build(:barge),
+      supplier: build(:company, is_supplier: true),
+      approval_status: "PENDING"
+    }
+  end
+
   def vessel_factory() do
     %Oceanconnect.Auctions.Vessel{
       imo: 1_234_567,
