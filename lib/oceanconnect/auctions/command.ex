@@ -52,12 +52,16 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :select_winning_bid, data: %{bid: bid, user: user}}
   end
 
-  def submit_barge(auction_barge = %AuctionBarge{}) do
-    %Command{command: :submit_barge, data: %{auction_barge: auction_barge}}
+  def submit_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :submit_barge, data: %{auction_barge: auction_barge, user: user}}
   end
 
-  def approve_barge(auction_barge = %AuctionBarge{}) do
-    %Command{command: :approve_barge, data: %{auction_barge: auction_barge}}
+  def unsubmit_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :unsubmit_barge, data: %{auction_barge: auction_barge, user: user}}
+  end
+
+  def approve_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :approve_barge, data: %{auction_barge: auction_barge, user: user}}
   end
 
   def extend_duration(auction_id) when is_integer(auction_id) do

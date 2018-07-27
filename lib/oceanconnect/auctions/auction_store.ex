@@ -205,23 +205,34 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:submit_barge, %{auction_barge: auction_barge}, emit},
+        {:submit_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
     new_state = submit_barge(auction_barge, current_state)
 
-    AuctionEvent.emit(AuctionEvent.barge_submitted(auction_barge, current_state), emit)
+    AuctionEvent.emit(AuctionEvent.barge_submitted(auction_barge, new_state, user), emit)
 
     {:noreply, new_state}
   end
 
   def handle_cast(
-        {:approve_barge, %{auction_barge: auction_barge}, emit},
+        {:unsubmit_barge, %{auction_barge: auction_barge, user: user}, emit},
+        current_state
+      ) do
+    new_state = unsubmit_barge(auction_barge, current_state)
+
+    AuctionEvent.emit(AuctionEvent.barge_unsubmitted(auction_barge, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+        {:approve_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
     new_state = approve_barge(auction_barge, current_state)
 
-    AuctionEvent.emit(AuctionEvent.barge_approved(auction_barge, current_state), emit)
+    AuctionEvent.emit(AuctionEvent.barge_approved(auction_barge, new_state, user), emit)
 
     {:noreply, new_state}
   end
@@ -285,11 +296,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     select_winning_bid(bid, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :submit_barge, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(%AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}}, previous_state) do
     submit_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :approve_barge, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(%AuctionEvent{type: :barge_unsubmitted, data: %{auction_barge: auction_barge}}, previous_state) do
+    unsubmit_barge(auction_barge, previous_state)
+  end
+
+  defp replay_event(%AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}}, previous_state) do
     approve_barge(auction_barge, previous_state)
   end
 
@@ -385,6 +400,23 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         submitted_barges: submitted_barges ++ [auction_barge]
       }
     end
+  end
+
+  defp unsubmit_barge(
+        auction_barge = %AuctionBarge{
+          auction_id: auction_id,
+          barge_id: barge_id,
+          supplier_id: supplier_id
+        },
+        current_state = %AuctionState{submitted_barges: submitted_barges}
+      ) do
+    new_submitted_barges = Enum.reject(submitted_barges, fn(barge) ->
+      match?(%AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id}, barge)
+    end)
+
+    %AuctionState{ current_state |
+      submitted_barges: new_submitted_barges
+    }
   end
 
   defp approve_barge(

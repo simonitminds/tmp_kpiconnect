@@ -601,13 +601,13 @@ defmodule Oceanconnect.Auctions do
   end
 
   def list_auction_barges(%Auction{id: auction_id}) do
-    query = auction_id
+    auction_id
     |> AuctionBarge.by_auction()
     |> Repo.all()
     |> Repo.preload(barge: [:port])
   end
 
-  def submit_barge(%Auction{id: auction_id}, barge = %Barge{id: barge_id}, supplier_id) do
+  def submit_barge(%Auction{id: auction_id}, barge = %Barge{id: barge_id}, supplier_id, user \\ nil) do
     {:ok, auction_barge} = %AuctionBarge{}
     |> AuctionBarge.changeset(%{
         auction_id: auction_id,
@@ -619,22 +619,41 @@ defmodule Oceanconnect.Auctions do
 
     auction_barge
     |> Map.put(:barge, barge)
-    |> Command.submit_barge()
+    |> Command.submit_barge(user)
     |> AuctionStore.process_command()
   end
 
-  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id) do
-    {:ok, auction_barge} = Repo.get_by!(AuctionBarge,
-        barge_id: barge_id,
-        auction_id: auction_id,
-        supplier_id: supplier_id
-      )
-    |> Repo.preload(barge: [:port])
-    |> AuctionBarge.changeset(%{approval_status: "APPROVED"})
-    |> Repo.update()
+  def unsubmit_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
+    query =
+      from ab in AuctionBarge,
+      where: ab.auction_id == ^auction_id and ab.supplier_id == ^supplier_id and ab.barge_id == ^barge_id
 
-    auction_barge
-    |> Command.approve_barge()
+    Repo.delete_all(query)
+
+    %AuctionBarge{
+      auction_id: auction_id,
+      barge_id: barge_id,
+      supplier_id: supplier_id
+    }
+    |> Command.unsubmit_barge(user)
     |> AuctionStore.process_command()
+  end
+
+  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, user \\ nil) do
+    query =
+      from ab in AuctionBarge,
+      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id
+
+    Repo.update_all(query, set: [approval_status: "APPROVED"])
+
+    auction_barges = query
+    |> Repo.all()
+    |> Repo.preload(barge: [:port])
+
+    Enum.map(auction_barges, fn(auction_barge) ->
+      auction_barge
+      |> Command.approve_barge(user)
+      |> AuctionStore.process_command()
+    end)
   end
 end

@@ -10,6 +10,8 @@ import {
   setPortAgent,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
+  unsubmitBargeForApproval,
+  approveBarge,
   submitBid,
   updateBidStatus
 } from '../actions';
@@ -53,6 +55,16 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
 
     dispatch(submitBargeForApproval(auctionId, bargeId));
+  },
+  unsubmitBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+
+    dispatch(unsubmitBargeForApproval(auctionId, bargeId));
+  },
+  approveBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+
+    dispatch(approveBarge(auctionId, bargeId));
   },
   acceptBid(auctionId, bidId, ev) {
     ev.preventDefault();
