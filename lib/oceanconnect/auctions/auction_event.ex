@@ -130,21 +130,33 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def barge_submitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}) do
+  def barge_submitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
     %AuctionEvent{
       type: :barge_submitted,
-      auction_id: auction_barge.auction_id,
+      auction_id: auction_id,
       data: %{auction_barge: auction_barge, state: state},
-      time_entered: DateTime.utc_now()
+      time_entered: DateTime.utc_now(),
+      user: user
     }
   end
 
-  def barge_approved(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}) do
+  def barge_unsubmitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_unsubmitted,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def barge_approved(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
     %AuctionEvent{
       type: :barge_approved,
-      auction_id: auction_barge.auction_id,
+      auction_id: auction_id,
       data: %{auction_barge: auction_barge, state: state},
-      time_entered: DateTime.utc_now()
+      time_entered: DateTime.utc_now(),
+      user: user
     }
   end
 end

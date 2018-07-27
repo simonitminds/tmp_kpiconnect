@@ -87,6 +87,34 @@ export function submitBargeForApproval(auctionId, bargeId) {
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
+        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+      });
+  };
+}
+
+export function unsubmitBargeForApproval(auctionId, bargeId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/unsubmit`, {
+        headers: defaultHeaders,
+        method: 'POST'
+      })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+      });
+  };
+}
+
+export function approveBarge(auctionId, bargeId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/approve`, {
+        headers: defaultHeaders,
+        method: 'POST'
+      })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
         console.log(response);
         dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
       });

@@ -158,11 +158,33 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def has_submitted_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
     submitted_barges = find_element(:css, ".qa-submitted-barges")
-    |> find_all_within_element(:css, ".qa-barge-header")
+    |> find_all_within_element(:css, ".qa-barge-status-pending")
     |> Enum.map(&inner_text/1)
     |> Enum.map(&String.trim/1)
 
     Enum.any?(submitted_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def has_approved_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    approved_barges = find_element(:css, ".qa-submitted-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-approved")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(approved_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def has_rejected_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    rejected_barges = find_element(:css, ".qa-submitted-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-rejected")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(rejected_barges, fn(barge_text) ->
       barge_text =~ "#{name} (#{imo_number})"
     end)
   end
@@ -175,6 +197,39 @@ defmodule Oceanconnect.AuctionShowPage do
     :timer.sleep(1000)
 
     find_element(:css, ".qa-auction-barge-submit-#{id}")
+    |> click
+  end
+
+  def unsubmit_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:tag, "section")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-unsubmit-#{id}")
+    |> click
+  end
+
+  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:tag, "section")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-approve-#{id}")
+    |> click
+  end
+
+  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:tag, "section")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-reject-#{id}")
     |> click
   end
 end
