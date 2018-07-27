@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import CollapsibleSection from './collapsible-section';
+import CollapsingBarge from './collapsing-barge';
 
 const BargeSubmission = ({auctionPayload, submitBargeForm, companyBarges}) => {
   const auction = auctionPayload.auction;
@@ -28,6 +29,21 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, companyBarges}) => {
             </div>
           </div>
         </CollapsibleSection>
+        {/* <CollapsingBarge
+          trigger={ `${barge.name} (${barge.imo_number})` }
+          classParentString="collapsing-barge__barge"
+          easing="ease"
+          open={false}
+        >
+          <div className="collapsing-barge__barge__header">
+            <div className="collapsing-barge__barge__content">
+              <p><strong>Port</strong> {barge.port}</p>
+              <p><strong>Approved for</strong> (Approved for)</p>
+              <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+              <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
+            </div>
+          </div>
+        </CollapsingBarge> */}
       </div>
     );
   };
@@ -50,6 +66,20 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, companyBarges}) => {
             </div>
           </div>
         </CollapsibleSection>
+        {/* <CollapsingBarge
+          trigger={ `${barge.name} (${barge.imo_number})` }
+          classParentString="collapsing-barge__barge"
+          easing="ease"
+          open={false}
+        >
+          <div className="collapsing-barge__barge__header">
+            <div className="collapsing-barge__barge__content">
+              <p><strong>Port</strong> {barge.port.name}</p>
+              <p><strong>Approved for</strong> (Approved for)</p>
+              <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+            </div>
+          </div>
+        </CollapsingBarge> */}
       </div>
     );
   };
