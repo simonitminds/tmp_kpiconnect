@@ -172,7 +172,7 @@ class CollapsingBarge extends Component {
         <div className="container is-fullhd">
           <div className="content has-gray-lighter">
             <h2
-              className={triggerClassString.trim()}
+              className={"qa-barge-header " + triggerClassString.trim()}
               onClick={this.handleTriggerClick}
               style={this.props.triggerStyle && this.props.triggerStyle}
             >

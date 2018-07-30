@@ -78,4 +78,29 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
         |> render("show.json", %{success: false, message: "Suppliers cannot approve barges"})
     end
   end
+
+  def reject(conn, %{"auction_id" => auction_id, "barge_id" => barge_id}) do
+    user = OceanconnectWeb.Plugs.Auth.current_user(conn)
+    buyer_id = user.company_id
+
+    with auction = %Auction{} <- Auctions.get_auction(auction_id),
+         true <- buyer_id == auction.buyer_id,
+         {barge_id, _} <- Integer.parse(barge_id),
+         barge <- Auctions.get_barge(barge_id)
+    do
+      Auctions.reject_barge(auction, barge, user)
+
+      auction_payload = auction
+      |> Auctions.fully_loaded
+      |> AuctionPayload.get_auction_payload!(buyer_id)
+
+      conn
+      |> render("submit.json", auction_payload: auction_payload)
+    else
+      _ ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: "Suppliers cannot reject barges"})
+    end
+  end
 end

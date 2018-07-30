@@ -64,6 +64,10 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :approve_barge, data: %{auction_barge: auction_barge, user: user}}
   end
 
+  def reject_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :reject_barge, data: %{auction_barge: auction_barge, user: user}}
+  end
+
   def extend_duration(auction_id) when is_integer(auction_id) do
     %Command{command: :extend_duration, data: auction_id}
   end

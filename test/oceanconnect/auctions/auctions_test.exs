@@ -477,8 +477,6 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "unsubmit_barge/3 removes given barge to auction for the supplier", %{auction: auction, supplier: supplier} do
       barge = insert(:barge, companies: [supplier])
-      barge_id = barge.id
-      supplier_id = supplier.id
 
       Auctions.submit_barge(auction, barge, supplier.id)
       Auctions.unsubmit_barge(auction, barge, supplier.id)
@@ -489,7 +487,6 @@ defmodule Oceanconnect.AuctionsTest do
     test "unsubmit_barge/3 preserves barge submissions from other suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
       barge = insert(:barge, companies: [supplier, supplier2])
       barge_id = barge.id
-      supplier_id = supplier.id
       supplier2_id = supplier2.id
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -519,6 +516,23 @@ defmodule Oceanconnect.AuctionsTest do
         barge_id: ^barge_id,
         supplier_id: ^supplier_id,
         approval_status: "APPROVED"} = submitted_barge
+    end
+
+    test "reject_barge/3 updates the approval status of a submitted barge" ,%{auction: auction, supplier: supplier} do
+      barge = insert(:barge, companies: [supplier])
+
+      barge_id = barge.id
+      supplier_id = supplier.id
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.reject_barge(auction, barge, supplier.id)
+      auction_state = Auctions.get_auction_state!(auction)
+
+      [submitted_barge] = auction_state.submitted_barges
+      assert %Auctions.AuctionBarge{
+        barge_id: ^barge_id,
+        supplier_id: ^supplier_id,
+        approval_status: "REJECTED"} = submitted_barge
     end
   end
 

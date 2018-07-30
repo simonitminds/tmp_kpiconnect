@@ -159,4 +159,14 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       user: user
     }
   end
+
+  def barge_rejected(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_rejected,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
 end

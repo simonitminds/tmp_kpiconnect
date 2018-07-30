@@ -86,4 +86,30 @@ defmodule OceanconnectWeb.Api.AuctionBargesControllerTest do
       assert json_response(new_conn, 422) == %{"success" => false, "message" => "Suppliers cannot approve barges"}
     end
   end
+
+
+  describe "reject" do
+    test "buyer can reject submitted barges from supplier", %{auction: auction, conn: supplier_conn, buyer: buyer, supplier: supplier} do
+      boaty = insert(:barge, name: "Boaty", imo_number: "1234568", companies: [supplier.company])
+      post supplier_conn, auction_barges_api_submit_path(supplier_conn, :submit, auction.id, boaty.id)
+
+      conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
+      new_conn = post conn, auction_barges_api_reject_path(conn, :reject, auction.id, boaty.id)
+      payload = new_conn.assigns.auction_payload
+      assert length(payload.submitted_barges) == 1
+
+      first = hd(payload.submitted_barges)
+      assert first.barge_id == boaty.id
+      assert first.approval_status == "REJECTED"
+    end
+
+    test "supplier can not reject barges", %{auction: auction, conn: conn, supplier: supplier} do
+      boaty = insert(:barge, name: "Boaty", imo_number: "1234568", companies: [supplier.company])
+      post conn, auction_barges_api_submit_path(conn, :submit, auction.id, boaty.id)
+
+      insert(:auction_barge, barge: boaty, auction: auction, supplier: supplier.company)
+      new_conn = post conn, auction_barges_api_reject_path(conn, :reject, auction.id, boaty.id)
+      assert json_response(new_conn, 422) == %{"success" => false, "message" => "Suppliers cannot reject barges"}
+    end
+  end
 end

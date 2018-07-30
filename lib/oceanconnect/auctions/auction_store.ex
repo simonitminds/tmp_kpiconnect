@@ -237,6 +237,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  def handle_cast(
+        {:reject_barge, %{auction_barge: auction_barge, user: user}, emit},
+        current_state
+      ) do
+    new_state = reject_barge(auction_barge, current_state)
+
+    AuctionEvent.emit(AuctionEvent.barge_rejected(auction_barge, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
   defp is_suppliers_first_bid?(%AuctionState{bids: bids}, %AuctionBid{supplier_id: supplier_id}) do
     !Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
   end
@@ -306,6 +317,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(%AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}}, previous_state) do
     approve_barge(auction_barge, previous_state)
+  end
+
+  defp replay_event(%AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}}, previous_state) do
+    reject_barge(auction_barge, previous_state)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
@@ -425,6 +440,27 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           barge_id: barge_id,
           supplier_id: supplier_id,
           approval_status: "APPROVED"
+        },
+        current_state = %AuctionState{submitted_barges: submitted_barges}
+      ) do
+    new_submitted_barges = Enum.map(submitted_barges, fn(barge) ->
+      case barge do
+        %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
+        _ -> barge
+      end
+    end)
+
+    %AuctionState{ current_state |
+      submitted_barges: new_submitted_barges
+    }
+  end
+
+  defp reject_barge(
+        auction_barge = %AuctionBarge{
+          auction_id: auction_id,
+          barge_id: barge_id,
+          supplier_id: supplier_id,
+          approval_status: "REJECTED"
         },
         current_state = %AuctionState{submitted_barges: submitted_barges}
       ) do

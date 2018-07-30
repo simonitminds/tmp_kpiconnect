@@ -216,6 +216,7 @@ export default class AuctionShow extends React.Component {
                           submitBargeForm={this.props.submitBargeForm}
                           unsubmitBargeForm={this.props.unsubmitBargeForm}
                           approveBargeForm={this.props.approveBargeForm}
+                          rejectBargeForm={this.props.rejectBargeForm}
                           auctionPayload={auctionPayload}
                           companyBarges={companyProfile.companyBarges}
                           isBuyer={currentUser.isBuyer}
