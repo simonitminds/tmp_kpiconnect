@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   defstruct id: nil,
@@ -125,6 +125,46 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :winning_bid_selected,
       auction_id: bid.auction_id,
       data: %{bid: bid, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def barge_submitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_submitted,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def barge_unsubmitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_unsubmitted,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def barge_approved(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_approved,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def barge_rejected(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+    %AuctionEvent{
+      type: :barge_rejected,
+      auction_id: auction_id,
+      data: %{auction_barge: auction_barge, state: state},
       time_entered: DateTime.utc_now(),
       user: user
     }

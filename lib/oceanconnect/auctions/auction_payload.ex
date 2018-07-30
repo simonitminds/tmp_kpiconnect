@@ -1,8 +1,9 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer, Barge}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Accounts
 
   defstruct time_remaining: nil,
             current_server_time: nil,
@@ -12,7 +13,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             lowest_bids: [],
             bid_history: [],
             is_leading: false,
-            lead_is_tied: false
+            lead_is_tied: false,
+            available_barges: [],
+            submitted_barges: []
 
 
   def get_auction_payload!(auction = %Auction{buyer_id: buyer_id}, buyer_id) do
@@ -47,7 +50,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: Enum.filter(bids, &(&1.supplier_id == supplier_id)) |> Enum.map(&(scrub_bid_for_supplier(&1, supplier_id, auction))),
       winning_bid: scrub_bid_for_supplier(winning_bid, supplier_id, auction),
       is_leading: is_leading?(state, supplier_id),
-      lead_is_tied: lead_is_tied?(state)
+      lead_is_tied: lead_is_tied?(state),
+      submitted_barges: get_submitted_barges_for_supplier(state, supplier_id)
     }
   end
 
@@ -61,7 +65,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: bids |> Enum.map(&(scrub_bid_for_buyer(&1, buyer_id, auction))),
       winning_bid: scrub_bid_for_buyer(winning_bid, buyer_id, auction),
       is_leading: false,
-      lead_is_tied: lead_is_tied?(state)
+      lead_is_tied: lead_is_tied?(state),
+      submitted_barges: get_submitted_barges_for_buyer(state, buyer_id)
     }
   end
 
@@ -100,6 +105,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.put(:supplier, supplier)
   end
 
+  defp scrub_barge_for_supplier(barge = %Barge{port: port}, supplier_id) do
+    %{ barge | port: port.name }
+    |> Map.delete(:port_id)
+  end
+
   defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
@@ -107,7 +117,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 
-  defp is_leading?(_state = %AuctionState{lowest_bids: []}, supplier_id), do: false
+  defp is_leading?(_state = %AuctionState{lowest_bids: []}, _supplier_id), do: false
   defp is_leading?(_state = %AuctionState{lowest_bids: lowest_bids = [lowest | _]}, supplier_id) do
     lowest_bids
     |> Enum.any?(fn(bid) ->
@@ -121,5 +131,14 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Enum.count(fn(bid) -> bid.amount == lowest.amount end)
 
     tied_bids > 1
+  end
+
+  defp get_submitted_barges_for_supplier(_state = %AuctionState{submitted_barges: submitted_barges}, supplier_id) do
+    submitted_barges
+    |> Enum.filter(&(&1.supplier_id == supplier_id))
+  end
+
+  defp get_submitted_barges_for_buyer(_state = %AuctionState{submitted_barges: submitted_barges}, _buyer_id) do
+    submitted_barges
   end
 end

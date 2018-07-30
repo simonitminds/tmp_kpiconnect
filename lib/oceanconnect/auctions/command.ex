@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Auctions.Command do
-  alias Oceanconnect.Auctions.{Auction}
-  alias Oceanconnect.Auctions.{AuctionBid}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid}
   alias __MODULE__
 
   defstruct command: :get_current_state, data: nil
@@ -51,6 +50,22 @@ defmodule Oceanconnect.Auctions.Command do
 
   def select_winning_bid(bid = %AuctionBid{}, user) when not is_integer(user) do
     %Command{command: :select_winning_bid, data: %{bid: bid, user: user}}
+  end
+
+  def submit_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :submit_barge, data: %{auction_barge: auction_barge, user: user}}
+  end
+
+  def unsubmit_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :unsubmit_barge, data: %{auction_barge: auction_barge, user: user}}
+  end
+
+  def approve_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :approve_barge, data: %{auction_barge: auction_barge, user: user}}
+  end
+
+  def reject_barge(auction_barge = %AuctionBarge{}, user) do
+    %Command{command: :reject_barge, data: %{auction_barge: auction_barge, user: user}}
   end
 
   def extend_duration(auction_id) when is_integer(auction_id) do

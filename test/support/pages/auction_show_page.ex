@@ -119,14 +119,8 @@ defmodule Oceanconnect.AuctionShowPage do
     |> inner_text
   end
 
-  def has_available_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
-    find_element(:css, ".qa-submit-barges-panel") |> find_within_element(:tag, "section") |> click
-
-    available_names = find_all_elements(:css, ".qa-barge-header")
-    |> Enum.map(&inner_text/1)
-    |> Enum.map(&String.trim/1)
-
-    "#{name} (#{imo_number})" in available_names
+  def expand_barging_section() do
+    find_element(:css, ".qa-barging") |> find_within_element(:tag, "section") |> click
   end
 
   def convert_to_supplier_names(bid_list, auction = %Auction{}) do
@@ -149,5 +143,95 @@ defmodule Oceanconnect.AuctionShowPage do
 
   defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
+  end
+
+  def has_available_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    available_barges = find_element(:css, ".qa-available-barges")
+    |> find_all_within_element(:css, ".qa-barge-header")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(available_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def has_submitted_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    submitted_barges = find_element(:css, ".qa-submitted-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-pending")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(submitted_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def has_no_submitted_barges?, do: {:error, _} = search_element(:css, ".qa-submitted-barges")
+
+  def has_approved_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    approved_barges = find_element(:css, ".qa-submitted-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-approved")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(approved_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def has_rejected_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
+    rejected_barges = find_element(:css, ".qa-submitted-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-rejected")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(rejected_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
+  def submit_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:css, ".qa-barge-header")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-submit-#{id}")
+    |> click
+  end
+
+  def unsubmit_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:css, ".qa-barge-header")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-unsubmit-#{id}")
+    |> click
+  end
+
+  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:css, ".qa-barge-header")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-approve-#{id}")
+    |> click
+  end
+
+  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+    find_element(:css, ".qa-barge-#{id}")
+    |> find_within_element(:css, ".qa-barge-header")
+    |> click
+
+    :timer.sleep(1000)
+
+    find_element(:css, ".qa-auction-barge-reject-#{id}")
+    |> click
   end
 end

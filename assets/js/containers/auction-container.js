@@ -9,6 +9,10 @@ import {
   acceptWinningBid,
   setPortAgent,
   subscribeToAuctionUpdates,
+  submitBargeForApproval,
+  unsubmitBargeForApproval,
+  approveBarge,
+  rejectBarge,
   submitBid,
   updateBidStatus
 } from '../actions';
@@ -47,6 +51,22 @@ const mapDispatchToProps = (dispatch) => ({
     elements.amount.value = '';
     elements.min_amount.value = '';
     dispatch(submitBid(auctionId, bidData));
+  },
+  submitBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+    dispatch(submitBargeForApproval(auctionId, bargeId));
+  },
+  unsubmitBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+    dispatch(unsubmitBargeForApproval(auctionId, bargeId));
+  },
+  approveBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+    dispatch(approveBarge(auctionId, bargeId));
+  },
+  rejectBargeForm(auctionId, bargeId, ev) {
+    ev.preventDefault();
+    dispatch(rejectBarge(auctionId, bargeId));
   },
   acceptBid(auctionId, bidId, ev) {
     ev.preventDefault();

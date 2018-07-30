@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
 
-    {:ok, %{auction: auction}}
+    {:ok, %{auction: auction, supplier: supplier_company}}
   end
 
   test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
@@ -122,6 +122,64 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
         %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+      ] = AuctionEventStore.event_list(auction.id)
+    end
+
+    test "submitting a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      barge = insert(:barge, companies: [supplier])
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      :timer.sleep(500)
+
+      assert_received %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+      assert [
+        %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+      ] = AuctionEventStore.event_list(auction.id)
+    end
+
+    test "unsubmitting a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      barge = insert(:barge, companies: [supplier])
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.unsubmit_barge(auction, barge, supplier.id)
+      :timer.sleep(500)
+
+      assert_received %AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id}
+      assert [
+        %AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id},
+        %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+      ] = AuctionEventStore.event_list(auction.id)
+    end
+
+    test "approving a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      barge = insert(:barge, companies: [supplier])
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.approve_barge(auction, barge, supplier.id)
+      :timer.sleep(500)
+
+      assert_received %AuctionEvent{type: :barge_approved, auction_id: ^auction_id}
+      assert [
+        %AuctionEvent{type: :barge_approved, auction_id: ^auction_id},
+        %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+      ] = AuctionEventStore.event_list(auction.id)
+    end
+
+    test "rejecting a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      barge = insert(:barge, companies: [supplier])
+
+      Auctions.submit_barge(auction, barge, supplier.id)
+      Auctions.reject_barge(auction, barge, supplier.id)
+      :timer.sleep(500)
+
+      assert_received %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id}
+      assert [
+        %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id},
+        %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
       ] = AuctionEventStore.event_list(auction.id)
     end
   end
