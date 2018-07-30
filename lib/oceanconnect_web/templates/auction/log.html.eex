@@ -64,6 +64,7 @@
           <th>Company</th>
           <th>Time</th>
           <th>Bid Amount</th>
+          <th>Min Bid Amount</th>
         </tr>
       </thead>
       <tbody>
@@ -74,6 +75,7 @@
             <td class="qa-event-company"><%= event_company(event) %></td>
             <td><%= convert_date?(event.time_entered) %></td>
             <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>
+            <td class="qa-event-bid-min_amount"><%= event_bid_min_amount(event) %></td>
           </tr>
         <% end %>
       </tbody>

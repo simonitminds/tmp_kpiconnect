@@ -40,6 +40,14 @@ defmodule OceanconnectWeb.AuctionView do
   end
   def event_bid_amount(_event), do: "-"
 
+  def event_bid_min_amount(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: nil}}}), do: ""
+  def event_bid_min_amount(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: amount}}}) do
+    "$#{:erlang.float_to_binary(amount, decimals: 2)}"
+  end
+  def event_bid_min_amount(_event), do: "-"
+
+
+
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
   def event_company(%AuctionEvent{data: %{bid: %{supplier_id: supplier_id}}}), do: Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, supplier_id).name

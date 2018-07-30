@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.AuctionBidCalculator
-  alias Oceanconnect.Auctions.AuctionBid
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionEvent}
 
   setup do
     supplier_company = insert(:company)
@@ -605,6 +605,119 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
       lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{0.75, ^supplier2}, {1.00, ^supplier1} | _rest] = lowest_bids
+    end
+  end
+
+  describe "events" do
+    test "updated auto bids do fire bid events", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.75,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier1_bid2 = %AuctionBid{
+        amount: nil,
+        min_amount: 1.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      state =  %AuctionState{initial_state | status: :open}
+      {state, _events} = AuctionBidCalculator.process(state)
+      {_state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
+
+      assert [
+        %AuctionEvent{
+          type: :auto_bid_placed,
+          auction_id: auction_id,
+          data: %{bid: %AuctionBid{amount: 1.25, supplier_id: ^supplier1}}
+        },
+        %AuctionEvent{
+          type: :auto_bid_placed,
+          auction_id: auction_id,
+          data: %{bid: %AuctionBid{amount: 1.50, supplier_id: ^supplier2}}
+        }
+      ] = events
+    end
+
+    test "unchanged auto bids do not fire bid events", %{
+      auction: auction,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.50,
+        min_amount: 2.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.25,
+        min_amount: 2.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      supplier1_bid2 = %AuctionBid{
+        amount: nil,
+        min_amount: 1.75,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %AuctionState{
+        auction_id: auction_id,
+        status: :pending,
+        lowest_bids: [],
+        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        active_bids: [],
+        winning_bid: nil,
+        bids: []
+      }
+
+      state =  %AuctionState{initial_state | status: :open}
+      {state, _events} = AuctionBidCalculator.process(state)
+      {_state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
+
+      assert [%AuctionEvent{
+        type: :auto_bid_placed,
+        auction_id: auction_id,
+        data: %{bid: %AuctionBid{amount: 1.75, supplier_id: ^supplier1}}
+      }] = events
     end
   end
 

@@ -180,8 +180,11 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     )
 
     next_state = enter_auto_bids(state, decremented_auto_bids)
-    events =
-      Enum.map(decremented_auto_bids, fn bid ->
+    events = Enum.reject(decremented_auto_bids, fn(bid) ->
+      Enum.member?(state.active_bids, bid)
+    end)
+    |> IO.inspect
+    |> Enum.map(fn bid ->
         AuctionEvent.auto_bid_placed(bid, next_state, nil)
       end)
 
