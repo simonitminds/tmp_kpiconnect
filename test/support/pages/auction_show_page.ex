@@ -167,6 +167,8 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def has_no_submitted_barges?, do: {:error, _} = search_element(:css, ".qa-submitted-barges")
+
   def has_approved_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
     approved_barges = find_element(:css, ".qa-submitted-barges")
     |> find_all_within_element(:css, ".qa-barge-status-approved")
@@ -191,7 +193,7 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def submit_barge(%Oceanconnect.Auctions.Barge{id: id}) do
     find_element(:css, ".qa-barge-#{id}")
-    |> find_within_element(:tag, "section")
+    |> find_within_element(:css, ".qa-barge-header")
     |> click
 
     :timer.sleep(1000)
@@ -202,7 +204,7 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def unsubmit_barge(%Oceanconnect.Auctions.Barge{id: id}) do
     find_element(:css, ".qa-barge-#{id}")
-    |> find_within_element(:tag, "section")
+    |> find_within_element(:css, ".qa-barge-header")
     |> click
 
     :timer.sleep(1000)
@@ -213,7 +215,7 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def approve_barge(%Oceanconnect.Auctions.Barge{id: id}) do
     find_element(:css, ".qa-barge-#{id}")
-    |> find_within_element(:tag, "section")
+    |> find_within_element(:css, ".qa-barge-header")
     |> click
 
     :timer.sleep(1000)
@@ -224,7 +226,7 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def reject_barge(%Oceanconnect.Auctions.Barge{id: id}) do
     find_element(:css, ".qa-barge-#{id}")
-    |> find_within_element(:tag, "section")
+    |> find_within_element(:css, ".qa-barge-header")
     |> click
 
     :timer.sleep(1000)

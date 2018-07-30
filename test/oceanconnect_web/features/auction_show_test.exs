@@ -357,7 +357,7 @@ defmodule Oceanconnect.AuctionShowTest do
     :timer.sleep(1000)
     AuctionShowPage.unsubmit_barge(barge)
     :timer.sleep(1000)
-    refute AuctionShowPage.has_submitted_barge?(barge)
+    assert AuctionShowPage.has_no_submitted_barges?()
     assert AuctionShowPage.has_available_barge?(barge)
   end
 
@@ -365,21 +365,21 @@ defmodule Oceanconnect.AuctionShowTest do
   test "buyer can approve submitted barges", %{auction: auction, buyer: buyer, supplier: supplier} do
     barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
 
-    in_browser_session(:supplier, fn ->
-      login_user(supplier)
-      AuctionShowPage.visit(auction.id)
-      :timer.sleep(200)
-      AuctionShowPage.submit_barge(barge)
-    end)
-
-    login_user(buyer)
+    login_user(supplier)
     AuctionShowPage.visit(auction.id)
     :timer.sleep(200)
+    AuctionShowPage.submit_barge(barge)
 
-    AuctionShowPage.approve_barge(barge)
-    :timer.sleep(200)
+    in_browser_session(:buyer, fn ->
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(300)
 
-    assert AuctionShowPage.has_approved_barge?(barge)
+      AuctionShowPage.approve_barge(barge)
+      :timer.sleep(300)
+
+      assert AuctionShowPage.has_approved_barge?(barge)
+    end)
   end
 
   test "buyer can reject submitted barges", %{auction: auction, buyer: buyer, supplier: supplier} do

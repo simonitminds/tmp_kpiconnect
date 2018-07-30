@@ -656,4 +656,23 @@ defmodule Oceanconnect.Auctions do
       |> AuctionStore.process_command()
     end)
   end
+
+  def reject_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, user \\ nil) do
+    query =
+      from ab in AuctionBarge,
+      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id
+
+    Repo.update_all(query, set: [approval_status: "REJECTED"])
+
+    auction_barges = query
+    |> Repo.all()
+    |> Repo.preload(barge: [:port])
+
+    Enum.map(auction_barges, fn(auction_barge) ->
+      auction_barge
+      |> Command.reject_barge(user)
+      |> AuctionStore.process_command()
+    end)
+  end
+
 end
