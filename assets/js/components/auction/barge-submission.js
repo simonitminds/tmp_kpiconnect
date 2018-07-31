@@ -42,6 +42,13 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           classParentString="collapsing-barge__barge"
           easing="ease"
           open={false}
+          submitBargeForm={submitBargeForm}
+          unsubmitBargeForm={unsubmitBargeForm}
+          approveBargeForm={approveBargeForm}
+          rejectBargeForm={rejectBargeForm}
+          barge={barge}
+          bargeStatus={null}
+          isBuyer={isBuyer}
         >
           <div className="collapsing-barge__barge__header">
             <div className="collapsing-barge__barge__content">
@@ -67,6 +74,13 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           classParentString="collapsing-barge__barge"
           easing="ease"
           open={false}
+          submitBargeForm={submitBargeForm}
+          unsubmitBargeForm={unsubmitBargeForm}
+          approveBargeForm={approveBargeForm}
+          rejectBargeForm={rejectBargeForm}
+          barge={auctionBarge.barge}
+          bargeStatus={auctionBarge.approval_status}
+          isBuyer={isBuyer}
         >
           <div className="collapsing-barge__barge__header">
             <div className="collapsing-barge__barge__content">
