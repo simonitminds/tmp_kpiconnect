@@ -167,6 +167,14 @@ class CollapsingBarge extends Component {
     const outerClassString = `${this.props.classParentString}__contentOuter ${this.props.contentOuterClassName}`;
     const innerClassString = `${this.props.classParentString}__contentInner ${this.props.contentInnerClassName}`;
 
+    const approvalStatusIcon = () => {
+      console.log("I've loaded!")
+      if (this.props.bargeStatus == 'PENDING') { return `fas fa-question-circle` }
+      else if (this.props.bargeStatus == 'APPROVED') { return `fas fa-check-circle` }
+      else if (this.props.bargeStatus == 'REJECTED') {return `fas fa-times-circle`}
+      else {return `fas fa-ban`}
+    };
+
     return(
       <section className={parentClassString.trim()}>
         <div className="container is-fullhd">
@@ -177,7 +185,7 @@ class CollapsingBarge extends Component {
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
               <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
-              <span className="collapsible-section__category-icon"><i className="fas fa-question-circle"></i></span>
+              <span className="collapsible-section__category-icon"><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
             </h2>
             <button className={ `auction-barging__barge__button button is-primary is-small` }>Add</button>
