@@ -644,14 +644,15 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         auction_id: auction_id,
         status: :pending,
         lowest_bids: [],
-        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        minimum_bids: [],
         active_bids: [],
         winning_bid: nil,
         bids: []
       }
 
-      state =  %AuctionState{initial_state | status: :open}
-      {state, _events} = AuctionBidCalculator.process(state)
+      {state, _} = AuctionBidCalculator.process(initial_state, supplier2_bid1)
+      {state, _} = AuctionBidCalculator.process(state, supplier1_bid1)
+      {state, _events} = AuctionBidCalculator.process(%AuctionState{state | status: :open})
       {_state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
 
       assert [
@@ -703,15 +704,15 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         auction_id: auction_id,
         status: :pending,
         lowest_bids: [],
-        minimum_bids: [supplier2_bid1, supplier1_bid1],
+        minimum_bids: [],
         active_bids: [],
         winning_bid: nil,
         bids: []
       }
-
-      state =  %AuctionState{initial_state | status: :open}
-      {state, _events} = AuctionBidCalculator.process(state)
-      {_state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
+      {state, _} = AuctionBidCalculator.process(initial_state, supplier2_bid1)
+      {state, _} = AuctionBidCalculator.process(initial_state, supplier1_bid1)
+      {state, events} = AuctionBidCalculator.process(%AuctionState{state | status: :open})
+      {state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
 
       assert [%AuctionEvent{
         type: :auto_bid_placed,
