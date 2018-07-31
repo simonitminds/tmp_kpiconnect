@@ -188,19 +188,19 @@ class CollapsingBarge extends Component {
         switch(bargeStatus) {
           case 'pending':
             return (
-              <div>
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-approve-${barge.id}` }>Approve</button>
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-reject-${barge.id}` }>Reject</button>
+              <div className="collapsing-barge__barge__button buttons has-addons has-margin-bottom-none">
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
               </div>)
           case 'approved':
             return (
-              <div>
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-reject-${barge.id}` }>Reject</button>
+              <div className="collapsing-barge__barge__button">
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
               </div>)
           case 'rejected':
             return (
-              <div>
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-approve-${barge.id}` }>Approve</button>
+              <div className="collapsing-barge__barge__button">
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
               </div>)
         }
       }
@@ -208,13 +208,13 @@ class CollapsingBarge extends Component {
         switch(bargeStatus) {
           case 'available':
             return (
-              <div>
-                <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
+              <div className="collapsing-barge__barge__button">
+                <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
               </div>)
           default:
             return (
-              <div>
-                <button onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-unsubmit-${barge.id}` }>Unsubmit</button>
+              <div className="collapsing-barge__barge__button">
+                <a onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `qa-auction-barge-unsubmit-${barge.id}` }><i className="fas fa-times"></i></a>
               </div>)
         }
       }
@@ -230,10 +230,9 @@ class CollapsingBarge extends Component {
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
               <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
-              <span className="collapsible-section__category-icon"><i className={approvalStatusIcon()}></i></span>
+              <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
             </h2>
-            {/* <button className={ `auction-barging__barge__button button is-primary is-small` }>Add</button> */}
             {bargeAction()}
           </div>
         </div>
@@ -253,7 +252,6 @@ class CollapsingBarge extends Component {
                 <p><strong>Port</strong> {barge.port}</p>
                 <p><strong>Approved for</strong> (Approved for)</p>
                 <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
-                {/* <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button> */}
               </div>
             </div>
           </div>

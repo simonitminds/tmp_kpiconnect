@@ -306,6 +306,15 @@ export default class AuctionShow extends React.Component {
                     { auctionLogLinkDisplay() }
                     {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
                     { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
+                    <BargeSubmission
+                      submitBargeForm={this.props.submitBargeForm}
+                      unsubmitBargeForm={this.props.unsubmitBargeForm}
+                      approveBargeForm={this.props.approveBargeForm}
+                      rejectBargeForm={this.props.rejectBargeForm}
+                      auctionPayload={auctionPayload}
+                      companyBarges={companyProfile.companyBarges}
+                      isBuyer={currentUser.isBuyer}
+                    />
                     <div className="box has-margin-bottom-md">
                       <div className="box__subsection">
                         <h3 className="box__header">Buyer Information
