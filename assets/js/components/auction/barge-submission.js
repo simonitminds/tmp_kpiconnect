@@ -83,12 +83,12 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
 
 
   return(
-    <div className="box has-margin-bottom-md">
-      <div className="box__subsection">
+    <div className="box has-margin-bottom-md has-padding-bottom-none">
+      <div className="box__subsection has-padding-bottom-none">
         <h3 className="box__header">Barges for Delivery</h3>
         <form className="auction-barging__container">
           { submittedBarges && submittedBarges.length > 0 && (
-            <div className="qa-submitted-barges">
+            <div className="has-margin-top-sm qa-submitted-barges">
               <strong>Submitted Barges</strong>
               { submittedBarges.map(renderSubmittedBarge) }
             </div>

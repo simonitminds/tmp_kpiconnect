@@ -188,6 +188,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     &--approved { color: $green };
     &--rejected { color: $red };
     &--pending { color: $gray-3 };
+    &--available { display: none };
   }
   .collapsing-barge__barge__trigger > .collapsible-section__title { // Ersatz header. Probably a little brittle.
     font-size: 1rem;
@@ -205,13 +206,23 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     margin-right: 0.5rem;
     font-weight: 700;
     font-size: 1rem;
+    text-transform: capitalize;
   }
   .collapsing-barge__barge__status {
     margin-right: 0.5rem;
     font-size: 1rem;
   }
   .collapsing-barge__barge__button {
+    flex-shrink: 0;
     margin: 0.5rem 0 0.5rem auto;
+
+    a {
+      color: $gray-3;
+      transition: color 0.1s ease-in;
+      &:hover, &:focus {
+        color: darken($gray-3, 20%);
+      }
+    }
   }
   .collapsing-barge__barge__content {
     margin: 1rem 0 1rem auto;
