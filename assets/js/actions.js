@@ -106,9 +106,9 @@ export function unsubmitBargeForApproval(auctionId, bargeId) {
   };
 }
 
-export function approveBarge(auctionId, bargeId) {
+export function approveBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/approve`, {
+    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/approve`, {
         headers: defaultHeaders,
         method: 'POST'
       })
@@ -121,9 +121,9 @@ export function approveBarge(auctionId, bargeId) {
   };
 }
 
-export function rejectBarge(auctionId, bargeId) {
+export function rejectBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/reject`, {
+    fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/reject`, {
         headers: defaultHeaders,
         method: 'POST'
       })

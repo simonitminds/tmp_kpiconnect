@@ -362,43 +362,61 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
 
-  test "buyer can approve submitted barges", %{auction: auction, buyer: buyer, supplier: supplier} do
-    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+  test "buyer can approve submitted barges", %{auction: auction, buyer: buyer, supplier: supplier, supplier2: supplier2} do
+    barge = insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
     login_user(supplier)
     AuctionShowPage.visit(auction.id)
     :timer.sleep(200)
     AuctionShowPage.submit_barge(barge)
 
-    in_browser_session(:buyer, fn ->
-      login_user(buyer)
-      AuctionShowPage.visit(auction.id)
-      :timer.sleep(300)
-
-      AuctionShowPage.approve_barge(barge)
-      :timer.sleep(300)
-
-      assert AuctionShowPage.has_approved_barge?(barge)
-    end)
-  end
-
-  test "buyer can reject submitted barges", %{auction: auction, buyer: buyer, supplier: supplier} do
-    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
-
-    in_browser_session(:supplier, fn ->
-      login_user(supplier)
+    in_browser_session(:supplier2, fn ->
+      login_user(supplier2)
       AuctionShowPage.visit(auction.id)
       :timer.sleep(200)
       AuctionShowPage.submit_barge(barge)
     end)
 
-    login_user(buyer)
+    in_browser_session(:buyer, fn ->
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(300)
+
+      AuctionShowPage.approve_barge(barge, supplier.id)
+      :timer.sleep(300)
+
+      assert AuctionShowPage.has_approved_barge?(barge, supplier.id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.id)
+    end)
+  end
+
+  test "buyer can reject submitted barges", %{auction: auction, buyer: buyer, supplier: supplier, supplier2: supplier2} do
+    barge = insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+
+    login_user(supplier)
     AuctionShowPage.visit(auction.id)
     :timer.sleep(200)
+    AuctionShowPage.submit_barge(barge)
 
-    AuctionShowPage.reject_barge(barge)
-    :timer.sleep(200)
+    in_browser_session(:supplier2, fn ->
+      login_user(supplier2)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(200)
+      AuctionShowPage.submit_barge(barge)
+    end)
 
-    assert AuctionShowPage.has_rejected_barge?(barge)
+    :timer.sleep(2000)
+
+    in_browser_session(:buyer, fn ->
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(300)
+
+      AuctionShowPage.reject_barge(barge, supplier.id)
+      :timer.sleep(300)
+
+      assert AuctionShowPage.has_rejected_barge?(barge, supplier.id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.id)
+    end)
   end
 end

@@ -3,36 +3,13 @@ import _ from 'lodash';
 import CollapsibleSection from './collapsible-section';
 import CollapsingBarge from './collapsing-barge';
 
-const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, approveBargeForm, rejectBargeForm, companyBarges, isBuyer}) => {
+const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, approveBargeForm, rejectBargeForm, companyBarges, isBuyer, supplierId}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.status;
   const submittedBarges = auctionPayload.submitted_barges;
   const availableBarges = companyBarges.filter((barge) => {
     return !submittedBarges.find((submittedBarge) => submittedBarge.barge_id == barge.id)
   });
-
-  const buyerBargeApprovalButtons = (auctionBarge) => {
-    const barge = auctionBarge.barge;
-
-    return (
-      <div>
-        <span>{ auctionBarge.approval_status }</span>
-        <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-approve-${barge.id}` }>Approve</button>
-        <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-reject-${barge.id}` }>Reject</button>
-      </div>
-    );
-  }
-
-  const supplierBargeApprovalStatus = (auctionBarge) => {
-    const barge = auctionBarge.barge;
-
-    return (
-      <div>
-        <span>{ auctionBarge.approval_status }</span>
-        <button onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-unsubmit-${barge.id}` }>Unsubmit</button>
-      </div>
-    );
-  }
 
   const renderAvailableBarge = (barge) => {
     return (
@@ -48,6 +25,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           rejectBargeForm={rejectBargeForm}
           auction={auction}
           barge={barge}
+          supplierId={supplierId}
           bargeStatus={null}
           isBuyer={isBuyer}
         >
@@ -72,6 +50,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           approveBargeForm={approveBargeForm}
           rejectBargeForm={rejectBargeForm}
           auction={auction}
+          supplierId={supplierId}
           barge={auctionBarge.barge}
           bargeStatus={auctionBarge.approval_status}
           isBuyer={isBuyer}

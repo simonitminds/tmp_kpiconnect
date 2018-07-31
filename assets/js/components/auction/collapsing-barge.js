@@ -169,6 +169,7 @@ class CollapsingBarge extends Component {
 
     // Barging Data
     const barge = this.props.barge;
+    const supplierId = this.props.supplierId;
     const isBuyer = this.props.isBuyer;
     const approveBargeForm = this.props.approveBargeForm;
     const rejectBargeForm = this.props.rejectBargeForm;
@@ -189,18 +190,18 @@ class CollapsingBarge extends Component {
           case 'pending':
             return (
               <div className="collapsing-barge__barge__button buttons has-addons has-margin-bottom-none">
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
               </div>)
           case 'approved':
             return (
               <div className="collapsing-barge__barge__button">
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
               </div>)
           case 'rejected':
             return (
               <div className="collapsing-barge__barge__button">
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
               </div>)
         }
       }
@@ -221,7 +222,7 @@ class CollapsingBarge extends Component {
     };
 
     return(
-      <section className={parentClassString.trim()}>
+      <section className={`qa-barge-${barge.id} qa-barge-status-${bargeStatus} ${parentClassString.trim()}`}>
         <div className="container is-fullhd">
           <div className="content has-gray-lighter">
             <h2

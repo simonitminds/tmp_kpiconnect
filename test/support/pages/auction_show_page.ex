@@ -169,8 +169,8 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def has_no_submitted_barges?, do: {:error, _} = search_element(:css, ".qa-submitted-barges")
 
-  def has_approved_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
-    approved_barges = find_element(:css, ".qa-submitted-barges")
+  def has_approved_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}, supplier_id) do
+    approved_barges = find_element(:css, ".qa-auction-supplier-#{supplier_id}-barges")
     |> find_all_within_element(:css, ".qa-barge-status-approved")
     |> Enum.map(&inner_text/1)
     |> Enum.map(&String.trim/1)
@@ -180,8 +180,8 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  def has_rejected_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
-    rejected_barges = find_element(:css, ".qa-submitted-barges")
+  def has_rejected_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}, supplier_id) do
+    rejected_barges = find_element(:css, ".qa-auction-supplier-#{supplier_id}-barges")
     |> find_all_within_element(:css, ".qa-barge-status-rejected")
     |> Enum.map(&inner_text/1)
     |> Enum.map(&String.trim/1)
@@ -213,7 +213,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click
@@ -224,7 +224,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}) do
+  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click
