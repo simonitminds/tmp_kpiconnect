@@ -19,6 +19,10 @@
   margin: 0 -1.32rem;
   border-radius: 0;
   padding: 0.25rem 1rem;
+
+  &> div:first-child { // Make sure there's proper margining for the top barge list category.
+    margin-top: 0.5rem;
+  }
 }
 
 .auction-barging__barge { // Each line containing an auction solution.
