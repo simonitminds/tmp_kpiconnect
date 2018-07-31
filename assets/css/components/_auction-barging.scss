@@ -184,6 +184,10 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     margin-right: 0.5rem;
     font-size: 1rem;
     color: $gray-3;
+
+    &--approved { color: $green };
+    &--rejected { color: $red };
+    &--pending { color: $gray-3 };
   }
   .collapsing-barge__barge__trigger > .collapsible-section__title { // Ersatz header. Probably a little brittle.
     font-size: 1rem;
