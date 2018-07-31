@@ -167,12 +167,57 @@ class CollapsingBarge extends Component {
     const outerClassString = `${this.props.classParentString}__contentOuter ${this.props.contentOuterClassName}`;
     const innerClassString = `${this.props.classParentString}__contentInner ${this.props.contentInnerClassName}`;
 
+    // Barging Data
+    const barge = this.props.barge;
+    const isBuyer = this.props.isBuyer;
+    const approveBargeForm = this.props.approveBargeForm;
+    const rejectBargeForm = this.props.rejectBargeForm;
+    const submitBargeForm = this.props.submitBargeForm;
+    const unsubmitBargeForm = this.props.unsubmitBargeForm;
+    const auction = this.props.auction;
+    const bargeStatus = (this.props.bargeStatus || 'available').toLowerCase();
+
     const approvalStatusIcon = () => {
-      console.log("I've loaded!")
-      if (this.props.bargeStatus == 'PENDING') { return `fas fa-question-circle` }
-      else if (this.props.bargeStatus == 'APPROVED') { return `fas fa-check-circle` }
-      else if (this.props.bargeStatus == 'REJECTED') {return `fas fa-times-circle`}
+      if (bargeStatus == 'pending') { return `fas fa-question-circle` }
+      else if (bargeStatus == 'approved') { return `fas fa-check-circle` }
+      else if (bargeStatus == 'rejected') {return `fas fa-times-circle`}
       else {return `fas fa-ban`}
+    };
+    const bargeAction = () => {
+      if(isBuyer) {
+        switch(bargeStatus) {
+          case 'pending':
+            return (
+              <div>
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-approve-${barge.id}` }>Approve</button>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-reject-${barge.id}` }>Reject</button>
+              </div>)
+          case 'approved':
+            return (
+              <div>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-reject-${barge.id}` }>Reject</button>
+              </div>)
+          case 'rejected':
+            return (
+              <div>
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-approve-${barge.id}` }>Approve</button>
+              </div>)
+        }
+      }
+      else {
+        switch(bargeStatus) {
+          case 'available':
+            return (
+              <div>
+                <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
+              </div>)
+          default:
+            return (
+              <div>
+                <button onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-unsubmit-${barge.id}` }>Unsubmit</button>
+              </div>)
+        }
+      }
     };
 
     return(
@@ -188,7 +233,8 @@ class CollapsingBarge extends Component {
               <span className="collapsible-section__category-icon"><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
             </h2>
-            <button className={ `auction-barging__barge__button button is-primary is-small` }>Add</button>
+            {/* <button className={ `auction-barging__barge__button button is-primary is-small` }>Add</button> */}
+            {bargeAction()}
           </div>
         </div>
 
@@ -202,7 +248,14 @@ class CollapsingBarge extends Component {
           <div className="content has-gray-lighter"
             ref="inner"
         >
-          { children }
+            <div className="collapsing-barge__barge__header">
+              <div className="collapsing-barge__barge__content">
+                <p><strong>Port</strong> {barge.port.name}</p>
+                <p><strong>Approved for</strong> (Approved for)</p>
+                <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
+                {/* <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button> */}
+              </div>
+            </div>
           </div>
         </div>
       </section>

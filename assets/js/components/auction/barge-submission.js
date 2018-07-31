@@ -46,18 +46,11 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           unsubmitBargeForm={unsubmitBargeForm}
           approveBargeForm={approveBargeForm}
           rejectBargeForm={rejectBargeForm}
+          auction={auction}
           barge={barge}
           bargeStatus={null}
           isBuyer={isBuyer}
         >
-          <div className="collapsing-barge__barge__header">
-            <div className="collapsing-barge__barge__content">
-              <p><strong>Port</strong> {barge.port}</p>
-              <p><strong>Approved for</strong> (Approved for)</p>
-              <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
-              <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
-            </div>
-          </div>
         </CollapsingBarge>
       </div>
     );
@@ -78,18 +71,11 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           unsubmitBargeForm={unsubmitBargeForm}
           approveBargeForm={approveBargeForm}
           rejectBargeForm={rejectBargeForm}
+          auction={auction}
           barge={auctionBarge.barge}
           bargeStatus={auctionBarge.approval_status}
           isBuyer={isBuyer}
         >
-          <div className="collapsing-barge__barge__header">
-            <div className="collapsing-barge__barge__content">
-              <p><strong>Port</strong> {barge.port.name}</p>
-              <p><strong>Approved for</strong> (Approved for)</p>
-              <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
-              { isBuyer ? buyerBargeApprovalButtons(auctionBarge) : supplierBargeApprovalStatus(auctionBarge) }
-            </div>
-          </div>
         </CollapsingBarge>
       </div>
     );
