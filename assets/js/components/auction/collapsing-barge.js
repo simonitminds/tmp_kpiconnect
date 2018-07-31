@@ -250,7 +250,7 @@ class CollapsingBarge extends Component {
         >
             <div className="collapsing-barge__barge__header">
               <div className="collapsing-barge__barge__content">
-                <p><strong>Port</strong> {barge.port.name}</p>
+                <p><strong>Port</strong> {barge.port}</p>
                 <p><strong>Approved for</strong> (Approved for)</p>
                 <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
                 {/* <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button> */}

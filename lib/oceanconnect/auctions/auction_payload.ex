@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer, Barge}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionTimer, Barge}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Accounts
 
@@ -105,9 +105,18 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.put(:supplier, supplier)
   end
 
-  defp scrub_barge_for_supplier(barge = %Barge{port: port}, supplier_id) do
-    %{ barge | port: port.name }
+  defp scrub_barge_for_supplier(auction_barge = %AuctionBarge{barge: barge = %Barge{port: port}}, _supplier_id) do
+    scrubbed_barge = %{ barge | port: port.name }
     |> Map.delete(:port_id)
+
+    %{auction_barge | barge: scrubbed_barge }
+  end
+
+  defp scrub_barge_for_buyer(auction_barge = %AuctionBarge{barge: barge = %Barge{port: port}}, _buyer_id) do
+    scrubbed_barge = %{ barge | port: port.name }
+    |> Map.delete(:port_id)
+
+    %{auction_barge | barge: scrubbed_barge }
   end
 
   defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
@@ -136,9 +145,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp get_submitted_barges_for_supplier(_state = %AuctionState{submitted_barges: submitted_barges}, supplier_id) do
     submitted_barges
     |> Enum.filter(&(&1.supplier_id == supplier_id))
+    |> Enum.map(&(scrub_barge_for_supplier(&1, supplier_id)))
   end
 
-  defp get_submitted_barges_for_buyer(_state = %AuctionState{submitted_barges: submitted_barges}, _buyer_id) do
+  defp get_submitted_barges_for_buyer(_state = %AuctionState{submitted_barges: submitted_barges}, buyer_id) do
     submitted_barges
+    |> Enum.map(&(scrub_barge_for_buyer(&1, buyer_id)))
   end
 end
