@@ -132,12 +132,14 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     decremented_auto_bids =
       Enum.map(min_bids, fn bid = %AuctionBid{min_amount: min_amount} ->
         cond do
-          min_amount == first_lowest_min_bid.min_amount && second_lowest_min_bid ->
-            %AuctionBid{bid | amount: second_lowest_min_bid.min_amount - 0.25}
+          min_amount == first_lowest_min_bid.min_amount && second_lowest_min_bid -> {bid, second_lowest_min_bid.min_amount - 0.25}
 
-          true ->
-            %AuctionBid{bid | amount: min_amount}
+          true -> {bid, min_amount}
         end
+      end)
+      |> Enum.reject(fn ({bid, new_amount}) -> bid.amount == new_amount end)
+      |> Enum.map(fn({bid, new_amount}) ->
+        %AuctionBid{bid | amount: new_amount}
       end)
       |> Enum.sort_by(&{&1.amount, &1.time_entered})
 
@@ -180,8 +182,9 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     )
 
     next_state = enter_auto_bids(state, decremented_auto_bids)
-    events =
-      Enum.map(decremented_auto_bids, fn bid ->
+
+    events = decremented_auto_bids
+    |> Enum.map(fn bid ->
         AuctionEvent.auto_bid_placed(bid, next_state, nil)
       end)
 
@@ -201,20 +204,20 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         !has_single_lowest_bid
 
       cond do
-        is_already_leading -> bid
+        is_already_leading -> {bid, bid.amount}
 
-        is_tied_leading && min_amount < lowest_bid.amount ->
-          %AuctionBid{bid | amount: lowest_bid.amount - 0.25}
+        is_tied_leading && min_amount < lowest_bid.amount -> {bid, lowest_bid.amount - 0.25}
 
-        min_amount >= lowest_bid.amount ->
-          %AuctionBid{bid | amount: min_amount}
+        min_amount >= lowest_bid.amount -> {bid, min_amount}
 
-        min_amount == first_lowest_min_bid.min_amount ->
-          %AuctionBid{bid | amount: winning_bid_target - 0.25}
+        min_amount == first_lowest_min_bid.min_amount -> {bid, winning_bid_target - 0.25}
 
-        true ->
-          %AuctionBid{bid | amount: min_amount}
+        true -> {bid, min_amount}
       end
+    end)
+    |> Enum.reject(fn ({bid, new_amount}) -> bid.amount == new_amount end)
+    |> Enum.map(fn({bid, new_amount}) ->
+      %AuctionBid{bid | amount: new_amount}
     end)
     |> Enum.sort_by(&{&1.amount, &1.time_entered})
   end
