@@ -625,8 +625,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       }
 
       supplier2_bid1 = %AuctionBid{
-        amount: 2.00,
-        min_amount: 1.50,
+        amount: 1.50,
+        min_amount: 1.25,
         supplier_id: supplier2,
         auction_id: auction_id,
         time_entered: DateTime.utc_now()
@@ -659,12 +659,12 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         %AuctionEvent{
           type: :auto_bid_placed,
           auction_id: auction_id,
-          data: %{bid: %AuctionBid{amount: 1.25, supplier_id: ^supplier1}}
+          data: %{bid: %AuctionBid{amount: 1.00, supplier_id: ^supplier1}}
         },
         %AuctionEvent{
           type: :auto_bid_placed,
           auction_id: auction_id,
-          data: %{bid: %AuctionBid{amount: 1.50, supplier_id: ^supplier2}}
+          data: %{bid: %AuctionBid{amount: 1.25, supplier_id: ^supplier2}}
         }
       ] = events
     end
