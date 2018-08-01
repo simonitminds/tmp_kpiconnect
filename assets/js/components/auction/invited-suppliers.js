@@ -50,6 +50,12 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
       <h3 className="box__header">Invited Suppliers</h3>
       <ul className="supplier-list list has-no-bullets qa-auction-suppliers">
         { _.map(suppliers, (supplier) => {
+          const bargeList = auctionBargesBySupplier[supplier.id] || [];
+          const bargeCount = bargeList.length;
+          const hasPendingBarges = bargeList.some((barge) => {
+            return barge.approval_status == 'PENDING'
+          })
+
             return (
 
               <div key={supplier.id}>
@@ -57,15 +63,18 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
                   <span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>
                   <span className={`qa-auction-supplier-${supplier.id}`}>{supplier.name}</span>
                 </li>
-                <CollapsingBargeList
-                  trigger="Barges"
-                  open={true}
-                  triggerClassString="collapsible-barge-list__container__trigger"
-                  classParentString="qa-open-auctions-list collapsing-barge-list__container"
-                  // contentChildCount={}
-                  >
-                  { bargesForSupplier(supplier) }
-                </CollapsingBargeList>
+                { bargeCount != 0 &&
+                  <CollapsingBargeList
+                    trigger="Barges"
+                    open={true}
+                    pendingBargeFlag = {hasPendingBarges}
+                    triggerClassString="collapsible-barge-list__container__trigger"
+                    classParentString="qa-open-auctions-list collapsing-barge-list__container"
+                    contentChildCount={bargeCount}
+                    >
+                    { bargesForSupplier(supplier) }
+                  </CollapsingBargeList>
+                }
               </div>
             );
           })

@@ -171,6 +171,7 @@ class CollapsingBargeList extends Component {
     const barge = this.props.barge;
     const auction = this.props.auction;
     const bargeStatus = (this.props.bargeStatus || 'available').toLowerCase();
+    const pendingBargeFlag = this.props.pendingBargeFlag;
 
     return(
       <section className={`${parentClassString.trim()}`}>
@@ -182,7 +183,7 @@ class CollapsingBargeList extends Component {
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
               <span className="collapsible-barge-list__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
-              <span className={`collapsible-barge-list__category-icon collapsible-section__category-icon is-warning}`}><i className="fas fa-exclamation-circle"></i></span>
+              <span className={`collapsible-barge-list__category-icon collapsible-section__category-icon ${!pendingBargeFlag && 'is-hidden'}`}><i className="fas fa-exclamation-circle"></i></span>
               <span className="collapsible-barge-list__title">{trigger} ({this.props.contentChildCount})</span>
             </h2>
           </div>
@@ -210,6 +211,7 @@ CollapsingBargeList.propTypes = {
   transitionTime: PropTypes.number,
   easing: PropTypes.string,
   open: PropTypes.bool,
+  pendingBargeFlag: PropTypes.bool,
   classParentString: PropTypes.string,
   openedClassName: PropTypes.string,
   triggerStyle: PropTypes.object,
@@ -252,6 +254,7 @@ CollapsingBargeList.defaultProps = {
   transitionTime: 300,
   easing: 'ease-in',
   open: false,
+  pendingBargeFlag: false,
   classParentString: 'Collapsible',
   triggerDisabled: false,
   lazyRender: false,
