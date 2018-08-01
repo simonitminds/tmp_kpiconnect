@@ -64,7 +64,6 @@
           <th>Company</th>
           <th>Time</th>
           <th>Bid Amount</th>
-          <th>Min Bid Amount</th>
         </tr>
       </thead>
       <tbody>
