@@ -180,6 +180,17 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def has_pending_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}, supplier_id) do
+    pending_barges = find_element(:css, ".qa-auction-supplier-#{supplier_id}-barges")
+    |> find_all_within_element(:css, ".qa-barge-status-pending")
+    |> Enum.map(&inner_text/1)
+    |> Enum.map(&String.trim/1)
+
+    Enum.any?(pending_barges, fn(barge_text) ->
+      barge_text =~ "#{name} (#{imo_number})"
+    end)
+  end
+
   def has_rejected_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}, supplier_id) do
     rejected_barges = find_element(:css, ".qa-auction-supplier-#{supplier_id}-barges")
     |> find_all_within_element(:css, ".qa-barge-status-rejected")

@@ -377,16 +377,18 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.submit_barge(barge)
     end)
 
+    :timer.sleep(1000)
+
     in_browser_session(:buyer, fn ->
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       :timer.sleep(300)
 
-      AuctionShowPage.approve_barge(barge, supplier.id)
+      AuctionShowPage.approve_barge(barge, supplier.company_id)
       :timer.sleep(300)
 
-      assert AuctionShowPage.has_approved_barge?(barge, supplier.id)
-      assert AuctionShowPage.has_pending_barge?(barge, supplier2.id)
+      assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
     end)
   end
 
@@ -405,18 +407,18 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.submit_barge(barge)
     end)
 
-    :timer.sleep(2000)
+    :timer.sleep(1000)
 
     in_browser_session(:buyer, fn ->
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       :timer.sleep(300)
 
-      AuctionShowPage.reject_barge(barge, supplier.id)
+      AuctionShowPage.reject_barge(barge, supplier.company_id)
       :timer.sleep(300)
 
-      assert AuctionShowPage.has_rejected_barge?(barge, supplier.id)
-      assert AuctionShowPage.has_pending_barge?(barge, supplier2.id)
+      assert AuctionShowPage.has_rejected_barge?(barge, supplier.company_id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
     end)
   end
 end
