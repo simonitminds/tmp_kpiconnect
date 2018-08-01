@@ -15,7 +15,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
     return (
       <div className={ `qa-barge-header qa-barge-${barge.id}` } key={ barge.id } >
         <CollapsingBarge
-          trigger={ `${barge.name} (${barge.imo_number})` }
+          trigger={ `${barge.name.toLowerCase()} (${barge.imo_number})` }
           classParentString="collapsing-barge__barge"
           easing="ease"
           open={false}
@@ -41,7 +41,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
     return (
       <div className={ `qa-barge-${barge.id} qa-barge-status-${approvalStatus}` } key={ barge.id }>
         <CollapsingBarge
-          trigger={ `${barge.name} (${barge.imo_number})` }
+          trigger={ `${barge.name.toLowerCase()} (${barge.imo_number})` }
           classParentString="collapsing-barge__barge"
           easing="ease"
           open={false}

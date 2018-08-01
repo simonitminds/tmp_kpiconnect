@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 // NOTE: Sourced from glennflanagan's react-collapsible component (https://github.com/glennflanagan/react-collapsible/blob/develop/src/Collapsible.js)
 
-class CollapsingBarge extends Component {
+class CollapsingBargeList extends Component {
   constructor(props) {
     super(props)
 
@@ -169,60 +169,11 @@ class CollapsingBarge extends Component {
 
     // Barging Data
     const barge = this.props.barge;
-    const supplierId = this.props.supplierId;
-    const isBuyer = this.props.isBuyer;
-    const approveBargeForm = this.props.approveBargeForm;
-    const rejectBargeForm = this.props.rejectBargeForm;
-    const submitBargeForm = this.props.submitBargeForm;
-    const unsubmitBargeForm = this.props.unsubmitBargeForm;
     const auction = this.props.auction;
     const bargeStatus = (this.props.bargeStatus || 'available').toLowerCase();
 
-    const approvalStatusIcon = () => {
-      if (bargeStatus == 'pending') { return `fas fa-question-circle` }
-      else if (bargeStatus == 'approved') { return `fas fa-check-circle` }
-      else if (bargeStatus == 'rejected') {return `fas fa-times-circle`}
-      else {return `fas fa-ban`}
-    };
-    const bargeAction = () => {
-      if(isBuyer) {
-        switch(bargeStatus) {
-          case 'pending':
-            return (
-              <div className="collapsing-barge__barge__button buttons has-addons has-margin-bottom-none">
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
-              </div>)
-          case 'approved':
-            return (
-              <div className="collapsing-barge__barge__button collapsing-barge__barge__button--toggle">
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-reject-${barge.id}` }><span>Approved</span></button>
-              </div>)
-          case 'rejected':
-            return (
-              <div className="collapsing-barge__barge__button collapsing-barge__barge__button--toggle">
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-approve-${barge.id}` }><span>Rejected</span></button>
-              </div>)
-        }
-      }
-      else {
-        switch(bargeStatus) {
-          case 'available':
-            return (
-              <div className="collapsing-barge__barge__button">
-                <button onClick={ submitBargeForm.bind(this, auction.id, barge.id) } className={ `button is-small is-primary qa-auction-barge-submit-${barge.id}` }>Submit</button>
-              </div>)
-          default:
-            return (
-              <div className="collapsing-barge__barge__button">
-                <a onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `qa-auction-barge-unsubmit-${barge.id}` }><i className="fas fa-times"></i></a>
-              </div>)
-        }
-      }
-    };
-
     return(
-      <section className={`qa-barge-${barge.id} qa-barge-status-${bargeStatus} ${parentClassString.trim()}`}>
+      <section className={`${parentClassString.trim()}`}>
         <div className="container is-fullhd">
           <div className="content has-gray-lighter">
             <h2
@@ -230,17 +181,16 @@ class CollapsingBarge extends Component {
               onClick={this.handleTriggerClick}
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
-              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
-              <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
-              <span className="collapsible-section__title">{trigger}</span>
+              <span className="collapsible-barge-list__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
+              <span className={`collapsible-barge-list__category-icon collapsible-section__category-icon is-warning}`}><i className="fas fa-exclamation-circle"></i></span>
+              <span className="collapsible-barge-list__title">{trigger} ({this.props.contentChildCount})</span>
             </h2>
-            {bargeAction()}
           </div>
         </div>
 
         {this.renderNonClickableTriggerElement()}
 
-        <div className="container is-fullhd"
+        <div className="collapsing-barge-list__content container is-fullhd"
           ref="outer"
           style={dropdownStyle}
           onTransitionEnd={this.handleTransitionEnd}
@@ -248,13 +198,7 @@ class CollapsingBarge extends Component {
           <div className="content has-gray-lighter"
             ref="inner"
         >
-            <div className="collapsing-barge__barge__header">
-              <div className="collapsing-barge__barge__content">
-                <p><strong>Port</strong> {barge.port}</p>
-                <p><strong>Approved for</strong> (Approved for)</p>
-                <p><strong>Last SIRE Inspection</strong> ({barge.sire_inspection_date})</p>
-              </div>
-            </div>
+            {children}
           </div>
         </div>
       </section>
@@ -262,7 +206,7 @@ class CollapsingBarge extends Component {
   }
 }
 
-CollapsingBarge.propTypes = {
+CollapsingBargeList.propTypes = {
   transitionTime: PropTypes.number,
   easing: PropTypes.string,
   open: PropTypes.bool,
@@ -304,7 +248,7 @@ CollapsingBarge.propTypes = {
   ]),
 }
 
-CollapsingBarge.defaultProps = {
+CollapsingBargeList.defaultProps = {
   transitionTime: 300,
   easing: 'ease-in',
   open: false,
@@ -326,4 +270,4 @@ CollapsingBarge.defaultProps = {
   onClosing: () => {},
 };
 
-export default CollapsingBarge;
+export default CollapsingBargeList;

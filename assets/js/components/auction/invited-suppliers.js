@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import CollapsingBargeList from './collapsing-barge-list';
 import CollapsingBarge from './collapsing-barge';
 
 const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) => {
@@ -12,6 +13,8 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
     return acc;
   }, {});
 
+  // const supplierBargeCount = auctionBargesBySupplier[supplier.id].length;
+
   const bargesForSupplier = (supplier) => {
     const auctionBarges = auctionBargesBySupplier[supplier.id] || [];
 
@@ -21,7 +24,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
             const barge = auctionBarge.barge;
             return (
               <CollapsingBarge
-                trigger={ `${barge.name} (${barge.imo_number})` }
+                trigger={ `${barge.name.toLowerCase()} (${barge.imo_number})` }
                 classParentString="collapsing-barge__barge"
                 easing="ease"
                 open={false}
@@ -45,15 +48,24 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
   return(
     <div className="box">
       <h3 className="box__header">Invited Suppliers</h3>
-      <ul className="list has-no-bullets qa-auction-suppliers">
+      <ul className="supplier-list list has-no-bullets qa-auction-suppliers">
         { _.map(suppliers, (supplier) => {
             return (
+
               <div key={supplier.id}>
-                <li>
+                <li className="supplier-list__supplier">
                   <span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>
                   <span className={`qa-auction-supplier-${supplier.id}`}>{supplier.name}</span>
                 </li>
-                { bargesForSupplier(supplier) }
+                <CollapsingBargeList
+                  trigger="Barges"
+                  open={true}
+                  triggerClassString="collapsible-barge-list__container__trigger"
+                  classParentString="qa-open-auctions-list collapsing-barge-list__container"
+                  // contentChildCount={}
+                  >
+                  { bargesForSupplier(supplier) }
+                </CollapsingBargeList>
               </div>
             );
           })
