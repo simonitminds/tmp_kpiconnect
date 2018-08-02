@@ -35,8 +35,8 @@ defmodule OceanconnectWeb.Router do
 
     post("/auctions/:auction_id/barges/:barge_id/submit", AuctionBargesController, :submit, as: :auction_barges_api_submit)
     post("/auctions/:auction_id/barges/:barge_id/unsubmit",  AuctionBargesController, :unsubmit, as: :auction_barges_api_unsubmit)
-    post("/auctions/:auction_id/barges/:barge_id/approve", AuctionBargesController, :approve, as: :auction_barges_api_approve)
-    post("/auctions/:auction_id/barges/:barge_id/reject", AuctionBargesController, :reject, as: :auction_barges_api_reject)
+    post("/auctions/:auction_id/barges/:barge_id/:supplier_id/approve", AuctionBargesController, :approve, as: :auction_barges_api_approve)
+    post("/auctions/:auction_id/barges/:barge_id/:supplier_id/reject", AuctionBargesController, :reject, as: :auction_barges_api_reject)
 
     get("/ports/:port_id/suppliers", PortSupplierController, :index)
     get("/companies/:company_id/barges", CompanyBargesController, :index, as: :company_barges_api)

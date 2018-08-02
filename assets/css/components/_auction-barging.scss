@@ -197,6 +197,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
   .collapsing-barge__barge__trigger > .collapsible-section__title { // Ersatz header. Probably a little brittle.
     font-size: 1rem;
     font-weight: bold;
+    text-transform: capitalize;
   }
   .collapsing-barge__barge__trigger > .collapsible-section__toggle-icon { // Toggle button. Probably a little brittle.
     font-size: 1rem;
@@ -220,6 +221,10 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     flex-shrink: 0;
     margin: 0.5rem 0 0.5rem auto;
 
+    &--toggle {
+      margin-right: 1rem;
+    }
+
     a {
       color: $gray-3;
       transition: color 0.1s ease-in;
@@ -228,6 +233,57 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
       }
     }
   }
+  .collapsing-barge__barge__button--toggle button {
+    position: relative;
+    width: calc(100% + 1.5rem);
+    text-align: right !important;
+    border-radius: 20px;
+    box-shadow: inset 0 2px 3px rgba(54, 54, 54, 0.1), 0 0 0 1px rgba(54, 54, 54, 0.1);
+    transition: background-color 0.1s ease-in;
+
+    span {
+      display: inline-block;
+    }
+
+    &.is-danger:hover, &.is-danger:focus {
+      background-color: darken($danger, 2%) !important;
+    }
+
+    &.is-success:hover, &.is-success:focus {
+      background-color: darken($success, 2%) !important;
+    }
+
+    &:before {
+      content: '';
+      top: auto;
+      width: 1.5rem;
+      border-radius: 20px;
+      height: calc(100% - 0.25rem);
+      position: absolute;
+      background-color: $gray-1;
+      box-shadow: 0 2px 3px rgba(54, 54, 54, 0.1), 0 0 0 1px rgba(54, 54, 54, 0.1);
+    }
+
+    &:hover:before, &:focus:before {
+      background-color: darken($gray-1, 5%);
+    }
+
+    &.is-danger {
+      &:before {
+      left: auto;
+      right: 0.125rem;
+      }
+      span { margin-right: auto; }
+    }
+    &.is-success {
+      &:before {
+        right: auto;
+        left: 0.125rem;
+      }
+      span { margin-left: auto; }
+    }
+  }
+
   .collapsing-barge__barge__content {
     margin: 1rem 0 1rem auto;
 

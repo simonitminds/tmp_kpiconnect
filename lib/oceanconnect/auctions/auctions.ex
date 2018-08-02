@@ -639,10 +639,10 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, user \\ nil) do
+  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
     query =
       from ab in AuctionBarge,
-      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id
+      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id and ab.supplier_id == ^supplier_id
 
     Repo.update_all(query, set: [approval_status: "APPROVED"])
 
@@ -657,10 +657,10 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def reject_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, user \\ nil) do
+  def reject_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
     query =
       from ab in AuctionBarge,
-      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id
+      where: ab.auction_id == ^auction_id and ab.barge_id == ^barge_id and ab.supplier_id == ^supplier_id
 
     Repo.update_all(query, set: [approval_status: "REJECTED"])
 

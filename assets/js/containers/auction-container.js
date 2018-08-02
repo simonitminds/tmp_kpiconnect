@@ -60,13 +60,13 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
     dispatch(unsubmitBargeForApproval(auctionId, bargeId));
   },
-  approveBargeForm(auctionId, bargeId, ev) {
+  approveBargeForm(auctionId, bargeId, supplierId, ev) {
     ev.preventDefault();
-    dispatch(approveBarge(auctionId, bargeId));
+    dispatch(approveBarge(auctionId, bargeId, supplierId));
   },
-  rejectBargeForm(auctionId, bargeId, ev) {
+  rejectBargeForm(auctionId, bargeId, supplierId, ev) {
     ev.preventDefault();
-    dispatch(rejectBarge(auctionId, bargeId));
+    dispatch(rejectBarge(auctionId, bargeId, supplierId));
   },
   acceptBid(auctionId, bidId, ev) {
     ev.preventDefault();

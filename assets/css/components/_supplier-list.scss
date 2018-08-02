@@ -1,0 +1,71 @@
+// ========================== //
+// ========================== //
+// SUPPLIER LIST
+// ========================== //
+// ========================== //
+
+// Associated Variables
+
+// Blocks
+
+.supplier-list {
+  &> div:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
+.supplier-list__supplier {
+  display: flex;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: $white;
+  box-shadow: 0 2px 3px rgba(54, 54, 54, 0.1), 0 0 0 1px rgba(54, 54, 54, 0.1);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+
+.collapsing-barge-list__container {
+  margin-top: -3px;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: $white;
+  box-shadow: 0 2px 3px rgba(54, 54, 54, 0.1), 0 0 0 1px rgba(54, 54, 54, 0.1);
+  padding: 0.5rem;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-bottom: 0.5rem;
+
+  &> .container:first-child { padding: 0 0.4375rem; }
+}
+
+.collapsing-barge-list__container__trigger {
+  display: flex;
+}
+
+
+.collapsing-barge-list__content {
+  width: auto !important;
+  margin: -0.5rem !important;
+  background-color: $gray-1;
+}
+
+.collapsing-barge-list__counter {
+  background-color: $gray-1;
+  color: $black;
+}
+
+.collapsible-barge-list__toggle-icon,
+.collapsible-barge-list__category-icon,
+.collapsible-barge-list__title {
+  font-size: 1rem;
+}
+
+.collapsible-barge-list__toggle-icon {
+  margin-right: 0.5rem;
+}
+
+.collapsible-barge-list__category-icon {
+  color: $gold;
+  margin-right: 0.5rem;
+}

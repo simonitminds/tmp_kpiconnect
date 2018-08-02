@@ -211,16 +211,20 @@ export default class AuctionShow extends React.Component {
                       <TabPanel>
                         { auctionLogLinkDisplay() }
                         {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
-                        { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-                        <BargeSubmission
-                          submitBargeForm={this.props.submitBargeForm}
-                          unsubmitBargeForm={this.props.unsubmitBargeForm}
-                          approveBargeForm={this.props.approveBargeForm}
-                          rejectBargeForm={this.props.rejectBargeForm}
-                          auctionPayload={auctionPayload}
-                          companyBarges={companyProfile.companyBarges}
-                          isBuyer={currentUser.isBuyer}
-                        />
+                        { currentUser.isBuyer ?
+                          <InvitedSuppliers
+                            auctionPayload={auctionPayload}
+                            approveBargeForm={this.props.approveBargeForm}
+                            rejectBargeForm={this.props.rejectBargeForm}
+                          /> :
+                          <BargeSubmission
+                            submitBargeForm={this.props.submitBargeForm}
+                            unsubmitBargeForm={this.props.unsubmitBargeForm}
+                            auctionPayload={auctionPayload}
+                            companyBarges={companyProfile.companyBarges}
+                            supplierId={this.props.currentUserCompanyId}
+                          />
+                        }
                         <div className="box has-margin-bottom-md">
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
@@ -305,16 +309,20 @@ export default class AuctionShow extends React.Component {
                   <TabPanel>
                     { auctionLogLinkDisplay() }
                     {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
-                    { currentUser.isBuyer ? <InvitedSuppliers auction={auction} /> : "" }
-                    <BargeSubmission
-                      submitBargeForm={this.props.submitBargeForm}
-                      unsubmitBargeForm={this.props.unsubmitBargeForm}
-                      approveBargeForm={this.props.approveBargeForm}
-                      rejectBargeForm={this.props.rejectBargeForm}
-                      auctionPayload={auctionPayload}
-                      companyBarges={companyProfile.companyBarges}
-                      isBuyer={currentUser.isBuyer}
-                    />
+                    { currentUser.isBuyer ?
+                      <InvitedSuppliers
+                        auctionPayload={auctionPayload}
+                        approveBargeForm={this.props.approveBargeForm}
+                        rejectBargeForm={this.props.rejectBargeForm}
+                      /> :
+                      <BargeSubmission
+                        submitBargeForm={this.props.submitBargeForm}
+                        unsubmitBargeForm={this.props.unsubmitBargeForm}
+                        auctionPayload={auctionPayload}
+                        companyBarges={companyProfile.companyBarges}
+                        supplierId={this.props.currentUserCompanyId}
+                      />
+                    }
                     <div className="box has-margin-bottom-md">
                       <div className="box__subsection">
                         <h3 className="box__header">Buyer Information
