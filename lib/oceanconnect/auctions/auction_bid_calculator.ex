@@ -122,9 +122,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   defp decrement_auto_bids(state = %AuctionState{minimum_bids: []}), do: {state, []}
 
   defp decrement_auto_bids(state = %AuctionState{minimum_bids: min_bids, lowest_bids: []}) do
-    min_bid_amounts =
-      Enum.uniq_by(min_bids, & &1.min_amount)
-      |> Enum.sort_by(& &1.min_amount)
+    min_bid_amounts = Enum.sort_by(min_bids, & &1.min_amount)
 
     [first_lowest_min_bid | rest] = min_bid_amounts
     second_lowest_min_bid = Enum.at(rest, 0, nil)
@@ -156,9 +154,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   defp decrement_auto_bids(
          state = %AuctionState{minimum_bids: min_bids, lowest_bids: lowest_bids = [lowest_bid | _]}
        ) do
-    min_bid_amounts =
-      Enum.uniq_by(min_bids, & &1.min_amount)
-      |> Enum.sort_by(& &1.min_amount)
+    min_bid_amounts = Enum.sort_by(min_bids, & &1.min_amount)
 
     [first_lowest_min_bid | rest] = min_bid_amounts
     second_lowest_min_bid = Enum.at(rest, 0, nil)
