@@ -11,6 +11,7 @@ defmodule Oceanconnect.Accounts.User do
     field :last_name, :string
     field :password_hash, :string
     field :password, :string, virtual: true
+    field :is_admin, :bool, default: false
     belongs_to :company, Oceanconnect.Accounts.Company
 
     timestamps()
