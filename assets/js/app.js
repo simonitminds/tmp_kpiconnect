@@ -27,6 +27,7 @@ import { getAllAuctionPayloads, receiveAuctionFormData } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';
+import AdminBar from './components/admin-bar';
 
 
 function getDataForComponent(componentName) {
@@ -64,9 +65,10 @@ if (document.getElementById('auctions-app')) {
   };
 
   render((
-    <Provider store={store}>
-      {setContainer()}
-    </Provider>
-
+      <AdminBar isAdmin={window.isAdmin} impersonableUsers={[]}>
+      <Provider store={store}>
+          {setContainer()}
+      </Provider>
+    </AdminBar>
   ), document.getElementById('auctions-app'));
 }
