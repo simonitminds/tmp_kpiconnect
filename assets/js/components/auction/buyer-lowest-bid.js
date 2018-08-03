@@ -8,7 +8,7 @@ const BuyerLowestBid = ({auctionPayload}) => {
   const lowestBidListDisplay = () => {
     if (lowestBidList.length > 0) {
       return (
-        <table className="table is-fullwidth is-striped is-marginless">
+        <table className="table table--lowest-bid is-fullwidth is-striped is-marginless">
           <thead>
             <tr>
               <th>Seller</th>

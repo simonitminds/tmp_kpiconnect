@@ -19,6 +19,28 @@
 
 // Additions
 
+.table--lowest-bid {
+  counter-reset: rowNumber - 1;
+
+  tr {
+      counter-increment: rowNumber;
+  }
+
+  tr td:first-child::before {
+      content: counter(rowNumber);
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 0.75rem;
+      background-color: $turquoise;
+      color: $white;
+      font-weight: 700;
+      min-width: 1em;
+      margin-right: 0.5em;
+      text-align: center;
+  }
+}
+
 .table.is-marginless {
   margin: 0 -1.25rem 1.5rem -1.25rem !important;
   width: calc(100% + 2.5rem);
