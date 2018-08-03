@@ -3,7 +3,7 @@ defmodule Oceanconnect.Repo.Migrations.AddIsAdminToUsers do
 
   def change do
     alter table(:users) do
-      add :is_admin, :bool, default: false
+      add :is_admin, :boolean, default: false
     end
   end
 end

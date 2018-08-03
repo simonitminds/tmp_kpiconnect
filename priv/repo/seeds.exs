@@ -47,6 +47,7 @@ defmodule SupplierHelper do
 end
 
 companies =
+  [chevron, nigeria, qatargas, petrochina, global, shell, chemoil, ocm] =
   [
     %{
       name: "Chevron Overseas Tankers",
@@ -137,15 +138,29 @@ companies =
       main_phone: "+65 6415 7653",
       mobile_phone: "+65 9672 1065",
       postal_code: "039192"
+    },
+    %{
+      name: "Ocean Connect Marine",
+      address1: "",
+      address2: "",
+      city: "London",
+      is_supplier: true,
+      country: "Britain",
+      contact_name: "Neal Bolton",
+      email: "nbolton@oceanconnectmarine.com",
+      main_phone: "",
+      mobile_phone: "",
+      postal_code: ""
     }
   ]
   |> Enum.map(fn company ->
     Repo.get_or_insert!(Company, company)
   end)
 
-[chevron, nigeria, qatargas, petrochina, global, shell, chemoil] = companies
-suppliers = companies
+
+suppliers = [chevron, nigeria, qatargas, petrochina, global, shell, chemoil]
 # User creation doesn't use get_or_insert! fn due to virtual password field
+
 Enum.map(companies, fn c ->
   Repo.get_or_insert_user!(
     Repo.get_by(User, %{email: String.upcase(c.email)}),
@@ -154,6 +169,12 @@ Enum.map(companies, fn c ->
   )
 end)
 
+Repo.get_by(User, %{email: String.upcase(ocm.email)})
+|> User.changeset(%{is_admin: true, password: "ocmtest"})
+|> Repo.update()
+|> IO.inspect(label: "UPDATING IS ADMIN")
+
+# Create Admin User
 ports =
   [
     %{name: "Algeciras", country: "Spain", gmt_offset: 1},
@@ -526,11 +547,15 @@ barges =
     }
   end)
   |> Enum.map(fn barge_attrs ->
-    data = Repo.get_or_insert!(Barge, Map.delete(barge_attrs, :companies))
-    |> Repo.preload(:companies)
+    data =
+      Repo.get_or_insert!(Barge, Map.delete(barge_attrs, :companies))
+      |> Repo.preload(:companies)
 
     Barge.changeset(data, barge_attrs)
-    |> Ecto.Changeset.put_assoc(:companies, MapSet.new(barge_attrs.companies ++ data.companies) |> MapSet.to_list())
+    |> Ecto.Changeset.put_assoc(
+      :companies,
+      MapSet.new(barge_attrs.companies ++ data.companies) |> MapSet.to_list()
+    )
     |> Repo.update()
   end)
 

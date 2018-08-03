@@ -11,7 +11,7 @@ defmodule Oceanconnect.Accounts.User do
     field :last_name, :string
     field :password_hash, :string
     field :password, :string, virtual: true
-    field :is_admin, :bool, default: false
+    field :is_admin, :boolean, default: false
     belongs_to :company, Oceanconnect.Accounts.Company
 
     timestamps()
@@ -20,7 +20,7 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id])
+    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
     |> validate_required([:email, :password])
     |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)

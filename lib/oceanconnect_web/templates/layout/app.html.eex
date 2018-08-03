@@ -37,6 +37,14 @@
                 <i class="is-size-6 is-block-desktop has-margin-left-sm">(<%= OceanconnectWeb.SessionView.current_company(@conn) %>)</i>
               <% end %>
             </div>
+            <div class="navbar-dropdown__admin">
+              <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                <button class="qa-admin-act-as-admin">Admin</button>
+                <button class="qa-admin-act-as-agent">Agent</button>
+                <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
+              <% end %>
+            </div>
+
             <div class="navbar-item navbar-item--burger has-dropdown is-hoverable">
               <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
               <div class="navbar-dropdown">
