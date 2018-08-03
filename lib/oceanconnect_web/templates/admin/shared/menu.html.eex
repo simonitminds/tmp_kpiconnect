@@ -1,0 +1,18 @@
+<aside class="admin-panel__nav column is-one-quarter menu">
+	<p class="menu-label">
+		Manage Resources
+	</p>
+	<ul class="menu-list">
+		<li><%= link "Vessels", to: admin_vessel_path(@conn, :index) %></li>
+		<li><%= link "Barges", to: admin_barge_path(@conn, :index) %></li>
+		<li><%= link "Fuel Grades", to: admin_fuel_path(@conn, :index) %></li>
+		<li><%= link "Ports", to: admin_port_path(@conn, :index) %></li>
+	</ul>
+	<p class="menu-label">
+		Manage Users
+	</p>
+	<ul class="menu-list">
+		<li><a>New Registrations</a></li>
+		<li><a>User Permissions</a></li>
+	</ul>
+</aside>

@@ -1,0 +1,44 @@
+<div class="auction-app">
+	<div class="auction-app__header container is-fullhd">
+		<div class="content is-clearfix">
+			<h1 class="auction-list__title title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="container is-fullhd">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<div class="container is-fullhd">
+					<div class="content has-gray-lighter">
+						<h2>Ports</h2>
+						<span><%= link "New Port", to: admin_port_path(@conn, :new) %></span>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Country</th>
+
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<%= for port <- @ports do %>
+									<tr>
+										<td><%= port.name %></td>
+										<td><%= port.country %></td>
+
+										<td class="text-right">
+											<span><%= link "Show", to: admin_port_path(@conn, :show, port), class: "btn btn-default btn-xs" %></span>
+											<span><%= link "Edit", to: admin_port_path(@conn, :edit, port), class: "btn btn-default btn-xs" %></span>
+											<span><%= link "Delete", to: admin_port_path(@conn, :delete, port), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+										</td>
+									</tr>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>

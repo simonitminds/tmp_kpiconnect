@@ -63,4 +63,15 @@ defmodule OceanconnectWeb.Router do
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
   end
+
+  scope "/admin", OceanconnectWeb.Admin do
+    pipe_through(:browser)
+
+    resources("/vessels", VesselController, as: :admin_vessel)
+    resources("/users", UserController, as: :admin_user)
+    resources("/companies", CompanyController, as: :admin_company)
+    resources("/barges", BargeController, as: :admin_barge)
+    resources("/fuels", FuelController, as: :admin_fuel)
+    resources("/ports", PortController, as: :admin_port)
+  end
 end

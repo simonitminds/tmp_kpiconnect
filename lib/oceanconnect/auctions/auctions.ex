@@ -592,6 +592,10 @@ defmodule Oceanconnect.Auctions do
     Fuel.changeset(fuel, %{})
   end
 
+  def list_barges do
+    Repo.all(Barge)
+  end
+
   def get_barge(id) do
     Repo.get(Barge, id)
   end

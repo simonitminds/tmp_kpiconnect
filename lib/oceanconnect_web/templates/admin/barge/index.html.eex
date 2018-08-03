@@ -1,0 +1,44 @@
+<div class="auction-app">
+	<div class="auction-app__header container is-fullhd">
+		<div class="content is-clearfix">
+			<h1 class="auction-list__title title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="container is-fullhd">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<div class="container is-fullhd">
+					<div class="content has-gray-lighter">
+						<h2>Barges</h2>
+						<span><%= link "New Barge", to: admin_barge_path(@conn, :new) %></span>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Imo</th>
+
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<%= for barge <- @barges do %>
+									<tr>
+										<td><%= barge.name %></td>
+										<td><%= barge.imo_number %></td>
+
+										<td class="text-right">
+											<span><%= link "Show", to: admin_barge_path(@conn, :show, barge), class: "btn btn-default btn-xs" %></span>
+											<span><%= link "Edit", to: admin_barge_path(@conn, :edit, barge), class: "btn btn-default btn-xs" %></span>
+											<span><%= link "Delete", to: admin_barge_path(@conn, :delete, barge), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+										</td>
+									</tr>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>
