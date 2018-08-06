@@ -17,7 +17,8 @@ import {
   SELECT_ALL_SUPPLIERS,
   DESELECT_ALL_SUPPLIERS,
   SELECT_PORT,
-  RECEIVE_SUPPLIERS
+  RECEIVE_SUPPLIERS,
+  RECEIVE_IMPERSONATION
 } from "./constants";
 
 let channel, socket;
@@ -53,6 +54,16 @@ export function subscribeToAuctionUpdates() {
       const { connection } = getState().auctionsReducer;
       if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
     });
+  };
+}
+export function impersonateUser(user_id) {
+  return dispatch => {
+    fetch(`/api/impersonate_user/${user_id}`, {headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveImpersonation(response.data));
+      });
   };
 }
 
@@ -218,6 +229,11 @@ export function updateBidStatus(auctionId, response) {
           auctionId,
           success: response.success,
           message: response.message};
+}
+
+export function receiveImpersonation(impersonationPayload) {
+  return {type: RECEIVE_IMPERSONATION,
+          impersonationPayload: impersonationPayload};
 }
 
 export function receiveAuctionPayloads(auctionPayloads) {

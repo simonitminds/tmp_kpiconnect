@@ -1,6 +1,8 @@
 import React from 'react';
 
-const AdminBar = ({isAdmin, impersonableUsers, children}) => {
+const AdminBar = ({isAdmin, impersonableUsers, children, impersonateUser}) => {
+  const onImpersonateUser = impersonateUser;
+
   return(
   <div className="">
     <select className="qa-admin-impersonate-user">

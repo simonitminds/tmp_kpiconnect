@@ -23,7 +23,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
-import { getAllAuctionPayloads, receiveAuctionFormData } from './actions';
+import { getAllAuctionPayloads, receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';
@@ -65,7 +65,7 @@ if (document.getElementById('auctions-app')) {
   };
 
   render((
-      <AdminBar isAdmin={window.isAdmin} impersonableUsers={window.impersonableUsers}>
+      <AdminBar isAdmin={window.isAdmin} impersonableUsers={window.impersonableUsers} impersonateUser={impersonateUser}>
       <Provider store={store}>
           {setContainer()}
       </Provider>
