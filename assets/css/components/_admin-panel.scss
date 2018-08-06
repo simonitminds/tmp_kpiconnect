@@ -1,0 +1,29 @@
+.admin-panel__nav {
+  .menu-label {
+//  @extend .box__header
+    font-weight: 700;
+    font-family: "Montserrat", "Futura", "Helvetica", "Arial", sans-serif;
+  }
+  .menu-list, .menu-list ul {
+    margin-left: 0;
+    list-style-type: none;
+  }
+  .menu-list + .menu-label {
+    margin-top: 2rem;
+  }
+}
+
+.admin-panel__content {
+  &__header {
+    display: flex;
+    margin-bottom: 2rem !important;
+    padding-bottom: 1rem;
+    border-bottom: 5px solid #dbdbdb; // $gray-2
+  }
+}
+
+.admin-panel__table thead tr {
+  &:hover, &:focus {
+    background-color: $white !important;
+  }
+}
