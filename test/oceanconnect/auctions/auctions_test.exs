@@ -403,7 +403,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
-  describe "barges" do
+  describe "auction barges" do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       supplier_company2 = insert(:company, is_supplier: true)
@@ -588,6 +588,57 @@ defmodule Oceanconnect.AuctionsTest do
       ] = auction_state.submitted_barges
     end
   end
+
+	describe "barges" do
+    alias Oceanconnect.Auctions.Barge
+
+    @valid_attrs %{name: "some name", imo_number: "1337", dwt: "37", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
+    @update_attrs %{name: "some updated name", imo_number: "1338", dwt: "38", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
+    @invalid_attrs %{name: nil, imo_number: nil, dwt: nil, sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
+
+    setup do
+      barge = insert(:barge, @valid_attrs)
+      {:ok, %{barge: Auctions.get_barge!(barge.id)}}
+    end
+
+		test "list_barges/0 returns all barges", %{barge: barge} do
+			assert Enum.map(Auctions.list_barges(), fn(b) -> b.id end) == [barge.id]
+		end
+
+		test "get_barge!/1 returns the barge with given id", %{barge: barge} do
+			assert Auctions.get_barge!(barge.id) == barge
+		end
+
+		test "create_barge/1 with valid data creates a barge" do
+			new_barge = Map.put(@valid_attrs, :port_id, 1)
+			assert {:ok, %Barge{} = barge} = Auctions.create_barge(new_barge)
+			assert barge.name == "some name"
+		end
+
+		test "create_barge/1 with invalid data returns error changeset" do
+			assert {:error, %Ecto.Changeset{}} = Auctions.create_barge(@invalid_attrs)
+		end
+
+		test "update_barge/2 with valid data updates the barge", %{barge: barge} do
+			assert {:ok, barge} = Auctions.update_barge(barge, @update_attrs)
+			assert %Barge{} = barge
+			assert barge.name == "some updated name"
+		end
+
+		test "update_barge/2 with invalid data returns error changeset", %{barge: barge} do
+			assert {:error, %Ecto.Changeset{}} = Auctions.update_barge(barge, @invalid_attrs)
+			assert barge == Auctions.get_barge!(barge.id)
+		end
+
+		test "delete_barge/1 deletes the barge", %{barge: barge} do
+			assert {:ok, %Barge{}} = Auctions.delete_barge(barge)
+			assert_raise Ecto.NoResultsError, fn -> Auctions.get_barge!(barge.id) end
+		end
+
+		test "change_barge/1 returns a barge changeset", %{barge: barge} do
+			assert %Ecto.Changeset{} = Auctions.change_barge(barge)
+		end
+	end
 
   test "strip non loaded" do
     auction = insert(:auction)
