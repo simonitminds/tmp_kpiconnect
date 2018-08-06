@@ -8,36 +8,33 @@
 		<div class="content columns">
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
-				<div class="container is-fullhd">
-					<div class="content has-gray-lighter">
-						<h2>Vessels</h2>
-						<span><%= link "New Vessel", to: admin_vessel_path(@conn, :new) %></span>
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Imo</th>
+				<h2 class="admin-panel__content__header"><span class="is-inline-block">Vessels</span>
+					<%= link "Add Vessel", to: admin_vessel_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>IMO</th>
 
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<%= for vessel <- @vessels do %>
-									<tr>
-										<td><%= vessel.name %></td>
-										<td><%= vessel.imo %></td>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for vessel <- @vessels do %>
+							<tr>
+								<td><%= vessel.name %></td>
+								<td><%= vessel.imo %></td>
 
-										<td class="text-right">
-											<span><%= link "Show", to: admin_vessel_path(@conn, :show, vessel), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Edit", to: admin_vessel_path(@conn, :edit, vessel), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Delete", to: admin_vessel_path(@conn, :delete, vessel), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
-										</td>
-									</tr>
-								<% end %>
-							</tbody>
-						</table>
-					</div>
-				</div>
+								<td class="text-right">
+									<%= link "Show", to: admin_vessel_path(@conn, :show, vessel), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Edit", to: admin_vessel_path(@conn, :edit, vessel), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Delete", to: admin_vessel_path(@conn, :delete, vessel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
 			</section>
 		</div>
 	</div>

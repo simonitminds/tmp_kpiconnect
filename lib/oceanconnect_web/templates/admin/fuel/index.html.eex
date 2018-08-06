@@ -8,34 +8,31 @@
 		<div class="content columns">
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
-				<div class="container is-fullhd">
-					<div class="content has-gray-lighter">
-						<h2>Fuel Grades</h2>
-						<span><%= link "New Fuel", to: admin_fuel_path(@conn, :new) %></span>
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Name</th>
+				<h2 class="admin-panel__content__header"><span class="is-inline-block">Fuel Grades</span>
+					<%= link "Add Fuel", to: admin_fuel_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Name</th>
 
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<%= for fuel <- @fuels do %>
-									<tr>
-										<td><%= fuel.name %></td>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for fuel <- @fuels do %>
+							<tr>
+								<td><%= fuel.name %></td>
 
-										<td class="text-right">
-											<span><%= link "Show", to: admin_fuel_path(@conn, :show, fuel), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
-										</td>
-									</tr>
-								<% end %>
-							</tbody>
-						</table>
-					</div>
-				</div>
+								<td class="text-right">
+									<%= link "Show", to: admin_fuel_path(@conn, :show, fuel), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
 			</section>
 		</div>
 	</div>
