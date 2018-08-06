@@ -1,12 +1,11 @@
 <%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert is-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
   <div class="columns">
     <div class="column is-one-third">
-      <%= if @changeset.action do %>
-        <div class="alert is-danger">
-          <p>Oops, something went wrong! Please check the errors below.</p>
-        </div>
-      <% end %>
-
       <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
