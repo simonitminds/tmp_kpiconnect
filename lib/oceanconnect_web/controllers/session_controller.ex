@@ -23,6 +23,11 @@ defmodule OceanconnectWeb.SessionController do
     end
   end
 
+  def impersonate(conn, %{"user_id" => user_id}) do
+    conn
+    |> redirect(to: auction_path(conn, :index))
+  end
+
   def delete(conn, _) do
     conn
     |> Auth.browser_logout

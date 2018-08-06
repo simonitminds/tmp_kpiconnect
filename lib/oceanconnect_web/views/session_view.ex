@@ -1,6 +1,7 @@
 defmodule OceanconnectWeb.SessionView do
   use OceanconnectWeb, :view
   alias OceanconnectWeb.Plugs.Auth
+  alias Oceanconnect.Accounts
 
   def current_user_is_admin?(conn) do
     case Auth.current_user(conn) do
@@ -8,6 +9,24 @@ defmodule OceanconnectWeb.SessionView do
       user -> user.is_admin
     end
   end
+
+  def impersonable_users(conn) do
+    case current_user_is_admin?(conn) do
+      true ->
+        conn
+        |> Auth.current_user()
+        |> Accounts.impersonable_users_for()
+        |> Enum.map(&(%{id: &1.id,
+                       first_name: &1.first_name,
+                       last_name: &1.last_name,
+                       company_name: &1.company.name }))
+      false ->
+        []
+    end
+    |> Poison.encode!
+    |> Phoenix.HTML.raw
+  end
+
   def current_user(conn) do
     case Auth.current_user(conn) do
       nil -> ""

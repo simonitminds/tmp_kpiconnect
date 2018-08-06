@@ -244,4 +244,10 @@ defmodule Oceanconnect.Accounts do
     |> Repo.all()
     |> Repo.preload(:port)
   end
+
+  def impersonable_users_for(%User{is_admin: true}) do
+    User.impersonable_users
+    |> Repo.all
+  end
+  def impersonable_users_for(_user), do: []
 end

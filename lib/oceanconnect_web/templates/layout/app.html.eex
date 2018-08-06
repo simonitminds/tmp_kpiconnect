@@ -42,6 +42,7 @@
                 <button class="qa-admin-act-as-admin">Admin</button>
                 <button class="qa-admin-act-as-agent">Agent</button>
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
+                <script> window.impersonableUsers = <%= OceanconnectWeb.SessionView.impersonable_users(@conn) %></script>
               <% end %>
             </div>
 

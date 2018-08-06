@@ -49,6 +49,7 @@ defmodule OceanconnectWeb.Router do
     get("/sessions/new", SessionController, :new)
     get("/", SessionController, :new)
     post("/sessions", SessionController, :create)
+    put("/sessions/impersonate/:user_id", SessionController, :impersonate)
 
     # Routes requiring authentication
     pipe_through(:authenticated)

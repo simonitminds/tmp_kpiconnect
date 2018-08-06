@@ -1,9 +1,11 @@
 defmodule Oceanconnectweb.SessionControllerTest do
   use OceanconnectWeb.ConnCase
+  alias Oceanconnect.Accounts.User
 
   setup do
     {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "FOO@EXAMPLE.COM", password: "password"})
-    %{user: user, conn: build_conn()}
+    {:ok, admin} = Oceanconnect.Accounts.create_user(%{email: "ADMIN@EXAMPLE.COM", password: "password", is_admin: true})
+    %{user: user, admin: admin, conn: build_conn()}
   end
 
   test "confirm login page renders", %{conn: conn} do
@@ -53,6 +55,21 @@ defmodule Oceanconnectweb.SessionControllerTest do
     assert response.private.phoenix_flash["error"] == "Authentication Required"
   end
 
+  test "impersonating a user session as an admin", %{admin: admin, user: user, conn: conn} do
+    updated_conn = post(conn, "/sessions", %{"session": %{email: "ADMIN@EXAMPLE.COM", password: "password"}})
+    assert redirected_to(updated_conn, 302) =~ "/auctions"
+    response = put(conn, "/sessions/impersonate/#{user.id}", %{})
+    assert html_response(response, 200)
+    assert %User{id: user.id, impersonated_by: admin.id} == Auth.current_user(response)
+  end
+
+  test "impersonating another admin as an admin" do
+
+  end
+
+  test "impersonating a user session as a non-admin" do
+
+  end
   # test "already logged in", %{conn: conn} do
   #   response = post(conn, "/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
 

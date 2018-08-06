@@ -6,7 +6,7 @@ defmodule Oceanconnect.AdminPage do
     find_element(:css, ".qa-admin-act-as-agent")
     |> click
 
-    find_element(:css, ".qa-admin-impersonate-user_id option[value='#{user_id}']")
+    find_element(:css, ".qa-admin-impersonate-user option[value='#{user_id}']")
     |> click
 
     find_element(:css, ".qa-admin-impersonate-user-submit")

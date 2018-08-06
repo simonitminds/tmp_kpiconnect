@@ -5,9 +5,10 @@ const AdminBar = ({isAdmin, impersonableUsers, children}) => {
   <div className="">
     <select className="qa-admin-impersonate-user">
     {impersonableUsers.map((user) =>
-                           <option key={user.id} value={user.id}>{`${user.first_name} ${user.last_name}`}</option>
+                           <option key={user.id} value={user.id}>{`${user.first_name} ${user.last_name} (${user.company_name})`}</option>
                           )}
     </select>
+      <button className='qa-admin-impersonate-user-submit'> {'<-'} </button>
       {children}
   </div>
   );

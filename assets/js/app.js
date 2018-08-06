@@ -65,7 +65,7 @@ if (document.getElementById('auctions-app')) {
   };
 
   render((
-      <AdminBar isAdmin={window.isAdmin} impersonableUsers={[]}>
+      <AdminBar isAdmin={window.isAdmin} impersonableUsers={window.impersonableUsers}>
       <Provider store={store}>
           {setContainer()}
       </Provider>

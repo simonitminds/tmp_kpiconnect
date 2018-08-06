@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Accounts.User do
   use Ecto.Schema
-  import Ecto.Changeset
+  import Ecto.{Changeset, Query}
   alias Oceanconnect.Accounts.User
 
   @derive {Poison.Encoder, only: [:email, :company]}
@@ -12,6 +12,7 @@ defmodule Oceanconnect.Accounts.User do
     field :password_hash, :string
     field :password, :string, virtual: true
     field :is_admin, :boolean, default: false
+    field :impersonated_by, :integer, virtual: true
     belongs_to :company, Oceanconnect.Accounts.Company
 
     timestamps()
@@ -25,6 +26,12 @@ defmodule Oceanconnect.Accounts.User do
     |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)
     |> put_pass_hash()
+  end
+
+  def impersonable_users do
+    from u in User,
+    where: u.is_admin == false,
+    preload: [:company]
   end
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
