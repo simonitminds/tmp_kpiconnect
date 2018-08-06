@@ -65,10 +65,10 @@ if (document.getElementById('auctions-app')) {
   };
 
   render((
-      <AdminBar isAdmin={window.isAdmin} impersonableUsers={window.impersonableUsers} impersonateUser={impersonateUser}>
       <Provider store={store}>
+        <AdminBar isAdmin={window.isAdmin} impersonableUsers={window.impersonableUsers} impersonateUser={impersonateUser}>
           {setContainer()}
+        </AdminBar>
       </Provider>
-    </AdminBar>
   ), document.getElementById('auctions-app'));
 }
