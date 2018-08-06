@@ -4,9 +4,14 @@ defmodule OceanconnectWeb.Admin.FuelController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Fuel
 
-  def index(conn, _params) do
-    fuels = Auctions.list_fuels()
-    render(conn, "index.html", fuels: fuels)
+  def index(conn, params) do
+    page = Auctions.list_fuels(params)
+    render(conn, "index.html",
+			fuels: page.entries,
+		  page_number: page.page_number,
+		  page_size: page.page_size,
+		  total_pages: page.total_pages,
+		  total_entries: page.total_entries)
   end
 
   def new(conn, _params) do

@@ -25,7 +25,6 @@
 							<tr>
 								<td><%= port.name %></td>
 								<td><%= port.country %></td>
-
 								<td class="text-right">
 									<%= link "Show", to: admin_port_path(@conn, :show, port), class: "button is-small is-primary is-inline-block" %>
 									<%= link "Edit", to: admin_port_path(@conn, :edit, port), class: "button is-small is-primary is-inline-block" %>
@@ -35,6 +34,12 @@
 						<% end %>
 					</tbody>
 				</table>
+				<%= if @page_number > 1 do %>
+					<%= link "Previous Page", to: admin_port_path(@conn, :index, page: @page_number - 1) %>
+				<% end %>
+				<%= if @page_number < @total_pages do %>
+					<%= link "Next Page", to: admin_port_path(@conn, :index, page: @page_number + 1) %>
+				<% end %>
 			</section>
 		</div>
 	</div>

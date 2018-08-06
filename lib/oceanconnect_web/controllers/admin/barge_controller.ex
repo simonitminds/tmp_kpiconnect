@@ -4,9 +4,14 @@ defmodule OceanconnectWeb.Admin.BargeController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Barge
 
-  def index(conn, _params) do
-    barges = Auctions.list_barges()
-    render(conn, "index.html", barges: barges)
+  def index(conn, params) do
+    page = Auctions.list_barges(params)
+    render(conn, "index.html",
+			barges: page.entries,
+		  page_number: page.page_number,
+		  page_size: page.page_size,
+		  total_pages: page.total_pages,
+		  total_entries: page.total_entries)
   end
 
   def new(conn, _params) do

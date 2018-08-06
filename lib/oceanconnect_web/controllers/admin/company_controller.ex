@@ -4,9 +4,14 @@ defmodule OceanconnectWeb.Admin.CompanyController do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.Company
 
-  def index(conn, _params) do
-    companies = Accounts.list_companies()
-    render(conn, "index.html", companies: companies)
+  def index(conn, params) do
+    page = Accounts.list_companies(params)
+    render(conn, "index.html",
+			companies: page.entries,
+		  page_number: page.page_number,
+		  page_size: page.page_size,
+		  total_pages: page.total_pages,
+		  total_entries: page.total_entries)
   end
 
   def new(conn, _params) do

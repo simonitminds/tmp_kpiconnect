@@ -22,6 +22,11 @@ defmodule Oceanconnect.Accounts do
     Repo.all(User)
   end
 
+	def list_users(params) do
+		User
+		|> Repo.paginate(params)
+	end
+
   @doc """
   Gets a single user.
 
@@ -125,6 +130,11 @@ defmodule Oceanconnect.Accounts do
   def list_companies do
     Repo.all(Company)
   end
+
+	def list_companies(params) do
+		Company
+		|> Repo.paginate(params)
+	end
 
   @doc """
   Gets a single company.

@@ -20,7 +20,7 @@ defmodule Oceanconnect.Mixfile do
   def application do
     [
       mod: {Oceanconnect.Application, []},
-      extra_applications: [:comeonin, :logger, :runtime_tools]
+      extra_applications: [:comeonin, :scrivener_ecto, :logger, :runtime_tools]
     ]
   end
 
@@ -47,6 +47,7 @@ defmodule Oceanconnect.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:uuid, "~> 1.1"},
+			{:scrivener_ecto, "~> 1.0"}
     ]
   end
 

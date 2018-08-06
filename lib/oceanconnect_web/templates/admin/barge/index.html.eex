@@ -25,7 +25,6 @@
 							<tr>
 								<td><%= barge.name %></td>
 								<td><%= barge.imo_number %></td>
-
 								<td class="text-right">
 									<%= link "Show", to: admin_barge_path(@conn, :show, barge), class: "button is-small is-primary is-inline-block" %>
 									<%= link "Edit", to: admin_barge_path(@conn, :edit, barge), class: "button is-small is-primary is-inline-block" %>
@@ -35,6 +34,12 @@
 						<% end %>
 					</tbody>
 				</table>
+				<%= if @page_number > 1 do %>
+					<%= link "Previous Page", to: admin_barge_path(@conn, :index, page: @page_number - 1) %>
+				<% end %>
+				<%= if @page_number < @total_pages do %>
+					<%= link "Next Page", to: admin_barge_path(@conn, :index, page: @page_number + 1) %>
+				<% end %>
 			</section>
 		</div>
 	</div>

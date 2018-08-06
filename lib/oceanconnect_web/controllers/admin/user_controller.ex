@@ -4,9 +4,14 @@ defmodule OceanconnectWeb.Admin.UserController do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.User
 
-  def index(conn, _params) do
-    users = Accounts.list_users()
-    render(conn, "index.html", users: users)
+  def index(conn, params) do
+    page = Accounts.list_users(params)
+    render(conn, "index.html",
+			users: page.entries,
+		  page_number: page.page_number,
+		  page_size: page.page_size,
+		  total_pages: page.total_pages,
+		  total_entries: page.total_entries)
   end
 
   def new(conn, _params) do

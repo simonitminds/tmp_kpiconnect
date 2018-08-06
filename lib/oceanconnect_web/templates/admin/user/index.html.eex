@@ -8,34 +8,35 @@
 		<div class="content columns">
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
-				<div class="container is-fullhd">
-					<div class="content has-gray-lighter">
-						<h2>Users</h2>
-						<span><%= link "New User", to: admin_user_path(@conn, :new) %></span>
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Name</th>
+				<h2 class="admin-panel__content__header"><span class="is-inline-block">Users</span>
+				<%= link "Add User", to: admin_barge_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Name</th>
 
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<%= for user <- @users do %>
-									<tr>
-										<td><%= user.first_name %> <%= user.last_name %></td>
-
-										<td class="text-right">
-											<span><%= link "Show", to: admin_user_path(@conn, :show, user), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Edit", to: admin_user_path(@conn, :edit, user), class: "btn btn-default btn-xs" %></span>
-											<span><%= link "Delete", to: admin_user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
-										</td>
-									</tr>
-								<% end %>
-							</tbody>
-						</table>
-					</div>
-				</div>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for user <- @users do %>
+							<tr>
+								<td><%= user.first_name %> <%= user.last_name %></td>
+								<td class="text-right">
+									<%= link "Show", to: admin_user_path(@conn, :show, user), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Edit", to: admin_user_path(@conn, :edit, user), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Delete", to: admin_user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+				<%= if @page_number > 1 do %>
+					<%= link "Previous Page", to: admin_user_path(@conn, :index, page: @page_number - 1) %>
+				<% end %>
+				<%= if @page_number < @total_pages do %>
+					<%= link "Next Page", to: admin_user_path(@conn, :index, page: @page_number + 1) %>
+				<% end %>
 			</section>
 		</div>
 	</div>

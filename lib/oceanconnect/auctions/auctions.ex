@@ -293,6 +293,11 @@ defmodule Oceanconnect.Auctions do
     Repo.all(Port)
   end
 
+	def list_ports(params) do
+		Port
+		|> Repo.paginate(params)
+	end
+
   @doc """
   Gets a single port.
 
@@ -417,6 +422,11 @@ defmodule Oceanconnect.Auctions do
     Repo.all(Vessel)
   end
 
+	def list_vessels(params) do
+		Vessel
+		|> Repo.paginate(params)
+	end
+
   @doc """
   Gets a single vessel.
 
@@ -511,6 +521,11 @@ defmodule Oceanconnect.Auctions do
     Repo.all(Fuel)
   end
 
+	def list_fuels(params) do
+		Fuel
+		|> Repo.paginate(params)
+	end
+
   @doc """
   Gets a single fuel.
 
@@ -592,9 +607,12 @@ defmodule Oceanconnect.Auctions do
     Fuel.changeset(fuel, %{})
   end
 
-  def list_barges do
-    Repo.all(Barge)
-  end
+  def list_barges, do: Repo.all(Barge)
+
+	def list_barges(params) do
+		Barge
+		|> Oceanconnect.Repo.paginate(params)
+	end
 
   def get_barge(id) do
     Repo.get(Barge, id)
