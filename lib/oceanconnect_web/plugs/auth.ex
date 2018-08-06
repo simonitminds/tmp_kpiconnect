@@ -47,11 +47,21 @@ defmodule OceanconnectWeb.Plugs.Auth do
     conn
   end
 
-  def impersonate_user(conn, current_user, user_id) do
+  def impersonate_user(conn, current_user = %User{}, user_id) do
     user_with_company = Accounts.get_user!(user_id)
     |> Accounts.load_company_on_user()
-    impersonated_user = %User{ user_with_company | impersonated_by: current_user.id}
+    sign_in_impersonator(conn, current_user, user_with_company)
+  end
+
+  def sign_in_impersonator(conn, %User{is_admin: true}, %User{is_admin: true}) do
+    {:error, {conn, "Could Not Impersonate User"}}
+  end
+  def sign_in_impersonator(conn, impersonator = %User{is_admin: true}, user = %User{}) do
+    impersonated_user = %User{ user | impersonated_by: impersonator.id}
     authed_conn = Oceanconnect.Guardian.Plug.sign_in(conn, impersonated_user)
     {:ok, {authed_conn, impersonated_user}}
+  end
+  def sign_in_impersonator(conn, _current_user, _user_id) do
+    {:error, {conn, "Could Not Impersonate User"}}
   end
 end

@@ -8,8 +8,8 @@ defmodule OceanconnectWeb.Api.SessionController do
     case Auth.impersonate_user(conn, admin_user, user_id) do
       {:ok, {updated_conn, %User{} = user}} ->
         render(updated_conn, "impersonate.json", data: {user, admin_user})
-      {:error, _reason} ->
-        conn
+      {:error, {error_conn, reason}} ->
+        error_conn
         |> put_status(422)
         |> render(OceanconnectWeb.ErrorView, "422.json", data: %{})
     end
