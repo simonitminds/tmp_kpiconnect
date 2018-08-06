@@ -26,7 +26,6 @@
 							<tr>
 								<td><%= fuel.name %></td>
 								<td class="text-right">
-									<%= link "Show", to: admin_fuel_path(@conn, :show, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
 									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
 									<%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block has-margin-bottom-xs" %>
 								</td>
