@@ -28,19 +28,19 @@
 								<td><%= company.contact_name %></td>
 								<td><%= company.email %></td>
 								<td class="text-right">
-									<%= link "Show", to: admin_barge_path(@conn, :show, barge), class: "button is-small is-primary is-inline-block" %>
-									<%= link "Edit", to: admin_barge_path(@conn, :edit, barge), class: "button is-small is-primary is-inline-block" %>
-									<%= link "Delete", to: admin_barge_path(@conn, :delete, barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+									<%= link "Show", to: admin_company_path(@conn, :show, company), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Edit", to: admin_company_path(@conn, :edit, company), class: "button is-small is-primary is-inline-block" %>
+									<%= link "Delete", to: admin_company_path(@conn, :delete, company), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
 								</td>
 							</tr>
 						<% end %>
 					</tbody>
 				</table>
 				<%= if @page_number > 1 do %>
-					<%= link "Previous Page", to: admin_barge_path(@conn, :index, page: @page_number - 1) %>
+					<%= link "Previous Page", to: admin_company_path(@conn, :index, page: @page_number - 1) %>
 				<% end %>
 				<%= if @page_number < @total_pages do %>
-					<%= link "Next Page", to: admin_barge_path(@conn, :index, page: @page_number + 1) %>
+					<%= link "Next Page", to: admin_company_path(@conn, :index, page: @page_number + 1) %>
 				<% end %>
 			</section>
 		</div>
