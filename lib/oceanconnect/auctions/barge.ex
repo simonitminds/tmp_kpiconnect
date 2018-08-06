@@ -38,4 +38,9 @@ defmodule Oceanconnect.Auctions.Barge do
       distinct: b.id,
       join: cb in "company_barges", where: cb.barge_id == b.id and cb.company_id == ^company_id
   end
+
+	def alphabetical do
+		from b in Barge,
+		  order_by: [asc: b.name]
+	end
 end

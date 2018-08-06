@@ -31,4 +31,9 @@ defmodule Oceanconnect.Auctions.Vessel do
     from v in Vessel,
       where: v.company_id == ^company_id
   end
+
+	def alphabetical do
+		from v in Vessel,
+		  order_by: [asc: v.name]
+	end
 end

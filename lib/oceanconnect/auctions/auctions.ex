@@ -423,7 +423,7 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_vessels(params) do
-		Vessel
+		query = Vessel.alphabetical
 		|> Repo.paginate(params)
 	end
 
@@ -610,7 +610,7 @@ defmodule Oceanconnect.Auctions do
   def list_barges, do: Repo.all(Barge)
 
 	def list_barges(params) do
-		Barge
+		query = Barge.alphabetical
 		|> Oceanconnect.Repo.paginate(params)
 	end
 
