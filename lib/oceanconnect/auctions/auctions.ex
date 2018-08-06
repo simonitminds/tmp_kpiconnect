@@ -622,6 +622,26 @@ defmodule Oceanconnect.Auctions do
     Repo.get!(Barge, id)
   end
 
+	def create_barge(attrs \\ %{}) do
+		%Barge{}
+		|> Barge.changeset(attrs)
+		|> Repo.insert()
+	end
+
+	def update_barge(%Barge{} = barge, attrs) do
+		barge
+		|> Barge.changeset(attrs)
+		|> Repo.update
+	end
+
+	def delete_barge(%Barge{} = barge) do
+		Repo.delete(barge)
+	end
+
+	def change_barge(%Barge{} = barge) do
+		Barge.changeset(barge, %{})
+	end
+
   def list_auction_barges(%Auction{id: auction_id}) do
     auction_id
     |> AuctionBarge.by_auction()

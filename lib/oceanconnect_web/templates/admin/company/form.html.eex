@@ -1,0 +1,85 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert is-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <div class="field" >
+    <%= label f, :name, class: "label" %>
+		<div class="control">
+			<%= text_input f, :name, class: "input" %>
+			<%= error_tag f, :name %>
+		</div>
+  </div>
+
+  <div class="field is-grouped" >
+    <%= label f, :address1, class: "label" %>
+		<div class="control">
+			<%= text_input f, :address1, class: "input" %>
+			<%= error_tag f, :address1 %>
+		</div>
+
+    <%= label f, :address2, class: "label" %>
+		<div class="control">
+			<%= text_input f, :address2, class: "input" %>
+			<%= error_tag f, :address2 %>
+		</div>
+  </div>
+
+  <div class="field is-grouped" >
+    <%= label f, :city, class: "label" %>
+		<div class="control">
+			<%= text_input f, :city, class: "input" %>
+			<%= error_tag f, :city %>
+		</div>
+
+    <%= label f, :country, class: "label" %>
+		<div class="control">
+			<%= text_input f, :country, class: "input" %>
+			<%= error_tag f, :country %>
+		</div>
+
+		<%= label f, :postal_code, class: "label" %>
+		<div class="control">
+			<%= text_input f, :postal_code, class: "input" %>
+			<%= error_tag f, :postal_code %>
+		</div>
+  </div>
+
+  <div class="field" >
+    <%= label f, :contact_name, class: "label" %>
+		<div class="control">
+			<%= text_input f, :contact_name, class: "input" %>
+			<%= error_tag f, :contact_name %>
+		</div>
+  </div>
+
+  <div class="field is-grouped" >
+    <%= label f, :main_phone, class: "label" %>
+		<div class="control">
+			<%= text_input f, :main_phone, class: "input" %>
+			<%= error_tag f, :main_phone %>
+		</div>
+
+    <%= label f, :mobile_phone, class: "label" %>
+		<div class="control">
+			<%= text_input f, :mobile_phone, class: "input" %>
+			<%= error_tag f, :mobile_phone %>
+		</div>
+  </div>
+
+	<div class="field">
+		<%= label f, :is_supplier, class="checkbox" %>
+    <div class="control">
+			<%= checkbox f, :is_supplier, class: "checkbox" %>
+			<%= error_tag f, :is_supplier %>
+		</div>
+	</div>
+
+	<div class="field">
+		<div class="control">
+			<%= submit "Submit", class: "button is-primary" %>
+		</div>
+	</div>
+<% end %>

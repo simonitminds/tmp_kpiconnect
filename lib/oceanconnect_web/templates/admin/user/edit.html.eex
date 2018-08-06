@@ -1,0 +1,17 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block"><%= @user.name %></span></h2>
+				<%= render "form.html", Map.put(assigns, :action, admin_user_path(@conn, :update, @user)) %>
+				<span><%= link "Back", to: admin_user_path(@conn, :index) %></span>
+			</section>
+		</div>
+	</div>
+</div>
