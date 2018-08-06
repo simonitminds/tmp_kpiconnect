@@ -1,15 +1,15 @@
 <div class="auction-app">
-	<div class="auction-app__header container is-fullhd">
+	<div class="admin-panel__header container">
 		<div class="content is-clearfix">
-			<h1 class="auction-list__title title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
 		</div>
 	</div>
-	<div class="container is-fullhd">
+	<div class="admin-panel__body container">
 		<div class="content columns">
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
-				<h2 class="admin-panel__content__header"><span class="is-inline-block">Fuel Grades</span>
-				<%= link "Add Fuel", to: admin_fuel_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fuel Grades</span>
+					<%= link "Add Fuel", to: admin_fuel_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
 				</h2>
 				<table class="admin-panel__table">
 					<thead>
@@ -24,9 +24,9 @@
 							<tr>
 								<td><%= fuel.name %></td>
 								<td class="text-right">
-									<%= link "Show", to: admin_fuel_path(@conn, :show, fuel), class: "button is-small is-primary is-inline-block" %>
-									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block" %>
-									<%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+									<%= link "Show", to: admin_fuel_path(@conn, :show, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
+									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
+									<%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block has-margin-bottom-xs" %>
 								</td>
 							</tr>
 						<% end %>
