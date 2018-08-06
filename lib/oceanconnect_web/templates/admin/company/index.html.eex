@@ -9,7 +9,8 @@
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
 				<h2 class="admin-panel__content__header"><span class="is-inline-block">Companies</span>
-				<%= link "Add Company", to: admin_company_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+					<%= link "Add Company", to: admin_company_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" %>
+				</h2>
 				<table class="admin-panel__table">
 					<thead>
 						<tr>
