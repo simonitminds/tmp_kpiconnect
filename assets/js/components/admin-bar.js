@@ -1,8 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { render } from 'react-dom';
 
 
-export default class AdminBar extends React.Component {
+class AdminBar extends React.Component {
   constructor(props) {
     super(props);
 
@@ -20,7 +21,6 @@ export default class AdminBar extends React.Component {
   onImpersonateUser(evt) {
     evt.preventDefault();
     this.props.dispatch(this.props.impersonateUser(this.state.selectedUser));
-    return(value);
   }
 
   render() {
@@ -35,11 +35,11 @@ export default class AdminBar extends React.Component {
             <option key={user.id} value={user.id}>{`${user.first_name} ${user.last_name} (${user.company_name})`}</option>
           )}
         </select>
-        <button className='qa-admin-impersonate-user-submit' onClick={this.onImpersonateUser} disabled={!this.state.selectedUser}> {'<-'} </button>
+        <button className='qa-admin-impersonate-user-submit' onClick={this.onImpersonateUser} disabled={!this.state.selectedUser}> {'-->'} </button>
         {children}
       </div>
     );
   }
 };
 
-// ({isAdmin, impersonableUsers, children, impersonateUser}) => {
+export default connect()(AdminBar);

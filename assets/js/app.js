@@ -20,7 +20,7 @@ import 'phoenix_html';
 import React from 'react';
 import { render } from 'react-dom';
 import { createStore, applyMiddleware, compose } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
 import { getAllAuctionPayloads, receiveAuctionFormData, impersonateUser } from './actions';

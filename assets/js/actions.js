@@ -58,7 +58,10 @@ export function subscribeToAuctionUpdates() {
 }
 export function impersonateUser(user_id) {
   return dispatch => {
-    fetch(`/api/impersonate_user/${user_id}`, {headers: defaultHeaders })
+    fetch(`/api/sessions/impersonate/${user_id}`, {
+        headers: defaultHeaders,
+        method: 'PUT'
+      })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
