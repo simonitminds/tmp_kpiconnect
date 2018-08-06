@@ -1,9 +1,11 @@
 defmodule OceanconnectWeb.Plugs.Auth do
   use OceanconnectWeb, :controller
   import Plug.Conn
+  alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.{User}
 
   def build_session(conn, user) do
-    user_with_company = Oceanconnect.Accounts.load_company_on_user(user)
+    user_with_company = Accounts.load_company_on_user(user)
     Oceanconnect.Guardian.Plug.sign_in(conn, user_with_company)
   end
 
@@ -43,5 +45,13 @@ defmodule OceanconnectWeb.Plugs.Auth do
     token = Oceanconnect.Guardian.Plug.current_token(conn)
     {:ok, _old_claims} = Oceanconnect.Guardian.revoke(token)
     conn
+  end
+
+  def impersonate_user(conn, current_user, user_id) do
+    user_with_company = Accounts.get_user!(user_id)
+    |> Accounts.load_company_on_user()
+    impersonated_user = %User{ user_with_company | impersonated_by: current_user.id}
+    authed_conn = Oceanconnect.Guardian.Plug.sign_in(conn, impersonated_user)
+    {:ok, {authed_conn, impersonated_user}}
   end
 end
