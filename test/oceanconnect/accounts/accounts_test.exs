@@ -15,13 +15,27 @@ defmodule Oceanconnect.AccountsTest do
       {:ok, %{user: Accounts.get_user!(user.id)}}
     end
 
+
     test "list_users/0 returns all users", %{user: user} do
       assert Accounts.list_users() == [user]
     end
 
+		test "list_users/1 returns a paginated list of users" do
+			
+		end
+
+		test "list_active_users/0 returns all users marked as active", %{user: user} do
+
+		end
+
+
     test "get_user!/1 returns the user with given id", %{user: user} do
       assert Accounts.get_user!(user.id) == user
     end
+
+		test "get_active_user!/1 returns the an active user with the given id", %{user: user} do
+			
+		end
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
@@ -54,6 +68,10 @@ defmodule Oceanconnect.AccountsTest do
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
     end
 
+		test "deactivate_user/1 marks the user as inactive", %{user: user} do
+			
+		end
+
     test "change_user/1 returns a user changeset", %{user: user} do
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
@@ -68,17 +86,35 @@ defmodule Oceanconnect.AccountsTest do
 
 
     setup do
-      company = insert(:company)
+      company = insert(:company, is_active: true)
+			inactive_company = insert(:company, is_active: false)
       {:ok, %{company: Accounts.get_company!(company.id)}}
     end
 
-    test "list_companies/0 returns all companies", %{company: company} do
+    test "list_companies/0 returns all companies", %{company: company, inactive_company: inactive_company} do
       assert Accounts.list_companies() == [company]
     end
 
-    test "get_company!/1 returns the company with given id", %{company: company} do
+		test "list_companies/1 returns a paginated list all companies", %{company: company, inactive_company: inactive_company} do
+			page = Accounts.list_companies(%{})
+			assert page.entries == [company, inactive_company]
+			assert page.page_size == 10
+		end
+
+		test "list_active_companies/0 returns all companies marked as active", %{company: company, inactive_company: inactive_company} do
+			assert Accounts.list_active_companies() == [company]
+			refute Accounts.list_active_companies() == [company, inactive_company]
+		end
+
+    test "get_company!/1 returns the company with given id", %{company: company, inactive_company: inactive_company} do
       assert Accounts.get_company!(company.id) == company
+      assert Accounts.get_company!(inactive_company.id) == inactive_company
     end
+
+		test "get_active_company!/1 returns an active company with given id", %{company: company, inactive_company: inactive_company} do
+			assert Accounts.get_company!(company.id) == company
+			refute Accounts.get_company!(inactive_company.id) == inactive_company
+		end
 
     test "create_company/1 with valid data creates a company" do
       assert {:ok, %Company{} = company} = Accounts.create_company(@valid_attrs)
@@ -104,6 +140,11 @@ defmodule Oceanconnect.AccountsTest do
       assert {:ok, %Company{}} = Accounts.delete_company(company)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_company!(company.id) end
     end
+
+		test "deactivate_company/1 marks the company as inactive", %{company: company} do
+			assert {:ok, %Company{}} = Accounts.deactivate_company(company)
+			assert company.is_active == false
+		end
 
     test "change_company/1 returns a company changeset", %{company: company} do
       assert %Ecto.Changeset{} = Accounts.change_company(company)

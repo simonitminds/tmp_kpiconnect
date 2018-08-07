@@ -605,6 +605,11 @@ defmodule Oceanconnect.AuctionsTest do
 			assert Enum.map(Auctions.list_barges(), fn(b) -> b.id end) == [barge.id]
 		end
 
+		test "list_barges/1 returns a paginated list of all barges", %{barge: barge, inactive_barge: inactive_barge} do
+			page = Auctions.list_barges(%{})
+			assert page.entries == [barge, inactive_barge]
+		end
+
 		test "get_barge!/1 returns the barge with given id", %{barge: barge} do
 			assert Auctions.get_barge!(barge.id) == barge
 		end
