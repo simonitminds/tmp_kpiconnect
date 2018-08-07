@@ -24,15 +24,10 @@ defmodule OceanconnectWeb.Admin.BargeController do
       {:ok, barge} ->
         conn
         |> put_flash(:info, "Barge created successfully.")
-        |> redirect(to: admin_barge_path(conn, :show, barge))
+        |> redirect(to: admin_barge_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
-  end
-
-  def show(conn, %{"id" => id}) do
-    barge = Auctions.get_barge!(id)
-    render(conn, "show.html", barge: barge)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -48,7 +43,7 @@ defmodule OceanconnectWeb.Admin.BargeController do
       {:ok, barge} ->
         conn
         |> put_flash(:info, "Barge updated successfully.")
-        |> redirect(to: admin_barge_path(conn, :show, barge))
+        |> redirect(to: admin_barge_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", barge: barge, changeset: changeset)
     end

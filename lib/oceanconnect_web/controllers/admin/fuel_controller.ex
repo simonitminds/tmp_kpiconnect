@@ -24,7 +24,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
       {:ok, fuel} ->
         conn
         |> put_flash(:info, "Fuel created successfully.")
-        |> redirect(to: fuel_path(conn, :show, fuel))
+        |> redirect(to: admin_fuel_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -48,7 +48,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
       {:ok, fuel} ->
         conn
         |> put_flash(:info, "Fuel updated successfully.")
-        |> redirect(to: fuel_path(conn, :show, fuel))
+        |> redirect(to: admin_fuel_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", fuel: fuel, changeset: changeset)
     end
@@ -60,6 +60,6 @@ defmodule OceanconnectWeb.Admin.FuelController do
 
     conn
     |> put_flash(:info, "Fuel deleted successfully.")
-    |> redirect(to: fuel_path(conn, :index))
+    |> redirect(to: admin_fuel_path(conn, :index))
   end
 end

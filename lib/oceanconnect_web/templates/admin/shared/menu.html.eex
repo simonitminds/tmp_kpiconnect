@@ -17,8 +17,6 @@
 		<ul class="menu-list">
 			<li><%= link "Users", to: admin_user_path(@conn, :index) %></li>
 			<li><%= link "Companies", to: admin_company_path(@conn, :index) %></li>
-			<li><a>New Registrations</a></li>
-			<li><a>User Permissions</a></li>
 		</ul>
 	</div>
 </aside>

@@ -24,15 +24,10 @@ defmodule OceanconnectWeb.Admin.VesselController do
       {:ok, vessel} ->
         conn
         |> put_flash(:info, "Vessel created successfully.")
-        |> redirect(to: admin_vessel_path(conn, :show, vessel))
+        |> redirect(to: admin_vessel_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
-  end
-
-  def show(conn, %{"id" => id}) do
-    vessel = Auctions.get_vessel!(id)
-    render(conn, "show.html", vessel: vessel)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -48,7 +43,7 @@ defmodule OceanconnectWeb.Admin.VesselController do
       {:ok, vessel} ->
         conn
         |> put_flash(:info, "Vessel updated successfully.")
-        |> redirect(to: admin_vessel_path(conn, :show, vessel))
+        |> redirect(to: admin_vessel_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", vessel: vessel, changeset: changeset)
     end

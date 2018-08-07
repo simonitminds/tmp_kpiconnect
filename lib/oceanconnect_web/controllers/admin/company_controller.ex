@@ -24,15 +24,10 @@ defmodule OceanconnectWeb.Admin.CompanyController do
       {:ok, company} ->
         conn
         |> put_flash(:info, "Company created successfully.")
-        |> redirect(to: admin_company_path(conn, :show, company))
+        |> redirect(to: admin_company_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
-  end
-
-  def show(conn, %{"id" => id}) do
-    company = Accounts.get_company!(id)
-    render(conn, "show.html", company: company)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -48,7 +43,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
       {:ok, company} ->
         conn
         |> put_flash(:info, "Company updated successfully.")
-        |> redirect(to: admin_company_path(conn, :show, company))
+        |> redirect(to: admin_company_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", company: company, changeset: changeset)
     end

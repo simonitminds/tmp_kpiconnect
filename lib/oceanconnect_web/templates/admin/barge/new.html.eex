@@ -8,9 +8,12 @@
 		<div class="content columns">
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
-				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block"><%= OceanconnectWeb.Admin.UserView.full_name(@user) %></span></h2>
-				<%= render "form.html", Map.put(assigns, :action, admin_user_path(@conn, :update, @user)) %>
-				<span><%= link "Back", to: admin_user_path(@conn, :index) %></span>
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block"><span class="is-inline-block has-margin-right-sm has-text-gray-3">New Barge</span></span>
+					<%= link to: admin_barge_path(@conn, :index), class: "button has-margin-left-auto" do %>
+						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+					<%end%>
+				</h2>
+				<%= render "form.html", Map.put(assigns, :action, admin_barge_path(@conn, :create)) %>
 			</section>
 		</div>
 	</div>

@@ -24,7 +24,7 @@ defmodule OceanconnectWeb.Admin.UserController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User created successfully.")
-        |> redirect(to: admin_user_path(conn, :show, user))
+        |> redirect(to: admin_user_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -48,7 +48,7 @@ defmodule OceanconnectWeb.Admin.UserController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
-        |> redirect(to: admin_user_path(conn, :show, user))
+        |> redirect(to: admin_user_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", user: user, changeset: changeset)
     end
