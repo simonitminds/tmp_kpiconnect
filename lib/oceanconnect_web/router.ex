@@ -17,6 +17,10 @@ defmodule OceanconnectWeb.Router do
     plug(Oceanconnect.Guardian.AuthPipeline)
   end
 
+	pipeline :admin_required do
+		plug(OceanconnectWeb.Plugs.CheckAdmin)
+	end
+
   # Other scopes may use custom stacks.
   scope "/api", OceanconnectWeb.Api do
     pipe_through(:api)
@@ -66,6 +70,8 @@ defmodule OceanconnectWeb.Router do
 
   scope "/admin", OceanconnectWeb.Admin do
     pipe_through(:browser)
+		pipe_through(:authenticated)
+		pipe_through(:admin_required)
 
     resources("/vessels", VesselController, as: :admin_vessel)
     resources("/users", UserController, as: :admin_user)
