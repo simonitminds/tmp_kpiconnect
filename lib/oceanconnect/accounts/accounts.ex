@@ -27,6 +27,11 @@ defmodule Oceanconnect.Accounts do
 		|> Repo.paginate(params)
 	end
 
+	def list_active_users do
+		query = User.select_active
+		|> Repo.all
+	end
+
   @doc """
   Gets a single user.
 
@@ -42,6 +47,11 @@ defmodule Oceanconnect.Accounts do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+
+	def get_active_user!(id) do
+		User.select_active
+		|> Repo.get!(id)
+	end
 
   @doc """
   Creates a user.
@@ -95,6 +105,18 @@ defmodule Oceanconnect.Accounts do
     Repo.delete(user)
   end
 
+	def activate_user(user = %User{is_active: false}) do
+		user
+		|> User.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_user(user = %User{is_active: true}) do
+		user
+		|> User.changeset(%{is_active: false})
+		|> Repo.update
+	end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
@@ -136,6 +158,11 @@ defmodule Oceanconnect.Accounts do
 		|> Repo.paginate(params)
 	end
 
+	def list_active_companies do
+		query = Company.select_active
+		|> Repo.all
+	end
+
   @doc """
   Gets a single company.
 
@@ -151,6 +178,11 @@ defmodule Oceanconnect.Accounts do
 
   """
   def get_company!(id), do: Repo.get!(Company, id)
+
+	def get_active_company!(id) do
+		Company.select_active
+		|> Repo.get!(id)
+	end
 
   @doc """
   Creates a company.
@@ -204,6 +236,18 @@ defmodule Oceanconnect.Accounts do
     Repo.delete(company)
   end
 
+	def activate_company(company = %Company{is_active: false}) do
+		company
+		|> Company.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_company(company = %Company{is_active: true}) do
+		company
+		|> Company.changeset(%{is_active: false})
+		|> Repo.update
+	end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking company changes.
 
@@ -249,6 +293,8 @@ defmodule Oceanconnect.Accounts do
   id. If no barges are associated with the company, an empty list is returned.
   """
   def list_company_barges(company_id) do
+		query = Company.select_active
+
     query = company_id
     |> Barge.by_company()
     |> Repo.all()
@@ -256,7 +302,9 @@ defmodule Oceanconnect.Accounts do
   end
 
   def impersonable_users_for(%User{is_admin: true}) do
-    User.impersonable_users
+		query = User.select_active
+
+    query = User.impersonable_users
     |> Repo.all
 		|> Repo.preload(:company)
   end

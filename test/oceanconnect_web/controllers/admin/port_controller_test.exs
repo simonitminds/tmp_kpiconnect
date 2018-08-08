@@ -82,9 +82,21 @@ defmodule OceanconnectWeb.Admin.PortControllerTest do
     test "deletes chosen port", %{conn: conn, port: port} do
       conn = delete conn, admin_port_path(conn, :delete, port)
       assert redirected_to(conn) == admin_port_path(conn, :index)
-      assert port.is_active == false
+			assert_error_sent 404, fn ->
+				get conn, admin_port_path(conn, :edit, port)
+			end
 		end
   end
+
+	describe "deactivate port" do
+		setup [:create_port]
+
+		test "deactivates chosen port", %{conn: conn, port: port} do
+			conn = post conn, admin_port_path(conn, :deactivate, port)
+			assert redirected_to(conn) == admin_port_path(conn, :index)
+			assert port.is_active == false
+		end
+	end
 
   defp create_port(_) do
     port = fixture(:port)

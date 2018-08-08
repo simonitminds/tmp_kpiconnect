@@ -212,22 +212,39 @@ defmodule Oceanconnect.AuctionsTest do
   describe "ports" do
     alias Oceanconnect.Auctions.Port
 
-    @valid_attrs %{name: "some port", country: "Merica"}
+    @valid_attrs %{name: "some port", country: "Merica", is_active: true}
+    @valid_attrs_inactive %{name: "some other port", country: "Merica", is_active: false}
     @update_attrs %{name: "some updated port", country: "Merica"}
     @invalid_attrs %{name: nil, country: "Merica"}
 
     setup do
       port = insert(:port, @valid_attrs)
-      {:ok, %{port: Auctions.get_port!(port.id)}}
+			inactive_port = insert(:port, @valid_attrs_inactive)
+      {:ok, %{port: Auctions.get_port!(port.id), inactive_port: Auctions.get_port!(inactive_port.id)}}
     end
 
-    test "list_ports/0 returns all ports", %{port: port} do
-      assert Auctions.list_ports() == [port]
+    test "list_ports/0 returns all ports", %{port: port, inactive_port: inactive_port} do
+      assert Enum.map(Auctions.list_ports(), fn(f) -> f.id end) == [port.id, inactive_port.id]
     end
+
+		test "list_ports/1 returns a paginated list of all ports", %{port: port, inactive_port: inactive_port} do
+			page = Auctions.list_ports(%{})
+			assert page.entries == [port, inactive_port]
+		end
+
+		test "list_active_ports/0 returns all ports marked as active", %{port: port, inactive_port: inactive_port} do
+			assert Enum.map(Auctions.list_active_ports(), fn(f) -> f.id end) == [port.id]
+			refute Enum.map(Auctions.list_active_ports(), fn(f) -> f.id end) == [port.id, inactive_port.id]
+		end
 
     test "get_port!/1 returns the port with given id", %{port: port} do
       assert Auctions.get_port!(port.id) == port
     end
+
+		test "get_active_port!/1 returns the active port with given id", %{port: port, inactive_port: inactive_port} do
+			assert Auctions.get_active_port!(port.id) == port
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_port!(inactive_port.id) end
+		end
 
     test "create_port/1 with valid data creates a port" do
       assert {:ok, %Port{} = port} = Auctions.create_port(@valid_attrs)
@@ -253,6 +270,14 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:ok, %Port{}} = Auctions.delete_port(port)
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_port!(port.id) end
     end
+
+		test "activate_port/1 marks the port as active", %{inactive_port: inactive_port} do
+			assert {:ok, %Port{is_active: true}} = Auctions.activate_port(inactive_port)
+		end
+
+		test "deactivate_port/1 marks the port as inactive", %{port: port} do
+			assert {:ok, %Port{is_active: false}} = Auctions.deactivate_port(port)
+		end
 
     test "change_port/1 returns a port changeset", %{port: port} do
       assert %Ecto.Changeset{} = Auctions.change_port(port)
@@ -295,15 +320,17 @@ defmodule Oceanconnect.AuctionsTest do
   describe "vessels" do
     alias Oceanconnect.Auctions.Vessel
 
-    @valid_attrs %{imo: 42, name: "some name"}
+    @valid_attrs %{imo: 42, name: "some name", is_active: true}
+		@valid_attrs_ianctive %{imo: 41, name: "some other name", is_active: false}
     @update_attrs %{imo: 43, name: "some updated name"}
     @invalid_attrs %{imo: nil, name: nil}
 
     setup do
       company = insert(:company)
       vessel = insert(:vessel, Map.merge(@valid_attrs, %{company: company}))
+			inactive_vessel = insert(:vessel, Map.merge(@valid_attrs_ianctive, %{company: company}))
       user = insert(:user, company: company)
-      {:ok, %{company: company, user: user, vessel: Auctions.get_vessel!(vessel.id)}}
+      {:ok, %{company: company, user: user, vessel: Auctions.get_vessel!(vessel.id), inactive_vessel: Auctions.get_vessel!(inactive_vessel.id)}}
     end
 
     test "vessels_for_buyer/1", %{user: user, vessel: vessel} do
@@ -314,13 +341,32 @@ defmodule Oceanconnect.AuctionsTest do
       refute extra_vessel in result
     end
 
-    test "list_vessels/0 returns all vessels", %{vessel: vessel} do
-      assert Auctions.list_vessels() |> Repo.preload(:company) == [vessel]
+    test "list_vessels/0 returns all vessels", %{vessel: vessel, inactive_vessel: inactive_vessel} do
+      assert Enum.map(Auctions.list_vessels(), fn(f) -> f.id end) == [vessel.id, inactive_vessel.id]
     end
+
+		test "list_vessels/1 returns a paginated list of all vessels", %{vessel: vessel, inactive_vessel: inactive_vessel} do
+			page = Auctions.list_vessels(%{})
+
+			vessels = page.entries
+			|> Repo.preload(:company)
+
+			assert vessels == [vessel, inactive_vessel]
+		end
+
+		test "list_active_vessels/0 returns all vessels marked as active", %{vessel: vessel, inactive_vessel: inactive_vessel} do
+			assert Enum.map(Auctions.list_active_vessels(), fn(f) -> f.id end) == [vessel.id]
+			refute Enum.map(Auctions.list_active_vessels(), fn(f) -> f.id end) == [vessel.id, inactive_vessel.id]
+		end
 
     test "get_vessel!/1 returns the vessel with given id", %{vessel: vessel} do
       assert Auctions.get_vessel!(vessel.id) == vessel
     end
+
+		test "get_active_vessel!/1 returns the active vessel with given id", %{vessel: vessel, inactive_vessel: inactive_vessel} do
+			assert Auctions.get_active_vessel!(vessel.id) |> Repo.preload(:company) == vessel
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_vessel!(inactive_vessel.id) end
+		end
 
     test "create_vessel/1 with valid data creates a vessel", %{company: company} do
       attrs = Map.merge(@valid_attrs, %{company_id: company.id})
@@ -348,6 +394,14 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_vessel!(vessel.id) end
     end
 
+		test "activate_vessel/1 marks the vessel as active", %{inactive_vessel: inactive_vessel} do
+			assert {:ok, %Vessel{is_active: true}} = Auctions.activate_vessel(inactive_vessel)
+		end
+
+		test "deactivate_vessel/1 marks the vessel as inactive", %{vessel: vessel} do
+			assert {:ok, %Vessel{is_active: false}} = Auctions.deactivate_vessel(vessel)
+		end
+
     test "change_vessel/1 returns a vessel changeset", %{vessel: vessel} do
       assert %Ecto.Changeset{} = Auctions.change_vessel(vessel)
     end
@@ -356,22 +410,39 @@ defmodule Oceanconnect.AuctionsTest do
   describe "fuels" do
     alias Oceanconnect.Auctions.Fuel
 
-    @valid_attrs %{name: "some name"}
+    @valid_attrs %{name: "some name", is_active: true}
+		@valid_attrs_inactive %{name: "some other name", is_active: false}
     @update_attrs %{name: "some updated name"}
     @invalid_attrs %{name: nil}
 
     setup do
       fuel = insert(:fuel, @valid_attrs)
-      {:ok, %{fuel: Auctions.get_fuel!(fuel.id)}}
+			inactive_fuel = insert(:fuel, @valid_attrs_inactive)
+      {:ok, %{fuel: Auctions.get_fuel!(fuel.id), inactive_fuel: Auctions.get_fuel!(inactive_fuel.id)}}
     end
 
-    test "list_fuels/0 returns all fuels", %{fuel: fuel} do
-      assert Enum.map(Auctions.list_fuels(), fn(f) -> f.id end) == [fuel.id]
+    test "list_fuels/0 returns all fuels", %{fuel: fuel, inactive_fuel: inactive_fuel} do
+      assert Enum.map(Auctions.list_fuels(), fn(f) -> f.id end) == [fuel.id, inactive_fuel.id]
     end
+
+		test "list_fuels/1 returns a paginated list of all fuels", %{fuel: fuel, inactive_fuel: inactive_fuel} do
+			page = Auctions.list_fuels(%{})
+			assert page.entries == [fuel, inactive_fuel]
+		end
+
+		test "list_active_fuels/0 returns all fuels marked as active", %{fuel: fuel, inactive_fuel: inactive_fuel} do
+			assert Enum.map(Auctions.list_active_fuels(), fn(f) -> f.id end) == [fuel.id]
+			refute Enum.map(Auctions.list_active_fuels(), fn(f) -> f.id end) == [fuel.id, inactive_fuel.id]
+		end
 
     test "get_fuel!/1 returns the fuel with given id", %{fuel: fuel} do
       assert Auctions.get_fuel!(fuel.id) == fuel
     end
+
+		test "get_active_fuel!/1 returns the active fuel with given id", %{fuel: fuel, inactive_fuel: inactive_fuel} do
+			assert Auctions.get_active_fuel!(fuel.id) == fuel
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_fuel!(inactive_fuel.id) end
+		end
 
     test "create_fuel/1 with valid data creates a fuel" do
       assert {:ok, %Fuel{} = fuel} = Auctions.create_fuel(@valid_attrs)
@@ -397,6 +468,14 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:ok, %Fuel{}} = Auctions.delete_fuel(fuel)
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_fuel!(fuel.id) end
     end
+
+		test "activate_fuel/1 marks the fuel as active", %{inactive_fuel: inactive_fuel} do
+			assert {:ok, %Fuel{is_active: true}} = Auctions.activate_fuel(inactive_fuel)
+		end
+
+		test "deactivate_fuel/1 marks the fuel as inactive", %{fuel: fuel} do
+			assert {:ok, %Fuel{is_active: false}} = Auctions.deactivate_fuel(fuel)
+		end
 
     test "change_fuel/1 returns a fuel changeset", %{fuel: fuel} do
       assert %Ecto.Changeset{} = Auctions.change_fuel(fuel)
@@ -592,17 +671,20 @@ defmodule Oceanconnect.AuctionsTest do
 	describe "barges" do
     alias Oceanconnect.Auctions.Barge
 
-    @valid_attrs %{name: "some name", imo_number: "1337", dwt: "37", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
+    @valid_attrs %{name: "some name", imo_number: "1337", dwt: "37", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true, is_active: true}
+		@valid_attrs_inactive %{name: "some other name", imo_number: "1336", dwt: "36", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true, is_active: false}
     @update_attrs %{name: "some updated name", imo_number: "1338", dwt: "38", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
     @invalid_attrs %{name: nil, imo_number: nil, dwt: nil, sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
 
     setup do
-      barge = insert(:barge, @valid_attrs)
-      {:ok, %{barge: Auctions.get_barge!(barge.id)}}
+			port = insert(:port)
+      barge = insert(:barge, Map.merge(@valid_attrs, %{port: port}))
+			inactive_barge = insert(:barge, Map.merge(@valid_attrs_inactive, %{port: port}))
+      {:ok, %{barge: Auctions.get_barge!(barge.id), inactive_barge: Auctions.get_barge!(inactive_barge.id), port: Auctions.get_port!(port.id)}}
     end
 
-		test "list_barges/0 returns all barges", %{barge: barge} do
-			assert Enum.map(Auctions.list_barges(), fn(b) -> b.id end) == [barge.id]
+		test "list_barges/0 returns all barges", %{barge: barge, inactive_barge: inactive_barge} do
+			assert Enum.map(Auctions.list_barges(), fn(b) -> b.id end) == [barge.id, inactive_barge.id]
 		end
 
 		test "list_barges/1 returns a paginated list of all barges", %{barge: barge, inactive_barge: inactive_barge} do
@@ -610,13 +692,23 @@ defmodule Oceanconnect.AuctionsTest do
 			assert page.entries == [barge, inactive_barge]
 		end
 
+		test "list_active_barges/0 returns all barges marked as active", %{barge: barge, inactive_barge: inactive_barge} do
+			assert Enum.map(Auctions.list_active_barges(), fn(b) -> b.id end) == [barge.id]
+			refute Enum.map(Auctions.list_active_barges(), fn(b) -> b.id end) == [barge.id, inactive_barge.id]
+		end
+
 		test "get_barge!/1 returns the barge with given id", %{barge: barge} do
 			assert Auctions.get_barge!(barge.id) == barge
 		end
 
-		test "create_barge/1 with valid data creates a barge" do
-			new_barge = Map.put(@valid_attrs, :port_id, 1)
-			assert {:ok, %Barge{} = barge} = Auctions.create_barge(new_barge)
+		test "get_active_barge!/1 returns the active barge with given id", %{barge: barge, inactive_barge: inactive_barge} do
+			assert Auctions.get_active_barge!(barge.id) == barge
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_barge!(inactive_barge.id) end
+		end
+
+		test "create_barge/1 with valid data creates a barge", %{port: port} do
+			attrs = Map.merge(@valid_attrs, %{port_id: port.id})
+			assert {:ok, %Barge{} = barge} = Auctions.create_barge(attrs)
 			assert barge.name == "some name"
 		end
 
@@ -638,6 +730,14 @@ defmodule Oceanconnect.AuctionsTest do
 		test "delete_barge/1 deletes the barge", %{barge: barge} do
 			assert {:ok, %Barge{}} = Auctions.delete_barge(barge)
 			assert_raise Ecto.NoResultsError, fn -> Auctions.get_barge!(barge.id) end
+		end
+
+		test "activate_barge/1 marks the barge as active", %{inactive_barge: inactive_barge} do
+			assert {:ok, %Barge{is_active: true}} = Auctions.activate_barge(inactive_barge)
+		end
+
+		test "deactivate_barge/1 marks the barge as inactive", %{barge: barge} do
+			assert {:ok, %Barge{is_active: false}} = Auctions.deactivate_barge(barge)
 		end
 
 		test "change_barge/1 returns a barge changeset", %{barge: barge} do

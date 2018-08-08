@@ -57,4 +57,14 @@ defmodule OceanconnectWeb.Admin.CompanyController do
     |> put_flash(:info, "Company deleted successfully.")
     |> redirect(to: admin_company_path(conn, :index))
   end
+
+  def deactivate(conn, %{"id" => id}) do
+    company = Accounts.get_active_company!(id)
+    {:ok, _company} = Accounts.deactivate_company(company)
+
+    conn
+    |> put_flash(:info, "Company deactivated successfully.")
+    |> redirect(to: admin_company_path(conn, :index))
+  end
+
 end

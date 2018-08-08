@@ -28,7 +28,8 @@ defmodule Oceanconnect.Auctions.Barge do
       :imo_number,
       :dwt,
       :sire_inspection_date,
-      :sire_inspection_validity
+      :sire_inspection_validity,
+			:is_active
       ])
     |> foreign_key_constraint(:port_id)
     |> validate_required([:name, :port_id])
@@ -43,5 +44,10 @@ defmodule Oceanconnect.Auctions.Barge do
 	def alphabetical do
 		from b in Barge,
 		  order_by: [asc: b.name]
+	end
+
+	def select_active do
+		from b in Barge,
+		  where: b.is_active == true
 	end
 end

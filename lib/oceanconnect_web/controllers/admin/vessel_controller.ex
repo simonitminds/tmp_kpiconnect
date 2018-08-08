@@ -57,4 +57,14 @@ defmodule OceanconnectWeb.Admin.VesselController do
     |> put_flash(:info, "Vessel deleted successfully.")
     |> redirect(to: admin_vessel_path(conn, :index))
   end
+
+  def deactivate(conn, %{"id" => id}) do
+    vessel = Auctions.get_active_vessel!(id)
+    {:ok, _vessel} = Auctions.deactivate_vessel(vessel)
+
+    conn
+    |> put_flash(:info, "Vessel deactivated successfully.")
+    |> redirect(to: admin_vessel_path(conn, :index))
+  end
+
 end

@@ -34,7 +34,7 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
 
   describe "create barge" do
     test "redirects to index when data is valid", %{conn: conn, barge: barge} do
-			barge_params = string_params_for(:barge, company_id: barge.company_id)
+			barge_params = string_params_for(:barge, port_id: barge.port_id)
       conn = post conn, admin_barge_path(conn, :create), barge: barge_params
 
       assert redirected_to(conn) == admin_barge_path(conn, :index)
@@ -75,7 +75,17 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
     test "deletes chosen barge", %{conn: conn, barge: barge} do
       conn = delete conn, admin_barge_path(conn, :delete, barge)
       assert redirected_to(conn) == admin_barge_path(conn, :index)
-      assert barge.is_active == false
+      assert_error_sent 404, fn ->
+				get conn, admin_barge_path(conn, :edit, barge)
+			end
 		end
   end
+
+	describe "deactivate barge" do
+		test "deactivates chosen barge", %{conn: conn, barge: barge} do
+			conn = post conn, admin_barge_path(conn, :deactivate, barge)
+			assert redirected_to(conn) == admin_barge_path(conn, :index)
+			assert barge.is_active == false
+		end
+	end
 end

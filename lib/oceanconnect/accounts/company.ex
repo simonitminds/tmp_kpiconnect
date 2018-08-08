@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Accounts.Company do
   use Ecto.Schema
-  import Ecto.Changeset
+  import Ecto.{Changeset, Query}
   alias Oceanconnect.Accounts.Company
 
   @derive {Poison.Encoder, except: [:__meta__, :barges, :users, :vessels, :ports]}
@@ -40,7 +40,8 @@ defmodule Oceanconnect.Accounts.Company do
     :main_phone,
     :mobile_phone,
     :postal_code,
-    :is_supplier
+    :is_supplier,
+		:is_active
   ]
 
   @doc false
@@ -49,4 +50,9 @@ defmodule Oceanconnect.Accounts.Company do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
+
+	def select_active do
+		from c in Company,
+		  where: c.is_active == true
+	end
 end

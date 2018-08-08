@@ -30,11 +30,6 @@ defmodule OceanconnectWeb.Admin.PortController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    port = Auctions.get_port!(id)
-    render(conn, "show.html", port: port)
-  end
-
   def edit(conn, %{"id" => id}) do
     port = Auctions.get_port!(id)
     changeset = Auctions.change_port(port)
@@ -62,4 +57,13 @@ defmodule OceanconnectWeb.Admin.PortController do
     |> put_flash(:info, "Port deleted successfully.")
     |> redirect(to: admin_port_path(conn, :index))
   end
+
+	def deactivate(conn, %{"id" => id}) do
+		port = Auctions.get_active_port!(id)
+		{:ok, _port} = Auctions.deactivate_port(port)
+
+		conn
+		|> put_flash(:info, "Port deactivated successfully.")
+		|> redirect(to: admin_port_path(conn, :index))
+	end
 end

@@ -57,4 +57,13 @@ defmodule OceanconnectWeb.Admin.BargeController do
     |> put_flash(:info, "Barge deleted successfully.")
     |> redirect(to: admin_barge_path(conn, :index))
   end
+
+	def deactivate(conn, %{"id" => id}) do
+		barge = Auction.get_active_barge!(id)
+		{:ok, _barge} = Auctions.deactivate_barge(barge)
+
+		conn
+		|> put_flash(:info, "Barge deactivated successfully.")
+		|> redirect(to: admin_barge_path(conn, :index))
+	end
 end

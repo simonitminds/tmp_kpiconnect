@@ -82,9 +82,21 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
     test "deletes chosen company", %{conn: conn, company: company} do
       conn = delete conn, admin_company_path(conn, :delete, company)
       assert redirected_to(conn) == admin_company_path(conn, :index)
-      assert company.is_active == false
+			assert_error_sent 404, fn ->
+				get conn, admin_company_path(conn, :edit, company)
+			end
 		end
   end
+
+	describe "deactivate company" do
+		setup [:create_company]
+
+		test "deactivates chosen company", %{conn: conn, company: company} do
+			conn = post conn, admin_company_path(conn, :deactivate, company)
+			assert redirected_to(conn) == admin_company_path(conn, :index)
+			assert company.is_active == false
+		end
+	end
 
   defp create_company(_) do
     company = fixture(:company)

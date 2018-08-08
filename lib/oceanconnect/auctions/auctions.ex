@@ -298,6 +298,11 @@ defmodule Oceanconnect.Auctions do
 		|> Repo.paginate(params)
 	end
 
+	def list_active_ports do
+		query = Port.select_active
+		|> Repo.all
+	end
+
   @doc """
   Gets a single port.
 
@@ -313,6 +318,11 @@ defmodule Oceanconnect.Auctions do
 
   """
   def get_port!(id), do: Repo.get!(Port, id)
+
+	def get_active_port!(id) do
+		Port.select_active
+		|> Repo.get!(id)
+	end
 
   @doc """
   Creates a port.
@@ -366,6 +376,18 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(port)
   end
 
+	def activate_port(port = %Port{is_active: false}) do
+		port
+		|> Port.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_port(port = %Port{is_active: true}) do
+		port
+		|> Port.changeset(%{is_active: false})
+		|> Repo.update
+	end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking port changes.
 
@@ -380,7 +402,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def ports_for_company(company = %Company{}) do
-    company
+    company = Company.select_active
     |> Repo.preload([ports: :companies])
     |> Map.get(:ports)
   end
@@ -405,7 +427,8 @@ defmodule Oceanconnect.Auctions do
   """
 
   def vessels_for_buyer(%Company{id: id}) do
-    Vessel.by_company(id)
+    query = Vessel.by_company(id)
+		query = Vessel.select_active
     |> Repo.all
   end
 
@@ -427,6 +450,11 @@ defmodule Oceanconnect.Auctions do
 		|> Repo.paginate(params)
 	end
 
+	def list_active_vessels do
+		query = Vessel.select_active
+		|> Repo.all
+	end
+
   @doc """
   Gets a single vessel.
 
@@ -442,6 +470,11 @@ defmodule Oceanconnect.Auctions do
 
   """
   def get_vessel!(id), do: Repo.get!(Vessel, id) |> Repo.preload(:company)
+
+	def get_active_vessel!(id) do
+		Vessel.select_active
+		|> Repo.get!(id)
+	end
 
   @doc """
   Creates a vessel.
@@ -495,6 +528,18 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(vessel)
   end
 
+	def activate_vessel(vessel = %Vessel{is_active: false}) do
+		vessel
+		|> Vessel.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_vessel(vessel = %Vessel{is_active: true}) do
+		vessel
+		|> Vessel.changeset(%{is_active: false})
+		|> Repo.update
+	end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking vessel changes.
 
@@ -522,8 +567,13 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_fuels(params) do
-		Fuel
+		query = Fuel.alphabetical
 		|> Repo.paginate(params)
+	end
+
+	def list_active_fuels do
+		query = Fuel.select_active
+		|> Repo.all
 	end
 
   @doc """
@@ -541,6 +591,11 @@ defmodule Oceanconnect.Auctions do
 
   """
   def get_fuel!(id), do: Repo.get!(Fuel, id)
+
+	def get_active_fuel!(id) do
+		Fuel.select_active
+		|> Repo.get!(id)
+	end
 
   @doc """
   Creates a fuel.
@@ -594,6 +649,18 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(fuel)
   end
 
+	def activate_fuel(fuel = %Fuel{is_active: false}) do
+		fuel
+		|> Fuel.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_fuel(fuel = %Fuel{is_active: true}) do
+		fuel
+		|> Fuel.changeset(%{is_active: false})
+		|> Repo.update
+	end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking fuel changes.
 
@@ -614,9 +681,19 @@ defmodule Oceanconnect.Auctions do
 		|> Oceanconnect.Repo.paginate(params)
 	end
 
+	def list_active_barges do
+		query = Barge.select_active
+		|> Repo.all
+	end
+
   def get_barge(id) do
     Repo.get(Barge, id)
   end
+
+	def get_active_barge!(id) do
+		Barge.select_active
+		|> Repo.get!(id)
+	end
 
   def get_barge!(id) do
     Repo.get!(Barge, id)
@@ -636,6 +713,18 @@ defmodule Oceanconnect.Auctions do
 
 	def delete_barge(%Barge{} = barge) do
 		Repo.delete(barge)
+	end
+
+	def activate_barge(barge = %Barge{is_active: false}) do
+		barge
+		|> Barge.changeset(%{is_active: true})
+		|> Repo.update
+	end
+
+	def deactivate_barge(barge = %Barge{is_active: true}) do
+		barge
+		|> Barge.changeset(%{is_active: false})
+		|> Repo.update
 	end
 
 	def change_barge(%Barge{} = barge) do

@@ -22,7 +22,7 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
+    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin, :is_active])
     |> validate_required([:email, :password])
     |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)
@@ -39,4 +39,9 @@ defmodule Oceanconnect.Accounts.User do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
   defp put_pass_hash(changeset), do: changeset
+
+	def select_active do
+		from u in User,
+		  where: u.is_active == true
+	end
 end

@@ -18,7 +18,7 @@ defmodule Oceanconnect.Auctions.Port do
   @doc false
   def changeset(%Port{} = port, attrs) do
     port
-    |> cast(attrs, [:name, :country, :gmt_offset])
+    |> cast(attrs, [:name, :country, :gmt_offset, :is_active])
     |> validate_required([:name, :country])
   end
 
@@ -34,4 +34,9 @@ defmodule Oceanconnect.Auctions.Port do
       where: p.id == ^port_id and c.is_supplier == true and c.id != ^buyer_id,
       select: c
   end
+
+	def select_active do
+		from p in Port,
+		  where: p.is_active == true
+	end
 end
