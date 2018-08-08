@@ -128,10 +128,10 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     second_lowest_min_bid = Enum.at(rest, 0, nil)
 
     decremented_auto_bids =
-      Enum.map(min_bids, fn bid = %AuctionBid{min_amount: min_amount} ->
+      Enum.map(min_bids, fn bid = %AuctionBid{amount: amount, min_amount: min_amount} ->
         cond do
-          min_amount == first_lowest_min_bid.min_amount && second_lowest_min_bid -> {bid, second_lowest_min_bid.min_amount - 0.25}
-
+          amount == min_amount -> {bid, amount}
+          min_amount == first_lowest_min_bid.min_amount && second_lowest_min_bid -> {bid, max(second_lowest_min_bid.min_amount - 0.25, bid.min_amount)}
           true -> {bid, min_amount}
         end
       end)
@@ -188,7 +188,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp set_decrements(auto_bids, winning_bid_target, lowest_bid, has_single_lowest_bid, first_lowest_min_bid, second_lowest_min_bid) do
-    Enum.map(auto_bids, fn bid = %AuctionBid{min_amount: min_amount} ->
+    Enum.map(auto_bids, fn bid = %AuctionBid{amount: amount, min_amount: min_amount} ->
       is_already_leading =
         bid.supplier_id == lowest_bid.supplier_id &&
         bid.amount == winning_bid_target &&
@@ -202,11 +202,11 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       cond do
         is_already_leading -> {bid, bid.amount}
 
-        is_tied_leading && min_amount < lowest_bid.amount -> {bid, lowest_bid.amount - 0.25}
+        is_tied_leading && min_amount < lowest_bid.amount -> {bid, max(lowest_bid.amount - 0.25, bid.min_amount)}
 
         min_amount >= lowest_bid.amount -> {bid, min_amount}
 
-        min_amount == first_lowest_min_bid.min_amount -> {bid, winning_bid_target - 0.25}
+        min_amount == first_lowest_min_bid.min_amount -> {bid, max(winning_bid_target - 0.25, bid.min_amount)}
 
         true -> {bid, min_amount}
       end
