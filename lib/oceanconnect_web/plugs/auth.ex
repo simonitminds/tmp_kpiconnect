@@ -10,11 +10,20 @@ defmodule OceanconnectWeb.Plugs.Auth do
 
   def build_session(conn, user) do
     user_with_company = Accounts.load_company_on_user(user)
-    Guardian.Plug.sign_in(conn, user_with_company)
+    if user_with_company.is_admin do
+      Guardian.Plug.sign_in(conn, user_with_company)
+      |> Guardian.Plug.sign_in(user_with_company, token: "access", key: :admin)
+    else
+      Guardian.Plug.sign_in(conn, user_with_company)
+    end
   end
 
   def current_user(conn) do
     Guardian.Plug.current_resource(conn)
+  end
+
+  def current_admin(conn) do
+    Guardian.Plug.current_resource(conn, key: :admin)
   end
 
   def browser_logout(conn) do
@@ -63,9 +72,9 @@ defmodule OceanconnectWeb.Plugs.Auth do
   def sign_in_impersonator(conn, impersonator = %User{is_admin: true}, user = %User{}) do
     impersonated_user = %User{ user | impersonated_by: impersonator.id}
     authed_conn = conn
-    |> Guardian.Plug.sign_out(token_type: "default")
-    |> Guardian.Plug.sign_in(impersonator, %{}, token_type: "access", key: :admin)
+    |> Guardian.Plug.sign_out()
     |> Guardian.Plug.sign_in(impersonated_user)
+    |> Guardian.Plug.sign_in(impersonator, %{}, token_type: "access", key: :admin)
     {:ok, {authed_conn, impersonated_user}}
   end
 
@@ -73,9 +82,10 @@ defmodule OceanconnectWeb.Plugs.Auth do
     {:error, {conn, "Could Not Impersonate User"}}
   end
 
-  def stop_impersonating(conn = %{assigns: %{acutal_user: actual_user}}) do
+  def stop_impersonating(conn) do
+    admin_user = current_admin(conn)
     conn
-    |> Guardian.sign_out
-    |> Guardian.sign_in(actual_user)
+    |> Guardian.Plug.sign_out
+    |> Guardian.Plug.sign_in(admin_user)
   end
 end

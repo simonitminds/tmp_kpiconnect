@@ -15,6 +15,9 @@ defmodule OceanconnectWeb.Router do
 
   pipeline :authenticated do
     plug(Oceanconnect.Guardian.AuthPipeline)
+    plug(Guardian.Plug.VerifySession, key: :admin, allow_blank: true)
+    plug(Guardian.Plug.VerifyHeader, key: :admin, allow_blank: true)
+    plug(Guardian.Plug.LoadResource, key: :admin, allow_blank: true)
   end
 
 	pipeline :admin_required do
@@ -58,7 +61,8 @@ defmodule OceanconnectWeb.Router do
 
     # Routes requiring authentication
     pipe_through(:authenticated)
-    post("/sessions/impersonate", SessionController, :impersonate)
+
+    post("/sessions/stop_impersonating", SessionController, :stop_impersonating, as: :admin_stop_impersonating_session)
     delete("/sessions/logout", SessionController, :delete)
     resources("/auctions", AuctionController, except: [:delete])
     get("/auctions/:id/log", AuctionController, :log)
@@ -72,6 +76,9 @@ defmodule OceanconnectWeb.Router do
     pipe_through(:browser)
 		pipe_through(:authenticated)
 		pipe_through(:admin_required)
+
+    post("/sessions/impersonate", SessionController, :impersonate, as: :admin_impersonate_session)
+    post("/sessions/stop_impersonating", SessionController, :stop_impersonating, as: :admin_stop_impersonating_session)
 
     resources("/vessels", VesselController, as: :admin_vessel)
 		post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)

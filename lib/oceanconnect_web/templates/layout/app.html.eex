@@ -39,7 +39,7 @@
             </div>
             <div class="navbar-dropdown__admin">
               <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                <button class="qa-admin-act-as-admin">Admin</button>
+                <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "qa-admin-act-as-admin") %>
                 <button class="qa-admin-act-as-agent">Agent</button>
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
               <% end %>
@@ -68,7 +68,7 @@
          <div class="admin-bar" >
 
            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-             <%= form_for @conn, session_path(@conn, :impersonate), fn(f) ->  %>
+             <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), fn(f) ->  %>
              <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
              <%=  submit "<-" %>
            <% end %>

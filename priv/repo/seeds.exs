@@ -172,7 +172,6 @@ end)
 Repo.get_by(User, %{email: String.upcase(ocm.email)})
 |> User.changeset(%{is_admin: true, password: "ocmtest"})
 |> Repo.update()
-|> IO.inspect(label: "UPDATING IS ADMIN")
 
 # Create Admin User
 ports =

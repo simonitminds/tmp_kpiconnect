@@ -4,11 +4,9 @@ defmodule OceanconnectWeb.SessionView do
   alias Oceanconnect.Accounts
 
   def current_user_is_admin?(conn) do
-
-    IO.inspect conn.private[:guardian_default_resource]
     case Auth.current_user(conn) do
       nil -> false
-      user -> user.is_admin || user.impersonated_by
+      user -> user.is_admin || admin_present?(conn)
     end
   end
 
@@ -48,6 +46,14 @@ defmodule OceanconnectWeb.SessionView do
   def log_in_logout_link(conn) do
     if current_user(conn) != "" do
       link("Log Out", to: session_path(conn, :delete), method: :delete, class: "navbar-item")
+    end
+  end
+
+  defp admin_present?(conn) do
+    admin_present? = if admin = Auth.current_admin(conn) do
+      admin.is_admin
+    else
+      false
     end
   end
 end

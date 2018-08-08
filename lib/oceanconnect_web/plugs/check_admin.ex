@@ -5,7 +5,6 @@ defmodule OceanconnectWeb.Plugs.CheckAdmin do
 
 	def call(conn, _) do
 		current_user = Guardian.Plug.current_resource(conn)
-
 		if current_user.is_admin do
 			conn
 		else
