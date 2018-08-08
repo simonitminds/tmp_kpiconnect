@@ -6,7 +6,6 @@
 <% end %>
   <div class="columns is-variable is-4">
     <div class="column is-one-third">
-      <h3 class="form-group__header">User Information</h3>
       <div class="field" >
         <%= label f, :email, class: "label" do %>
           Email
