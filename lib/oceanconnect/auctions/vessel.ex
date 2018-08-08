@@ -10,6 +10,7 @@ defmodule Oceanconnect.Auctions.Vessel do
   schema "vessels" do
     field :imo, :integer
     field :name, :string
+		field :is_active, :boolean, default: true
     belongs_to :company, Company
 
     timestamps()

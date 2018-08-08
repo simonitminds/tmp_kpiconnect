@@ -13,6 +13,7 @@ defmodule Oceanconnect.Auctions.Barge do
     field :dwt, :string
     field :sire_inspection_date, :naive_datetime
     field :sire_inspection_validity, :boolean
+		field :is_active, :boolean, default: true
     many_to_many :companies, Oceanconnect.Accounts.Company, join_through: "company_barges", on_replace: :delete
 
     timestamps()

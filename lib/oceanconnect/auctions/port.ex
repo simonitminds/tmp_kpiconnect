@@ -9,6 +9,7 @@ defmodule Oceanconnect.Auctions.Port do
     field :name, :string
     field :country, :string
     field :gmt_offset, :integer
+		field :is_active, :boolean, default: true
     many_to_many :companies, Oceanconnect.Accounts.Company, join_through: "company_ports", on_replace: :delete
 
     timestamps()

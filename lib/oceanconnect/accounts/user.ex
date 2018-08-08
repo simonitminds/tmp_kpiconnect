@@ -12,6 +12,7 @@ defmodule Oceanconnect.Accounts.User do
     field :password_hash, :string
     field :password, :string, virtual: true
     field :is_admin, :boolean, default: false
+		field :is_active, :boolean, default: true
     field :impersonated_by, :integer, virtual: true
     belongs_to :company, Oceanconnect.Accounts.Company
 
