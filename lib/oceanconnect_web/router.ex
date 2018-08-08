@@ -41,7 +41,7 @@ defmodule OceanconnectWeb.Router do
     get("/ports/:port_id/suppliers", PortSupplierController, :index)
     get("/companies/:company_id/barges", CompanyBargesController, :index, as: :company_barges_api)
 
-    put("/sessions/impersonate/:user_id", SessionController, :impersonate)
+
   end
 
   scope "/", OceanconnectWeb do
@@ -54,7 +54,7 @@ defmodule OceanconnectWeb.Router do
 
     # Routes requiring authentication
     pipe_through(:authenticated)
-
+    post("/sessions/impersonate", SessionController, :impersonate)
     delete("/sessions/logout", SessionController, :delete)
     resources("/auctions", AuctionController, except: [:delete])
     get("/auctions/:id/log", AuctionController, :log)

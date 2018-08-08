@@ -42,7 +42,6 @@
                 <button class="qa-admin-act-as-admin">Admin</button>
                 <button class="qa-admin-act-as-agent">Agent</button>
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
-                <script> window.impersonableUsers = <%= OceanconnectWeb.SessionView.impersonable_users(@conn) %></script>
               <% end %>
             </div>
 
@@ -65,10 +64,18 @@
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+       <main role="main">
+         <div class="admin-bar" >
 
-      <main role="main">
-        <%= render @view_module, @view_template, assigns %>
-      </main>
+           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+             <%= form_for @conn, session_path(@conn, :impersonate), fn(f) ->  %>
+             <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
+             <%=  submit "<-" %>
+           <% end %>
+          <% end %>
+          <%= render @view_module, @view_template, assigns %>
+         </div>
+        </main>
       <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
       <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>
       <script> window.companyId = "<%= OceanconnectWeb.SessionView.current_user_company_id(@conn) %>";</script>

@@ -2,6 +2,7 @@ defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
   import Plug.Conn
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.{User}
   alias OceanconnectWeb.Plugs.Auth
 
   def new(conn, _) do
@@ -24,8 +25,16 @@ defmodule OceanconnectWeb.SessionController do
   end
 
   def impersonate(conn, %{"user_id" => user_id}) do
-    conn
-    |> redirect(to: auction_path(conn, :index))
+    admin_user = Auth.current_user(conn)
+    case Auth.impersonate_user(conn, admin_user, user_id) do
+      {:ok, {authed_conn, %User{} = user}} ->
+        authed_conn
+        |> redirect(to: auction_path(authed_conn, :index))
+      {:error, _reason} ->
+        conn
+        |> put_status(401)
+        |> redirect(to: auction_path(conn, :index))
+    end
   end
 
   def delete(conn, _) do

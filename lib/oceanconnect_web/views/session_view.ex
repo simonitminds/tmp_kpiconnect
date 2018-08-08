@@ -4,9 +4,11 @@ defmodule OceanconnectWeb.SessionView do
   alias Oceanconnect.Accounts
 
   def current_user_is_admin?(conn) do
+
+    IO.inspect conn.private[:guardian_default_resource]
     case Auth.current_user(conn) do
       nil -> false
-      user -> user.is_admin
+      user -> user.is_admin || user.impersonated_by
     end
   end
 
@@ -16,15 +18,10 @@ defmodule OceanconnectWeb.SessionView do
         conn
         |> Auth.current_user()
         |> Accounts.impersonable_users_for()
-        |> Enum.map(&(%{id: &1.id,
-                       first_name: &1.first_name,
-                       last_name: &1.last_name,
-                       company_name: &1.company.name }))
+        |> Enum.map(&([value: &1.id, key: "#{&1.first_name} #{&1.last_name} (#{&1.company.name})"]))
       false ->
         []
     end
-    |> Poison.encode!
-    |> Phoenix.HTML.raw
   end
 
   def current_user(conn) do
