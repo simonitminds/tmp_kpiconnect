@@ -74,7 +74,17 @@ defmodule OceanconnectWeb.Admin.UserControllerTest do
     test "deletes chosen user", %{conn: conn, user: user} do
       conn = delete conn, admin_user_path(conn, :delete, user)
       assert redirected_to(conn) == admin_user_path(conn, :index)
-      assert user.is_active == false
+      assert_error_sent 404, fn ->
+				get conn, admin_user_path(conn, :edit, user)
+			end
 		end
   end
+
+	describe "deactivate user" do
+		test "deactivates chosen user", %{conn: conn, user: user} do
+			conn = post conn, admin_user_path(conn, :deactivate, user)
+			assert = redirected_to(conn) == admin_user_path(conn, :index)
+			assert user.is_active == false
+		end
+	end
 end

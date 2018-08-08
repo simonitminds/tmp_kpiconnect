@@ -74,10 +74,21 @@ defmodule OceanconnectWeb.Router do
 		pipe_through(:admin_required)
 
     resources("/vessels", VesselController, as: :admin_vessel)
+		post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)
+
     resources("/users", UserController, as: :admin_user)
+		post("/users/:user_id/deactivate", UserController, :deactivate, as: :admin_user)
+
     resources("/companies", CompanyController, as: :admin_company)
+		post("/companies/:company_id/deactivate", CompanyController, :deactivate, as: :admin_company)
+
     resources("/barges", BargeController, as: :admin_barge)
+		post("/barges/:barge_id/deactivate", BargeController, :deactivate, as: :admin_barge)
+
     resources("/fuels", FuelController, as: :admin_fuel)
+		post("/fuels/:fuel_id/deactivate", FuelController, :deactivate, as: :admin_fuel)
+
     resources("/ports", PortController, as: :admin_port)
+		post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
   end
 end

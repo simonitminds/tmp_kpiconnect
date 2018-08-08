@@ -82,9 +82,21 @@ defmodule OceanconnectWeb.Admin.FuelControllerTest do
     test "deletes chosen fuel", %{conn: conn, fuel: fuel} do
       conn = delete conn, admin_fuel_path(conn, :delete, fuel)
       assert redirected_to(conn) == admin_fuel_path(conn, :index)
-      assert fuel.is_active == false
+			assert_error_sent 404, fn ->
+				get conn, admin_fuel_path(conn, :edit, fuel)
+			end
 		end
   end
+
+	describe "deactivate fuel" do
+		setup [:create_fuel]
+
+		test "deactivates chosen fuel", %{conn: conn, fuel: fuel} do
+			conn = post conn, admin_fuel_path(conn, :deactivate, fuel)
+			assert redirected_to(conn) == admin_fuel_path(conn, :index)
+			assert fuel.is_active == false
+		end
+	end
 
   defp create_fuel(_) do
     fuel = fixture(:fuel)

@@ -258,6 +258,7 @@ defmodule Oceanconnect.Accounts do
   def impersonable_users_for(%User{is_admin: true}) do
     User.impersonable_users
     |> Repo.all
+		|> Repo.preload(:company)
   end
   def impersonable_users_for(_user), do: []
 end

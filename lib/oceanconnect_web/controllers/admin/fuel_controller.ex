@@ -30,11 +30,6 @@ defmodule OceanconnectWeb.Admin.FuelController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    fuel = Auctions.get_fuel!(id)
-    render(conn, "show.html", fuel: fuel)
-  end
-
   def edit(conn, %{"id" => id}) do
     fuel = Auctions.get_fuel!(id)
     changeset = Auctions.change_fuel(fuel)
@@ -62,4 +57,13 @@ defmodule OceanconnectWeb.Admin.FuelController do
     |> put_flash(:info, "Fuel deleted successfully.")
     |> redirect(to: admin_fuel_path(conn, :index))
   end
+
+	def deactivate(conn, %{"id" => id}) do
+		fuel = Auctions.get_active_fuel!(id)
+		{:ok, _fuel} = Auctions.deactivate_fuel(fuel)
+
+		conn
+		|> put_flash(:info, "Fuel deactivated successfully.")
+		|> redirect(to: admin_fuel_path(conn, :index))
+	end
 end
