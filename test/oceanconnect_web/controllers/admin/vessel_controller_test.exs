@@ -85,7 +85,17 @@ defmodule OceanconnectWeb.Admin.VesselControllerTest do
 		test "deactivates chosen vessel", %{conn: conn, vessel: vessel} do
 			conn = post conn, admin_vessel_path(conn, :deactivate, vessel)
 			assert redirected_to(conn) == admin_vessel_path(conn, :index)
+			vessel = Auctions.get_vessel!(vessel.id)
 			assert vessel.is_active == false
+		end
+	end
+
+	describe "activate vessel" do
+		test "activates chosen vessel", %{conn: conn, vessel: vessel} do
+			conn = post conn, admin_vessel_path(conn, :activate, vessel)
+			assert redirected_to(conn) == admin_vessel_path(conn, :index)
+			vessel = Auctions.get_vessel!(vessel.id)
+			assert vessel.is_active == true
 		end
 	end
 end

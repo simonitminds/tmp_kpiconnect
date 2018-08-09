@@ -94,7 +94,19 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
 		test "deactivates chosen company", %{conn: conn, company: company} do
 			conn = post conn, admin_company_path(conn, :deactivate, company)
 			assert redirected_to(conn) == admin_company_path(conn, :index)
+			company = Accounts.get_company!(company.id)
 			assert company.is_active == false
+		end
+	end
+
+	describe "activate company" do
+		setup [:create_company]
+
+		test "activates chosen company", %{conn: conn, company: company} do
+			conn = post conn, admin_company_path(conn, :activate, company)
+			assert redirected_to(conn) == admin_company_path(conn, :index)
+			company = Accounts.get_company!(company.id)
+			assert company.is_active == true
 		end
 	end
 

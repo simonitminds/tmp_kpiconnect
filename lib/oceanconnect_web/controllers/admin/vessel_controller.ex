@@ -58,8 +58,8 @@ defmodule OceanconnectWeb.Admin.VesselController do
     |> redirect(to: admin_vessel_path(conn, :index))
   end
 
-  def deactivate(conn, %{"id" => id}) do
-    vessel = Auctions.get_active_vessel!(id)
+  def deactivate(conn, %{"vessel_id" => vessel_id}) do
+    vessel = Auctions.get_active_vessel!(vessel_id)
     {:ok, _vessel} = Auctions.deactivate_vessel(vessel)
 
     conn
@@ -67,4 +67,12 @@ defmodule OceanconnectWeb.Admin.VesselController do
     |> redirect(to: admin_vessel_path(conn, :index))
   end
 
+  def activate(conn, %{"vessel_id" => vessel_id}) do
+    vessel = Auctions.get_vessel!(vessel_id)
+    {:ok, _vessel} = Auctions.activate_vessel(vessel)
+
+    conn
+    |> put_flash(:info, "Vessel activated successfully.")
+    |> redirect(to: admin_vessel_path(conn, :index))
+  end
 end

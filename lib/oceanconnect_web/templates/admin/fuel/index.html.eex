@@ -23,11 +23,15 @@
 					</thead>
 					<tbody>
 						<%= for fuel <- @fuels do %>
-							<tr>
+							<tr class="qa-admin-fuel-<%= fuel.id %>">
 								<td><%= fuel.name %></td>
 								<td class="text-right">
-									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
-									<%= link "Delete", to: admin_fuel_path(@conn, :delete, fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block has-margin-bottom-xs" %>
+									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs qa-admin-fuel-edit" %>
+									<%= if fuel.is_active do %>
+                    <%= link "Deactivate", to: admin_fuel_path(@conn, :deactivate, fuel), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-fuel-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_fuel_path(@conn, :activate, fuel), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-fuel-activate" %>
+									<% end %>
 								</td>
 							</tr>
 						<% end %>

@@ -11,9 +11,10 @@ defmodule Oceanconnect.AccountsTest do
     @invalid_attrs %{password: nil}
 
     setup do
-      user = insert(:user, Map.merge(@valid_attrs, %{is_active: true}))
+			company = insert(:company)
+      user = insert(:user, Map.merge(@valid_attrs, %{is_active: true, company: company}))
 			inactive_user = insert(:user, Map.merge(@valid_attrs, %{is_active: false}))
-      {:ok, %{user: Accounts.get_user!(user.id), inactive_user: Accounts.get_user!(inactive_user.id)}}
+      {:ok, %{user: Accounts.get_user!(user.id), inactive_user: Accounts.get_user!(inactive_user.id), company: company}}
     end
 
     test "list_users/0 returns all users", %{user: user, inactive_user: inactive_user} do
@@ -40,8 +41,8 @@ defmodule Oceanconnect.AccountsTest do
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_active_user!(inactive_user.id) end
 		end
 
-    test "create_user/1 with valid data creates a user" do
-      assert {:ok, %User{} = user} = Accounts.create_user(Map.merge(@valid_attrs, %{email: "SOME EMAIL"}))
+    test "create_user/1 with valid data creates a user", %{company: company} do
+      assert {:ok, %User{} = user} = Accounts.create_user(Map.merge(@valid_attrs, %{email: "SOME EMAIL", company_id: company.id}))
       assert user.email == "SOME EMAIL"
       assert {:ok, %User{}} = Accounts.verify_login(
         %{"email" => user.email, "password" => @valid_attrs.password}

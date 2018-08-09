@@ -63,4 +63,22 @@ defmodule OceanconnectWeb.Admin.UserController do
     |> put_flash(:info, "User deleted successfully.")
     |> redirect(to: admin_user_path(conn, :index))
   end
+
+	def deactivate(conn, %{"user_id" => user_id}) do
+		user = Accounts.get_active_user!(user_id)
+		{:ok, _user} = Accounts.deactivate_user(user)
+
+		conn
+		|> put_flash(:info, "User deactivated successfully.")
+		|> redirect(to: admin_user_path(conn, :index))
+	end
+
+	def activate(conn, %{"user_id" => user_id}) do
+		user = Accounts.get_user!(user_id)
+		{:ok, _user} = Accounts.activate_user(user)
+
+		conn
+		|> put_flash(:info, "User activated successfully.")
+		|> redirect(to: admin_user_path(conn, :index))
+	end
 end

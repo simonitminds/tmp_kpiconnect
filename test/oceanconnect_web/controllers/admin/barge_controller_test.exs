@@ -85,7 +85,17 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
 		test "deactivates chosen barge", %{conn: conn, barge: barge} do
 			conn = post conn, admin_barge_path(conn, :deactivate, barge)
 			assert redirected_to(conn) == admin_barge_path(conn, :index)
+			barge = Auctions.get_barge!(barge.id)
 			assert barge.is_active == false
+		end
+	end
+
+	describe "activate barge" do
+		test "activates chosen barge", %{conn: conn, barge: barge} do
+			conn = post conn, admin_barge_path(conn, :activate, barge)
+			assert redirected_to(conn) == admin_barge_path(conn, :index)
+			barge = Auctions.get_barge!(barge.id)
+			assert barge.is_active == true
 		end
 	end
 end

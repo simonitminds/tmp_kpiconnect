@@ -105,15 +105,15 @@ defmodule Oceanconnect.Accounts do
     Repo.delete(user)
   end
 
-	def activate_user(user = %User{is_active: false}) do
+	def activate_user(user = %User{}) do
 		user
-		|> User.changeset(%{is_active: true})
+		|> User.admin_changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_user(user = %User{is_active: true}) do
+	def deactivate_user(user = %User{}) do
 		user
-		|> User.changeset(%{is_active: false})
+		|> User.admin_changeset(%{is_active: false})
 		|> Repo.update
 	end
 
@@ -236,13 +236,13 @@ defmodule Oceanconnect.Accounts do
     Repo.delete(company)
   end
 
-	def activate_company(company = %Company{is_active: false}) do
+	def activate_company(company = %Company{}) do
 		company
 		|> Company.changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_company(company = %Company{is_active: true}) do
+	def deactivate_company(company = %Company{}) do
 		company
 		|> Company.changeset(%{is_active: false})
 		|> Repo.update
@@ -293,18 +293,15 @@ defmodule Oceanconnect.Accounts do
   id. If no barges are associated with the company, an empty list is returned.
   """
   def list_company_barges(company_id) do
-		query = Company.select_active
-
-    query = company_id
+    company_id
     |> Barge.by_company()
     |> Repo.all()
     |> Repo.preload(:port)
   end
 
   def impersonable_users_for(%User{is_admin: true}) do
-		query = User.select_active
-
-    query = User.impersonable_users
+		User.select_active
+    |> User.impersonable_users
     |> Repo.all
 		|> Repo.preload(:company)
   end

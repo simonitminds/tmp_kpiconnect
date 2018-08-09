@@ -22,16 +22,21 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin, :is_active])
-    |> validate_required([:email, :password])
+    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
+    |> validate_required([:email, :password, :company_id])
     |> foreign_key_constraint(:company_id)
     |> unique_constraint(:email)
     |> put_pass_hash()
   end
 
-  def impersonable_users do
-    from u in User,
-    where: u.is_admin == false,
+	def admin_changeset(%User{} = user, attrs) do
+		user
+		|> cast(attrs, [:is_active])
+	end
+
+  def impersonable_users(query \\ User) do
+    from q in query,
+    where: q.is_admin == false,
     preload: [:company]
   end
 
@@ -40,8 +45,8 @@ defmodule Oceanconnect.Accounts.User do
   end
   defp put_pass_hash(changeset), do: changeset
 
-	def select_active do
-		from u in User,
-		  where: u.is_active == true
+	def select_active(query \\ User) do
+		from q in query,
+		where: q.is_active == true
 	end
 end

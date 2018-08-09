@@ -58,12 +58,21 @@ defmodule OceanconnectWeb.Admin.CompanyController do
     |> redirect(to: admin_company_path(conn, :index))
   end
 
-  def deactivate(conn, %{"id" => id}) do
-    company = Accounts.get_active_company!(id)
+  def deactivate(conn, %{"company_id" => company_id}) do
+    company = Accounts.get_active_company!(company_id)
     {:ok, _company} = Accounts.deactivate_company(company)
 
     conn
     |> put_flash(:info, "Company deactivated successfully.")
+    |> redirect(to: admin_company_path(conn, :index))
+  end
+
+  def activate(conn, %{"company_id" => company_id}) do
+    company = Accounts.get_company!(company_id)
+    {:ok, _company} = Accounts.activate_company(company)
+
+    conn
+    |> put_flash(:info, "Company activated successfully.")
     |> redirect(to: admin_company_path(conn, :index))
   end
 

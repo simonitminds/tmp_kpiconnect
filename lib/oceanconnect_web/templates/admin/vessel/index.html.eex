@@ -24,12 +24,16 @@
 					</thead>
 					<tbody>
 						<%= for vessel <- @vessels do %>
-							<tr>
+							<tr class="qa-admin-vessel-<%= vessel.id %>">
 								<td><%= vessel.name %></td>
 								<td><%= vessel.imo %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_vessel_path(@conn, :edit, vessel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
-									<%= link "Delete", to: admin_vessel_path(@conn, :delete, vessel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block has-margin-bottom-xs" %>
+									<%= if vessel.is_active do %>
+                    <%= link "Deactivate", to: admin_vessel_path(@conn, :deactivate, vessel), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-vessel-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_vessel_path(@conn, :activate, vessel), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-vessel-activate" %>
+									<% end %>
 								</td>
 							</tr>
 						<% end %>

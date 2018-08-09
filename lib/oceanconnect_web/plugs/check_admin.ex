@@ -9,9 +9,8 @@ defmodule OceanconnectWeb.Plugs.CheckAdmin do
 			conn
 		else
 			conn
-			|> put_status(404)
 			|> Phoenix.Controller.put_flash(:warning, "Page not found")
-			|> Phoenix.Controller.render(OceanconnectWeb.ErrorView, "404.html")
+			|> Phoenix.Controller.redirect(to: "/auctions")
 			|> halt()
 		end
 	end

@@ -376,13 +376,13 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(port)
   end
 
-	def activate_port(port = %Port{is_active: false}) do
+	def activate_port(port = %Port{}) do
 		port
 		|> Port.changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_port(port = %Port{is_active: true}) do
+	def deactivate_port(port = %Port{}) do
 		port
 		|> Port.changeset(%{is_active: false})
 		|> Repo.update
@@ -402,7 +402,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def ports_for_company(company = %Company{}) do
-    company = Company.select_active
+    company
     |> Repo.preload([ports: :companies])
     |> Map.get(:ports)
   end
@@ -427,8 +427,9 @@ defmodule Oceanconnect.Auctions do
   """
 
   def vessels_for_buyer(%Company{id: id}) do
-    query = Vessel.by_company(id)
 		query = Vessel.select_active
+
+    query = Vessel.by_company(id)
     |> Repo.all
   end
 
@@ -528,13 +529,13 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(vessel)
   end
 
-	def activate_vessel(vessel = %Vessel{is_active: false}) do
+	def activate_vessel(vessel = %Vessel{}) do
 		vessel
 		|> Vessel.changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_vessel(vessel = %Vessel{is_active: true}) do
+	def deactivate_vessel(vessel = %Vessel{}) do
 		vessel
 		|> Vessel.changeset(%{is_active: false})
 		|> Repo.update
@@ -649,13 +650,13 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(fuel)
   end
 
-	def activate_fuel(fuel = %Fuel{is_active: false}) do
+	def activate_fuel(fuel = %Fuel{}) do
 		fuel
 		|> Fuel.changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_fuel(fuel = %Fuel{is_active: true}) do
+	def deactivate_fuel(fuel = %Fuel{}) do
 		fuel
 		|> Fuel.changeset(%{is_active: false})
 		|> Repo.update
@@ -715,13 +716,13 @@ defmodule Oceanconnect.Auctions do
 		Repo.delete(barge)
 	end
 
-	def activate_barge(barge = %Barge{is_active: false}) do
+	def activate_barge(barge = %Barge{}) do
 		barge
 		|> Barge.changeset(%{is_active: true})
 		|> Repo.update
 	end
 
-	def deactivate_barge(barge = %Barge{is_active: true}) do
+	def deactivate_barge(barge = %Barge{}) do
 		barge
 		|> Barge.changeset(%{is_active: false})
 		|> Repo.update

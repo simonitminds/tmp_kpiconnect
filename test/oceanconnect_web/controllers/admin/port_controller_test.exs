@@ -94,7 +94,19 @@ defmodule OceanconnectWeb.Admin.PortControllerTest do
 		test "deactivates chosen port", %{conn: conn, port: port} do
 			conn = post conn, admin_port_path(conn, :deactivate, port)
 			assert redirected_to(conn) == admin_port_path(conn, :index)
+			port = Auctions.get_port!(port.id)
 			assert port.is_active == false
+		end
+	end
+
+	describe "activate port" do
+		setup [:create_port]
+
+		test "activates chosen port", %{conn: conn, port: port} do
+			conn = post conn, admin_port_path(conn, :activate, port)
+			assert redirected_to(conn) == admin_port_path(conn, :index)
+			port = Auctions.get_port!(port.id)
+			assert port.is_active == true
 		end
 	end
 

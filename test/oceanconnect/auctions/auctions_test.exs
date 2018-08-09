@@ -327,8 +327,9 @@ defmodule Oceanconnect.AuctionsTest do
 
     setup do
       company = insert(:company)
+			company2 = insert(:company)
       vessel = insert(:vessel, Map.merge(@valid_attrs, %{company: company}))
-			inactive_vessel = insert(:vessel, Map.merge(@valid_attrs_ianctive, %{company: company}))
+			inactive_vessel = insert(:vessel, Map.merge(@valid_attrs_ianctive, %{company: company2}))
       user = insert(:user, company: company)
       {:ok, %{company: company, user: user, vessel: Auctions.get_vessel!(vessel.id), inactive_vessel: Auctions.get_vessel!(inactive_vessel.id)}}
     end

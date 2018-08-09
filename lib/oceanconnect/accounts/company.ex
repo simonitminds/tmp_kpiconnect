@@ -51,8 +51,8 @@ defmodule Oceanconnect.Accounts.Company do
     |> validate_required(@required_fields)
   end
 
-	def select_active do
-		from c in Company,
-		  where: c.is_active == true
+	def select_active(query \\ Company) do
+		from q in query,
+		  where: q.is_active == true
 	end
 end

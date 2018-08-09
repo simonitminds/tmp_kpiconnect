@@ -24,12 +24,16 @@
 					</thead>
 					<tbody>
 						<%= for company <- @companies do %>
-							<tr>
+							<tr class="qa-admin-company-<%= company.id %>">
 								<td><%= company.name %></td>
 								<td><%= company.contact_name %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_company_path(@conn, :edit, company), class: "button is-small is-primary is-inline-block" %>
-									<%= link "Delete", to: admin_company_path(@conn, :delete, company), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block" %>
+									<%= if company.is_active do %>
+                    <%= link "Deactivate", to: admin_company_path(@conn, :deactivate, company), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-company-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_company_path(@conn, :activate, company), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-company-activate" %>
+									<% end %>
 								</td>
 							</tr>
 						<% end %>

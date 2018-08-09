@@ -24,12 +24,16 @@
 					</thead>
 					<tbody>
 						<%= for port <- @ports do %>
-							<tr>
+							<tr class="qa-admin-port-<%= port.id %>">
 								<td><%= port.name %></td>
 								<td><%= port.country %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_port_path(@conn, :edit, port), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
-									<%= link "Delete", to: admin_port_path(@conn, :delete, port), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block has-margin-bottom-xs" %>
+									<%= if port.is_active do %>
+                    <%= link "Deactivate", to: admin_port_path(@conn, :deactivate, port), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-port-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_port_path(@conn, :activate, port), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-port-activate" %>
+									<% end %>
 								</td>
 							</tr>
 						<% end %>

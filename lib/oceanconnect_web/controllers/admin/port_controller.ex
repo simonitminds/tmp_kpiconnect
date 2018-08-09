@@ -58,12 +58,21 @@ defmodule OceanconnectWeb.Admin.PortController do
     |> redirect(to: admin_port_path(conn, :index))
   end
 
-	def deactivate(conn, %{"id" => id}) do
-		port = Auctions.get_active_port!(id)
+	def deactivate(conn, %{"port_id" => port_id}) do
+		port = Auctions.get_active_port!(port_id)
 		{:ok, _port} = Auctions.deactivate_port(port)
 
 		conn
 		|> put_flash(:info, "Port deactivated successfully.")
+		|> redirect(to: admin_port_path(conn, :index))
+	end
+
+	def activate(conn, %{"port_id" => port_id}) do
+		port = Auctions.get_port!(port_id)
+		{:ok, _port} = Auctions.activate_port(port)
+
+		conn
+		|> put_flash(:info, "Port activated successfully.")
 		|> redirect(to: admin_port_path(conn, :index))
 	end
 end

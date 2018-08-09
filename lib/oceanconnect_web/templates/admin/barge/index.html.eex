@@ -24,12 +24,16 @@
 					</thead>
 					<tbody>
 						<%= for barge <- @barges do %>
-							<tr>
+							<tr class="qa-admin-barge-<%= barge.id %>">
 								<td><%= barge.name %></td>
 								<td><%= barge.imo_number %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_barge_path(@conn, :edit, barge), class: "button is-small is-primary is-inline-block  has-margin-bottom-xs" %>
-									<%= link "Delete", to: admin_barge_path(@conn, :delete, barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-small is-danger is-inline-block  has-margin-bottom-xs" %>
+									<%= if barge.is_active do %>
+                    <%= link "Deactivate", to: admin_barge_path(@conn, :deactivate, barge), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-barge-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_barge_path(@conn, :activate, barge), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-barge-deactivate" %>
+									<% end %>
 								</td>
 							</tr>
 						<% end %>

@@ -14,6 +14,8 @@
 					<%end%>
 				</h2>
 				<%= render "form.html", Map.put(assigns, :action, admin_fuel_path(@conn, :update, @fuel)) %>
+				<br>
+				<%= link "Delete", to: admin_fuel_path(@conn, :delete, @fuel), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs" %>
 			</section>
 		</div>
 	</div>
