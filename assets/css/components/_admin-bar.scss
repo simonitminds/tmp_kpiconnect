@@ -10,14 +10,26 @@
 
 .navbar-dropdown__admin { // Styles related to Admin/Agent Toggle
   align-self: center;
+
+  @media (max-width: 768px) {
+    background-color: #efefef;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+  }
 }
 
 .navbar-dropdown__admin__toggles {
   &.inactive {
     @extend .button, .is-link, .is-outlined, .is-small, .has-text-weight-bold;
+    &:hover, &:focus {
+      background-color: darken($teal, 10%) !important;
+    }
   }
   &.active {
     @extend .button, .is-link, .is-small, .has-text-weight-bold;
+    &:hover, &:focus {
+      background-color: $turquoise !important;
+    }
   }
 }
 
@@ -26,7 +38,28 @@
   flex-direction: column;
   width: 100vw;
   height: calc(100vh - 3.25rem);
+  margin-top: 4rem;
   border: 5px solid $gray-3;
+
+  main & {
+    margin-top: 0;
+  }
+  &--login {
+    margin-top: 2rem;
+  }
+
+  &--no-border {
+    border: 0px solid transparent;
+  }
+
+  &--green-border {
+    border: 5px solid $green;
+    overflow-y: hidden;
+  }
+
+  &> .container.is-fullhd {
+    width: 100%;
+  }
 }
 
 .admin-bar__form ~  #auctions-app {
@@ -80,6 +113,22 @@
 
     &:hover, &:focus {
       background-color: darken($gray-3, 10%);
+      border: 2px solid darken($white, 5%);
+      color: darken($white, 5%);
+    }
+  }
+}
+
+.admin-bar--green-border > .admin-bar__form {
+  background-color: $green;
+
+  button {
+    border: 2px solid $white;
+    background-color: $green;
+    color: $white;
+
+    &:hover, &:focus {
+      background-color: darken($green, 10%);
       border: 2px solid darken($white, 5%);
       color: darken($white, 5%);
     }
