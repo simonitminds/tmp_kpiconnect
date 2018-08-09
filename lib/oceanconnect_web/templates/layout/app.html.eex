@@ -39,8 +39,14 @@
             </div>
             <div class="navbar-dropdown__admin">
               <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "qa-admin-act-as-admin") %>
-                <button class="qa-admin-act-as-agent">Agent</button>
+                <div class="field has-addons has-margin-bottom-none">
+                  <div class="control">
+                    <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "navbar-dropdown__admin__toggles active qa-admin-act-as-admin") %>
+                  </div>
+                  <div class="control">
+                    <button class="navbar-dropdown__admin__toggles inactive qa-admin-act-as-agent">Agent</button>
+                  </div>
+                </div>
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
               <% end %>
             </div>
@@ -66,12 +72,27 @@
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
        <main role="main">
          <div class="admin-bar" >
+<<<<<<< HEAD
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
               <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), fn(f) ->  %>
                 <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
                 <%= submit "<-" %>
               <% end %>
             <% end %>
+=======
+
+           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+             <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
+             <label class="label">Acting as User</label>
+             <div class="select">
+               <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
+             </div>
+             <%=  submit [class: "button is-outlined"] do %>
+               <i class="fas fa-arrow-right"></i>
+             <%end%>
+           <% end %>
+          <% end %>
+>>>>>>> Style up admin impersonation elements somewhat.
           <%= render @view_module, @view_template, assigns %>
          </div>
         </main>
