@@ -7,7 +7,7 @@ defmodule OceanconnectWeb.SessionController do
 
   def new(conn, _) do
     render(conn, "new.html")
-  end
+ end
 
   def create(conn, %{"session" => session}) do
     case Accounts.verify_login(session) do

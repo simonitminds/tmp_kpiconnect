@@ -22,6 +22,16 @@ defmodule OceanconnectWeb.SessionView do
     end
   end
 
+  def is_impersonating?(conn) do
+    current_user = Auth.current_user(conn)
+    current_admin = Auth.current_admin(conn)
+    cond do
+      %User(is_admin: true) = current_user -> false
+      %User(is_admin: false) = current_user && current_admin -> true
+      %User(is_admin: false) = current_user && !current_admin -> false
+    end
+  end
+
   def current_user(conn) do
     case Auth.current_user(conn) do
       nil -> ""
