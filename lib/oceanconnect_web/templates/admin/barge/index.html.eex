@@ -25,8 +25,8 @@
 					<tbody>
 						<%= for barge <- @barges do %>
 							<tr class="qa-admin-barge-<%= barge.id %>">
-								<td><%= barge.name %></td>
-								<td><%= barge.imo_number %></td>
+								<td class="qa-admin-barge-name"><%= barge.name %></td>
+								<td class="qa-admin-barge-imo_number"><%= barge.imo_number %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_barge_path(@conn, :edit, barge), class: "button is-small is-primary is-inline-block  has-margin-bottom-xs" %>
 									<%= if barge.is_active do %>

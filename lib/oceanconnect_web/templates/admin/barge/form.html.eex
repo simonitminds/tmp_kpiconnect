@@ -6,7 +6,7 @@
   <% end %>
   <div class="columns">
     <div class="column is-one-third">
-      <div class="field" >
+      <div class="field qa-admin-name" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
     			<%= text_input f, :name, class: "input" %>
@@ -14,7 +14,7 @@
     		</div>
       </div>
 
-      <div class="field" >
+      <div class="field qa-admin-imo_number" >
         <%= label f, :imo_number, class: "label" do %>
           IMO Number
         <%end%>
@@ -24,7 +24,7 @@
     		</div>
       </div>
 
-      <div class="field" >
+      <div class="field qa-admin-dwt" >
         <%= label f, :dwt, class: "label" do %>
           DWT
         <%end%>
