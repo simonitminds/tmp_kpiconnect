@@ -21,8 +21,23 @@
   }
 }
 
+.admin-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: calc(100vh - 3.25rem);
+  border: 5px solid $gray-3;
+}
+
+.admin-bar__form ~  #auctions-app {
+  height: calc(100vh - 6.5rem);
+  top: 6.5rem;
+  overflow-y: scroll;
+}
+
 .admin-bar__form {
   display: flex;
+  flex-shrink: 0;
   padding: 0.5rem;
   background-color: $gray-3;
 

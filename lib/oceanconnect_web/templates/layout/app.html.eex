@@ -72,18 +72,10 @@
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
        <main role="main">
          <div class="admin-bar" >
-<<<<<<< HEAD
-            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), fn(f) ->  %>
-                <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
-                <%= submit "<-" %>
-              <% end %>
-            <% end %>
-=======
 
            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
              <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
-             <label class="label">Acting as User</label>
+             <label class="label">Act as User</label>
              <div class="select">
                <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
              </div>
@@ -92,7 +84,6 @@
              <%end%>
            <% end %>
           <% end %>
->>>>>>> Style up admin impersonation elements somewhat.
           <%= render @view_module, @view_template, assigns %>
          </div>
         </main>
