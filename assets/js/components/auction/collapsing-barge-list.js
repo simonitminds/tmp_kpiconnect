@@ -175,7 +175,7 @@ class CollapsingBargeList extends Component {
 
     return(
       <section className={`${parentClassString.trim()}`}>
-        <div className="container is-fullhd">
+        <div className="container">
           <div className="content has-gray-lighter">
             <h2
               className={"qa-barge-header " + triggerClassString.trim()}
@@ -191,7 +191,7 @@ class CollapsingBargeList extends Component {
 
         {this.renderNonClickableTriggerElement()}
 
-        <div className="collapsing-barge-list__content container is-fullhd"
+        <div className="collapsing-barge-list__content container"
           ref="outer"
           style={dropdownStyle}
           onTransitionEnd={this.handleTransitionEnd}

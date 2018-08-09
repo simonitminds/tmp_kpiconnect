@@ -36,7 +36,10 @@
   border-top-right-radius: 0;
   margin-bottom: 0.5rem;
 
-  &> .container:first-child { padding: 0 0.4375rem; }
+  &> .container:first-child {
+    width: 100%;
+    padding: 0 0.4375rem;
+  }
 }
 
 .collapsing-barge-list__container__trigger {
