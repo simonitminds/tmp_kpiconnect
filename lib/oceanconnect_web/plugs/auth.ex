@@ -75,6 +75,10 @@ defmodule OceanconnectWeb.Plugs.Auth do
     |> Guardian.Plug.sign_out()
     |> Guardian.Plug.sign_in(impersonated_user)
     |> Guardian.Plug.sign_in(impersonator, %{}, token_type: "access", key: :admin)
+
+    previous_claims = Guardian.Plug.current_claims(authed_conn)
+    authed_conn = Guardian.Plug.sign_in(authed_conn, impersonated_user, Map.put(previous_claims, :impersonated_by, impersonator.id))
+
     {:ok, {authed_conn, impersonated_user}}
   end
 

@@ -41,10 +41,18 @@
               <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
                 <div class="field has-addons has-margin-bottom-none">
                   <div class="control">
-                    <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "navbar-dropdown__admin__toggles active qa-admin-act-as-admin") %>
+                    <%= if OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
+                      <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "navbar-dropdown__admin__toggles inactive qa-admin-act-as-admin") %>
+                    <% else %>
+                      <%= button("Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "navbar-dropdown__admin__toggles active qa-admin-act-as-admin") %>
+                    <% end %>
                   </div>
                   <div class="control">
-                    <button class="navbar-dropdown__admin__toggles inactive qa-admin-act-as-agent">Agent</button>
+                    <%= if OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
+                      <button class="navbar-dropdown__admin__toggles active qa-admin-act-as-agent">Agent</button>
+                    <% else %>
+                      <button class="navbar-dropdown__admin__toggles inactive qa-admin-act-as-agent">Agent</button>
+                    <% end %>
                   </div>
                 </div>
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
@@ -71,18 +79,17 @@
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
        <main role="main">
-         <div class="admin-bar" >
-
-           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-             <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
-             <label class="label">Act as User</label>
-             <div class="select">
-               <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
-             </div>
-             <%=  submit [class: "button is-outlined"] do %>
-               <i class="fas fa-arrow-right"></i>
-             <%end%>
-           <% end %>
+         <div class="admin-bar">
+          <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+            <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
+              <label class="label">Act as User</label>
+              <div class="select">
+                <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
+              </div>
+              <%= submit [class: "button is-outlined"] do %>
+                <i class="fas fa-arrow-right"></i>
+              <%end%>
+            <% end %>
           <% end %>
           <%= render @view_module, @view_template, assigns %>
          </div>

@@ -36,4 +36,13 @@ defmodule Oceanconnect.AdminTest do
     AdminPage.impersonate_user(buyer)
     assert AdminPage.logged_in_as?(buyer)
   end
+
+  test "stop impersonating another user", %{admin: admin, buyer: buyer} do
+    login_user(admin)
+    AdminPage.impersonate_user(buyer)
+
+    AdminPage.stop_impersonating()
+
+    assert AdminPage.logged_in_as?(admin)
+  end
 end

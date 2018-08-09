@@ -13,6 +13,11 @@ defmodule Oceanconnect.AdminPage do
     |> click
   end
 
+  def stop_impersonating() do
+    find_element(:css, ".qa-admin-act-as-admin")
+    |> click
+  end
+
   def logged_in_as?(%User{first_name: first, last_name: last}) do
     find_element(:css, ".navbar-item--user")
     |> inner_text =~ "#{first} #{last}"
