@@ -2,6 +2,7 @@ defmodule OceanconnectWeb.SessionView do
   use OceanconnectWeb, :view
   alias OceanconnectWeb.Plugs.Auth
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.User
 
   def current_user_is_admin?(conn) do
     case Auth.current_user(conn) do
@@ -26,9 +27,9 @@ defmodule OceanconnectWeb.SessionView do
     current_user = Auth.current_user(conn)
     current_admin = Auth.current_admin(conn)
     cond do
-      %User(is_admin: true) = current_user -> false
-      %User(is_admin: false) = current_user && current_admin -> true
-      %User(is_admin: false) = current_user && !current_admin -> false
+      %User{is_admin: true} = current_user -> false
+      %User{is_admin: false} = current_user && current_admin -> true
+      %User{is_admin: false} = current_user && !current_admin -> false
     end
   end
 

@@ -83,9 +83,12 @@ defmodule OceanconnectWeb.Plugs.Auth do
   end
 
   def stop_impersonating(conn) do
-    admin_user = current_admin(conn)
-    conn
-    |> Guardian.Plug.sign_out
-    |> Guardian.Plug.sign_in(admin_user)
+    if admin_user = current_admin(conn) do
+      conn
+      |> Guardian.Plug.sign_out
+      |> Guardian.Plug.sign_in(admin_user)
+    else
+      conn
+    end
   end
 end
