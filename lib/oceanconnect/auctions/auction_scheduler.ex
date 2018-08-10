@@ -100,7 +100,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     {:via, Registry, {@registry_name, auction_id}}
   end
 
-  defp get_schedule_delay(delay) when delay < 0, do: 0
+  defp get_schedule_delay(delay) when delay <= 0, do: 500
   defp get_schedule_delay(delay), do: delay
 
   defp cancel_timer(nil), do: :ok
