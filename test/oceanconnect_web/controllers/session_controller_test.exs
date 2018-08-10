@@ -1,8 +1,9 @@
 defmodule Oceanconnectweb.SessionControllerTest do
   use OceanconnectWeb.ConnCase
+  alias Oceanconnect.Accounts.User
 
   setup do
-    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "FOO@EXAMPLE.COM", password: "password"})
+    {:ok, user} = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
     %{user: user, conn: build_conn()}
   end
 
@@ -23,8 +24,7 @@ defmodule Oceanconnectweb.SessionControllerTest do
 
   test "invalid password", %{conn: conn} do
     response = post(conn, "/sessions", %{"session": %{email: "foo@example.com", password: "wrongpassword"}})
-    assert html_response(response, 401) =~ "Invalid email/password"
-  end
+    assert html_response(response, 401) =~ "Invalid email/password" end
 
   test "invalid email", %{conn: conn} do
     response = post(conn, "/sessions", %{"session": %{email: "test@example.com", password: "password"}})
@@ -52,18 +52,4 @@ defmodule Oceanconnectweb.SessionControllerTest do
     assert redirected_to(response, 302) =~ "/sessions/new"
     assert response.private.phoenix_flash["error"] == "Authentication Required"
   end
-
-  # test "already logged in", %{conn: conn} do
-  #   response = post(conn, "/sessions", %{"session": %{email: "foo@example.com", password: "password"}})
-
-  #   new_response = get(response, "/sessions")
-
-  #   assert redirected_to(new_response, 302) =~ "/user/dashboard"
-  # end
-
-  # test "invalid credentials" do
-  #   response = get(build_conn(), "/user/dashboard")
-  #   assert redirected_to(response, 302) =~ "/sessions"
-  #   assert response.private.phoenix_flash["error"] == "Authentication Required"
-  # end
 end

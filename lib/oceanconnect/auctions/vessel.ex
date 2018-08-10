@@ -10,6 +10,7 @@ defmodule Oceanconnect.Auctions.Vessel do
   schema "vessels" do
     field :imo, :integer
     field :name, :string
+		field :is_active, :boolean, default: true
     belongs_to :company, Company
 
     timestamps()
@@ -18,7 +19,7 @@ defmodule Oceanconnect.Auctions.Vessel do
   @doc false
   def changeset(%Vessel{} = vessel, attrs) do
     vessel
-    |> cast(attrs, [:name, :imo, :company_id])
+    |> cast(attrs, [:name, :imo, :company_id, :is_active])
     |> foreign_key_constraint(:company_id)
     |> validate_required([:name, :imo, :company_id])
   end
@@ -31,4 +32,14 @@ defmodule Oceanconnect.Auctions.Vessel do
     from v in Vessel,
       where: v.company_id == ^company_id
   end
+
+	def select_active do
+		from v in Vessel,
+		  where: v.is_active == true
+	end
+
+	def alphabetical do
+		from v in Vessel,
+		  order_by: [asc: v.name]
+	end
 end

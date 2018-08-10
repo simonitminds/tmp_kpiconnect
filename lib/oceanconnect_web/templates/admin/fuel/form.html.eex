@@ -1,0 +1,26 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert is-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+  <div class="columns">
+    <div class="column is-one-third">
+      <div class="field" >
+        <%= label f, :name, class: "label" do %>
+          Fuel Grade Name
+        <%end%>
+    		<div class="control">
+    			<%= text_input f, :name, class: "input" %>
+    			<%= error_tag f, :name %>
+    		</div>
+      </div>
+
+    	<div class="field has-margin-top-lg">
+    		<div class="control">
+    			<%= submit "Submit", class: "button is-primary" %>
+    		</div>
+    	</div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,22 @@
+<aside class="admin-panel__nav column is-one-quarter menu">
+	<label class="admin-panel__nav__toggle__label" for="admin-panel-menu-toggle"><i class="fas fa-bars is-inline-block has-margin-left-sm has-margin-right-md"></i><strong>Admin Menu</strong></label>
+	<input class="admin-panel__nav__toggle__checkbox" type="checkbox" id="admin-panel-menu-toggle">
+	<div class="admin-panel__nav__content">
+		<p class="menu-label">
+			Manage Resources
+		</p>
+		<ul class="menu-list">
+			<li><%= link "Vessels", to: admin_vessel_path(@conn, :index) %></li>
+			<li><%= link "Barges", to: admin_barge_path(@conn, :index) %></li>
+			<li><%= link "Fuel Grades", to: admin_fuel_path(@conn, :index) %></li>
+			<li><%= link "Ports", to: admin_port_path(@conn, :index) %></li>
+		</ul>
+		<p class="menu-label">
+			Manage Users
+		</p>
+		<ul class="menu-list">
+			<li><%= link "Users", to: admin_user_path(@conn, :index) %></li>
+			<li><%= link "Companies", to: admin_company_path(@conn, :index) %></li>
+		</ul>
+	</div>
+</aside>

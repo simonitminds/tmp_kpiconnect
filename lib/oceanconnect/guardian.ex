@@ -24,6 +24,7 @@ defmodule Oceanconnect.Guardian do
     resource =
       Oceanconnect.Accounts.get_user!(id)
       |> Oceanconnect.Accounts.load_company_on_user()
+      |> load_impersonator(claims["impersonated_by"])
 
     {:ok, resource}
   end
@@ -31,4 +32,8 @@ defmodule Oceanconnect.Guardian do
   # def resource_from_claims(_claims) do
   #   {:error, :reason_for_error}
   # end
+
+  defp load_impersonator(user, impersonator_id) do
+    %Oceanconnect.Accounts.User{user | impersonated_by: impersonator_id}
+  end
 end

@@ -1,0 +1,57 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<h2 class="admin-panel__content__header"><span class="is-inline-block">Users</span>
+					<%= link to: admin_user_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" do %>
+						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add User
+					<%end%>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Name</th>
+
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for user <- @users do %>
+							<tr class="qa-admin-user-<%= user.id %>">
+								<td><%= OceanconnectWeb.Admin.UserView.full_name(user) %></td>
+								<td class="text-right">
+									<%= link "Edit", to: admin_user_path(@conn, :edit, user), class: "button is-small is-primary is-inline-block" %>
+									<%= if user.is_active do %>
+                    <%= link "Deactivate", to: admin_user_path(@conn, :deactivate, user), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-user-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_user_path(@conn, :activate, user), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-user-activate" %>
+									<% end %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+				<div class="is-flex">
+					<div class="has-margin-left-auto">
+						<%= if @page_number > 1 do %>
+							<%= link to: admin_user_path(@conn, :index, page: @page_number - 1), class: "button is-inline-block" do %>
+								<i class="fas fa-chevron-left is-inline-block has-margin-right-sm"></i> Previous Page
+							<% end %>
+						<% end %>
+						<%= if @page_number < @total_pages do %>
+							<%= link to: admin_user_path(@conn, :index, page: @page_number + 1), class: "button is-inline-block" do %>
+								Next Page <i class="fas fa-chevron-right is-inline-block has-margin-left-sm"></i>
+							<% end %>
+						<% end %>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>

@@ -17,7 +17,7 @@ import {
   SELECT_ALL_SUPPLIERS,
   DESELECT_ALL_SUPPLIERS,
   SELECT_PORT,
-  RECEIVE_SUPPLIERS
+  RECEIVE_SUPPLIERS,
 } from "./constants";
 
 let channel, socket;

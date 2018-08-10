@@ -5,6 +5,8 @@
 @import 'base/theme';
 
 // Import Components
+@import 'components/admin-bar';
+@import 'components/admin-panel';
 @import 'components/auction-barging';
 @import 'components/auction-invitation';
 @import 'components/auction-notification';

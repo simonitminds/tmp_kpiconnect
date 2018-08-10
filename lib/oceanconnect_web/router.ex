@@ -15,7 +15,14 @@ defmodule OceanconnectWeb.Router do
 
   pipeline :authenticated do
     plug(Oceanconnect.Guardian.AuthPipeline)
+    plug(Guardian.Plug.VerifySession, key: :admin, allow_blank: true)
+    plug(Guardian.Plug.VerifyHeader, key: :admin, allow_blank: true)
+    plug(Guardian.Plug.LoadResource, key: :admin, allow_blank: true)
   end
+
+	pipeline :admin_required do
+		plug(OceanconnectWeb.Plugs.CheckAdmin)
+	end
 
   # Other scopes may use custom stacks.
   scope "/api", OceanconnectWeb.Api do
@@ -40,6 +47,8 @@ defmodule OceanconnectWeb.Router do
 
     get("/ports/:port_id/suppliers", PortSupplierController, :index)
     get("/companies/:company_id/barges", CompanyBargesController, :index, as: :company_barges_api)
+
+
   end
 
   scope "/", OceanconnectWeb do
@@ -52,6 +61,8 @@ defmodule OceanconnectWeb.Router do
 
     # Routes requiring authentication
     pipe_through(:authenticated)
+
+    post("/sessions/stop_impersonating", SessionController, :stop_impersonating, as: :admin_stop_impersonating_session)
     delete("/sessions/logout", SessionController, :delete)
     resources("/auctions", AuctionController, except: [:delete])
     get("/auctions/:id/log", AuctionController, :log)
@@ -59,5 +70,38 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+  end
+
+  scope "/admin", OceanconnectWeb.Admin do
+    pipe_through(:browser)
+		pipe_through(:authenticated)
+		pipe_through(:admin_required)
+
+    post("/sessions/impersonate", SessionController, :impersonate, as: :admin_impersonate_session)
+    post("/sessions/stop_impersonating", SessionController, :stop_impersonating, as: :admin_stop_impersonating_session)
+
+    resources("/vessels", VesselController, as: :admin_vessel)
+		post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)
+		post("/vessels/:vessel_id/activate", VesselController, :activate, as: :admin_vessel)
+
+    resources("/users", UserController, as: :admin_user)
+		post("/users/:user_id/deactivate", UserController, :deactivate, as: :admin_user)
+		post("/users/:user_id/activate", UserController, :activate, as: :admin_user)
+
+    resources("/companies", CompanyController, as: :admin_company)
+		post("/companies/:company_id/deactivate", CompanyController, :deactivate, as: :admin_company)
+		post("/companies/:company_id/activate", CompanyController, :activate, as: :admin_company)
+
+    resources("/barges", BargeController, as: :admin_barge)
+		post("/barges/:barge_id/deactivate", BargeController, :deactivate, as: :admin_barge)
+		post("/barges/:barge_id/activate", BargeController, :activate, as: :admin_barge)
+
+    resources("/fuels", FuelController, as: :admin_fuel)
+		post("/fuels/:fuel_id/deactivate", FuelController, :deactivate, as: :admin_fuel)
+		post("/fuels/:fuel_id/activate", FuelController, :activate, as: :admin_fuel)
+
+    resources("/ports", PortController, as: :admin_port)
+		post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
+		post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
   end
 end

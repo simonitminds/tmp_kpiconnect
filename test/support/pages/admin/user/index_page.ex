@@ -1,0 +1,45 @@
+defmodule Oceanconnect.Admin.User.IndexPage do
+	use Oceanconnect.Page
+
+	@page_path "/admin/users"
+
+	def visit do
+		navigate_to(@page_path)
+	end
+
+	def is_current_path? do
+		current_path() == @page_path
+	end
+
+	def has_users?(users) do
+		users
+		|> Enum.all?(fn(user) ->
+			case search_element(:css, ".qa-admin-user-#{user.id}") do
+				{:ok, _} -> true
+				_ -> false
+			end
+		end)
+	end
+
+	def deactivate_user(user) do
+		find_element(:css, ".qa-admin-user-#{user.id}")
+		|> find_within_element(:css, ".qa-admin-user-deactivate")
+		|> click
+	end
+
+	def activate_user(user) do
+		find_element(:css, ".qa-admin-user-#{user.id}")
+		|> find_within_element(:css, ".qa-admin-user-activate")
+		|> click
+	end
+
+	def is_user_active?(user) do
+		find_element(:css, ".qa-admin-user-#{user.id}")
+		|> search_within_element(:css, ".qa-admin-user-deactivate")
+	end
+
+	def is_user_inactive?(user) do
+		find_element(:css, ".qa-admin-user-#{user.id}")
+		|> search_within_element(:css, ".qa-admin-user-activate")
+	end
+end

@@ -6,5 +6,5 @@ import companyProfileReducer from "./company-profile";
 export default combineReducers({
   auctionsReducer,
   auctionFormReducer,
-  companyProfileReducer
+  companyProfileReducer,
 });

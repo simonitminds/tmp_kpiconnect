@@ -1,0 +1,103 @@
+// ========================== //
+// ========================== //
+// ADMIN PANEL
+// ========================== //
+// ========================== //
+
+// Associated Variables
+
+// Blocks
+
+
+.admin-panel__nav {
+  .menu-label {
+    font-weight: 700;
+    font-family: "Montserrat", "Futura", "Helvetica", "Arial", sans-serif;
+  }
+  .menu-list, .menu-list ul {
+    margin-left: 0;
+    list-style-type: none;
+  }
+  .menu-list + .menu-label {
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) { // Style for mobile
+    display: block;
+    margin: 0 1rem 2rem 1rem;
+    margin-bottom: 2rem;
+    background-color: $gray-1;
+    border-radius: 3px;
+  }
+}
+
+.admin-panel__nav__toggle__label { // When you need to expand/collapse in mobile
+  display: none;
+
+  @media (max-width: 768px) {
+    display: inline-block;
+    width: calc(100% - 20px);
+    color: $gray-3;
+  }
+}
+
+.admin-panel__nav__toggle__checkbox { // When you need to expand/collapse in mobile
+  display: none;
+
+  @media (max-width: 768px) {
+    display: inline-block;
+    opacity: 0;
+
+    &:not(:checked) + .admin-panel__nav__content {
+      display: none;
+    }
+
+    &:checked + .admin-panel__nav__content {
+      display: block;
+      padding: 1.5rem 1.25rem 0.5rem 1.25rem;
+      border-top: 1px solid $gray-2;
+      margin: 0.75rem -0.75rem 0 -0.75rem;
+    }
+  }
+}
+
+
+.admin-panel__header {
+  h1 {
+    font-weight: 700 !important;
+    margin-bottom: 2rem !important;
+  }
+
+  @media (max-width: 1023px) {
+    width: calc(100vw - 2rem);
+  }
+}
+
+.admin-panel__body {
+  @media (max-width: 1023px) {
+    width: calc(100vw - 2rem);
+  }
+  @media (max-width: 768px) {
+    width: auto;
+  }
+}
+
+.admin-panel__content {
+  &__header {
+    display: flex;
+    margin-bottom: 2rem !important;
+    padding-bottom: 1rem;
+    border-bottom: 5px solid #dbdbdb; // $gray-2
+
+    @media (max-width: 768px) {
+      width: calc(100vw - 2rem);
+      // padding: 0 1.75rem !important;
+    }
+  }
+}
+
+.admin-panel__table thead tr {
+  &:hover, &:focus {
+    background-color: $white !important;
+  }
+}

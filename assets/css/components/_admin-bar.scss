@@ -1,0 +1,136 @@
+// ========================== //
+// ========================== //
+// ADMIN BAR
+// ========================== //
+// ========================== //
+
+// Associated Variables
+
+// Blocks
+
+.navbar-dropdown__admin { // Styles related to Admin/Agent Toggle
+  align-self: center;
+
+  @media (max-width: 768px) {
+    background-color: #efefef;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.navbar-dropdown__admin__toggles {
+  &.inactive {
+    @extend .button, .is-link, .is-outlined, .is-small, .has-text-weight-bold;
+    &:hover, &:focus {
+      background-color: darken($teal, 10%) !important;
+    }
+  }
+  &.active {
+    @extend .button, .is-link, .is-small, .has-text-weight-bold;
+    &:hover, &:focus {
+      background-color: $turquoise !important;
+    }
+  }
+}
+
+.admin-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: calc(100vh - 3.25rem);
+  margin-top: 4rem;
+  border: 5px solid $gray-3;
+
+  main & {
+    margin-top: 0;
+  }
+  &--login {
+    margin-top: 2rem;
+  }
+
+  &--no-border {
+    border: 0px solid transparent;
+  }
+
+  &--green-border {
+    border: 5px solid $green;
+    overflow-y: hidden;
+  }
+
+  &> .container.is-fullhd {
+    width: 100%;
+  }
+}
+
+.admin-bar__form ~  #auctions-app {
+  height: calc(100vh - 6.5rem);
+  top: 6.5rem;
+  overflow-y: scroll;
+}
+
+.admin-bar__form {
+  display: flex;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  background-color: $gray-3;
+
+  label {
+    color: $white;
+    margin-left: auto;
+    margin-right: 1rem;
+    margin-bottom: 0;
+    margin-top: 0.375rem;
+
+    @media (max-width: 768px) { // Probably not going to be doing this on mobile much, but just in case...
+      display: none;
+    }
+  }
+
+  .select { // Dropdown to select which user to impersonate
+    // margin-left: auto;
+    margin-right: 0.25rem;
+
+    select {
+      border-color: darken($gray-3, 2%);
+
+      &:hover, &:focus {
+        border-color: darken($gray-3, 5%);
+      }
+    }
+    &:not(.is-multiple):after {
+      border-color: darken($gray-3, 5%);
+    }
+
+    @media (max-width: 768px) { // Probably not going to be doing this on mobile much, but just in case...
+      max-width: 266px;
+      margin-left: auto;
+    }
+  }
+  button {
+    border: 2px solid $white;
+    background-color: $gray-3;
+    color: $white;
+
+    &:hover, &:focus {
+      background-color: darken($gray-3, 10%);
+      border: 2px solid darken($white, 5%);
+      color: darken($white, 5%);
+    }
+  }
+}
+
+.admin-bar--green-border > .admin-bar__form {
+  background-color: $green;
+
+  button {
+    border: 2px solid $white;
+    background-color: $green;
+    color: $white;
+
+    &:hover, &:focus {
+      background-color: darken($green, 10%);
+      border: 2px solid darken($white, 5%);
+      color: darken($white, 5%);
+    }
+  }
+}

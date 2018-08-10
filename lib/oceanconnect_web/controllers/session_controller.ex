@@ -2,18 +2,20 @@ defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
   import Plug.Conn
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.{User}
   alias OceanconnectWeb.Plugs.Auth
 
   def new(conn, _) do
     render(conn, "new.html")
-  end
+ end
 
   def create(conn, %{"session" => session}) do
     case Accounts.verify_login(session) do
       {:ok, user} ->
-        conn
+        updated_conn = conn
         |> Auth.build_session(user)
-        |> redirect(to: auction_path(conn, :index))
+        updated_conn
+        |> redirect(to: auction_path(updated_conn, :index))
 
       {:error, _} ->
         conn
@@ -28,6 +30,12 @@ defmodule OceanconnectWeb.SessionController do
     |> Auth.browser_logout
     |> put_status(302)
     |> redirect(to: session_path(conn, :new))
+  end
+
+  def stop_impersonating(conn, _params) do
+    updated_conn = Auth.stop_impersonating(conn)
+    updated_conn
+    |> redirect(to: auction_path(updated_conn, :index))
   end
 
   def already_authenticated(conn, _) do

@@ -20,10 +20,10 @@ import 'phoenix_html';
 import React from 'react';
 import { render } from 'react-dom';
 import { createStore, applyMiddleware, compose } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';
-import { getAllAuctionPayloads, receiveAuctionFormData } from './actions';
+import { getAllAuctionPayloads, receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';
@@ -64,9 +64,8 @@ if (document.getElementById('auctions-app')) {
   };
 
   render((
-    <Provider store={store}>
-      {setContainer()}
-    </Provider>
-
+      <Provider store={store}>
+        {setContainer()}
+      </Provider>
   ), document.getElementById('auctions-app'));
 }

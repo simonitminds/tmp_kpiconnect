@@ -22,6 +22,10 @@
     flex-basis: 100%;
   }
 
+  &> .control {
+    width: 100%;
+  }
+
   &> .control:not(:last-child) {
     margin-bottom: 0.5rem;
   }
@@ -53,6 +57,11 @@
 fieldset {
   max-width: 750px;
   border: none;
+}
+
+.content h3.form-group__header {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
 }
 
 .select__extra-label { // Additional text following an "inline" select.
