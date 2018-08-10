@@ -50,19 +50,23 @@
                 <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
               <% end %>
             </div>
-
-            <div class="navbar-item navbar-item--burger has-dropdown is-hoverable">
-              <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
-              <div class="navbar-dropdown">
-                <a href="/auctions" class="navbar-item">Current Auctions</a>
-                <!-- <a href="#" class="navbar-item">Auction History</a>
-                <a href="#" class="navbar-item">Claims</a>
-                <a href="#" class="navbar-item">Invoices</a>
-                <a href="#" class="navbar-item">Messages</a>
-                <a href="#" class="navbar-item">Account Settings</a> -->
-                <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
+            <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>
+              <div class="navbar-item navbar-item--burger has-dropdown is-hoverable">
+                <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
+                <div class="navbar-dropdown">
+                  <a href="/auctions" class="navbar-item">Current Auctions</a>
+                  <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                    <a href="/admin/vessels" class="navbar-item">Admin Panel</a>
+                  <% end %>
+                  <!-- <a href="#" class="navbar-item">Auction History</a>
+                  <a href="#" class="navbar-item">Claims</a>
+                  <a href="#" class="navbar-item">Invoices</a>
+                  <a href="#" class="navbar-item">Messages</a>
+                  <a href="#" class="navbar-item">Account Settings</a> -->
+                  <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
+                </div>
               </div>
-            </div>
+            <% end %>
             <!-- <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>          --></div>
         </div>
       </nav>
