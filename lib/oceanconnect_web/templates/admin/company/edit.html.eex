@@ -15,7 +15,7 @@
 				</h2>
 				<%= render "form.html", Map.put(assigns, :action, admin_company_path(@conn, :update, @company)) %>
 				<br>
-				<%= link "Delete", to: admin_company_path(@conn, :delete, @company), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block" %>
+				<%= link "Delete", to: admin_company_path(@conn, :delete, @company), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block qa-admin-delete" %>
 			</section>
 		</div>
 	</div>

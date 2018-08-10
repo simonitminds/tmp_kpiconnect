@@ -6,37 +6,37 @@
   <% end %>
   <div class="columns">
     <div class="column is-one-third">
-      <div class="field qa-admin-name" >
+      <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
-    			<%= text_input f, :name, class: "input" %>
+    			<%= text_input f, :name, class: "input qa-admin-name" %>
     			<%= error_tag f, :name %>
     		</div>
       </div>
 
-      <div class="field qa-admin-imo_number" >
+      <div class="field" >
         <%= label f, :imo_number, class: "label" do %>
           IMO Number
         <%end%>
     		<div class="control">
-    			<%= text_input f, :imo_number, class: "input" %>
+    			<%= text_input f, :imo_number, class: "input qa-admin-imo_number" %>
     			<%= error_tag f, :imo %>
     		</div>
       </div>
 
-      <div class="field qa-admin-dwt" >
+      <div class="field" >
         <%= label f, :dwt, class: "label" do %>
           DWT
         <%end%>
     		<div class="control">
-    			<%= text_input f, :dwt, class: "input" %>
+    			<%= text_input f, :dwt, class: "input qa-admin-dwt" %>
     			<%= error_tag f, :dwt %>
     		</div>
       </div>
 
     	<div class="field has-margin-top-lg">
     		<div class="control">
-    			<%= submit "Submit", class: "button is-primary" %>
+    			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>
     		</div>
     	</div>
     </div>

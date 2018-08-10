@@ -31,9 +31,17 @@ defmodule Oceanconnect.Admin.Barge.EditTest do
 
 		test "admin can edit a barge and submit the changes", %{barge: barge} do
 			EditPage.visit(barge.id)
-
 			EditPage.fill_form(%{name: "some new name", imo_number: barge.imo_number, dwt: barge.dwt})
 			EditPage.submit
+			assert EditPage.is_index_path?
+			assert EditPage.updated_barge_name == "some new name"
+		end
+
+		test "admin can delete a barge", %{barge: barge} do
+			EditPage.visit(barge.id)
+			EditPage.delete
+			assert EditPage.is_index_path?
+			refute EditPage.has_barge?(barge.id)
 		end
 	end
 end

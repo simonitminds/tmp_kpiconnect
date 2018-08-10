@@ -16,7 +16,7 @@
 				</h2>
 				<%= render "form.html", Map.put(assigns, :action, admin_barge_path(@conn, :update, @barge)) %></section>
 			  <br>
-			  <%= link "Delete", to: admin_barge_path(@conn, :delete, @barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block  has-margin-bottom-xs" %>
+			  <%= link "Delete", to: admin_barge_path(@conn, :delete, @barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block  has-margin-bottom-xs qa-admin-delete" %>
 		  </section>
 		</div>
 	</div>

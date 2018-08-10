@@ -21,6 +21,19 @@ defmodule Oceanconnect.Admin.Company.IndexPage do
 		end)
 	end
 
+	def has_company?(id) do
+		case search_element(:css, ".qa-admin-company-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_company_name?(name) do
+		company_name = find_element(:css, ".qa-admin-company-name")
+		|> inner_text
+		name == company_name
+	end
+
 	def deactivate_company(company) do
 		find_element(:css, ".qa-admin-company-#{company.id}")
 		|> find_within_element(:css, ".qa-admin-company-deactivate")

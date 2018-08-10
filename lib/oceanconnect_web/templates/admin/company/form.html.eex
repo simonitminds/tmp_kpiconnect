@@ -10,7 +10,7 @@
       <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
-    			<%= text_input f, :name, class: "input" %>
+    			<%= text_input f, :name, class: "input qa-admin-company-name" %>
     			<%= error_tag f, :name %>
     		</div>
       </div>
@@ -20,7 +20,7 @@
           Address 1
         <%end%>
     		<div class="control">
-    			<%= text_input f, :address1, class: "input" %>
+    			<%= text_input f, :address1, class: "input qa-admin-company-address1" %>
     			<%= error_tag f, :address1 %>
     		</div>
 
@@ -28,7 +28,7 @@
           Address 2
         <%end%>
     		<div class="control">
-    			<%= text_input f, :address2, class: "input" %>
+    			<%= text_input f, :address2, class: "input qa-admin-company-address2" %>
     			<%= error_tag f, :address2 %>
     		</div>
       </div>
@@ -36,13 +36,13 @@
       <div class="field is-grouped" >
         <%= label f, :city, class: "label" %>
     		<div class="control">
-    			<%= text_input f, :city, class: "input" %>
+    			<%= text_input f, :city, class: "input qa-admin-company-city" %>
     			<%= error_tag f, :city %>
     		</div>
 
         <%= label f, :country, class: "label" %>
     		<div class="control">
-    			<%= text_input f, :country, class: "input" %>
+    			<%= text_input f, :country, class: "input qa-admin-company-country" %>
     			<%= error_tag f, :country %>
     		</div>
 
@@ -50,7 +50,7 @@
           Postal Code
         <%end%>
     		<div class="control">
-    			<%= text_input f, :postal_code, class: "input" %>
+    			<%= text_input f, :postal_code, class: "input qa-admin-company-postal_code" %>
     			<%= error_tag f, :postal_code %>
     		</div>
       </div>
@@ -62,7 +62,7 @@
           Contact Name
         <%end%>
         <div class="control">
-          <%= text_input f, :contact_name, class: "input" %>
+          <%= text_input f, :contact_name, class: "input qa-admin-company-contact_name" %>
           <%= error_tag f, :contact_name %>
         </div>
       </div>
@@ -72,7 +72,7 @@
           Main Phone
         <%end%>
         <div class="control">
-          <%= text_input f, :main_phone, class: "input" %>
+          <%= text_input f, :main_phone, class: "input qa-admin-company-main_phone" %>
           <%= error_tag f, :main_phone %>
         </div>
 
@@ -80,14 +80,14 @@
           Mobile Phone
         <%end%>
         <div class="control">
-          <%= text_input f, :mobile_phone, class: "input" %>
+          <%= text_input f, :mobile_phone, class: "input qa-admin-company-mobile_phone" %>
           <%= error_tag f, :mobile_phone %>
         </div>
       </div>
 
       <div class="field is-horizontal">
         <div class="control">
-          <%= checkbox f, :is_supplier, class: "checkbox" %>
+          <%= checkbox f, :is_supplier, class: "checkbox qa-admin-company-is_supplier" %>
           <%= error_tag f, :is_supplier %>
         </div>
         <%= label f, :is_supplier, class: "label has-margin-left-md" do %>
@@ -100,7 +100,7 @@
     <div class="column">
       <div class="field is-margin-top-lg">
         <div class="control">
-          <%= submit "Submit", class: "button is-primary" %>
+          <%= submit "Submit", class: "button is-primary qa-admin-submit" %>
         </div>
       </div>
     </div>
