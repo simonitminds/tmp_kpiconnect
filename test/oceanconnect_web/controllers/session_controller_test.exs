@@ -3,7 +3,7 @@ defmodule Oceanconnectweb.SessionControllerTest do
   alias Oceanconnect.Accounts.User
 
   setup do
-    {:ok, user} = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
+    user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
     %{user: user, conn: build_conn()}
   end
 
