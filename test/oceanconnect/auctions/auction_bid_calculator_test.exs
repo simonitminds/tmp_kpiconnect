@@ -763,13 +763,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         bids: []
       }
       {state, _} = AuctionBidCalculator.process(initial_state, supplier2_bid1)
-      {state, _} = AuctionBidCalculator.process(initial_state, supplier1_bid1)
-      {state, events} = AuctionBidCalculator.process(%AuctionState{state | status: :open})
-      {state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
+      {state, _} = AuctionBidCalculator.process(state, supplier1_bid1)
+      {state, _} = AuctionBidCalculator.process(%AuctionState{state | status: :open})
+      {_state, events} = AuctionBidCalculator.process(state, supplier1_bid2)
 
       assert [%AuctionEvent{
         type: :auto_bid_placed,
-        auction_id: auction_id,
+        auction_id: ^auction_id,
         data: %{bid: %AuctionBid{amount: 1.75, supplier_id: ^supplier1}}
       }] = events
     end

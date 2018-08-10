@@ -83,7 +83,7 @@
                <div class="select">
                  <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
                </div>
-               <%=  submit [class: "button is-outlined"] do %>
+               <%=  submit [class: "button is-outlined qa-admin-impersonate-user-submit"] do %>
                  <i class="fas fa-arrow-right"></i>
                <%end%>
              <% end %>

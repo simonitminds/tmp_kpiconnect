@@ -4,10 +4,10 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
   alias OceanconnectWeb.Plugs.Auth
 
   setup do
-    {:ok, user} = Oceanconnect.Accounts.create_user(%{email: "FOO@EXAMPLE.COM", password: "password"})
-    {:ok, other_user} = Oceanconnect.Accounts.create_user(%{email: "BAR@EXAMPLE.COM", password: "password"})
-    {:ok, admin} = Oceanconnect.Accounts.create_user(%{email: "ADMIN@EXAMPLE.COM", password: "password", is_admin: true})
-    {:ok, other_admin} = Oceanconnect.Accounts.create_user(%{email: "ADMIN_TWO@EXAMPLE.COM", password: "password", is_admin: true})
+    user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
+    other_user = insert(:user, %{email: "BAR@EXAMPLE.COM", password: "password"})
+    admin = insert(:user, %{email: "ADMIN@EXAMPLE.COM", password: "password", is_admin: true})
+    other_admin =  insert(:user, %{email: "ADMIN_TWO@EXAMPLE.COM", password: "password", is_admin: true})
     %{user: user, admin: admin, other_admin: other_admin, other_user: other_user, conn: build_conn()}
   end
 
