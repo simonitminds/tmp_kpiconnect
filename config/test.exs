@@ -31,3 +31,6 @@ config :hound,
   host: System.get_env("DATA_CHROME_HOST") || "localhost",
   app_host: "http://" <> (System.get_env("APP_IP") || "localhost"),
   app_port: 4001
+
+config :oceanconnect, Oceanconnect.Auctions.Mailer,
+  adapter: Bamboo.TestAdapter

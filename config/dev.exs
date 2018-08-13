@@ -62,3 +62,6 @@ config :oceanconnect, Oceanconnect.Repo,
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "oceanconnect_dev",
   pool_size: 10
+
+config :oceanconnect, Oceanconnect.Auctions.Mailer,
+	adapter: Bamboo.LocalAdapter

@@ -48,10 +48,20 @@ defmodule Oceanconnect.Accounts.User do
 
   defp put_pass_hash(changeset), do: changeset
 
-  def select_active(query \\ User) do
-    from(
-      q in query,
-      where: q.is_active == true
-    )
-  end
+	def select_active(query \\ User) do
+		from q in query,
+		where: q.is_active == true
+	end
+
+	def for_companies(company_ids) when is_list(company_ids) do
+		from u in User,
+		  where: u.company_id in ^company_ids
+	end
+
+	defimpl Bamboo.Formatter, for: User do
+		def format_email_address(%User{first_name: first_name, last_name: last_name, email: email}, opts \\ []) do
+			full_name = "#{first_name} #{last_name}"
+			{full_name, email}
+		end
+	end
 end
