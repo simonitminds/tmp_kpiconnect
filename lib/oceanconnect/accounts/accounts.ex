@@ -28,7 +28,7 @@ defmodule Oceanconnect.Accounts do
 	end
 
 	def list_active_users do
-		query = User.select_active
+		User.select_active
 		|> Repo.all
 	end
 

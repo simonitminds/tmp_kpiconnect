@@ -294,12 +294,12 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_ports(params) do
-		Port
+		Port.alphabetical
 		|> Repo.paginate(params)
 	end
 
 	def list_active_ports do
-		query = Port.select_active
+		Port.select_active
 		|> Repo.all
 	end
 
@@ -427,9 +427,8 @@ defmodule Oceanconnect.Auctions do
   """
 
   def vessels_for_buyer(%Company{id: id}) do
-		query = Vessel.select_active
-
-    query = Vessel.by_company(id)
+    Vessel.by_company(id)
+		|> Vessel.select_active
     |> Repo.all
   end
 
@@ -447,12 +446,12 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_vessels(params) do
-		query = Vessel.alphabetical
+		Vessel.alphabetical
 		|> Repo.paginate(params)
 	end
 
 	def list_active_vessels do
-		query = Vessel.select_active
+		Vessel.select_active
 		|> Repo.all
 	end
 
@@ -568,12 +567,12 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_fuels(params) do
-		query = Fuel.alphabetical
+		Fuel.alphabetical
 		|> Repo.paginate(params)
 	end
 
 	def list_active_fuels do
-		query = Fuel.select_active
+		Fuel.select_active
 		|> Repo.all
 	end
 
@@ -678,12 +677,12 @@ defmodule Oceanconnect.Auctions do
   def list_barges, do: Repo.all(Barge)
 
 	def list_barges(params) do
-		query = Barge.alphabetical
+		Barge.alphabetical
 		|> Oceanconnect.Repo.paginate(params)
 	end
 
 	def list_active_barges do
-		query = Barge.select_active
+		Barge.select_active
 		|> Repo.all
 	end
 

@@ -41,13 +41,13 @@ defmodule Oceanconnect.Auctions.Barge do
       join: cb in "company_barges", where: cb.barge_id == b.id and cb.company_id == ^company_id
   end
 
-	def alphabetical do
-		from b in Barge,
-		  order_by: [asc: b.name]
+	def alphabetical(query \\ Barge) do
+		from q in query,
+		  order_by: [asc: q.name]
 	end
 
-	def select_active do
-		from b in Barge,
-		  where: b.is_active == true
+	def select_active(query \\ Barge) do
+		from q in query,
+		  where: q.is_active == true
 	end
 end

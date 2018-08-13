@@ -35,8 +35,13 @@ defmodule Oceanconnect.Auctions.Port do
       select: c
   end
 
-	def select_active do
-		from p in Port,
-		  where: p.is_active == true
+	def alphabetical(query \\ Port) do
+		from q in query,
+		  order_by: [asc: q.name]
+	end
+
+	def select_active(query \\ Port) do
+		from q in query,
+		  where: q.is_active == true
 	end
 end
