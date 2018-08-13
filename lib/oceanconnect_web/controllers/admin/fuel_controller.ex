@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
 
   def create(conn, %{"fuel" => fuel_params}) do
     case Auctions.create_fuel(fuel_params) do
-      {:ok, fuel} ->
+      {:ok, _fuel} ->
         conn
         |> put_flash(:info, "Fuel created successfully.")
         |> redirect(to: admin_fuel_path(conn, :index))
@@ -40,7 +40,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
     fuel = Auctions.get_fuel!(id)
 
     case Auctions.update_fuel(fuel, fuel_params) do
-      {:ok, fuel} ->
+      {:ok, _fuel} ->
         conn
         |> put_flash(:info, "Fuel updated successfully.")
         |> redirect(to: admin_fuel_path(conn, :index))

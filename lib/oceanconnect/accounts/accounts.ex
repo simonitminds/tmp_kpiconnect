@@ -159,7 +159,7 @@ defmodule Oceanconnect.Accounts do
 	end
 
 	def list_active_companies do
-		query = Company.select_active
+		Company.select_active
 		|> Repo.all
 	end
 

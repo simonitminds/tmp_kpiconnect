@@ -2,7 +2,6 @@ defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
   import Plug.Conn
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.{User}
   alias OceanconnectWeb.Plugs.Auth
 
   def new(conn, _) do

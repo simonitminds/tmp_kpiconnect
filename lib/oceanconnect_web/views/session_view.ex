@@ -61,7 +61,7 @@ defmodule OceanconnectWeb.SessionView do
   end
 
   defp admin_present?(conn) do
-    admin_present? = if admin = Auth.current_admin(conn) do
+    if admin = Auth.current_admin(conn) do
       admin.is_admin
     else
       false

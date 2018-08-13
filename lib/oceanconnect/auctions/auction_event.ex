@@ -123,7 +123,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   def winning_bid_selected(bid = %AuctionBid{auction_id: auction_id}, state = %AuctionState{}, user) do
     %AuctionEvent{
       type: :winning_bid_selected,
-      auction_id: bid.auction_id,
+      auction_id: auction_id,
       data: %{bid: bid, state: state},
       time_entered: DateTime.utc_now(),
       user: user
