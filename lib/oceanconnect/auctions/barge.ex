@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Auctions.Barge do
   use Ecto.Schema
   import Ecto.{Changeset, Query}
-  alias Oceanconnect.Accounts.Company
   alias __MODULE__
 
   @derive {Poison.Encoder, except: [:__meta__, :companies]}

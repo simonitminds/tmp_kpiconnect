@@ -80,7 +80,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         data: data = %{auction_barge: %AuctionBarge{auction_id: auction_id}}
       }) do
     with {:ok, pid} <- find_pid(auction_id),
-      do: GenServer.cast(pid, {cmd, data, true})
+         do: GenServer.cast(pid, {cmd, data, true})
   end
 
   def process_command(%Command{command: cmd, data: data = %{auction: %Auction{id: auction_id}}}) do
@@ -165,7 +165,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       ) do
     is_first_bid = is_suppliers_first_bid?(current_state, bid)
     {new_state, events} = AuctionBidCalculator.process(current_state, bid)
-    Enum.map(events, &(AuctionEvent.emit(&1, true)))
+    Enum.map(events, &AuctionEvent.emit(&1, true))
     AuctionEvent.emit(AuctionEvent.bid_placed(bid, new_state, user), emit)
 
     if is_lowest_bid?(new_state, bid) or is_first_bid do
@@ -183,7 +183,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {new_state, events} = AuctionBidCalculator.process(current_state, bid)
 
     AuctionEvent.emit(AuctionEvent.auto_bid_placed(bid, new_state, user), emit)
-    Enum.map(events, &(AuctionEvent.emit(&1, true)))
+    Enum.map(events, &AuctionEvent.emit(&1, true))
 
     if is_lowest_bid?(new_state, bid) or is_first_bid do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
@@ -253,6 +253,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp is_lowest_bid?(%AuctionState{lowest_bids: []}, %AuctionBid{}), do: true
+
   defp is_lowest_bid?(%AuctionState{lowest_bids: lowest_bids}, bid = %AuctionBid{}) do
     hd(lowest_bids).supplier_id == bid.supplier_id
   end
@@ -307,19 +308,31 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     select_winning_bid(bid, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}},
+         previous_state
+       ) do
     submit_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :barge_unsubmitted, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :barge_unsubmitted, data: %{auction_barge: auction_barge}},
+         previous_state
+       ) do
     unsubmit_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}},
+         previous_state
+       ) do
     approve_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}},
+         previous_state
+       ) do
     reject_barge(auction_barge, previous_state)
   end
 
@@ -347,8 +360,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Command.cancel_scheduled_start()
     |> AuctionScheduler.process_command()
 
-    {next_state, _} = %AuctionState{current_state | status: :open}
-    |> AuctionBidCalculator.process()
+    {next_state, _} =
+      %AuctionState{current_state | status: :open}
+      |> AuctionBidCalculator.process()
+
     next_state
   end
 
@@ -397,83 +412,91 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp submit_barge(
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id
-        },
-        current_state = %AuctionState{submitted_barges: submitted_barges}
-      ) do
-    barge_is_submitted = Enum.any?(submitted_barges, fn(barge) ->
-      match?(%AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id}, barge)
-    end)
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
+    barge_is_submitted =
+      Enum.any?(submitted_barges, fn barge ->
+        match?(
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
+          barge
+        )
+      end)
 
     if barge_is_submitted do
       current_state
     else
-      %AuctionState{ current_state |
-        submitted_barges: submitted_barges ++ [auction_barge]
-      }
+      %AuctionState{current_state | submitted_barges: submitted_barges ++ [auction_barge]}
     end
   end
 
   defp unsubmit_barge(
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id
-        },
-        current_state = %AuctionState{submitted_barges: submitted_barges}
-      ) do
-    new_submitted_barges = Enum.reject(submitted_barges, fn(barge) ->
-      match?(%AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id}, barge)
-    end)
+         %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
+    new_submitted_barges =
+      Enum.reject(submitted_barges, fn barge ->
+        match?(
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
+          barge
+        )
+      end)
 
-    %AuctionState{ current_state |
-      submitted_barges: new_submitted_barges
-    }
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   defp approve_barge(
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id,
-          approval_status: "APPROVED"
-        },
-        current_state = %AuctionState{submitted_barges: submitted_barges}
-      ) do
-    new_submitted_barges = Enum.map(submitted_barges, fn(barge) ->
-      case barge do
-        %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
-        _ -> barge
-      end
-    end)
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id,
+           approval_status: "APPROVED"
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
+    new_submitted_barges =
+      Enum.map(submitted_barges, fn barge ->
+        case barge do
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} ->
+            auction_barge
 
-    %AuctionState{ current_state |
-      submitted_barges: new_submitted_barges
-    }
+          _ ->
+            barge
+        end
+      end)
+
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   defp reject_barge(
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id,
-          approval_status: "REJECTED"
-        },
-        current_state = %AuctionState{submitted_barges: submitted_barges}
-      ) do
-    new_submitted_barges = Enum.map(submitted_barges, fn(barge) ->
-      case barge do
-        %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
-        _ -> barge
-      end
-    end)
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id,
+           approval_status: "REJECTED"
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
+    new_submitted_barges =
+      Enum.map(submitted_barges, fn barge ->
+        case barge do
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} ->
+            auction_barge
 
-    %AuctionState{ current_state |
-      submitted_barges: new_submitted_barges
-    }
+          _ ->
+            barge
+        end
+      end)
+
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   defp expire_auction(current_state = %{auction_id: auction_id}) do
@@ -488,6 +511,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     state
   end
+
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :decision, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :decision_duration)
 
@@ -495,10 +519,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     state
   end
+
   defp maybe_emit_rebuilt_event(state), do: state
 
   defp maybe_emit_extend_auction(auction_id, {true, extension_time}, emit) do
     AuctionEvent.emit(AuctionEvent.duration_extended(auction_id, extension_time), emit)
   end
+
   defp maybe_emit_extend_auction(_auction_id, {false, _time_remaining}, _emit), do: nil
 end

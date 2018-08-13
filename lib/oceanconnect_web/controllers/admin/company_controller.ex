@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
 
   def create(conn, %{"company" => company_params}) do
     case Accounts.create_company(company_params) do
-      {:ok, company} ->
+      {:ok, _company} ->
         conn
         |> put_flash(:info, "Company created successfully.")
         |> redirect(to: admin_company_path(conn, :index))
@@ -40,7 +40,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
     company = Accounts.get_company!(id)
 
     case Accounts.update_company(company, company_params) do
-      {:ok, company} ->
+      {:ok, _company} ->
         conn
         |> put_flash(:info, "Company updated successfully.")
         |> redirect(to: admin_company_path(conn, :index))

@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.Admin.PortController do
 
   def create(conn, %{"port" => port_params}) do
     case Auctions.create_port(port_params) do
-      {:ok, port} ->
+      {:ok, _port} ->
         conn
         |> put_flash(:info, "Port created successfully.")
         |> redirect(to: admin_port_path(conn, :index))
@@ -40,7 +40,7 @@ defmodule OceanconnectWeb.Admin.PortController do
     port = Auctions.get_port!(id)
 
     case Auctions.update_port(port, port_params) do
-      {:ok, port} ->
+      {:ok, _port} ->
         conn
         |> put_flash(:info, "Port updated successfully.")
         |> redirect(to: admin_port_path(conn, :index))

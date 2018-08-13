@@ -32,7 +32,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  def notify_updated_bid(auction, bid, supplier_id) do
+  def notify_updated_bid(auction, _bid, _supplier_id) do
     buyer_payload = auction
     |> AuctionPayload.get_auction_payload!(auction.buyer_id)
     send_notification_to_participants("user_auctions", buyer_payload, [auction.buyer_id])

@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.Admin.BargeController do
 
   def create(conn, %{"barge" => barge_params}) do
     case Auctions.create_barge(barge_params) do
-      {:ok, barge} ->
+      {:ok, _barge} ->
         conn
         |> put_flash(:info, "Barge created successfully.")
         |> redirect(to: admin_barge_path(conn, :index))
@@ -40,7 +40,7 @@ defmodule OceanconnectWeb.Admin.BargeController do
     barge = Auctions.get_barge!(id)
 
     case Auctions.update_barge(barge, barge_params) do
-      {:ok, barge} ->
+      {:ok, _barge} ->
         conn
         |> put_flash(:info, "Barge updated successfully.")
         |> redirect(to: admin_barge_path(conn, :index))

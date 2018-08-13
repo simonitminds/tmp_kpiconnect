@@ -21,7 +21,7 @@ defmodule OceanconnectWeb.Admin.VesselController do
 
   def create(conn, %{"vessel" => vessel_params}) do
     case Auctions.create_vessel(vessel_params) do
-      {:ok, vessel} ->
+      {:ok, _vessel} ->
         conn
         |> put_flash(:info, "Vessel created successfully.")
         |> redirect(to: admin_vessel_path(conn, :index))
@@ -40,7 +40,7 @@ defmodule OceanconnectWeb.Admin.VesselController do
     vessel = Auctions.get_vessel!(id)
 
     case Auctions.update_vessel(vessel, vessel_params) do
-      {:ok, vessel} ->
+      {:ok, _vessel} ->
         conn
         |> put_flash(:info, "Vessel updated successfully.")
         |> redirect(to: admin_vessel_path(conn, :index))

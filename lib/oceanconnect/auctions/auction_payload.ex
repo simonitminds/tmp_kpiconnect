@@ -3,7 +3,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionTimer, Barge}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
-  alias Oceanconnect.Accounts
 
   defstruct time_remaining: nil,
             current_server_time: nil,

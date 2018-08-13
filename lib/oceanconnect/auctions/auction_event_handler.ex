@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventHandler do
   use GenServer
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent, AuctionNotifier, AuctionStore.AuctionState}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionNotifier, AuctionStore.AuctionState}
 
   @registry_name :auction_event_handler_registry
 

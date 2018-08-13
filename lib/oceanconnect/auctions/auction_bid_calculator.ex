@@ -187,8 +187,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     {next_state, events}
   end
 
-  defp set_decrements(auto_bids, winning_bid_target, lowest_bid, has_single_lowest_bid, first_lowest_min_bid, second_lowest_min_bid) do
-    Enum.map(auto_bids, fn bid = %AuctionBid{amount: amount, min_amount: min_amount} ->
+  defp set_decrements(auto_bids, winning_bid_target, lowest_bid, has_single_lowest_bid, first_lowest_min_bid, _second_lowest_min_bid) do
+    Enum.map(auto_bids, fn bid = %AuctionBid{amount: _amount, min_amount: min_amount} ->
       is_already_leading =
         bid.supplier_id == lowest_bid.supplier_id &&
         bid.amount == winning_bid_target &&
