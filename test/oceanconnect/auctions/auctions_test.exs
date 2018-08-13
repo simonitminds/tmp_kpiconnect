@@ -229,7 +229,7 @@ defmodule Oceanconnect.AuctionsTest do
 
 		test "list_ports/1 returns a paginated list of all ports", %{port: port, inactive_port: inactive_port} do
 			page = Auctions.list_ports(%{})
-			assert page.entries == [port, inactive_port]
+			assert page.entries == [inactive_port, port]
 		end
 
 		test "list_active_ports/0 returns all ports marked as active", %{port: port, inactive_port: inactive_port} do

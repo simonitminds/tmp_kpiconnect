@@ -11,14 +11,14 @@
           Fuel Grade Name
         <%end%>
     		<div class="control">
-    			<%= text_input f, :name, class: "input" %>
+    			<%= text_input f, :name, class: "input qa-admin-fuel-name" %>
     			<%= error_tag f, :name %>
     		</div>
       </div>
 
     	<div class="field has-margin-top-lg">
     		<div class="control">
-    			<%= submit "Submit", class: "button is-primary" %>
+    			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>
     		</div>
     	</div>
     </div>

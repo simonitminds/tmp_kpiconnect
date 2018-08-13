@@ -15,37 +15,40 @@ defmodule OceanconnectWeb.Admin.BargeController do
   end
 
   def new(conn, _params) do
+		ports = Auctions.list_active_ports
     changeset = Auctions.change_barge(%Barge{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, ports: ports)
   end
 
   def create(conn, %{"barge" => barge_params}) do
+		ports = Auctions.list_active_ports
     case Auctions.create_barge(barge_params) do
-      {:ok, barge} ->
+      {:ok, _barge} ->
         conn
         |> put_flash(:info, "Barge created successfully.")
         |> redirect(to: admin_barge_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, ports: ports)
     end
   end
 
   def edit(conn, %{"id" => id}) do
+		ports = Auctions.list_active_ports
     barge = Auctions.get_barge!(id)
     changeset = Auctions.change_barge(barge)
-    render(conn, "edit.html", barge: barge, changeset: changeset)
+    render(conn, "edit.html", barge: barge, changeset: changeset, ports: ports)
   end
 
   def update(conn, %{"id" => id, "barge" => barge_params}) do
     barge = Auctions.get_barge!(id)
-
+		ports = Auctions.list_active_ports
     case Auctions.update_barge(barge, barge_params) do
-      {:ok, barge} ->
+      {:ok, _barge} ->
         conn
         |> put_flash(:info, "Barge updated successfully.")
         |> redirect(to: admin_barge_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", barge: barge, changeset: changeset)
+        render(conn, "edit.html", barge: barge, changeset: changeset, ports: ports)
     end
   end
 

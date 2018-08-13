@@ -21,6 +21,25 @@ defmodule Oceanconnect.Admin.User.IndexPage do
 		end)
 	end
 
+	def has_user?(id) do
+		case search_element(:css, ".qa-admin-user-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_user_name?(name, id) do
+		user_name = find_element(:css, ".qa-admin-user-#{id}")
+		|> find_within_element(:css, ".qa-admin-user-full_name")
+		|> inner_text
+		name == user_name
+	end
+
+	def user_created_successfully? do
+		page_text = visible_page_text()
+		page_text =~ "User created successfully."
+	end
+
 	def deactivate_user(user) do
 		find_element(:css, ".qa-admin-user-#{user.id}")
 		|> find_within_element(:css, ".qa-admin-user-deactivate")

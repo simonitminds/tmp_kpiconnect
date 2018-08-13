@@ -24,7 +24,7 @@
 					<tbody>
 						<%= for fuel <- @fuels do %>
 							<tr class="qa-admin-fuel-<%= fuel.id %>">
-								<td><%= fuel.name %></td>
+								<td class="qa-admin-fuel-name"><%= fuel.name %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_fuel_path(@conn, :edit, fuel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs qa-admin-fuel-edit" %>
 									<%= if fuel.is_active do %>

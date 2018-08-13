@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Admin.Barge.EditTest do
 	use Oceanconnect.FeatureCase
-	alias Oceanconnect.Admin.Barge.EditPage
+	alias Oceanconnect.Admin.Barge.{IndexPage, EditPage}
 
 	hound_session()
 
@@ -33,15 +33,15 @@ defmodule Oceanconnect.Admin.Barge.EditTest do
 			EditPage.visit(barge.id)
 			EditPage.fill_form(%{name: "some new name", imo_number: barge.imo_number, dwt: barge.dwt})
 			EditPage.submit
-			assert EditPage.is_index_path?
-			assert EditPage.updated_barge_name == "some new name"
+			assert IndexPage.is_current_path?
+			assert IndexPage.has_barge_name?("some new name")
 		end
 
 		test "admin can delete a barge", %{barge: barge} do
 			EditPage.visit(barge.id)
 			EditPage.delete
-			assert EditPage.is_index_path?
-			refute EditPage.has_barge?(barge.id)
+			assert IndexPage.is_current_path?
+			refute IndexPage.has_barge?(barge.id)
 		end
 	end
 end

@@ -19,11 +19,13 @@ defmodule OceanconnectWeb.Admin.UserController do
   end
 
   def new(conn, _params) do
+		companies = Accounts.list_active_companies
     changeset = Accounts.change_user(%User{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, companies: companies)
   end
 
   def create(conn, %{"user" => user_params}) do
+		companies = Accounts.list_active_companies
     case Accounts.create_user(user_params) do
       {:ok, user} ->
         conn
@@ -31,19 +33,20 @@ defmodule OceanconnectWeb.Admin.UserController do
         |> redirect(to: admin_user_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, companies: companies)
     end
   end
 
   def edit(conn, %{"id" => id}) do
+		companies = Accounts.list_active_companies
     user = Accounts.get_user!(id)
     changeset = Accounts.change_user(user)
-    render(conn, "edit.html", user: user, changeset: changeset)
+    render(conn, "edit.html", user: user, changeset: changeset, companies: companies)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
-
+		companies = Accounts.list_active_companies
     case Accounts.update_user(user, user_params) do
       {:ok, user} ->
         conn
@@ -51,7 +54,7 @@ defmodule OceanconnectWeb.Admin.UserController do
         |> redirect(to: admin_user_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
+        render(conn, "edit.html", user: user, changeset: changeset, companies: companies)
     end
   end
 

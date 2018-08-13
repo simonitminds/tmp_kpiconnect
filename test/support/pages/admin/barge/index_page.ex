@@ -21,6 +21,19 @@ defmodule Oceanconnect.Admin.Barge.IndexPage do
 		end)
 	end
 
+	def has_barge?(id) do
+		case search_element(:css, ".qa-admin-barge-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_barge_name?(name) do
+		barge_name = find_element(:css, ".qa-admin-barge-name")
+		|> inner_text
+		name == barge_name
+	end
+
 	def deactivate_barge(barge) do
 		find_element(:css, ".qa-admin-barge-#{barge.id}")
 		|> find_within_element(:css, ".qa-admin-barge-deactivate")

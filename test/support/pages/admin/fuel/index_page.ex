@@ -21,6 +21,19 @@ defmodule Oceanconnect.Admin.Fuel.IndexPage do
 		end)
 	end
 
+	def has_fuel?(id) do
+		case search_element(:css, ".qa-admin-fuel-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_fuel_name?(name) do
+		fuel_name = find_element(:css, ".qa-admin-fuel-name")
+		|> inner_text
+		name == fuel_name
+	end
+
 	def deactivate_fuel(fuel) do
 		find_element(:css, ".qa-admin-fuel-#{fuel.id}")
 		|> find_within_element(:css, ".qa-admin-fuel-deactivate")
