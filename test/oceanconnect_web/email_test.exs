@@ -1,7 +1,7 @@
-defmodule Oceanconnect.EmailTest do
+defmodule OceanconnectWeb.EmailTest do
 	use Oceanconnect.DataCase
 
-	alias Oceanconnect.Auctions.Email
+	alias OceanconnectWeb.Email
 	alias Oceanconnect.Accounts
 
 	setup do

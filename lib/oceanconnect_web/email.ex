@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Auctions.Email do
+defmodule OceanconnectWeb.Email do
 	import Bamboo.Email
 
 	alias Oceanconnect.Accounts
