@@ -41,7 +41,7 @@ defmodule Oceanconnect.Admin.Company.EditTest do
 			EditPage.fill_form(%{name: "some new name", address1: company.address1, address2: company.address2, city: company.city, country: company.country, postal_code: company.postal_code, contact_name: company.contact_name, main_phone: company.main_phone, mobile_phone: company.mobile_phone})
 			EditPage.submit
 			assert IndexPage.is_current_path?
-			assert IndexPage.has_company_name?("some new name")
+			assert IndexPage.has_company_name?("some new name", company.id)
 		end
 
 		test "admin can delete a company", %{company: company} do

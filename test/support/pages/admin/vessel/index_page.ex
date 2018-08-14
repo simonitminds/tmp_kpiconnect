@@ -21,6 +21,19 @@ defmodule Oceanconnect.Admin.Vessel.IndexPage do
 		end)
 	end
 
+	def has_vessel?(id) do
+		case search_element(:css, ".qa-admin-vessel-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_vessel_name?(name) do
+		vessel_name = find_element(:css, ".qa-admin-vessel-name")
+		|> inner_text
+		name == vessel_name
+	end
+
 	def deactivate_vessel(vessel) do
 		find_element(:css, ".qa-admin-vessel-#{vessel.id}")
 		|> find_within_element(:css, ".qa-admin-vessel-deactivate")

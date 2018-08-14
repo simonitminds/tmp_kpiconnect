@@ -28,10 +28,16 @@ defmodule Oceanconnect.Admin.Company.IndexPage do
 		end
 	end
 
-	def has_company_name?(name) do
-		company_name = find_element(:css, ".qa-admin-company-name")
+	def has_company_name?(name, id) do
+		company_name = find_element(:css, ".qa-admin-company-#{id}")
+		|> find_within_element(:css, ".qa-admin-company-name")
 		|> inner_text
 		name == company_name
+	end
+
+	def company_created_successfully? do
+		page_text = visible_page_text()
+		page_text =~ "Company created successfully."
 	end
 
 	def deactivate_company(company) do

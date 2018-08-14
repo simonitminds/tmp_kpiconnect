@@ -294,7 +294,7 @@ defmodule Oceanconnect.Auctions do
   end
 
 	def list_ports(params) do
-		Port
+		Port.alphabetical
 		|> Repo.paginate(params)
 	end
 
@@ -427,9 +427,8 @@ defmodule Oceanconnect.Auctions do
   """
 
   def vessels_for_buyer(%Company{id: id}) do
-		query = Vessel.select_active
-
-    query = Vessel.by_company(id)
+    Vessel.by_company(id)
+		|> Vessel.select_active
     |> Repo.all
   end
 

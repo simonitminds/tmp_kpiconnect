@@ -33,13 +33,13 @@ defmodule Oceanconnect.Auctions.Vessel do
       where: v.company_id == ^company_id
   end
 
-	def select_active do
-		from v in Vessel,
-		  where: v.is_active == true
+	def select_active(query \\ Vessel) do
+		from q in query,
+		  where: q.is_active == true
 	end
 
-	def alphabetical do
-		from v in Vessel,
-		  order_by: [asc: v.name]
+	def alphabetical(query \\ Vessel) do
+		from q in query,
+		  order_by: [asc: q.name]
 	end
 end

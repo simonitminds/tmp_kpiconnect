@@ -367,7 +367,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
     login_user(supplier)
     AuctionShowPage.visit(auction.id)
-    :timer.sleep(200)
+    :timer.sleep(500)
     AuctionShowPage.submit_barge(barge)
 
     in_browser_session(:supplier2, fn ->
@@ -377,15 +377,15 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.submit_barge(barge)
     end)
 
-    :timer.sleep(1000)
+    :timer.sleep(500)
 
     in_browser_session(:buyer, fn ->
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      :timer.sleep(300)
+      :timer.sleep(500)
 
       AuctionShowPage.approve_barge(barge, supplier.company_id)
-      :timer.sleep(300)
+      :timer.sleep(500)
 
       assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
       assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)

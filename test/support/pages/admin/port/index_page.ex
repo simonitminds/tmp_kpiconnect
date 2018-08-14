@@ -21,6 +21,19 @@ defmodule Oceanconnect.Admin.Port.IndexPage do
 		end)
 	end
 
+	def has_port?(id) do
+		case search_element(:css, ".qa-admin-port-#{id}") do
+			{:error, _} -> false
+			_ -> true
+		end
+	end
+
+	def has_port_name?(name) do
+		port_name = find_element(:css, ".qa-admin-port-name")
+		|> inner_text
+		name == port_name
+	end
+
 	def deactivate_port(port) do
 		find_element(:css, ".qa-admin-port-#{port.id}")
 		|> find_within_element(:css, ".qa-admin-port-deactivate")

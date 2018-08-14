@@ -9,7 +9,7 @@
       <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
-    			<%= text_input f, :name, class: "input qa-admin-name" %>
+    			<%= text_input f, :name, class: "input qa-admin-barge-name" %>
     			<%= error_tag f, :name %>
     		</div>
       </div>
@@ -19,8 +19,8 @@
           IMO Number
         <%end%>
     		<div class="control">
-    			<%= text_input f, :imo_number, class: "input qa-admin-imo_number" %>
-    			<%= error_tag f, :imo %>
+    			<%= text_input f, :imo_number, class: "input qa-admin-barge-imo_number" %>
+    			<%= error_tag f, :imo_number %>
     		</div>
       </div>
 
@@ -29,10 +29,22 @@
           DWT
         <%end%>
     		<div class="control">
-    			<%= text_input f, :dwt, class: "input qa-admin-dwt" %>
+    			<%= text_input f, :dwt, class: "input qa-admin-barge-dwt" %>
     			<%= error_tag f, :dwt %>
     		</div>
       </div>
+
+			<div class="field">
+				<%= label f, :port_id, class: "label" do %>
+					Port
+				<% end %>
+				<div class="control">
+					<div class="select">
+					  <%= select f, :port_id, Enum.map(@ports, &{&1.name, &1.id}), class: "qa-admin-barge-port_id" %>
+						<%= error_tag f, :port_id %>
+					</div>
+				</div>
+			</div>
 
     	<div class="field has-margin-top-lg">
     		<div class="control">

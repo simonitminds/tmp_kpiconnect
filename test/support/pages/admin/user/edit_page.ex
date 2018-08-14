@@ -1,18 +1,18 @@
-defmodule Oceanconnect.Admin.Barge.EditPage do
+defmodule Oceanconnect.Admin.User.EditPage do
 	use Oceanconnect.Page
 
 	def visit(id) do
-		navigate_to("/admin/barges/#{id}/edit")
+		navigate_to("/admin/users/#{id}/edit")
 	end
 
 	def has_fields?(fields) do
 		Enum.all?(fields, fn field ->
-			find_element(:css, ".qa-admin-barge-#{field}")
+			find_element(:css, ".qa-admin-user-#{field}")
 		end)
 	end
 
 	def is_current_path?(id) do
-		current_path() == "/admin/barges/#{id}/edit"
+		current_path() == "/admin/users/#{id}/edit"
 	end
 
 	def submit do
@@ -29,7 +29,7 @@ defmodule Oceanconnect.Admin.Barge.EditPage do
 	def fill_form(params = %{}) do
 		params
 		|> Enum.map(fn({key, value}) ->
-			element = find_element(:css, ".qa-admin-barge-#{key}")
+			element = find_element(:css, ".qa-admin-user-#{key}")
 			type = Hound.Helpers.Element.tag_name(element)
 			fill_form_element(key, element, type, value)
 		end)

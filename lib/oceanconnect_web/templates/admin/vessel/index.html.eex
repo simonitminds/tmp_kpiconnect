@@ -25,8 +25,8 @@
 					<tbody>
 						<%= for vessel <- @vessels do %>
 							<tr class="qa-admin-vessel-<%= vessel.id %>">
-								<td><%= vessel.name %></td>
-								<td><%= vessel.imo %></td>
+								<td class="qa-admin-vessel-name"><%= vessel.name %></td>
+								<td class="qa-admin-vessel-imo"><%= vessel.imo %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_vessel_path(@conn, :edit, vessel), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
 									<%= if vessel.is_active do %>

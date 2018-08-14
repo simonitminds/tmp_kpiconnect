@@ -25,8 +25,8 @@
 					<tbody>
 						<%= for port <- @ports do %>
 							<tr class="qa-admin-port-<%= port.id %>">
-								<td><%= port.name %></td>
-								<td><%= port.country %></td>
+								<td class="qa-admin-port-name"><%= port.name %></td>
+								<td class="qa-admin-port-country"><%= port.country %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_port_path(@conn, :edit, port), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
 									<%= if port.is_active do %>

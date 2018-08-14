@@ -10,12 +10,12 @@
 			<section class="admin-panel__content column is-three-quarters">
 				<h2 class="admin-panel__content__header">
 					<span class="is-4 is-inline-block"><span class="is-inline-block has-margin-right-sm has-text-gray-3">Edit Barge</span> <%= @barge.name %></span>
-					<%= link "Delete", to: admin_barge_path(@conn, :delete, @barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs has-margin-left-auto" %>
+					<%= link "Delete", to: admin_barge_path(@conn, :delete, @barge), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs has-margin-left-auto qa-admin-delete" %>
 					<%= link to: admin_barge_path(@conn, :index), class: "button has-margin-left-sm" do %>
 						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
 					<%end%>
 				</h2>
-				<%= render "form.html", Map.put(assigns, :action, admin_barge_path(@conn, :update, @barge)) %></section>
+				<%= render "form.html", changeset: @changeset, action: admin_barge_path(@conn, :update, @barge), ports: @ports %>
 		  </section>
 		</div>
 	</div>
