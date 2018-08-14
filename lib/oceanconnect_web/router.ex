@@ -138,4 +138,8 @@ defmodule OceanconnectWeb.Router do
     post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
     post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
   end
+
+  if Mix.env == :dev do
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
+  end
 end
