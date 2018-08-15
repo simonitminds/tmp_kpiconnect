@@ -1,0 +1,11 @@
+<p>Dear <%= Oceanconnect.Accounts.User.full_name(@user) %>,</p>
+<br>
+<p>Auction with ID <%= @auction.id %> has been canceled.</p>
+<br>
+<p>BUYER: <%= @buyer_company.name %></p>
+<p>VESSEL: <%= @auction.vessel.name %></p>
+<p>PORT: <%= @auction.port.name %></p>
+<p>ETA/ETD: <%= @auction.eta %> / <%= @auction.etd %></p>
+<br>
+<p>GRADE (1): <%= @auction.fuel.name %></p>
+<p>QUANTITY (1): <%= @auction.fuel_quantity %> M/T</p>

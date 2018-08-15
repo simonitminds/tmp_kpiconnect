@@ -1,0 +1,25 @@
+<p>Dear <%= Oceanconnect.Accounts.User.full_name(@supplier) %>,</p>
+<br>
+<p>We have just created a new Reverese Auction with you as the point of contact. Please verify the accuracy of the information listed below.</p>
+<br>
+<p>DETAILS OF THIS REVERSE AUCTION ARE AS FOLLOWS:</p>
+<p>AUCTION ID: <%= @auction.id %></p>
+<p>TRANSACTION DURATION: <%= @auction.duration %></p>
+<p>BUYER: <%= @buyer_company.name %></p>
+<p>VESSEL: <%= @auction.vessel.name %></p>
+<p>PORT: <%= @auction.port.name %></p>
+<p>ETA/ETD: <%= @auction.eta %> / <%= @auction.etd %></p>
+<br>
+<p>GRADE (1): <%= @auction.fuel.name %></p>
+<p>QUANTITY (1): <%= @auction.fuel_quantity %> M/T</p>
+<br>
+<p>BUYER INFORMATION</p>
+<hr>
+<p>BUYER NAME: <%= @buyer_company.contact_name %></p>
+<br>
+<p>ADDRESS:</p>
+<p><%= @buyer_company.address1 %></p>
+<p><%= @buyer_company.address2 %></p>
+<p><%= @buyer_company.city %>, <%= @buyer_company.country %></p>
+<p><%= @buyer_company.main_phone %></p>
+<p><%= @buyer_company.email %></p>

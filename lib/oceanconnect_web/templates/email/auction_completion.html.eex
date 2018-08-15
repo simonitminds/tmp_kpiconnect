@@ -1,0 +1,32 @@
+<p>Dear <%= Oceanconnect.Accounts.User.full_name(@user) %>,</p>
+<br>
+<p><%= @winning_supplier_company.name %> has accepted the winning bid of BID_AMOUNT for you auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
+<br>
+<p>BUYER: <%= @buyer_company.name %></p>
+<p>VESSEL: <%= @auction.vessel.name %></p>
+<p>VESSEL IMO: <%= @auction.vessel.imo %></p>
+<p>PORT: <%= @auction.port.name %></p>
+<br>
+<p>ETA/ETD: <%= @auction.eta %> / <%= @auction.etd %></p>
+<p>GRADE (1): <%= @auction.fuel.name %></p>
+<p>QUANTITY (1): <%= @auction.fuel_quantity %></p>
+<p>PRICE (1): PRICE</p>
+<br>
+<p>PORT AGENT: <%= @auction.port_agent %></p>
+<br>
+<p>BUYER INFORMATION</p>
+<hr>
+<p>BUYER NAME: <%= @buyer_company.contact_name %></p>
+<br>
+<p>ADDRESS:</p>
+<p><%= @buyer_company.address1 %></p>
+<p><%= @buyer_company.address2 %></p>
+<p><%= @buyer_company.city %>, <%= @buyer_company.country %></p>
+<p><%= @buyer_company.main_phone %></p>
+<p><%= @buyer_company.email %></p>
+<br>
+<p>SUPPLIER INFORMATION</p>
+<hr>
+<p>SUPPLIER NAME: <%= @winning_supplier_company.contact_name %></p>
+<p>ORGANIZATION: <%= @winning_supplier_company.name %></p>
+<p>EMAIL: <%= @winning_supplier_company.email %></p>

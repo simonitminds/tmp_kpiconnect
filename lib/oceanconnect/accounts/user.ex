@@ -58,10 +58,13 @@ defmodule Oceanconnect.Accounts.User do
 		  where: u.company_id in ^company_ids
 	end
 
+  def full_name(%User{first_name: first_name, last_name: last_name}) do
+    "#{first_name} #{last_name}"
+  end
+
 	defimpl Bamboo.Formatter, for: User do
-		def format_email_address(%User{first_name: first_name, last_name: last_name, email: email}, opts \\ []) do
-			full_name = "#{first_name} #{last_name}"
-			{full_name, email}
+		def format_email_address(user = %User{email: email}, opts \\ []) do
+			{user.full_name, email}
 		end
 	end
 end
