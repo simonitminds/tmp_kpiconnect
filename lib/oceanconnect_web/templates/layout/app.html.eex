@@ -13,7 +13,7 @@
     <link href="https://use.fontawesome.com/releases/v5.0.4/css/all.css" rel="stylesheet">
   </head>
 
-  <body>
+  <body class="<%= "#{ if OceanconnectWeb.SessionView.current_user_is_admin?(@conn),  do:  "body--admin",  else:  "body"}" %>">
     <header class="header">
       <nav role="navigation" class="navbar is-primary is-fixed-top">
         <div class="navbar-brand">

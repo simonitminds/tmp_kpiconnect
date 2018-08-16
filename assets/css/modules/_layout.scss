@@ -13,6 +13,11 @@ main {
     top: 6.25rem;
     height: calc(100vh - 6.25rem);
 
+    .body--admin & {
+      top: 3.25rem;
+      height: calc(100vh - 3.25rem);
+    }
+
     @media (max-width: 768px) {
       top: 6.25rem;
       height: calc(100vh - 6.25rem);

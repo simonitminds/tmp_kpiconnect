@@ -23,8 +23,17 @@
       display: none;
     }
   }
+
+  body.body--admin >& {
+    top: 104px;
+  }
+
   #auctions-app >& { // For show page-specific alerts.
     top: 13px;
+  }
+
+  body.body--admin #auctions-app >& {
+    top: 60px;
   }
   .content >& {
     margin-bottom: 1rem;
