@@ -3,6 +3,7 @@ defmodule Oceanconnect.AuctionsTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -134,6 +135,19 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
+    end
+  end
+
+  describe "canceling an auction" do
+    setup do
+      auction = insert(:auction, duration: 1_000, decision_duration: 1_000)
+      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      {:ok, %{auction: auction}}
+    end
+
+    test "cancel_auction/1", %{auction: auction} do
+      {:ok, %AuctionState{status: :canceled}} = Auctions.cancel_auction(auction)
+      assert {:error, "Auciton Suppervisor Not Started"} = Auctions.AuctionSupervisor.find_pid(auction.id)
     end
   end
 

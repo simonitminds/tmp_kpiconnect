@@ -40,6 +40,15 @@ defmodule OceanconnectWeb.AuctionController do
     redirect(conn, to: auction_path(conn, :index))
   end
 
+  def cancel(conn, %{"id" => id}) do
+    user = Auth.current_user(conn)
+    id
+    |> Auctions.get_auction!
+    |> Auctions.fully_loaded
+    |> Auctions.cancel_auction(user)
+    redirect(conn, to: auction_path(conn, :index))
+  end
+
   def new(conn, _params) do
     changeset = Auctions.change_auction(%Auction{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)

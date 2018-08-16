@@ -103,6 +103,9 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
+            <a href={`/auctions/${auction.id}/cancel`} className="card__cancel-auction button is-link is-small qa-auction-cancel">
+              <span className="icon"><i className="fas fa-times"></i></span> Cancel Auction
+            </a>
           { window.isAdmin &&
             <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
               <span className="icon"><i className="fas fa-play"></i></span> Start Auction

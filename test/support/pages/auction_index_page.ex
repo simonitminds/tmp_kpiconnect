@@ -25,6 +25,12 @@ defmodule Oceanconnect.AuctionIndexPage do
     end)
   end
 
+  def cancel_auction(auction) do
+    find_element(:class, "qa-auction-#{auction.id}")
+    |> find_within_element(:class, "qa-auction-cancel")
+    |> click
+  end
+
   def auction_is_status?(auction, status) do
     actual_status = find_element(:class, "qa-#{status}-auctions-list")
     |> find_within_element(:class, "qa-auction-#{auction.id}")

@@ -107,6 +107,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
+  describe "cancel auction" do
+    test "manually canceling an auction", %{conn: conn, auction: auction} do
+      new_conn = get(conn, auction_path(conn, :cancel, auction.id))
+
+      assert redirected_to(new_conn, 302) == "/auctions"
+    end
+  end
+
   describe "start auction" do
     test "manually starting an auction", (%{auction: auction, conn: conn}) do
       new_conn = get(conn, auction_path(conn, :start, auction.id))
