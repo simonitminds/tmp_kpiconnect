@@ -86,11 +86,11 @@
       </div>
 
       <div class="field is-horizontal">
-        <div class="control">
+        <div class="control is-inline-block">
           <%= checkbox f, :is_supplier, class: "checkbox qa-admin-company-is_supplier" %>
           <%= error_tag f, :is_supplier %>
         </div>
-        <%= label f, :is_supplier, class: "label has-margin-left-md" do %>
+        <%= label f, :is_supplier, class: "label has-margin-left-md is-inline-block" do %>
           Is Supplier
         <%end%>
       </div>

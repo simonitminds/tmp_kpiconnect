@@ -78,7 +78,7 @@
     width: calc(100vw - 2rem);
   }
   @media (max-width: 768px) {
-    width: auto;
+    width: calc(100vw - 10px);
   }
 }
 
@@ -91,7 +91,16 @@
 
     @media (max-width: 768px) {
       width: calc(100vw - 2rem);
-      // padding: 0 1.75rem !important;
+      flex-wrap: wrap;
+      flex-direction: column-reverse;
+    }
+
+    &__actions {
+      margin-left: auto;
+
+      @media (max-width: 768px) {
+        margin-bottom: 1rem;
+      }
     }
   }
 }

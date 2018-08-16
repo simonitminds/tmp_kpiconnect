@@ -57,11 +57,11 @@
 			</div>
 
       <div class="field is-horizontal">
-        <div class="control">
+        <div class="control is-inline-block">
           <%= checkbox f, :is_admin, class: "checkbox qa-admin-user-is_admin" %>
           <%= error_tag f, :is_admin %>
         </div>
-        <%= label f, :is_admin, class: "label has-margin-left-md" do %>
+        <%= label f, :is_admin, class: "label has-margin-left-md is-inline-block" do %>
           Is Admin
         <%end%>
       </div>
