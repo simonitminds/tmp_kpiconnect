@@ -35,7 +35,7 @@ export default class BuyerBestSolution extends React.Component {
         return "";
       } else if(this.state.solutionCommentBidId == bid.id) {
         return (
-          <form className="box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bid.id)}>
+          <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bid.id)}>
             {lowestBidId != bid.id ?
             "" :
             <span className="is-inline-block has-margin-bottom-lg"><strong>Are you sure that you want to accept this offer?</strong></span>

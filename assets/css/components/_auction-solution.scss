@@ -28,6 +28,15 @@
   .auction-solution__content {
     margin-left: auto;
   }
+  .auction-solution__confirmation {
+    &> .field.is-expanded {
+      flex-direction: row;
+
+      &> .control {
+        width: auto;
+      }
+    }
+  }
 
   &--best { // General style modifications for the calculated "Best Solution"
     background-color: $highlight !important;
