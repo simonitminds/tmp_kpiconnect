@@ -73,7 +73,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}
-              <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+
+                <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
             {/* Start Link to Auction Edit */}
             { auctionStatus != 'open' && auctionStatus != 'decision' ?
@@ -102,9 +103,11 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
+          { window.isAdmin &&
             <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
               <span className="icon"><i className="fas fa-play"></i></span> Start Auction
             </a>
+          }
           </div>
           :
           <div className="is-none"></div>

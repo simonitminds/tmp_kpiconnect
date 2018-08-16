@@ -1,7 +1,7 @@
 defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
-
+  alias Oceanconnect.AdminPage
 
   setup do
     buyer_company = insert(:company)
@@ -15,7 +15,12 @@ defmodule Oceanconnect.AuctionIndexTest do
   describe "buyer login" do
     setup %{auctions: auctions, buyer: buyer} do
       auction = auctions |> hd
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}})
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}}
+        )
+
       login_user(buyer)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
@@ -27,15 +32,18 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
 
     test "buyer can see his view of the auction card", %{auction: auction} do
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
+      # Temporarily removed parameter "suppliers"
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
     end
 
     test "buyer/supplier can see his respective view per auction", %{auction: auction} do
       supplier_auction = insert(:auction, suppliers: [auction.buyer])
 
       AuctionIndexPage.visit()
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
-      assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "supplier-card")  # Temporarily removed parameter "invitation-controls"
+      # Temporarily removed parameter "suppliers"
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
+      # Temporarily removed parameter "invitation-controls"
+      assert AuctionIndexPage.has_field_in_auction?(supplier_auction.id, "supplier-card")
     end
 
     test "user can only see auctions they participate in", %{auctions: auctions} do
@@ -46,33 +54,64 @@ defmodule Oceanconnect.AuctionIndexTest do
       assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
       refute AuctionIndexPage.has_auctions?(non_participant_auctions)
     end
+  end
 
-    test "can start auction manually with start auction button", %{auction: auction} do
-      :timer.sleep(1_000) # Ensures auction card is rendered after reveal animation
+  describe "admin login" do
+    setup %{auctions: auctions, buyer: buyer} do
+      admin_company = insert(:company)
+      admin = insert(:user, company: admin_company, is_admin: true)
+      auction = auctions |> hd
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}}
+        )
+
+      login_user(admin)
+      AuctionIndexPage.visit()
+      {:ok, %{auction: auction, buyer: buyer}}
+    end
+
+    test "can start auction manually with start auction button when impersonating a buyer", %{
+      auction: auction,
+      buyer: buyer
+    } do
+      AdminPage.impersonate_user(buyer)
+      assert AdminPage.logged_in_as?(buyer)
+      # Ensures auction card is rendered after reveal animation
+      :timer.sleep(1_000)
       assert AuctionIndexPage.auction_is_status?(auction, "pending")
       AuctionIndexPage.start_auction(auction)
-      :timer.sleep(1_000) # Ensures auction card is rendered after reveal animation
+      # Ensures auction card is rendered after reveal animation
+      :timer.sleep(1_000)
       assert AuctionIndexPage.auction_is_status?(auction, "open")
     end
   end
 
-
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
       auction = auctions |> hd
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_scheduler]}}}
+        )
+
       login_user(supplier)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
     end
 
     test "supplier can see his view of the auction card", %{auction: auction} do
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card") # Temporarily removed parameter "invitation-controls"
-      refute AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card") # Temporarily removed parameter "suppliers"
+      # Temporarily removed parameter "invitation-controls"
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card")
+      # Temporarily removed parameter "suppliers"
+      refute AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
     end
 
     test "supplier sees realtime start", %{auction: auction} do
-      assert AuctionIndexPage.is_current_path?
+      assert AuctionIndexPage.is_current_path?()
       assert AuctionIndexPage.auction_is_status?(auction, "pending")
 
       Oceanconnect.Auctions.start_auction(auction)

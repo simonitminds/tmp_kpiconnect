@@ -30,12 +30,13 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def start(conn, %{"id" => id}) do
-    user = Auth.current_user(conn)
-    id
-    |> Auctions.get_auction!
-    |> Auctions.fully_loaded
-    |> Auctions.start_auction(user)
-
+    admin = Auth.current_admin(conn)
+    if admin do
+      id
+      |> Auctions.get_auction!
+      |> Auctions.fully_loaded
+      |> Auctions.start_auction(admin)
+    end
     redirect(conn, to: auction_path(conn, :index))
   end
 
