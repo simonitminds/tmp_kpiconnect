@@ -30,8 +30,9 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def notify_auction_created(auction = %Auction{}) do
+    auction = auction |> Auctions.fully_loaded
     invitation_emails = OceanconnectWeb.Email.auction_invitation(auction)
-    deliver_emails(invitation_emails)
+    invitation_emails = deliver_emails(invitation_emails)
     {:ok, invitation_emails}
   end
   def notify_auction_canceled(auction = %Auction{}) do
@@ -40,10 +41,10 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     deliver_emails(cancellation_emails)
     {:ok, cancellation_emails}
   end
-  def notify_auction_completed(supplier_id, auction_id) do
+  def notify_auction_completed(bid_amount, total_price, supplier_id, auction_id) do
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded
     winning_supplier_company = Oceanconnect.Accounts.get_company!(supplier_id)
-    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = OceanconnectWeb.Email.auction_closed(winning_supplier_company, auction)
+    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = OceanconnectWeb.Email.auction_closed(bid_amount, total_price, winning_supplier_company, auction)
     completion_emails = List.flatten([supplier_emails | buyer_emails])
     deliver_emails(completion_emails)
     {:ok, completion_emails}
@@ -52,7 +53,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   defp deliver_emails(emails) do
     {:ok, pid} = Task.Supervisor.start_link()
     @task_supervisor.async_nolink(pid, fn ->
-      Enum.each(emails, fn(email) ->
+      Enum.map(emails, fn(email) ->
         OceanconnectWeb.Mailer.deliver_now(email)
       end)
     end)

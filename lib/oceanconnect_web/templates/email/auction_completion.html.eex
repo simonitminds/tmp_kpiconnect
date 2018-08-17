@@ -1,6 +1,6 @@
 <p>Dear <%= Oceanconnect.Accounts.User.full_name(@user) %>,</p>
 <br>
-<p><%= @winning_supplier_company.name %> has accepted the winning bid of BID_AMOUNT for you auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
+<p><%= @winning_supplier_company.name %> has accepted the winning bid of <%= @bid_amount %> for you auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
 <br>
 <p>BUYER: <%= @buyer_company.name %></p>
 <p>VESSEL: <%= @auction.vessel.name %></p>
@@ -10,7 +10,7 @@
 <p>ETA/ETD: <%= @auction.eta %> / <%= @auction.etd %></p>
 <p>GRADE (1): <%= @auction.fuel.name %></p>
 <p>QUANTITY (1): <%= @auction.fuel_quantity %></p>
-<p>PRICE (1): PRICE</p>
+<p>PRICE (1): <%= @total_price %></p>
 <br>
 <p>PORT AGENT: <%= @auction.port_agent %></p>
 <br>
