@@ -145,6 +145,18 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  def handle_cast(
+    {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
+    current_state
+  ) do
+    new_state = cancel_auction(current_state)
+
+    AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
+
   def handle_cast({:end_auction, _auction_id, _emit}, current_state),
     do: {:noreply, current_state}
 
@@ -497,6 +509,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       end)
 
     %AuctionState{current_state | submitted_barges: new_submitted_barges}
+  end
+
+  defp cancel_auction(current_state = %{auction_id: auction_id}) do
+    AuctionTimer.cancel_timer(auction_id, :duration)
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+    %AuctionState{current_state | status: :canceled}
   end
 
   defp expire_auction(current_state = %{auction_id: auction_id}) do

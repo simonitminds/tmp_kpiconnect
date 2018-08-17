@@ -120,6 +120,13 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
+  def cancel_auction(auction = %Auction{}, user) do
+    auction
+    |> Command.cancel_auction(user)
+    |> AuctionStore.process_command
+    auction
+  end
+
   def create_auction(attrs \\ %{}, user \\ nil)
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
     %Auction{}
