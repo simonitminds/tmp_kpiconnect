@@ -32,5 +32,5 @@ config :hound,
   app_host: "http://" <> (System.get_env("APP_IP") || "localhost"),
   app_port: 4001
 
-config :oceanconnect, Oceanconnect.Auctions.Mailer,
+config :oceanconnect, OceanconnectWeb.Mailer,
   adapter: Bamboo.TestAdapter

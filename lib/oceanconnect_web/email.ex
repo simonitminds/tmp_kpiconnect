@@ -116,7 +116,6 @@ defmodule OceanconnectWeb.Email do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies([winning_supplier_company])
-
     supplier_emails =
       Enum.map(suppliers, fn(supplier) ->
         base_email(supplier)

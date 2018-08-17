@@ -50,15 +50,15 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
     {:noreply, state}
   end
-
-  def handle_info(
-        %AuctionEvent{
-          type: :auction_started,
-          data: %{state: auction_state = %AuctionState{}, auction: auction},
-          time_entered: time_entered
-        },
-        state
-      ) do
+  def handle_info(%AuctionEvent{type: :auction_created, data: %{state: auction_state = %AuctionState{status: :pending}, auction: auction}}, state) do
+    AuctionNotifier.notify_auction_created(auction)
+    {:noreply, state}
+  end
+  def handle_info(%AuctionEvent{type: :auction_canceled, data: %{state: auction_state = %AuctionState{status: :pending}, auction: auction}}, state) do
+    AuctionNotifier.notify_auction_canceled(auction)
+    {:noreply, state}
+  end
+  def handle_info(%AuctionEvent{type: :auction_started, data: %{state: auction_state = %AuctionState{}, auction: auction}, time_entered: time_entered}, state) do
     auction
     |> Auctions.update_auction_without_event_storage!(%{scheduled_start: time_entered})
 
@@ -80,9 +80,10 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
-
-  def handle_info(%AuctionEvent{type: _, data: auction = %Auction{scheduled_start: start}}, state)
-      when not is_nil(start) do
+  def handle_info(%AuctionEvent{type: :winning_bid_selected, data: %{bid: %AuctionBid{supplier_id: supplier_id}, state: %AuctionState{auction_id: auction_id}}}, state) do
+    AuctionNotifier.notify_auction_completed(supplier_id, auction_id)
+  end
+  def handle_info(%AuctionEvent{type: _, data: auction = %Auction{scheduled_start: start}}, state) when not is_nil(start) do
     AuctionNotifier.notify_participants(auction)
     {:noreply, state}
   end

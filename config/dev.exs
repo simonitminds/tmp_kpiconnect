@@ -63,5 +63,6 @@ config :oceanconnect, Oceanconnect.Repo,
   database: "oceanconnect_dev",
   pool_size: 10
 
-config :oceanconnect, Oceanconnect.Auctions.Mailer,
-	adapter: Bamboo.LocalAdapter
+if File.exists?("config/dev.secret.exs") do
+  import_config "dev.secret.exs"
+end

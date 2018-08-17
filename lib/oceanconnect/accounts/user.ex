@@ -64,7 +64,7 @@ defmodule Oceanconnect.Accounts.User do
 
 	defimpl Bamboo.Formatter, for: User do
 		def format_email_address(user = %User{email: email}, opts \\ []) do
-			{user.full_name, email}
+			{User.full_name(user), email}
 		end
 	end
 end
