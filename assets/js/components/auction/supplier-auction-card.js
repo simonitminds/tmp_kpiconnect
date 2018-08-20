@@ -44,7 +44,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
     <div className="column is-one-third-desktop is-half-tablet">
       <div className={`card card--auction qa-auction-${auction.id}`}>
         <div className="card-content qa-auction-supplier-card">
-          <div className="is-clearfix">
+          <div className="is-clearfix is-flex">
             {/* Start Status/Time Bubble */}
             <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
               <span className="qa-auction-status">{auctionStatus}</span>

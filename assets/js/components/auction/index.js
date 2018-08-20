@@ -175,6 +175,15 @@ export default class AuctionsIndex extends React.Component {
             >
             { filteredAuctionsDisplay("expired") }
           </CollapsibleSection>
+          <CollapsibleSection
+            trigger="Canceled Auctions"
+            classParentString="qa-canceled-auctions-list auction-list"
+            contentChildCount={filteredAuctionsCount("canceled")}
+            open={filteredAuctionsCount("canceled") > 0}
+            >
+            { filteredAuctionsDisplay("canceled") }
+          </CollapsibleSection>
+
         </div>
       </div>
     );

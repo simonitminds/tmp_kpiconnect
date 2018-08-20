@@ -67,6 +67,7 @@ defmodule OceanconnectWeb.Router do
     resources("/auctions", AuctionController, except: [:delete])
     get("/auctions/:id/log", AuctionController, :log)
     get("/auctions/:id/start", AuctionController, :start)
+    get("/auctions/:id/cancel", AuctionController, :cancel)
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)

@@ -377,7 +377,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.submit_barge(barge)
     end)
 
-    :timer.sleep(500)
+    :timer.sleep(1000)
 
     in_browser_session(:buyer, fn ->
       login_user(buyer)

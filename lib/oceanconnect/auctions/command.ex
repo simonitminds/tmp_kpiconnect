@@ -28,6 +28,10 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :end_auction, data: auction}
   end
 
+  def cancel_auction(auction = %Auction{}, user) do
+    %Command{command: :cancel_auction, data: %{auction: auction, user: user}}
+  end
+
   def start_duration_timer(auction = %Auction{}) do
     %Command{command: :start_duration_timer, data: auction}
   end

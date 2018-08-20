@@ -3,6 +3,7 @@ defmodule Oceanconnect.AuctionsTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -134,6 +135,23 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
+    end
+  end
+
+  describe "canceling an auction" do
+    setup do
+      buyer_company = insert(:company)
+      buyer = insert(:user, company: buyer_company)
+      auction = insert(:auction, duration: 1_000, decision_duration: 1_000, buyer: buyer_company)
+      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      {:ok, %{auction: auction, buyer: buyer}}
+    end
+
+    test "cancel_auction/1", %{auction: auction, buyer: buyer} do
+      Auctions.cancel_auction(auction, buyer)
+      # TODO: Eventually shutdown the auction and commit the final state 
+      # assert {:error, "Auciton Suppervisor Not Started"} = Auctions.AuctionSupervisor.find_pid(auction.id)
+      assert %AuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
     end
   end
 
