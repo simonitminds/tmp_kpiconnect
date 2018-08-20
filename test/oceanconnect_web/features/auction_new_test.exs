@@ -9,7 +9,8 @@ defmodule Oceanconnect.AuctionNewTest do
     buyer = insert(:user, company: buyer_company)
     buyer_company_with_no_credit = insert(:company, credit_margin_amount: nil)
     buyer_with_no_credit = insert(:user, company: buyer_company_with_no_credit)
-    fuel = insert(:fuel)
+    login_user(buyer)
+    fuels = insert_list(2, :fuel)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
     supplier_companies = insert_list(3, :company, is_supplier: true)
@@ -32,8 +33,7 @@ defmodule Oceanconnect.AuctionNewTest do
       eta_time: date_time,
       etd_date: date_time,
       etd_time: date_time,
-      fuel_id: fuel.id,
-      fuel_quantity: 1_000,
+      is_traded_bid_allowed: true,
       scheduled_start_date: date_time,
       scheduled_start_time: date_time,
       suppliers: [
@@ -43,8 +43,7 @@ defmodule Oceanconnect.AuctionNewTest do
         %{
           id: selected_company2.id
         }
-      ],
-      vessel_id: selected_vessel.id
+      ]
     }
 
     show_params = %{
@@ -62,12 +61,13 @@ defmodule Oceanconnect.AuctionNewTest do
        buyer_company: buyer_company,
        show_params: show_params,
        suppliers: suppliers,
-       port: port
+       port: port,
+       fuels: fuels,
+       selected_vessel: selected_vessel
      }}
   end
 
-  test "visting the new auction page", %{buyer: buyer} do
-    login_user(buyer)
+  test "visting the new auction page" do
     AuctionNewPage.visit()
 
     assert AuctionNewPage.has_fields?([
@@ -78,18 +78,14 @@ defmodule Oceanconnect.AuctionNewTest do
              "decision_duration",
              "eta",
              "etd",
-             "fuel_id",
-             "fuel_quantity",
              "is_traded_bid_allowed",
              "po",
              "port_id",
-             "vessel_id",
              "select-port"
            ])
   end
 
-  test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels, buyer: buyer} do
-    login_user(buyer)
+  test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
     AuctionNewPage.visit()
     buyer_vessels = Enum.map(buyer_vessels, fn v -> "#{v.name}, #{v.imo}" end)
     vessels_on_page = MapSet.new(AuctionNewPage.vessel_list())
@@ -98,8 +94,7 @@ defmodule Oceanconnect.AuctionNewTest do
     assert MapSet.equal?(vessels_on_page, company_vessels)
   end
 
-  test "port selection reveals port agent and supplier list", %{port: port, buyer: buyer} do
-    login_user(buyer)
+  test "port selection reveals port agent and supplier list", %{port: port} do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
 
@@ -109,8 +104,7 @@ defmodule Oceanconnect.AuctionNewTest do
            ])
   end
 
-  test "supplier list is filtered by port", %{suppliers: suppliers, port: port, buyer: buyer} do
-    login_user(buyer)
+  test "supplier list is filtered by port", %{suppliers: suppliers, port: port} do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
 
@@ -118,27 +112,60 @@ defmodule Oceanconnect.AuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
-  test "creating an auction", %{
+  test "creating an auction with one vessel fuel", %{
     params: params,
     show_params: show_params,
     port: port,
-    buyer: buyer,
-    buyer_company: buyer_company
+    selected_vessel: selected_vessel,
+    fuels: [selected_fuel | _rest]
   } do
-    login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(Map.put(params, :is_traded_bid_allowed, true))
-
-    assert AuctionNewPage.credit_margin_amount() ==
-             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
-
+    AuctionNewPage.add_vessel_fuel(0, selected_vessel, selected_fuel, 1500)
     AuctionNewPage.submit()
 
-    eventually(fn ->
-      assert current_path() =~ ~r/auctions\/\d/
-      assert AuctionShowPage.has_values_from_params?(show_params)
-    end)
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(show_params)
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+  end
+
+  test "creating an auction with multiple vessel fuels", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    buyer_vessels: [vessel1 | _],
+    fuels: [fuel1, fuel2 | _]
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessel_fuel(0, vessel1, fuel1, 1500)
+    AuctionNewPage.add_vessel_fuel(1, vessel1, fuel2, 2000)
+    AuctionNewPage.submit()
+
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(show_params)
+  end
+
+  test "creating an auction with split bidding disabled", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    buyer_vessels: [vessel1 | _],
+    fuels: [fuel1, fuel2 | _]
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessel_fuel(0, vessel1, fuel1, 1500)
+    AuctionNewPage.add_vessel_fuel(1, vessel1, fuel2, 2000)
+    AuctionNewPage.disable_split_bidding()
+    AuctionNewPage.submit()
+
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_split_bidding_toggled?(true)
   end
 
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",

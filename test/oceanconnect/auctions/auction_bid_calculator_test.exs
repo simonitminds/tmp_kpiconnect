@@ -17,9 +17,12 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         suppliers: [supplier_company, supplier2_company, supplier3_company]
       )
 
+    vessel_fuel = List.first(auction.auction_vessel_fuels)
+
     {:ok,
      %{
        auction: auction,
+       vessel_fuel_id: vessel_fuel.id,
        supplier1: supplier_company.id,
        supplier2: supplier2_company.id,
        supplier3: supplier3_company.id
@@ -27,7 +30,11 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   end
 
   describe "bidding" do
-    test "with no previous bids", %{auction: auction, supplier1: supplier1} do
+    test "with no previous bids", %{
+      auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
+      supplier1: supplier1
+    } do
       auction_id = auction.id
 
       current_state = %AuctionState{
@@ -43,6 +50,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         active: true
       }
 
@@ -60,11 +68,18 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "out bidding a previous bid", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
       auction_id = auction.id
-      prev_bid = %AuctionBid{amount: 2.00, supplier_id: supplier1, auction_id: auction_id}
+
+      prev_bid = %AuctionBid{
+        amount: 2.00,
+        supplier_id: supplier1,
+        vessel_fuel_id: vessel_fuel_id,
+        auction_id: auction_id
+      }
 
       current_state = %AuctionState{
         auction_id: auction_id,
@@ -76,7 +91,12 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         bids: [prev_bid]
       }
 
-      new_bid = %AuctionBid{amount: 1.75, supplier_id: supplier2, auction_id: auction_id}
+      new_bid = %AuctionBid{
+        amount: 1.75,
+        supplier_id: supplier2,
+        vessel_fuel_id: vessel_fuel_id,
+        auction_id: auction_id
+      }
 
       assert {%AuctionState{
                 auction_id: ^auction_id,
@@ -91,6 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "entering a matching bid", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -100,6 +121,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -117,6 +139,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 2.00,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -132,6 +155,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "bid not lower than previous bids", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -141,6 +165,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -158,6 +183,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 3.00,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -173,6 +199,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "entering a bid invalidates previous bid from a supplier", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1
     } do
       auction_id = auction.id
@@ -181,6 +208,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -198,6 +226,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         amount: 3.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -219,6 +248,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   describe "auto bidding" do
     test "entering a auto bid before the auction starts", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -229,6 +259,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -237,6 +268,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -265,6 +297,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "minimum bids get processed at auction start", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -275,6 +308,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -283,6 +317,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -300,8 +335,18 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       {new_state, _events} = AuctionBidCalculator.process(state)
 
       assert [
-               %AuctionBid{amount: 1.25, min_amount: 1.00, supplier_id: ^supplier1},
-               %AuctionBid{amount: 1.50, min_amount: 1.50, supplier_id: ^supplier2}
+               %AuctionBid{
+                 amount: 1.25,
+                 min_amount: 1.00,
+                 vessel_fuel_id: ^vessel_fuel_id,
+                 supplier_id: ^supplier1
+               },
+               %AuctionBid{
+                 amount: 1.50,
+                 min_amount: 1.50,
+                 vessel_fuel_id: ^vessel_fuel_id,
+                 supplier_id: ^supplier2
+               }
              ] = new_state.lowest_bids
 
       inactive_bids =
@@ -316,6 +361,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "minimum bids get processed after auction start with matching lowest bid", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -326,6 +372,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -334,6 +381,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -342,6 +390,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 0.75,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -366,6 +415,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "after auction start with lower bid than current lowest", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -376,6 +426,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -384,6 +435,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -392,6 +444,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 0.75,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -416,6 +469,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "after auction start with lower bid that is normal bid", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -426,6 +480,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -434,6 +489,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -442,6 +498,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: nil,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -466,6 +523,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "after auction start with higher bid that is normal bid", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -476,6 +534,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -484,6 +543,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -492,6 +552,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: nil,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -517,6 +578,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
     test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten",
          %{
            auction: auction,
+           vessel_fuel_id: vessel_fuel_id,
            supplier1: supplier1,
            supplier2: supplier2
          } do
@@ -527,6 +589,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -535,6 +598,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -543,6 +607,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: nil,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -567,6 +632,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "after auction start with lower, unbeatable normal bid lowers all auto bids", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -577,6 +643,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -585,6 +652,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -593,6 +661,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: nil,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -617,6 +686,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "with multiple matching lowest bids", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2,
       supplier3: supplier3
@@ -628,6 +698,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -636,6 +707,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -644,6 +716,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 3.50,
         supplier_id: supplier3,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -669,6 +742,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
     test "with only multiple matching lowest bids", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -679,6 +753,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -687,6 +762,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -713,6 +789,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   describe "events" do
     test "updated auto bids do fire bid events", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -723,6 +800,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.75,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -731,6 +809,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.25,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -739,6 +818,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -761,18 +841,31 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
                %AuctionEvent{
                  type: :auto_bid_placed,
                  auction_id: auction_id,
-                 data: %{bid: %AuctionBid{amount: 1.00, supplier_id: ^supplier1}}
+                 data: %{
+                   bid: %AuctionBid{
+                     amount: 1.00,
+                     vessel_fuel_id: ^vessel_fuel_id,
+                     supplier_id: ^supplier1
+                   }
+                 }
                },
                %AuctionEvent{
                  type: :auto_bid_placed,
                  auction_id: auction_id,
-                 data: %{bid: %AuctionBid{amount: 1.25, supplier_id: ^supplier2}}
+                 data: %{
+                   bid: %AuctionBid{
+                     amount: 1.25,
+                     vessel_fuel_id: ^vessel_fuel_id,
+                     supplier_id: ^supplier2
+                   }
+                 }
                }
              ] = events
     end
 
     test "unchanged auto bids do not fire bid events", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -783,6 +876,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -791,6 +885,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 2.00,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -799,6 +894,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.75,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -821,7 +917,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
                %AuctionEvent{
                  type: :auto_bid_placed,
                  auction_id: ^auction_id,
-                 data: %{bid: %AuctionBid{amount: 1.75, supplier_id: ^supplier1}}
+                 data: %{
+                   bid: %AuctionBid{
+                     amount: 1.75,
+                     vessel_fuel_id: ^vessel_fuel_id,
+                     supplier_id: ^supplier1
+                   }
+                 }
                }
              ] = events
     end
@@ -830,6 +932,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   describe "pending auction" do
     test "does not lower auto bids", %{
       auction: auction,
+      vessel_fuel_id: vessel_fuel_id,
       supplier1: supplier1,
       supplier2: supplier2
     } do
@@ -840,6 +943,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.00,
         supplier_id: supplier1,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 
@@ -848,6 +952,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         min_amount: 1.50,
         supplier_id: supplier2,
         auction_id: auction_id,
+        vessel_fuel_id: vessel_fuel_id,
         time_entered: DateTime.utc_now()
       }
 

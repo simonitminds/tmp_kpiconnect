@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
   alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent}
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
 
   defstruct id: nil,
             type: nil,
@@ -140,7 +140,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def bid_placed(
         bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
-        new_state = %AuctionState{},
+        new_state = %ProductBidState{},
         user
       ) do
     %AuctionEvent{
@@ -153,10 +153,10 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auto_bid_placed(
-        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
-        new_state = %AuctionState{},
-        nil
-      ) do
+    bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+    new_state = %ProductBidState{},
+    nil
+  ) do
     %AuctionEvent{
       type: :auto_bid_placed,
       auction_id: auction_id,
@@ -168,7 +168,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def auto_bid_placed(
         bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
-        new_state = %AuctionState{},
+        new_state = %ProductBidState{},
         user
       ) do
     %AuctionEvent{

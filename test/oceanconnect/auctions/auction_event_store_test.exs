@@ -67,6 +67,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
 
     :timer.sleep(500)
     assert current_cache == AuctionCache.read(auction_id)
+    :timer.sleep(500)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end

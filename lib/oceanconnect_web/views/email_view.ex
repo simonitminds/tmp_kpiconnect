@@ -5,6 +5,12 @@ defmodule OceanconnectWeb.EmailView do
     "#{user.first_name} #{user.last_name}"
   end
 
+  def vessel_name_list(vessels) do
+    vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
+  end
+
   def duration_minute_string(duration) do
     "#{trunc(duration / 60_000)} minutes"
   end

@@ -72,16 +72,11 @@ defmodule OceanconnectWeb.AuctionController do
     changeset = Auctions.change_auction(%Auction{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
-    json_auction =
-      %Auction{}
-      |> Auctions.strip_non_loaded()
-      |> Poison.encode!()
-
     render(
       conn,
       "new.html",
       changeset: changeset,
-      json_auction: json_auction,
+      auction: %Auction{},
       fuels: fuels,
       ports: ports,
       vessels: vessels,
@@ -91,6 +86,9 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def create(conn, %{"auction" => auction_params}) do
+    auction_vessel_fuels =
+      convert_auction_vessel_fuels_to_list(auction_params["auction_vessel_fuels"])
+
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
 
@@ -98,6 +96,7 @@ defmodule OceanconnectWeb.AuctionController do
       auction_params
       |> Auction.from_params()
       |> Map.put("buyer_id", user.company.id)
+      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
     case Auctions.create_auction(updated_params, user) do
       {:ok, auction} ->
@@ -236,4 +235,16 @@ defmodule OceanconnectWeb.AuctionController do
 
     [auction, json_auction, suppliers]
   end
+
+  defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels)
+       when is_map(auction_vessel_fuels) do
+    Enum.map(auction_vessel_fuels, fn {_, values} -> values end)
+  end
+
+  defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels)
+       when is_list(auction_vessel_fuels) do
+    auction_vessel_fuels
+  end
+
+  defp convert_auction_vessel_fuels_to_list(_), do: []
 end

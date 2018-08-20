@@ -8,12 +8,13 @@ defmodule Oceanconnect.AuctionsTest do
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
 
-    @invalid_attrs %{vessel_id: nil}
+    @invalid_attrs %{port_id: "not a valid attribute"}
     @valid_attrs %{po: "some po"}
     @update_attrs %{po: "some updated po"}
 
     setup do
       auction = insert(:auction, @valid_attrs)
+      |> Auctions.fully_loaded
       {:ok, %{auction: Auctions.get_auction!(auction.id)}}
     end
 
@@ -114,19 +115,19 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
+      |> Auctions.fully_loaded
 
       auction_attrs =
         auction_with_participants
         |> Map.take(
-          [:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers, :buyer_id] ++
+          [:scheduled_start, :eta, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
             Map.keys(@valid_attrs)
         )
-
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
       # create_auction has a side effect of starting the AuctionsSupervisor, thus the sleep
       :timer.sleep(200)
 
-      assert all_values_match?(auction_attrs, new_auction)
+      assert all_values_match?(Map.drop(auction_attrs, [:auction_vessel_fuels]), new_auction)
 
       supplier = hd(auction_with_participants.suppliers)
 
@@ -1080,6 +1081,18 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_barge!(inactive_barge.id) end
     end
 
+    test "strip non loaded" do
+      auction = insert(:auction)
+
+      partially_loaded_auction =
+        Oceanconnect.Auctions.Auction
+        |> Repo.get(auction.id)
+        |> Repo.preload([:vessels])
+
+      result = Auctions.strip_non_loaded(partially_loaded_auction)
+      assert hd(result.vessels).company == nil
+    end
+
     test "create_barge/1 with valid data creates a barge", %{port: port} do
       attrs = Map.merge(@valid_attrs, %{port_id: port.id})
       assert {:ok, %Barge{} = barge} = Auctions.create_barge(attrs)
@@ -1131,17 +1144,5 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert barge.companies == companies
     end
-  end
-
-  test "strip non loaded" do
-    auction = insert(:auction)
-
-    partially_loaded_auction =
-      Oceanconnect.Auctions.Auction
-      |> Repo.get(auction.id)
-      |> Repo.preload([:vessel])
-
-    result = Auctions.strip_non_loaded(partially_loaded_auction)
-    assert result.vessel.company == nil
   end
 end

@@ -49,6 +49,10 @@ defmodule OceanconnectWeb.EmailTest do
       auction: auction,
       buyer_company: buyer_company
     } do
+      vessel_name_list = auction.vessels
+      |> Enum.map(&(&1.name))
+      |> Enum.join(", ")
+
       supplier_emails = Email.auction_invitation(auction)
 
       for supplier <- suppliers do
@@ -63,7 +67,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for supplier_email <- supplier_emails do
         assert supplier_email.subject ==
-                 "You have been invited to Auction #{auction.id} for #{auction.vessel.name} at #{
+                 "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{
                    auction.port.name
                  }"
 
@@ -83,6 +87,10 @@ defmodule OceanconnectWeb.EmailTest do
       auction: auction,
       buyer_company: buyer_company
     } do
+      vessel_name_list = auction.vessels
+      |> Enum.map(&(&1.name))
+      |> Enum.join(", ")
+
       %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
         Email.auction_starting_soon(auction)
 
@@ -99,7 +107,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for supplier_email <- supplier_emails do
         assert supplier_email.subject ==
-                 "Auction #{auction.id} for #{auction.vessel.name} at #{auction.port.name} is starting soon."
+                 "Auction #{auction.id} for #{vessel_name_list} at #{auction.port.name} is starting soon."
 
         assert supplier_email.html_body =~ buyer_company.name
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
@@ -107,7 +115,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for buyer_email <- buyer_emails do
         assert buyer_email.subject ==
-                 "Auction #{auction.id} for #{auction.vessel.name} at #{auction.port.name} is starting soon."
+                 "Auction #{auction.id} for #{vessel_name_list} at #{auction.port.name} is starting soon."
 
         assert buyer_email.html_body =~ buyer_company.name
         assert buyer_email.html_body =~ Integer.to_string(auction.id)
@@ -124,6 +132,9 @@ defmodule OceanconnectWeb.EmailTest do
     } do
       is_traded_bid = false
       total_price = winning_bid_amount * auction.fuel_quantity
+      vessel_name_list = auction.vessels
+      |> Enum.map(&(&1.name))
+      |> Enum.join(", ")
 
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
         Email.auction_closed(
@@ -146,7 +157,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for supplier_email <- winning_supplier_emails do
         assert supplier_email.subject ==
-                 "You have won Auction #{auction.id} for #{auction.vessel.name} at #{
+                 "You have won Auction #{auction.id} for #{vessel_name_list} at #{
                    auction.port.name
                  }!"
 
@@ -155,9 +166,9 @@ defmodule OceanconnectWeb.EmailTest do
         assert supplier_email.html_body =~ buyer_company.contact_name
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
         assert supplier_email.html_body =~ auction.vessel.name
-
         assert supplier_email.html_body =~
                  "$#{:erlang.float_to_binary(winning_bid_amount, decimals: 2)}"
+        assert supplier_email.html_body =~ vessel_name_list
       end
 
       for buyer <- buyers do
@@ -170,14 +181,14 @@ defmodule OceanconnectWeb.EmailTest do
 
       for buyer_email <- buyer_emails do
         assert buyer_email.subject ==
-                 "Auction #{auction.id} for #{auction.vessel.name} at #{auction.port.name} has closed."
+                 "Auction #{auction.id} for #{vessel_name_list} at #{auction.port.name} has closed."
 
         assert buyer_email.html_body =~ winning_supplier_company.name
         assert buyer_email.html_body =~ winning_supplier_company.contact_name
         assert buyer_email.html_body =~ buyer_company.name
         assert buyer_email.html_body =~ buyer_company.contact_name
         assert buyer_email.html_body =~ Integer.to_string(auction.id)
-        assert buyer_email.html_body =~ auction.vessel.name
+        assert buyer_email.html_body =~ vessel_name_list
       end
     end
 
@@ -255,6 +266,10 @@ defmodule OceanconnectWeb.EmailTest do
       buyers: buyers,
       auction: auction
     } do
+      vessel_name_list = auction.vessels
+      |> Enum.map(&(&1.name))
+      |> Enum.join(", ")
+
       supplier_emails = Email.auction_canceled(auction).supplier_emails
 
       for supplier <- suppliers do
@@ -267,7 +282,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for supplier_email <- supplier_emails do
         assert supplier_email.subject ==
-                 "Auction #{auction.id} for #{auction.vessel.name} at #{auction.port.name} cancelled."
+                 "Auction #{auction.id} for #{vessel_name_list} at #{auction.port.name} cancelled."
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
         assert supplier_email.html_body =~ buyer_company.name
@@ -285,7 +300,7 @@ defmodule OceanconnectWeb.EmailTest do
 
       for buyer_email <- buyer_emails do
         assert buyer_email.subject ==
-                 "You have canceled Auction #{auction.id} for #{auction.vessel.name} at #{
+                 "You have canceled Auction #{auction.id} for #{vessel_name_list} at #{
                    auction.port.name
                  }."
 

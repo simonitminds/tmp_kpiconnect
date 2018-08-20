@@ -1,5 +1,5 @@
 <div class="form auction-app__body">
-<%= form_for @changeset, @action,[class: "control"], fn _f -> %>
+<%= form_for @changeset, @action, [class: "control"], fn _f -> %>
 
   <%= if @changeset.action do %>
     <div class="container is-fullhd">
@@ -13,7 +13,7 @@
 
   <div id="auctions-app">
     <div id="AuctionFormContainer"
-      data-auction="<%= @json_auction %>"
+      data-auction="<%= auction_json_for_form(@auction) %>"
       data-suppliers="<%= @suppliers %>"
       data-fuels="<%= @fuels %>"
       data-ports="<%= @ports %>"

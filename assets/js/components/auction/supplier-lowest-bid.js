@@ -1,40 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatTime, formatPrice } from '../../utilities';
-import SupplierBidStatus from './supplier-bid-status'
+import SupplierBidStatus from './supplier-bid-status';
+import SolutionDisplay from './solution-display';
 
 const SupplierLowestBid = ({auctionPayload, connection}) => {
-  const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const auctionStatus = _.get(auctionPayload, 'status');
-  const lowestBid = _.chain(auctionPayload)
-    .get('lowest_bids')
-    .first()
-    .value();
-
-  const lowestBidListDisplay = () => {
-    if (_.get(lowestBid, 'amount')) {
-      return (
-        <table className="table is-fullwidth is-striped is-marginless">
-          <thead>
-            <tr>
-              <th>{fuel}</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="qa-auction-lowest-bid-amount">${formatPrice(lowestBid.amount)}</td>
-              <td>{formatTime(lowestBid.time_entered)}</td>
-            </tr>
-          </tbody>
-        </table>
-      );
-    } else {
-      return <div className="auction-table-placeholder">
-        <i>No bids have been placed on this auction</i>
-      </div>;
-    }
-  }
+  const fuels = _.get(auctionPayload, 'auction.fuels');
+  const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
 
   return(
     <div className="auction-lowest-bid">
@@ -42,10 +14,11 @@ const SupplierLowestBid = ({auctionPayload, connection}) => {
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Bid` : `Best Offer`}</h3>
-          {lowestBidListDisplay()}
+          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="" />
         </div>
       </div>
     </div>
   );
 };
+
 export default SupplierLowestBid;

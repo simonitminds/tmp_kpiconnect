@@ -17,8 +17,10 @@ alias Oceanconnect.Auctions
 
 alias Oceanconnect.Auctions.{
   Auction,
+  AuctionVesselFuel,
   AuctionEvent,
   AuctionEventStorage,
+  AuctionSuppliers,
   Barge,
   Fuel,
   Port,
@@ -156,7 +158,6 @@ companies =
   |> Enum.map(fn company ->
     Repo.get_or_insert!(Company, company)
   end)
-
 
 suppliers = [chevron, nigeria, qatargas, petrochina, global, shell, chemoil]
 # User creation doesn't use get_or_insert! fn due to virtual password field
@@ -587,11 +588,11 @@ date_time =
   |> DateTime.from_naive!("Etc/UTC")
 
 auctions_params = [
-  %{
-    vessel_id: vessel1.id,
+  %Auction{
+    auction_vessel_fuels: [
+      %AuctionVesselFuel{vessel_id: vessel1.id, fuel_id: fuel1.id, quantity: 1500}
+    ],
     port_id: port1.id,
-    fuel_id: fuel1.id,
-    fuel_quantity: 1000,
     scheduled_start: date_time,
     eta: date_time,
     po: "1234567",
@@ -599,11 +600,11 @@ auctions_params = [
     duration: 1 * 60_000,
     decision_duration: 1 * 60_000
   },
-  %{
-    vessel_id: List.first(vessels).id,
+  %Auction{
+    auction_vessel_fuels: [
+      %AuctionVesselFuel{vessel_id: vessel1.id, fuel_id: fuel1.id, quantity: 1500}
+    ],
     port_id: fujairah.id,
-    fuel_id: List.first(fuels).id,
-    fuel_quantity: 1000,
     scheduled_start: date_time,
     eta: date_time,
     po: "2345678",
@@ -611,11 +612,16 @@ auctions_params = [
     duration: 4 * 60_000,
     decision_duration: 4 * 60_000
   },
-  %{
-    vessel_id: List.last(vessels).id,
+  %Auction{
+    auction_vessel_fuels: [
+      %AuctionVesselFuel{
+        vessel_id: List.last(vessels).id,
+        fuel_id: List.last(fuels).id,
+        quantity: 1000
+      },
+      %AuctionVesselFuel{vessel_id: List.last(vessels).id, fuel_id: hd(fuels).id, quantity: 1000}
+    ],
     port_id: port1.id,
-    fuel_id: List.last(fuels).id,
-    fuel_quantity: 1000,
     scheduled_start: date_time,
     eta: date_time,
     po: "3456789",
@@ -637,9 +643,16 @@ Enum.map(suppliers, fn supplier ->
   Accounts.add_port_to_company(supplier, port1)
 end)
 
+Repo.delete_all(AuctionEventStorage)
+Repo.delete_all(AuctionSuppliers)
+Repo.delete_all(AuctionVesselFuel)
+Repo.delete_all(Auction)
+
 [auction1, auction2, auction3] =
   Enum.map(auctions_params, fn auction_params ->
-    Repo.get_or_insert!(Auction, auction_params)
+    auction_params
+    |> Auction.changeset(%{})
+    |> Repo.insert!()
   end)
 
 [auction1, auction2, auction3]

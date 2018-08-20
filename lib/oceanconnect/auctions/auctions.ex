@@ -11,6 +11,7 @@ defmodule Oceanconnect.Auctions do
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
+    AuctionTimer,
     Port,
     Vessel,
     Fuel,
@@ -22,19 +23,40 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def place_bid(auction, bid_params, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
-    bid =
-      bid_params
-      |> maybe_add_amount
-      |> maybe_add_min_amount
+  def place_bids(auction, bids_params = %{}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
+    with  :ok <- duration_time_remaining?(auction),
+          bids <- Enum.map(bids_params, fn({product_id, bid_params}) ->
+            {:ok, bid} = make_bid(auction, product_id, bid_params, supplier_id, time_entered)
+            bid
+          end) do
+      bids = Enum.map(bids, fn(bid) -> place_bid(bid, user) end)
+      {:ok, bids}
+    else
+      {:error, :late_bid} -> {:error, :late_bid}
+      {:invalid_bid, bid_params} -> {:invalid_bid, bid_params}
+    end
+  end
+
+  def make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
+    with  bid_params <- maybe_add_amount(bid_params),
+          bid_params <- maybe_add_min_amount(bid_params),
+          bid_params <- convert_amounts(bid_params),
+          true <- check_quarter_increments(bid_params) do
+      bid = bid_params
       |> Map.put("supplier_id", supplier_id)
       |> Map.put("time_entered", time_entered)
+      |> Map.put("fuel_id", product_id)
       |> AuctionBid.from_params_to_auction_bid(auction)
+      {:ok, bid}
+    else
+      _ -> {:invalid_bid, bid_params}
+    end
+  end
 
+  def place_bid(bid, user \\ nil) do
     bid
     |> Command.process_new_bid(user)
     |> AuctionStore.process_command()
-
     bid
   end
 
@@ -43,6 +65,50 @@ defmodule Oceanconnect.Auctions do
 
   defp maybe_add_min_amount(params = %{"min_amount" => _}), do: params
   defp maybe_add_min_amount(params), do: Map.put(params, "min_amount", nil)
+
+  defp convert_amounts(bid_params = %{"amount" => amount, "min_amount" => min_amount}) do
+    bid_params
+    |> Map.put("amount", convert_currency_input(amount))
+    |> Map.put("min_amount", convert_currency_input(min_amount))
+  end
+  defp convert_amounts(bid_params = %{"amount" => amount}) do
+    bid_params
+    |> Map.put("amount", convert_currency_input(amount))
+  end
+  defp convert_amounts(bid_params = %{"min_amount" => min_amount}) do
+    bid_params
+    |> Map.put("min_amount", convert_currency_input(min_amount))
+  end
+  defp convert_amounts(bid_params) do
+    bid_params
+  end
+
+  defp convert_currency_input(""), do: nil
+  defp convert_currency_input(amount) when is_float(amount), do: amount
+  defp convert_currency_input(amount) do
+    {float_amount, _} = Float.parse(amount)
+    float_amount
+  end
+
+  defp check_quarter_increments(_params = %{"amount" => amount, "min_amount" => min_amount}) do
+    check_quarter_increment(amount) && check_quarter_increment(min_amount)
+  end
+  defp check_quarter_increment(nil), do: true
+  defp check_quarter_increment(amount) do
+    amount / 0.25 - Float.floor(amount / 0.25) == 0.0
+  end
+
+  defp duration_time_remaining?(auction = %Auction{id: auction_id}) do
+    case AuctionTimer.read_timer(auction_id, :duration) do
+      false -> maybe_pending(get_auction_state!(auction))
+      _ -> :ok
+    end
+  end
+
+  defp maybe_pending(%{status: :pending}), do: :ok
+  defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
+  defp maybe_pending(_), do: :error
+
 
   def select_winning_bid(bid, comment, user \\ nil) do
     %{bid | comment: comment}
@@ -112,7 +178,7 @@ defmodule Oceanconnect.Auctions do
 
     query
     |> Repo.all()
-    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
+    |> fully_loaded
   end
 
   def get_auction(id) do
@@ -176,17 +242,19 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
-    %Auction{}
-    |> Auction.changeset_for_scheduled_auction(attrs)
-    |> Repo.insert()
-    |> handle_auction_creation(user)
+    auction =
+      %Auction{}
+      |> Auction.changeset_for_scheduled_auction(attrs)
+      |> Repo.insert()
+      |> handle_auction_creation(user)
   end
 
   def create_auction(attrs, user) do
-    %Auction{}
-    |> Auction.changeset(attrs)
-    |> Repo.insert()
-    |> handle_auction_creation(user)
+    auction =
+      %Auction{}
+      |> Auction.changeset(attrs)
+      |> Repo.insert()
+      |> handle_auction_creation(user)
   end
 
   defp handle_auction_creation({:ok, auction}, user) do
@@ -291,10 +359,11 @@ defmodule Oceanconnect.Auctions do
     fully_loaded_auction =
       Repo.preload(auction, [
         :port,
-        [vessel: :company],
-        :fuel,
-        [buyer: [:users]],
-        [suppliers: [:users]]
+        :vessels,
+        :fuels,
+        [auction_vessel_fuels: [:vessel, :fuel]],
+        [buyer: :users],
+        [suppliers: :users]
       ])
 
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))

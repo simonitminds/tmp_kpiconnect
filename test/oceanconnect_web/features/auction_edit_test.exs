@@ -23,13 +23,15 @@ defmodule Oceanconnect.AuctionEditTest do
              "decision_duration",
              "eta",
              "etd",
-             "fuel_id",
-             "fuel_quantity",
+             "vessel_fuel-0-vessel_id",
+             "vessel_fuel-0-fuel_id",
+             "vessel_fuel-0-quantity",
+             "vessel_fuel-1-vessel_id",
+             "vessel_fuel-1-fuel_id",
+             "vessel_fuel-1-quantity",
              "is_traded_bid_allowed",
              "po",
-             "port_id",
-             "scheduled_start",
-             "vessel_id"
+             "port_id"
            ])
   end
 end

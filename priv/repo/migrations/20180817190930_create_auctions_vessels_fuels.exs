@@ -7,6 +7,11 @@ defmodule Oceanconnect.Repo.Migrations.CreateAuctionsVesselsFuels do
       add :vessel_id, references(:vessels)
       add :fuel_id, references(:fuels)
       add :quantity, :integer
+
+      add :eta, :naive_datetime
+      add :etd, :naive_datetime
+
+      timestamps()
     end
   end
 end

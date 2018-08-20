@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionComment from './solution-comment';
+import SolutionDisplay from './solution-display';
 import InputField from '../input-field';
 
 export default class BuyerBestSolution extends React.Component {
@@ -29,7 +30,8 @@ export default class BuyerBestSolution extends React.Component {
       .reject(['id', winningBidId])
       .orderBy(['amount', 'time_entered'],['asc', 'asc'])
       .value();
-
+    const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
+    const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
 
     const bidAcceptDisplay = (bid) => {
       if(auctionStatus == 'closed'){
@@ -76,73 +78,15 @@ export default class BuyerBestSolution extends React.Component {
       }
     }
 
-    const bidDisplay = (bid) => {
-      return (
-        <div>
-          <div className="auction-solution__header">
-            <h3 className="auction-solution__title is-inline-block">{bid.supplier}</h3>
-            <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> <span className="qa-auction-bid-is_traded_bid">{bid.is_traded_bid && <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-xs has-text-gray-3 auction__traded-bid-marker"></i>}</span> ({formatTime(bid.time_entered)})
-              <button
-                className={`button is-small has-margin-left-md qa-select-bid-${bid.id} ${auctionPayload.status != 'decision' ? 'is-hidden' : ''}`}
-                onClick={
-                  this.state.solutionCommentBidId == bid.id ? this.setSolutionCommentBidId.bind(this, null)
-                                                            : this.setSolutionCommentBidId.bind(this, bid.id)
-                }
-              >
-                Select
-              </button>
-            </div>
-          </div>
-          { bidAcceptDisplay(bid) }
-        </div>
-      );
-    }
-
-    const bestSolutionDisplay = () => {
-      if (lowestBid) {
-        return (
-          <div className={`box auction-solution auction-solution--best qa-best-solution-${lowestBidId}`}>
-            {bidDisplay(lowestBid)}
-          </div>
-        );
-      } else {
-        return (
-          <div className="auction-table-placeholder">
-            <i>No bids had been placed on this auction</i>
-          </div>
-        );
-      }
-    }
-
-    const otherSolutionDisplay = () => {
-      if (remainingBids.length > 0) {
-        return (
-          <div className="box box--margin-bottom">
-            <div className="box__subsection has-padding-bottom-none">
-              <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
-            </div>
-            {_.map(remainingBids, (bid) => {
-              return (
-                <div key={bid.id} className={`box auction-solution qa-other-solution-${bid.id}`}>
-                  {bidDisplay(bid)}
-                </div>
-              );
-            })}
-          </div>
-        );
-      }
-    }
-
     return(
       <div className="auction-solution__container">
         <div className="box">
           <div className="box__subsection has-padding-bottom-none">
             <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
-            { bestSolutionDisplay() }
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Single Supplier Solution"} />
           </div>
         </div>
-        { otherSolutionDisplay() }
       </div>
     );
   }

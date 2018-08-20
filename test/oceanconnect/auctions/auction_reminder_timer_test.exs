@@ -39,7 +39,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimerTest do
   end
 
   test "start auction_reminder_timer for auction", %{auction: auction} do
-    :timer.sleep(500)
+    :timer.sleep(1000)
 
     assert length(
              Enum.filter(AuctionEventStore.event_list(auction.id), fn event ->

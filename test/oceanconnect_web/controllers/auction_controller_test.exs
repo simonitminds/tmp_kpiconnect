@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   alias Oceanconnect.Auctions
 
   @update_attrs %{"duration" => 15}
-  @invalid_attrs %{"vessel_id" => nil}
+  @invalid_attrs %{"port_id" => nil}
 
   setup do
     buyer_company = insert(:company, is_supplier: true)
@@ -16,9 +16,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     port = insert(:port, companies: [buyer_company, supplier_company])
 
     auction_params =
-      string_params_for(:auction,
-        vessel: vessel,
-        fuel: fuel,
+      string_params_for(
+        :auction,
+        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 1500)],
         port: port,
         is_traded_bid_allowed: true
       )
@@ -32,7 +32,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         :auction,
         port: port,
         buyer: buyer_company,
-        vessel: vessel,
+        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 1500)],
         suppliers: [supplier_company],
         is_traded_bid_allowed: true
       )
@@ -70,25 +70,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
-  describe "auction create/edit data check" do
-    test "ensures serialized data doesn't include password", %{conn: conn, auction: auction} do
-      new = get(conn, auction_path(conn, :new))
-      create_fail = post(conn, auction_path(conn, :create), auction: @invalid_attrs)
-      edit = get(conn, auction_path(conn, :edit, auction))
-      update_fail = put(conn, auction_path(conn, :update, auction), auction: @invalid_attrs)
-
-      Enum.map([new, create_fail, edit, update_fail], fn conn ->
-        json_auction = conn.assigns[:json_auction]
-        refute json_auction =~ "password"
-        refute json_auction =~ "password_hash"
-      end)
-    end
-  end
-
   describe "create auction" do
     setup(%{buyer: buyer}) do
-      port = insert(:port)
-      invalid_attrs = Map.merge(@invalid_attrs, %{port_id: port.id, buyer_id: buyer.id})
+      invalid_attrs = Map.merge(@invalid_attrs, %{buyer_id: buyer.id})
       {:ok, %{invalid_attrs: invalid_attrs}}
     end
 
@@ -107,10 +91,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction =
-        Oceanconnect.Repo.get(Auctions.Auction, id)
-        |> Oceanconnect.Repo.preload([:vessel, :suppliers])
-
+      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Auctions.fully_loaded()
       conn = get(conn, auction_path(conn, :show, id))
       assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == buyer.id
@@ -131,13 +112,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       valid_auction_params: valid_auction_params
     } do
       draft_attrs =
-        Map.drop(valid_auction_params, [
-          "scheduled_start",
-          "duration",
-          "decision_duration",
-          "fuel_id",
-          "fuel_quantity"
-        ])
+        Map.drop(valid_auction_params, ["scheduled_start", "duration", "decision_duration"])
 
       conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
       assert %{id: id} = redirected_params(conn)
@@ -150,7 +125,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     } do
       invalid_attrs =
         valid_auction_params
-        |> Map.drop(["duration", "decision_duration", "fuel_id", "fuel_quantity"])
+        |> Map.drop(["duration", "decision_duration", "auction_vessel_fuels"])
         |> Map.put(
           "scheduled_start",
           DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string()

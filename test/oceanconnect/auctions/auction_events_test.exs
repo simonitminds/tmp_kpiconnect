@@ -56,7 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
           :eta,
           :fuel_id,
           :port_id,
-          :vessel_id,
+          :auction_vessel_fuels,
           :suppliers,
           :buyer_id
         ])

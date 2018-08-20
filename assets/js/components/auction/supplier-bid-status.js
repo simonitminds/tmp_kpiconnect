@@ -7,8 +7,8 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
   const lowestBids = _.get(auctionPayload, 'lowest_bids');
   const auctionStatus = _.get(auctionPayload, 'status');
   const companyId = window.companyId;
-  const suppliersLowestBid = lowestBids.find((bid) => bid.supplier_id == companyId);
-  const rank = lowestBids.indexOf(suppliersLowestBid);
+  // const suppliersLowestBid = lowestBids.find((bid) => bid.supplier_id == companyId);
+  // const rank = lowestBids.indexOf(suppliersLowestBid);
   const isLeading = _.get(auctionPayload, 'is_leading');
   const leadIsTied = _.get(auctionPayload, 'lead_is_tied');
   const winning_bid = _.get(auctionPayload, 'winning_bid')

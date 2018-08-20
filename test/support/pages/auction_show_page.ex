@@ -31,6 +31,26 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def has_split_bidding_toggled?(allowed) do
+    text = find_element(:css, ".qa-auction-split_bid_allowed")
+    |> inner_text
+
+    case allowed do
+      true -> text =~ ~r/\ballowed/
+      false -> text =~ ~r/\bdisallowed/
+    end
+  end
+
+  def has_anonymous_bidding_toggled?(allowed) do
+    text = find_element(:css, ".qa-auction-anonymous_bidding")
+    |> inner_text
+
+    case allowed do
+      true -> text =~ ~r/\ballowed/
+      false -> text =~ ~r/\bdisallowed/
+    end
+  end
+
   defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
     Enum.all?(suppliers, fn supplier ->
       text =
@@ -41,8 +61,9 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  defp value_equals_element_text?(_key, element, value) do
-    value == element |> inner_text
+  defp value_equals_element_text?(key, element, value) do
+    text = element |> inner_text
+    value == text
   end
 
   def has_bid_list_bids?(bid_list) do

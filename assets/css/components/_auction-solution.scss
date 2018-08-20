@@ -50,3 +50,127 @@
     margin-bottom: 0 !important;
   }
 }
+.auction-solution__header--bordered {
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 0.25rem 1rem 0.5rem 1rem;
+  border-bottom: 4px solid $teal;
+}
+
+.auction-solution__body {
+
+}
+
+.auction-solution__port-designation {
+  background-color: $gray-0;
+  margin: 0.5rem -1rem 0.5rem -1rem;
+  padding: 0.25rem 1rem;
+  border-bottom: 1px solid $gray-1;
+}
+
+.auction-solution__vessel-table, .auction-solution__product-table {
+  width: calc(100% + 2rem);
+  margin: 0 -1rem;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid $gray-1;
+  }
+
+  thead tr {
+    border-bottom: 3px solid $gray-3;
+  }
+  thead tr th {
+    font-weight: bold;
+  }
+  thead th, tbody td { // Align table contents with collapsing toggle.
+    &:first-child {
+      padding-left: 1rem;
+    }
+    &:last-child {
+      padding-right: 1rem;
+    }
+  }
+}
+
+.auction-solution__product-table {
+  tbody {
+    border-top: 3px solid $gray-3;
+  }
+}
+
+.auction-bidding__title {
+  @media (min-width: 1024px) {
+    border-bottom: 1px solid $gray-2;
+    padding: 0.5rem 1.25rem 0.5rem 1.25rem;
+    margin: 0 -1.25rem;
+    width: calc(100% + 2.5rem);
+  }
+}
+
+.auction-bidding__product-group {
+  @media (max-width: 1024px) {
+    border-top: 1px solid $gray-2;
+    padding: 0.5rem 0.75rem 0 0.75rem;
+    margin: 0 -1.25rem;
+    width: calc(100% + 2.5rem);
+  }
+}
+
+.auction-bidding__input {
+  flex-grow: 0;
+  flex-basis: 150px;
+}
+
+.field--offset {
+    background-color: $gray-2;
+    width: calc(100% + 2.5rem);
+    padding: 0.75rem 1rem;
+    margin: 0 -1.25rem;
+}
+
+.box--nested-base--base {
+    margin-top: calc(-1.5rem - 2px);
+    margin-bottom: 1rem;
+}
+
+.auction-solution--split {
+  .auction-solution__body__seller-list {
+    counter-reset: rowNumber - 1;
+
+    li {
+        display: inline-block;
+        counter-increment: rowNumber;
+        margin-top: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    ul li:before {
+        content: counter(rowNumber);
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 0.75rem;
+        background-color: $gray-3;
+        color: $white;
+        font-weight: 700;
+        min-width: 1em;
+        margin-right: 0.5em;
+        text-align: center;
+    }
+  }
+}
+
+.auction-solution__marker {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: $gray-3;
+  color: $white;
+  font-weight: 700;
+  min-width: 1rem;
+  margin-right: 0.5rem;
+  text-align: center;
+}

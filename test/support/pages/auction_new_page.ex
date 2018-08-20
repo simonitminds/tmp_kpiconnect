@@ -2,6 +2,8 @@ defmodule Oceanconnect.AuctionNewPage do
   @page_path "/auctions/new"
   use Oceanconnect.Page
 
+  alias Oceanconnect.Auctions.{Fuel, Vessel}
+
   def visit do
     navigate_to(@page_path)
   end
@@ -13,7 +15,7 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def vessel_list() do
-    find_all_elements(:css, ".qa-auction-vessel_id option")
+    find_all_elements(:css, ".qa-auction-vessel_fuel-0-vessel_id option")
     |> Enum.map(fn elem -> inner_text(elem) end)
     |> Enum.reject(fn elem -> elem == "Please select" end)
   end
@@ -23,33 +25,49 @@ defmodule Oceanconnect.AuctionNewPage do
     |> Enum.map(fn {key, value} ->
       element = find_element(:css, ".qa-auction-#{key}")
       type = Hound.Helpers.Element.tag_name(element)
-      fill_form_element(key, element, type, value)
+      fill_form_element(element, type, value)
     end)
   end
 
-  def fill_form_element(_key, element, _type, value = %DateTime{}) do
+  def fill_form_element(element, _type, value = %DateTime{}) do
     element
     |> find_within_element(:css, "input")
     |> fill_field(value)
   end
 
-  def fill_form_element(_key, _element, _type, value) when is_list(value) do
+  def fill_form_element(_element, _type, value) when is_list(value) do
     Enum.map(value, fn supplier ->
       execute_script("document.getElementById('invite-#{supplier.id}').click();", [])
     end)
   end
 
-  def fill_form_element(_key, element, "select", value) do
+  def fill_form_element(element, "select", value) do
     find_within_element(element, :css, "option[value='#{value}']")
     |> click
   end
 
-  def fill_form_element(_key, element, _type, value) do
-    input_into_field(element, value)
+  def fill_form_element(element, _type, value) do
+    fill_field(element, value)
+  end
+
+  def add_vessel_fuel(index, selected_vessel = %Vessel{}, selected_fuel = %Fuel{}, quantity) do
+    find_element(:css, ".qa-auction-vessel_fuel-#{index}-vessel_id")
+    |> fill_form_element("select", selected_vessel.id)
+
+    find_element(:css, ".qa-auction-vessel_fuel-#{index}-fuel_id")
+    |> fill_form_element("select", selected_fuel.id)
+
+    find_element(:css, ".qa-auction-vessel_fuel-#{index}-quantity")
+    |> fill_form_element("input", quantity)
   end
 
   def select_port(port_id) do
     find_element(:css, ".qa-auction-port_id option[value='#{port_id}']")
+    |> click
+  end
+
+  def disable_split_bidding() do
+    find_element(:css, ".qa-auction-split_bid_allowed")
     |> click
   end
 

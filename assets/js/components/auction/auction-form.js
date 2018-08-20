@@ -32,9 +32,9 @@ const AuctionForm = (props) => {
     credit_margin_amount
   } = props;
 
-  const fuel_id = auction.fuel_id ? auction.fuel_id : "";
+  const vesselFuel0 = auction.vessel_fuels[0] || {};
+  const vesselFuel1 = auction.vessel_fuels[1] || {};
   const port_id = auction.port_id ? auction.port_id : "";
-  const vessel_id = auction.vessel_id ? auction.vessel_id : "";
   const selectedPort = _.chain(ports)
                         .filter(['id', auction.port_id])
                         .first()
@@ -59,42 +59,6 @@ const AuctionForm = (props) => {
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
       <input type="hidden" name="auction[eta]" className="qa-auction-eta" value={auction.eta ? moment(auction.eta).utc() : ""} />
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={auction.etd ? moment(auction.etd).utc() : ""} />
-
-      <section className="auction-info"> {/* Vessel info */}
-        <div className="container"> <div className="content">
-            <fieldset>
-              <legend className="subtitle is-4" >Vessel</legend>
-              <div className="field is-horizontal">
-                <div className="field-label">
-                  <label htmlFor="auction_vessel_id" className="label">
-                    Vessel Name
-                  </label>
-                </div>
-                <div className="field-body">
-                  <div className="control">
-                    <div className="select is-fullwidth">
-                      <select
-                        id="auction_vessel_id"
-                        name="auction[vessel_id]"
-                        className="qa-auction-vessel_id"
-                        value={vessel_id}
-                        onChange={updateInformation.bind(this, 'auction.vessel_id')} > <option disabled value="">
-                          Please select
-                        </option>
-                        {_.map(vessels, vessel => (
-                          <option key={vessel.id} value={vessel.id}>
-                            {vessel.name}, {vessel.imo}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </fieldset>
-          </div>
-        </div>
-      </section> {/* Vessel info */}
 
       <section className="auction-info"> {/* Port info */}
         <div className="container">
@@ -191,7 +155,35 @@ const AuctionForm = (props) => {
         <div className="container">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Fuel</legend>
+              <legend className="subtitle is-4" >Fuel 1</legend>
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_vessel_id" className="label">
+                    Vessel Name
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select is-fullwidth">
+                      <select
+                        id="auction_vessel_id_0"
+                        name="auction[auction_vessel_fuels][0][vessel_id]"
+                        className="qa-auction-vessel_fuel-0-vessel_id"
+                        value={vesselFuel0.vessel_id || ""}
+                        onChange={updateInformation.bind(this, 'auction.vessel_fuels.0.vessel_id')} > <option disabled value="">
+                          Please select
+                        </option>
+                        {_.map(vessels, vessel => (
+                          <option key={vessel.id} value={vessel.id}>
+                            {vessel.name}, {vessel.imo}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_fuel_id" className="label">
@@ -202,11 +194,11 @@ const AuctionForm = (props) => {
                   <div className="control">
                     <div className="select is-fullwidth">
                       <select
-                        id="auction_fuel_id"
-                        name="auction[fuel_id]"
-                        className="qa-auction-fuel_id"
-                        value={fuel_id}
-                        onChange={updateInformation.bind(this, 'auction.fuel_id')}
+                        id="auction_fuel_id_0"
+                        name="auction[auction_vessel_fuels][0][fuel_id]"
+                        className="qa-auction-vessel_fuel-0-fuel_id"
+                        value={vesselFuel0.fuel_id || ""}
+                        onChange={updateInformation.bind(this, 'auction.vessel_fuels.0.fuel_id')}
                       >
                         <option disabled value="">
                           Please select
@@ -223,12 +215,83 @@ const AuctionForm = (props) => {
 
               <InputField
                 model={'auction'}
-                field={'fuel_quantity'}
+                field={'auction_vessel_fuels][0][quantity'}
                 labelText={'Fuel Quantity (MT)'}
-                value={auction.fuel_quantity}
+                value="FIX ME"
                 isHorizontal={true}
-                opts={{type: 'number'}}
-                onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
+                opts={{type: 'number', name: 'vessel_fuel-0-quantity'}}
+                onChange={updateInformation.bind(this, 'auction.vessel_fuels.0.quantity')}
+              />
+            </fieldset>
+
+
+            <fieldset>
+              <legend className="subtitle is-4" >Fuel 2</legend>
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_vessel_id" className="label">
+                    Vessel Name
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select is-fullwidth">
+                      <select
+                        id="auction_vessel_id_1"
+                        name="auction[auction_vessel_fuels][1][vessel_id]"
+                        className="qa-auction-vessel_fuel-1-vessel_id"
+                        value={vesselFuel1.vessel_id || ""}
+                        onChange={updateInformation.bind(this, 'auction.vessel_fuels.1.vessel_id')} > <option disabled value="">
+                          Please select
+                        </option>
+                        {_.map(vessels, vessel => (
+                          <option key={vessel.id} value={vessel.id}>
+                            {vessel.name}, {vessel.imo}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_fuel_id" className="label">
+                    Fuel
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select is-fullwidth">
+                      <select
+                        id="auction_fuel_id_1"
+                        name="auction[auction_vessel_fuels][1][fuel_id]"
+                        className="qa-auction-vessel_fuel-1-fuel_id"
+                        value={vesselFuel1.fuel_id || ""}
+                        onChange={updateInformation.bind(this, 'auction.vessel_fuels.1.fuel_id')}
+                      >
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        {_.map(fuels, fuel => (
+                          <option key={fuel.id} value={fuel.id}>
+                            {fuel.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div> </div>
+              </div>
+
+              <InputField
+                model={'auction'}
+                field={'auction_vessel_fuels][1][quantity'}
+                labelText={'Fuel Quantity (MT)'}
+                value="FIX ME"
+                isHorizontal={true}
+                opts={{type: 'number', name: 'vessel_fuel-1-quantity'}}
+                onChange={updateInformation.bind(this, 'auction.vessel_fuels.1.quantity')}
               />
             </fieldset>
           </div>
@@ -293,80 +356,95 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-             <div className="field is-horizontal">
-               <div className="field-label">
-                <label htmlFor="auction_duration" className="label">
-                  Duration
-                </label>
-              </div>
-              <div className="field-body">
-                <div className="control">
-                  <div className="select">
-                    <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
-                      <option disabled value="">
-                        Please select
-                      </option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                    </select>
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_duration" className="label">
+                    Duration
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select">
+                      <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                    </div>
+                    <span className="select__extra-label">minutes</span>
                   </div>
-                  <span className="select__extra-label">minutes</span>
                 </div>
               </div>
-             </div>
 
-             <div className="field is-horizontal">
-               <div className="field-label">
-                <label htmlFor="auction_decision_duration" className="label">
-                  Decision Duration
-                </label>
-              </div>
-              <div className="field-body">
-                <div className="control">
-                  <div className="select">
-                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
-                      <option disabled value="">
-                        Please select
-                      </option>
-                      <option value="15">15</option>
-                      <option value="10">10</option>
-                    </select>
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_decision_duration" className="label">
+                    Decision Duration
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select">
+                      <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        <option value="15">15</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <span className="select__extra-label">minutes</span>
                   </div>
-                  <span className="select__extra-label">minutes</span>
                 </div>
               </div>
-             </div>
 
-             <div className="field is-horizontal">
-               <div className="field-label"></div>
-               <div className="field-body">
-                 <CheckBoxField
-                     model={'auction'}
-                     field={'anonymous_bidding'}
-                     labelText={'anonymous bidding'}
-                     value={auction.anonymous_bidding}
-                     opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                     onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
-                 />
-               </div>
-             </div>
-             { (credit_margin_amount != 0) &&
-                 <div className="field is-horizontal">
-                   <div className="field-label"></div>
-                   <div className="field-body field-body--columned">
-                     <CheckBoxField
-                         model={'auction'}
-                         field={'is_traded_bid_allowed'}
-                         labelText={'accept traded bids'}
-                         value={auction.is_traded_bid_allowed}
-                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
-                     />
-                     <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
-                   </div>
-                 </div>
-            }
+              <div className="field is-horizontal">
+                <div className="field-label"></div>
+                <div className="field-body">
+                  <CheckBoxField
+                      model={'auction'}
+                      field={'anonymous_bidding'}
+                      labelText={'anonymous bidding'}
+                      value={auction.anonymous_bidding}
+                      opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                      onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
+                  />
+                </div>
+              </div>
+
+              { (credit_margin_amount != 0) &&
+                  <div className="field is-horizontal">
+                    <div className="field-label"></div>
+                    <div className="field-body field-body--columned">
+                      <CheckBoxField
+                          model={'auction'}
+                          field={'is_traded_bid_allowed'}
+                          labelText={'accept traded bids'}
+                          value={auction.is_traded_bid_allowed}
+                          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                          onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
+                      />
+                      <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
+                    </div>
+                  </div>
+              }
+
+              <div className="field is-horizontal">
+                <div className="field-label"></div>
+                <div className="field-body">
+                  <CheckBoxField
+                      model={'auction'}
+                      field={'split_bid_allowed'}
+                      labelText={'allow split bidding'}
+                      value={auction.allow_split_bidding}
+                      opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                      onChange={updateInformation.bind(this, 'auction.split_bid_allowed')}
+                  />
+                </div>
+              </div>
             </fieldset>
           </div>
         </div>

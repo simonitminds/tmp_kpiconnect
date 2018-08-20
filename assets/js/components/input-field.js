@@ -5,6 +5,7 @@ const InputField = ({model, field, labelText, value, opts, onChange, expandedInp
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
   const type = _.has(opts, 'type') ? opts.type : 'text';
+  const name = _.has(opts, 'name') ? opts.name : field;
   return (
     <div className={`field ${isHorizontal ? 'is-horizontal' : ''}`}>
       <div className="field-label">
@@ -17,8 +18,8 @@ const InputField = ({model, field, labelText, value, opts, onChange, expandedInp
           <input
             type={type}
             name={`${model}[${field}]`}
-            id={`${model}_${field}`}
-            className={`input qa-${model}-${field}`}
+            id={`${model}_${name}`}
+            className={`input qa-${model}-${name}`}
             defaultValue={value}
             autoComplete="off"
             onChange={onChange}

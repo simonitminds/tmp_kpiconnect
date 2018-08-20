@@ -9,7 +9,11 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
-  const fuel = _.get(auction, 'fuel.name');
+  const vesselFuel = _.get(auction, 'auction_vessel_fuels.0');
+  const fuel = _.get(vesselFuel, 'fuel.name');
+  const fuel_quantity = _.get(vesselFuel, 'quantity');
+  const vessel = _.get(vesselFuel, 'vessel.name');
+
 
   const bidStatusDisplay = () => {
     const lowestBid = _.chain(auctionPayload)
@@ -57,7 +61,10 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
           </div>
         </div>
         <div className="card-title">
-          <h3 className="title is-size-4 has-text-weight-bold is-marginless"> {auction.vessel.name} {auction.is_traded_bid_allowed && <span><i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}</h3>
+          <h3 className="title is-size-4 has-text-weight-bold is-marginless">
+            {vessel}
+            {auction.is_traded_bid_allowed && <span><i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
+          </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>

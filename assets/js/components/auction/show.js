@@ -273,7 +273,21 @@ export default class AuctionShow extends React.Component {
                             <ul className="list has-no-bullets">
                               <li>
                                 {additionInfoDisplay(auction)}
-                            </li>
+                              </li>
+                              <li class="qa-auction-split_bid_allowed">
+                                {
+                                  auction.split_bid_allowed ?
+                                    "Split bidding is allowed for this auction." :
+                                    "Split bidding is not allowed for this auction."
+                                }
+                              </li>
+                              <li class="qa-auction-anonymous_bidding">
+                                {
+                                  auction.anonymous_bidding ?
+                                    "Anonymous bidding is allowed for this auction." :
+                                    "Anonymous bidding is not allowed for this auction."
+                                }
+                              </li>
                             </ul>
                           </div>
                         </div>

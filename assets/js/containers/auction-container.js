@@ -40,18 +40,17 @@ const mapDispatchToProps = (dispatch) => ({
   formSubmit(auctionId, ev) {
     ev.preventDefault();
 
-    const elements = ev.target.elements;
-    const bidData = {
-      'bid': {
-        'amount': elements.amount.value,
-        'min_amount': elements.min_amount.value,
-        'is_traded_bid': elements && elements.is_traded_bid && elements.is_traded_bid.checked
-      }
-    };
+    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
+    const bidsByProduct = _.reduce(bidElements, (acc, e) => {
+      acc[e.dataset.product] = acc[e.dataset.product] || {};
+      acc[e.dataset.product][e.name] = e.value;
+      return acc;
+    }, {});
 
-    elements.amount.value = '';
-    elements.min_amount.value = '';
-    dispatch(submitBid(auctionId, bidData));
+    dispatch(submitBid(auctionId, {
+      "bids": bidsByProduct,
+      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
+    }));
   },
   submitBargeForm(auctionId, bargeId, ev) {
     ev.preventDefault();

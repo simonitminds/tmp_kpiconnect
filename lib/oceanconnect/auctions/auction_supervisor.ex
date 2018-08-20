@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     Auction,
     AuctionCache,
     AuctionEventHandler,
+    AuctionEmailNotificationHandler,
     AuctionEventStore,
     AuctionScheduler,
     AuctionStore,
@@ -25,6 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       auction_a_timer: {AuctionTimer, auction_id},
       auction_cache: {AuctionCache, auction},
       auction_event_handler: {AuctionEventHandler, auction_id},
+      auction_email_notification_handler: {AuctionEmailNotificationHandler, auction_id},
       auction_event_store: {AuctionEventStore, auction_id},
       auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction},
@@ -56,9 +58,11 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
         all_children
       end
 
-    children
+    children_included = children
     |> Enum.reject(fn {k, _v} -> k in exclusions end)
     |> Enum.map(fn {_, v} -> v end)
+
+    children_included
   end
 
   defp exclude_children(all_children, %{}), do: all_children |> Map.values()

@@ -1,6 +1,32 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge}
+
+  def auction_json_for_form(auction = %Auction{}) do
+    auction_map =
+      auction
+      |> Auctions.strip_non_loaded()
+
+    %{
+      po: auction_map.po,
+      port_agent: auction_map.port_agent,
+      eta: auction_map.eta,
+      etd: auction_map.etd,
+      scheduled_start: auction_map.scheduled_start,
+      auction_ended: auction_map.auction_ended,
+      duration: auction_map.duration,
+      decision_duration: auction_map.decision_duration,
+      anonymous_bidding: auction_map.anonymous_bidding,
+      split_bid_allowed: auction_map.split_bid_allowed,
+      additional_information: auction_map.additional_information,
+      port: auction_map.port,
+      buyer: auction_map.buyer,
+      suppliers: auction_map.suppliers || [],
+      vessel_fuels: auction_map.auction_vessel_fuels || []
+    }
+    |> Poison.encode!()
+  end
 
   def actual_duration(%Auction{auction_ended: nil}), do: "-"
 
