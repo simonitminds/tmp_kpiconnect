@@ -98,6 +98,11 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+
+    # TODO: remove this after emails are designed
+    post("/send_email/invitation", EmailController, :send_invitation)
+    post("/send_email/cancellation", EmailController, :send_cancellation)
+    post("/send_email/completion", EmailController, :send_completion)
   end
 
   scope "/admin", OceanconnectWeb.Admin do
@@ -135,7 +140,17 @@ defmodule OceanconnectWeb.Router do
     post("/fuels/:fuel_id/activate", FuelController, :activate, as: :admin_fuel)
 
     resources("/ports", PortController, as: :admin_port)
+<<<<<<< HEAD
     post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
     post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
+=======
+		post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
+		post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
+  end
+
+  # TODO: remove this when finished designing emails
+  if Mix.env == :dev do
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
+>>>>>>> Created fake email controller for email design and testing
   end
 end

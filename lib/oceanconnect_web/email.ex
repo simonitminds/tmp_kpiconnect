@@ -126,7 +126,7 @@ defmodule OceanconnectWeb.Email do
       Enum.map(buyers, fn(buyer) ->
         base_email(buyer)
         |> subject("Your auction has closed.")
-        |> render("auction_completion.html", user: buyer, winning_supplier_company: winning_supplier_company, auction: auction, buyer_company: buyer_company)
+        |> render("auction_completion.html", user: buyer, winning_supplier_company: winning_supplier_company, auction: auction, buyer_company: buyer_company, bid_amount: bid_amount, total_price: total_price)
       end)
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
