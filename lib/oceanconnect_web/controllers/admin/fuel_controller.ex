@@ -6,12 +6,16 @@ defmodule OceanconnectWeb.Admin.FuelController do
 
   def index(conn, params) do
     page = Auctions.list_fuels(params)
-    render(conn, "index.html",
-			fuels: page.entries,
-		  page_number: page.page_number,
-		  page_size: page.page_size,
-		  total_pages: page.total_pages,
-		  total_entries: page.total_entries)
+
+    render(
+      conn,
+      "index.html",
+      fuels: page.entries,
+      page_number: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages,
+      total_entries: page.total_entries
+    )
   end
 
   def new(conn, _params) do
@@ -25,6 +29,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
         conn
         |> put_flash(:info, "Fuel created successfully.")
         |> redirect(to: admin_fuel_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,6 +49,7 @@ defmodule OceanconnectWeb.Admin.FuelController do
         conn
         |> put_flash(:info, "Fuel updated successfully.")
         |> redirect(to: admin_fuel_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", fuel: fuel, changeset: changeset)
     end
@@ -58,21 +64,21 @@ defmodule OceanconnectWeb.Admin.FuelController do
     |> redirect(to: admin_fuel_path(conn, :index))
   end
 
-	def deactivate(conn, %{"fuel_id" => fuel_id}) do
-		fuel = Auctions.get_active_fuel!(fuel_id)
-		{:ok, _fuel} = Auctions.deactivate_fuel(fuel)
+  def deactivate(conn, %{"fuel_id" => fuel_id}) do
+    fuel = Auctions.get_active_fuel!(fuel_id)
+    {:ok, _fuel} = Auctions.deactivate_fuel(fuel)
 
-		conn
-		|> put_flash(:info, "Fuel deactivated successfully.")
-		|> redirect(to: admin_fuel_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "Fuel deactivated successfully.")
+    |> redirect(to: admin_fuel_path(conn, :index))
+  end
 
-	def activate(conn, %{"fuel_id" => fuel_id}) do
-		fuel = Auctions.get_fuel!(fuel_id)
-		{:ok, _fuel} = Auctions.activate_fuel(fuel)
+  def activate(conn, %{"fuel_id" => fuel_id}) do
+    fuel = Auctions.get_fuel!(fuel_id)
+    {:ok, _fuel} = Auctions.activate_fuel(fuel)
 
-		conn
-		|> put_flash(:info, "Fuel activated successfully.")
-		|> redirect(to: admin_fuel_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "Fuel activated successfully.")
+    |> redirect(to: admin_fuel_path(conn, :index))
+  end
 end

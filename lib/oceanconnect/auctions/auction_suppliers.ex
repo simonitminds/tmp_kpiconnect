@@ -3,12 +3,11 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.AuctionSuppliers
 
-
   schema "auction_suppliers" do
-    field :participation, :string
-    field :alias_name, :string
-    belongs_to :auction, Oceanconnect.Auctions.Auction
-    belongs_to :supplier, Oceanconnect.Accounts.Company
+    field(:participation, :string)
+    field(:alias_name, :string)
+    belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:supplier, Oceanconnect.Accounts.Company)
 
     timestamps()
   end

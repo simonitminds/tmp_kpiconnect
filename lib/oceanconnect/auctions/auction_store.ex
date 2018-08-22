@@ -146,16 +146,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-    {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
-    current_state
-  ) do
+        {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
+        current_state
+      ) do
     new_state = cancel_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
 
     {:noreply, new_state}
   end
-
 
   def handle_cast({:end_auction, _auction_id, _emit}, current_state),
     do: {:noreply, current_state}

@@ -12,7 +12,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
   end
 
-
   test "canceling an auction", %{auctions: [auction | _rest], buyer: buyer} do
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     login_user(buyer)
@@ -64,7 +63,6 @@ defmodule Oceanconnect.AuctionIndexTest do
       assert AuctionIndexPage.has_auctions?(auctions ++ [supplier_auction])
       refute AuctionIndexPage.has_auctions?(non_participant_auctions)
     end
-
   end
 
   describe "admin login" do

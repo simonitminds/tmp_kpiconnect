@@ -12,10 +12,23 @@ defmodule Oceanconnect.Auctions.AuctionEventStorageTest do
 
   test "events_by_auction/1 returns events in reverse chronological order" do
     auction = insert(:auction)
-    AuctionEventStorage.persist(%AuctionEventStorage{auction_id: auction.id, event: %AuctionEvent{type: "1"}})
-    AuctionEventStorage.persist(%AuctionEventStorage{auction_id: auction.id, event: %AuctionEvent{type: "2"}})
-    AuctionEventStorage.persist(%AuctionEventStorage{auction_id: auction.id, event: %AuctionEvent{type: "3"}})
+
+    AuctionEventStorage.persist(%AuctionEventStorage{
+      auction_id: auction.id,
+      event: %AuctionEvent{type: "1"}
+    })
+
+    AuctionEventStorage.persist(%AuctionEventStorage{
+      auction_id: auction.id,
+      event: %AuctionEvent{type: "2"}
+    })
+
+    AuctionEventStorage.persist(%AuctionEventStorage{
+      auction_id: auction.id,
+      event: %AuctionEvent{type: "3"}
+    })
+
     event_list = AuctionEventStorage.events_by_auction(auction.id)
-    assert ["3", "2", "1"] == Enum.map(event_list, &(&1.type))
+    assert ["3", "2", "1"] == Enum.map(event_list, & &1.type)
   end
 end

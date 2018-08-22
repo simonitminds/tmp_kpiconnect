@@ -11,13 +11,13 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          available_barges <- Accounts.list_company_barges(supplier_id),
          {barge_id, _} <- Integer.parse(barge_id),
-         barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id))
-    do
+         barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id)) do
       Auctions.submit_barge(auction, barge, supplier_id, user)
 
-      auction_payload = auction
-      |> Auctions.fully_loaded
-      |> AuctionPayload.get_auction_payload!(supplier_id)
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded()
+        |> AuctionPayload.get_auction_payload!(supplier_id)
 
       conn
       |> render("submit.json", auction_payload: auction_payload)
@@ -36,13 +36,13 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          available_barges <- Accounts.list_company_barges(supplier_id),
          {barge_id, _} <- Integer.parse(barge_id),
-         barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id))
-    do
+         barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id)) do
       Auctions.unsubmit_barge(auction, barge, supplier_id, user)
 
-      auction_payload = auction
-      |> Auctions.fully_loaded
-      |> AuctionPayload.get_auction_payload!(supplier_id)
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded()
+        |> AuctionPayload.get_auction_payload!(supplier_id)
 
       conn
       |> render("submit.json", auction_payload: auction_payload)
@@ -54,20 +54,24 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     end
   end
 
-  def approve(conn, %{"auction_id" => auction_id, "barge_id" => barge_id, "supplier_id" => supplier_id}) do
+  def approve(conn, %{
+        "auction_id" => auction_id,
+        "barge_id" => barge_id,
+        "supplier_id" => supplier_id
+      }) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
 
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- buyer_id == auction.buyer_id,
          {barge_id, _} <- Integer.parse(barge_id),
-         barge <- Auctions.get_barge(barge_id)
-    do
+         barge <- Auctions.get_barge(barge_id) do
       Auctions.approve_barge(auction, barge, supplier_id, user)
 
-      auction_payload = auction
-      |> Auctions.fully_loaded
-      |> AuctionPayload.get_auction_payload!(buyer_id)
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded()
+        |> AuctionPayload.get_auction_payload!(buyer_id)
 
       conn
       |> render("submit.json", auction_payload: auction_payload)
@@ -79,20 +83,24 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     end
   end
 
-  def reject(conn, %{"auction_id" => auction_id, "barge_id" => barge_id, "supplier_id" => supplier_id}) do
+  def reject(conn, %{
+        "auction_id" => auction_id,
+        "barge_id" => barge_id,
+        "supplier_id" => supplier_id
+      }) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
 
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- buyer_id == auction.buyer_id,
          {barge_id, _} <- Integer.parse(barge_id),
-         barge <- Auctions.get_barge(barge_id)
-    do
+         barge <- Auctions.get_barge(barge_id) do
       Auctions.reject_barge(auction, barge, supplier_id, user)
 
-      auction_payload = auction
-      |> Auctions.fully_loaded
-      |> AuctionPayload.get_auction_payload!(buyer_id)
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded()
+        |> AuctionPayload.get_auction_payload!(buyer_id)
 
       conn
       |> render("submit.json", auction_payload: auction_payload)

@@ -19,19 +19,26 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "#maybe_parse_date_field" do
       expected_date = DateTime.from_naive!(~N[2017-12-28 01:30:00.000], "Etc/UTC")
-      epoch = expected_date
-      |> DateTime.to_unix(:milliseconds)
-      |> Integer.to_string
+
+      epoch =
+        expected_date
+        |> DateTime.to_unix(:milliseconds)
+        |> Integer.to_string()
+
       params = %{"scheduled_start" => epoch}
-      %{ "scheduled_start" => parsed_date } = Auction.maybe_parse_date_field(params, "scheduled_start")
+
+      %{"scheduled_start" => parsed_date} =
+        Auction.maybe_parse_date_field(params, "scheduled_start")
 
       assert parsed_date == expected_date |> DateTime.to_string()
     end
 
     test "#maybe_convert_duration" do
       params = %{"duration" => "10", "decision_duration" => "15"}
-      %{ "duration" => duration } = Auction.maybe_convert_duration(params, "duration")
-      %{ "decision_duration" => decision_duration } = Auction.maybe_convert_duration(params, "decision_duration")
+      %{"duration" => duration} = Auction.maybe_convert_duration(params, "duration")
+
+      %{"decision_duration" => decision_duration} =
+        Auction.maybe_convert_duration(params, "decision_duration")
 
       assert duration == 10 * 60_000
       assert decision_duration == 15 * 60_000
@@ -40,25 +47,28 @@ defmodule Oceanconnect.AuctionsTest do
     test "#maybe_load_suppliers" do
       supplier = insert(:company, is_supplier: true)
       params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
-      %{ "suppliers" => suppliers } = Auction.maybe_load_suppliers(params, "suppliers")
+      %{"suppliers" => suppliers} = Auction.maybe_load_suppliers(params, "suppliers")
 
       assert List.first(suppliers).id == supplier.id
     end
 
     test "list_auctions/0 returns all auctions", %{auction: auction} do
       assert Auctions.list_auctions()
-      |> Enum.map(fn(a) -> a.id end)
-      |> MapSet.new
-      |> MapSet.equal?(MapSet.new([auction.id]))
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([auction.id]))
     end
 
-    test "list_participating_auctions/1 returns all auctions a company is a participant in", %{auction: auction} do
+    test "list_participating_auctions/1 returns all auctions a company is a participant in", %{
+      auction: auction
+    } do
       supplier_auction = insert(:auction, suppliers: [Repo.preload(auction, [:buyer]).buyer])
       insert(:auction)
+
       assert Auctions.list_participating_auctions(auction.buyer_id)
-      |> Enum.map(fn(a) -> a.id end)
-      |> MapSet.new
-      |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
     end
 
     test "list_participating_auctions/1 doesn't return draft auctions" do
@@ -77,13 +87,25 @@ defmodule Oceanconnect.AuctionsTest do
 
       auction_one = insert(:auction, scheduled_start: third_date, suppliers: [supplier_company])
       auction_two = insert(:auction, scheduled_start: first_date, suppliers: [supplier_company])
-      auction_three = insert(:auction, scheduled_start: second_date, suppliers: [supplier_company])
+
+      auction_three =
+        insert(:auction, scheduled_start: second_date, suppliers: [supplier_company])
+
       auction_four = insert(:auction, scheduled_start: fourth_date, buyer: supplier_company)
       auction_five = insert(:auction, scheduled_start: third_date, buyer: supplier_company)
       auction_six = insert(:auction, scheduled_start: first_date, buyer: supplier_company)
-      auctions = Enum.map(Auctions.list_participating_auctions(supplier_company.id), fn(a) -> a.id end)
 
-      assert  [auction_six.id, auction_five.id, auction_four.id, auction_two.id, auction_three.id, auction_one.id] == auctions
+      auctions =
+        Enum.map(Auctions.list_participating_auctions(supplier_company.id), fn a -> a.id end)
+
+      assert [
+               auction_six.id,
+               auction_five.id,
+               auction_four.id,
+               auction_two.id,
+               auction_three.id,
+               auction_one.id
+             ] == auctions
     end
 
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
@@ -92,13 +114,26 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
-      auction_attrs = auction_with_participants |> Map.take([:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++ Map.keys(@valid_attrs))
+
+      auction_attrs =
+        auction_with_participants
+        |> Map.take(
+          [:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers] ++
+            Map.keys(@valid_attrs)
+        )
+
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
 
       assert all_values_match?(auction_attrs, new_auction)
 
       supplier = hd(auction_with_participants.suppliers)
-      auction_supplier = Repo.get_by(Auctions.AuctionSuppliers, %{auction_id: new_auction.id, supplier_id: supplier.id})
+
+      auction_supplier =
+        Repo.get_by(Auctions.AuctionSuppliers, %{
+          auction_id: new_auction.id,
+          supplier_id: supplier.id
+        })
+
       assert auction_supplier.alias_name == "Supplier 1"
     end
 
@@ -106,8 +141,12 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
 
-    test "update_auction_without_event_storage!/2 with valid data updates the auction", %{auction: auction} do
-      assert auction = %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
+    test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
+      auction: auction
+    } do
+      assert auction =
+               %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
+
       assert auction.po == "some updated po"
       assert auction == Auctions.get_auction(auction.id)
     end
@@ -143,7 +182,12 @@ defmodule Oceanconnect.AuctionsTest do
       buyer_company = insert(:company)
       buyer = insert(:user, company: buyer_company)
       auction = insert(:auction, duration: 1_000, decision_duration: 1_000, buyer: buyer_company)
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}}
+        )
+
       {:ok, %{auction: auction, buyer: buyer}}
     end
 
@@ -159,22 +203,37 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company)
       supplier2_company = insert(:company)
-      auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company])
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+
+      auction =
+        insert(
+          :auction,
+          duration: 1_000,
+          decision_duration: 1_000,
+          suppliers: [supplier_company, supplier2_company]
+        )
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}}
+        )
 
       {:ok, %{auction: auction}}
     end
 
-    test "ending an auction saves the auction_ended timestamp on the auction", %{auction: auction = %Auction{id: auction_id}} do
+    test "ending an auction saves the auction_ended timestamp on the auction", %{
+      auction: auction = %Auction{id: auction_id}
+    } do
       auction
-      |> Auctions.start_auction
-      |> Auctions.end_auction
+      |> Auctions.start_auction()
+      |> Auctions.end_auction()
+
       :timer.sleep(500)
 
-      auction_ended_event = auction_id
-      |> AuctionEventStore.event_list
-      |> Enum.filter(fn(event) -> event.type == :auction_ended end)
-      |> hd
+      auction_ended_event =
+        auction_id
+        |> AuctionEventStore.event_list()
+        |> Enum.filter(fn event -> event.type == :auction_ended end)
+        |> hd
 
       updated_auction = Auctions.get_auction(auction_id)
       assert auction_ended_event.time_entered == updated_auction.auction_ended
@@ -187,13 +246,22 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company])
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+        )
+
       Auctions.start_auction(auction)
+
       on_exit(fn ->
         case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
-          [] -> nil
+          [] ->
+            nil
+
           children ->
-            Enum.map(children, fn({_, pid, _, _}) ->
+            Enum.map(children, fn {_, pid, _, _} ->
               Process.unlink(pid)
               Process.exit(pid, :shutdown)
             end)
@@ -203,8 +271,12 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, %{auction: auction, supplier_company: supplier_company}}
     end
 
-    test "place_bid/3 enters bid in bid_list and runs lowest_bid logic", %{auction: auction, supplier_company: supplier_company} do
+    test "place_bid/3 enters bid in bid_list and runs lowest_bid logic", %{
+      auction: auction,
+      supplier_company: supplier_company
+    } do
       amount = 1.25
+
       expected_result = %{
         amount: amount,
         auction_id: auction.id,
@@ -212,14 +284,18 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: DateTime.utc_now()
       }
 
-      assert bid = %AuctionBid{} = Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
-      assert Enum.all?(expected_result, fn({k, v}) ->
-        if k == :time_entered do
-          Map.fetch!(bid, k) >= v
-        else
-          Map.fetch!(bid, k) == v
-        end
-      end)
+      assert bid =
+               %AuctionBid{} =
+               Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
+
+      assert Enum.all?(expected_result, fn {k, v} ->
+               if k == :time_entered do
+                 Map.fetch!(bid, k) >= v
+               else
+                 Map.fetch!(bid, k) == v
+               end
+             end)
+
       payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
 
       assert hd(payload.bid_history).id == bid.id
@@ -237,32 +313,47 @@ defmodule Oceanconnect.AuctionsTest do
 
     setup do
       port = insert(:port, @valid_attrs)
-			inactive_port = insert(:port, @valid_attrs_inactive)
-      {:ok, %{port: Auctions.get_port!(port.id), inactive_port: Auctions.get_port!(inactive_port.id)}}
+      inactive_port = insert(:port, @valid_attrs_inactive)
+
+      {:ok,
+       %{port: Auctions.get_port!(port.id), inactive_port: Auctions.get_port!(inactive_port.id)}}
     end
 
     test "list_ports/0 returns all ports", %{port: port, inactive_port: inactive_port} do
-      assert Enum.map(Auctions.list_ports(), fn(f) -> f.id end) == [port.id, inactive_port.id]
+      assert Enum.map(Auctions.list_ports(), fn f -> f.id end) == [port.id, inactive_port.id]
     end
 
-		test "list_ports/1 returns a paginated list of all ports", %{port: port, inactive_port: inactive_port} do
-			page = Auctions.list_ports(%{})
-			assert page.entries == [inactive_port, port]
-		end
+    test "list_ports/1 returns a paginated list of all ports", %{
+      port: port,
+      inactive_port: inactive_port
+    } do
+      page = Auctions.list_ports(%{})
+      assert page.entries == [inactive_port, port]
+    end
 
-		test "list_active_ports/0 returns all ports marked as active", %{port: port, inactive_port: inactive_port} do
-			assert Enum.map(Auctions.list_active_ports(), fn(f) -> f.id end) == [port.id]
-			refute Enum.map(Auctions.list_active_ports(), fn(f) -> f.id end) == [port.id, inactive_port.id]
-		end
+    test "list_active_ports/0 returns all ports marked as active", %{
+      port: port,
+      inactive_port: inactive_port
+    } do
+      assert Enum.map(Auctions.list_active_ports(), fn f -> f.id end) == [port.id]
+
+      refute Enum.map(Auctions.list_active_ports(), fn f -> f.id end) == [
+               port.id,
+               inactive_port.id
+             ]
+    end
 
     test "get_port!/1 returns the port with given id", %{port: port} do
       assert Auctions.get_port!(port.id) == port
     end
 
-		test "get_active_port!/1 returns the active port with given id", %{port: port, inactive_port: inactive_port} do
-			assert Auctions.get_active_port!(port.id) == port
+    test "get_active_port!/1 returns the active port with given id", %{
+      port: port,
+      inactive_port: inactive_port
+    } do
+      assert Auctions.get_active_port!(port.id) == port
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_port!(inactive_port.id) end
-		end
+    end
 
     test "create_port/1 with valid data creates a port" do
       assert {:ok, %Port{} = port} = Auctions.create_port(@valid_attrs)
@@ -289,13 +380,13 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_port!(port.id) end
     end
 
-		test "activate_port/1 marks the port as active", %{inactive_port: inactive_port} do
-			assert {:ok, %Port{is_active: true}} = Auctions.activate_port(inactive_port)
-		end
+    test "activate_port/1 marks the port as active", %{inactive_port: inactive_port} do
+      assert {:ok, %Port{is_active: true}} = Auctions.activate_port(inactive_port)
+    end
 
-		test "deactivate_port/1 marks the port as inactive", %{port: port} do
-			assert {:ok, %Port{is_active: false}} = Auctions.deactivate_port(port)
-		end
+    test "deactivate_port/1 marks the port as inactive", %{port: port} do
+      assert {:ok, %Port{is_active: false}} = Auctions.deactivate_port(port)
+    end
 
     test "change_port/1 returns a port changeset", %{port: port} do
       assert %Ecto.Changeset{} = Auctions.change_port(port)
@@ -314,14 +405,21 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, %{p1: port1, p2: port2, c1: company1, c2: company2, c3: company3}}
     end
 
-    test "supplier_list_for_auction/1 returns only supplier companies for given port", %{p1: p1, p2: p2, c1: c1, c2: c2, c3: c3} do
+    test "supplier_list_for_auction/1 returns only supplier companies for given port", %{
+      p1: p1,
+      p2: p2,
+      c1: c1,
+      c2: c2,
+      c3: c3
+    } do
       companies = Auctions.supplier_list_for_auction(p1)
-      assert Enum.all?(companies, fn(c) -> c.id in [c1.id, c2.id] end)
+      assert Enum.all?(companies, fn c -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.supplier_list_for_auction(p2), fn(c) -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.supplier_list_for_auction(p2), fn c -> c.id in [c2.id, c3.id] end)
     end
 
-    test "supplier_list_for_auction/2 returns only supplier companies for given port and not buyer", %{p1: p1, c1: buyer, c2: c2} do
+    test "supplier_list_for_auction/2 returns only supplier companies for given port and not buyer",
+         %{p1: p1, c1: buyer, c2: c2} do
       companies = Auctions.supplier_list_for_auction(p1, buyer.id)
       assert length(companies) == 1
       assert hd(companies).id == c2.id
@@ -329,9 +427,9 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "ports_for_company/1 returns ports for given company", %{p1: p1, p2: p2, c1: c1, c2: c2} do
       ports = Auctions.ports_for_company(c2)
-      assert Enum.all?(ports, fn(p) -> p.id in [p1.id, p2.id] end)
+      assert Enum.all?(ports, fn p -> p.id in [p1.id, p2.id] end)
       assert length(ports) == 2
-      assert Enum.all?(Auctions.ports_for_company(c1), fn(p) -> p.id === p1.id end)
+      assert Enum.all?(Auctions.ports_for_company(c1), fn p -> p.id === p1.id end)
     end
   end
 
@@ -339,53 +437,80 @@ defmodule Oceanconnect.AuctionsTest do
     alias Oceanconnect.Auctions.Vessel
 
     @valid_attrs %{imo: 42, name: "some name", is_active: true}
-		@valid_attrs_ianctive %{imo: 41, name: "some other name", is_active: false}
+    @valid_attrs_ianctive %{imo: 41, name: "some other name", is_active: false}
     @update_attrs %{imo: 43, name: "some updated name"}
     @invalid_attrs %{imo: nil, name: nil}
 
     setup do
       company = insert(:company)
-			company2 = insert(:company)
+      company2 = insert(:company)
       vessel = insert(:vessel, Map.merge(@valid_attrs, %{company: company}))
-			inactive_vessel = insert(:vessel, Map.merge(@valid_attrs_ianctive, %{company: company2}))
+      inactive_vessel = insert(:vessel, Map.merge(@valid_attrs_ianctive, %{company: company2}))
       user = insert(:user, company: company)
-      {:ok, %{company: company, user: user, vessel: Auctions.get_vessel!(vessel.id), inactive_vessel: Auctions.get_vessel!(inactive_vessel.id)}}
+
+      {:ok,
+       %{
+         company: company,
+         user: user,
+         vessel: Auctions.get_vessel!(vessel.id),
+         inactive_vessel: Auctions.get_vessel!(inactive_vessel.id)
+       }}
     end
 
     test "vessels_for_buyer/1", %{user: user, vessel: vessel} do
       extra_vessel = insert(:vessel)
-      result = Auctions.vessels_for_buyer(user.company)
-      |> Oceanconnect.Repo.preload(:company)
+
+      result =
+        Auctions.vessels_for_buyer(user.company)
+        |> Oceanconnect.Repo.preload(:company)
+
       assert result == [vessel]
       refute extra_vessel in result
     end
 
     test "list_vessels/0 returns all vessels", %{vessel: vessel, inactive_vessel: inactive_vessel} do
-      assert Enum.map(Auctions.list_vessels(), fn(f) -> f.id end) == [vessel.id, inactive_vessel.id]
+      assert Enum.map(Auctions.list_vessels(), fn f -> f.id end) == [
+               vessel.id,
+               inactive_vessel.id
+             ]
     end
 
-		test "list_vessels/1 returns a paginated list of all vessels", %{vessel: vessel, inactive_vessel: inactive_vessel} do
-			page = Auctions.list_vessels(%{})
+    test "list_vessels/1 returns a paginated list of all vessels", %{
+      vessel: vessel,
+      inactive_vessel: inactive_vessel
+    } do
+      page = Auctions.list_vessels(%{})
 
-			vessels = page.entries
-			|> Repo.preload(:company)
+      vessels =
+        page.entries
+        |> Repo.preload(:company)
 
-			assert vessels == [vessel, inactive_vessel]
-		end
+      assert vessels == [vessel, inactive_vessel]
+    end
 
-		test "list_active_vessels/0 returns all vessels marked as active", %{vessel: vessel, inactive_vessel: inactive_vessel} do
-			assert Enum.map(Auctions.list_active_vessels(), fn(f) -> f.id end) == [vessel.id]
-			refute Enum.map(Auctions.list_active_vessels(), fn(f) -> f.id end) == [vessel.id, inactive_vessel.id]
-		end
+    test "list_active_vessels/0 returns all vessels marked as active", %{
+      vessel: vessel,
+      inactive_vessel: inactive_vessel
+    } do
+      assert Enum.map(Auctions.list_active_vessels(), fn f -> f.id end) == [vessel.id]
+
+      refute Enum.map(Auctions.list_active_vessels(), fn f -> f.id end) == [
+               vessel.id,
+               inactive_vessel.id
+             ]
+    end
 
     test "get_vessel!/1 returns the vessel with given id", %{vessel: vessel} do
       assert Auctions.get_vessel!(vessel.id) == vessel
     end
 
-		test "get_active_vessel!/1 returns the active vessel with given id", %{vessel: vessel, inactive_vessel: inactive_vessel} do
-			assert Auctions.get_active_vessel!(vessel.id) |> Repo.preload(:company) == vessel
+    test "get_active_vessel!/1 returns the active vessel with given id", %{
+      vessel: vessel,
+      inactive_vessel: inactive_vessel
+    } do
+      assert Auctions.get_active_vessel!(vessel.id) |> Repo.preload(:company) == vessel
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_vessel!(inactive_vessel.id) end
-		end
+    end
 
     test "create_vessel/1 with valid data creates a vessel", %{company: company} do
       attrs = Map.merge(@valid_attrs, %{company_id: company.id})
@@ -403,7 +528,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert all_values_match?(@update_attrs, vessel)
     end
 
-    test "update_vessel/2 with invalid data returns error changeset", %{ vessel: vessel} do
+    test "update_vessel/2 with invalid data returns error changeset", %{vessel: vessel} do
       assert {:error, %Ecto.Changeset{}} = Auctions.update_vessel(vessel, @invalid_attrs)
       assert vessel == Auctions.get_vessel!(vessel.id)
     end
@@ -413,13 +538,13 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_vessel!(vessel.id) end
     end
 
-		test "activate_vessel/1 marks the vessel as active", %{inactive_vessel: inactive_vessel} do
-			assert {:ok, %Vessel{is_active: true}} = Auctions.activate_vessel(inactive_vessel)
-		end
+    test "activate_vessel/1 marks the vessel as active", %{inactive_vessel: inactive_vessel} do
+      assert {:ok, %Vessel{is_active: true}} = Auctions.activate_vessel(inactive_vessel)
+    end
 
-		test "deactivate_vessel/1 marks the vessel as inactive", %{vessel: vessel} do
-			assert {:ok, %Vessel{is_active: false}} = Auctions.deactivate_vessel(vessel)
-		end
+    test "deactivate_vessel/1 marks the vessel as inactive", %{vessel: vessel} do
+      assert {:ok, %Vessel{is_active: false}} = Auctions.deactivate_vessel(vessel)
+    end
 
     test "change_vessel/1 returns a vessel changeset", %{vessel: vessel} do
       assert %Ecto.Changeset{} = Auctions.change_vessel(vessel)
@@ -430,38 +555,53 @@ defmodule Oceanconnect.AuctionsTest do
     alias Oceanconnect.Auctions.Fuel
 
     @valid_attrs %{name: "some name", is_active: true}
-		@valid_attrs_inactive %{name: "some other name", is_active: false}
+    @valid_attrs_inactive %{name: "some other name", is_active: false}
     @update_attrs %{name: "some updated name"}
     @invalid_attrs %{name: nil}
 
     setup do
       fuel = insert(:fuel, @valid_attrs)
-			inactive_fuel = insert(:fuel, @valid_attrs_inactive)
-      {:ok, %{fuel: Auctions.get_fuel!(fuel.id), inactive_fuel: Auctions.get_fuel!(inactive_fuel.id)}}
+      inactive_fuel = insert(:fuel, @valid_attrs_inactive)
+
+      {:ok,
+       %{fuel: Auctions.get_fuel!(fuel.id), inactive_fuel: Auctions.get_fuel!(inactive_fuel.id)}}
     end
 
     test "list_fuels/0 returns all fuels", %{fuel: fuel, inactive_fuel: inactive_fuel} do
-      assert Enum.map(Auctions.list_fuels(), fn(f) -> f.id end) == [fuel.id, inactive_fuel.id]
+      assert Enum.map(Auctions.list_fuels(), fn f -> f.id end) == [fuel.id, inactive_fuel.id]
     end
 
-		test "list_fuels/1 returns a paginated list of all fuels", %{fuel: fuel, inactive_fuel: inactive_fuel} do
-			page = Auctions.list_fuels(%{})
-			assert page.entries == [fuel, inactive_fuel]
-		end
+    test "list_fuels/1 returns a paginated list of all fuels", %{
+      fuel: fuel,
+      inactive_fuel: inactive_fuel
+    } do
+      page = Auctions.list_fuels(%{})
+      assert page.entries == [fuel, inactive_fuel]
+    end
 
-		test "list_active_fuels/0 returns all fuels marked as active", %{fuel: fuel, inactive_fuel: inactive_fuel} do
-			assert Enum.map(Auctions.list_active_fuels(), fn(f) -> f.id end) == [fuel.id]
-			refute Enum.map(Auctions.list_active_fuels(), fn(f) -> f.id end) == [fuel.id, inactive_fuel.id]
-		end
+    test "list_active_fuels/0 returns all fuels marked as active", %{
+      fuel: fuel,
+      inactive_fuel: inactive_fuel
+    } do
+      assert Enum.map(Auctions.list_active_fuels(), fn f -> f.id end) == [fuel.id]
+
+      refute Enum.map(Auctions.list_active_fuels(), fn f -> f.id end) == [
+               fuel.id,
+               inactive_fuel.id
+             ]
+    end
 
     test "get_fuel!/1 returns the fuel with given id", %{fuel: fuel} do
       assert Auctions.get_fuel!(fuel.id) == fuel
     end
 
-		test "get_active_fuel!/1 returns the active fuel with given id", %{fuel: fuel, inactive_fuel: inactive_fuel} do
-			assert Auctions.get_active_fuel!(fuel.id) == fuel
+    test "get_active_fuel!/1 returns the active fuel with given id", %{
+      fuel: fuel,
+      inactive_fuel: inactive_fuel
+    } do
+      assert Auctions.get_active_fuel!(fuel.id) == fuel
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_fuel!(inactive_fuel.id) end
-		end
+    end
 
     test "create_fuel/1 with valid data creates a fuel" do
       assert {:ok, %Fuel{} = fuel} = Auctions.create_fuel(@valid_attrs)
@@ -488,13 +628,13 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_fuel!(fuel.id) end
     end
 
-		test "activate_fuel/1 marks the fuel as active", %{inactive_fuel: inactive_fuel} do
-			assert {:ok, %Fuel{is_active: true}} = Auctions.activate_fuel(inactive_fuel)
-		end
+    test "activate_fuel/1 marks the fuel as active", %{inactive_fuel: inactive_fuel} do
+      assert {:ok, %Fuel{is_active: true}} = Auctions.activate_fuel(inactive_fuel)
+    end
 
-		test "deactivate_fuel/1 marks the fuel as inactive", %{fuel: fuel} do
-			assert {:ok, %Fuel{is_active: false}} = Auctions.deactivate_fuel(fuel)
-		end
+    test "deactivate_fuel/1 marks the fuel as inactive", %{fuel: fuel} do
+      assert {:ok, %Fuel{is_active: false}} = Auctions.deactivate_fuel(fuel)
+    end
 
     test "change_fuel/1 returns a fuel changeset", %{fuel: fuel} do
       assert %Ecto.Changeset{} = Auctions.change_fuel(fuel)
@@ -507,11 +647,19 @@ defmodule Oceanconnect.AuctionsTest do
       supplier_company2 = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier_company, supplier_company2])
 
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}}
+        )
+
       {:ok, %{auction: auction, supplier: supplier_company, supplier2: supplier_company2}}
     end
 
-    test "list_auction_barges/1 lists all barges submitted to an auction", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "list_auction_barges/1 lists all barges submitted to an auction", %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
       barge1 = insert(:barge, companies: [supplier])
       barge2 = insert(:barge, companies: [supplier2])
 
@@ -523,7 +671,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert second.barge_id == barge2.id
     end
 
-    test "list_auction_barges/1 allows the same barge to be submitted by multiple suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "list_auction_barges/1 allows the same barge to be submitted by multiple suppliers", %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
       barge = insert(:barge, companies: [supplier, supplier2])
       barge_id = barge.id
       supplier_id = supplier.id
@@ -537,7 +689,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier2_id} = second
     end
 
-    test "submit_barge/3 adds given barge to auction for the supplier", %{auction: auction, supplier: supplier} do
+    test "submit_barge/3 adds given barge to auction for the supplier", %{
+      auction: auction,
+      supplier: supplier
+    } do
       barge = insert(:barge, companies: [supplier])
       barge_id = barge.id
       supplier_id = supplier.id
@@ -546,13 +701,19 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       assert length(auction_state.submitted_barges) == 1
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier_id,
-        approval_status: "PENDING"} = hd(auction_state.submitted_barges)
+               barge_id: ^barge_id,
+               supplier_id: ^supplier_id,
+               approval_status: "PENDING"
+             } = hd(auction_state.submitted_barges)
     end
 
-    test "submit_barge/3 allows multiple suppliers to submit the same barge", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "submit_barge/3 allows multiple suppliers to submit the same barge", %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
       barge = insert(:barge, companies: [supplier, supplier2])
       barge_id = barge.id
       supplier_id = supplier.id
@@ -563,17 +724,24 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       [first, second] = auction_state.submitted_barges
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier_id,
-        approval_status: "PENDING"} = first
+               barge_id: ^barge_id,
+               supplier_id: ^supplier_id,
+               approval_status: "PENDING"
+             } = first
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier2_id,
-        approval_status: "PENDING"} = second
+               barge_id: ^barge_id,
+               supplier_id: ^supplier2_id,
+               approval_status: "PENDING"
+             } = second
     end
 
-    test "unsubmit_barge/3 removes given barge to auction for the supplier", %{auction: auction, supplier: supplier} do
+    test "unsubmit_barge/3 removes given barge to auction for the supplier", %{
+      auction: auction,
+      supplier: supplier
+    } do
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -582,7 +750,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert length(auction_state.submitted_barges) == 0
     end
 
-    test "unsubmit_barge/3 preserves barge submissions from other suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "unsubmit_barge/3 preserves barge submissions from other suppliers", %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
       barge = insert(:barge, companies: [supplier, supplier2])
       barge_id = barge.id
       supplier2_id = supplier2.id
@@ -593,13 +765,18 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       [second] = auction_state.submitted_barges
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier2_id,
-        approval_status: "PENDING"} = second
+               barge_id: ^barge_id,
+               supplier_id: ^supplier2_id,
+               approval_status: "PENDING"
+             } = second
     end
 
-    test "approve_barge/3 updates the approval status of a submitted barge for a supplier" ,%{auction: auction, supplier: supplier} do
+    test "approve_barge/3 updates the approval status of a submitted barge for a supplier", %{
+      auction: auction,
+      supplier: supplier
+    } do
       barge = insert(:barge, companies: [supplier])
 
       barge_id = barge.id
@@ -610,13 +787,16 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       [submitted_barge] = auction_state.submitted_barges
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier_id,
-        approval_status: "APPROVED"} = submitted_barge
+               barge_id: ^barge_id,
+               supplier_id: ^supplier_id,
+               approval_status: "APPROVED"
+             } = submitted_barge
     end
 
-    test "approve_barge/3 does not update approval status of barge submitted by other suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "approve_barge/3 does not update approval status of barge submitted by other suppliers",
+         %{auction: auction, supplier: supplier, supplier2: supplier2} do
       barge = insert(:barge, companies: [supplier, supplier2])
 
       barge_id = barge.id
@@ -629,20 +809,23 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       assert [
-        %Auctions.AuctionBarge{
-          barge_id: ^barge_id,
-          supplier_id: ^supplier_id,
-          approval_status: "APPROVED"
-        },
-        %Auctions.AuctionBarge{
-          barge_id: ^barge_id,
-          supplier_id: ^supplier2_id,
-          approval_status: "PENDING"
-        }
-      ] = auction_state.submitted_barges
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier_id,
+                 approval_status: "APPROVED"
+               },
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier2_id,
+                 approval_status: "PENDING"
+               }
+             ] = auction_state.submitted_barges
     end
 
-    test "reject_barge/3 updates the approval status of a submitted barge", %{auction: auction, supplier: supplier} do
+    test "reject_barge/3 updates the approval status of a submitted barge", %{
+      auction: auction,
+      supplier: supplier
+    } do
       barge = insert(:barge, companies: [supplier])
 
       barge_id = barge.id
@@ -653,14 +836,16 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       [submitted_barge] = auction_state.submitted_barges
+
       assert %Auctions.AuctionBarge{
-        barge_id: ^barge_id,
-        supplier_id: ^supplier_id,
-        approval_status: "REJECTED"} = submitted_barge
+               barge_id: ^barge_id,
+               supplier_id: ^supplier_id,
+               approval_status: "REJECTED"
+             } = submitted_barge
     end
 
-
-    test "reject_barge/3 does not update approval status of barge submitted by other suppliers", %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    test "reject_barge/3 does not update approval status of barge submitted by other suppliers",
+         %{auction: auction, supplier: supplier, supplier2: supplier2} do
       barge = insert(:barge, companies: [supplier, supplier2])
 
       barge_id = barge.id
@@ -673,102 +858,149 @@ defmodule Oceanconnect.AuctionsTest do
       auction_state = Auctions.get_auction_state!(auction)
 
       assert [
-        %Auctions.AuctionBarge{
-          barge_id: ^barge_id,
-          supplier_id: ^supplier_id,
-          approval_status: "APPROVED"
-        },
-        %Auctions.AuctionBarge{
-          barge_id: ^barge_id,
-          supplier_id: ^supplier2_id,
-          approval_status: "PENDING"
-        }
-      ] = auction_state.submitted_barges
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier_id,
+                 approval_status: "APPROVED"
+               },
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier2_id,
+                 approval_status: "PENDING"
+               }
+             ] = auction_state.submitted_barges
     end
   end
 
-	describe "barges" do
+  describe "barges" do
     alias Oceanconnect.Auctions.Barge
 
-    @valid_attrs %{name: "some name", imo_number: "1337", dwt: "37", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true, is_active: true}
-		@valid_attrs_inactive %{name: "some other name", imo_number: "1336", dwt: "36", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true, is_active: false}
-    @update_attrs %{name: "some updated name", imo_number: "1338", dwt: "38", sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
-    @invalid_attrs %{name: nil, imo_number: nil, dwt: nil, sire_inspection_date: DateTime.utc_now(), sire_inspection_validity: true}
+    @valid_attrs %{
+      name: "some name",
+      imo_number: "1337",
+      dwt: "37",
+      sire_inspection_date: DateTime.utc_now(),
+      sire_inspection_validity: true,
+      is_active: true
+    }
+    @valid_attrs_inactive %{
+      name: "some other name",
+      imo_number: "1336",
+      dwt: "36",
+      sire_inspection_date: DateTime.utc_now(),
+      sire_inspection_validity: true,
+      is_active: false
+    }
+    @update_attrs %{
+      name: "some updated name",
+      imo_number: "1338",
+      dwt: "38",
+      sire_inspection_date: DateTime.utc_now(),
+      sire_inspection_validity: true
+    }
+    @invalid_attrs %{
+      name: nil,
+      imo_number: nil,
+      dwt: nil,
+      sire_inspection_date: DateTime.utc_now(),
+      sire_inspection_validity: true
+    }
 
     setup do
-			port = insert(:port)
+      port = insert(:port)
       barge = insert(:barge, Map.merge(@valid_attrs, %{port: port}))
-			inactive_barge = insert(:barge, Map.merge(@valid_attrs_inactive, %{port: port}))
-      {:ok, %{barge: Auctions.get_barge!(barge.id), inactive_barge: Auctions.get_barge!(inactive_barge.id), port: Auctions.get_port!(port.id)}}
+      inactive_barge = insert(:barge, Map.merge(@valid_attrs_inactive, %{port: port}))
+
+      {:ok,
+       %{
+         barge: Auctions.get_barge!(barge.id),
+         inactive_barge: Auctions.get_barge!(inactive_barge.id),
+         port: Auctions.get_port!(port.id)
+       }}
     end
 
-		test "list_barges/0 returns all barges", %{barge: barge, inactive_barge: inactive_barge} do
-			assert Enum.map(Auctions.list_barges(), fn(b) -> b.id end) == [barge.id, inactive_barge.id]
-		end
+    test "list_barges/0 returns all barges", %{barge: barge, inactive_barge: inactive_barge} do
+      assert Enum.map(Auctions.list_barges(), fn b -> b.id end) == [barge.id, inactive_barge.id]
+    end
 
-		test "list_barges/1 returns a paginated list of all barges", %{barge: barge, inactive_barge: inactive_barge} do
-			page = Auctions.list_barges(%{})
-			assert page.entries == [barge, inactive_barge]
-		end
+    test "list_barges/1 returns a paginated list of all barges", %{
+      barge: barge,
+      inactive_barge: inactive_barge
+    } do
+      page = Auctions.list_barges(%{})
+      assert page.entries == [barge, inactive_barge]
+    end
 
-		test "list_active_barges/0 returns all barges marked as active", %{barge: barge, inactive_barge: inactive_barge} do
-			assert Enum.map(Auctions.list_active_barges(), fn(b) -> b.id end) == [barge.id]
-			refute Enum.map(Auctions.list_active_barges(), fn(b) -> b.id end) == [barge.id, inactive_barge.id]
-		end
+    test "list_active_barges/0 returns all barges marked as active", %{
+      barge: barge,
+      inactive_barge: inactive_barge
+    } do
+      assert Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [barge.id]
 
-		test "get_barge!/1 returns the barge with given id", %{barge: barge} do
-			assert Auctions.get_barge!(barge.id) == barge
-		end
+      refute Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [
+               barge.id,
+               inactive_barge.id
+             ]
+    end
 
-		test "get_active_barge!/1 returns the active barge with given id", %{barge: barge, inactive_barge: inactive_barge} do
-			assert Auctions.get_active_barge!(barge.id) == barge
+    test "get_barge!/1 returns the barge with given id", %{barge: barge} do
+      assert Auctions.get_barge!(barge.id) == barge
+    end
+
+    test "get_active_barge!/1 returns the active barge with given id", %{
+      barge: barge,
+      inactive_barge: inactive_barge
+    } do
+      assert Auctions.get_active_barge!(barge.id) == barge
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_barge!(inactive_barge.id) end
-		end
+    end
 
-		test "create_barge/1 with valid data creates a barge", %{port: port} do
-			attrs = Map.merge(@valid_attrs, %{port_id: port.id})
-			assert {:ok, %Barge{} = barge} = Auctions.create_barge(attrs)
-			assert barge.name == "some name"
-		end
+    test "create_barge/1 with valid data creates a barge", %{port: port} do
+      attrs = Map.merge(@valid_attrs, %{port_id: port.id})
+      assert {:ok, %Barge{} = barge} = Auctions.create_barge(attrs)
+      assert barge.name == "some name"
+    end
 
-		test "create_barge/1 with invalid data returns error changeset" do
-			assert {:error, %Ecto.Changeset{}} = Auctions.create_barge(@invalid_attrs)
-		end
+    test "create_barge/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Auctions.create_barge(@invalid_attrs)
+    end
 
-		test "update_barge/2 with valid data updates the barge", %{barge: barge} do
-			assert {:ok, barge} = Auctions.update_barge(barge, @update_attrs)
-			assert %Barge{} = barge
-			assert barge.name == "some updated name"
-		end
+    test "update_barge/2 with valid data updates the barge", %{barge: barge} do
+      assert {:ok, barge} = Auctions.update_barge(barge, @update_attrs)
+      assert %Barge{} = barge
+      assert barge.name == "some updated name"
+    end
 
-		test "update_barge/2 with invalid data returns error changeset", %{barge: barge} do
-			assert {:error, %Ecto.Changeset{}} = Auctions.update_barge(barge, @invalid_attrs)
-			assert barge == Auctions.get_barge!(barge.id)
-		end
+    test "update_barge/2 with invalid data returns error changeset", %{barge: barge} do
+      assert {:error, %Ecto.Changeset{}} = Auctions.update_barge(barge, @invalid_attrs)
+      assert barge == Auctions.get_barge!(barge.id)
+    end
 
-		test "delete_barge/1 deletes the barge", %{barge: barge} do
-			assert {:ok, %Barge{}} = Auctions.delete_barge(barge)
-			assert_raise Ecto.NoResultsError, fn -> Auctions.get_barge!(barge.id) end
-		end
+    test "delete_barge/1 deletes the barge", %{barge: barge} do
+      assert {:ok, %Barge{}} = Auctions.delete_barge(barge)
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_barge!(barge.id) end
+    end
 
-		test "activate_barge/1 marks the barge as active", %{inactive_barge: inactive_barge} do
-			assert {:ok, %Barge{is_active: true}} = Auctions.activate_barge(inactive_barge)
-		end
+    test "activate_barge/1 marks the barge as active", %{inactive_barge: inactive_barge} do
+      assert {:ok, %Barge{is_active: true}} = Auctions.activate_barge(inactive_barge)
+    end
 
-		test "deactivate_barge/1 marks the barge as inactive", %{barge: barge} do
-			assert {:ok, %Barge{is_active: false}} = Auctions.deactivate_barge(barge)
-		end
+    test "deactivate_barge/1 marks the barge as inactive", %{barge: barge} do
+      assert {:ok, %Barge{is_active: false}} = Auctions.deactivate_barge(barge)
+    end
 
-		test "change_barge/1 returns a barge changeset", %{barge: barge} do
-			assert %Ecto.Changeset{} = Auctions.change_barge(barge)
-		end
-	end
+    test "change_barge/1 returns a barge changeset", %{barge: barge} do
+      assert %Ecto.Changeset{} = Auctions.change_barge(barge)
+    end
+  end
 
   test "strip non loaded" do
     auction = insert(:auction)
-    partially_loaded_auction = Oceanconnect.Auctions.Auction
-    |> Repo.get(auction.id)
-    |> Repo.preload([:vessel])
+
+    partially_loaded_auction =
+      Oceanconnect.Auctions.Auction
+      |> Repo.get(auction.id)
+      |> Repo.preload([:vessel])
 
     result = Auctions.strip_non_loaded(partially_loaded_auction)
     assert result.vessel.company == nil

@@ -7,20 +7,20 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def has_fields?(fields) do
-    Enum.all?(fields, fn(field) ->
+    Enum.all?(fields, fn field ->
       find_element(:class, "qa-auction-#{field}")
     end)
   end
 
   def vessel_list() do
     find_all_elements(:css, ".qa-auction-vessel_id option")
-    |> Enum.map(fn(elem) -> inner_text(elem) end)
-    |> Enum.reject(fn(elem) -> elem == "Please select" end)
+    |> Enum.map(fn elem -> inner_text(elem) end)
+    |> Enum.reject(fn elem -> elem == "Please select" end)
   end
 
   def fill_form(params = %{}) do
     params
-    |> Enum.map(fn({key, value}) ->
+    |> Enum.map(fn {key, value} ->
       element = find_element(:class, "qa-auction-#{key}")
       type = Hound.Helpers.Element.tag_name(element)
       fill_form_element(key, element, type, value)
@@ -32,15 +32,18 @@ defmodule Oceanconnect.AuctionNewPage do
     |> find_within_element(:css, "input")
     |> fill_field(value)
   end
+
   def fill_form_element(_key, _element, _type, value) when is_list(value) do
-    Enum.map(value, fn(supplier) ->
+    Enum.map(value, fn supplier ->
       execute_script("document.getElementById('invite-#{supplier.id}').click();", [])
     end)
   end
+
   def fill_form_element(_key, element, "select", value) do
     find_within_element(element, :css, "option[value='#{value}']")
     |> click
   end
+
   def fill_form_element(_key, element, _type, value) do
     fill_field(element, value)
   end
@@ -51,13 +54,13 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def has_suppliers?(suppliers) do
-    Enum.all?(suppliers, fn(supplier) ->
+    Enum.all?(suppliers, fn supplier ->
       find_element(:class, "qa-auction-supplier-#{supplier.id}")
     end)
   end
 
   def supplier_count(suppliers) do
-    Enum.map(suppliers, fn(supplier) ->
+    Enum.map(suppliers, fn supplier ->
       find_element(:class, "qa-auction-supplier-#{supplier.id}")
     end)
     |> length

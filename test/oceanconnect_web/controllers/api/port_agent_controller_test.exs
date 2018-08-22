@@ -11,12 +11,12 @@ defmodule OceanconnectWeb.Api.PortAgentControllerTest do
 
   test "user must be authenticated", %{auction: auction} do
     conn = build_conn()
-    conn = post conn, port_agent_api_path(conn, :update, auction), port_agent: "Test Agent"
+    conn = post(conn, port_agent_api_path(conn, :update, auction), port_agent: "Test Agent")
     assert conn.resp_body == "\"Unauthorized\""
   end
 
   test "buyer can set port agent during winning bid selection", %{auction: auction, conn: conn} do
-    new_conn = post conn, port_agent_api_path(conn, :update, auction), port_agent: "Test Agent"
+    new_conn = post(conn, port_agent_api_path(conn, :update, auction), port_agent: "Test Agent")
     updated_auction = Oceanconnect.Repo.get(Oceanconnect.Auctions.Auction, auction.id)
     assert json_response(new_conn, 200)
     assert updated_auction.port_agent == "Test Agent"

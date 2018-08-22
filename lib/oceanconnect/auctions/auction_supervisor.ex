@@ -1,18 +1,23 @@
 defmodule Oceanconnect.Auctions.AuctionSupervisor do
   use Supervisor
   @registry_name :auction_supervisor_registry
-  alias Oceanconnect.Auctions.{Auction,
-                               AuctionCache,
-                               AuctionEventHandler,
-                               AuctionEventStore,
-                               AuctionScheduler,
-                               AuctionStore,
-                               AuctionTimer}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionCache,
+    AuctionEventHandler,
+    AuctionEventStore,
+    AuctionScheduler,
+    AuctionStore,
+    AuctionTimer
+  }
 
   def start_link({auction = %Auction{id: auction_id}, config}) do
-    Supervisor.start_link(__MODULE__, {auction, config}, name: get_auction_supervisor_name(auction_id))
+    Supervisor.start_link(
+      __MODULE__,
+      {auction, config},
+      name: get_auction_supervisor_name(auction_id)
+    )
   end
-
 
   def init({auction = %Auction{id: auction_id}, options}) do
     all_children = %{
@@ -23,6 +28,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction}
     }
+
     children = exclude_children(all_children, options)
     Supervisor.init(children, strategy: :one_for_all)
   end
@@ -41,8 +47,9 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
 
   defp exclude_children(all_children, %{exclude_children: exclusions}) do
     all_children
-    |> Enum.filter(fn({k, _v}) -> not k in exclusions end)
-    |> Enum.map(fn({_, v}) -> v end)
+    |> Enum.filter(fn {k, _v} -> not (k in exclusions) end)
+    |> Enum.map(fn {_, v} -> v end)
   end
-  defp exclude_children(all_children, %{}), do: all_children |> Map.values
+
+  defp exclude_children(all_children, %{}), do: all_children |> Map.values()
 end

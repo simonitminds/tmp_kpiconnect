@@ -9,7 +9,12 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
     supplier_2 = insert(:company, is_supplier: true)
     auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+      )
+
     {:ok, %{auction: auction}}
   end
 
@@ -20,6 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
   test "updating the cache", %{auction: auction} do
     auction
     |> Auctions.update_auction!(%{po: "TEST STRING"}, nil)
+
     :timer.sleep(500)
 
     assert %Auction{po: "TEST STRING"} = AuctionCache.read(auction.id)

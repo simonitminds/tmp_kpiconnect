@@ -19,7 +19,6 @@ config :oceanconnect, Oceanconnect.Repo,
   database: "oceanconnect_test",
   pool: Ecto.Adapters.SQL.Sandbox
 
-
 config :oceanconnect, :sql_sandbox, true
 
 config :oceanconnect, :task_supervisor, Oceanconnect.FakeTaskSupervisor
@@ -32,5 +31,3 @@ config :hound,
   host: System.get_env("DATA_CHROME_HOST") || "localhost",
   app_host: "http://" <> (System.get_env("APP_IP") || "localhost"),
   app_port: 4001
-
-

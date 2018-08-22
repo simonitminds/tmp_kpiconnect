@@ -4,14 +4,20 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   setup do
     auction = insert(:auction, duration: 15 * 60_000, decision_duration: 10 * 60_000)
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}})
+
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+      )
+
     {:ok, %{auction: auction}}
   end
 
   test "start auction_duration_timer for auction", %{auction: auction} do
     auction
-    |> Command.start_duration_timer
-    |> AuctionTimer.process_command
+    |> Command.start_duration_timer()
+    |> AuctionTimer.process_command()
 
     time_remaining = AuctionTimer.read_timer(auction.id, :duration)
     assert round(Float.round(time_remaining / 10) * 10) == auction.duration
@@ -22,12 +28,12 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
 
   test "start auction_decision_duration_timer for auction", %{auction: auction} do
     auction
-    |> Command.start_duration_timer
-    |> AuctionTimer.process_command
+    |> Command.start_duration_timer()
+    |> AuctionTimer.process_command()
 
     auction
-    |> Command.start_decision_duration_timer
-    |> AuctionTimer.process_command
+    |> Command.start_decision_duration_timer()
+    |> AuctionTimer.process_command()
 
     time_remaining = AuctionTimer.read_timer(auction.id, :decision_duration)
     assert round(Float.round(time_remaining / 10) * 10) == auction.decision_duration

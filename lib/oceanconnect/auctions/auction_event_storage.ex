@@ -4,8 +4,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   alias __MODULE__
 
   schema "auction_events" do
-    belongs_to :auction, Oceanconnect.Auctions.Auction
-    field :event, :binary
+    belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    field(:event, :binary)
 
     timestamps()
   end
@@ -17,16 +17,21 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   end
 
   def events_by_auction(auction_id) do
-    query = from storage in __MODULE__,
-      where: storage.auction_id == ^auction_id,
-      select: storage.event,
-      order_by: [desc: :id]
+    query =
+      from(
+        storage in __MODULE__,
+        where: storage.auction_id == ^auction_id,
+        select: storage.event,
+        order_by: [desc: :id]
+      )
+
     query
-    |> Oceanconnect.Repo.all
-    |> Enum.map(fn(event) -> hydrate_event(event) end)
+    |> Oceanconnect.Repo.all()
+    |> Enum.map(fn event -> hydrate_event(event) end)
   end
 
   defp hydrate_event(nil), do: nil
+
   defp hydrate_event(event) do
     :erlang.binary_to_term(event)
   end

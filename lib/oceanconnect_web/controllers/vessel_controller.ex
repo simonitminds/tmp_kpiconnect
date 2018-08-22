@@ -20,6 +20,7 @@ defmodule OceanconnectWeb.VesselController do
         conn
         |> put_flash(:info, "Vessel created successfully.")
         |> redirect(to: vessel_path(conn, :show, vessel))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,6 +45,7 @@ defmodule OceanconnectWeb.VesselController do
         conn
         |> put_flash(:info, "Vessel updated successfully.")
         |> redirect(to: vessel_path(conn, :show, vessel))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", vessel: vessel, changeset: changeset)
     end

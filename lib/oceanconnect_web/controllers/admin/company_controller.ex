@@ -6,12 +6,16 @@ defmodule OceanconnectWeb.Admin.CompanyController do
 
   def index(conn, params) do
     page = Accounts.list_companies(params)
-    render(conn, "index.html",
-			companies: page.entries,
-		  page_number: page.page_number,
-		  page_size: page.page_size,
-		  total_pages: page.total_pages,
-		  total_entries: page.total_entries)
+
+    render(
+      conn,
+      "index.html",
+      companies: page.entries,
+      page_number: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages,
+      total_entries: page.total_entries
+    )
   end
 
   def new(conn, _params) do
@@ -25,6 +29,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
         conn
         |> put_flash(:info, "Company created successfully.")
         |> redirect(to: admin_company_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,6 +49,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
         conn
         |> put_flash(:info, "Company updated successfully.")
         |> redirect(to: admin_company_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", company: company, changeset: changeset)
     end
@@ -75,5 +81,4 @@ defmodule OceanconnectWeb.Admin.CompanyController do
     |> put_flash(:info, "Company activated successfully.")
     |> redirect(to: admin_company_path(conn, :index))
   end
-
 end

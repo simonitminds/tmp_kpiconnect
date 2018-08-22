@@ -12,18 +12,42 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
-    auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company, supplier_company2], duration: 600_000)
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+
+    auction =
+      insert(
+        :auction,
+        buyer: buyer_company,
+        suppliers: [supplier_company, supplier_company2],
+        duration: 600_000
+      )
+
+    {:ok, _pid} =
+      start_supervised(
+        {Oceanconnect.Auctions.AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_scheduler]}}}
+      )
+
     Auctions.start_auction(auction)
-    bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id, DateTime.utc_now(), supplier)
+
+    bid =
+      Auctions.place_bid(
+        auction,
+        %{"amount" => 1.25},
+        supplier_company.id,
+        DateTime.utc_now(),
+        supplier
+      )
+
     Auctions.end_auction(auction)
     Auctions.select_winning_bid(bid, "test")
     :timer.sleep(500)
     login_user(buyer)
     AuctionLogPage.visit(auction.id)
-    updated_auction = Auctions.Auction
-    |> Oceanconnect.Repo.get(auction.id)
-    |> Auctions.fully_loaded
+
+    updated_auction =
+      Auctions.Auction
+      |> Oceanconnect.Repo.get(auction.id)
+      |> Auctions.fully_loaded()
 
     {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier}}
   end
@@ -46,8 +70,9 @@ defmodule Oceanconnect.AuctionLogTest do
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
       "winning-bid-amount" => "$#{auction_payload.winning_bid.amount}",
-      "winning-supplier" => auction_payload.winning_bid.supplier,
+      "winning-supplier" => auction_payload.winning_bid.supplier
     }
+
     assert AuctionLogPage.has_details?(expected_details)
   end
 end

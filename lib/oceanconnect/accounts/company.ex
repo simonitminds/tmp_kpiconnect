@@ -6,22 +6,35 @@ defmodule Oceanconnect.Accounts.Company do
   @derive {Poison.Encoder, except: [:__meta__, :barges, :users, :vessels, :ports]}
 
   schema "companies" do
-    field :address1, :string
-    field :address2, :string
-    field :city, :string
-    field :contact_name, :string
-    field :country, :string
-    field :email, :string
-    field :name, :string
-    field :main_phone, :string
-    field :mobile_phone, :string
-    field :postal_code, :string
-    field :is_supplier, :boolean, default: false
-		field :is_active, :boolean, default: true
-    many_to_many :barges, Oceanconnect.Auctions.Barge, join_through: "company_barges", on_replace: :delete
-    has_many :users, Oceanconnect.Accounts.User, on_replace: :delete
-    has_many :vessels, Oceanconnect.Auctions.Vessel, on_replace: :delete
-    many_to_many :ports, Oceanconnect.Auctions.Port, join_through: "company_ports", on_replace: :delete
+    field(:address1, :string)
+    field(:address2, :string)
+    field(:city, :string)
+    field(:contact_name, :string)
+    field(:country, :string)
+    field(:email, :string)
+    field(:name, :string)
+    field(:main_phone, :string)
+    field(:mobile_phone, :string)
+    field(:postal_code, :string)
+    field(:is_supplier, :boolean, default: false)
+    field(:is_active, :boolean, default: true)
+
+    many_to_many(
+      :barges,
+      Oceanconnect.Auctions.Barge,
+      join_through: "company_barges",
+      on_replace: :delete
+    )
+
+    has_many(:users, Oceanconnect.Accounts.User, on_replace: :delete)
+    has_many(:vessels, Oceanconnect.Auctions.Vessel, on_replace: :delete)
+
+    many_to_many(
+      :ports,
+      Oceanconnect.Auctions.Port,
+      join_through: "company_ports",
+      on_replace: :delete
+    )
 
     timestamps()
   end
@@ -41,7 +54,7 @@ defmodule Oceanconnect.Accounts.Company do
     :mobile_phone,
     :postal_code,
     :is_supplier,
-		:is_active
+    :is_active
   ]
 
   @doc false
@@ -51,8 +64,10 @@ defmodule Oceanconnect.Accounts.Company do
     |> validate_required(@required_fields)
   end
 
-	def select_active(query \\ Company) do
-		from q in query,
-		  where: q.is_active == true
-	end
+  def select_active(query \\ Company) do
+    from(
+      q in query,
+      where: q.is_active == true
+    )
+  end
 end

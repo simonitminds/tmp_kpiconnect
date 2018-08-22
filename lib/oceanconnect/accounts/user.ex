@@ -6,15 +6,15 @@ defmodule Oceanconnect.Accounts.User do
   @derive {Poison.Encoder, only: [:email, :company]}
 
   schema "users" do
-    field :email, :string
-    field :first_name, :string
-    field :last_name, :string
-    field :password_hash, :string
-    field :password, :string, virtual: true
-    field :is_admin, :boolean, default: false
-		field :is_active, :boolean, default: true
-    field :impersonated_by, :integer, virtual: true
-    belongs_to :company, Oceanconnect.Accounts.Company
+    field(:email, :string)
+    field(:first_name, :string)
+    field(:last_name, :string)
+    field(:password_hash, :string)
+    field(:password, :string, virtual: true)
+    field(:is_admin, :boolean, default: false)
+    field(:is_active, :boolean, default: true)
+    field(:impersonated_by, :integer, virtual: true)
+    belongs_to(:company, Oceanconnect.Accounts.Company)
 
     timestamps()
   end
@@ -29,24 +29,29 @@ defmodule Oceanconnect.Accounts.User do
     |> put_pass_hash()
   end
 
-	def admin_changeset(%User{} = user, attrs) do
-		user
-		|> cast(attrs, [:is_active])
-	end
+  def admin_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:is_active])
+  end
 
   def impersonable_users(query \\ User) do
-    from q in query,
-    where: q.is_admin == false,
-    preload: [:company]
+    from(
+      q in query,
+      where: q.is_admin == false,
+      preload: [:company]
+    )
   end
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
+
   defp put_pass_hash(changeset), do: changeset
 
-	def select_active(query \\ User) do
-		from q in query,
-		where: q.is_active == true
-	end
+  def select_active(query \\ User) do
+    from(
+      q in query,
+      where: q.is_active == true
+    )
+  end
 end

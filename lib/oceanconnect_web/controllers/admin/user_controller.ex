@@ -19,13 +19,14 @@ defmodule OceanconnectWeb.Admin.UserController do
   end
 
   def new(conn, _params) do
-		companies = Accounts.list_active_companies
+    companies = Accounts.list_active_companies()
     changeset = Accounts.change_user(%User{})
     render(conn, "new.html", changeset: changeset, companies: companies)
   end
 
   def create(conn, %{"user" => user_params}) do
-		companies = Accounts.list_active_companies
+    companies = Accounts.list_active_companies()
+
     case Accounts.create_user(user_params) do
       {:ok, _user} ->
         conn
@@ -38,7 +39,7 @@ defmodule OceanconnectWeb.Admin.UserController do
   end
 
   def edit(conn, %{"id" => id}) do
-		companies = Accounts.list_active_companies
+    companies = Accounts.list_active_companies()
     user = Accounts.get_user!(id)
     changeset = Accounts.change_user(user)
     render(conn, "edit.html", user: user, changeset: changeset, companies: companies)
@@ -46,7 +47,8 @@ defmodule OceanconnectWeb.Admin.UserController do
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
-		companies = Accounts.list_active_companies
+    companies = Accounts.list_active_companies()
+
     case Accounts.update_user(user, user_params) do
       {:ok, _user} ->
         conn
@@ -67,21 +69,21 @@ defmodule OceanconnectWeb.Admin.UserController do
     |> redirect(to: admin_user_path(conn, :index))
   end
 
-	def deactivate(conn, %{"user_id" => user_id}) do
-		user = Accounts.get_active_user!(user_id)
-		{:ok, _user} = Accounts.deactivate_user(user)
+  def deactivate(conn, %{"user_id" => user_id}) do
+    user = Accounts.get_active_user!(user_id)
+    {:ok, _user} = Accounts.deactivate_user(user)
 
-		conn
-		|> put_flash(:info, "User deactivated successfully.")
-		|> redirect(to: admin_user_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "User deactivated successfully.")
+    |> redirect(to: admin_user_path(conn, :index))
+  end
 
-	def activate(conn, %{"user_id" => user_id}) do
-		user = Accounts.get_user!(user_id)
-		{:ok, _user} = Accounts.activate_user(user)
+  def activate(conn, %{"user_id" => user_id}) do
+    user = Accounts.get_user!(user_id)
+    {:ok, _user} = Accounts.activate_user(user)
 
-		conn
-		|> put_flash(:info, "User activated successfully.")
-		|> redirect(to: admin_user_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "User activated successfully.")
+    |> redirect(to: admin_user_path(conn, :index))
+  end
 end

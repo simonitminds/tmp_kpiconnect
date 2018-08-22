@@ -19,8 +19,7 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "VNn8or6QKekZ6Wg74hL/GvtqU7/8E1dx7ckxT7YWsZ702Y2hCgLoYd5ABtKLHqDY",
   render_errors: [view: OceanconnectWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Oceanconnect.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Oceanconnect.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -29,4 +28,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

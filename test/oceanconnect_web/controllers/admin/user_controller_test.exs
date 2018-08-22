@@ -1,100 +1,104 @@
 defmodule OceanconnectWeb.Admin.UserControllerTest do
-	use OceanconnectWeb.ConnCase
+  use OceanconnectWeb.ConnCase
 
-	alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts
 
   @update_attrs %{email: "some-updated-email@example.com", password: "password"}
   @invalid_attrs %{email: nil}
 
   setup do
-		admin_company = insert(:company)
-		company = insert(:company)
+    admin_company = insert(:company)
+    company = insert(:company)
     admin_user = insert(:user, password: "password", is_admin: "true", company: admin_company)
-		user = insert(:user, company: company)
-    conn = build_conn()
-    |> login_user(admin_user)
+    user = insert(:user, company: company)
+
+    conn =
+      build_conn()
+      |> login_user(admin_user)
+
     {:ok, %{conn: conn, user: user, company: company}}
   end
 
   describe "index" do
     test "lists paginated users", %{conn: conn} do
-      conn = get conn, admin_user_path(conn, :index)
+      conn = get(conn, admin_user_path(conn, :index))
       assert html_response(conn, 200) =~ "Users"
-			assert conn.assigns.page_size == 10
+      assert conn.assigns.page_size == 10
     end
   end
 
   describe "new user" do
     test "renders form", %{conn: conn} do
-      conn = get conn, admin_user_path(conn, :new)
+      conn = get(conn, admin_user_path(conn, :new))
       assert html_response(conn, 200) =~ "New User"
     end
   end
 
   describe "create user" do
     test "redirects to index when data is valid", %{conn: conn, company: company} do
-			user_params = string_params_for(:user, company_id: company.id)
-      conn = post conn, admin_user_path(conn, :create), user: user_params
+      user_params = string_params_for(:user, company_id: company.id)
+      conn = post(conn, admin_user_path(conn, :create), user: user_params)
 
       assert redirected_to(conn) == admin_user_path(conn, :index)
 
-      conn = get conn, admin_user_path(conn, :index)
+      conn = get(conn, admin_user_path(conn, :index))
       assert html_response(conn, 200) =~ "Users"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, admin_user_path(conn, :create), user: @invalid_attrs
+      conn = post(conn, admin_user_path(conn, :create), user: @invalid_attrs)
       assert html_response(conn, 200) =~ "New User"
     end
   end
 
   describe "edit user" do
     test "renders form for editing chosen user", %{conn: conn, user: user} do
-      conn = get conn, admin_user_path(conn, :edit, user)
+      conn = get(conn, admin_user_path(conn, :edit, user))
       assert html_response(conn, 200) =~ OceanconnectWeb.Admin.UserView.full_name(user)
     end
   end
 
   describe "update user" do
     test "redirects to index when data is valid", %{conn: conn, user: user} do
-      conn = put conn, admin_user_path(conn, :update, user), user: @update_attrs
+      conn = put(conn, admin_user_path(conn, :update, user), user: @update_attrs)
       assert redirected_to(conn) == admin_user_path(conn, :index)
 
-      conn = get conn, admin_user_path(conn, :index)
+      conn = get(conn, admin_user_path(conn, :index))
       assert html_response(conn, 200) =~ "Users"
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = put conn, admin_user_path(conn, :update, user), user: @invalid_attrs
+      conn = put(conn, admin_user_path(conn, :update, user), user: @invalid_attrs)
       assert html_response(conn, 200) =~ OceanconnectWeb.Admin.UserView.full_name(user)
     end
   end
 
   describe "delete user" do
     test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete conn, admin_user_path(conn, :delete, user)
+      conn = delete(conn, admin_user_path(conn, :delete, user))
       assert redirected_to(conn) == admin_user_path(conn, :index)
-      assert_error_sent 404, fn ->
-				get conn, admin_user_path(conn, :edit, user)
-			end
-		end
+
+      assert_error_sent(404, fn ->
+        get(conn, admin_user_path(conn, :edit, user))
+      end)
+    end
   end
 
-	describe "deactivate user" do
-		test "deactivates chosen user", %{conn: conn, user: user} do
-			conn = post conn, admin_user_path(conn, :deactivate, user)
-			assert redirected_to(conn) == admin_user_path(conn, :index)
-			user = Accounts.get_user!(user.id)
-			assert user.is_active == false
-		end
-	end
+  describe "deactivate user" do
+    test "deactivates chosen user", %{conn: conn, user: user} do
+      conn = post(conn, admin_user_path(conn, :deactivate, user))
+      assert redirected_to(conn) == admin_user_path(conn, :index)
+      user = Accounts.get_user!(user.id)
+      assert user.is_active == false
+    end
+  end
 
-	describe "activate user" do
-		test "activates chosen user", %{conn: conn, user: user} do
-			conn = post conn, admin_user_path(conn, :activate, user)
-			assert redirected_to(conn) == admin_user_path(conn, :index)
-			user = Accounts.get_user!(user.id)
-			assert user.is_active == true
-		end
-	end
+  describe "activate user" do
+    test "activates chosen user", %{conn: conn, user: user} do
+      conn = post(conn, admin_user_path(conn, :activate, user))
+      assert redirected_to(conn) == admin_user_path(conn, :index)
+      user = Accounts.get_user!(user.id)
+      assert user.is_active == true
+    end
+  end
 end

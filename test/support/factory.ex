@@ -16,7 +16,7 @@ defmodule Oceanconnect.Factory do
     %Oceanconnect.Accounts.User{
       email: sequence(:email, &"USER-#{&1}@EXAMPLE.COM"),
       first_name: sequence(:first_name, &"test-#{&1}"),
-      last_name:  sequence(:first_name, &"user-#{&1}"),
+      last_name: sequence(:first_name, &"user-#{&1}"),
       password: "password",
       company: build(:company)
     }
@@ -89,6 +89,7 @@ defmodule Oceanconnect.Factory do
       "supplier_id" => supplier_id,
       "time_entered" => DateTime.utc_now()
     }
+
     Oceanconnect.Auctions.AuctionBid.from_params_to_auction_bid(bid_params, auction)
   end
 end

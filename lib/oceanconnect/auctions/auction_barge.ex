@@ -6,14 +6,13 @@ defmodule Oceanconnect.Auctions.AuctionBarge do
   @derive {Poison.Encoder, except: [:__meta__, :auction, :supplier]}
 
   schema "auctions_barges" do
-    belongs_to :auction, Oceanconnect.Auctions.Auction
-    belongs_to :barge, Oceanconnect.Auctions.Barge
-    belongs_to :supplier, Oceanconnect.Accounts.Company
-    field :approval_status, :string
+    belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:barge, Oceanconnect.Auctions.Barge)
+    belongs_to(:supplier, Oceanconnect.Accounts.Company)
+    field(:approval_status, :string)
 
     timestamps()
   end
-
 
   def changeset(%AuctionBarge{} = auction_barge, attrs) do
     auction_barge
@@ -25,7 +24,9 @@ defmodule Oceanconnect.Auctions.AuctionBarge do
   end
 
   def by_auction(auction_id) do
-    from ab in AuctionBarge,
+    from(
+      ab in AuctionBarge,
       where: ab.auction_id == ^auction_id
+    )
   end
 end

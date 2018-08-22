@@ -6,13 +6,15 @@ defmodule OceanconnectWeb.SessionController do
 
   def new(conn, _) do
     render(conn, "new.html")
- end
+  end
 
   def create(conn, %{"session" => session}) do
     case Accounts.verify_login(session) do
       {:ok, user} ->
-        updated_conn = conn
-        |> Auth.build_session(user)
+        updated_conn =
+          conn
+          |> Auth.build_session(user)
+
         updated_conn
         |> redirect(to: auction_path(updated_conn, :index))
 
@@ -26,13 +28,14 @@ defmodule OceanconnectWeb.SessionController do
 
   def delete(conn, _) do
     conn
-    |> Auth.browser_logout
+    |> Auth.browser_logout()
     |> put_status(302)
     |> redirect(to: session_path(conn, :new))
   end
 
   def stop_impersonating(conn, _params) do
     updated_conn = Auth.stop_impersonating(conn)
+
     updated_conn
     |> redirect(to: auction_path(updated_conn, :index))
   end
@@ -49,6 +52,7 @@ defmodule OceanconnectWeb.SessionController do
         conn
         |> put_status(401)
         |> render(OceanconnectWeb.ErrorView, "401.json", data: %{})
+
       false ->
         conn
         |> put_flash(:error, "Authentication Required")

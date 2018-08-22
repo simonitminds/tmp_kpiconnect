@@ -5,25 +5,32 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   defstruct id: nil,
-    type: nil,
-    data: nil,
-    auction_id: nil,
-    time_entered: nil,
-    user: nil
+            type: nil,
+            data: nil,
+            auction_id: nil,
+            time_entered: nil,
+            user: nil
 
   alias __MODULE__
 
   def emit(%AuctionEvent{}, false), do: nil
+
   def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data, user: _user}, _emit) do
-    Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", Map.put(event, :id, UUID.uuid4(:hex)))
-  end
-  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}, _emit) do
-    updated_event = event
-    |> Map.put(:id, UUID.uuid4(:hex))
-    |> Map.put(:user, nil)
-    Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", updated_event)
+    Phoenix.PubSub.broadcast(
+      :auction_pubsub,
+      "auction:#{id}",
+      Map.put(event, :id, UUID.uuid4(:hex))
+    )
   end
 
+  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}, _emit) do
+    updated_event =
+      event
+      |> Map.put(:id, UUID.uuid4(:hex))
+      |> Map.put(:user, nil)
+
+    Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", updated_event)
+  end
 
   def auction_created(auction = %Auction{id: auction_id}, user) do
     %AuctionEvent{
@@ -35,7 +42,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_started(auction = %Auction{id: auction_id, scheduled_start: scheduled_start}, new_state = %AuctionState{}, user) do
+  def auction_started(
+        auction = %Auction{id: auction_id, scheduled_start: scheduled_start},
+        new_state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :auction_started,
       auction_id: auction_id,
@@ -55,7 +66,10 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_ended(auction = %Auction{id: auction_id, auction_ended: ended_at}, new_state = %AuctionState{}) do
+  def auction_ended(
+        auction = %Auction{id: auction_id, auction_ended: ended_at},
+        new_state = %AuctionState{}
+      ) do
     %AuctionEvent{
       type: :auction_ended,
       auction_id: auction_id,
@@ -83,7 +97,6 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-
   def auction_closed(auction_id, new_state = %AuctionState{}) do
     %AuctionEvent{
       type: :auction_closed,
@@ -102,7 +115,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def bid_placed(bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered}, new_state = %AuctionState{}, user) do
+  def bid_placed(
+        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+        new_state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :bid_placed,
       auction_id: auction_id,
@@ -112,7 +129,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auto_bid_placed(bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered}, new_state = %AuctionState{}, user) do
+  def auto_bid_placed(
+        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+        new_state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :auto_bid_placed,
       auction_id: auction_id,
@@ -131,7 +152,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def winning_bid_selected(bid = %AuctionBid{auction_id: auction_id}, state = %AuctionState{}, user) do
+  def winning_bid_selected(
+        bid = %AuctionBid{auction_id: auction_id},
+        state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :winning_bid_selected,
       auction_id: auction_id,
@@ -141,7 +166,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def barge_submitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+  def barge_submitted(
+        auction_barge = %AuctionBarge{auction_id: auction_id},
+        state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :barge_submitted,
       auction_id: auction_id,
@@ -151,7 +180,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def barge_unsubmitted(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+  def barge_unsubmitted(
+        auction_barge = %AuctionBarge{auction_id: auction_id},
+        state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :barge_unsubmitted,
       auction_id: auction_id,
@@ -161,7 +194,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def barge_approved(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+  def barge_approved(
+        auction_barge = %AuctionBarge{auction_id: auction_id},
+        state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :barge_approved,
       auction_id: auction_id,
@@ -171,7 +208,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def barge_rejected(auction_barge = %AuctionBarge{auction_id: auction_id}, state = %AuctionState{}, user) do
+  def barge_rejected(
+        auction_barge = %AuctionBarge{auction_id: auction_id},
+        state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :barge_rejected,
       auction_id: auction_id,

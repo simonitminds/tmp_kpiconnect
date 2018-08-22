@@ -17,7 +17,7 @@ defmodule Oceanconnect.AuctionIndexPage do
 
   def has_auctions?(auctions) do
     auctions
-    |> Enum.all?(fn(auction) ->
+    |> Enum.all?(fn auction ->
       case search_element(:class, "qa-auction-#{auction.id}") do
         {:ok, _} -> true
         _ -> false
@@ -32,20 +32,22 @@ defmodule Oceanconnect.AuctionIndexPage do
   end
 
   def auction_is_status?(auction, status) do
-    actual_status = find_element(:class, "qa-#{status}-auctions-list")
-    |> find_within_element(:class, "qa-auction-#{auction.id}")
-    |> find_within_element(:class, "qa-auction-status")
-    |> inner_text()
+    actual_status =
+      find_element(:class, "qa-#{status}-auctions-list")
+      |> find_within_element(:class, "qa-auction-#{auction.id}")
+      |> find_within_element(:class, "qa-auction-status")
+      |> inner_text()
+
     String.downcase(actual_status) == status
   end
 
   def time_remaining() do
     find_element(:css, ".qa-auction-time_remaining")
-    |> Hound.Helpers.Element.inner_text
+    |> Hound.Helpers.Element.inner_text()
   end
 
   def has_values_from_params?(params) do
-    Enum.all?(params, fn({k, v}) ->
+    Enum.all?(params, fn {k, v} ->
       element = find_element(:class, "qa-auction-#{k}")
       value_equals_element_text?(k, element, v)
     end)
@@ -57,6 +59,7 @@ defmodule Oceanconnect.AuctionIndexPage do
 
   def has_field_in_auction?(auction_id, field) do
     element = find_element(:class, "qa-auction-#{auction_id}")
+
     case search_within_element(element, :class, "qa-auction-#{field}") do
       {:ok, _} -> true
       {:error, _} -> false

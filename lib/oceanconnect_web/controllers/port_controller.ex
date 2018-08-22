@@ -20,6 +20,7 @@ defmodule OceanconnectWeb.PortController do
         conn
         |> put_flash(:info, "Port created successfully.")
         |> redirect(to: port_path(conn, :show, port))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,6 +45,7 @@ defmodule OceanconnectWeb.PortController do
         conn
         |> put_flash(:info, "Port updated successfully.")
         |> redirect(to: port_path(conn, :show, port))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", port: port, changeset: changeset)
     end

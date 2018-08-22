@@ -25,16 +25,21 @@ defmodule OceanconnectWeb.AuctionsChannel do
   # Add authorization logic here as required.
   defp authorized?(socket, id, %{"token" => token}) do
     authed = Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token)
+
     case authed do
       {:ok, authed_socket} ->
         company_id = Guardian.Phoenix.Socket.current_resource(authed_socket).company_id
+
         if company_id == String.to_integer(id) do
           true
         else
           false
         end
-      {:error, _reason} -> false
+
+      {:error, _reason} ->
+        false
     end
   end
-  defp authorized?(_,_,_), do: false
+
+  defp authorized?(_, _, _), do: false
 end

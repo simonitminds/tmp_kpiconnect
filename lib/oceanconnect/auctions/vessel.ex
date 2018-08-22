@@ -4,14 +4,13 @@ defmodule Oceanconnect.Auctions.Vessel do
   alias Oceanconnect.Auctions.{Vessel}
   alias Oceanconnect.Accounts.Company
 
-
   @derive {Poison.Encoder, except: [:__meta__, :company]}
 
   schema "vessels" do
-    field :imo, :integer
-    field :name, :string
-		field :is_active, :boolean, default: true
-    belongs_to :company, Company
+    field(:imo, :integer)
+    field(:name, :string)
+    field(:is_active, :boolean, default: true)
+    belongs_to(:company, Company)
 
     timestamps()
   end
@@ -25,21 +24,30 @@ defmodule Oceanconnect.Auctions.Vessel do
   end
 
   def by_company(%Company{id: company_id}) do
-    from v in Vessel,
+    from(
+      v in Vessel,
       where: v.company_id == ^company_id
+    )
   end
+
   def by_company(company_id) when is_integer(company_id) do
-    from v in Vessel,
+    from(
+      v in Vessel,
       where: v.company_id == ^company_id
+    )
   end
 
-	def select_active(query \\ Vessel) do
-		from q in query,
-		  where: q.is_active == true
-	end
+  def select_active(query \\ Vessel) do
+    from(
+      q in query,
+      where: q.is_active == true
+    )
+  end
 
-	def alphabetical(query \\ Vessel) do
-		from q in query,
-		  order_by: [asc: q.name]
-	end
+  def alphabetical(query \\ Vessel) do
+    from(
+      q in query,
+      order_by: [asc: q.name]
+    )
+  end
 end

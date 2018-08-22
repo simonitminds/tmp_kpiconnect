@@ -26,7 +26,9 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
   def event_list(auction_id) do
     case find_pid(auction_id) do
-      {:ok, pid} -> GenServer.call(pid, :get_event_list)
+      {:ok, pid} ->
+        GenServer.call(pid, :get_event_list)
+
       {:error, "Auction Event Store Not Started"} ->
         @event_storage.events_by_auction(auction_id)
     end
@@ -37,6 +39,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     {:ok, []}
   end
+
   def init({auction_id, events}) do
     Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     {:ok, events}
@@ -47,7 +50,9 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   end
 
   def handle_info(event = %AuctionEvent{auction_id: auction_id}, current_events) do
-    {:ok, %AuctionEventStorage{event: persisted_event}} = @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
+    {:ok, %AuctionEventStorage{event: persisted_event}} =
+      @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
+
     events = [persisted_event | current_events]
     {:noreply, events}
   end

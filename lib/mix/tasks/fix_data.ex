@@ -3,10 +3,10 @@ defmodule Mix.Tasks.FixData do
 
   @shortdoc "foo"
   def run("master") do
-    Mix.shell.info "master"
+    Mix.shell().info("master")
   end
 
   def run(_) do
-    Mix.shell.info "branch"
+    Mix.shell().info("branch")
   end
 end

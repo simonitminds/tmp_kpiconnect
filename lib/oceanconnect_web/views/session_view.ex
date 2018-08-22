@@ -17,7 +17,8 @@ defmodule OceanconnectWeb.SessionView do
         conn
         |> Auth.current_user()
         |> Accounts.impersonable_users_for()
-        |> Enum.map(&([value: &1.id, key: "#{&1.first_name} #{&1.last_name} (#{&1.company.name})"]))
+        |> Enum.map(&[value: &1.id, key: "#{&1.first_name} #{&1.last_name} (#{&1.company.name})"])
+
       false ->
         []
     end
@@ -26,6 +27,7 @@ defmodule OceanconnectWeb.SessionView do
   def is_impersonating?(conn) do
     current_user = Auth.current_user(conn)
     current_admin = Auth.current_admin(conn)
+
     case current_user do
       %User{is_admin: true} -> false
       %User{is_admin: false} -> !!current_admin

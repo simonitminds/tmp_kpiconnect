@@ -37,7 +37,7 @@ defmodule Oceanconnect.DataCase do
   end
 
   def all_values_match?(map, struct) do
-    Enum.all?(map, fn({k, v}) ->
+    Enum.all?(map, fn {k, v} ->
       Map.fetch!(struct, k) == v
     end)
   end

@@ -36,7 +36,7 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :start_duration_timer, data: auction}
   end
 
-  def start_decision_duration_timer(auction = %Auction{})  do
+  def start_decision_duration_timer(auction = %Auction{}) do
     %Command{command: :start_decision_duration_timer, data: auction}
   end
 

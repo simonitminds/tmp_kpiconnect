@@ -19,6 +19,7 @@ defmodule Oceanconnect.AuctionNewTest do
 
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
+
     auction_params = %{
       scheduled_start_date: date_time,
       scheduled_start_time: date_time,
@@ -40,38 +41,47 @@ defmodule Oceanconnect.AuctionNewTest do
       ],
       vessel_id: selected_vessel.id
     }
+
     show_params = %{
       vessel: "#{selected_vessel.name} (#{selected_vessel.imo})",
       port: port.name,
       suppliers: suppliers
     }
-    {:ok, %{buyer_vessels: buyer_vessels, params: auction_params, buyer_company: buyer_company,
-            show_params: show_params, suppliers: suppliers, port: port}}
+
+    {:ok,
+     %{
+       buyer_vessels: buyer_vessels,
+       params: auction_params,
+       buyer_company: buyer_company,
+       show_params: show_params,
+       suppliers: suppliers,
+       port: port
+     }}
   end
 
   test "visting the new auction page" do
     AuctionNewPage.visit()
 
     assert AuctionNewPage.has_fields?([
-      "additional_information",
-      "anonymous_bidding",
-      "scheduled_start",
-      "duration",
-      "decision_duration",
-      "eta",
-      "etd",
-      "fuel_id",
-      "fuel_quantity",
-      "po",
-      "port_id",
-      "vessel_id",
-      "select-port"
-    ])
+             "additional_information",
+             "anonymous_bidding",
+             "scheduled_start",
+             "duration",
+             "decision_duration",
+             "eta",
+             "etd",
+             "fuel_id",
+             "fuel_quantity",
+             "po",
+             "port_id",
+             "vessel_id",
+             "select-port"
+           ])
   end
 
   test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
     AuctionNewPage.visit()
-    buyer_vessels = Enum.map(buyer_vessels, fn(v) -> "#{v.name}, #{v.imo}" end)
+    buyer_vessels = Enum.map(buyer_vessels, fn v -> "#{v.name}, #{v.imo}" end)
     vessels_on_page = MapSet.new(AuctionNewPage.vessel_list())
     company_vessels = MapSet.new(buyer_vessels)
 
@@ -83,9 +93,9 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.select_port(port.id)
 
     assert AuctionNewPage.has_fields?([
-      "port_agent",
-      "suppliers"
-    ])
+             "port_agent",
+             "suppliers"
+           ])
   end
 
   test "supplier list is filtered by port", %{suppliers: suppliers, port: port} do
@@ -102,9 +112,9 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.fill_form(params)
     AuctionNewPage.submit()
 
-    eventually fn ->
+    eventually(fn ->
       assert current_path() =~ ~r/auctions\/\d/
       assert AuctionShowPage.has_values_from_params?(show_params)
-    end
+    end)
   end
 end

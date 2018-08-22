@@ -2,10 +2,10 @@ defmodule OceanconnectWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "user_auctions:*", OceanconnectWeb.AuctionsChannel
+  channel("user_auctions:*", OceanconnectWeb.AuctionsChannel)
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport(:websocket, Phoenix.Transports.WebSocket)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
@@ -22,13 +22,16 @@ defmodule OceanconnectWeb.UserSocket do
   def connect(%{"token" => token}, socket) do
     # max_age: 1209600 is equivalent to two weeks in seconds
     auth = Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token)
+
     case auth do
       {:ok, authed_socket} ->
         {:ok, authed_socket}
+
       {:error, _reason} ->
         :error
     end
   end
+
   def connect(_, socket), do: socket
   # Socket id's are topics that allow you to identify all sockets for a given user:
   #

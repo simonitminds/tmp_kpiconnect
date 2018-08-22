@@ -31,18 +31,20 @@ defmodule OceanconnectWeb.ChannelCase do
     end
   end
 
-
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Oceanconnect.Repo)
+
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(Oceanconnect.Repo, {:shared, self()})
     end
 
     on_exit(fn ->
       case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
-        [] -> nil
+        [] ->
+          nil
+
         children ->
-          Enum.map(children, fn({_, pid, _, _}) ->
+          Enum.map(children, fn {_, pid, _, _} ->
             Process.unlink(pid)
             Process.exit(pid, :shutdown)
           end)

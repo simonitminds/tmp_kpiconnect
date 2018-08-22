@@ -6,12 +6,16 @@ defmodule OceanconnectWeb.Admin.PortController do
 
   def index(conn, params) do
     page = Auctions.list_ports(params)
-    render(conn, "index.html",
-			ports: page.entries,
-		  page_number: page.page_number,
-		  page_size: page.page_size,
-		  total_pages: page.total_pages,
-		  total_entries: page.total_entries)
+
+    render(
+      conn,
+      "index.html",
+      ports: page.entries,
+      page_number: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages,
+      total_entries: page.total_entries
+    )
   end
 
   def new(conn, _params) do
@@ -25,6 +29,7 @@ defmodule OceanconnectWeb.Admin.PortController do
         conn
         |> put_flash(:info, "Port created successfully.")
         |> redirect(to: admin_port_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,6 +49,7 @@ defmodule OceanconnectWeb.Admin.PortController do
         conn
         |> put_flash(:info, "Port updated successfully.")
         |> redirect(to: admin_port_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", port: port, changeset: changeset)
     end
@@ -58,21 +64,21 @@ defmodule OceanconnectWeb.Admin.PortController do
     |> redirect(to: admin_port_path(conn, :index))
   end
 
-	def deactivate(conn, %{"port_id" => port_id}) do
-		port = Auctions.get_active_port!(port_id)
-		{:ok, _port} = Auctions.deactivate_port(port)
+  def deactivate(conn, %{"port_id" => port_id}) do
+    port = Auctions.get_active_port!(port_id)
+    {:ok, _port} = Auctions.deactivate_port(port)
 
-		conn
-		|> put_flash(:info, "Port deactivated successfully.")
-		|> redirect(to: admin_port_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "Port deactivated successfully.")
+    |> redirect(to: admin_port_path(conn, :index))
+  end
 
-	def activate(conn, %{"port_id" => port_id}) do
-		port = Auctions.get_port!(port_id)
-		{:ok, _port} = Auctions.activate_port(port)
+  def activate(conn, %{"port_id" => port_id}) do
+    port = Auctions.get_port!(port_id)
+    {:ok, _port} = Auctions.activate_port(port)
 
-		conn
-		|> put_flash(:info, "Port activated successfully.")
-		|> redirect(to: admin_port_path(conn, :index))
-	end
+    conn
+    |> put_flash(:info, "Port activated successfully.")
+    |> redirect(to: admin_port_path(conn, :index))
+  end
 end

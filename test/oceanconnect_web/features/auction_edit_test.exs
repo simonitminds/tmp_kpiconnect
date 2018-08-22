@@ -16,18 +16,18 @@ defmodule Oceanconnect.AuctionEditTest do
     AuctionEditPage.visit(auction.id)
 
     assert AuctionEditPage.has_fields?([
-      "additional_information",
-      "anonymous_bidding",
-      "scheduled_start",
-      "duration",
-      "decision_duration",
-      "eta",
-      "etd",
-      "fuel_id",
-      "fuel_quantity",
-      "po",
-      "port_id",
-      "vessel_id"
-    ])
+             "additional_information",
+             "anonymous_bidding",
+             "scheduled_start",
+             "duration",
+             "decision_duration",
+             "eta",
+             "etd",
+             "fuel_id",
+             "fuel_quantity",
+             "po",
+             "port_id",
+             "vessel_id"
+           ])
   end
 end

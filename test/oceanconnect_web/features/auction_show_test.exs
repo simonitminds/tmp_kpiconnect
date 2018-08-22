@@ -101,7 +101,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       auction_state =
         auction
-        |> Auctions.get_auction_state!
+        |> Auctions.get_auction_state!()
 
       stored_bid_list =
         auction_state.bids
@@ -141,7 +141,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       auction_state =
         auction
-        |> Auctions.get_auction_state!
+        |> Auctions.get_auction_state!()
 
       stored_bid_list =
         auction_state.bids
@@ -200,6 +200,7 @@ defmodule Oceanconnect.AuctionShowTest do
         :timer.sleep(500)
         assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
       end)
+
       change_session_to(:default)
       assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
       AuctionShowPage.visit(auction.id)
@@ -361,9 +362,14 @@ defmodule Oceanconnect.AuctionShowTest do
     assert AuctionShowPage.has_available_barge?(barge)
   end
 
-
-  test "buyer can approve submitted barges", %{auction: auction, buyer: buyer, supplier: supplier, supplier2: supplier2} do
-    barge = insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+  test "buyer can approve submitted barges", %{
+    auction: auction,
+    buyer: buyer,
+    supplier: supplier,
+    supplier2: supplier2
+  } do
+    barge =
+      insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
     login_user(supplier)
     AuctionShowPage.visit(auction.id)
@@ -392,8 +398,14 @@ defmodule Oceanconnect.AuctionShowTest do
     end)
   end
 
-  test "buyer can reject submitted barges", %{auction: auction, buyer: buyer, supplier: supplier, supplier2: supplier2} do
-    barge = insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+  test "buyer can reject submitted barges", %{
+    auction: auction,
+    buyer: buyer,
+    supplier: supplier,
+    supplier2: supplier2
+  } do
+    barge =
+      insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
     login_user(supplier)
     AuctionShowPage.visit(auction.id)

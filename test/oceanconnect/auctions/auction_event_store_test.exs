@@ -1,16 +1,36 @@
 defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionCache, AuctionEvent, AuctionEventStore, AuctionStore, AuctionSupervisor}
+
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionCache,
+    AuctionEvent,
+    AuctionEventStore,
+    AuctionStore,
+    AuctionSupervisor
+  }
 
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
-    auction = insert(:auction, duration: 1_000, decision_duration: 60_000, suppliers: [supplier_company, supplier2_company])
-    |> Auctions.create_supplier_aliases
-    |> Auctions.fully_loaded
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler, :auction_event_handler]}}})
+    auction =
+      insert(
+        :auction,
+        duration: 1_000,
+        decision_duration: 60_000,
+        suppliers: [supplier_company, supplier2_company]
+      )
+      |> Auctions.create_supplier_aliases()
+      |> Auctions.fully_loaded()
+
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_scheduler, :auction_event_handler]}}}
+      )
+
     Oceanconnect.FakeEventStorage.FakeEventStorageCache.start_link()
 
     {:ok, %{auction: auction}}
@@ -42,7 +62,9 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end
 
-  test "rebuilding auction state emits a rebuilt event", %{auction: auction = %Auction{id: auction_id}} do
+  test "rebuilding auction state emits a rebuilt event", %{
+    auction: auction = %Auction{id: auction_id}
+  } do
     :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     Auctions.start_auction(auction)
     Auctions.place_bid(auction, %{"amount" => 1.50}, hd(auction.suppliers).id)
@@ -58,16 +80,23 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     :timer.sleep(1_000)
 
     assert_received %AuctionEvent{type: :auction_state_rebuilt, auction_id: ^auction_id}
-    assert %AuctionEvent{type: :auction_state_rebuilt, data: %{state: _state, time_remaining: time_remaining}} = hd(AuctionEventStore.event_list(auction_id))
-    assert Oceanconnect.Utilities.round_time_remaining(time_remaining) == auction.decision_duration
+
+    assert %AuctionEvent{
+             type: :auction_state_rebuilt,
+             data: %{state: _state, time_remaining: time_remaining}
+           } = hd(AuctionEventStore.event_list(auction_id))
+
+    assert Oceanconnect.Utilities.round_time_remaining(time_remaining) ==
+             auction.decision_duration
   end
 
-
-  test "ensure decision_duration timer is canceled when rebuilding expired auction", %{auction: auction = %Auction{id: auction_id}} do
+  test "ensure decision_duration timer is canceled when rebuilding expired auction", %{
+    auction: auction = %Auction{id: auction_id}
+  } do
     auction
-    |> Auctions.start_auction
-    |> Auctions.end_auction
-    |> Auctions.expire_auction
+    |> Auctions.start_auction()
+    |> Auctions.end_auction()
+    |> Auctions.expire_auction()
 
     current_state = Auctions.get_auction_state!(auction)
     current_event_list = AuctionEventStore.event_list(auction_id)
