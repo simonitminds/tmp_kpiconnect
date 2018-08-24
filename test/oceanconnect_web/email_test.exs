@@ -38,19 +38,21 @@ defmodule OceanconnectWeb.EmailTest do
       for buyer <- buyers, do: refute Enum.any?(emails, fn(email) -> email.to.id == buyer.id end)
 		end
 
-		test "auction starting soon email builds for all participants", %{suppliers: suppliers, buyers: buyers, auction: auction} do
-			supplier_emails = Email.auction_starting_soon(auction).supplier_emails
+		test "auction starting soon email builds for all participants", %{suppliers: suppliers, buyers: buyers, auction: auction, buyer_company: buyer_company} do
+      %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_starting_soon(auction)
+
 			for supplier <- suppliers, do: assert Enum.any?(supplier_emails, fn(supplier_email) -> supplier_email.to.id == supplier.id end)
+      for buyer <- buyers, do: assert Enum.any?(buyer_emails, fn(buyer_email) -> buyer_email.to.id == buyer.id end)
+
       for supplier_email <- supplier_emails do
         assert supplier_email.subject == "Auction starting soon."
-				assert supplier_email.html_body =~ "Auction Starting Soon"
+				assert supplier_email.html_body =~ buyer_company.name
+				assert supplier_email.html_body =~ Integer.to_string(auction.id)
       end
-
-      buyer_emails = Email.auction_starting_soon(auction).buyer_emails
-      for buyer <- buyers, do: assert Enum.any?(buyer_emails, fn(buyer_email) -> buyer_email.to.id == buyer.id end)
       for buyer_email <- buyer_emails do
         assert buyer_email.subject == "Your auction is starting soon."
-        assert buyer_email.html_body =~ "Auction Starting Soon"
+				assert buyer_email.html_body =~ buyer_company.name
+        assert buyer_email.html_body =~ Integer.to_string(auction.id)
       end
 		end
 
@@ -103,7 +105,7 @@ defmodule OceanconnectWeb.EmailTest do
     end
 
     test "auction completion email builds for winning supplier and buyer", %{buyer_company: buyer_company, winning_supplier_company: winning_supplier_company, buyers: buyers, auction: auction, winning_suppliers: winning_suppliers} do
-      %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} = Email.auction_closed(winning_supplier_company, auction)
+      %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} = Email.auction_closed(100, 20000, winning_supplier_company, auction)
 
       for supplier <- winning_suppliers do
         assert Enum.any?(winning_supplier_emails, fn(supplier_email) -> supplier_email.to.id == supplier.id end)

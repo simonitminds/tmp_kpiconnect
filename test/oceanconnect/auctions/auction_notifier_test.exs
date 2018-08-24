@@ -27,6 +27,14 @@ defmodule Oceanconnect.Auctions.AuctionNotifierTest do
       end
     end
 
+    test "auction notifier sends upcoming emails to participants", %{auction: auction} do
+      assert {:ok, emails} = AuctionNotifier.notify_auction_upcoming(auction)
+      assert length(emails) > 0
+      for email <- emails do
+        assert_delivered_email email
+      end
+    end
+
     test "auction notifier sends cancellation emails to participants", %{auction: auction} do
       assert {:ok, emails} = AuctionNotifier.notify_auction_canceled(auction)
       assert length(emails) > 0

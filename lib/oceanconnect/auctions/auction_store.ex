@@ -156,6 +156,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  def handle_cast({:notify_upcoming_auction, %{auction: auction = %Auction{}}, emit}, state) do
+    AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), emit)
+    {:noreply, state}
+  end
+
   def handle_cast({:end_auction, _auction_id, _emit}, current_state),
     do: {:noreply, current_state}
 

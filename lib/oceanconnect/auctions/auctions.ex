@@ -1,12 +1,12 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
-
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionBid,
     AuctionCache,
     AuctionEvent,
+    AuctionEventStorage,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
@@ -15,7 +15,6 @@ defmodule Oceanconnect.Auctions do
     Fuel,
     Barge
   }
-
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -69,6 +68,16 @@ defmodule Oceanconnect.Auctions do
   def list_participating_auctions(company_id) do
     (buyer_auctions(company_id) ++ supplier_auctions(company_id))
     |> Enum.uniq_by(& &1.id)
+  end
+
+  def list_upcoming_auctions(time_frame) do
+    Auction
+    |> Auction.select_upcoming(time_frame)
+    |> Repo.all()
+  end
+
+  def upcoming_notification_sent?(%Auction{id: auction_id}) do
+    Enum.any?(AuctionEventStorage.events_by_auction(auction_id), fn(event) -> event.type == :auction_upcoming_notified end)
   end
 
   defp buyer_auctions(buyer_id) do
@@ -156,6 +165,13 @@ defmodule Oceanconnect.Auctions do
     |> Command.cancel_auction(user)
     |> AuctionStore.process_command()
 
+    auction
+  end
+
+  def notify_upcoming_auction(auction = %Auction{}) do
+    auction
+    |> Command.notify_upcoming_auction
+    |> AuctionStore.process_command
     auction
   end
 

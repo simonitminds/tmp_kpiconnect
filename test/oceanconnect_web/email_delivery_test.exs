@@ -9,7 +9,7 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
   setup do
     auction = insert(:auction)
 		buyer_company = Accounts.get_company!(auction.buyer_id)
-		buyers = [insert(:user, company: buyer_company), insert(:user, company: buyer_company)]
+		[insert(:user, company: buyer_company), insert(:user, company: buyer_company)]
 
 		Enum.each(auction.suppliers, fn(supplier_company) ->
 			insert(:user, %{company: supplier_company})
@@ -28,8 +28,15 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
       end
     end
 
+    test "sends auction starting soon emails to all participants", %{auction: auction} do
+      %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_starting_soon(auction)
+      for email <- List.flatten([supplier_emails | buyer_emails]) do
+        Mailer.deliver_now(email)
+      end
+    end
+
     test "sends auction completion emails to winning supplier and buyer", %{auction: auction, winning_supplier_company: winning_supplier_company} do
-      %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_closed(winning_supplier_company, auction)
+      %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_closed(100, 20000, winning_supplier_company, auction)
       for supplier_email <- supplier_emails do
         Mailer.deliver_now(supplier_email)
         assert_delivered_email supplier_email
