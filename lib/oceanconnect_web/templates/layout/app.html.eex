@@ -56,11 +56,11 @@
                 <div class="navbar-dropdown">
                   <a href="/auctions" class="navbar-item">Current Auctions</a>
                   <%# TODO: Remove this when done designing emails %>
-                  <%= link "Send Invitation Email", to: "/send_email/invitation", class: "navbar-item", method: :post %>
-                  <%= link "Send starting soon email", to: "/send_email/upcoming", class: "navbar-item", method: :post %>
-                  <%= link "Send Cancellation Email", to: "/send_email/cancellation", class: "navbar-item", method: :post %>
-                  <%= link "Send Completion Email", to: "/send_email/completion", class: "navbar-item", method: :post %>
                   <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                    <%= link "Send Invitation Email", to: "/send_email/invitation", class: "navbar-item", method: :post %>
+                    <%= link "Send starting soon email", to: "/send_email/upcoming", class: "navbar-item", method: :post %>
+                    <%= link "Send Cancellation Email", to: "/send_email/cancellation", class: "navbar-item", method: :post %>
+                    <%= link "Send Completion Email", to: "/send_email/completion", class: "navbar-item", method: :post %>
                     <a href="/admin/vessels" class="navbar-item">Admin Panel</a>
                   <% end %>
                   <!-- <a href="#" class="navbar-item">Auction History</a>

@@ -22,7 +22,10 @@ lrXAmEEDZgiXy4zWC4w2D4HW9+Dfc0Crf+B3YPc2Cv/HyvBv/N4WrbDw0iQKVsWCqAPDS9aGZQs2hCCM
   </tr>
 </table>
 <br/>
-<p>Apologies for the inconvenience.</p>
+
+<%= if Oceanconnect.Accounts.User.full_name(@user) != @buyer_company.contact_name do %>
+  <p>Apologies for the inconvenience.</p>
+<% end %>
 <hr style="margin-top: 2rem;">
 <table style="border: 0px solid #efefef; margin-bottom: 1rem;">
 <tr>
