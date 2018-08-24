@@ -16,6 +16,18 @@ defmodule OceanconnectWeb.EmailController do
     |> redirect(to: "/sent_emails")
   end
 
+  def send_upcoming(conn, _) do
+    auction = Oceanconnect.Auctions.get_auction(1) |> Oceanconnect.Auctions.fully_loaded
+    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_starting_soon(auction)
+    emails = List.flatten([supplier_emails, buyer_emails])
+    for email <- emails do
+      Mailer.deliver_now(email)
+    end
+
+    conn
+    |> redirect(to: "/sent_emails")
+  end
+
   def send_cancellation(conn, _) do
     auction = Oceanconnect.Auctions.get_auction!(1) |> Oceanconnect.Auctions.fully_loaded
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = Email.auction_canceled(auction)

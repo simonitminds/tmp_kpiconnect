@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.Email do
     end)
 	end
 
-	def auction_starting_soon(%Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
+	def auction_starting_soon(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
 		buyer_company = Accounts.get_company!(buyer_id)
 		buyers = Accounts.users_for_companies([buyer_company])
 		suppliers = Accounts.users_for_companies(supplier_companies)
@@ -27,89 +27,16 @@ defmodule OceanconnectWeb.Email do
 			Enum.map(suppliers, fn(supplier) ->
 				base_email(supplier)
 				|> subject("Auction starting soon.")
-				|> html_body("<strong>Auction Starting Soon</strong>")
-				|> text_body("An auction that you have been invited to is starting soon.")
+        |> render("auction_starting.html", user: supplier, auction: auction, buyer_company: buyer_company)
 			end)
 		buyer_emails =
       Enum.map(buyers, fn(buyer) ->
         base_email(buyer)
         |> subject("Your auction is starting soon.")
-        |> html_body("<strong>Auction Starting Soon</strong>")
-        |> text_body("Your auction is starting soon.")
+        |> render("auction_starting.html", user: buyer, auction: auction, buyer_company: buyer_company)
       end)
 
      %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
-	end
-
-	def auction_started(%Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
-		buyer_company = Accounts.get_company!(buyer_id)
-		buyers = Accounts.users_for_companies([buyer_company])
-		suppliers = Accounts.users_for_companies(supplier_companies)
-
-		supplier_emails =
-			Enum.map(suppliers, fn(supplier) ->
-				base_email(supplier)
-				|> subject("Auction started.")
-				|> html_body("<strong>Auction Started</strong>")
-				|> text_body("An auction that you have been invited to has started.")
-			end)
-		buyer_emails =
-      Enum.map(buyers, fn(buyer) ->
-        base_email(buyer)
-        |> subject("Your auction has started.")
-        |> html_body("<strong>Auction Started</strong>")
-        |> text_body("Your auction has started.")
-      end)
-
-    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
-	end
-
-	def auction_ending_soon(%Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
-		buyer_company = Accounts.get_company!(buyer_id)
-		buyers = Accounts.users_for_companies([buyer_company])
-		suppliers = Accounts.users_for_companies(supplier_companies)
-
-    # pass buyer_company as assigns in this
-		supplier_emails =
-			Enum.map(suppliers, fn(supplier) ->
-				base_email(supplier)
-				|> subject("Auction ending soon.")
-				|> html_body("<strong>Auction Ending Soon</strong>")
-				|> text_body("An auction that you have been invited to is ending soon.")
-			end)
-		buyer_emails =
-      Enum.map(buyers, fn(buyer) ->
-        base_email(buyer)
-        |> subject("Your auction is ending soon.")
-        |> html_body("<strong>Auction Ending Soon</strong>")
-        |> text_body("Your auction is ending soon.")
-      end)
-
-    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
-	end
-
-	def auction_ended(%Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
-		buyer_company = Accounts.get_company!(buyer_id)
-		buyers = Accounts.users_for_companies([buyer_company])
-		suppliers = Accounts.users_for_companies(supplier_companies)
-
-    # TODO: pass buyer_company as assigns in this
-		supplier_emails =
-			Enum.map(suppliers, fn(supplier) ->
-				base_email(supplier)
-				|> subject("Auction ended.")
-				|> html_body("<strong>Auction Ended</strong>")
-				|> text_body("An auction that you have been invited to has ended.")
-			end)
-		buyer_emails =
-      Enum.map(buyers, fn(buyer) ->
-        base_email(buyer)
-        |> subject("Your auction has ended.")
-        |> html_body("<strong>Auction Ended</strong>")
-        |> text_body("Your auction has ended.")
-      end)
-
-    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
 	end
 
   def auction_closed(bid_amount, total_price, winning_supplier_company = %Company{}, auction = %Auction{buyer_id: buyer_id}) do
@@ -137,7 +64,6 @@ defmodule OceanconnectWeb.Email do
 		buyers = Accounts.users_for_companies([buyer_company])
 		suppliers = Accounts.users_for_companies(supplier_companies)
 
-    # TODO: pass buyer_company as assigns in this
 		supplier_emails =
 			Enum.map(suppliers, fn(supplier) ->
 				base_email(supplier)
