@@ -13,18 +13,10 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     supplier_2 = insert(:user, company: supplier_company)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
+    auction = insert(:auction, buyer: buyer_company, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier3_company])
+    |> Auctions.fully_loaded
 
-    auction =
-      insert(
-        :auction,
-        buyer: buyer_company,
-        duration: 1_000,
-        decision_duration: 1_000,
-        suppliers: [supplier_company, supplier3_company]
-      )
-
-    {:ok, _pid} =
-      start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}})
 
     expected_payload = %{
       time_remaining: auction.duration,
@@ -76,18 +68,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       @endpoint.subscribe(channel)
 
-      auction_attrs =
-        auction
-        |> Map.take([
-          :scheduled_start,
-          :eta,
-          :fuel_id,
-          :fuel_quantity,
-          :port_id,
-          :vessel_id,
-          :suppliers
-        ])
-
+      auction_attrs = auction |> Map.take([:scheduled_start, :eta, :fuel_id, :fuel_quantity, :port_id, :vessel_id, :suppliers, :buyer_id])
       {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
 
       receive do

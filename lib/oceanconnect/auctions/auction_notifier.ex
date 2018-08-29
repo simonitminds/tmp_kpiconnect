@@ -35,7 +35,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     invitation_emails = deliver_emails(invitation_emails)
     {:ok, invitation_emails}
   end
-  def notify_auction_upcoming(auction = %Auction{}) do
+  def notify_upcoming_auction(auction = %Auction{}) do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} = OceanconnectWeb.Email.auction_starting_soon(auction)
     upcoming_emails = List.flatten([supplier_emails | buyer_emails])
     deliver_emails(upcoming_emails)

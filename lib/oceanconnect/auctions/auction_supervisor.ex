@@ -1,17 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionSupervisor do
   use Supervisor
   @registry_name :auction_supervisor_registry
-<<<<<<< HEAD
-  alias Oceanconnect.Auctions.{
-    Auction,
-    AuctionCache,
-    AuctionEventHandler,
-    AuctionEventStore,
-    AuctionScheduler,
-    AuctionStore,
-    AuctionTimer
-  }
-=======
   alias Oceanconnect.Auctions.{Auction,
                                AuctionCache,
                                AuctionEventHandler,
@@ -20,7 +9,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
                                AuctionStore,
                                AuctionTimer,
                                AuctionReminderTimer}
->>>>>>> WIP Auction starting soon email notification
 
   def start_link({auction = %Auction{id: auction_id}, config}) do
     Supervisor.start_link(
@@ -38,7 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       auction_event_store: {AuctionEventStore, auction_id},
       auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction},
-      auction_reminder_timer: worker(AuctionReminderTimer, [auction], restart: :transient)
+      auction_reminder_timer: Supervisor.child_spec({AuctionReminderTimer, auction}, restart: :transient)
     }
 
     children = exclude_children(all_children, options)
@@ -57,10 +45,15 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     end
   end
 
-  defp exclude_children(all_children, %{exclude_children: exclusions}) do
-    all_children
-    |> Enum.filter(fn {k, _v} -> not (k in exclusions) end)
-    |> Enum.map(fn {_, v} -> v end)
+  defp exclude_children(all_children, opts = %{exclude_children: exclusions}) do
+    children = if :auction_reminder_timer in exclusions do
+      Enum.reject(all_children, fn(child) -> child == :auction_reminder_timer end)
+    else
+      all_children
+    end
+    children
+    |> Enum.reject(fn({k, _v}) -> k in exclusions end)
+    |> Enum.map(fn({_, v}) -> v end)
   end
 
   defp exclude_children(all_children, %{}), do: all_children |> Map.values()

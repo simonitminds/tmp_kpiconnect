@@ -14,23 +14,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
+    buyer_company = insert(:company, is_supplier: false)
+    auction = insert(:auction, duration: 1_000, decision_duration: 60_000, suppliers: [supplier_company, supplier2_company], buyer: buyer_company)
+    |> Auctions.create_supplier_aliases
+    |> Auctions.fully_loaded
 
-    auction =
-      insert(
-        :auction,
-        duration: 1_000,
-        decision_duration: 60_000,
-        suppliers: [supplier_company, supplier2_company]
-      )
-      |> Auctions.create_supplier_aliases()
-      |> Auctions.fully_loaded()
-
-    {:ok, _pid} =
-      start_supervised(
-        {AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_scheduler, :auction_event_handler]}}}
-      )
-
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler, :auction_event_handler]}}})
     Oceanconnect.FakeEventStorage.FakeEventStorageCache.start_link()
 
     {:ok, %{auction: auction}}
@@ -80,6 +69,9 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     :timer.sleep(1_000)
 
     assert_received %AuctionEvent{type: :auction_state_rebuilt, auction_id: ^auction_id}
+    assert %AuctionEvent{type: :auction_state_rebuilt, data: %{state: _state, time_remaining: time_remaining}} = hd(Enum.filter(AuctionEventStore.event_list(auction_id), fn(event) -> event.type == :auction_state_rebuilt end))
+    assert Oceanconnect.Utilities.round_time_remaining(time_remaining) == auction.decision_duration
+  end
 
     assert %AuctionEvent{
              type: :auction_state_rebuilt,

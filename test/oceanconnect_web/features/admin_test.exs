@@ -20,12 +20,12 @@ defmodule Oceanconnect.AdminTest do
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
         duration: 600_000
-      )
+      ) |> Auctions.fully_loaded
 
     {:ok, _pid} =
       start_supervised(
         {Oceanconnect.Auctions.AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_scheduler]}}}
+         {auction, %{exclude_children: [:auction_reminder_test, :auction_scheduler]}}}
       )
 
     {:ok, %{admin: admin, auction: auction, buyer: buyer, supplier: supplier}}

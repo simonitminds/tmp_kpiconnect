@@ -168,13 +168,6 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def notify_upcoming_auction(auction = %Auction{}) do
-    auction
-    |> Command.notify_upcoming_auction
-    |> AuctionStore.process_command
-    auction
-  end
-
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
@@ -290,9 +283,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def fully_loaded(auction = %Auction{}) do
-    fully_loaded_auction =
-      Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
-
+    fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, [buyer: [:users]], [suppliers: [:users]]])
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
 

@@ -5,15 +5,15 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
   alias OceanconnectWeb.Email
   alias OceanconnectWeb.Mailer
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Auctions
 
   setup do
-    auction = insert(:auction)
-		buyer_company = Accounts.get_company!(auction.buyer_id)
-		[insert(:user, company: buyer_company), insert(:user, company: buyer_company)]
+		buyer_company = insert(:company, is_supplier: false)
+    supplier_companies = [insert(:company, is_supplier: true), insert(:company, is_supplier: true)]
 
-		Enum.each(auction.suppliers, fn(supplier_company) ->
-			insert(:user, %{company: supplier_company})
-		end)
+    auction = insert(:auction, buyer: buyer_company, suppliers: supplier_companies)
+    |> Auctions.fully_loaded
+
     winning_supplier_company = Enum.at(Enum.take_random(auction.suppliers, 1), 0)
 
     {:ok, %{auction: auction, winning_supplier_company: winning_supplier_company}}

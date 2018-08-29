@@ -17,12 +17,11 @@ defmodule OceanconnectWeb.Email do
     end)
 	end
 
-	def auction_starting_soon(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
-		buyer_company = Accounts.get_company!(buyer_id)
-		buyers = Accounts.users_for_companies([buyer_company])
-		suppliers = Accounts.users_for_companies(supplier_companies)
+	def auction_starting_soon(auction = %Auction{suppliers: supplier_companies, buyer: buyer_company}) do
+		buyers = buyer_company.users
+		suppliers = Enum.map(supplier_companies, fn(supplier_company) -> Enum.map(supplier_company.users, fn(user) -> user end) end)
+    |> List.flatten()
 
-    # pass buyer_company as assigns in this
 		supplier_emails =
 			Enum.map(suppliers, fn(supplier) ->
 				base_email(supplier)

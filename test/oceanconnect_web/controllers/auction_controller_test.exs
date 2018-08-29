@@ -195,12 +195,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects if auction is in open or decision state", %{conn: conn, auction: auction} do
-      {:ok, _pid} =
-        start_supervised(
-          {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
-        )
-
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
       Auctions.start_auction(auction)
       conn = get(conn, auction_path(conn, :edit, auction))
       assert redirected_to(conn, 302) == "/auctions"
@@ -226,12 +221,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "redirects if auction in open or decision state", %{conn: conn, auction: auction} do
-      {:ok, _pid} =
-        start_supervised(
-          {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
-        )
-
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
       Auctions.start_auction(auction)
       conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
       assert redirected_to(conn, 302) == "/auctions"
@@ -262,12 +252,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
   describe "auction log" do
     setup(%{auction: auction}) do
-      {:ok, _pid} =
-        start_supervised(
-          {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
-        )
-
+      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
       :ok
     end
 

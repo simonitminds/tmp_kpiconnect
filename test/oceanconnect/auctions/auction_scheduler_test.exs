@@ -11,12 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
       |> DateTime.from_naive!("Etc/UTC")
 
     auction = insert(:auction, scheduled_start: start)
-
-    {:ok, _pid} =
-      start_supervised(
-        {AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler]}}}
-      )
-
+    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler]}}})
     {:ok, %{auction: auction}}
   end
 
