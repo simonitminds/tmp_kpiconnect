@@ -13,7 +13,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   end
 
   test "canceling an auction", %{auctions: [auction | _rest], buyer: buyer} do
-    auction = auction |> Oceanconnect.Auctions.fully_loaded
+    auction = auction |> Oceanconnect.Auctions.fully_loaded()
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     login_user(buyer)
     AuctionIndexPage.visit()
@@ -24,7 +24,7 @@ defmodule Oceanconnect.AuctionIndexTest do
 
   describe "buyer login" do
     setup %{auctions: auctions, buyer: buyer} do
-      auction = auctions |> hd |> Oceanconnect.Auctions.fully_loaded
+      auction = auctions |> hd |> Oceanconnect.Auctions.fully_loaded()
 
       {:ok, _pid} =
         start_supervised(
@@ -70,7 +70,7 @@ defmodule Oceanconnect.AuctionIndexTest do
     setup %{auctions: auctions, buyer: buyer} do
       admin_company = insert(:company)
       admin = insert(:user, company: admin_company, is_admin: true)
-      auction = auctions |> hd |> Oceanconnect.Auctions.fully_loaded
+      auction = auctions |> hd |> Oceanconnect.Auctions.fully_loaded()
 
       {:ok, _pid} =
         start_supervised(

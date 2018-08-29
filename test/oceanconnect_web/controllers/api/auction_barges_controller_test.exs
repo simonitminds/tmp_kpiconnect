@@ -12,7 +12,20 @@ defmodule OceanconnectWeb.Api.AuctionBargesControllerTest do
     supplier2 = insert(:user, company: supplier2_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
     auction = insert(:auction, port: port, buyer: buyer_company, suppliers: [supplier_company])
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
+
+    {:ok, _pid} =
+      start_supervised(
+        {Oceanconnect.Auctions.AuctionSupervisor,
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_event_handler,
+              :auction_scheduler
+            ]
+          }}}
+      )
+
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
 
     {:ok,

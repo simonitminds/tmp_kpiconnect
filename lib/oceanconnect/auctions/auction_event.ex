@@ -51,7 +51,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_started(auction = %Auction{id: auction_id, scheduled_start: scheduled_start}, new_state = %AuctionState{}, user) do
+  def auction_started(
+        auction = %Auction{id: auction_id, scheduled_start: scheduled_start},
+        new_state = %AuctionState{},
+        user
+      ) do
     %AuctionEvent{
       type: :auction_started,
       auction_id: auction_id,

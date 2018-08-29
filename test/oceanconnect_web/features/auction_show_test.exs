@@ -29,7 +29,8 @@ defmodule Oceanconnect.AuctionShowTest do
 
     {:ok, _pid} =
       start_supervised(
-        {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer]}}}
+        {Oceanconnect.Auctions.AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer]}}}
       )
 
     {:ok,

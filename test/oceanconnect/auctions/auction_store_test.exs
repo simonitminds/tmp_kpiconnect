@@ -8,10 +8,21 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
 
-    auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company], buyer: buyer_company)
-    |> Auctions.fully_loaded
+    auction =
+      insert(:auction,
+        duration: 1_000,
+        decision_duration: 1_000,
+        suppliers: [supplier_company, supplier2_company],
+        buyer: buyer_company
+      )
+      |> Auctions.fully_loaded()
 
-    {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}})
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+      )
+
     on_exit(fn ->
       case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
         [] ->

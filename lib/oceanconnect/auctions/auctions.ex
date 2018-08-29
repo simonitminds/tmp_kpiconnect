@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
+
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionBid,
@@ -15,6 +16,7 @@ defmodule Oceanconnect.Auctions do
     Fuel,
     Barge
   }
+
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
@@ -77,7 +79,9 @@ defmodule Oceanconnect.Auctions do
   end
 
   def upcoming_notification_sent?(%Auction{id: auction_id}) do
-    Enum.any?(AuctionEventStorage.events_by_auction(auction_id), fn(event) -> event.type == :auction_upcoming_notified end)
+    Enum.any?(AuctionEventStorage.events_by_auction(auction_id), fn event ->
+      event.type == :auction_upcoming_notified
+    end)
   end
 
   defp buyer_auctions(buyer_id) do
@@ -283,7 +287,15 @@ defmodule Oceanconnect.Auctions do
   end
 
   def fully_loaded(auction = %Auction{}) do
-    fully_loaded_auction = Repo.preload(auction, [:port, [vessel: :company], :fuel, [buyer: [:users]], [suppliers: [:users]]])
+    fully_loaded_auction =
+      Repo.preload(auction, [
+        :port,
+        [vessel: :company],
+        :fuel,
+        [buyer: [:users]],
+        [suppliers: [:users]]
+      ])
+
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
 

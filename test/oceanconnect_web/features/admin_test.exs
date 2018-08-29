@@ -20,7 +20,8 @@ defmodule Oceanconnect.AdminTest do
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
         duration: 600_000
-      ) |> Auctions.fully_loaded
+      )
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(

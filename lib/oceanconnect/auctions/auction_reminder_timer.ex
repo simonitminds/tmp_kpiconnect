@@ -1,7 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   use GenServer
 
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionCache, AuctionNotifier}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionEvent,
+    AuctionEventStore,
+    AuctionCache,
+    AuctionNotifier
+  }
 
   @registry_name :auction_reminder_timers_registry
 
@@ -19,11 +25,16 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   end
 
   def init(auction = %Auction{id: auction_id, scheduled_start: start_time}) do
-    if Enum.any?(AuctionEventStore.event_list(auction_id), fn(event) -> event.type == :upcoming_auction_notified end) do
+    if Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
+         event.type == :upcoming_auction_notified
+       end) do
       Process.send_after(self(), :shutdown_timer, 5_000)
       {:ok, start_time}
     else
-      duration = DateTime.to_unix(start_time, :millisecond) - DateTime.to_unix(DateTime.utc_now(), :millisecond) - 3_600_000
+      duration =
+        DateTime.to_unix(start_time, :millisecond) -
+          DateTime.to_unix(DateTime.utc_now(), :millisecond) - 3_600_000
+
       Process.send_after(self(), {:remind_participants, auction}, max(0, duration))
       {:ok, start_time}
     end
@@ -32,6 +43,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   def handle_info(:shutdown_timer, state) do
     {:stop, :normal, state}
   end
+
   def handle_info({:remind_participants, %Auction{id: auction_id}}, state) do
     auction = AuctionCache.read(auction_id)
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), true)

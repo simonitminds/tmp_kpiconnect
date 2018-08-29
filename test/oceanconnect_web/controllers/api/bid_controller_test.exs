@@ -7,8 +7,23 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     supplier2_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     buyer = insert(:user)
-    auction = insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company])
-    {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
+
+    auction =
+      insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company])
+
+    {:ok, _pid} =
+      start_supervised(
+        {Oceanconnect.Auctions.AuctionSupervisor,
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_event_handler,
+              :auction_scheduler
+            ]
+          }}}
+      )
+
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
     bid_params = %{"bid" => %{"amount" => "3.50", "min_amount" => ""}}
 

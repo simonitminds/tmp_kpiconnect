@@ -114,7 +114,14 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
       auction_with_participants = Auctions.with_participants(auction)
-      auction_attrs = auction_with_participants |> Map.take([:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers, :buyer_id] ++ Map.keys(@valid_attrs))
+
+      auction_attrs =
+        auction_with_participants
+        |> Map.take(
+          [:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers, :buyer_id] ++
+            Map.keys(@valid_attrs)
+        )
+
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
       # create_auction has a side effect of starting the AuctionsSupervisor, thus the sleep
       :timer.sleep(200)
@@ -177,10 +184,16 @@ defmodule Oceanconnect.AuctionsTest do
       buyer_company = insert(:company)
       buyer = insert(:user, company: buyer_company)
 
-      auction = insert(:auction, duration: 1_000, decision_duration: 1_000, buyer: buyer_company)
-      |> Auctions.fully_loaded
+      auction =
+        insert(:auction, duration: 1_000, decision_duration: 1_000, buyer: buyer_company)
+        |> Auctions.fully_loaded()
 
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}})
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
+
       {:ok, %{auction: auction, buyer: buyer}}
     end
 
@@ -198,10 +211,20 @@ defmodule Oceanconnect.AuctionsTest do
       supplier2_company = insert(:company)
       buyer_company = insert(:company, is_supplier: false)
 
-      auction = insert(:auction, duration: 1_000, decision_duration: 1_000, suppliers: [supplier_company, supplier2_company], buyer: buyer_company)
-      |> Auctions.fully_loaded
+      auction =
+        insert(:auction,
+          duration: 1_000,
+          decision_duration: 1_000,
+          suppliers: [supplier_company, supplier2_company],
+          buyer: buyer_company
+        )
+        |> Auctions.fully_loaded()
 
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}})
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
 
       {:ok, %{auction: auction}}
     end
@@ -232,10 +255,24 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       buyer_company = insert(:company, is_supplier: false)
-      auction = insert(:auction, suppliers: [supplier_company], buyer: buyer_company)
-      |> Auctions.fully_loaded
 
-      {:ok, _pid} = start_supervised({Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler, :auction_scheduler]}}})
+      auction =
+        insert(:auction, suppliers: [supplier_company], buyer: buyer_company)
+        |> Auctions.fully_loaded()
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
+        )
+
       Auctions.start_auction(auction)
 
       on_exit(fn ->
@@ -630,10 +667,16 @@ defmodule Oceanconnect.AuctionsTest do
       supplier_company2 = insert(:company, is_supplier: true)
       buyer_company = insert(:company, is_supplier: false)
 
-      auction = insert(:auction, suppliers: [supplier_company, supplier_company2], buyer: buyer_company)
-      |> Auctions.fully_loaded
+      auction =
+        insert(:auction, suppliers: [supplier_company, supplier_company2], buyer: buyer_company)
+        |> Auctions.fully_loaded()
 
-      {:ok, _pid} = start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}})
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
+
       {:ok, %{auction: auction, supplier: supplier_company, supplier2: supplier_company2}}
     end
 

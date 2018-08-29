@@ -33,7 +33,7 @@ defmodule Oceanconnect.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-			{:bamboo, "~> 1.0"},
+      {:bamboo, "~> 1.0"},
       {:bcrypt_elixir, "~> 1.0"},
       {:comeonin, "~> 4.0"},
       {:cowboy, "~> 1.0"},
@@ -44,11 +44,11 @@ defmodule Oceanconnect.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.1"},
-			{:hackney, "~> 1.12", override: true},
+      {:hackney, "~> 1.12", override: true},
       {:hound, "~> 1.0", only: :test},
       {:guardian, "~> 1.1"},
       {:gettext, "~> 0.11"},
-			{:scrivener_ecto, "~> 1.0"},
+      {:scrivener_ecto, "~> 1.0"},
       {:uuid, "~> 1.1"}
     ]
   end
