@@ -7,6 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
+    buyer_company = insert(:company, is_supplier: false)
 
     auction =
       insert(
