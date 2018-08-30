@@ -39,7 +39,7 @@
           Password
         <%end%>
         <div class="control">
-          <%= text_input f, :password, class: "input qa-admin-user-password" %>
+          <%= password_input f, :password, class: "input qa-admin-user-password" %>
           <%= error_tag f, :password %>
         </div>
       </div>
