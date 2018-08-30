@@ -25,6 +25,7 @@ defmodule Oceanconnect.Accounts.User do
     |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
     |> validate_required([:email, :password, :company_id])
     |> foreign_key_constraint(:company_id)
+    |> upcase_email()
     |> unique_constraint(:email)
     |> put_pass_hash()
   end
@@ -45,8 +46,12 @@ defmodule Oceanconnect.Accounts.User do
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
-
   defp put_pass_hash(changeset), do: changeset
+
+  defp upcase_email(%Ecto.Changeset{valid?: true, changes: %{email: email}} = changeset) do
+    change(changeset, %{email: String.upcase(email)})
+  end
+  defp upcase_email(changeset), do: changeset
 
   def select_active(query \\ User) do
     from(
