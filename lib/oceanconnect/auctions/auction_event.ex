@@ -42,6 +42,15 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
+  def upcoming_auction_notified(auction = %Auction{id: auction_id}) do
+    %AuctionEvent{
+      type: :upcoming_auction_notified,
+      auction_id: auction_id,
+      data: auction,
+      time_entered: DateTime.utc_now()
+    }
+  end
+
   def auction_started(
         auction = %Auction{id: auction_id, scheduled_start: scheduled_start},
         new_state = %AuctionState{},
@@ -87,7 +96,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_canceled(auction = %Auction{id: auction_id}, new_state = %AuctionState{}, user) do
+  def auction_canceled(%Auction{id: auction_id}, new_state = %AuctionState{}, user) do
     %AuctionEvent{
       type: :auction_canceled,
       auction_id: auction_id,

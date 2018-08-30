@@ -29,7 +29,8 @@ defmodule Oceanconnect.AuctionShowTest do
 
     {:ok, _pid} =
       start_supervised(
-        {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: []}}}
+        {Oceanconnect.Auctions.AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer]}}}
       )
 
     {:ok,
@@ -121,6 +122,7 @@ defmodule Oceanconnect.AuctionShowTest do
     setup %{auction: auction, supplier: supplier} do
       Auctions.start_auction(auction)
       login_user(supplier)
+      :timer.sleep(500)
       AuctionShowPage.visit(auction.id)
       :ok
     end
@@ -243,6 +245,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_bid(bid.id)
       AuctionShowPage.accept_bid()
+      :timer.sleep(200)
       assert AuctionShowPage.auction_status() == "CLOSED"
       assert has_css?(".qa-winning-solution-#{bid.id}")
 
@@ -270,10 +273,12 @@ defmodule Oceanconnect.AuctionShowTest do
       supplier3: supplier3
     } do
       login_user(buyer)
+      :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_bid(bid2.id)
       AuctionShowPage.enter_bid_comment("Screw you!")
       AuctionShowPage.accept_bid()
+      :timer.sleep(500)
 
       assert AuctionShowPage.auction_status() == "CLOSED"
       assert has_css?(".qa-winning-solution-#{bid2.id}")
@@ -371,10 +376,12 @@ defmodule Oceanconnect.AuctionShowTest do
     barge =
       insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
-    login_user(supplier)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(500)
-    AuctionShowPage.submit_barge(barge)
+    in_browser_session(:supplier, fn ->
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(500)
+      AuctionShowPage.submit_barge(barge)
+    end)
 
     in_browser_session(:supplier2, fn ->
       login_user(supplier2)
@@ -407,10 +414,12 @@ defmodule Oceanconnect.AuctionShowTest do
     barge =
       insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
-    login_user(supplier)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(200)
-    AuctionShowPage.submit_barge(barge)
+    in_browser_session(:supplier, fn ->
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(500)
+      AuctionShowPage.submit_barge(barge)
+    end)
 
     in_browser_session(:supplier2, fn ->
       login_user(supplier2)

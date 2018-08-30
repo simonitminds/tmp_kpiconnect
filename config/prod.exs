@@ -69,3 +69,6 @@ config :oceanconnect, Oceanconnect.Repo,
 #
 #     config :oceanconnect, OceanconnectWeb.Endpoint, server: true
 #
+if File.exists?("config/prod.secret.exs") do
+  import_config "prod.secret.exs"
+end

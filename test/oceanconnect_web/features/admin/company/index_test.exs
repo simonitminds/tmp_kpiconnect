@@ -7,19 +7,26 @@ defmodule Oceanconnect.Admin.Company.IndexTest do
   setup do
     admin_user = insert(:user, %{is_admin: true})
     user = insert(:user)
-    companies = insert_list(2, :company)
-    {:ok, admin_user: admin_user, user: user, companies: companies}
+    active_company = insert(:company, is_active: true)
+    inactive_company = insert(:company, is_active: false)
+
+    {:ok,
+     admin_user: admin_user,
+     user: user,
+     active_company: active_company,
+     inactive_company: inactive_company}
   end
 
   describe "companies" do
     test "renders the company index page for admins", %{
       admin_user: admin_user,
-      companies: companies
+      active_company: active_company,
+      inactive_company: inactive_company
     } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
-      assert IndexPage.has_companies?(companies)
+      assert IndexPage.has_companies?([active_company, inactive_company])
     end
 
     test "company index page does not render for regular companies", %{user: user} do
@@ -28,26 +35,32 @@ defmodule Oceanconnect.Admin.Company.IndexTest do
       refute IndexPage.is_current_path?()
     end
 
-    test "admin can deactivate a company grade", %{admin_user: admin_user, companies: companies} do
+    test "admin can deactivate a company", %{
+      admin_user: admin_user,
+      active_company: active_company,
+      inactive_company: inactive_company
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
-      assert IndexPage.has_companies?(companies)
+      assert IndexPage.has_companies?([active_company, inactive_company])
 
-      [company, _] = companies
-      IndexPage.deactivate_company(company)
-      assert IndexPage.is_company_inactive?(company)
+      IndexPage.deactivate_company(active_company)
+      assert IndexPage.is_company_inactive?(active_company)
     end
 
-    test "admin can activate a company grade", %{admin_user: admin_user, companies: companies} do
+    test "admin can activate a company", %{
+      admin_user: admin_user,
+      active_company: active_company,
+      inactive_company: inactive_company
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
-      assert IndexPage.has_companies?(companies)
+      assert IndexPage.has_companies?([active_company, inactive_company])
 
-      [company, _] = companies
-      IndexPage.deactivate_company(company)
-      assert IndexPage.is_company_active?(company)
+      IndexPage.activate_company(inactive_company)
+      assert IndexPage.is_company_active?(inactive_company)
     end
   end
 end

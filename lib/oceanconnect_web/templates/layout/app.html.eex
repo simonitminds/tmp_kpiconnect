@@ -55,6 +55,7 @@
                 <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
                 <div class="navbar-dropdown">
                   <a href="/auctions" class="navbar-item">Current Auctions</a>
+                  <%# TODO: Remove this when done designing emails %>
                   <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
                     <a href="/admin/vessels" class="navbar-item">Admin Panel</a>
                   <% end %>

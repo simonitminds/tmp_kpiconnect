@@ -6,19 +6,29 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
+    buyer_company = insert(:company, is_supplier: false)
 
     auction =
       insert(
         :auction,
         duration: 1_000,
         decision_duration: 1_000,
-        suppliers: [supplier_company, supplier2_company]
+        suppliers: [supplier_company, supplier2_company],
+        buyer: buyer_company
       )
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_event_handler,
+              :auction_scheduler
+            ]
+          }}}
       )
 
     {:ok, %{auction: auction, supplier: supplier_company}}
@@ -40,14 +50,23 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction
     } do
       auction_attrs =
-        auction |> Map.take([:scheduled_start, :eta, :fuel_id, :port_id, :vessel_id, :suppliers])
+        auction
+        |> Map.take([
+          :scheduled_start,
+          :eta,
+          :fuel_id,
+          :port_id,
+          :vessel_id,
+          :suppliers,
+          :buyer_id
+        ])
 
       {:ok, new_auction} = Auctions.create_auction(auction_attrs)
-      new_auction_id = new_auction.id
       :timer.sleep(500)
 
-      assert [%AuctionEvent{type: :auction_created, auction_id: ^new_auction_id, data: _}] =
-               AuctionEventStore.event_list(new_auction.id)
+      assert Enum.any?(AuctionEventStore.event_list(new_auction.id), fn event ->
+               event.type == :auction_created && event.auction_id == new_auction.id
+             end)
     end
 
     test "update_auction/2 adds an auction_updated event to the event store", %{

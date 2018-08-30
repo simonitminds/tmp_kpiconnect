@@ -14,7 +14,8 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
 
     {:ok, _pid} =
       start_supervised(
-        {AuctionSupervisor, {auction, %{exclude_children: [:auction_event_handler]}}}
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_event_handler]}}}
       )
 
     {:ok, %{auction: auction}}

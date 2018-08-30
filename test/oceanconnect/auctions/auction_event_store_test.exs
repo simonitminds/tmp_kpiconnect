@@ -14,13 +14,15 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   setup do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
+    buyer_company = insert(:company, is_supplier: false)
 
     auction =
       insert(
         :auction,
         duration: 1_000,
         decision_duration: 60_000,
-        suppliers: [supplier_company, supplier2_company]
+        suppliers: [supplier_company, supplier2_company],
+        buyer: buyer_company
       )
       |> Auctions.create_supplier_aliases()
       |> Auctions.fully_loaded()
@@ -28,7 +30,14 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_scheduler, :auction_event_handler]}}}
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_scheduler,
+              :auction_event_handler
+            ]
+          }}}
       )
 
     Oceanconnect.FakeEventStorage.FakeEventStorageCache.start_link()

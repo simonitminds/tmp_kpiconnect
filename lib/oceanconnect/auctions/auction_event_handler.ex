@@ -39,6 +39,24 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           auction_id: auction_id,
+          type: :winning_bid_selected,
+          data: %{
+            bid: %AuctionBid{
+              amount: bid_amount,
+              supplier_id: supplier_id,
+              total_price: total_price
+            }
+          }
+        },
+        state
+      ) do
+    AuctionNotifier.notify_auction_completed(bid_amount, total_price, supplier_id, auction_id)
+    {:noreply, state}
+  end
+
+  def handle_info(
+        %AuctionEvent{
+          auction_id: auction_id,
           type: _type,
           data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}
         },
@@ -47,6 +65,32 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     auction_id
     |> Auctions.AuctionCache.read()
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
+
+    {:noreply, state}
+  end
+
+  def handle_info(%AuctionEvent{type: :auction_created, data: auction = %Auction{}}, state) do
+    AuctionNotifier.notify_auction_created(auction)
+    AuctionNotifier.notify_participants(auction)
+    {:noreply, state}
+  end
+
+  def handle_info(
+        %AuctionEvent{type: :upcoming_auction_notified, data: auction = %Auction{}},
+        state
+      ) do
+    AuctionNotifier.notify_upcoming_auction(auction)
+    {:noreply, state}
+  end
+
+  def handle_info(
+        %AuctionEvent{auction_id: auction_id, type: :auction_canceled, data: %AuctionState{}},
+        state
+      ) do
+    auction_id
+    |> Auctions.get_auction!()
+    |> Auctions.fully_loaded()
+    |> AuctionNotifier.notify_auction_canceled()
 
     {:noreply, state}
   end

@@ -59,4 +59,21 @@ defmodule Oceanconnect.Accounts.User do
       where: q.is_active == true
     )
   end
+
+  def for_companies(company_ids) when is_list(company_ids) do
+    from(
+      u in User,
+      where: u.company_id in ^company_ids
+    )
+  end
+
+  def full_name(%User{first_name: first_name, last_name: last_name}) do
+    "#{first_name} #{last_name}"
+  end
+
+  defimpl Bamboo.Formatter, for: User do
+    def format_email_address(user = %User{email: email}, opts \\ []) do
+      {User.full_name(user), email}
+    end
+  end
 end

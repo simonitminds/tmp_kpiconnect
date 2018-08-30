@@ -22,9 +22,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier3_company]
       )
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
-      start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+      )
 
     expected_payload = %{
       time_remaining: auction.duration,
@@ -85,7 +89,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           :fuel_quantity,
           :port_id,
           :vessel_id,
-          :suppliers
+          :suppliers,
+          :buyer_id
         ])
 
       {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)

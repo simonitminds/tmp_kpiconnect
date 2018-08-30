@@ -12,7 +12,14 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_event_handler,
+              :auction_scheduler
+            ]
+          }}}
       )
 
     {:ok, %{auction: auction}}

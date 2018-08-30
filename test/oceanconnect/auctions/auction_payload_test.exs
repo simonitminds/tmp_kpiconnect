@@ -9,11 +9,15 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       buyer_company = insert(:company, name: "FooCompany")
       supplier = insert(:company, name: "BarCompany")
       supplier_2 = insert(:company, name: "BazCompany")
-      auction = insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
+
+      auction =
+        insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
+        |> Auctions.fully_loaded()
 
       {:ok, _pid} =
         start_supervised(
-          {AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}}
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
         )
 
       Auctions.start_auction(auction)

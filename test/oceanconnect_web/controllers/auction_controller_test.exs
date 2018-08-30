@@ -198,7 +198,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+           {auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
         )
 
       Auctions.start_auction(auction)
@@ -229,7 +236,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+           {auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
         )
 
       Auctions.start_auction(auction)
@@ -265,7 +279,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+           {auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
         )
 
       :ok

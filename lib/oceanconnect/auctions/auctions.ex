@@ -7,6 +7,7 @@ defmodule Oceanconnect.Auctions do
     AuctionBid,
     AuctionCache,
     AuctionEvent,
+    AuctionEventStorage,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
@@ -69,6 +70,18 @@ defmodule Oceanconnect.Auctions do
   def list_participating_auctions(company_id) do
     (buyer_auctions(company_id) ++ supplier_auctions(company_id))
     |> Enum.uniq_by(& &1.id)
+  end
+
+  def list_upcoming_auctions(time_frame) do
+    Auction
+    |> Auction.select_upcoming(time_frame)
+    |> Repo.all()
+  end
+
+  def upcoming_notification_sent?(%Auction{id: auction_id}) do
+    Enum.any?(AuctionEventStorage.events_by_auction(auction_id), fn event ->
+      event.type == :auction_upcoming_notified
+    end)
   end
 
   defp buyer_auctions(buyer_id) do
@@ -275,7 +288,13 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(auction = %Auction{}) do
     fully_loaded_auction =
-      Repo.preload(auction, [:port, [vessel: :company], :fuel, :buyer, :suppliers])
+      Repo.preload(auction, [
+        :port,
+        [vessel: :company],
+        :fuel,
+        [buyer: [:users]],
+        [suppliers: [:users]]
+      ])
 
     Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end

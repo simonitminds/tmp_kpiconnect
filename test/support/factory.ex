@@ -8,7 +8,8 @@ defmodule Oceanconnect.Factory do
 
   def company_factory() do
     %Oceanconnect.Accounts.Company{
-      name: sequence(:name, &"Company-#{&1}")
+      name: sequence(:name, &"Company-#{&1}"),
+      contact_name: sequence(:contact_name, &"test-#{&1}")
     }
   end
 

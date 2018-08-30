@@ -13,11 +13,16 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
         :auction,
         duration: 1_000,
         decision_duration: 1_000,
-        suppliers: [supplier_company, supplier2_company]
+        suppliers: [supplier_company, supplier2_company],
+        buyer: buyer_company
       )
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
-      start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+      )
 
     on_exit(fn ->
       case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
@@ -42,6 +47,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> Map.take([:eta, :port_id, :vessel_id])
 
     {:ok, auction} = Auctions.create_auction(auction_attrs)
+    # create_action has the side effect of starting the AuctionsSupervisor, thus the sleep
+    :timer.sleep(100)
 
     assert :draft == Auctions.get_auction_state!(auction).status
   end
@@ -52,6 +59,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> Map.drop([:__struct__, :id, :buyer, :fuel, :port, :suppliers, :vessel])
 
     {:ok, auction} = Auctions.create_auction(auction_attrs)
+    # create_action has the side effect of starting the AuctionsSupervisor, thus the sleep
+    :timer.sleep(100)
 
     assert :pending == Auctions.get_auction_state!(auction).status
   end

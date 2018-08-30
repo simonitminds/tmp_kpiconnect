@@ -164,6 +164,13 @@ defmodule Oceanconnect.Accounts do
     |> Repo.all()
   end
 
+  def users_for_companies(companies) when is_list(companies) do
+    Enum.map(companies, & &1.id)
+    |> User.for_companies()
+    |> User.select_active()
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single company.
 

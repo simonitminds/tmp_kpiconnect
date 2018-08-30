@@ -16,7 +16,14 @@ defmodule OceanconnectWeb.Api.AuctionBargesControllerTest do
     {:ok, _pid} =
       start_supervised(
         {Oceanconnect.Auctions.AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_event_handler, :auction_scheduler]}}}
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_event_handler,
+              :auction_scheduler
+            ]
+          }}}
       )
 
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
