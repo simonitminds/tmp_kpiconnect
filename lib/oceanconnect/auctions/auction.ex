@@ -158,7 +158,8 @@ defmodule Oceanconnect.Auctions.Auction do
   def select_upcoming(query \\ Auction, time_frame) do
     current_time = DateTime.utc_now()
 
-    from(q in query,
+    from(
+      q in query,
       where:
         fragment("? - ?", q.scheduled_start, ^current_time) >= 0 and
           fragment("? - ?", q.sheduled_start, ^current_time) <= ^time_frame

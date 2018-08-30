@@ -14,7 +14,8 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier = insert(:user, company: supplier_company)
 
     auction =
-      insert(:auction,
+      insert(
+        :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
         duration: 600_000

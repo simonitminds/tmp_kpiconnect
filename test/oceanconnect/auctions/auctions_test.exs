@@ -212,7 +212,8 @@ defmodule Oceanconnect.AuctionsTest do
       buyer_company = insert(:company, is_supplier: false)
 
       auction =
-        insert(:auction,
+        insert(
+          :auction,
           duration: 1_000,
           decision_duration: 1_000,
           suppliers: [supplier_company, supplier2_company],

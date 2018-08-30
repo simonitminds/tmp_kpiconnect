@@ -22,7 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimerTest do
     end)
 
     auction =
-      insert(:auction,
+      insert(
+        :auction,
         scheduled_start: test_start_time,
         suppliers: supplier_companies,
         buyer: buyer_company

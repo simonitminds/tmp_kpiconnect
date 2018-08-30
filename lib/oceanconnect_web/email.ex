@@ -13,7 +13,8 @@ defmodule OceanconnectWeb.Email do
     Enum.map(suppliers, fn supplier ->
       base_email(supplier)
       |> subject("You have been invited to an auction.")
-      |> render("auction_invitation.html",
+      |> render(
+        "auction_invitation.html",
         supplier: supplier,
         auction: auction,
         buyer_company: buyer_company
@@ -36,7 +37,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(suppliers, fn supplier ->
         base_email(supplier)
         |> subject("Auction starting soon.")
-        |> render("auction_starting.html",
+        |> render(
+          "auction_starting.html",
           user: supplier,
           auction: auction,
           buyer_company: buyer_company
@@ -47,7 +49,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(buyers, fn buyer ->
         base_email(buyer)
         |> subject("Your auction is starting soon.")
-        |> render("auction_starting.html",
+        |> render(
+          "auction_starting.html",
           user: buyer,
           auction: auction,
           buyer_company: buyer_company
@@ -71,7 +74,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(suppliers, fn supplier ->
         base_email(supplier)
         |> subject("You have won the auction!")
-        |> render("auction_completion.html",
+        |> render(
+          "auction_completion.html",
           user: supplier,
           winning_supplier_company: winning_supplier_company,
           auction: auction,
@@ -85,7 +89,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(buyers, fn buyer ->
         base_email(buyer)
         |> subject("Your auction has closed.")
-        |> render("auction_completion.html",
+        |> render(
+          "auction_completion.html",
           user: buyer,
           winning_supplier_company: winning_supplier_company,
           auction: auction,
@@ -107,7 +112,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(suppliers, fn supplier ->
         base_email(supplier)
         |> subject("Auction canceled.")
-        |> render("auction_cancellation.html",
+        |> render(
+          "auction_cancellation.html",
           user: supplier,
           auction: auction,
           buyer_company: buyer_company
@@ -118,7 +124,8 @@ defmodule OceanconnectWeb.Email do
       Enum.map(buyers, fn buyer ->
         base_email(buyer)
         |> subject("Your auction has been canceled.")
-        |> render("auction_cancellation.html",
+        |> render(
+          "auction_cancellation.html",
           user: buyer,
           auction: auction,
           buyer_company: buyer_company

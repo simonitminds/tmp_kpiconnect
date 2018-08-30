@@ -49,13 +49,15 @@ defmodule Oceanconnect.Accounts.User do
   defp put_pass_hash(changeset), do: changeset
 
   def select_active(query \\ User) do
-    from(q in query,
+    from(
+      q in query,
       where: q.is_active == true
     )
   end
 
   def for_companies(company_ids) when is_list(company_ids) do
-    from(u in User,
+    from(
+      u in User,
       where: u.company_id in ^company_ids
     )
   end

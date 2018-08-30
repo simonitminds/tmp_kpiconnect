@@ -15,7 +15,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     non_participant = insert(:user, company: non_participant_company)
 
     auction =
-      insert(:auction,
+      insert(
+        :auction,
         buyer: buyer_company,
         duration: 1_000,
         decision_duration: 1_000,
