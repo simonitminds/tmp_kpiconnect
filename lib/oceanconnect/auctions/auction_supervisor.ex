@@ -28,8 +28,8 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       auction_event_store: {AuctionEventStore, auction_id},
       auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction},
-      auction_reminder_timer:
-        Supervisor.child_spec({AuctionReminderTimer, auction}, restart: :transient)
+      # auction_reminder_timer:
+      #   Supervisor.child_spec({AuctionReminderTimer, auction}, restart: :transient)
     }
 
     children = exclude_children(all_children, options)
