@@ -32,6 +32,10 @@ config :oceanconnect, Oceanconnect.Repo,
   database: "oceanconnect_prod",
   pool_size: 15
 
+config :oceanconnect, OceanconnectWeb.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY")
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
@@ -69,6 +73,6 @@ config :oceanconnect, Oceanconnect.Repo,
 #
 #     config :oceanconnect, OceanconnectWeb.Endpoint, server: true
 #
-if File.exists?("config/prod.secret.exs") do
-  import_config "prod.secret.exs"
-end
+# if File.exists?("config/prod.secret.exs") do
+#   import_config "prod.secret.exs"
+# end
