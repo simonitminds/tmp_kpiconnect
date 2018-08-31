@@ -20,7 +20,7 @@ defmodule Oceanconnect.Mixfile do
   def application do
     [
       mod: {Oceanconnect.Application, []},
-      extra_applications: [:comeonin, :scrivener_ecto, :logger, :runtime_tools, :bamboo]
+      extra_applications: [:comeonin, :scrivener_ecto, :sasl, :logger, :runtime_tools, :bamboo]
     ]
   end
 
