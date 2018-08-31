@@ -63,4 +63,5 @@ config :oceanconnect, Oceanconnect.Repo,
   database: "oceanconnect_dev",
   pool_size: 10
 
-config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.LocalAdapter
+config :oceanconnect, OceanconnectWeb.Mailer,
+  adapter: Bamboo.LocalAdapter

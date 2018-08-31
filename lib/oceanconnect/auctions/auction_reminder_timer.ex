@@ -44,8 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
     {:stop, :normal, state}
   end
 
-  def handle_info({:remind_participants, %Auction{id: auction_id}}, state) do
-    auction = AuctionCache.read(auction_id)
+  def handle_info({:remind_participants, auction = %Auction{id: auction_id}}, state) do
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), true)
     {:stop, :normal, state}
   end
