@@ -137,7 +137,7 @@ defmodule OceanconnectWeb.Email do
 
   defp base_email(user) do
     new_email()
-    |> cc("nbolten@oceanconnectmarine.com")
+    |> cc("nbolton@oceanconnectmarine.com")
     |> from("bunkers@oceanconnectmarine.com")
     |> to(user)
     |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
