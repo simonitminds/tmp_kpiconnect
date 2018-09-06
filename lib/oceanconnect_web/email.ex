@@ -6,6 +6,8 @@ defmodule OceanconnectWeb.Email do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.Auction
 
+  # TODO: Send out variant to buyers upon auction creation with a different subject line, drop in some control flow statements for copy
+
   def auction_invitation(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id}) do
     buyer_company = Accounts.get_company!(buyer_id)
     suppliers = Accounts.users_for_companies(supplier_companies)
@@ -41,7 +43,8 @@ defmodule OceanconnectWeb.Email do
           "auction_starting.html",
           user: supplier,
           auction: auction,
-          buyer_company: buyer_company
+          buyer_company: buyer_company,
+          is_buyer: false
         )
       end)
 
@@ -53,7 +56,8 @@ defmodule OceanconnectWeb.Email do
           "auction_starting.html",
           user: buyer,
           auction: auction,
-          buyer_company: buyer_company
+          buyer_company: buyer_company,
+          is_buyer: true
         )
       end)
 
@@ -81,7 +85,8 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price
+          total_price: total_price,
+          is_buyer: false
         )
       end)
 
@@ -96,7 +101,8 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price
+          total_price: total_price,
+          is_buyer: true
         )
       end)
 
@@ -116,7 +122,9 @@ defmodule OceanconnectWeb.Email do
           "auction_cancellation.html",
           user: supplier,
           auction: auction,
-          buyer_company: buyer_company
+          buyer_company: buyer_company,
+          is_buyer: false
+
         )
       end)
 
@@ -128,7 +136,9 @@ defmodule OceanconnectWeb.Email do
           "auction_cancellation.html",
           user: buyer,
           auction: auction,
-          buyer_company: buyer_company
+          buyer_company: buyer_company,
+          is_buyer: true
+
         )
       end)
 
@@ -138,6 +148,7 @@ defmodule OceanconnectWeb.Email do
   defp base_email(user) do
     new_email()
     |> cc("nbolton@oceanconnectmarine.com")
+    |> bcc("lauren@gaslight.co")
     |> from("bunkers@oceanconnectmarine.com")
     |> to(user)
     |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
