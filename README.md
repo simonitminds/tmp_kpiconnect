@@ -62,15 +62,15 @@ Nanobox guides: https://guides.nanobox.io/elixir/phoenix/existing-app/
 # OCM Notes
 
        __ Users _______
-      /    |           \  
+      /    |           \
 Buyers     Suppliers       Admin
    |          |   \
- Vessels   Ports   Barges 
+ Vessels   Ports   Barges
    |        /
 Auction-----
 
 
-## Ports 
+## Ports
 -  have an associated Timezone for ETD ETA of Ship Arrival on Auction
 
 
@@ -113,5 +113,17 @@ Repo.delete_all(Company)
 
 ## From your Local node on your machine
  - `:observer.start`
- 
+
 ## Select the web.main node from the node list in observer from the toolbar menu
+
+
+## Releasing
+
+We're using Ansible to manage server provisioning and deployments. For the most part, doing a new deploy involves:
+
+1. Log into the build server with `ssh -A deploy@oceanconnect`
+2. `cd ~/build/oceanconnect/`
+3. Run `./scripts/build-release.sh` to build the new release binary
+4. Deploy with `./scripts/deploy-local.sh`
+
+New users will need to add their account information to `ansible/inventory/group_vars/all/users/yml` before they will be able to access the servers.

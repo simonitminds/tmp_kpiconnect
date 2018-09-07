@@ -24,17 +24,11 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :debug,  handle_sasl_reports: true
 
-config :oceanconnect, Oceanconnect.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: System.get_env("DATA_DB_USER"),
-  password: System.get_env("DATA_DB_PASS"),
-  hostname: System.get_env("DATA_DB_HOST"),
-  database: "oceanconnect_prod",
-  pool_size: 15
-
 config :oceanconnect, OceanconnectWeb.Mailer,
   adapter: Bamboo.SendGridAdapter,
   api_key: System.get_env("SENDGRID_API_KEY")
+
+import_config "prod.secret.exs"
 
 # ## SSL Support
 #
