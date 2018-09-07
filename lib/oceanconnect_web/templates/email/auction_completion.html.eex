@@ -1,9 +1,9 @@
 <p style='font-family: "Arial";'><b>Dear <%= OceanconnectWeb.EmailView.full_name(@user) %>,</b></p>
 <br>
 <%= if @is_buyer == false do %>
-  <p style='font-family: "Arial";'><b><%= @buyer_company.name %></b> has accepted your bid of <b>$<%= @bid_amount %></b> per unit for the auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
+  <p style='font-family: "Arial";'><b><%= @buyer_company.name %></b> has accepted your bid for the auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
 <% else %>
-  <p style='font-family: "Arial";'>You have accepted the winning bid of <b>$<%= @bid_amount %></b> per unit from <b><%= @winning_supplier_company.name %></b> for your auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
+  <p style='font-family: "Arial";'>You have accepted the winning bid from <b><%= @winning_supplier_company.name %></b> for your auction with the ID <%= @auction.id %>. Please review the completed auction information listed below:</p>
 <% end %>
 <br>
 <table style="background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: 'Arial';">
