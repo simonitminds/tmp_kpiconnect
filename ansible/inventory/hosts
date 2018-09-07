@@ -1,0 +1,18 @@
+[web-servers]
+oceanconnect
+
+[build-servers]
+oceanconnect
+
+[db-servers]
+oceanconnect
+
+[py3-hosts]
+oceanconnect
+
+[local]
+localhost ansible_sudo=false
+
+[web-servers:vars]
+ansible_python_interpreter=/usr/bin/python3
+
