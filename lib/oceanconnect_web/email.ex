@@ -6,8 +6,6 @@ defmodule OceanconnectWeb.Email do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.Auction
 
-  # TODO: Send out variant to buyers upon auction creation with a different subject line, drop in some control flow statements for copy
-
   def auction_invitation(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id, vessel: vessel, port: port}) do
     buyer_company = Accounts.get_company!(buyer_id)
     suppliers = Accounts.users_for_companies(supplier_companies)
