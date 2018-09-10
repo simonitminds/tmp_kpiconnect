@@ -1,14 +1,14 @@
 [web-servers]
-oceanconnect
+206.189.19.216
 
 [build-servers]
-oceanconnect
+206.189.19.216
 
 [db-servers]
-oceanconnect
+206.189.19.216
 
 [py3-hosts]
-oceanconnect
+206.189.19.216
 
 [local]
 localhost ansible_sudo=false
