@@ -29,6 +29,8 @@ defmodule Oceanconnect.AuctionIndexPage do
     find_element(:class, "qa-auction-#{auction.id}")
     |> find_within_element(:class, "qa-auction-cancel")
     |> click
+
+    Hound.Helpers.Dialog.accept_dialog()
   end
 
   def auction_is_status?(auction, status) do
