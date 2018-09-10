@@ -28,8 +28,6 @@ config :oceanconnect, OceanconnectWeb.Mailer,
   adapter: Bamboo.SendGridAdapter,
   api_key: System.get_env("SENDGRID_API_KEY")
 
-import_config "prod.secret.exs"
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
@@ -65,8 +63,8 @@ import_config "prod.secret.exs"
 # Alternatively, you can configure exactly which server to
 # start per endpoint:
 #
-#     config :oceanconnect, OceanconnectWeb.Endpoint, server: true
-#
-# if File.exists?("config/prod.secret.exs") do
-#   import_config "prod.secret.exs"
-# end
+config :oceanconnect, OceanconnectWeb.Endpoint, server: true
+
+if File.exists?("config/prod.secret.exs") do
+  import_config "prod.secret.exs"
+end
