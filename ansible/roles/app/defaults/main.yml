@@ -1,12 +1,12 @@
 ---
 # A unique prefix for our directories
 # This could be your organization or the overall project
-org: myorg
+org: ocm
 
 # The external name of the app, used to name directories and the systemd process
-app_name: deploy-template
+app_name: oceanconnect
 # The internal "Elixir" name of the app, used to by Distillery to name directories
-app_name_code: deploy_template
+app_name_code: oceanconnect
 # Version of the app in the release
 # app_version: "0.1.0"
 # App environment

@@ -1,7 +1,7 @@
-deploy_template.Elixir.DeployTemplateWeb.Endpoint.secret_key_base = "{{ secret_key_base }}"
+oceanconnect.Elixir.OceanconnectWeb.Endpoint.secret_key_base = "{{ secret_key_base }}"
 
-deploy_template.Elixir.DeployTemplate.Repo.adapter = Elixir.Ecto.Adapters.Postgres
-deploy_template.Elixir.DeployTemplate.Repo.username = "{{ elixir_release_name_code }}"
-deploy_template.Elixir.DeployTemplate.Repo.password = "{{ db_pass }}"
-deploy_template.Elixir.DeployTemplate.Repo.database = "{{ elixir_release_name_code }}_prod"
-deploy_template.Elixir.DeployTemplate.Repo.hostname = "{{ db_host }}"
+oceanconnect.Elixir.Oceanconnect.Repo.adapter = Elixir.Ecto.Adapters.Postgres
+oceanconnect.Elixir.Oceanconnect.Repo.username = "{{ elixir_release_name_code }}"
+oceanconnect.Elixir.Oceanconnect.Repo.password = "{{ db_pass }}"
+oceanconnect.Elixir.Oceanconnect.Repo.database = "{{ elixir_release_name_code }}_prod"
+oceanconnect.Elixir.Oceanconnect.Repo.hostname = "{{ db_host }}"
