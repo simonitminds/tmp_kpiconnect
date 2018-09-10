@@ -19,4 +19,5 @@ source "$HOME/.asdf/asdf.sh"
 
 echo "Running database setup"
 
-mix ecto.setup
+mix ecto.migrate
+mix run priv/repo/prod_seeds.exs
