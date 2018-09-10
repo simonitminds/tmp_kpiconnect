@@ -14,6 +14,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const lowestBidCount = _.get(auctionPayload, 'lowest_bids.length');
   const winningBid = _.get(auctionPayload, 'winning_bid');
 
+  const confirmCancellation = () => { return confirm('Are you sure you want to cancel this auction?') ? window.open(`/auctions/${auction.id}/cancel`) : false; };
+
   const lowestBidMessage = () => {
     if (winningBid) {
       return (
@@ -72,16 +74,14 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
               <AuctionTimeRemaining auctionPayload={auctionPayload} auctionTimer={timeRemaining} />
             </div>
             {/* End Status/Time Bubble */}
-            {/* Start Link to Auction Edit/Delete */}
-            { auctionStatus != 'open' && auctionStatus != 'decision' ?
-              <div className="has-margin-left-auto">
+            {/* Start Link to Auction Edit/Delete */}              <div className="has-margin-left-auto">
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">
                     <i className="fas fa-lg fa-edit"></i>
                   </span>
                 </a>
                 {auctionStatus != 'canceled' ?
-                  <a href={`/auctions/${auction.id}/cancel`} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
+                 <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
                   <span className="icon is-medium has-text-right">
                     <i className="fas fa-lg fa-times"></i>
                   </span>
