@@ -148,6 +148,16 @@ Here, `web-servers` and `build-servers` are groups of servers. You can also spec
 Alternatively, since we mainly run all components (web, build, and db) on a single server, you can make a new host group for your servers and provision them that way. For example, a `demo-servers` group could list the hosts for a demo instance of the app.
 
 
+### SSH errors
+
+If you get an error while running `setup-build.yml` about cloning the repository, make sure that your SSH key tied to your GitHub account is addded to the active SSH keyring running on your computer. You can check this with `ssh-add -l`. If it is not listed there, add it with `ssh-add -k <key_path>`.
+
+```bash
+ssh-add -l
+ssh-add -k ~/.ssh/some_key
+```
+
+
 
 ## Observing
 
