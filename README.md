@@ -127,3 +127,39 @@ We're using Ansible to manage server provisioning and deployments. For the most 
 4. Deploy with `./scripts/deploy-local.sh`
 
 New users will need to add their account information to `ansible/inventory/group_vars/all/users/yml` before they will be able to access the servers.
+
+
+
+## Observing
+
+Get the port numbers for the running erlang processes by SSHing into the server as the `deploy` user and running `epmd -names`. If `epmd` is not available, reshim with asdf.
+
+```bash
+# If the `epmd` command is not found
+cd ~/build/oceanconnect
+asdf reshim erlang
+
+epmd -names
+```
+
+Copy the port numbers from that command, then open up an ssh connection as the deploy user with those ports forwarded:
+
+```bash
+# Sample port numbers replaced here. 4369 is consistent, the other number is likely to change
+ssh -L 4369:localhost:4369 -L 40497:localhost:40497 deploy@oceanconnect
+```
+
+Ansible creates a `~/.erlang.cookie` file under the application user (`ocm` for our deployments). SSH in as that user and copy the content of that file as your ssh cookie.
+
+```bash
+ssh -A ocm@server-name
+cat ~/.erlang.cookie
+```
+
+Start a local observer instance with the erlang cookie of the target server:
+
+```bash
+erl -name debug@127.0.0.1 -setcookie <erlang_cookie> -hidden -run observer
+```
+
+From there, you should be able to connect to the remote node under the Nodes menu in the toolbar.
