@@ -130,6 +130,25 @@ New users will need to add their account information to `ansible/inventory/group
 
 
 
+## Provisioning new servers
+
+Ansible should make this fairly easy. If you've added the host names to `./ansible/inventory/hosts`, setup should be as simple as:
+
+```bash
+ansible-playbook -u root -v -l web-servers playbooks/setup-web.yml -D
+ansible-playbook -u root -v -l web-servers playbooks/deploy-app.yml --skip-tags deploy -D
+ansible-playbook -u root -v -l web-servers playbooks/config-web.yml -D
+ansible-playbook -u root -v -l build-servers playbooks/setup-build.yml -D
+ansible-playbook -u root -v -l build-servers playbooks/setup-db.yml -D
+ansible-playbook -u root -v -l build-servers playbooks/config-build.yml -D
+```
+
+Here, `web-servers` and `build-servers` are groups of servers. You can also specify individual servers for more control/avoiding taking down other nodes.
+
+Alternatively, since we mainly run all components (web, build, and db) on a single server, you can make a new host group for your servers and provision them that way. For example, a `demo-servers` group could list the hosts for a demo instance of the app.
+
+
+
 ## Observing
 
 Get the port numbers for the running erlang processes by SSHing into the server as the `deploy` user and running `epmd -names`. If `epmd` is not available, reshim with asdf.
