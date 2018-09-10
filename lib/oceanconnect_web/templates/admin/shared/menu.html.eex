@@ -18,5 +18,14 @@
 			<li><%= link "Users", to: admin_user_path(@conn, :index) %></li>
 			<li><%= link "Companies", to: admin_company_path(@conn, :index) %></li>
 		</ul>
+		<p class="menu-label">
+			View Email Notifications
+		</p>
+		<ul class="menu-list">
+			<li><%= link "Send Invitation Email", to: "/send_email/invitation", method: :post %></li>
+			<li><%= link "Send Starting Soon Email", to: "/send_email/upcoming", method: :post %></li>
+			<li><%= link "Send Cancellation Email", to: "/send_email/cancellation", method: :post %></li>
+			<li><%= link "Send Completion Email", to: "/send_email/completion", method: :post %></li>
+		</ul>
 	</div>
 </aside>
