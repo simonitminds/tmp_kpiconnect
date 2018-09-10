@@ -10,12 +10,18 @@ users_users:
   - user: jon
     name: "Jon Egeland"
     github: faultyserver
+  - user: st23am
+    name: "James Smith"
+    github: st23am
+  - user: cam
+    name: "Cam Carter"
+    github: cam-carter
+
 
 # Users with sudo permission who should be set up on all servers.
 # We use this for our ops team and technical managers.
 users_global_admin_users:
  - jon
+ - st23am
+ - cam
 
-# You can set project level admins with the `users_admin_users` var
-# users_admin_users:
-#   - jake
