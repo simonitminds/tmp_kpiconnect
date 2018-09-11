@@ -64,7 +64,9 @@
           <th>Company</th>
           <th>Time</th>
           <th>Bid Amount</th>
+          <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
           <th>Impersonator</th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -75,7 +77,9 @@
             <td class="qa-event-company"><%= event_company(event) %></td>
             <td><%= convert_date?(event.time_entered) %></td>
             <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>
+            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
             <td class="qa-event-bid-amount"><%= event.user && Map.get(event.user, :impersonated_by) %></td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>
