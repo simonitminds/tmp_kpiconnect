@@ -60,7 +60,7 @@ Nanobox guides: https://guides.nanobox.io/elixir/phoenix/existing-app/
 
 
 # OCM Notes
-
+```
        __ Users _______
       /    |           \
 Buyers     Suppliers       Admin
@@ -68,6 +68,7 @@ Buyers     Suppliers       Admin
  Vessels   Ports   Barges
    |        /
 Auction-----
+```
 
 
 ## Ports
@@ -75,6 +76,7 @@ Auction-----
 
 
 # Clearing All Data
+```elixir
 alias Oceanconnect.Repo
 alias Oceanconnect.Accounts
 alias Oceanconnect.Accounts.{Company, User}
@@ -94,6 +96,7 @@ Repo.delete_all(Vessel)
 Repo.delete_all(Fuel)
 Repo.delete_all(Port)
 Repo.delete_all(Company)
+```
 
 # Troubleshooting Production / Staging (Nanobox)
 
