@@ -7,8 +7,14 @@
 [db-servers]
 206.189.19.216
 
+
+[staging]
+142.93.41.168
+
+
 [py3-hosts]
 206.189.19.216
+142.93.41.168
 
 [local]
 localhost ansible_sudo=false
