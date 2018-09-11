@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.AuctionController do
 
     with %Auction{} <- auction,
          true <- current_company_id == auction.buyer_id,
-         false <- Auctions.get_auction_state!(auction).status in [:pending, :open] do
+         false <- Auctions.get_auction_state!(auction).status in [:pending, :open, :draft] do
       events =
         auction.id
         |> AuctionEventStore.event_list()
@@ -27,7 +27,18 @@ defmodule OceanconnectWeb.AuctionController do
 
       render(conn, "log.html", auction_payload: auction_payload, events: events)
     else
-      _ -> redirect(conn, to: auction_path(conn, :index))
+      _ ->
+        if(Auth.current_admin(conn)) do
+          events =
+            auction.id
+            |> AuctionEventStore.event_list()
+
+          auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+          render(conn, "log.html", auction_payload: auction_payload, events: events)
+        else
+          redirect(conn, to: auction_path(conn, :index))
+        end
     end
   end
 

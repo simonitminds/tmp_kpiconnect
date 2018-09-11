@@ -68,7 +68,8 @@ export default class AuctionShow extends React.Component {
     };
 
     const currentUser = {
-      isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id
+      isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id,
+      isAdmin: parseInt(this.props.currentUserCompanyId) === auction.buyer_id && window.isAdmin
     };
     const fuel = _.get(auction, 'fuel.name');
 
@@ -81,7 +82,7 @@ export default class AuctionShow extends React.Component {
     }
 
     const auctionLogLinkDisplay = () => {
-      if (currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open') {
+      if (currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open' || currentUser.isAdmin) {
         return <AuctionLogLink auction={auction} />;
       } else {
         return false;
