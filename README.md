@@ -203,3 +203,64 @@ erl -name debug@127.0.0.1 -setcookie <erlang_cookie> -hidden -run observer
 ```
 
 From there, you should be able to connect to the remote node under the Nodes menu in the toolbar.
+
+
+
+# OCM Notes
+
+       __ Users _______
+      /    |           \
+Buyers     Suppliers       Admin
+   |          |   \
+ Vessels   Ports   Barges
+   |        /
+Auction-----
+
+
+## Ports
+-  have an associated Timezone for ETD ETA of Ship Arrival on Auction
+
+
+# Clearing All Data
+```elixir
+alias Oceanconnect.Repo
+alias Oceanconnect.Accounts
+alias Oceanconnect.Accounts.{Company, User}
+alias Oceanconnect.Auctions
+alias Oceanconnect.Auctions.AuctionEventStorage
+alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, Fuel, Port, Vessel, Barge}
+
+Repo.delete_all(AuctionEventStorage)
+Repo.delete_all("auctions_barges")
+Repo.delete_all("company_ports")
+Repo.delete_all("company_barges")
+Repo.delete_all(AuctionSuppliers)
+Repo.delete_all(Barge)
+Repo.delete_all(Auction)
+Repo.delete_all(User)
+Repo.delete_all(Vessel)
+Repo.delete_all(Fuel)
+Repo.delete_all(Port)
+Repo.delete_all(Company)
+```
+
+# Troubleshooting Nanobox deployments (old)
+
+## Add your ssh key to nanobox and download the identity file / key from Nanobox
+ - https://dashboard.nanobox.io/apps/8bc19967-0e9d-4303-91f6-67ea36f14923/security?ci=af0b01c6-391d-4b35-a8ae-07e88b2f7d4a
+
+## Port Forward 19000 from the Docker host on Nanobox to your local host
+ - `ssh nanobox@13.90.241.202 -R 172.17.0.1:4369:127.0.0.1:4369 -R 172.17.0.1:19000:127.0.0.1:19000 -N -i ../nanobox_private_key`
+
+## Create a local node
+ - `iex --name node@172.17.0.1  --cookie nanobox --erl "-kernel inet_dist_listen_min 19000 inet_dist_listen_max 19000" -S mix`
+
+## Attach to the nanobox console
+  - `nanbox console web.main`
+  - `node-attach`
+  - `Node.connect :'node@172.17.0.1'`
+
+## From your Local node on your machine
+ - `:observer.start`
+
+## Select the web.main node from the node list in observer from the toolbar menu
