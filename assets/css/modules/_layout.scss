@@ -18,39 +18,6 @@ header {
 main {
   transition: all 0.2s ease-out;
   overflow-y: scroll;
-  //
-  // .alert + &, .alert:not(:empty) + .alert:empty + &{
-  //   top: 9.75rem;
-  //   height: calc(100vh - 9.75rem);
-  //
-  //   .body--admin & {
-  //     top: 10rem;
-  //     height: calc(100vh - 10rem);
-  //   }
-  //
-  //   @media (max-width: 768px) {
-  //     top: 9.75rem;
-  //     height: calc(100vh - 9.75rem);
-  //
-  //     &> div {
-  //       height: calc(100vh - 9.75rem);
-  //     }
-  //   }
-  // }
-  //
-  // .alert:empty + &{
-  //   top: 3.25rem;
-  //   height: calc(100vh - 3.25rem);
-  //
-  //   @media (max-width: 768px) {
-  //     top: 3.25rem;
-  //     height: calc(100vh - 3.25rem);
-  //
-  //     &> div {
-  //       height: calc(100vh - 3.25rem);
-  //     }
-  //   }
-  // }
 }
 
 .container {
@@ -64,10 +31,7 @@ main {
 // ==== SECTIONS/DIVIDERS ==== //
 
 main {
-  // position: relative;
-  // top: 3.25rem;
   width: 100vw;
-  // height: calc(100vh - 3.25rem);
   overflow-y: scroll;
   @media (max-width: 768px) {
     height: calc(100vh - 3.25rem);
@@ -76,8 +40,6 @@ main {
 
 main > div { // #auctions-app
   @media (max-width: 768px) { // Sticky header for mobile.
-    // height: calc(100vh - 3.25rem);
-    // overflow-y: hidden;
   }
 }
 
@@ -168,10 +130,6 @@ section {
 .auction-app { // Not to be confused with the ID... probably going to rename in a bit.
   overflow-y: scroll;
   height: auto;
-  // top: 0px;
-  // position: relative;
-  // display: flex;
-  // flex-direction: column;
 
   .alert:not(:empty) + main & { // Adjust the height when there's a notification in the header...
     height: calc(100vh - 89px);
