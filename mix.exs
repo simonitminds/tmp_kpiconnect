@@ -10,7 +10,19 @@ defmodule Oceanconnect.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      deploy_dir: "/opt/ocm/oceanconnect/",
+      mix_systemd: [
+        # Enable restart from flag file
+        restart_flag: true,
+        # Enable conform config file
+        conform: true,
+        # Enable chroot
+        chroot: true,
+        # Enable extra restrictions
+        paranoia: true,
+        base_path: "/opt/ocm/oceanconnect",
+      ],
     ]
   end
 
@@ -37,6 +49,7 @@ defmodule Oceanconnect.Mixfile do
       {:bcrypt_elixir, "~> 1.0"},
       {:comeonin, "~> 4.0"},
       {:cowboy, "~> 1.0"},
+      {:distillery, "~> 1.5", runtime: false},
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
