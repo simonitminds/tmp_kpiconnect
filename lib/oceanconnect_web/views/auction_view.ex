@@ -32,10 +32,24 @@ defmodule OceanconnectWeb.AuctionView do
 
   def convert_date?(_), do: "-"
 
+  def convert_event_date_time?(date_time = %{}) do
+    time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}:#{elem(date_time.microsecond, 0)}"
+    date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
+    "#{date} #{time}"
+  end
+
   def convert_event_type(type) do
     ~r/_/
     |> Regex.replace(Atom.to_string(type), " ")
     |> String.capitalize()
+  end
+
+  def convert_event_type(type, event) do
+    if type in [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]  do
+      "#{convert_event_type(type)}: #{event.data.auction_barge.barge.name}"
+    else
+      convert_event_type(type)
+    end
   end
 
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: ""
