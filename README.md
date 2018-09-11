@@ -158,6 +158,17 @@ ssh-add -k ~/.ssh/some_key
 ```
 
 
+### Updating user lists
+
+If new users join the project or old users need to be removed, you can run the `manage-users` playbook to update them on all relevant servers.
+
+```bash
+ansible-playbook -u root -v -l build-servers playbooks/manage-users.yml -D
+```
+
+It is safe to run this while the server is running and will not restart the application.
+
+
 
 ## Observing
 
