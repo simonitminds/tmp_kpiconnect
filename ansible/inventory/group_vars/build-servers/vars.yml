@@ -7,7 +7,7 @@ users_deploy_group: "{{ elixir_release_deploy_user }}"
 # App git repo
 app_repo: ssh://git@github.com/oceanconnect/oceanconnect.git
 # App Version, can be branch name, SHA-1, tag name, default to HEAD
-app_version: ansible
+# app_version: ansible
 
 # Users who can ssh into the deploy account
 # This is needed to run the build and deploy scripts

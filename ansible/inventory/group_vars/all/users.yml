@@ -16,6 +16,9 @@ users_users:
   - user: cam
     name: "Cam Carter"
     github: cam-carter
+  - user: lwoodrick
+    name: "Lauren Woodrick"
+    github: lwoodrick
 
 
 # Users with sudo permission who should be set up on all servers.
@@ -24,4 +27,5 @@ users_global_admin_users:
  - jon
  - st23am
  - cam
+ - lwoodrick
 
