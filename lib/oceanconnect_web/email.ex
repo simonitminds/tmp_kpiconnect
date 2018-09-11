@@ -123,7 +123,7 @@ defmodule OceanconnectWeb.Email do
     supplier_emails =
       Enum.map(suppliers, fn supplier ->
         base_email(supplier)
-        |> subject("Auction #{auction.id} for #{vessel_name} at #{port_name} canceled.")
+        |> subject("Auction #{auction.id} for #{vessel_name} at #{port_name} cancelled.")
         |> render(
           "auction_cancellation.html",
           user: supplier,
