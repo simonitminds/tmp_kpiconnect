@@ -8,6 +8,19 @@
 
 // Blocks
 
+.navbar--admin {
+  display: none;
+}
+
+.body--admin .navbar--admin {
+  display: block;
+  top: 3.25rem;
+  left: 0;
+  position: fixed !important;
+  right: 0;
+  z-index: 29;
+}
+
 .navbar-dropdown__admin { // Styles related to Admin/Agent Toggle
   align-self: center;
 
@@ -34,16 +47,12 @@
 }
 
 .admin-bar {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: calc(100vh - 3.25rem);
-  margin-top: 4rem;
+  // position: fixed;
+  // top: 25px;
+  width: 100%;
+  // margin-top: 4rem;
   border: 5px solid $gray-3;
 
-  main & {
-    margin-top: 0;
-  }
   &--login {
     margin-top: 2rem;
   }

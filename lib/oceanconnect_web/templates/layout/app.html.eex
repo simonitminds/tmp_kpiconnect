@@ -20,16 +20,15 @@
           <a href="/auctions" class="navbar-item">
             <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
           </a>
-          <!-- <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %> -->
-          <%# TODO: Add in actual mobile implementation of nav... %>
+        <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>
           <button class="button navbar-burger is-primary" data-target="navMenubd-example">
             <span></span>
             <span></span>
             <span></span>
           </button>
+        <% end %>
         </div>
         <div id="navMenubd-example" class="navbar-menu">
-          <%# TODO: Add links as we add additional sections (when relevant) %>
           <div class="navbar-end">
             <div class="navbar-item navbar-item--user has-text-weight-bold">
               <%= OceanconnectWeb.SessionView.current_user(@conn) %>
@@ -71,30 +70,31 @@
             <!-- <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>          --></div>
         </div>
       </nav>
+      <nav class="navbar navbar--admin">
+        <div class= "<%= "admin-bar" <> "#{ if OceanconnectWeb.SessionView.current_user_is_admin?(@conn),  do:  "",  else:  " admin-bar--no-border"}" <> "#{ if OceanconnectWeb.SessionView.is_impersonating?(@conn),  do:  " admin-bar--green-border",  else:  ""}" %>" >
+          <%= if OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
+            <div class="admin-bar__form">
+                <%= button("Return to Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "button is-outlined has-margin-left-auto") %>
+            </div>
+         <% end %>
+          <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) && !OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
+            <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
+              <label class="label">Act as User</label>
+              <div class="select">
+                <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
+              </div>
+              <%=  submit [class: "button is-outlined qa-admin-impersonate-user-submit"] do %>
+                <i class="fas fa-arrow-right"></i>
+              <%end%>
+            <% end %>
+         <% end %>
+        </div>
+      </nav>
     </header>
-
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
        <main role="main">
-         <div class= "<%= "admin-bar" <> "#{ if OceanconnectWeb.SessionView.current_user_is_admin?(@conn),  do:  "",  else:  " admin-bar--no-border"}" <> "#{ if OceanconnectWeb.SessionView.is_impersonating?(@conn),  do:  " admin-bar--green-border",  else:  ""}" %>" >
-           <%= if OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
-             <div class="admin-bar__form">
-                 <%= button("Return to Admin", to: admin_stop_impersonating_session_path(@conn, :stop_impersonating), method: "POST", class: "button is-outlined has-margin-left-auto") %>
-             </div>
-          <% end %>
-           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) && !OceanconnectWeb.SessionView.is_impersonating?(@conn) do %>
-             <%= form_for @conn, admin_impersonate_session_path(@conn, :impersonate), [class: "admin-bar__form"], fn(f) ->  %>
-               <label class="label">Act as User</label>
-               <div class="select">
-                 <%= select f, :user_id,  OceanconnectWeb.SessionView.impersonable_users(@conn), class: "qa-admin-impersonate-user" %>
-               </div>
-               <%=  submit [class: "button is-outlined qa-admin-impersonate-user-submit"] do %>
-                 <i class="fas fa-arrow-right"></i>
-               <%end%>
-             <% end %>
-          <% end %>
-          <%= render @view_module, @view_template, assigns %>
-         </div>
+         <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+         <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+         <%= render @view_module, @view_template, assigns %>
         </main>
       <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
       <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>

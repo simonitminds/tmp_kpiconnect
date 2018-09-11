@@ -27,7 +27,7 @@ const SupplierList = (props) => {
   if (selectedPort) {
     return(
       <section className="auction-info">
-        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+        <div className="container">
           <div className="content"> <fieldset> <legend className="subtitle is-4">Invited Suppliers</legend>
               <p className="has-text-weight-bold is-5 has-margin-bottom-md">{portLabel()}</p>
               <div className="invite-selector__container qa-auction-suppliers">
@@ -78,7 +78,7 @@ const SupplierList = (props) => {
   } else {
     return(
       <section className="auction-info">
-        <div className="container is-fullhd has-padding-top-lg has-padding-bottom-lg">
+        <div className="container">
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4">Invited Suppliers</legend>
