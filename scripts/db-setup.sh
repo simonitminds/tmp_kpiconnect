@@ -3,6 +3,7 @@
 # Set up db
 
 export MIX_ENV=prod
+export PORT=4004
 
 # Exit on errors
 set -e
