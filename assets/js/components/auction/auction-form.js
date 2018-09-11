@@ -59,7 +59,7 @@ const AuctionForm = (props) => {
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={auction.etd ? moment(auction.etd).utc() : ""} />
 
       <section className="auction-info"> {/* Vessel info */}
-        <div className="container is-fullhd"> <div className="content">
+        <div className="container"> <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Vessel</legend>
               <div className="field is-horizontal">
@@ -95,7 +95,7 @@ const AuctionForm = (props) => {
       </section> {/* Vessel info */}
 
       <section className="auction-info"> {/* Port info */}
-        <div className="container is-fullhd">
+        <div className="container">
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Arrival / Departure</legend>
@@ -186,7 +186,7 @@ const AuctionForm = (props) => {
                     suppliers={suppliers} />
 
       <section className="auction-info"> {/* Fuel info */}
-        <div className="container is-fullhd">
+        <div className="container">
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Fuel</legend>
@@ -234,7 +234,7 @@ const AuctionForm = (props) => {
       </section> {/* Fuel info */}
 
       <section className="auction-info"> {/* Add'l info */}
-        <div className="container is-fullhd">
+        <div className="container">
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Additional Information</legend>
@@ -254,7 +254,7 @@ const AuctionForm = (props) => {
       </section> {/* Add'l info */}
 
       <section className="auction-info"> {/* Auction details */}
-        <div className="container is-fullhd">
+        <div className="container">
           <div className="content">
             <fieldset>
               <legend className="subtitle is-4" >Auction Details</legend>

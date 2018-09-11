@@ -6,41 +6,18 @@
 
 // ======= CONTAINER ======= //
 
+header {
+  // position: fixed;
+  height: 3.25rem;
+
+  .body--admin & {
+    height: 7.25rem;
+  }
+}
+
 main {
   transition: all 0.2s ease-out;
-
-  .alert + &, .alert:not(:empty) + .alert:empty + &{
-    top: 6.25rem;
-    height: calc(100vh - 6.25rem);
-
-    .body--admin & {
-      top: 3.25rem;
-      height: calc(100vh - 3.25rem);
-    }
-
-    @media (max-width: 768px) {
-      top: 6.25rem;
-      height: calc(100vh - 6.25rem);
-
-      &> div {
-        height: calc(100vh - 6.25rem);
-      }
-    }
-  }
-
-  .alert:empty + &{
-    top: 3.25rem;
-    height: calc(100vh - 3.25rem);
-
-    @media (max-width: 768px) {
-      top: 3.25rem;
-      height: calc(100vh - 3.25rem);
-
-      &> div {
-        height: calc(100vh - 3.25rem);
-      }
-    }
-  }
+  overflow-y: scroll;
 }
 
 .container {
@@ -54,17 +31,15 @@ main {
 // ==== SECTIONS/DIVIDERS ==== //
 
 main {
-  position: relative;
-  top: 3.25rem;
   width: 100vw;
-  height: calc(100vh - 3.25rem);
   overflow-y: scroll;
+  @media (max-width: 768px) {
+    height: calc(100vh - 3.25rem);
+  }
 }
 
 main > div { // #auctions-app
   @media (max-width: 768px) { // Sticky header for mobile.
-    height: calc(100vh - 3.25rem);
-    overflow-y: hidden;
   }
 }
 
@@ -149,16 +124,12 @@ section {
 // ==== STICKY MOBILE LAYOUT ==== //
 
 #auction-app {
-
+  overflow-y: scroll;
 }
 
 .auction-app { // Not to be confused with the ID... probably going to rename in a bit.
   overflow-y: scroll;
-  height: calc(100vh - 46px);
-  top: 0px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  height: auto;
 
   .alert:not(:empty) + main & { // Adjust the height when there's a notification in the header...
     height: calc(100vh - 89px);
@@ -167,21 +138,21 @@ section {
 
   &> div:first-child {
     @media (max-width: 768px) { // Kill aesthetic top padding in layout
-      margin-top: 0 !important;
+      margin-top: 2rem !important;
     }
   }
 }
 
 .auction-app__header {
+  margin-top: 4rem;
+
   @media (max-width: 768px) {
     flex-shrink: 0;
   }
 
   &--list {
     width: 100vw !important;
-  }
-  &--form {
-    margin: 0;
+    margin-top: 4rem;
   }
 }
 
@@ -194,6 +165,16 @@ section {
 
     @media (max-width: 768px) {
       margin-top: 2rem;
+    }
+  }
+}
+
+.auction-app > .auction-app__header--show:first-child {
+  @media (max-width: 768px) {
+    margin-top: -2rem !important;
+
+    .auction-page {
+      padding-top: 2rem;
     }
   }
 }

@@ -22,7 +22,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
   }
 
   return(
-    <div className="auction-app__header">
+    <div className="auction-app__header auction-app__header--show">
       <section className="auction-page">
         <div className="container">
           <div className="has-margin-top-lg">
