@@ -142,7 +142,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       end)
       |> Enum.reject(fn {bid, new_amount} -> bid.amount == new_amount end)
       |> Enum.map(fn {bid, new_amount} ->
-        %AuctionBid{bid | amount: new_amount}
+        %AuctionBid{bid | amount: new_amount, time_entered: DateTime.utc_now()}
       end)
       |> Enum.sort_by(&{&1.amount, &1.time_entered})
 
