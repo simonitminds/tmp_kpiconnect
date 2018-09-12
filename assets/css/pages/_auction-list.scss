@@ -153,6 +153,10 @@
     &:nth-child(2) { // Throw a margin-left: auto on this for when it's the only action button.
       margin-left: auto;
     }
+
+    .auction-card__status--decision ~ &,  .auction-card__status--open ~ &, {
+      margin-left: auto;
+    }
   }
   &__link-to-auction-edit, &__link-to-auction-cancel {
     color: $gray-3;
