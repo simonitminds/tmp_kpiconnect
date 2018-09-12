@@ -21,8 +21,8 @@ defmodule Oceanconnect.Mixfile do
         chroot: true,
         # Enable extra restrictions
         paranoia: true,
-        base_path: "/opt/ocm/oceanconnect",
-      ],
+        base_path: "/opt/ocm/oceanconnect"
+      ]
     ]
   end
 

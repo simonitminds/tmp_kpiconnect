@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  def notify_auction_created(auction = %Auction{}) do
+  def notify_auction_created(auction = %Auction{id: auction_id}) do
     auction = auction |> Auctions.fully_loaded()
     invitation_emails = OceanconnectWeb.Email.auction_invitation(auction)
     invitation_emails = deliver_emails(invitation_emails)

@@ -16,7 +16,10 @@ defmodule OceanconnectWeb.EmailView do
   end
 
   def month_abbreviation(month) when month >= 1 and month <= 12 do
-    Enum.at(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], month-1)
+    Enum.at(
+      ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      month - 1
+    )
   end
 
   def convert_date?(_), do: "—"

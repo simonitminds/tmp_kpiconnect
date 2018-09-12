@@ -141,12 +141,12 @@ defmodule OceanconnectWeb.Router do
     post("/fuels/:fuel_id/activate", FuelController, :activate, as: :admin_fuel)
 
     resources("/ports", PortController, as: :admin_port)
-		post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
-		post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
+    post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
+    post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)
   end
 
   # TODO: remove this when finished designing emails
-  if Mix.env == :dev do
-    forward "/sent_emails", Bamboo.SentEmailViewerPlug
+  if Mix.env() == :dev do
+    forward("/sent_emails", Bamboo.SentEmailViewerPlug)
   end
 end

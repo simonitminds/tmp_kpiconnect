@@ -6,26 +6,39 @@ defmodule OceanconnectWeb.Email do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.Auction
 
-  def auction_invitation(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id, vessel: vessel, port: port}) do
-    buyer_company = Accounts.get_company!(buyer_id)
+  def auction_invitation(
+        auction = %Auction{
+          suppliers: supplier_companies,
+          buyer: buyer,
+          vessel: vessel,
+          port: port
+        }
+      ) do
     suppliers = Accounts.users_for_companies(supplier_companies)
     vessel_name = vessel.name
     port_name = port.name
 
     Enum.map(suppliers, fn supplier ->
       base_email(supplier)
-      |> subject("You have been invited to Auction #{auction.id} for #{vessel_name} at #{port_name}")
+      |> subject(
+        "You have been invited to Auction #{auction.id} for #{vessel_name} at #{port_name}"
+      )
       |> render(
         "auction_invitation.html",
         supplier: supplier,
         auction: auction,
-        buyer_company: buyer_company
+        buyer_company: buyer
       )
     end)
   end
 
   def auction_starting_soon(
-        auction = %Auction{suppliers: supplier_companies, buyer: buyer_company, vessel: vessel, port: port}
+        auction = %Auction{
+          suppliers: supplier_companies,
+          buyer: buyer_company,
+          vessel: vessel,
+          port: port
+        }
       ) do
     buyers = buyer_company.users
     vessel_name = vessel.name
@@ -113,7 +126,14 @@ defmodule OceanconnectWeb.Email do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
   end
 
-  def auction_canceled(auction = %Auction{suppliers: supplier_companies, buyer_id: buyer_id, vessel: vessel, port: port}) do
+  def auction_canceled(
+        auction = %Auction{
+          suppliers: supplier_companies,
+          buyer_id: buyer_id,
+          vessel: vessel,
+          port: port
+        }
+      ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies(supplier_companies)
@@ -130,7 +150,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           is_buyer: false
-
         )
       end)
 
@@ -144,7 +163,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           is_buyer: true
-
         )
       end)
 
