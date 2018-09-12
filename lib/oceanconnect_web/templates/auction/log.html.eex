@@ -96,13 +96,15 @@
         <%= for event <- @events do %>
           <tr>
             <td>
-            <strong class="qa-mobile-event-type"><%= convert_event_type(event.type) %></strong><br/>
+            <strong class="qa-mobile-event-type"><%= convert_event_type(event.type, event) %></strong><br/>
             <strong><%= event_user(event) %></strong></br>
             <strong><%= event_company(event) %><br/></strong>
             <strong><%= convert_event_date_time?(event.time_entered) %><br/></strong>
-            <strong>
-              <%= event_bid_amount(event) %>
-            </strong>
+            <strong><%= event_bid_amount(event) %><br/></strong>
+            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+              <strong<%=  event_bid_min_amount(event) %><br/></strong>
+              <strong>Impersonator: <%= event.user && Map.get(event.user, :impersonated_by) %></strong>
+            <% end %>
             </td>
           </tr>
         <% end %>
