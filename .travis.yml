@@ -1,0 +1,55 @@
+language: elixir
+elixir:
+  - 1.6.6
+otp_release:
+  - 21.0.1
+# Have to be on Trusty for chromedriver to work properly
+dist: trusty
+sudo: required
+addons:
+  chrome: stable
+  postgresql: 9.6
+# Cache build files to speed up builds a little bit.
+cache:
+  directories:
+    - _build
+    - deps
+# Don't bother cloning too many commits in the history.
+git:
+  depth: 5
+  quiet: true
+# Only run travis for commits to master, tagged releases.
+# Pull requests should always be built.
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
+
+# Chrome is installed by default, but chromedriver has to be added manually.
+before_install:
+  - export CHROMEDRIVER_VERSION=`curl -s http://chromedriver.storage.googleapis.com/LATEST_RELEASE`
+  - curl -L -O "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+  - unzip chromedriver_linux64.zip
+  - sudo chmod +x chromedriver
+  - sudo mv chromedriver /usr/local/bin
+
+install:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+  - (cd assets && npm install && node_modules/brunch/bin/brunch build --production)
+  - mix compile
+  - mix phx.digest
+
+
+before_script:
+  - export PATH=$PATH:/usr/lib/chromium-browser/
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 # give xvfb some time to start
+  - nohup chromedriver &
+  - cp config/travis.exs config/test.exs
+  - mix do ecto.create, ecto.migrate
+
+script: mix test
