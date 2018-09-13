@@ -17,6 +17,7 @@ defmodule Oceanconnect.AuctionIndexTest do
     Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
     login_user(buyer)
     AuctionIndexPage.visit()
+    :timer.sleep(500)
     AuctionIndexPage.cancel_auction(auction)
     :timer.sleep(500)
     assert AuctionIndexPage.auction_is_status?(auction, "canceled")
