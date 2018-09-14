@@ -36,9 +36,9 @@ defmodule Oceanconnect.Admin.Port.EditPage do
     end)
   end
 
-  def fill_form_element(_key, element, "select", values) do
+  def fill_form_element(_key, element, "div", values) do
     Enum.each(values, fn value ->
-      find_within_element(element, :css, "option[value='#{value.id}']")
+      find_within_element(element, :css, ".qa-admin-port-companies-#{value.id}")
       |> click
     end)
   end
@@ -50,7 +50,7 @@ defmodule Oceanconnect.Admin.Port.EditPage do
   def add_companies(companies) do
     Enum.each(companies, fn company ->
       find_element(:css, ".qa-admin-port-companies")
-      |> find_within_element(:css, "option[value='#{company.id}']")
+      |> find_within_element(:css, ".qa-admin-port-companies-#{company.id}")
       |> click
     end)
   end
@@ -58,7 +58,7 @@ defmodule Oceanconnect.Admin.Port.EditPage do
   def companies_selected?(companies) do
     Enum.each(companies, fn company ->
       find_element(:css, ".qa-admin-port-companies")
-      |> find_within_element(:css, "option[value='#{company.id}']")
+      |> find_within_element(:css, ".qa-admin-port-companies-#{company.id}")
     end)
   end
 end

@@ -29,12 +29,25 @@ defmodule OceanconnectWeb.Admin.PortController do
     render(conn, "new.html", changeset: changeset, port: port, companies: companies)
   end
 
-  def create(conn, %{"port" => port_params}) do
+  def create(conn, %{"port" => port_params = %{"companies" =>  selected_companies}}) do
     port =
       %Port{}
       |> Auctions.port_with_companies()
 
     companies = Accounts.list_active_companies()
+
+    selected_companies = selected_companies
+    |> Enum.map(fn company ->
+      {company_id, is_selected} = company
+      if is_selected == "true" do
+        company_id
+      end
+    end)
+    |> Enum.filter(fn company_id -> company_id != nil end)
+    |> Enum.map(&(&1))
+
+    port_params = port_params
+    |> Map.put("companies", selected_companies)
 
     case Auctions.create_port(port_params) do
       {:ok, _port} ->
@@ -58,12 +71,25 @@ defmodule OceanconnectWeb.Admin.PortController do
     render(conn, "edit.html", port: port, changeset: changeset, companies: companies)
   end
 
-  def update(conn, %{"id" => id, "port" => port_params}) do
+  def update(conn, %{"id" => id, "port" => port_params = %{"companies" => selected_companies}}) do
     port =
       Auctions.get_port!(id)
       |> Auctions.port_with_companies()
 
     companies = Accounts.list_active_companies()
+
+    selected_companies = selected_companies
+    |> Enum.map(fn company ->
+        {company_id, is_selected} = company
+        if is_selected == "true" do
+          company_id
+        end
+      end)
+    |> Enum.filter(fn company_id -> company_id != nil end)
+    |> Enum.map(&(&1))
+
+    port_params = port_params
+    |> Map.put("companies", selected_companies)
 
     case Auctions.update_port(port, port_params) do
       {:ok, _port} ->

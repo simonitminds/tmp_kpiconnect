@@ -22,16 +22,20 @@
     		</div>
       </div>
 
-      <div class="field">
+
+      <div class="field qa-admin-port-companies">
         <%= label f, :companies, class: "label" do %>
           Companies
         <% end %>
-        <div class="control">
-          <div class="select is-multiple">
-            <%= multiple_select f, :companies, Enum.map(@companies, &{&1.name, &1.id}), selected: Enum.map(@port.companies, &(&1.id)), class: "qa-admin-port-companies" %>
-            <%= error_tag f, :companies %>
+        <%= for company <- @companies do %>
+          <div class="control invite-selector">
+            <label class="invite-selector__checkbox">
+              <%= checkbox f, :company, class: "checkbox qa-admin-port-companies-#{company.id}", name: "port[companies][#{company.id}]" %>
+              <%= error_tag f, :company %>
+              <span class="inite-selector__label"><%= company.name %></span>
+            </label>
           </div>
-        </div>
+        <% end %>
       </div>
 
     	<div class="field has-margin-top-lg">
