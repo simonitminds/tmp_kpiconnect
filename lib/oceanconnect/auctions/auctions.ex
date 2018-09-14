@@ -422,6 +422,22 @@ defmodule Oceanconnect.Auctions do
       {:error, %Ecto.Changeset{}}
 
   """
+  def create_port(attrs = %{"companies" => company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    attrs =
+      attrs
+      |> Map.delete("companies")
+      |> Map.put("companies", companies)
+
+    %Port{}
+    |> Port.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
   def create_port(attrs \\ %{}) do
     %Port{}
     |> Port.changeset(attrs)
@@ -440,6 +456,24 @@ defmodule Oceanconnect.Auctions do
       {:error, %Ecto.Changeset{}}
 
   """
+  def update_port(%Port{} = port, attrs = %{"companies" => company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    existing_companies = port.companies
+
+    attrs =
+      attrs
+      |> Map.delete("companies")
+      |> Map.put("companies", companies ++ existing_companies)
+
+    port
+    |> Port.admin_changeset(attrs)
+    |> Repo.update()
+  end
+
   def update_port(%Port{} = port, attrs) do
     port
     |> Port.changeset(attrs)
@@ -487,10 +521,24 @@ defmodule Oceanconnect.Auctions do
     Port.changeset(port, %{})
   end
 
+  def port_with_companies(port = %Port{}) do
+    port
+    |> Repo.preload(:companies)
+  end
+
   def ports_for_company(company = %Company{}) do
     company
     |> Repo.preload(ports: :companies)
     |> Map.get(:ports)
+  end
+
+  def companies_for_port(port = %Port{}) do
+    from(c in Oceanconnect.Accounts.Company,
+      join: p in assoc(c, :ports),
+      where: p.id == ^port.id,
+      select: c
+    )
+    |> Repo.all()
   end
 
   def supplier_list_for_auction(%Port{id: id}) do

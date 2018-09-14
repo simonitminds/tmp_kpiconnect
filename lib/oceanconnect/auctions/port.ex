@@ -28,6 +28,17 @@ defmodule Oceanconnect.Auctions.Port do
     |> validate_required([:name, :country])
   end
 
+  def admin_changeset(%Port{} = port, attrs = %{"companies" => companies}) do
+    port
+    |> cast(attrs, [:name, :country, :gmt_offset, :is_active])
+    |> validate_required([:name, :country])
+    |> put_assoc(:companies, companies)
+  end
+
+  def admin_changeset(%Port{} = port, attrs) do
+    changeset(port, attrs)
+  end
+
   def suppliers_for_port_id(port_id) do
     from(
       c in Oceanconnect.Accounts.Company,
