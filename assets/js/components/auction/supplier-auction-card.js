@@ -52,7 +52,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}
-              <a href={`/auctions/${auction.id}`} className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+              <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
           </div>
         </div>

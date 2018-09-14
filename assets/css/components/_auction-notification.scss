@@ -193,3 +193,21 @@
     right: 12px;
   }
 }
+
+// Different message based on page context...
+
+.auction-notification__show-message {
+  display: block;
+  
+ .card-content__bid-status & {
+   display: none;
+ }
+}
+
+.auction-notification__card-message {
+  display: block;
+
+  .auction-lowest-bid  &{
+    display: none;
+  }
+}
