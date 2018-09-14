@@ -66,9 +66,7 @@ defmodule OceanconnectWeb.Admin.PortController do
     companies = Accounts.list_active_companies()
 
     case Auctions.update_port(port, port_params) do
-      {:ok, port} ->
-        Auctions.update_port_companies(port)
-
+      {:ok, _port} ->
         conn
         |> put_flash(:info, "Port updated successfully.")
         |> redirect(to: admin_port_path(conn, :index))
