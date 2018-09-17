@@ -66,6 +66,13 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def barge_with_no_supplier_factory() do
+    %Oceanconnect.Auctions.Barge{
+      port: build(:port),
+      name: sequence(:barge_name, &"Barge-#{&1}")
+    }
+  end
+
   def auction_barge_factory() do
     %Oceanconnect.Auctions.AuctionBarge{
       auction: build(:auction),

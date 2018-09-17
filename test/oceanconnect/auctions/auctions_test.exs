@@ -468,6 +468,20 @@ defmodule Oceanconnect.AuctionsTest do
     test "change_port/1 returns a port changeset", %{port: port} do
       assert %Ecto.Changeset{} = Auctions.change_port(port)
     end
+
+    test "port_with_companies/1 returns a port with companies", %{
+      port: port,
+      companies: companies
+    } do
+      company_ids = Enum.map(companies, fn company -> Integer.to_string(company.id) end)
+
+      assert {:ok, port} =
+               port
+               |> Auctions.port_with_companies()
+               |> Auctions.update_port(%{"companies" => company_ids})
+
+      assert port.companies == companies
+    end
   end
 
   describe "port and company relationship" do
@@ -1006,32 +1020,46 @@ defmodule Oceanconnect.AuctionsTest do
       port = insert(:port)
       barge = insert(:barge, Map.merge(@valid_attrs, %{port: port}))
       inactive_barge = insert(:barge, Map.merge(@valid_attrs_inactive, %{port: port}))
+      barge_with_no_supplier = insert(:barge, %{companies: []})
+      companies = insert_list(2, :company)
 
       {:ok,
        %{
          barge: Auctions.get_barge!(barge.id),
          inactive_barge: Auctions.get_barge!(inactive_barge.id),
-         port: Auctions.get_port!(port.id)
+         port: Auctions.get_port!(port.id),
+         barge_with_no_supplier: barge_with_no_supplier,
+         companies: companies
        }}
     end
 
-    test "list_barges/0 returns all barges", %{barge: barge, inactive_barge: inactive_barge} do
-      assert Enum.map(Auctions.list_barges(), fn b -> b.id end) == [barge.id, inactive_barge.id]
+    test "list_barges/0 returns all barges", %{
+      barge: barge,
+      inactive_barge: inactive_barge,
+      barge_with_no_supplier: barge2
+    } do
+      assert Enum.map(Auctions.list_barges(), fn b -> b.id end) == [
+               barge.id,
+               inactive_barge.id,
+               barge2.id
+             ]
     end
 
     test "list_barges/1 returns a paginated list of all barges", %{
       barge: barge,
-      inactive_barge: inactive_barge
+      inactive_barge: inactive_barge,
+      barge_with_no_supplier: barge2
     } do
       page = Auctions.list_barges(%{})
-      assert page.entries == [barge, inactive_barge]
+      assert Enum.map(page.entries, fn b -> b.id end) == [barge2.id, barge.id, inactive_barge.id]
     end
 
     test "list_active_barges/0 returns all barges marked as active", %{
       barge: barge,
-      inactive_barge: inactive_barge
+      inactive_barge: inactive_barge,
+      barge_with_no_supplier: barge2
     } do
-      assert Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [barge.id]
+      assert Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [barge.id, barge2.id]
 
       refute Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [
                barge.id,
@@ -1087,6 +1115,20 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "change_barge/1 returns a barge changeset", %{barge: barge} do
       assert %Ecto.Changeset{} = Auctions.change_barge(barge)
+    end
+
+    test "barge_with_companies/1 returns a barge with companies", %{
+      barge_with_no_supplier: barge,
+      companies: companies
+    } do
+      company_ids = Enum.map(companies, fn company -> Integer.to_string(company.id) end)
+
+      assert {:ok, barge} =
+               barge
+               |> Auctions.barge_with_companies()
+               |> Auctions.update_barge(%{"companies" => company_ids})
+
+      assert barge.companies == companies
     end
   end
 

@@ -15,7 +15,8 @@ defmodule Oceanconnect.Auctions.Port do
       :companies,
       Oceanconnect.Accounts.Company,
       join_through: "company_ports",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     )
 
     timestamps()

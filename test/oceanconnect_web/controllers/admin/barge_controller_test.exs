@@ -8,6 +8,7 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
 
   setup do
     user = insert(:user, password: "password", is_admin: "true")
+    companies = insert_list(2, :company)
 
     barge =
       insert(:barge)
@@ -17,7 +18,7 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
       build_conn()
       |> login_user(user)
 
-    {:ok, %{conn: conn, barge: barge}}
+    {:ok, %{conn: conn, barge: barge, companies: companies}}
   end
 
   describe "index" do
@@ -36,8 +37,20 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
   end
 
   describe "create barge" do
-    test "redirects to index when data is valid", %{conn: conn, barge: barge} do
-      barge_params = string_params_for(:barge, port_id: barge.port_id)
+    test "redirects to index when data is valid", %{
+      conn: conn,
+      barge: barge,
+      companies: companies
+    } do
+      company_ids = Enum.map(companies, fn company -> Integer.to_string(company.id) end)
+
+      barge_params =
+        string_params_for(:barge, port_id: barge.port_id)
+        |> Map.put(
+          "companies",
+          Enum.map(companies, fn company -> {Integer.to_string(company.id), "true"} end)
+        )
+
       conn = post(conn, admin_barge_path(conn, :create), barge: barge_params)
 
       assert redirected_to(conn) == admin_barge_path(conn, :index)

@@ -46,6 +46,21 @@
 				</div>
 			</div>
 
+      <div class="field qa-admin-barge-companies">
+        <%= label f, :companies, class: "label" do %>
+          Companies
+        <% end %>
+        <%= for company <- @companies do %>
+          <div class="control invite-selector">
+            <label class="invite-selector__checkbox">
+              <%= checkbox f, :company, class: "checkbox qa-admin-barge-companies-#{company.id}", name: "barge[companies][#{company.id}]", checked: OceanconnectWeb.Admin.BargeView.barge_has_company?(@barge, company) %>
+              <%= error_tag f, :company %>
+              <span class="invite-selector__label"><%= company.name %></span>
+            </label>
+          </div>
+        <% end %>
+      </div>
+
     	<div class="field has-margin-top-lg">
     		<div class="control">
     			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>

@@ -23,7 +23,8 @@ defmodule Oceanconnect.Accounts.Company do
       :barges,
       Oceanconnect.Auctions.Barge,
       join_through: "company_barges",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     )
 
     has_many(:users, Oceanconnect.Accounts.User, on_replace: :delete)
@@ -33,7 +34,8 @@ defmodule Oceanconnect.Accounts.Company do
       :ports,
       Oceanconnect.Auctions.Port,
       join_through: "company_ports",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     )
 
     timestamps()

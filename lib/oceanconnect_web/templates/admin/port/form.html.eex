@@ -30,9 +30,9 @@
         <%= for company <- @companies do %>
           <div class="control invite-selector">
             <label class="invite-selector__checkbox">
-              <%= checkbox f, :company, class: "checkbox qa-admin-port-companies-#{company.id}", name: "port[companies][#{company.id}]" %>
+              <%= checkbox f, :company, class: "checkbox qa-admin-port-companies-#{company.id}", name: "port[companies][#{company.id}]", checked: OceanconnectWeb.Admin.PortView.port_has_company?(@port, company) %>
               <%= error_tag f, :company %>
-              <span class="inite-selector__label"><%= company.name %></span>
+              <span class="invite-selector__label"><%= company.name %></span>
             </label>
           </div>
         <% end %>

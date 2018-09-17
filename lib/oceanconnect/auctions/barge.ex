@@ -40,6 +40,26 @@ defmodule Oceanconnect.Auctions.Barge do
     |> validate_required([:name, :port_id])
   end
 
+  def admin_changeset(%Barge{} = barge, attrs = %{"companies" => companies}) do
+    barge
+    |> cast(attrs, [
+      :name,
+      :port_id,
+      :imo_number,
+      :dwt,
+      :sire_inspection_date,
+      :sire_inspection_validity,
+      :is_active
+    ])
+    |> put_assoc(:companies, companies)
+    |> foreign_key_constraint(:port_id)
+    |> validate_required([:name, :port_id])
+  end
+
+  def admin_changeset(%Barge{} = barge, attrs) do
+    changeset(barge, attrs)
+  end
+
   def by_company(company_id) do
     from(
       b in Barge,

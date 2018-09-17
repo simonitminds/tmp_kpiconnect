@@ -2,7 +2,6 @@ defmodule OceanconnectWeb.Admin.PortControllerTest do
   use OceanconnectWeb.ConnCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Accounts
 
   @create_attrs %{name: "some name", country: "Merica"}
   @update_attrs %{name: "some updated name", country: "Merica"}
