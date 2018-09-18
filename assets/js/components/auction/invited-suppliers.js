@@ -66,7 +66,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
                 { bargeCount != 0 &&
                   <CollapsingBargeList
                     trigger="Barges"
-                    open={true}
+                    open={hasPendingBarges && true || false}
                     pendingBargeFlag = {hasPendingBarges}
                     triggerClassString="collapsible-barge-list__container__trigger"
                     classParentString="qa-open-auctions-list collapsing-barge-list__container"
