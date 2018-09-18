@@ -150,7 +150,7 @@ defmodule OceanconnectWeb.Admin.BargeController do
           barge: barge,
           changeset: changeset,
           ports: ports,
-          companies: companies
+          companies: existing_companies
         )
     end
   end

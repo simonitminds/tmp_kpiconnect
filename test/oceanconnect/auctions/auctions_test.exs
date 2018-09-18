@@ -439,7 +439,8 @@ defmodule Oceanconnect.AuctionsTest do
                Auctions.update_port(port, %{
                  "name" => update_attrs.name,
                  "country" => update_attrs.country,
-                 "companies" => company_ids
+                 "companies" => company_ids,
+                 "removed_companies" => []
                })
 
       assert %Port{} = port
@@ -478,7 +479,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:ok, port} =
                port
                |> Auctions.port_with_companies()
-               |> Auctions.update_port(%{"companies" => company_ids})
+               |> Auctions.update_port(%{"companies" => company_ids, "removed_companies" => []})
 
       assert port.companies == companies
     end
@@ -1126,7 +1127,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:ok, barge} =
                barge
                |> Auctions.barge_with_companies()
-               |> Auctions.update_barge(%{"companies" => company_ids})
+               |> Auctions.update_barge(%{"companies" => company_ids, "removed_companies" => []})
 
       assert barge.companies == companies
     end
