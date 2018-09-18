@@ -105,13 +105,13 @@ defmodule OceanconnectWeb.Admin.BargeController do
     )
   end
 
-  def update(conn, %{"id" => id, "barge" => barge_params = %{"companies" => selected_companies}}) do
+  def update(conn, %{"id" => id, "barge" => barge_params = %{"companies" => companies}}) do
     barge = Auctions.get_barge!(id) |> Auctions.barge_with_companies()
-    companies = Accounts.list_active_companies()
+    existing_companies = Accounts.list_active_companies()
     ports = Auctions.list_active_ports()
 
     selected_companies =
-      selected_companies
+      companies
       |> Enum.map(fn company ->
         {company_id, is_selected} = company
 
@@ -122,9 +122,22 @@ defmodule OceanconnectWeb.Admin.BargeController do
       |> Enum.filter(fn company_id -> company_id != nil end)
       |> Enum.map(& &1)
 
+    removed_companies =
+      companies
+      |> Enum.map(fn company ->
+      {company_id, is_selected} = company
+
+      if is_selected == "false" do
+        company_id
+      end
+      end)
+      |> Enum.filter(fn company_id -> company_id != nil end)
+      |> Enum.map(& &1)
+
     barge_params =
       barge_params
       |> Map.put("companies", selected_companies)
+      |> Map.put("removed_companies", removed_companies)
 
     case Auctions.update_barge(barge, barge_params) do
       {:ok, _barge} ->

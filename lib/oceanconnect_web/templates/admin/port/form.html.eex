@@ -31,7 +31,6 @@
           <div class="invite-selector">
             <label class="invite-selector__checkbox">
               <%= checkbox f, :company, class: "qa-admin-port-companies-#{company.id}", name: "port[companies][#{company.id}]", checked: OceanconnectWeb.Admin.PortView.port_has_company?(@port, company) %>
-              <%= error_tag f, :company %>
               <span class="invite-selector__facade"><i class="fas <%= OceanconnectWeb.Admin.PortView.port_has_company?(@port, company) && 'fa-check' || 'fa-plus'%> default-only"></i><i class="fas fa-minus hover-only"></i></span>
               <span class="invite-selector__label"><%= company.name %></span>
             </label>

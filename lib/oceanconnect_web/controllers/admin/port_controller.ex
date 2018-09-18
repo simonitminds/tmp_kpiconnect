@@ -86,25 +86,36 @@ defmodule OceanconnectWeb.Admin.PortController do
     render(conn, "edit.html", port: port, changeset: changeset, companies: companies)
   end
 
-  def update(conn, %{"id" => id, "port" => port_params = %{"companies" => selected_companies}}) do
+  def update(conn, %{"id" => id, "port" => port_params = %{"companies" => companies}}) do
     port = Auctions.get_port!(id) |> Auctions.port_with_companies()
-    companies = Accounts.list_active_companies()
+    existing_companies = Accounts.list_active_companies()
 
-    selected_companies =
-      selected_companies
-      |> Enum.map(fn company ->
-        {company_id, is_selected} = company
+    selected_companies = companies
+    |> Enum.map(fn company ->
+      {company_id, is_selected} = company
 
-        if is_selected == "true" do
-          company_id
-        end
-      end)
-      |> Enum.filter(fn company_id -> company_id != nil end)
-      |> Enum.map(& &1)
+      if is_selected == "true" do
+        company_id
+      end
+    end)
+    |> Enum.filter(fn company_id -> company_id != nil end)
+    |> Enum.map(& &1)
+
+    removed_companies = companies
+    |> Enum.map(fn company ->
+      {company_id, is_selected} = company
+
+      if is_selected == "false" do
+        company_id
+      end
+    end)
+    |> Enum.filter(fn company_id -> company_id != nil end)
+    |> Enum.map(& &1)
 
     port_params =
       port_params
       |> Map.put("companies", selected_companies)
+      |> Map.put("removed_companies", removed_companies)
 
     case Auctions.update_port(port, port_params) do
       {:ok, _port} ->
@@ -113,7 +124,7 @@ defmodule OceanconnectWeb.Admin.PortController do
         |> redirect(to: admin_port_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", port: port, changeset: changeset, companies: companies)
+        render(conn, "edit.html", port: port, changeset: changeset, companies: existing_companies)
     end
   end
 

@@ -5,7 +5,9 @@ defmodule OceanconnectWeb.Admin.BargeView do
     if Enum.any?(barge_companies, fn barge_company ->
          barge_company.id == company_id
        end) do
-      ""
+      true
+    else
+      false
     end
   end
 end
