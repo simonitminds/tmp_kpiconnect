@@ -1,6 +1,6 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge}
 
   def actual_duration(%Auction{auction_ended: nil}), do: "-"
 
@@ -33,7 +33,11 @@ defmodule OceanconnectWeb.AuctionView do
   def convert_date?(_), do: "-"
 
   def convert_event_date_time?(date_time = %{}) do
-    time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}:#{elem(date_time.microsecond, 0)}"
+    time =
+      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}:#{
+        elem(date_time.microsecond, 0)
+      }"
+
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
@@ -45,12 +49,16 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def convert_event_type(type, event) do
-    if type in [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]  do
-      "#{convert_event_type(type)}: #{event.data.auction_barge.barge.name}"
+    if type in [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted] do
+      "#{convert_event_type(type)}: #{barge_name_for_event(event)}"
     else
       convert_event_type(type)
     end
   end
+
+  def barge_name_for_event(%AuctionEvent{data: %AuctionBarge{barge: %Barge{name: name}}}),
+    do: name
+  def barge_name_for_event(_event), do: ""
 
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: ""
 
