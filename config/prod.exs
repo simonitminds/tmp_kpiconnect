@@ -24,10 +24,6 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :debug, handle_sasl_reports: true
 
-config :oceanconnect, OceanconnectWeb.Mailer,
-  adapter: Bamboo.SendGridAdapter,
-  api_key: System.get_env("SENDGRID_API_KEY")
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
