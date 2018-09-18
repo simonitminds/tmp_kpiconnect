@@ -86,6 +86,12 @@ $info: $gray-1;
   background-color: $highlight !important;
   color: $dark;
 }
+.is-borderless {
+  border: 0px solid transparent !important;
+}
+.is-shadowless {
+  box-shadow: none !important;
+}
 .is-none { // Just a casual utility to display: none
   display: none !important;
 }
