@@ -252,7 +252,7 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "you were unsuccessful in this auction"
+        assert AuctionShowPage.auction_bid_status() =~ "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 
@@ -287,7 +287,7 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier, fn ->
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "You lost the auction"
+        assert AuctionShowPage.auction_bid_status() =~ "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
         assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
