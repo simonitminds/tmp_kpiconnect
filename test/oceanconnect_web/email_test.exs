@@ -21,8 +21,10 @@ defmodule OceanconnectWeb.EmailTest do
     end)
 
     auction =
-      insert(:auction, buyer: buyer_company, suppliers: supplier_companies)
+      insert(:auction, buyer: buyer_company, suppliers: supplier_companies, fuel_quantity: 200)
       |> Auctions.fully_loaded()
+
+    winning_bid_amount = 100.00
 
     suppliers = Accounts.users_for_companies(supplier_companies)
     winning_suppliers = Accounts.users_for_companies([winning_supplier_company])
@@ -34,7 +36,8 @@ defmodule OceanconnectWeb.EmailTest do
        buyers: buyers,
        auction: auction,
        winning_supplier_company: winning_supplier_company,
-       winning_suppliers: winning_suppliers
+       winning_suppliers: winning_suppliers,
+       winning_bid_amount: winning_bid_amount
      }}
   end
 
@@ -114,10 +117,12 @@ defmodule OceanconnectWeb.EmailTest do
       winning_supplier_company: winning_supplier_company,
       buyers: buyers,
       auction: auction,
-      winning_suppliers: winning_suppliers
+      winning_suppliers: winning_suppliers,
+      winning_bid_amount: winning_bid_amount
     } do
+      total_price = winning_bid_amount * auction.fuel_quantity
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(100, 20000, winning_supplier_company, auction)
+        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction)
 
       for supplier <- winning_suppliers do
         assert Enum.any?(winning_supplier_emails, fn supplier_email ->
@@ -140,6 +145,7 @@ defmodule OceanconnectWeb.EmailTest do
         assert supplier_email.html_body =~ buyer_company.contact_name
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
         assert supplier_email.html_body =~ auction.vessel.name
+        assert supplier_email.html_body =~ "$20000.00"
       end
 
       for buyer <- buyers do
