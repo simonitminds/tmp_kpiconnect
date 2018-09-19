@@ -17,7 +17,8 @@ config :oceanconnect, Oceanconnect.Repo,
   password: System.get_env("DATA_DB_PASS") || "postgres",
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "oceanconnect_test",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool: Ecto.Adapters.SQL.Sandbox,
+  ownership_timeout: 25_000
 
 config :oceanconnect, :sql_sandbox, true
 
