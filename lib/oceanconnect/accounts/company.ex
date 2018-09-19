@@ -17,6 +17,7 @@ defmodule Oceanconnect.Accounts.Company do
     field(:mobile_phone, :string)
     field(:postal_code, :string)
     field(:is_supplier, :boolean, default: false)
+    field(:has_ocm_credit, :boolean, default: false)
     field(:is_active, :boolean, default: true)
 
     many_to_many(
