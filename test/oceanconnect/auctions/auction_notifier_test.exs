@@ -56,8 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifierTest do
     } do
       assert {:ok, emails} =
                AuctionNotifier.notify_auction_completed(
-                 100,
-                 20000,
+                 100.00,
                  winning_supplier_company.id,
                  auction.id
                )
