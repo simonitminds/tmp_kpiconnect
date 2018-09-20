@@ -385,6 +385,7 @@ defmodule Oceanconnect.AuctionShowTest do
     AuctionShowPage.approve_barge(barge, supplier.company_id)
     :timer.sleep(500)
 
+    AuctionShowPage.expand_supplier_barges(supplier.company_id)
     assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
     assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
   end
@@ -407,6 +408,7 @@ defmodule Oceanconnect.AuctionShowTest do
     AuctionShowPage.reject_barge(barge, supplier.company_id)
     :timer.sleep(500)
 
+    AuctionShowPage.expand_supplier_barges(supplier.company_id)
     assert AuctionShowPage.has_rejected_barge?(barge, supplier.company_id)
     assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
   end
