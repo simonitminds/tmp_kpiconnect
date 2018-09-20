@@ -43,14 +43,13 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           data: %{
             bid: %AuctionBid{
               amount: bid_amount,
-              supplier_id: supplier_id,
-              total_price: total_price
+              supplier_id: supplier_id
             }
           }
         },
         state
       ) do
-    AuctionNotifier.notify_auction_completed(bid_amount, total_price, supplier_id, auction_id)
+    AuctionNotifier.notify_auction_completed(bid_amount, supplier_id, auction_id)
     {:noreply, state}
   end
 
@@ -79,7 +78,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
   def handle_info(
         %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
-        state = %AuctionState{status: :pending}
+        state
       ) do
     AuctionNotifier.notify_auction_created(auction)
     AuctionNotifier.notify_participants(auction)

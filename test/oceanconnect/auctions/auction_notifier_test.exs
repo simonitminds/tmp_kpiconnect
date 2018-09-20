@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifierTest do
     [insert(:user, company: buyer_company), insert(:user, company: buyer_company)]
 
     auction =
-      insert(:auction, buyer: buyer_company)
+      insert(:auction, buyer: buyer_company, scheduled_start: DateTime.utc_now())
       |> Auctions.fully_loaded()
 
     Enum.each(auction.suppliers, fn supplier_company ->
@@ -56,8 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifierTest do
     } do
       assert {:ok, emails} =
                AuctionNotifier.notify_auction_completed(
-                 100,
-                 20000,
+                 100.00,
                  winning_supplier_company.id,
                  auction.id
                )

@@ -25,6 +25,7 @@ defmodule OceanconnectWeb.EmailView do
   def convert_date?(_), do: "—"
 
   def format_price(amount) do
+    amount = :erlang.float_to_binary(amount, decimals: 2)
     "$#{amount}"
   end
 
