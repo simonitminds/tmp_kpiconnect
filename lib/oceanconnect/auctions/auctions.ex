@@ -18,6 +18,7 @@ defmodule Oceanconnect.Auctions do
   }
 
   alias Oceanconnect.Auctions.Command
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
@@ -422,7 +423,22 @@ defmodule Oceanconnect.Auctions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_port(attrs \\ %{}) do
+  def create_port(attrs = %{"companies" => company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    attrs =
+      attrs
+      |> Map.put("companies", companies)
+
+    %Port{}
+    |> Port.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_port(attrs) do
     %Port{}
     |> Port.changeset(attrs)
     |> Repo.insert()
@@ -440,6 +456,28 @@ defmodule Oceanconnect.Auctions do
       {:error, %Ecto.Changeset{}}
 
   """
+  def update_port(%Port{} = port, attrs = %{"companies" => company_ids, "removed_companies" => removed_company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    removed_companies =
+      Enum.map(removed_company_ids, fn removed_company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(removed_company_id))
+      end)
+
+    existing_companies = port.companies
+
+    attrs =
+      attrs
+      |> Map.put("companies", companies ++ existing_companies -- removed_companies)
+
+    port
+    |> Port.admin_changeset(attrs)
+    |> Repo.update()
+  end
+
   def update_port(%Port{} = port, attrs) do
     port
     |> Port.changeset(attrs)
@@ -487,10 +525,24 @@ defmodule Oceanconnect.Auctions do
     Port.changeset(port, %{})
   end
 
+  def port_with_companies(port = %Port{}) do
+    port
+    |> Repo.preload(:companies)
+  end
+
   def ports_for_company(company = %Company{}) do
     company
     |> Repo.preload(ports: :companies)
     |> Map.get(:ports)
+  end
+
+  def companies_for_port(port = %Port{}) do
+    from(c in Oceanconnect.Accounts.Company,
+      join: p in assoc(c, :ports),
+      where: p.id == ^port.id,
+      select: c
+    )
+    |> Repo.all()
   end
 
   def supplier_list_for_auction(%Port{id: id}) do
@@ -786,10 +838,47 @@ defmodule Oceanconnect.Auctions do
     Repo.get!(Barge, id)
   end
 
-  def create_barge(attrs \\ %{}) do
+  def create_barge(attrs = %{"companies" => company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    attrs =
+      attrs
+      |> Map.put("companies", companies)
+
+    %Barge{}
+    |> Barge.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_barge(attrs) do
     %Barge{}
     |> Barge.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_barge(%Barge{} = barge, attrs = %{"companies" => company_ids, "removed_companies" => removed_company_ids}) do
+    companies =
+      Enum.map(company_ids, fn company_id ->
+        Accounts.get_company!(String.to_integer(company_id))
+      end)
+
+    removed_companies =
+      Enum.map(removed_company_ids, fn removed_company_id ->
+        Oceanconnect.Accounts.get_company!(String.to_integer(removed_company_id))
+      end)
+
+    existing_companies = barge.companies
+
+    attrs =
+      attrs
+      |> Map.put("companies", companies ++ existing_companies -- removed_companies)
+
+    barge
+    |> Barge.admin_changeset(attrs)
+    |> Repo.update()
   end
 
   def update_barge(%Barge{} = barge, attrs) do
@@ -816,6 +905,11 @@ defmodule Oceanconnect.Auctions do
 
   def change_barge(%Barge{} = barge) do
     Barge.changeset(barge, %{})
+  end
+
+  def barge_with_companies(%Barge{} = barge) do
+    barge
+    |> Repo.preload(:companies)
   end
 
   def list_auction_barges(%Auction{id: auction_id}) do

@@ -58,18 +58,18 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
 
             return (
 
-              <div key={supplier.id}>
+              <div key={supplier.id} className={`qa-auction-supplier-${supplier.id}`}>
                 <li className="supplier-list__supplier">
                   <span className="icon has-text-success has-margin-right-sm"><i className="fas fa-check-circle"></i></span>
-                  <span className={`qa-auction-supplier-${supplier.id}`}>{supplier.name}</span>
+                  <span className={`qa-auction-supplier-${supplier.id}-name`}>{supplier.name}</span>
                 </li>
                 { bargeCount != 0 &&
                   <CollapsingBargeList
                     trigger="Barges"
-                    open={true}
+                    open={hasPendingBarges && true || false}
                     pendingBargeFlag = {hasPendingBarges}
                     triggerClassString="collapsible-barge-list__container__trigger"
-                    classParentString="qa-open-auctions-list collapsing-barge-list__container"
+                    classParentString="qa-open-barges-list collapsing-barge-list__container"
                     contentChildCount={bargeCount}
                     >
                     { bargesForSupplier(supplier) }

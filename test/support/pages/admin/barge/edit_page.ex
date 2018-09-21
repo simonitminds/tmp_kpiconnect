@@ -41,7 +41,29 @@ defmodule Oceanconnect.Admin.Barge.EditPage do
     |> click
   end
 
+  def fill_form_element(_key, element, "div", values) do
+    Enum.each(values, fn value ->
+      find_within_element(element, :css, ".qa-admin-barge-companies-#{value.id}")
+      |> click
+    end)
+  end
+
   def fill_form_element(_key, element, _type, value) do
     fill_field(element, value)
+  end
+
+  def add_companies(companies) do
+    Enum.each(companies, fn company ->
+      find_element(:css, ".qa-admin-barge-companies")
+      |> find_within_element(:css, ".qa-admin-barge-companies-#{company.id}")
+      |> click
+    end)
+  end
+
+  def companies_selected?(companies) do
+    Enum.each(companies, fn company ->
+      find_element(:css, ".qa-admin-barge-companies")
+      |> find_within_element(:css, ".qa-admin-barge-companies-#{company.id}")
+    end)
   end
 end

@@ -15,7 +15,8 @@ defmodule Oceanconnect.Auctions.Port do
       :companies,
       Oceanconnect.Accounts.Company,
       join_through: "company_ports",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     )
 
     timestamps()
@@ -26,6 +27,17 @@ defmodule Oceanconnect.Auctions.Port do
     port
     |> cast(attrs, [:name, :country, :gmt_offset, :is_active])
     |> validate_required([:name, :country])
+  end
+
+  def admin_changeset(%Port{} = port, attrs = %{"companies" => companies}) do
+    port
+    |> cast(attrs, [:name, :country, :gmt_offset, :is_active])
+    |> validate_required([:name, :country])
+    |> put_assoc(:companies, companies)
+  end
+
+  def admin_changeset(%Port{} = port, attrs) do
+    changeset(port, attrs)
   end
 
   def suppliers_for_port_id(port_id) do

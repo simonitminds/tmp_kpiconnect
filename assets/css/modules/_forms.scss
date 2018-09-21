@@ -94,3 +94,8 @@ fieldset {
     margin-bottom: 0;
   }
 }
+
+.checkbox--flex { // Align items so the checkbox doesn't look jank when using flex display for checkbox form elements
+  display: flex;
+  align-items: baseline;
+}

@@ -16,7 +16,7 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
 
   const messageDisplay = (message) => {
     return (
-      <h3 className="has-text-weight-bold">
+      <h3 className="has-text-weight-bold has-margin-bottom-none">
         <span className="auction-notification__copy qa-supplier-bid-status-message">
           {message}
         </span>
@@ -41,7 +41,12 @@ const SupplierBidStatus = ({auctionPayload, connection}) => {
   } else if (auctionStatus == "closed" && !winner) {
     return (
       <div className = "auction-notification box is-danger" >
-        {messageDisplay("You lost the auction")}
+        <div className="auction-notification__show-message">
+          {messageDisplay("Regretfully, you were unsuccessful in this auction. Thank you for quoting")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("You lost the auction")}
+        </div>
       </div>
     );
   } else if (auctionStatus == "open" && !connection) {

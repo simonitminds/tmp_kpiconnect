@@ -14,7 +14,7 @@
 						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
 					<%end%></div>
 				</h2>
-				<%= render "form.html", Map.put(assigns, :action, admin_port_path(@conn, :update, @port)) %>
+				<%= render "form.html", Map.put(assigns, :action, admin_port_path(@conn, :update, @port, @companies)) %>
 			</section>
 		</div>
 	</div>

@@ -13,7 +13,7 @@
 						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
 					<%end%>
 				</h2>
-				<%= render "form.html", changeset: @changeset, action: admin_barge_path(@conn, :create), ports: @ports %>
+				<%= render "form.html", changeset: @changeset, action: admin_barge_path(@conn, :create), barge: @barge, ports: @ports, companies: @companies %>
 			</section>
 		</div>
 	</div>

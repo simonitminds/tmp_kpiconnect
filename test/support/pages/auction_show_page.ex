@@ -34,7 +34,7 @@ defmodule Oceanconnect.AuctionShowPage do
   defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
     Enum.all?(suppliers, fn supplier ->
       text =
-        find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}")
+        find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}-name")
         |> inner_text
 
       supplier.name == text
@@ -268,5 +268,13 @@ defmodule Oceanconnect.AuctionShowPage do
 
     find_element(:css, ".qa-auction-barge-reject-#{id}")
     |> click
+  end
+
+  def expand_supplier_barges(supplier_id) do
+    find_element(:css, ".qa-auction-supplier-#{supplier_id}")
+    |> find_within_element(:css, ".qa-open-barges-list")
+    |> click
+
+    :timer.sleep(200)
   end
 end
