@@ -6,6 +6,7 @@ import AuctionForm from '../components/auction/auction-form';
 import { receiveAuctionFormData,
          updateDate,
          updateInformation,
+         updateInformationFromCheckbox,
          toggleSupplier,
          selectAllSuppliers,
          deselectAllSuppliers,
@@ -25,6 +26,7 @@ const mapStateToProps = (state, props) => {
     fuels: state.auctionFormReducer.fuels || props.fuels,
     ports: state.auctionFormReducer.ports || props.ports,
     vessels: state.auctionFormReducer.vessels || props.vessels,
+    credit_margin_amount: state.auctionFormReducer.credit_margin_amount || props.credit_margin_amount,
     loading: state.auctionFormReducer.loading,
     selectedSuppliers: state.auctionFormReducer.selectedSuppliers
   };
@@ -34,6 +36,7 @@ const mapDispatchToProps = (dispatch) => ({
   dispatch,
   ...bindActionCreators({ updateDate,
                           updateInformation,
+                          updateInformationFromCheckbox,
                           toggleSupplier,
                           selectAllSuppliers,
                           deselectAllSuppliers,
@@ -42,7 +45,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 export class AuctionFormContainer extends React.Component {
   dispatchItem() {
-    this.props.dispatch(receiveAuctionFormData(this.props.auction, this.props.suppliers, this.props.fuels, this.props.ports, this.props.vessels));
+    this.props.dispatch(receiveAuctionFormData(this.props.auction, this.props.suppliers, this.props.fuels, this.props.ports, this.props.vessels, this.props.credit_margin_amount));
   }
   componentDidMount() {
     this.dispatchItem();

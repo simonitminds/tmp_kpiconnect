@@ -36,7 +36,8 @@ function getDataForComponent(componentName) {
   let fuels = JSON.parse(data.fuels);
   let ports = JSON.parse(data.ports);
   let vessels = JSON.parse(data.vessels);
-  return <AuctionFormContainer auction={auction} suppliers={suppliers} fuels={fuels} ports={ports} vessels={vessels} />;
+  let credit_margin_amount = data.credit_margin_amount;
+  return <AuctionFormContainer auction={auction} suppliers={suppliers} fuels={fuels} ports={ports} vessels={vessels} credit_margin_amount={credit_margin_amount} />;
 }
 
 let currentUserCompanyId = null;

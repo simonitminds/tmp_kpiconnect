@@ -30,3 +30,5 @@ npm-debug.log
 # API keys and such live in this file. It is required for deployment
 # configuration to succeed, but obviously will not be versioned.
 ansible/secrets.yml
+
+screenshot-*.png

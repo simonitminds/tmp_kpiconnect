@@ -95,14 +95,14 @@
         <%end%>
       </div>
 
-      <div class="field is-horizontal">
-        <div class="control is-inline-block">
-          <%= checkbox f, :has_ocm_credit, class: "checkbox qa-admin-company-has_ocm_credit" %>
-          <%= error_tag f, :has_ocm_credit %>
+      <div class="field">
+        <%= label f, :credit_margin_amount, class: "label" do %>
+          Credit Margin
+        <% end %>
+        <div class="control">
+          <%= text_input f, :credit_margin_amount, class: "input qa-admin-company-credit_margin_amount" %>
+          <%= error_tag f, :credit_margin_amount %>
         </div>
-        <%= label f, :has_ocm_credit, class: "label has-margin-left-md is-inline-block" do %>
-          Has Credit with OCM
-        <%end%>
       </div>
     </div>
   </div>

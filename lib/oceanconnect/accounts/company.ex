@@ -11,14 +11,14 @@ defmodule Oceanconnect.Accounts.Company do
     field(:city, :string)
     field(:contact_name, :string)
     field(:country, :string)
+    field(:credit_margin_amount, :float)
     field(:email, :string)
-    field(:name, :string)
+    field(:is_active, :boolean, default: true)
+    field(:is_supplier, :boolean, default: false)
     field(:main_phone, :string)
     field(:mobile_phone, :string)
+    field(:name, :string)
     field(:postal_code, :string)
-    field(:is_supplier, :boolean, default: false)
-    field(:has_ocm_credit, :boolean, default: false)
-    field(:is_active, :boolean, default: true)
 
     many_to_many(
       :barges,
@@ -52,12 +52,13 @@ defmodule Oceanconnect.Accounts.Company do
     :city,
     :contact_name,
     :country,
+    :credit_margin_amount,
     :email,
+    :is_active,
+    :is_supplier,
     :main_phone,
     :mobile_phone,
-    :postal_code,
-    :is_supplier,
-    :is_active
+    :postal_code
   ]
 
   @doc false

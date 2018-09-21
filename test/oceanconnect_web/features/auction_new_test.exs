@@ -5,9 +5,8 @@ defmodule Oceanconnect.AuctionNewTest do
   hound_session()
 
   setup do
-    buyer_company = insert(:company)
+    buyer_company = insert(:company, credit_margin_amount: 5.40)
     buyer = insert(:user, company: buyer_company)
-    login_user(buyer)
     fuel = insert(:fuel)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
@@ -20,17 +19,20 @@ defmodule Oceanconnect.AuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
+
     auction_params = %{
-      scheduled_start_date: date_time,
-      scheduled_start_time: date_time,
+      anonymous_bidding: true,
+      decision_duration: 15,
+      duration: 10,
       eta_date: date_time,
       eta_time: date_time,
       etd_date: date_time,
       etd_time: date_time,
-      decision_duration: 15,
-      duration: 10,
       fuel_id: fuel.id,
       fuel_quantity: 1_000,
+      is_traded_bid: true,
+      scheduled_start_date: date_time,
+      scheduled_start_time: date_time,
       suppliers: [
         %{
           id: selected_company1.id
@@ -50,6 +52,7 @@ defmodule Oceanconnect.AuctionNewTest do
 
     {:ok,
      %{
+       buyer: buyer,
        buyer_vessels: buyer_vessels,
        params: auction_params,
        buyer_company: buyer_company,
@@ -59,8 +62,10 @@ defmodule Oceanconnect.AuctionNewTest do
      }}
   end
 
-  test "visting the new auction page" do
+  test "visting the new auction page", %{buyer: buyer} do
+    login_user(buyer)
     AuctionNewPage.visit()
+    Hound.Helpers.Screenshot.take_screenshot()
 
     assert AuctionNewPage.has_fields?([
              "additional_information",
@@ -72,6 +77,7 @@ defmodule Oceanconnect.AuctionNewTest do
              "etd",
              "fuel_id",
              "fuel_quantity",
+             "is_traded_bid",
              "po",
              "port_id",
              "vessel_id",
@@ -79,7 +85,8 @@ defmodule Oceanconnect.AuctionNewTest do
            ])
   end
 
-  test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
+  test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels, buyer: buyer} do
+    login_user(buyer)
     AuctionNewPage.visit()
     buyer_vessels = Enum.map(buyer_vessels, fn v -> "#{v.name}, #{v.imo}" end)
     vessels_on_page = MapSet.new(AuctionNewPage.vessel_list())
@@ -88,7 +95,8 @@ defmodule Oceanconnect.AuctionNewTest do
     assert MapSet.equal?(vessels_on_page, company_vessels)
   end
 
-  test "port selection reveals port agent and supplier list", %{port: port} do
+  test "port selection reveals port agent and supplier list", %{port: port, buyer: buyer} do
+    login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
 
@@ -98,7 +106,8 @@ defmodule Oceanconnect.AuctionNewTest do
            ])
   end
 
-  test "supplier list is filtered by port", %{suppliers: suppliers, port: port} do
+  test "supplier list is filtered by port", %{suppliers: suppliers, port: port, buyer: buyer} do
+    login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
 
@@ -106,10 +115,12 @@ defmodule Oceanconnect.AuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
-  test "creating an auction", %{params: params, show_params: show_params, port: port} do
+  test "creating an auction", %{params: params, show_params: show_params, port: port, buyer: buyer, buyer_company: buyer_company} do
+    login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
+    assert AuctionNewPage.credit_margin_amount == :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
     AuctionNewPage.submit()
 
     eventually(fn ->

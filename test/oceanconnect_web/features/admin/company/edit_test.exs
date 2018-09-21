@@ -27,7 +27,7 @@ defmodule Oceanconnect.Admin.Company.EditTest do
                "main_phone",
                "mobile_phone",
                "is_supplier",
-               "has_ocm_credit"
+               "credit_margin_amount"
              ])
     end
 
@@ -49,7 +49,8 @@ defmodule Oceanconnect.Admin.Company.EditTest do
         postal_code: company.postal_code,
         contact_name: company.contact_name,
         main_phone: company.main_phone,
-        mobile_phone: company.mobile_phone
+        mobile_phone: company.mobile_phone,
+        credit_margin_amount: 5.00
       })
 
       EditPage.submit()

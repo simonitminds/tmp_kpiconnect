@@ -116,13 +116,15 @@ defmodule Oceanconnect.AccountsTest do
     @valid_attrs %{
       address1: "some address",
       contact_name: "some contact_name",
-      country: "some country"
+      country: "some country",
+      credit_margin_amount: 5.00
     }
     @update_attrs %{
       address1: "some updated address",
       contact_name: "some updated contact_name",
       country: "some updated country",
-      name: "some updated name"
+      name: "some updated name",
+      credit_margin_amount: 0.00
     }
     @invalid_attrs %{address1: nil, contact_name: nil, country: nil, name: nil}
 

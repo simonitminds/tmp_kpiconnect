@@ -8,7 +8,7 @@ defmodule Oceanconnect.AuctionNewPage do
 
   def has_fields?(fields) do
     Enum.all?(fields, fn field ->
-      find_element(:class, "qa-auction-#{field}")
+      find_element(:css, ".qa-auction-#{field}")
     end)
   end
 
@@ -21,7 +21,7 @@ defmodule Oceanconnect.AuctionNewPage do
   def fill_form(params = %{}) do
     params
     |> Enum.map(fn {key, value} ->
-      element = find_element(:class, "qa-auction-#{key}")
+      element = find_element(:css, ".qa-auction-#{key}")
       type = Hound.Helpers.Element.tag_name(element)
       fill_form_element(key, element, type, value)
     end)
@@ -45,7 +45,7 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def fill_form_element(_key, element, _type, value) do
-    fill_field(element, value)
+    input_into_field(element, value)
   end
 
   def select_port(port_id) do
@@ -55,18 +55,23 @@ defmodule Oceanconnect.AuctionNewPage do
 
   def has_suppliers?(suppliers) do
     Enum.all?(suppliers, fn supplier ->
-      find_element(:class, "qa-auction-supplier-#{supplier.id}")
+      find_element(:css, ".qa-auction-supplier-#{supplier.id}")
     end)
   end
 
   def supplier_count(suppliers) do
     Enum.map(suppliers, fn supplier ->
-      find_element(:class, "qa-auction-supplier-#{supplier.id}")
+      find_element(:css, ".qa-auction-supplier-#{supplier.id}")
     end)
     |> length
   end
 
+  def credit_margin_amount do
+    element = find_element(:css, ".qa-auction-credit_margin_amount")
+    |> inner_text
+  end
+
   def submit do
-    submit_element({:class, "qa-auction-submit"})
+    submit_element({:css, ".qa-auction-submit"})
   end
 end

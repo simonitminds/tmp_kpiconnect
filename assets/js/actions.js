@@ -231,14 +231,15 @@ export function receiveSuppliers(port, suppliers) {
           suppliers: suppliers};
 }
 
-export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels) {
+export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels, credit_margin_amount) {
   return {type: RECEIVE_AUCTION_FORM_DATA,
           data: {
             auction,
             suppliers,
             fuels,
             ports,
-            vessels
+            vessels,
+            credit_margin_amount
           }
         };
 }
@@ -256,6 +257,17 @@ export function updateInformation(property, value) {
           }
         };
 }
+
+export function updateInformationFromCheckbox(property, value) {
+  console.log(_.get(value, 'target.checked', value));
+  return {type: UPDATE_INFORMATION,
+          data: {
+            property,
+            'value': _.get(value, 'target.checked', value)
+          }
+        };
+}
+
 export function updateDate(property, value) {
   return {type: UPDATE_DATE,
           data: {
