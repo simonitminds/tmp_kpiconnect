@@ -351,20 +351,22 @@ const AuctionForm = (props) => {
                  />
                </div>
              </div>
-             <div className="field is-horizontal">
-               <div className="field-label"></div>
-               <div className="field-body">
-                 <CheckBoxField
-                    model={'auction'}
-                    field={'is_traded_bid'}
-                    labelText={'accept traded bids'}
-                    value={auction.is_traded_bid}
-                    opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                    onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid')}
-                 />
-               </div>
-               <span style={{display: auction.is_traded_bid === true ? `inline-block` : `none`}}>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
-             </div>
+             { (credit_margin_amount !== "") &&
+                 <div className="field is-horizontal">
+                   <div className="field-label"></div>
+                   <div className="field-body">
+                     <CheckBoxField
+                         model={'auction'}
+                         field={'is_traded_bid'}
+                         labelText={'accept traded bids'}
+                         value={auction.is_traded_bid}
+                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid')}
+                     />
+                   </div>
+                   <span style={{display: auction.is_traded_bid === true ? `inline-block` : `none`}}>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
+                 </div>
+            }
             </fieldset>
           </div>
         </div>
