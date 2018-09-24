@@ -2,7 +2,8 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionsIndex from '../components/auction/index'
-import { getAllAuctionPayloads, subscribeToAuctionUpdates } from '../actions';
+import AuctionMessaging from '../components/auction/auction-messaging.js'
+import { getAllAuctionPayloads, subscribeToAuctionUpdates, subscribeToAuctionMessaging } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -19,6 +20,7 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionsContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
+    this.props.dispatch(subscribeToAuctionMessaging());
   }
   componentDidMount() {
     this.dispatchItem();
@@ -29,7 +31,12 @@ export class AuctionsContainer extends React.Component {
     }
   }
   render() {
-    return <AuctionsIndex {...this.props} />;
+    return (
+      <div>
+        <AuctionsIndex {...this.props} />
+        <AuctionMessaging {...this.props} />
+      </div>
+    );
   }
 }
 

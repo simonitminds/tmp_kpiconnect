@@ -18,14 +18,16 @@ import {
   DESELECT_ALL_SUPPLIERS,
   SELECT_PORT,
   RECEIVE_SUPPLIERS,
+  MESSAGING_AUCTION_LIST,
 } from "./constants";
 
-let channel, socket;
+let auctionChannel, messagingChannel, socket;
 if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
   socket = new Socket("/socket", {params: {token: window.userToken}});
   socket.connect();
 
-  channel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
+  auctionChannel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
+  messagingChannel = socket.channel('user_messaging', {token: window.userToken});
 };
 
 const defaultHeaders = {
@@ -35,9 +37,28 @@ const defaultHeaders = {
   'x-expires': window.expiration
 };
 
+export function subscribeToAuctionMessaging() {
+  return (dispatch, getState) => {
+    messagingChannel.join()
+      .receive("ok", resp => {
+        console.log("Joined chat successfully", resp);
+      })
+      .receive("error", resp => { console.log("Unable to join", resp); });
+
+    messagingChannel.on("auction_list", payload => {
+      dispatch({type: MESSAGING_AUCTION_LIST, messagingPayload: payload});
+    });
+
+    messagingChannel.onError( () => {
+      const { connection } = getState().auctionsReducer;
+      if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
+    });
+  };
+}
+
 export function subscribeToAuctionUpdates() {
   return (dispatch, getState) => {
-    channel.join()
+    auctionChannel.join()
       .receive("ok", resp => {
         console.log("Joined successful", resp);
         dispatch({type: CHANNEL_CONNECTED});
@@ -45,11 +66,11 @@ export function subscribeToAuctionUpdates() {
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
-    channel.on("auctions_update", payload => {
+    auctionChannel.on("auctions_update", payload => {
       dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload});
     });
 
-    channel.onError( () => {
+    auctionChannel.onError( () => {
       const { connection } = getState().auctionsReducer;
       if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
     });

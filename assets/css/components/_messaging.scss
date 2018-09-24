@@ -3,19 +3,32 @@
   flex-direction: column;
   position: fixed;
   z-index: 29;
-  top: 3.25rem;
+  height: 3.25rem;
+  overflow: hidden;
+  top: calc(100vh - 3.25rem);
   right: 0;
   left: calc(100vw - 400px);
   width: 400px;
-  height: calc(100vh - 3.25rem);
   max-height: calc(100vh - 3.25rem);
   background-color: $gray-1;
   box-shadow: $box-shadow;
+  transition: all 0.5s ease;
+
+  &.active {
+    top: 3.25rem;
+    height: calc(100vh - 3.25rem);
+  }
 
   .body--admin & {
-    top: 101px;
-    height: calc(100vh - 101px);
-    max-height: calc(100vh - 101px);
+    top: calc(100vh - 3.25rem);
+    height: 3.25rem;
+    max-height: calc(100vh - 3.25rem);
+
+    &.active {
+      top: 101px;
+      height: calc(100vh - 101px);
+      max-height: calc(100vh - 101px);
+    }
   }
 
   // Messaging Headers
@@ -44,15 +57,32 @@
 
   &> div { // Hit all children of messaging...
     display: flex;
-    // flex-shrink: 2;
     transition: max-height 0.2s ease;
   }
 
-  &__menu-bar { // Menu Bar showing notifications and allowing collapsibility
+  &__notification-context { // Menu Bar showing notifications and allowing collapsibility
     background-color: $white;
     border-top: none !important;
     flex-shrink: 0 !important;
-    h1 { padding: 1rem; }
+    flex-direction: column;
+
+    .messaging__menu-bar {
+      display: flex;
+      flex-direction: row;
+
+      // & + .messaging__conversation-list {
+      //   max-height: 0%;
+      //
+      //   &.open {
+      //     max-height: 100%;
+      //   }
+      // }
+    }
+
+    .messaging__menu-bar__title {
+      flex-grow: 2;
+      padding: 1rem;
+    }
   }
   &__notifications { // Marker in Menu Bar indicating unread messages
     background-color: $gray-1;
@@ -75,8 +105,8 @@
   }
   &__auction-context { // Menu Bar showing notifications and allowing collapsibility
     background-color: $white;
-    border-top: 1px solid $gray-2;
     flex-shrink: 0;
+    flex-direction: column;
 
 
     &.open {
@@ -85,8 +115,8 @@
   }
   &__user-context { // Menu Bar showing notifications and allowing collapsibility
     background-color: $white;
-    border-top: 1px solid $gray-2;
     flex-shrink: 0;
+    flex-direction: column;
 
     &.open {
 
@@ -98,14 +128,12 @@
     flex-direction: column;
     padding: 0;
     background-color: $white;
-    max-height: 0;
+    max-height: 100%;
     transition: max-height 0.2s ease;
     overflow: hidden;
 
     &.open {
       max-height: 100%;
-      border-top: 1px solid $gray-2;
-      padding: 1rem;
     }
   }
   &__datestamp { // Indicating date that conversation initiated/reinitiated.
@@ -178,20 +206,17 @@
 }
 
 .messaging__conversation-list {
-  transition: max-height 0.2s ease;
-  border-top: none;
+  border-top: 1px solid $gray-2;
   overflow: hidden;
   max-height: 0;
-  .messaging__auction-context.open + &, .messaging__user-context.open + & {
+  transition: max-height 0.2s ease;
+  .open & {
     max-height: 100%;
-    transition: max-height 0.2s ease;
-    border-top: 1px solid $gray-2;
   }
 }
 
 .messaging__input {
-  width: calc(100% + 2rem);
-  margin: auto -1rem -1rem -1rem;
+  flex-shrink: 0;
   padding: 1rem;
   background-color: $gray-2;
 
@@ -201,6 +226,10 @@
 
   .field .control:first-child {
     flex-grow: 2;
+  }
+
+  .messaging__conversation.open & {
+    display: block;
   }
 }
 
@@ -218,10 +247,6 @@
 
     &:hover, &:focus {
       background-color: $gray-0;
-    }
-
-    &:last-child {
-      border-bottom: none;
     }
   }
 
@@ -241,5 +266,7 @@
 
 .messaging__message-container {
   overflow-y: scroll;
+  flex-grow: 2;
   flex-shrink: 2;
+  padding: 1rem;
 }

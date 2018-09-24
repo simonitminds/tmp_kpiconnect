@@ -117,6 +117,7 @@ export class AuctionContainer extends React.Component {
       return <div className="alert is-info">Loading...</div>
     } else {
       return <AuctionShow {...this.props}/>;
+      return <AuctionMessaging/>;
     }
   }
 }
