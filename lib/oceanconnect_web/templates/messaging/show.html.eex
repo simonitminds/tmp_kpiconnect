@@ -1,0 +1,151 @@
+<div class="messaging">
+  <div class="messaging__menu-bar">
+    <h1>Messages</h1>
+    <div class="messaging__notifications messaging__notifications--has-unread">
+      <i class="fas fa-envelope has-margin-right-sm"></i> 3
+    </div>
+  </div>
+  <div class="messaging__auction-context">
+    <a class="messaging__toggle">
+      <h2>
+        <div class="auction-header__status
+                  auction-header__status--closed
+                  tag
+                  is-rounded
+                  has-margin-bottom-none has-margin-right-xs">
+          Closed</div>
+        Al Bidda <span class="has-text-gray-3">(9132741)</span>
+      </h2>
+      <i class="has-margin-left-auto is-inline-block fas fa-chevron-down"></i>
+    </a>
+  </div>
+  <div class="messaging__conversation-list">
+    <ul class="messaging__context-list">
+      <li class="messaging__context-list__instruction">Select an Auction</li>
+      <li>Petrochina International (Singapore) Pte Ltd
+        <i class="is-inline-block fas fa-angle-right has-text-gray-2 has-margin-left-auto has-margin-right-xs"></i>
+      </li>
+      <li class="messaging__context-list__active-convo">Qatargas Operating Company Limited <span class="is-inline-block has-text-gray-3 has-margin-left-xs">(Buyer)</span>
+        <i class="is-inline-block fas fa-envelope-open has-text-gray-2 has-margin-left-auto"></i>
+      </li>
+      <li>OceanConnect Marine <span class="is-inline-block has-text-gray-3 has-margin-left-xs">(Administrator)</span> <i class="is-inline-block fas fa-envelope has-margin-left-auto"></i></li>
+    </ul>
+  </div>
+  <div class="messaging__user-context">
+    <a class="messaging__toggle">
+      <h2>Qatargas Operating Company Limited</h2>
+      <i class="has-margin-left-auto is-inline-block fas fa-chevron-down"></i></a>
+  </div>
+  <div class="messaging__conversation-list">
+    <ul class="messaging__context-list">
+      <li class="messaging__context-list__instruction">Select a Conversation</li>
+      <li>Petrochina International (Singapore) Pte Ltd
+        <i class="is-inline-block fas fa-angle-right has-text-gray-2 has-margin-left-auto has-margin-right-xs"></i>
+      </li>
+      <li class="messaging__context-list__active-convo">Qatargas Operating Company Limited <span class="is-inline-block has-text-gray-3 has-margin-left-xs">(Buyer)</span>
+        <i class="is-inline-block fas fa-envelope-open has-text-gray-2 has-margin-left-auto"></i>
+      </li>
+      <li>OceanConnect Marine <span class="is-inline-block has-text-gray-3 has-margin-left-xs">(Administrator)</span> <i class="is-inline-block fas fa-envelope has-margin-left-auto"></i></li>
+    </ul>
+  </div>
+  <div class="messaging__conversation open">
+    <div class="messaging__message-container">
+      <div class="messaging__datestamp">
+        20 September 2018, 17:23 GMT
+      </div>
+      <div class="messaging__message">
+        <div class="messaging__message__bubble">What's the pump rate of your barge again?</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Lee Pritchard</strong>
+            (Qatargas Operating Company Limited)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+      <div class="messaging__message messaging__message--self">
+        <div class="messaging__message__bubble">Ludicrous speed.</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Wee-Tee Ng</strong>
+            (Petrochina International (Singapore) Pte Ltd)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+      <div class="messaging__message">
+        <div class="messaging__message__bubble">What's the pump rate of your barge again?</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Lee Pritchard</strong>
+            (Qatargas Operating Company Limited)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+      <div class="messaging__message messaging__message--self">
+        <div class="messaging__message__bubble">Ludicrous speed.</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Wee-Tee Ng</strong>
+            (Petrochina International (Singapore) Pte Ltd)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+      <div class="messaging__message">
+        <div class="messaging__message__bubble">What's the pump rate of your barge again?</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Lee Pritchard</strong>
+            (Qatargas Operating Company Limited)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+      <div class="messaging__message messaging__message--self">
+        <div class="messaging__message__bubble">Ludicrous speed.</div>
+        <div class="messaging__message__timestamp">
+          <div class="messaging__message__timestamp__name">
+            <strong>Wee-Tee Ng</strong>
+            (Petrochina International (Singapore) Pte Ltd)
+          </div>
+          <div class="messaging__message__timestamp__time">
+            <strong class="inline-block has-margin-left-auto">17:23 GMT</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="messaging__input">
+      <div class="field has-addons">
+        <div class="control">
+          <input class="input" type="text" placeholder="Type message here">
+        </div>
+        <div class="control">
+          <a class="button is-turquoise">
+            Send
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  const messagingContexts = [...document.querySelectorAll('.messaging > div')];
+  const messagingAuctionContextToggle = document.querySelector('.messaging__auction-context > .messaging__toggle');
+  const messagingUserContextToggle = document.querySelector('.messaging__user-context > .messaging__toggle');
+  function messagingToggleOpen(){ stripOpenState(); this.parentElement.classList.toggle('open'); };
+  function stripOpenState() { messagingContexts.map( container => container.classList.remove('open'))}
+  messagingAuctionContextToggle.addEventListener('click', messagingToggleOpen, false);
+  messagingUserContextToggle.addEventListener('click', messagingToggleOpen, false);
+</script>

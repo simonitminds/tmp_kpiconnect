@@ -1,0 +1,245 @@
+.messaging {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  z-index: 29;
+  top: 3.25rem;
+  right: 0;
+  left: calc(100vw - 400px);
+  width: 400px;
+  height: calc(100vh - 3.25rem);
+  max-height: calc(100vh - 3.25rem);
+  background-color: $gray-1;
+  box-shadow: $box-shadow;
+
+  .body--admin & {
+    top: 101px;
+    height: calc(100vh - 101px);
+    max-height: calc(100vh - 101px);
+  }
+
+  // Messaging Headers
+
+  h1, h2 { font-weight: bold;}
+
+  // Messaging Toggle Buttons
+
+  .messaging__toggle {
+    display: flex;
+    align-items: baseline;
+    padding: 1rem;
+    width: 100%;
+    border: none;
+    color: $black;
+
+    &:hover, &:focus {
+      background-color: $gray-1;
+    }
+    i {
+      transition: transform 0.3s ease;
+    }
+  }
+
+  // Messaging Containers
+
+  &> div { // Hit all children of messaging...
+    display: flex;
+    // flex-shrink: 2;
+    transition: max-height 0.2s ease;
+  }
+
+  &__menu-bar { // Menu Bar showing notifications and allowing collapsibility
+    background-color: $white;
+    border-top: none !important;
+    flex-shrink: 0 !important;
+    h1 { padding: 1rem; }
+  }
+  &__notifications { // Marker in Menu Bar indicating unread messages
+    background-color: $gray-1;
+    margin-left: auto;
+    padding: 1rem;
+    font-weight: bold;
+
+    &:hover, &:focus {
+      background-color: darken($gray-1, 5%);
+    }
+
+    &--has-unread {
+      background-color: $red;
+      color: $white;
+
+          &:hover, &:focus {
+      background-color: darken($red, 5%);
+    }
+    }
+  }
+  &__auction-context { // Menu Bar showing notifications and allowing collapsibility
+    background-color: $white;
+    border-top: 1px solid $gray-2;
+    flex-shrink: 0;
+
+
+    &.open {
+      .messaging__toggle i { transform: rotate(180deg);}
+    }
+  }
+  &__user-context { // Menu Bar showing notifications and allowing collapsibility
+    background-color: $white;
+    border-top: 1px solid $gray-2;
+    flex-shrink: 0;
+
+    &.open {
+
+      .messaging__toggle i { transform: rotate(180deg);}
+    }
+  }
+  &__conversation { // Menu Bar showing notifications and allowing collapsibility
+    flex-grow: 2;
+    flex-direction: column;
+    padding: 0;
+    background-color: $white;
+    max-height: 0;
+    transition: max-height 0.2s ease;
+    overflow: hidden;
+
+    &.open {
+      max-height: 100%;
+      border-top: 1px solid $gray-2;
+      padding: 1rem;
+    }
+  }
+  &__datestamp { // Indicating date that conversation initiated/reinitiated.
+    background-color: $gray-1;
+    margin: 1rem -1rem;
+    padding: 0.5rem 1rem;
+    font-family: $family-header;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  &__message { // Individual messaging unit
+    margin-bottom: 1rem;
+
+    &__bubble { // Message contents
+      position: relative;
+      padding: 1rem;
+      border-radius: 5px;
+      background-color: lighten($teal, 50%);
+
+        &:after {
+          content: "";
+          display: block;
+          position: absolute;
+          background-color: lighten($teal, 50%);
+          height: 1rem;
+          width: 1rem;
+          right: 1rem;
+          bottom: -0.25rem;
+          transform: skew(12deg, -40deg);
+          border-radius: 2px;
+          }
+    }
+    &__timestamp { // Name and time sent
+      display: flex;
+      margin: 0.75rem 0 0.5rem 0.25rem;
+      font-size: 0.85rem;
+
+      &__name {
+        color: $gray-3;
+        flex-shrink: 1;
+        overflow: hidden;
+        margin-right: 0.5rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      &__time {
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+    }
+  }
+  &__message--self { // Variation for when it's you sending the message, I guess.
+    .messaging__message__bubble {
+      background-color: $gray-2;
+
+      &:after {
+        background-color: $gray-2;
+        left: 1rem;
+        bottom: -0.25rem;
+        transform: skew(-12deg, 40deg);
+      }
+    }
+  }
+}
+
+.messaging__conversation-list {
+  transition: max-height 0.2s ease;
+  border-top: none;
+  overflow: hidden;
+  max-height: 0;
+  .messaging__auction-context.open + &, .messaging__user-context.open + & {
+    max-height: 100%;
+    transition: max-height 0.2s ease;
+    border-top: 1px solid $gray-2;
+  }
+}
+
+.messaging__input {
+  width: calc(100% + 2rem);
+  margin: auto -1rem -1rem -1rem;
+  padding: 1rem;
+  background-color: $gray-2;
+
+  .field .control > * {
+    border: 1px solid lighten($gray-3, 25%);
+  }
+
+  .field .control:first-child {
+    flex-grow: 2;
+  }
+}
+
+.messaging__context-list {
+  width: 100%;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    background-color: $white;
+    padding: 1rem;
+    border-left: 8px solid $gray-2;
+    border-bottom: 1px solid $gray-2;
+    font-weight: bold;
+
+    &:hover, &:focus {
+      background-color: $gray-0;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .messaging__context-list__instruction {
+    background-color: $gray-1;
+    font-style: italic;
+    border-left: 0;
+    &:hover, &:focus {
+      background-color: $gray-1;
+    }
+  }
+
+  .messaging__context-list__active-convo {
+    border-left: 8px solid $green;
+  }
+}
+
+.messaging__message-container {
+  overflow-y: scroll;
+  flex-shrink: 2;
+}

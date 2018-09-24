@@ -95,6 +95,7 @@
          <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
          <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
          <%= render @view_module, @view_template, assigns %>
+         <%= render OceanconnectWeb.MessagingView, "show.html", conn: @conn %>
         </main>
       <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
       <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>
