@@ -127,9 +127,10 @@ defmodule OceanconnectWeb.AuctionController do
   def show(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
     user = Auth.current_user(conn)
+    credit_margin_amount = user.company.credit_margin_amount
 
     if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) do
-      render(conn, "show.html", auction: auction)
+      render(conn, "show.html", auction: auction, credit_margin_amount: credit_margin_amount)
     else
       redirect(conn, to: auction_path(conn, :index))
     end

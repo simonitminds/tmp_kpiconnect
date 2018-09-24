@@ -73,6 +73,11 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def mark_as_traded_bid do
+    find_element(:css, ".qa-auction-bid-is_traded_bid")
+    |> click()
+  end
+
   def fill_form_element(:additional_charges, element, _type, _value) do
     element |> click
   end

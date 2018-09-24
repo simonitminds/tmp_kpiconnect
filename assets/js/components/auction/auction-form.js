@@ -357,14 +357,14 @@ const AuctionForm = (props) => {
                    <div className="field-body">
                      <CheckBoxField
                          model={'auction'}
-                         field={'is_traded_bid'}
+                         field={'is_traded_bid_allowed'}
                          labelText={'accept traded bids'}
-                         value={auction.is_traded_bid}
+                         value={auction.is_traded_bid_allowed}
                          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid')}
+                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
                      />
                    </div>
-                   <span style={{display: auction.is_traded_bid === true ? `inline-block` : `none`}}>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
+                   <span style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
                  </div>
             }
             </fieldset>

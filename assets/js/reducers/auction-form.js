@@ -1,6 +1,8 @@
 import _ from "lodash";
 import moment from 'moment';
-import { replaceListItem } from "../utilities";
+import { replaceListItem,
+         formatPrice
+ } from "../utilities";
 import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_DATE,
          UPDATE_INFORMATION,
@@ -59,7 +61,7 @@ export default function(state, action) {
           selectedSuppliers: supplierList,
           suppliers: _.get(action, 'data.suppliers', []),
           vessels: action.data.vessels,
-          credit_margin_amount: action.data.credit_margin_amount
+          credit_margin_amount: formatPrice(action.data.credit_margin_amount)
         };
       }
     }

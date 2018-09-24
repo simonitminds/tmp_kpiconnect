@@ -103,9 +103,6 @@ defmodule OceanconnectWeb.AuctionView do
   def event_user(%AuctionEvent{user: user}), do: "#{user.first_name} #{user.last_name}"
   def event_user(_), do: "-"
 
-  def format_credit_margin_amount(nil), do: ""
-  def format_credit_margin_amount(credit_margin_amount), do: :erlang.float_to_binary(credit_margin_amount, decimals: 2)
-
   defp leftpad(integer) do
     String.pad_leading(Integer.to_string(integer), 2, "0")
   end

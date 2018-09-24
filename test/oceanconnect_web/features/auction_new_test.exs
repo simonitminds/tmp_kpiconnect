@@ -30,7 +30,7 @@ defmodule Oceanconnect.AuctionNewTest do
       etd_time: date_time,
       fuel_id: fuel.id,
       fuel_quantity: 1_000,
-      is_traded_bid: true,
+      is_traded_bid_allowed: true,
       scheduled_start_date: date_time,
       scheduled_start_time: date_time,
       suppliers: [
@@ -77,7 +77,7 @@ defmodule Oceanconnect.AuctionNewTest do
              "etd",
              "fuel_id",
              "fuel_quantity",
-             "is_traded_bid",
+             "is_traded_bid_allowed",
              "po",
              "port_id",
              "vessel_id",

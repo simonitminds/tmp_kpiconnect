@@ -1,13 +1,13 @@
 defmodule Oceanconnect.AuctionShowTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.AuctionShowPage
+  alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Auctions
   #  import Hound.Helpers.Session
 
   hound_session()
 
   setup do
-    buyer_company = insert(:company)
+    buyer_company = insert(:company, credit_margin_amount: 5.00)
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
@@ -20,7 +20,8 @@ defmodule Oceanconnect.AuctionShowTest do
       insert(
         :auction,
         buyer: buyer_company,
-        suppliers: [supplier_company, supplier_company2, supplier_company3]
+        suppliers: [supplier_company, supplier_company2, supplier_company3],
+        is_traded_bid_allowed: true
       )
 
     bid_params = %{
@@ -40,7 +41,8 @@ defmodule Oceanconnect.AuctionShowTest do
        buyer: buyer,
        supplier: supplier,
        supplier2: supplier2,
-       supplier3: supplier3
+       supplier3: supplier3,
+       buyer_company: buyer_company
      }}
   end
 
@@ -152,6 +154,32 @@ defmodule Oceanconnect.AuctionShowTest do
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
           %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
+        end)
+
+      assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
+      assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
+      assert AuctionShowPage.has_bid_message?("Bid successfully placed")
+    end
+
+    test "supplier can enter a traded bid", %{auction: auction, bid_params: bid_params, buyer_company: buyer_company} do
+      AuctionShowPage.enter_bid(bid_params)
+      AuctionShowPage.mark_as_traded_bid()
+      assert AuctionNewPage.credit_margin_amount == :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+      AuctionShowPage.submit_bid()
+
+      :timer.sleep(500)
+
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!()
+
+      stored_bid_list =
+        auction_state.bids
+        |> AuctionShowPage.convert_to_supplier_names(auction)
+
+      bid_list_params =
+        Enum.map(stored_bid_list, fn bid ->
+          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => "#{bid.is_traded_bid}"}}
         end)
 
       assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})

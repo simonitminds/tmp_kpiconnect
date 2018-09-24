@@ -123,7 +123,25 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
-             ] = AuctionEventStore.event_list(auction.id)
+             ] = AuctionEventStore.event_list(auction_id)
+    end
+
+    test "placing a traded bid adds a traded_bid_place event to the event store", %{
+      auction: auction = %Auction{id: auction_id}
+    } do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      Auctions.start_auction(auction)
+      Auctions.place_bid(auction, %{"amount" => 1.25, "is_traded_bid" => true}, hd(auction.suppliers).id)
+
+      :timer.sleep(500)
+      assert_received %AuctionEvent{type: :traded_bid_placed, auction_id: ^auction_id}
+
+      assert [
+               %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :traded_bid_placed, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+             ] = AuctionEventStore.event_list(auction_id)
     end
 
     test "ending an auction adds an auction_ended event to the event store", %{
