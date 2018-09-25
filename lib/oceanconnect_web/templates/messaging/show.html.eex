@@ -1,4 +1,4 @@
-<div class="messaging qa-auction-messaging">
+<div class="messaging">
   <div class="messaging__notification-context">
     <div class="messaging__menu-bar">
       <h1 class="messaging__menu-bar__title">Messages</h1>
@@ -6,7 +6,7 @@
         <i class="fas fa-envelope has-margin-right-sm"></i> 3
       </div>
     </div>
-    <div class="messaging__conversation-list qa-auction-messaging-auctions">
+    <div class="messaging__conversation-list">
       <ul class="messaging__context-list">
         <li class="messaging__context-list__active-convo">
           <h2>
@@ -43,25 +43,6 @@
         </li>
       </ul>
     </div>
-  </div>
-  <div class="messaging__conversation-list">
-    <ul class="messaging__context-list">
-      <li>Petrochina International (Singapore) Pte Ltd
-        <i class="is-inline-block fas fa-angle-right has-text-gray-2 has-margin-left-auto has-margin-right-xs"></i>
-      </li>
-      <li class="messaging__context-list__active-convo">
-        <h2>
-          <div class="auction-header__status
-                    auction-header__status--closed
-                    tag
-                    is-rounded
-                    has-margin-bottom-none has-margin-right-xs">
-            Closed</div>
-          Al Bidda <span class="has-text-gray-3">(9132741)</span></br>
-         <span class="is-inline-block has-margin-left-xs has-margin-top-xs">Qatargas Operating Company Limited<span class="has-text-gray-3 has-margin-left-xs">(Buyer)</span></span>
-      </li>
-      <li>OceanConnect Marine <span class="is-inline-block has-text-gray-3 has-margin-left-xs">(Administrator)</span> <i class="is-inline-block fas fa-envelope has-margin-left-auto"></i></li>
-    </ul>
   </div>
   <div class="messaging__auction-context">
     <a class="messaging__toggle">
@@ -184,62 +165,52 @@
         </div>
       </div>
     </div>
+    <form class="messaging__input" action="#">
+      <div class="field has-addons">
+        <div class="control">
+          <input class="input" type="text" placeholder="Type message here">
+        </div>
+        <div class="control">
+          <input type="submit" value="Send" class="button is-turquoise">
+        </div>
+      </div>
+    </form>
   </div>
-  <form class="messaging__input">
-    <div class="field has-addons">
-      <div class="control">
-        <input class="input" type="text" placeholder="Type message here">
-      </div>
-      <div class="control">
-        <button type="submit" class="button is-turquoise">
-          Send
-        </button>
-      </div>
-    </div>
-  </form>
 </div>
 <script type="text/javascript">
   const messagingBox = document.querySelector('.messaging');
-  const messagingBoxCollapse = document.querySelector('.messaging__menu-bar');
+  const messagingBoxCollapse = document.querySelector('.messaging__menu-bar__title');
+  const messagingNotifications = document.querySelector('.messaging__notifications');
   const messagingContexts = [...document.querySelectorAll('.messaging > div')];
   const messagingAuctionContextToggle = document.querySelector('.messaging__auction-context > .messaging__toggle');
   const messagingUserContextToggle = document.querySelector('.messaging__user-context > .messaging__toggle');
   const conversationBox = document.querySelector('.messaging__conversation');
-  const newMessageList = document.querySelector('.messaging__notifications');
-  const messageSubmit = document.querySelector('.messaging__input > .field > .control > input');
-  const messageSubmitButton = document.querySelector('.messaging__input > .field > .control > input');
-
+  // const newMessageList = document.querySelector('.messaging__notifications');
+  // const messageSubmit = document.querySelector('.messaging__input > .field > .control > input[type="input"]');
+  // const messageSubmitButton = document.querySelector('.messaging__input > .field > .control > input.button');
+  //
   function stripOpenState() { messagingContexts.map( container => container.classList.remove('open'))}
   function messagingBoxToggle() {
     messagingBox.classList.toggle('active');
   }
+
+  function messagingNotificationsToggle() {
+    messagingNotifications.parentElement.parentElement.classList.toggle('open');
+  }
   function messagingToggle(){
     if(this.parentElement.classList.contains('open')) {
+      // stripHiddenState();
       this.parentElement.classList.remove('open');
       conversationBox.classList.add('open');
     }
     else {
-      stripOpenState(); this.parentElement.classList.toggle('open');
-    }
-  };
-  function newMessageListExpand(){
-    if(this.parentElement.classList.contains('.messaging__notifications--has-unread')) {
       stripOpenState();
-      this.parentElement.nextElementSibling.classList.toggle('open');
-    }
-    else {
-      stripOpenState(); this.parentElement.classList.toggle('open');
+      this.parentElement.classList.toggle('open');
     }
   };
-  function postMessage(event) {
-    event.preventDefault();
-    console.log("HEY.")
-  };
-
   messagingBoxCollapse.addEventListener('click', messagingBoxToggle, false);
+  messagingNotifications.addEventListener('click', messagingNotificationsToggle, false);
   messagingAuctionContextToggle.addEventListener('click', messagingToggle, false);
   messagingUserContextToggle.addEventListener('click', messagingToggle, false);
-  newMessageList.addEventListener('click', newMessageListExpand, false);
-  messageSubmitButton.addEventListener('submit', postMessage , false);
 
 </script>

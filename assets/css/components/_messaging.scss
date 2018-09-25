@@ -134,7 +134,6 @@
 
     &.open {
       max-height: 100%;
-      border-top: 1px solid $gray-2;
     }
   }
   &__datestamp { // Indicating date that conversation initiated/reinitiated.
@@ -210,7 +209,8 @@
   border-top: 1px solid $gray-2;
   overflow: hidden;
   max-height: 0;
-  .messaging__auction-context.open + &, .messaging__user-context.open + &, .messaging__menu-bar.open + & {
+  transition: max-height 0.2s ease;
+  .open & {
     max-height: 100%;
   }
 }
@@ -229,7 +229,7 @@
     flex-grow: 2;
   }
 
-  .messaging__conversation.open + & {
+  .messaging__conversation.open & {
     display: block;
   }
 }
