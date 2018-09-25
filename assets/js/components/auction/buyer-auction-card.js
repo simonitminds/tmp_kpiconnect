@@ -104,9 +104,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
-            {auction.is_traded_bid_allowed &&
-              <i className="fas fa-exchange-alt"></i>
-            }
             {auction.vessel.name}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>

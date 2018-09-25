@@ -6,6 +6,7 @@ defmodule OceanconnectWeb.EmailTest do
   alias Oceanconnect.Auctions
 
   setup do
+    credit_company = insert(:company, name: "Oceanconnect Marine")
     buyer_company = insert(:company, is_supplier: false)
     buyers = [insert(:user, %{company: buyer_company}), insert(:user, %{company: buyer_company})]
 
@@ -32,6 +33,7 @@ defmodule OceanconnectWeb.EmailTest do
     {:ok,
      %{
        suppliers: suppliers,
+       credit_company: credit_company,
        buyer_company: buyer_company,
        buyers: buyers,
        auction: auction,
@@ -120,9 +122,10 @@ defmodule OceanconnectWeb.EmailTest do
       winning_suppliers: winning_suppliers,
       winning_bid_amount: winning_bid_amount
     } do
+      is_traded_bid = false
       total_price = winning_bid_amount * auction.fuel_quantity
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction)
+        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction, is_traded_bid)
 
       for supplier <- winning_suppliers do
         assert Enum.any?(winning_supplier_emails, fn supplier_email ->
@@ -162,6 +165,65 @@ defmodule OceanconnectWeb.EmailTest do
 
         assert buyer_email.html_body =~ winning_supplier_company.name
         assert buyer_email.html_body =~ winning_supplier_company.contact_name
+        assert buyer_email.html_body =~ buyer_company.name
+        assert buyer_email.html_body =~ buyer_company.contact_name
+        assert buyer_email.html_body =~ Integer.to_string(auction.id)
+        assert buyer_email.html_body =~ auction.vessel.name
+      end
+    end
+
+    test "auction completion with traded bid builds for winning supplier and buyer", %{
+      buyer_company: buyer_company,
+      credit_company: oceanconnect,
+      winning_supplier_company: winning_supplier_company,
+      buyers: buyers,
+      auction: auction,
+      winning_suppliers: winning_suppliers,
+      winning_bid_amount: winning_bid_amount
+    } do
+      is_traded_bid = true
+      total_price = winning_bid_amount * auction.fuel_quantity
+      %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
+        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction, is_traded_bid)
+
+      for supplier <- winning_suppliers do
+        assert Enum.any?(winning_supplier_emails, fn supplier_email ->
+          supplier_email.to.id == supplier.id
+        end)
+
+        assert Enum.any?(winning_supplier_emails, fn supplier_email ->
+          supplier_email.html_body =~ Accounts.User.full_name(supplier)
+        end)
+      end
+
+      for supplier_email <- winning_supplier_emails do
+        assert supplier_email.subject ==
+                 "You have won Auction #{auction.id} for #{auction.vessel.name} at #{
+                   auction.port.name
+                 }!"
+
+        assert supplier_email.html_body =~ winning_supplier_company.name
+        assert supplier_email.html_body =~ oceanconnect.name
+        assert supplier_email.html_body =~ oceanconnect.contact_name
+        assert supplier_email.html_body =~ Integer.to_string(auction.id)
+        assert supplier_email.html_body =~ auction.vessel.name
+        assert supplier_email.html_body =~ "$20000.00"
+      end
+
+      for buyer <- buyers do
+        assert Enum.any?(buyer_emails, fn buyer_email -> buyer_email.to.id == buyer.id end)
+
+        assert Enum.any?(buyer_emails, fn buyer_email ->
+                 buyer_email.html_body =~ Accounts.User.full_name(buyer)
+               end)
+      end
+
+      for buyer_email <- buyer_emails do
+        assert buyer_email.subject ==
+                 "Auction #{auction.id} for #{auction.vessel.name} at #{auction.port.name} has closed."
+
+        assert buyer_email.html_body =~ oceanconnect.name
+        assert buyer_email.html_body =~ oceanconnect.contact_name
         assert buyer_email.html_body =~ buyer_company.name
         assert buyer_email.html_body =~ buyer_company.contact_name
         assert buyer_email.html_body =~ Integer.to_string(auction.id)

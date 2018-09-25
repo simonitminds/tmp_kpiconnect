@@ -99,8 +99,8 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "buyer can see the bid list", %{auction: auction} do
       [s1, s2, _s3] = auction.suppliers
-      Auctions.place_bid(auction, %{"amount" => 1.75}, s1.id)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, s2.id)
+      Auctions.place_bid(auction, %{"amount" => 1.75, "is_traded_bid" => true}, s1.id)
+      Auctions.place_bid(auction, %{"amount" => 1.25, "is_traded_bid" => false}, s2.id)
 
       auction_state =
         auction
@@ -110,13 +110,17 @@ defmodule Oceanconnect.AuctionShowTest do
         auction_state.bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
-      bid_list_params =
+      bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier}}
+          is_traded_bid_content = case bid.is_traded_bid do
+                                    true -> ""
+                                    false -> ""
+                                  end
+          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier, "is_traded_bid" => is_traded_bid_content}}
         end)
 
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
+      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
     end
   end
 
@@ -129,7 +133,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :ok
     end
 
-    test "supplier can see his view of the auction card" do
+    test "supplier can view the supplier auction card" do
       assert has_css?(".qa-supplier-bid-history")
       refute has_css?(".qa-auction-suppliers")
     end
@@ -177,13 +181,17 @@ defmodule Oceanconnect.AuctionShowTest do
         auction_state.bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
-      bid_list_params =
+      bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => "#{bid.is_traded_bid}"}}
+          is_traded_bid_content = case bid.is_traded_bid do
+                                    true -> ""
+                                    false -> ""
+                                  end
+          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid_content}}
         end)
 
       assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
+      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
       assert AuctionShowPage.has_bid_message?("Bid successfully placed")
     end
 

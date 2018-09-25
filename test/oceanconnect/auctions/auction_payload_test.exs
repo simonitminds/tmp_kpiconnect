@@ -44,7 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
     end
 
-    test "returns payload for a supplier", %{
+    test "returns correct amount in the payload for a supplier", %{
       auction: auction,
       supplier: supplier,
       bid_params: bid_params = %{"amount" => amount},
@@ -66,6 +66,36 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       lowest_bid = hd(payload.lowest_bids)
       refute Map.has_key?(lowest_bid, :supplier)
       assert Map.has_key?(lowest_bid, :supplier_id)
+    end
+
+    test "shows only own is_traded_bid information in lowest bids", %{
+      auction: auction,
+      supplier: supplier,
+      bid_params: bid_params = %{"amount" => amount},
+      supplier_2: supplier_2
+    } do
+      bid_params = Map.put(bid_params, "is_traded_bid", true)
+      Auctions.place_bid(auction, bid_params, supplier.id)
+      Auctions.place_bid(auction, %{"amount" => 1.5, "is_traded_bid" => false}, supplier_2.id)
+
+      supplier1_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
+      assert [%{amount: ^amount, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: nil}] = supplier1_payload.lowest_bids
+
+      supplier2_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
+      assert [%{amount: ^amount, is_traded_bid: nil}, %{amount: 1.5, is_traded_bid: false}] = supplier2_payload.lowest_bids
+    end
+
+    test "contains is_traded_bid information in supplier's bid_history", %{
+      auction: auction,
+      supplier: supplier,
+      bid_params: bid_params = %{"amount" => amount}
+    } do
+      bid_params = Map.put(bid_params, "is_traded_bid", true)
+      Auctions.place_bid(auction, bid_params, supplier.id)
+
+      payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
+
+      assert [%{amount: ^amount, is_traded_bid: true}] = payload.bid_history
     end
 
     test "with an existing lowest bid", %{

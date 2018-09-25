@@ -50,7 +50,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                       </div>
                   </MediaQuery>
 
-                  <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
+                  <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">{auction.is_traded_bid_allowed && <span><i className="fas fa-exchange-alt"></i> </span>}
                     {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})</span>
                     <span className="auction-header__company">{auction.buyer.name}</span>
                   </h1>

@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.Api.BidController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer}
 
-  def create(conn, %{"auction_id" => auction_id, "bid" => bid_params}) do
+  def create(conn, stuff = %{"auction_id" => auction_id, "bid" => bid_params}) do
     time_entered = DateTime.utc_now()
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id

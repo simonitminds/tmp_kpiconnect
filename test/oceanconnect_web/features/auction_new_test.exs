@@ -65,7 +65,6 @@ defmodule Oceanconnect.AuctionNewTest do
   test "visting the new auction page", %{buyer: buyer} do
     login_user(buyer)
     AuctionNewPage.visit()
-    Hound.Helpers.Screenshot.take_screenshot()
 
     assert AuctionNewPage.has_fields?([
              "additional_information",

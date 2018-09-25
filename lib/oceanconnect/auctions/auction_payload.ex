@@ -109,14 +109,14 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp scrub_bid_for_supplier(
          bid = %AuctionBid{supplier_id: supplier_id},
          supplier_id,
-         _auction = %Auction{}
+         %Auction{}
        ) do
     %{bid | min_amount: bid.min_amount, comment: bid.comment}
     |> Map.from_struct()
   end
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, _auction = %Auction{}) do
-    %{bid | min_amount: nil, comment: nil}
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, %Auction{}) do
+    %{bid | min_amount: nil, comment: nil, is_traded_bid: nil}
     |> Map.from_struct()
     |> Map.delete(:supplier_id)
   end
