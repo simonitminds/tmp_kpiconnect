@@ -20,6 +20,21 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
       <MediaQuery query="(min-width: 769px)">
         <form onSubmit={formSubmit.bind(this, auction.id)}>
           <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
+          { (is_traded_bid_allowed === true) &&
+            <div className="field field--ribbon is-horizontal">
+              <div className="field-label"></div>
+              <div className="field-body">
+                <CheckBoxField
+                  model={'auction-bid'}
+                  field={'is_traded_bid'}
+                  labelText={'mark as traded bid'}
+                  value={is_traded_bid}
+                  opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                />
+              </div>
+            <i>Buyer's Credit Margin with OCM: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
+            </div>
+          }
           <div className="field is-horizontal is-expanded">
             <div className="field-label">
               <div className="control">
@@ -68,21 +83,6 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
               </div>
             </div>
           </div>
-          { (is_traded_bid_allowed === true) &&
-            <div className="field is-horizontal">
-              <div className="field-label"></div>
-              <div className="field-body">
-                <CheckBoxField
-                  model={'auction-bid'}
-                  field={'is_traded_bid'}
-                  labelText={'mark as traded bid'}
-                  value={is_traded_bid}
-                  opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                />
-              </div>
-            <span>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
-            </div>
-          }
         </form>
       </MediaQuery>
       <MediaQuery query="(max-width: 768px)">
