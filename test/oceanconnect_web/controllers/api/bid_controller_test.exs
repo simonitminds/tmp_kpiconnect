@@ -157,14 +157,18 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
              }
     end
 
-    test "creating a bid for an auction that doesn't allow traded bids", %{auction: auction, conn: conn, bid_params: params} do 
+    test "creating a bid for an auction that doesn't allow traded bids", %{
+      auction: auction,
+      conn: conn,
+      bid_params: params
+    } do
       params = put_in(params["bid"]["is_traded_bid"], "true")
       conn = create_post(conn, auction, params)
 
       assert json_response(conn, 422) == %{
-        "success" => false,
-        "message" => "Auction not accepting traded bids"
-      }
+               "success" => false,
+               "message" => "Auction not accepting traded bids"
+             }
     end
   end
 

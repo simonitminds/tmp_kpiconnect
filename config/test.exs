@@ -28,6 +28,7 @@ config :oceanconnect, :store_starter, true
 
 config :hound,
   driver: "chrome_driver"
-  # browser: "chrome_headless"
+
+# browser: "chrome_headless"
 
 config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.TestAdapter

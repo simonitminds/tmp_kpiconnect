@@ -112,11 +112,20 @@ defmodule Oceanconnect.AuctionShowTest do
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          is_traded_bid_content = case bid.is_traded_bid do
-                                    true -> ""
-                                    false -> ""
-                                  end
-          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier, "is_traded_bid" => is_traded_bid_content}}
+          is_traded_bid_content =
+            case bid.is_traded_bid do
+              true -> ""
+              false -> ""
+            end
+
+          %{
+            "id" => bid.id,
+            "data" => %{
+              "amount" => "$#{bid.amount}",
+              "supplier" => bid.supplier,
+              "is_traded_bid" => is_traded_bid_content
+            }
+          }
         end)
 
       AuctionShowPage.visit(auction.id)
@@ -165,10 +174,17 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_bid_message?("Bid successfully placed")
     end
 
-    test "supplier can enter a traded bid", %{auction: auction, bid_params: bid_params, buyer_company: buyer_company} do
+    test "supplier can enter a traded bid", %{
+      auction: auction,
+      bid_params: bid_params,
+      buyer_company: buyer_company
+    } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.mark_as_traded_bid()
-      assert AuctionNewPage.credit_margin_amount == :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
+      assert AuctionNewPage.credit_margin_amount() ==
+               :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
       AuctionShowPage.submit_bid()
 
       :timer.sleep(500)
@@ -183,11 +199,16 @@ defmodule Oceanconnect.AuctionShowTest do
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          is_traded_bid_content = case bid.is_traded_bid do
-                                    true -> ""
-                                    false -> ""
-                                  end
-          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid_content}}
+          is_traded_bid_content =
+            case bid.is_traded_bid do
+              true -> ""
+              false -> ""
+            end
+
+          %{
+            "id" => bid.id,
+            "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid_content}
+          }
         end)
 
       assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
@@ -288,7 +309,10 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 
@@ -323,7 +347,10 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier, fn ->
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
         assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
@@ -413,6 +440,7 @@ defmodule Oceanconnect.AuctionShowTest do
   } do
     barge =
       insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+
     Auctions.submit_barge(auction, barge, supplier.company_id)
     Auctions.submit_barge(auction, barge, supplier2.company_id)
 
@@ -436,6 +464,7 @@ defmodule Oceanconnect.AuctionShowTest do
   } do
     barge =
       insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+
     Auctions.submit_barge(auction, barge, supplier.company_id)
     Auctions.submit_barge(auction, barge, supplier2.company_id)
 

@@ -39,7 +39,7 @@ defmodule OceanconnectWeb.Api.BidController do
   end
 
   defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
-    case is_traded_bid && is_traded_bid_allowed || !is_traded_bid do
+    case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
       true -> :ok
       false -> {"invalid_traded_bid", "Auction not accepting traded bids"}
     end

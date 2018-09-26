@@ -16,7 +16,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     port = insert(:port, companies: [buyer_company, supplier_company])
 
     auction_params =
-      string_params_for(:auction, vessel: vessel, fuel: fuel, port: port, is_traded_bid_allowed: true)
+      string_params_for(:auction,
+        vessel: vessel,
+        fuel: fuel,
+        port: port,
+        is_traded_bid_allowed: true
+      )
       |> Oceanconnect.Utilities.maybe_convert_date_times()
       |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
 

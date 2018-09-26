@@ -124,8 +124,15 @@ defmodule OceanconnectWeb.EmailTest do
     } do
       is_traded_bid = false
       total_price = winning_bid_amount * auction.fuel_quantity
+
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction, is_traded_bid)
+        Email.auction_closed(
+          winning_bid_amount,
+          total_price,
+          winning_supplier_company,
+          auction,
+          is_traded_bid
+        )
 
       for supplier <- winning_suppliers do
         assert Enum.any?(winning_supplier_emails, fn supplier_email ->
@@ -183,17 +190,24 @@ defmodule OceanconnectWeb.EmailTest do
     } do
       is_traded_bid = true
       total_price = winning_bid_amount * auction.fuel_quantity
+
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(winning_bid_amount, total_price, winning_supplier_company, auction, is_traded_bid)
+        Email.auction_closed(
+          winning_bid_amount,
+          total_price,
+          winning_supplier_company,
+          auction,
+          is_traded_bid
+        )
 
       for supplier <- winning_suppliers do
         assert Enum.any?(winning_supplier_emails, fn supplier_email ->
-          supplier_email.to.id == supplier.id
-        end)
+                 supplier_email.to.id == supplier.id
+               end)
 
         assert Enum.any?(winning_supplier_emails, fn supplier_email ->
-          supplier_email.html_body =~ Accounts.User.full_name(supplier)
-        end)
+                 supplier_email.html_body =~ Accounts.User.full_name(supplier)
+               end)
       end
 
       for supplier_email <- winning_supplier_emails do

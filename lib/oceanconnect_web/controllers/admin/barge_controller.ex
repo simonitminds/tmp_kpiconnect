@@ -125,11 +125,11 @@ defmodule OceanconnectWeb.Admin.BargeController do
     removed_companies =
       companies
       |> Enum.map(fn company ->
-      {company_id, is_selected} = company
+        {company_id, is_selected} = company
 
-      if is_selected == "false" do
-        company_id
-      end
+        if is_selected == "false" do
+          company_id
+        end
       end)
       |> Enum.filter(fn company_id -> company_id != nil end)
       |> Enum.map(& &1)

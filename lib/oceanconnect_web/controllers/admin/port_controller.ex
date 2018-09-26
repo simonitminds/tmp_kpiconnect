@@ -90,27 +90,29 @@ defmodule OceanconnectWeb.Admin.PortController do
     port = Auctions.get_port!(id) |> Auctions.port_with_companies()
     existing_companies = Accounts.list_active_companies()
 
-    selected_companies = companies
-    |> Enum.map(fn company ->
-      {company_id, is_selected} = company
+    selected_companies =
+      companies
+      |> Enum.map(fn company ->
+        {company_id, is_selected} = company
 
-      if is_selected == "true" do
-        company_id
-      end
-    end)
-    |> Enum.filter(fn company_id -> company_id != nil end)
-    |> Enum.map(& &1)
+        if is_selected == "true" do
+          company_id
+        end
+      end)
+      |> Enum.filter(fn company_id -> company_id != nil end)
+      |> Enum.map(& &1)
 
-    removed_companies = companies
-    |> Enum.map(fn company ->
-      {company_id, is_selected} = company
+    removed_companies =
+      companies
+      |> Enum.map(fn company ->
+        {company_id, is_selected} = company
 
-      if is_selected == "false" do
-        company_id
-      end
-    end)
-    |> Enum.filter(fn company_id -> company_id != nil end)
-    |> Enum.map(& &1)
+        if is_selected == "false" do
+          company_id
+        end
+      end)
+      |> Enum.filter(fn company_id -> company_id != nil end)
+      |> Enum.map(& &1)
 
     port_params =
       port_params

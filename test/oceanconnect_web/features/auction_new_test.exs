@@ -19,7 +19,6 @@ defmodule Oceanconnect.AuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
-
     auction_params = %{
       anonymous_bidding: true,
       decision_duration: 15,
@@ -114,12 +113,21 @@ defmodule Oceanconnect.AuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
-  test "creating an auction", %{params: params, show_params: show_params, port: port, buyer: buyer, buyer_company: buyer_company} do
+  test "creating an auction", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    buyer: buyer,
+    buyer_company: buyer_company
+  } do
     login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
-    assert AuctionNewPage.credit_margin_amount == :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
     AuctionNewPage.submit()
 
     eventually(fn ->

@@ -132,7 +132,12 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
-      Auctions.place_bid(auction, %{"amount" => 1.25, "is_traded_bid" => true}, hd(auction.suppliers).id)
+
+      Auctions.place_bid(
+        auction,
+        %{"amount" => 1.25, "is_traded_bid" => true},
+        hd(auction.suppliers).id
+      )
 
       :timer.sleep(500)
       assert_received %AuctionEvent{type: :traded_bid_placed, auction_id: ^auction_id}

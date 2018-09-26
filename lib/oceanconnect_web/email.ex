@@ -133,7 +133,7 @@ defmodule OceanconnectWeb.Email do
         winning_supplier_company = %Company{},
         auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
         _is_traded_bid = true
-  ) do
+      ) do
     oceanconnect = Accounts.get_ocm_company()
 
     buyer_company = Accounts.get_company!(buyer_id)

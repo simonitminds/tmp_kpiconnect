@@ -49,6 +49,7 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
       winning_supplier_company: winning_supplier_company
     } do
       is_traded_bid = true
+
       %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
         Email.auction_closed(100, 20000, winning_supplier_company, auction, is_traded_bid)
 
