@@ -269,16 +269,18 @@ defmodule Oceanconnect.AccountsTest do
       refute Accounts.authorized_for_company?(nil, company.id)
     end
 
-    test "list_company_barges/1 returns all barges associated with the company", %{
+    test "list_company_barges/1 returns all active barges associated with the company", %{
       company: company
     } do
       barges = [
-        insert(:barge, companies: [company]),
-        insert(:barge, companies: [company]),
-        insert(:barge, companies: [company])
+        insert(:barge, companies: [company], is_active: true),
+        insert(:barge, companies: [company], is_active: false),
+        insert(:barge, companies: [company], is_active: true)
       ]
 
-      assert Enum.map(barges, & &1.id) ==
+      [barge1, barge2, barge3] = barges
+      assert [barge1.id, barge3.id] == Enum.map(Accounts.list_company_barges(company.id), & &1.id)
+      refute Enum.map(barges, & &1.id) ==
                Enum.map(Accounts.list_company_barges(company.id), & &1.id)
     end
   end
