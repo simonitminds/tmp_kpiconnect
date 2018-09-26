@@ -58,7 +58,8 @@ defmodule Oceanconnect.Auctions.AuctionNotifierTest do
                AuctionNotifier.notify_auction_completed(
                  100.00,
                  winning_supplier_company.id,
-                 auction.id
+                 auction.id,
+                 false
                )
 
       assert length(emails) > 0

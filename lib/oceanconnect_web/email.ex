@@ -133,7 +133,9 @@ defmodule OceanconnectWeb.Email do
         winning_supplier_company = %Company{},
         auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
         _is_traded_bid = true
-      ) do
+  ) do
+    oceanconnect = Accounts.get_ocm_company()
+
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies([winning_supplier_company])
@@ -149,7 +151,7 @@ defmodule OceanconnectWeb.Email do
           user: supplier,
           winning_supplier_company: winning_supplier_company,
           auction: auction,
-          buyer_company: buyer_company,
+          buyer_company: oceanconnect,
           bid_amount: bid_amount,
           total_price: total_price,
           is_buyer: false
@@ -163,7 +165,7 @@ defmodule OceanconnectWeb.Email do
         |> render(
           "auction_completion.html",
           user: buyer,
-          winning_supplier_company: winning_supplier_company,
+          winning_supplier_company: oceanconnect,
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
