@@ -354,7 +354,7 @@ const AuctionForm = (props) => {
              { (credit_margin_amount !== "") &&
                  <div className="field is-horizontal">
                    <div className="field-label"></div>
-                   <div className="field-body">
+                   <div className="field-body field-body--columned">
                      <CheckBoxField
                          model={'auction'}
                          field={'is_traded_bid_allowed'}
@@ -363,8 +363,8 @@ const AuctionForm = (props) => {
                          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                          onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
                      />
+                     <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
                    </div>
-                   <span style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
                  </div>
             }
             </fieldset>

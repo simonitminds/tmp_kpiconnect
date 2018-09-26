@@ -15,6 +15,22 @@
   }
 }
 
+.field-body--columned {
+  flex-direction: column;
+
+  .field {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.field-body__note {
+  padding: 0.5rem 1rem;
+  background-color: $gray-1;
+  border-radius: 3px;
+  max-width: 21rem;
+
+}
+
 .field.is-grouped { // Kick form fields onto separate row from labels.
   flex-wrap: wrap;
 
