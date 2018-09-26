@@ -190,7 +190,7 @@ defmodule Oceanconnect.AccountsTest do
 
     test "create_company/1 with valid data creates a company" do
       assert {:ok, %Company{} = company} =
-               Accounts.create_company(Map.merge(@valid_attrs, %{name: "some name"}))
+               Accounts.create_company(Map.merge(@valid_attrs, %{name: "some name", credit_margin_amount: 5.0}))
 
       assert all_values_match?(@valid_attrs, company)
     end
@@ -199,15 +199,34 @@ defmodule Oceanconnect.AccountsTest do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_company(@invalid_attrs)
     end
 
+    test "create_company/1 with credit_margin_amount set to 0 creates a company with credit_margin_amount set to nil" do
+      new_valid_attrs = Map.merge(@valid_attrs, %{name: "some name", credit_margin_amount: 0})
+      assert {:ok, %Company{} = company} =
+        Accounts.create_company(new_valid_attrs)
+
+      refute all_values_match?(new_valid_attrs, company)
+      assert company.credit_margin_amount == nil
+    end
+
     test "update_company/2 with valid data updates the company", %{company: company} do
-      assert {:ok, company} = Accounts.update_company(company, @update_attrs)
+      new_update_attrs = Map.merge(@update_attrs, %{credit_margin_amount: 5.0})
+      assert {:ok, company} = Accounts.update_company(company, new_update_attrs)
       assert %Company{} = company
-      assert all_values_match?(@update_attrs, company)
+      assert all_values_match?(new_update_attrs, company)
     end
 
     test "update_company/2 with invalid data returns error changeset", %{company: company} do
       assert {:error, %Ecto.Changeset{}} = Accounts.update_company(company, @invalid_attrs)
       assert company == Accounts.get_company!(company.id)
+    end
+
+    test "update_company/2 with credit_margin_amount set to 0 updates a company with credit_margin_amount set to nil", %{company: company} do
+      new_update_attrs = Map.merge(@update_attrs, %{credit_margin_amount: 0})
+      assert {:ok, company} =
+        Accounts.update_company(company, new_update_attrs)
+
+      refute all_values_match?(new_update_attrs, company)
+      assert company.credit_margin_amount == nil
     end
 
     test "delete_company/1 deletes the company", %{company: company} do

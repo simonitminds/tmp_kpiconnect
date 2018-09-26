@@ -66,6 +66,7 @@ defmodule Oceanconnect.Accounts.Company do
     company
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> maybe_set_credit_margin_amount_to_nil
   end
 
   def select_active(query \\ Company) do
@@ -73,5 +74,12 @@ defmodule Oceanconnect.Accounts.Company do
       q in query,
       where: q.is_active == true
     )
+  end
+
+  defp maybe_set_credit_margin_amount_to_nil(changeset) do
+    case get_change(changeset, :credit_margin_amount) do
+      0.0 -> put_change(changeset, :credit_margin_amount, nil)
+      _ -> changeset
+    end
   end
 end
