@@ -339,10 +339,12 @@ defmodule Oceanconnect.AuctionShowTest do
     supplier: supplier
   } do
     barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+    inactive_barge = insert(:barge, companies: [supplier.company], imo_number: "1234568", is_active: false)
     login_user(supplier)
     AuctionShowPage.visit(auction.id)
     :timer.sleep(1000)
     assert AuctionShowPage.has_available_barge?(barge)
+    refute AuctionShowPage.has_available_barge?(inactive_barge)
 
     AuctionShowPage.submit_barge(barge)
     :timer.sleep(1000)
