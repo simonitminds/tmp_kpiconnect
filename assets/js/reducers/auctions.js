@@ -5,7 +5,7 @@ import {
   CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_PAYLOADS,
   UPDATE_AUCTION_PAYLOAD,
-  UPDATE_BID_STATUS
+  UPDATE_BID_STATUS,
 } from "../constants";
 
 const initialState = {

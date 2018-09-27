@@ -3,19 +3,21 @@ defmodule OceanconnectWeb.Api.BidController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionTimer}
 
-  def create(conn, %{"auction_id" => auction_id, "bid" => bid_params}) do
+  def create(conn, stuff = %{"auction_id" => auction_id, "bid" => bid_params}) do
     time_entered = DateTime.utc_now()
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
     updated_bid_params = convert_amount(bid_params)
     amount = updated_bid_params["amount"]
+    is_traded_bid = bid_params["is_traded_bid"] == "true"
 
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          :ok <- duration_time_remaining?(auction),
          # false if amount == nil or negative
          false <- amount < 0,
          true <- quarter_increment?(amount),
-         true <- supplier_id in Auctions.auction_supplier_ids(auction) do
+         true <- supplier_id in Auctions.auction_supplier_ids(auction),
+         :ok <- validate_traded_bids(is_traded_bid, auction) do
       Auctions.place_bid(auction, updated_bid_params, supplier_id, time_entered, user)
       render(conn, "show.json", %{success: true, message: "Bid successfully placed"})
     else
@@ -24,10 +26,22 @@ defmodule OceanconnectWeb.Api.BidController do
         |> put_status(409)
         |> render("show.json", %{success: false, message: message})
 
+      {"invalid_traded_bid", message} ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: message})
+
       _ ->
         conn
         |> put_status(422)
         |> render("show.json", %{success: false, message: "Invalid bid"})
+    end
+  end
+
+  defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
+    case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
+      true -> :ok
+      false -> {"invalid_traded_bid", "Auction not accepting traded bids"}
     end
   end
 

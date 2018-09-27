@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.Admin.PortView do
   def port_has_company?(%{companies: port_companies}, %{id: company_id}) do
     if Enum.any?(port_companies, fn port_company ->
          port_company.id == company_id
-        end) do
+       end) do
       true
     else
       false

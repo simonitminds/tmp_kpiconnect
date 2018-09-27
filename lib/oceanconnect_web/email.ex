@@ -83,7 +83,8 @@ defmodule OceanconnectWeb.Email do
         bid_amount,
         total_price,
         winning_supplier_company = %Company{},
-        auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port}
+        auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
+        _is_traded_bid = false
       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
@@ -115,6 +116,56 @@ defmodule OceanconnectWeb.Email do
           "auction_completion.html",
           user: buyer,
           winning_supplier_company: winning_supplier_company,
+          auction: auction,
+          buyer_company: buyer_company,
+          bid_amount: bid_amount,
+          total_price: total_price,
+          is_buyer: true
+        )
+      end)
+
+    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
+  end
+
+  def auction_closed(
+        bid_amount,
+        total_price,
+        winning_supplier_company = %Company{},
+        auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
+        _is_traded_bid = true
+      ) do
+    oceanconnect = Accounts.get_ocm_company()
+
+    buyer_company = Accounts.get_company!(buyer_id)
+    buyers = Accounts.users_for_companies([buyer_company])
+    suppliers = Accounts.users_for_companies([winning_supplier_company])
+    vessel_name = vessel.name
+    port_name = port.name
+
+    supplier_emails =
+      Enum.map(suppliers, fn supplier ->
+        base_email(supplier)
+        |> subject("You have won Auction #{auction.id} for #{vessel_name} at #{port_name}!")
+        |> render(
+          "auction_completion.html",
+          user: supplier,
+          winning_supplier_company: winning_supplier_company,
+          auction: auction,
+          buyer_company: oceanconnect,
+          bid_amount: bid_amount,
+          total_price: total_price,
+          is_buyer: false
+        )
+      end)
+
+    buyer_emails =
+      Enum.map(buyers, fn buyer ->
+        base_email(buyer)
+        |> subject("Auction #{auction.id} for #{vessel_name} at #{port_name} has closed.")
+        |> render(
+          "auction_completion.html",
+          user: buyer,
+          winning_supplier_company: oceanconnect,
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,

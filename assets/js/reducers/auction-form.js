@@ -1,6 +1,8 @@
 import _ from "lodash";
 import moment from 'moment';
-import { replaceListItem } from "../utilities";
+import { replaceListItem,
+         formatPrice
+ } from "../utilities";
 import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_DATE,
          UPDATE_INFORMATION,
@@ -12,19 +14,20 @@ import { RECEIVE_AUCTION_FORM_DATA,
 
 const initialState = {
   auction: null,
-  scheduled_start_date: null,
-  scheduled_start_time: null,
   eta_date: null,
   eta_time: null,
   etd_date: null,
   etd_time: null,
-  suppliers: null,
   fuels: null,
-  ports: null,
-  vessels: null,
   loading: true,
+  ports: null,
+  scheduled_start_date: null,
+  scheduled_start_time: null,
   selectedPort: null,
-  selectedSuppliers: []
+  selectedSuppliers: [],
+  suppliers: null,
+  vessels: null,
+  credit_margin_amount: null
 };
 
 const setUTCDateTime = (dateTime) => {
@@ -45,19 +48,20 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
-          scheduled_start_date: setUTCDateTime(action.data.auction.scheduled_start),
-          scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           eta_date: setUTCDateTime(action.data.auction.eta),
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
           etd_time: setUTCDateTime(action.data.auction.etd),
+          fuels: action.data.fuels,
+          loading: false,
+          ports: action.data.ports,
+          scheduled_start_date: setUTCDateTime(action.data.auction.scheduled_start),
+          scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           selectedPort: _.get(action, 'data.auction.port.id'),
           selectedSuppliers: supplierList,
           suppliers: _.get(action, 'data.suppliers', []),
-          fuels: action.data.fuels,
-          ports: action.data.ports,
           vessels: action.data.vessels,
-          loading: false
+          credit_margin_amount: formatPrice(action.data.credit_margin_amount)
         };
       }
     }

@@ -56,15 +56,21 @@ defmodule OceanconnectWeb.AuctionView do
     end
   end
 
-  def barge_name_for_event(%AuctionEvent{data: %{auction_barge: %AuctionBarge{barge: %Barge{name: name}}}}),
-    do: name
-  def barge_name_for_event(%AuctionEvent{data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}}) do
+  def barge_name_for_event(%AuctionEvent{
+        data: %{auction_barge: %AuctionBarge{barge: %Barge{name: name}}}
+      }),
+      do: name
+
+  def barge_name_for_event(%AuctionEvent{
+        data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}
+      }) do
     with %Barge{name: name} <- Occeanconnect.Repo.get(AuctionBarge, barge_id) do
       name
     else
       _ -> ""
     end
   end
+
   def barge_name_for_event(event = %AuctionEvent{}) do
     ""
   end

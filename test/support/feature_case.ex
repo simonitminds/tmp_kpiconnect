@@ -42,7 +42,7 @@ defmodule Oceanconnect.FeatureCase do
     Hound.start_session(
       additional_capabilities: %{
         chromeOptions: %{
-          "args" => ["--window-size=1920,1280"] |> put_headless(tags) |> put_user_agent(tags)
+          "args" => ["--window-size=1920,4000"] |> put_headless(tags) |> put_user_agent(tags)
         }
       }
     )

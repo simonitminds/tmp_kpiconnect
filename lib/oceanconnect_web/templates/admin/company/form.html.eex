@@ -94,6 +94,16 @@
           Is Supplier
         <%end%>
       </div>
+
+      <div class="field">
+        <%= label f, :credit_margin_amount, class: "label" do %>
+          Credit Margin
+        <% end %>
+        <div class="control">
+          <%= text_input f, :credit_margin_amount, class: "input qa-admin-company-credit_margin_amount" %>
+          <%= error_tag f, :credit_margin_amount %>
+        </div>
+      </div>
     </div>
   </div>
   <div class="columns">

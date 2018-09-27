@@ -192,6 +192,8 @@ defmodule Oceanconnect.Accounts do
     |> Repo.get!(id)
   end
 
+  def get_ocm_company, do: Repo.get_by!(Company, name: "Ocean Connect Marine")
+
   @doc """
   Creates a company.
 

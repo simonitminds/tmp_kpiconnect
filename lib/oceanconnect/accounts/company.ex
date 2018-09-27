@@ -11,13 +11,14 @@ defmodule Oceanconnect.Accounts.Company do
     field(:city, :string)
     field(:contact_name, :string)
     field(:country, :string)
+    field(:credit_margin_amount, :float)
     field(:email, :string)
-    field(:name, :string)
+    field(:is_active, :boolean, default: true)
+    field(:is_supplier, :boolean, default: false)
     field(:main_phone, :string)
     field(:mobile_phone, :string)
+    field(:name, :string)
     field(:postal_code, :string)
-    field(:is_supplier, :boolean, default: false)
-    field(:is_active, :boolean, default: true)
 
     many_to_many(
       :barges,
@@ -51,12 +52,13 @@ defmodule Oceanconnect.Accounts.Company do
     :city,
     :contact_name,
     :country,
+    :credit_margin_amount,
     :email,
+    :is_active,
+    :is_supplier,
     :main_phone,
     :mobile_phone,
-    :postal_code,
-    :is_supplier,
-    :is_active
+    :postal_code
   ]
 
   @doc false
@@ -64,6 +66,7 @@ defmodule Oceanconnect.Accounts.Company do
     company
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> maybe_set_credit_margin_amount_to_nil
   end
 
   def select_active(query \\ Company) do
@@ -71,5 +74,12 @@ defmodule Oceanconnect.Accounts.Company do
       q in query,
       where: q.is_active == true
     )
+  end
+
+  defp maybe_set_credit_margin_amount_to_nil(changeset) do
+    case get_change(changeset, :credit_margin_amount) do
+      0.0 -> put_change(changeset, :credit_margin_amount, nil)
+      _ -> changeset
+    end
   end
 end

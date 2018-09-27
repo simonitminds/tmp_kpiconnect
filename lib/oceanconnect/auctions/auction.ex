@@ -22,6 +22,7 @@ defmodule Oceanconnect.Auctions.Auction do
     # milliseconds
     field(:decision_duration, :integer, default: 15 * 60_000)
     field(:anonymous_bidding, :boolean)
+    field(:is_traded_bid_allowed, :boolean)
     field(:additional_information, :string)
 
     many_to_many(
@@ -55,6 +56,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :etd,
     :fuel_id,
     :fuel_quantity,
+    :is_traded_bid_allowed,
     :po,
     :port_agent
   ]

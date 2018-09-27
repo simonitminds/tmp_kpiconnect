@@ -11,23 +11,25 @@ import SupplierList  from './supplier-list';
 const AuctionForm = (props) => {
   const {
     auction,
-    scheduled_start_date,
-    scheduled_start_time,
+    deselectAllSuppliers,
     eta_date,
     eta_time,
     etd_date,
     etd_time,
     fuels,
     ports,
-    vessels,
-    updateDate,
-    updateInformation,
+    scheduled_start_date,
+    scheduled_start_time,
+    selectAllSuppliers,
+    selectPort,
     selectedSuppliers,
     suppliers,
-    selectPort,
     toggleSupplier,
-    selectAllSuppliers,
-    deselectAllSuppliers,
+    updateDate,
+    updateInformation,
+    updateInformationFromCheckbox,
+    vessels,
+    credit_margin_amount
   } = props;
 
   const fuel_id = auction.fuel_id ? auction.fuel_id : "";
@@ -349,6 +351,22 @@ const AuctionForm = (props) => {
                  />
                </div>
              </div>
+             { (credit_margin_amount !== "") &&
+                 <div className="field is-horizontal">
+                   <div className="field-label"></div>
+                   <div className="field-body field-body--columned">
+                     <CheckBoxField
+                         model={'auction'}
+                         field={'is_traded_bid_allowed'}
+                         labelText={'accept traded bids'}
+                         value={auction.is_traded_bid_allowed}
+                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
+                     />
+                     <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
+                   </div>
+                 </div>
+            }
             </fieldset>
           </div>
         </div>

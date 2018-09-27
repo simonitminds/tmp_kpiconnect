@@ -18,6 +18,7 @@
       data-fuels="<%= @fuels %>"
       data-ports="<%= @ports %>"
       data-vessels="<%= @vessels %>"
+      data-credit_margin_amount="<%= @credit_margin_amount %>"
     ></div>
   </div>
 

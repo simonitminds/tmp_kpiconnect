@@ -54,18 +54,18 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     {:ok, cancellation_emails}
   end
 
-  def notify_auction_completed(bid_amount, supplier_id, auction_id) do
+  def notify_auction_completed(bid_amount, supplier_id, auction_id, is_traded_bid) do
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
     winning_supplier_company = Oceanconnect.Accounts.get_company!(supplier_id)
     total_price = bid_amount * auction.fuel_quantity
-
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       OceanconnectWeb.Email.auction_closed(
         bid_amount,
         total_price,
         winning_supplier_company,
-        auction
+        auction,
+        is_traded_bid
       )
 
     completion_emails = List.flatten([supplier_emails | buyer_emails])

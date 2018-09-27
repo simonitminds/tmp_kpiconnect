@@ -3,6 +3,7 @@ import _ from 'lodash';
 import MediaQuery from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
 import { formatPrice } from '../../utilities';
+import CheckBoxField from '../check-box-field';
 
 const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const auction = auctionPayload.auction;
@@ -10,12 +11,30 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const currentBidAmount = _.get(auctionPayload, 'bid_history[0].amount');
   const minimumBidAmount = _.get(auctionPayload, 'bid_history[0].min_amount');
   const fuel = _.get(auction, 'fuel.name');
+  const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'))
+  const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
+  const is_traded_bid = _.get(auctionPayload, 'bid_history[0].is_traded_bid');
 
   return(
     <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
       <MediaQuery query="(min-width: 769px)">
         <form onSubmit={formSubmit.bind(this, auction.id)}>
           <h3 className="title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
+          { (is_traded_bid_allowed === true) &&
+            <div className="field field--ribbon is-horizontal">
+              <div className="field-label"></div>
+              <div className="field-body">
+                <CheckBoxField
+                  model={'auction-bid'}
+                  field={'is_traded_bid'}
+                  labelText={'mark as traded bid'}
+                  value={is_traded_bid}
+                  opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                />
+              </div>
+            <i>Buyer's Credit Margin with OCM: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
+            </div>
+          }
           <div className="field is-horizontal is-expanded">
             <div className="field-label">
               <div className="control">
@@ -120,6 +139,21 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
                 </div>
               </div>
             </div>
+            { (is_traded_bid_allowed === true) &&
+              <div className="field is-horizontal">
+                <div className="field-label"></div>
+                <div className="field-body">
+                  <CheckBoxField
+                    model={'auction-bid'}
+                    field={'is_traded_bid'}
+                    labelText={'mark as traded bid'}
+                    value={is_traded_bid}
+                    opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                  />
+                </div>
+                <span>Your credit margin amount: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></span>
+              </div>
+            }
           </form>
         </CollapsibleSection>
       </MediaQuery>

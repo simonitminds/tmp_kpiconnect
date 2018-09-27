@@ -67,6 +67,8 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def new(conn, _params) do
+    user = Auth.current_user(conn)
+    credit_margin_amount = user.company.credit_margin_amount
     changeset = Auctions.change_auction(%Auction{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
@@ -83,12 +85,14 @@ defmodule OceanconnectWeb.AuctionController do
       fuels: fuels,
       ports: ports,
       vessels: vessels,
-      suppliers: Poison.encode!([])
+      suppliers: Poison.encode!([]),
+      credit_margin_amount: credit_margin_amount
     )
   end
 
   def create(conn, %{"auction" => auction_params}) do
     user = Auth.current_user(conn)
+    credit_margin_amount = user.company.credit_margin_amount
 
     updated_params =
       auction_params
@@ -114,16 +118,19 @@ defmodule OceanconnectWeb.AuctionController do
           fuels: fuels,
           ports: ports,
           vessels: vessels,
-          suppliers: suppliers
+          suppliers: suppliers,
+          credit_margin_amount: credit_margin_amount
         )
     end
   end
 
   def show(conn, %{"id" => id}) do
     auction = Auctions.get_auction!(id)
+    user = Auth.current_user(conn)
+    credit_margin_amount = user.company.credit_margin_amount
 
     if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) do
-      render(conn, "show.html", auction: auction)
+      render(conn, "show.html", auction: auction, credit_margin_amount: credit_margin_amount)
     else
       redirect(conn, to: auction_path(conn, :index))
     end
@@ -137,6 +144,9 @@ defmodule OceanconnectWeb.AuctionController do
       [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
       [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
+      user = Auth.current_user(conn)
+      credit_margin_amount = user.company.credit_margin_amount
+
       render(
         conn,
         "edit.html",
@@ -146,7 +156,8 @@ defmodule OceanconnectWeb.AuctionController do
         fuels: fuels,
         ports: ports,
         vessels: vessels,
-        suppliers: suppliers
+        suppliers: suppliers,
+        credit_margin_amount: credit_margin_amount
       )
     else
       _ -> redirect(conn, to: auction_path(conn, :index))
@@ -170,6 +181,7 @@ defmodule OceanconnectWeb.AuctionController do
         {:error, %Ecto.Changeset{} = changeset} ->
           [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
           [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
+          credit_margin_amount = user.company.credit_margin_amount
 
           render(
             conn,
@@ -180,7 +192,8 @@ defmodule OceanconnectWeb.AuctionController do
             fuels: fuels,
             ports: ports,
             vessels: vessels,
-            suppliers: suppliers
+            suppliers: suppliers,
+            credit_margin_amount: credit_margin_amount
           )
       end
     else
@@ -190,9 +203,10 @@ defmodule OceanconnectWeb.AuctionController do
 
   defp auction_inputs_by_buyer(conn) do
     buyer = Auth.current_user(conn)
+    buyer_company = buyer.company
     fuels = Auctions.list_fuels()
-    ports = Auctions.ports_for_company(buyer.company)
-    vessels = Auctions.vessels_for_buyer(buyer.company)
+    ports = Auctions.ports_for_company(buyer_company)
+    vessels = Auctions.vessels_for_buyer(buyer_company)
 
     Enum.map([fuels, ports, vessels], fn list ->
       list |> Poison.encode!()

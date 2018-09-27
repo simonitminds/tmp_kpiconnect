@@ -22,6 +22,7 @@ export default class BuyerBestSolution extends React.Component {
     const lowestBid = _.get(auctionPayload, 'lowest_bids[0]');
     const lowestBidId = _.get(lowestBid, 'id');
     const winningBidId = _.get(auctionPayload, 'winning_bid.id');
+    const is_traded_bid = _.get(auctionPayload, 'lowest_bids.is_traded_bid');
     const remainingBids = _.chain(auctionPayload)
       .get('bid_history', [])
       .reject(['id', lowestBidId])
@@ -81,7 +82,7 @@ export default class BuyerBestSolution extends React.Component {
           <div className="auction-solution__header">
             <h3 className="auction-solution__title is-inline-block">{bid.supplier}</h3>
             <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> ({formatTime(bid.time_entered)})
+              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(bid.amount)}</span> <span className="qa-auction-bid-is_traded_bid">{bid.is_traded_bid && <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-xs has-text-gray-3 auction__traded-bid-marker"></i>}</span> ({formatTime(bid.time_entered)})
               <button
                 className={`button is-small has-margin-left-md qa-select-bid-${bid.id} ${auctionPayload.status != 'decision' ? 'is-hidden' : ''}`}
                 onClick={
