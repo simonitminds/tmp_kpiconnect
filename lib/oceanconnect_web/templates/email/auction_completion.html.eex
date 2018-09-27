@@ -19,10 +19,12 @@
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Grade:</b> <%= @auction.fuel.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Quantity:</b> <%= @auction.fuel_quantity %> MT</p>
     <br>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Price:</b> <%= OceanconnectWeb.EmailView.format_price(@total_price) %> </p>
+
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Price:</b> <%= OceanconnectWeb.EmailView.format_price(@bid_amount) %> </p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Delivery:</b> Fully Delivered Price</p>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Payment:</b> [Payment Terms] <%= OceanconnectWeb.EmailView.format_price(@total_price) %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Payment:</b> 30 days from date of delivery</p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Additional Information:</b> <%= @auction.additional_information %></p><br/>
+
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Buyer Information</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer Name:</b> <%= @buyer_company.contact_name %></p>
