@@ -127,7 +127,7 @@ companies =
       postal_code: "138588"
     },
     %{
-      name: "Chemoil Internatinoal Pte Ltd",
+      name: "Chemoil International Pte Ltd",
       address1: "1 Temasek Avenue",
       address2: "#34-01 Mellenia Tower",
       city: "Singapore",
