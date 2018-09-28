@@ -155,7 +155,9 @@ defmodule OceanconnectWeb.EmailTest do
         assert supplier_email.html_body =~ buyer_company.contact_name
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
         assert supplier_email.html_body =~ auction.vessel.name
-        assert supplier_email.html_body =~ "$#{:erlang.float_to_binary(winning_bid_amount, decimals: 2)}"
+
+        assert supplier_email.html_body =~
+                 "$#{:erlang.float_to_binary(winning_bid_amount, decimals: 2)}"
       end
 
       for buyer <- buyers do
@@ -221,7 +223,9 @@ defmodule OceanconnectWeb.EmailTest do
         assert supplier_email.html_body =~ oceanconnect.contact_name
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
         assert supplier_email.html_body =~ auction.vessel.name
-        assert supplier_email.html_body =~ "$#{:erlang.float_to_binary(winning_bid_amount, decimals: 2)}"
+
+        assert supplier_email.html_body =~
+                 "$#{:erlang.float_to_binary(winning_bid_amount, decimals: 2)}"
       end
 
       for buyer <- buyers do
