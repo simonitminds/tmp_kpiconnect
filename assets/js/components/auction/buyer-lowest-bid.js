@@ -5,7 +5,6 @@ import { formatTime, formatPrice } from '../../utilities';
 const BuyerLowestBid = ({auctionPayload}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const lowestBidList = _.get(auctionPayload, 'lowest_bids', []);
-  const is_traded_bid = _.get(auctionPayload, 'lowest_bids[0].is_traded_bid');
 
   const lowestBidListDisplay = () => {
     if (lowestBidList.length > 0) {
@@ -19,11 +18,11 @@ const BuyerLowestBid = ({auctionPayload}) => {
             </tr>
           </thead>
           <tbody>
-            {_.map(lowestBidList, (bid, is_traded_bid) => {
+            {_.map(lowestBidList, (bid) => {
               return (
                 <tr key={bid.id} className={`qa-auction-lowest-bid-${bid.id}`}>
                   <td className="qa-auction-lowest-bid-supplier">{bid.supplier}</td>
-                  <td className="qa-auction-lowest-bid-amount">${formatPrice(bid.amount)} <span className="qa-auction-bid-is_traded_bid">{!is_traded_bid && <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>}</span></td>
+                  <td className="qa-auction-lowest-bid-amount">${formatPrice(bid.amount)} <span className="qa-auction-bid-is_traded_bid">{bid.is_traded_bid && <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>}</span></td>
                   <td>{formatTime(bid.time_entered)}</td>
                 </tr>
               );
