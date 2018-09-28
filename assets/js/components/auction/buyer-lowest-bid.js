@@ -18,7 +18,7 @@ const BuyerLowestBid = ({auctionPayload}) => {
             </tr>
           </thead>
           <tbody>
-            {_.map(lowestBidList, (bid, is_traded_bid) => {
+            {_.map(lowestBidList, (bid) => {
               return (
                 <tr key={bid.id} className={`qa-auction-lowest-bid-${bid.id}`}>
                   <td className="qa-auction-lowest-bid-supplier">{bid.supplier}</td>
