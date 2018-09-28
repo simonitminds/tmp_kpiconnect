@@ -85,10 +85,10 @@ We're using Ansible to manage server provisioning and deployments. For the most 
 1. Log into the build server with `ssh -A deploy@oceanconnect`
 2. `cd ~/build/oceanconnect/`
 3. Run `./scripts/build-release.sh` to build the new release binary
-4. Deploy with `./scripts/deploy-local.sh`
+4. Run any necessary migrations with `./scripts/db-migrate.sh`
+5. Deploy with `./scripts/deploy-local.sh`
 
 New users will need to add their account information to `ansible/inventory/group_vars/all/users/yml` before they will be able to access the servers.
-
 
 
 ### Provisioning new servers
