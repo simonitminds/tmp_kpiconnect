@@ -22,3 +22,6 @@ source "$HOME/.asdf/asdf.sh"
 
 mix deploy.local
 sudo /bin/systemctl restart "$APP_NAME"
+
+# Save a version file to track what's currently deployed.
+git rev-parse --short HEAD > .deployed-version

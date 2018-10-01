@@ -31,4 +31,9 @@ npm-debug.log
 # configuration to succeed, but obviously will not be versioned.
 ansible/secrets.yml
 
+# This file represents the git commit that has most recently been deployed
+# on the local system, and thus shouldn't be versioned.
+.deployed-version
+
+# Browser screenshots from running tests with Hound.
 screenshot-*.png
