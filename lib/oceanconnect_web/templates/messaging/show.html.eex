@@ -1,4 +1,4 @@
-<div class="messaging">
+<div class="messaging qa-auction-messaging">
   <div class="messaging__notification-context">
     <div class="messaging__menu-bar">
       <h1 class="messaging__menu-bar__title">Messages</h1>
@@ -6,7 +6,7 @@
         <i class="fas fa-envelope has-margin-right-sm"></i> 3
       </div>
     </div>
-    <div class="messaging__conversation-list">
+    <div class="messaging__conversation-list qa-auction-messaging-auctions">
       <ul class="messaging__context-list">
         <li class="messaging__context-list__active-convo">
           <h2>
