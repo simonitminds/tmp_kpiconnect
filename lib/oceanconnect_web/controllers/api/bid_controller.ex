@@ -3,16 +3,23 @@ defmodule OceanconnectWeb.Api.BidController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid}
 
-  def create(conn, %{"auction_id" => auction_id, "bids" => bids_params}) do
+  def create(conn, %{"auction_id" => auction_id, "bids" => bids_params, "is_traded_bid" => is_traded_bid}) do
     time_entered = DateTime.utc_now()
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
-    is_traded_bid = bid_params["is_traded_bid"] == "true"
+    is_traded_bid = is_traded_bid == true
+
+    bids_params = bids_params
+    |> Enum.reduce(%{}, fn({product_id, bid_params}, acc) ->
+      updated_bid_params = Map.put(bid_params, "is_traded_bid", is_traded_bid)
+      Map.put(acc, product_id, updated_bid_params)
+    end)
+    |> IO.inspect()
 
     with  auction = %Auction{} <- Auctions.get_auction(auction_id),
           true <- supplier_id in Auctions.auction_supplier_ids(auction),
-          bids <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user),
-          :ok <- validate_traded_bids(is_traded_bid, auction) do
+          :ok <- validate_traded_bids(is_traded_bid, auction),
+          bids <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
       render(conn, "show.json", %{success: true, message: "Bids successfully placed"})
     else
       {:error, :late_bid} ->

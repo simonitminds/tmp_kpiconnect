@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.Auction do
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
     belongs_to(:port, Port)
-    has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel)
+    has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel, on_replace: :delete, on_delete: :delete_all)
 
     many_to_many(
       :vessels,

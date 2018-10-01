@@ -164,12 +164,16 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
+    auction_vessel_fuels =
+      convert_auction_vessel_fuels_to_list(auction_params["auction_vessel_fuels"])
+
     user = Auth.current_user(conn)
 
     with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params = Auction.from_params(auction_params)
+      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
       case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->

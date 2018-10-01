@@ -48,9 +48,8 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
                         { bid ?
                           <span>
                             ${formatPrice(bid.amount)}
-                            <span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT</span>
-                            <span className="qa-auction-bid-is_traded_bid">
-                              {bid.is_traded_bid &&
+                            <span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT
+                            <span className="qa-auction-bid-is_traded_bid"> {bid.is_traded_bid &&
                                 <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>
                               }
                             </span>

@@ -49,7 +49,7 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
-          credit_margin_amount: formatPrice(action.data.credit_margin_amount)
+          credit_margin_amount: formatPrice(action.data.credit_margin_amount),
           eta_date: setUTCDateTime(action.data.auction.eta),
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
