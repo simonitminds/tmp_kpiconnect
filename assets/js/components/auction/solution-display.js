@@ -3,14 +3,18 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 
-const SolutionDisplay = ({auctionPayload, solution, title}) => {
+const SolutionDisplay = ({auctionPayload, solution, title, acceptBid, best, onSelectSolution, children}) => {
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
   const fuels = _.get(auctionPayload, 'auction.fuels');
   const {bids, normalized_price, total_price, latest_time_entered} = solution;
+  const bidIds = _.map(bids, 'id');
   const fuelBids = _.map(bids, (bid) => {
     const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);
     return {fuel, bid};
   });
+  const selectSolution = (bidIds) =>  {
+    onSelectSolution(bidIds, best);
+  }
 
   //TODO: maybe put this on the SolutionPayload
   const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
@@ -26,7 +30,13 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
     <div className="box auction-solution">
       <div className="auction-solution__header auction-solution__header--bordered">
         <h3 className="auction-solution__title is-inline-block"><i className="fas fa-minus has-padding-right-xs"></i> {title}</h3>
-        <div className="auction-solution__content"><span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span> ({formatTime(latest_time_entered)})</div>
+    <div className="auction-solution__content">
+      <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
+      ({formatTime(latest_time_entered)})
+      {acceptBid &&
+        <button class="button is-small has-margin-left-md qa-select-bid-79345c5649cd4233ac1ad2541c691c2a" onClick={selectSolution(bidIds)}>Select</button>
+      }
+    </div>
       </div>
       <div className="auction-solution__body">
         <div>
@@ -72,6 +82,7 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
           </table>
         </div>
       </div>
+      {children}
     </div>
   );
 };

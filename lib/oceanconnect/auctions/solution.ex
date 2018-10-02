@@ -3,9 +3,10 @@ defmodule Oceanconnect.Auctions.Solution do
 
   defstruct valid: false,
     bids: [],
-    normalized_price: 0.0,
-    total_price: 0.0,
-    latest_time_entered: nil
+    normalized_price: nil,
+    total_price: nil,
+    latest_time_entered: nil,
+    comment: nil
 
   def from_bids(bids, product_bids, %Auction{auction_vessel_fuels: vessel_fuels}) do
     product_ids = Map.keys(product_bids)

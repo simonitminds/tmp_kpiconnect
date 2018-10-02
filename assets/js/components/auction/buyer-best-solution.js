@@ -12,8 +12,11 @@ export default class BuyerBestSolution extends React.Component {
       solutionCommentBidId: null
     }
   }
-  setSolutionCommentBidId(bidId) {
-    this.setState({solutionCommentBidId: bidId});
+  setSolutionCommentBidId(bidIds, isBest) {
+    this.setState({
+      solutionCommentBidId: bidIds,
+      bestSolutionSelected: isBest
+    });
   }
 
   render() {
@@ -32,19 +35,20 @@ export default class BuyerBestSolution extends React.Component {
       .value();
     const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
     const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
+    const setCommentForSolution = (bidIds) => { this.state.solutionCommentBidId == bidIds ? this.setSolutionCommentBidId.bind(this, null) : this.setSolutionCommentBidId.bind(this, bidIds)}
 
-    const bidAcceptDisplay = (bid) => {
+     const bidAcceptDisplay = (bidIds) => {
       if(auctionStatus == 'closed'){
         return "";
-      } else if(this.state.solutionCommentBidId == bid.id) {
+      } else {
         return (
-          <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bid.id)}>
-            {lowestBidId != bid.id ?
+          <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bidIds)}>
+            { this.state.bestSolutionSelected ?
             "" :
             <span className="is-inline-block has-margin-bottom-lg"><strong>Are you sure that you want to accept this offer?</strong></span>
             }
 
-            <SolutionComment showInput={lowestBidId != bid.id} bid={bid} auctionStatus={auctionStatus} />
+            <SolutionComment showInput={!this.state.bestSolutionSelected} auctionStatus={auctionStatus} />
 
             <div className="has-margin-top-md has-margin-bottom-sm"><i>Optional: Specify the Port Agent handling delivery</i></div>
             <InputField
@@ -73,8 +77,25 @@ export default class BuyerBestSolution extends React.Component {
             </div>
           </form>
         );
-      } else {
-        return("");
+      }
+    }
+
+    const otherSolutionDisplay = () => {
+      if (remainingBids.length > 0) {
+        return (
+          <div className="box box--margin-bottom">
+            <div className="box__subsection has-padding-bottom-none">
+              <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
+            </div>
+            {_.map(remainingBids, (bid) => {
+              return (
+                <div key={bid.id} className={`box auction-solution qa-other-solution-${bid.id}`}>
+                  {bidDisplay(this.state.solutionCommentBidId)}
+                </div>
+              );
+            })}
+          </div>
+        );
       }
     }
 
@@ -83,8 +104,12 @@ export default class BuyerBestSolution extends React.Component {
         <div className="box">
           <div className="box__subsection has-padding-bottom-none">
             <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} />
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Single Supplier Solution"} />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} acceptBid={acceptBid} best={true} onSelectSolution={setCommentForSolution.bind(this)} >
+              { bidAcceptDisplay(this.state.solutionCommentBidId) }
+            </SolutionDisplay>
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Solution"} acceptBid={acceptBid} onSelectSolution={setCommentForSolution.bind(this)}>
+              { bidAcceptDisplay(this.state.solutionCommentBidId) }
+            </SolutionDisplay>
           </div>
         </div>
       </div>
