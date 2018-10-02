@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
       |> NaiveDateTime.add(3)
       |> DateTime.from_naive!("Etc/UTC")
 
-    auction = insert(:auction, scheduled_start: start)
+    auction = insert(:auction, scheduled_start: start) |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(

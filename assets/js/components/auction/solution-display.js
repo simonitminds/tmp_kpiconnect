@@ -23,7 +23,7 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
   const totalQuantity = _.sum(Object.values(fuelQuantities));
 
   return (
-    <div className="box auction-solution qa-other-solution-79345c5649cd4233ac1ad2541c691c2a">
+    <div className="box auction-solution">
       <div className="auction-solution__header auction-solution__header--bordered">
         <h3 className="auction-solution__title is-inline-block"><i className="fas fa-minus has-padding-right-xs"></i> {title}</h3>
         <div className="auction-solution__content"><span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span> ({formatTime(latest_time_entered)})</div>
@@ -41,13 +41,13 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
                 bids.length > 0  ?
                 fuelBids.map(({fuel, bid}) => {
                   return (
-                    <tr key={fuel.id}>
+                    <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
                       <td>{fuel.name}</td>
 
                       <td>
                         { bid ?
                           <span>
-                            ${formatPrice(bid.amount)}
+                            <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}</span>
                             <span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT
                             <span className="qa-auction-bid-is_traded_bid"> {bid.is_traded_bid &&
                                 <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>
@@ -57,7 +57,7 @@ const SolutionDisplay = ({auctionPayload, solution, title}) => {
                           <i>No bid</i>
                         }
                       </td>
-                      <td>{ true ? bid.supplier : "" }</td>
+                      <td className="qa-auction-bid-supplier">{ true ? bid.supplier : "" }</td>
                     </tr>
                   );
                 })

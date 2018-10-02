@@ -35,7 +35,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 1500)],
         suppliers: [supplier_company],
         is_traded_bid_allowed: true
-      )
+      ) |> Auctions.fully_loaded()
 
     {:ok,
      conn: authed_conn,

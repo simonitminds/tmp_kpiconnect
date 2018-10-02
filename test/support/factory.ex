@@ -96,11 +96,13 @@ defmodule Oceanconnect.Factory do
     }
   end
 
-  def create_bid(amount, min_amount, supplier_id, auction) do
+  def create_bid(amount, min_amount, supplier_id, fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,
       "min_amount" => min_amount,
       "supplier_id" => supplier_id,
+      "fuel_id" => fuel_id,
+      "is_traded_bid" => is_traded_bid,
       "time_entered" => DateTime.utc_now()
     }
 

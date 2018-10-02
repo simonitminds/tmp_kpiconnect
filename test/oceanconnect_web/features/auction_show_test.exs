@@ -16,13 +16,17 @@ defmodule Oceanconnect.AuctionShowTest do
     supplier2 = insert(:user, company: supplier_company2)
     supplier3 = insert(:user, company: supplier_company3)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2, supplier_company3],
+        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         is_traded_bid_allowed: true
-      )
+      ) |> Auctions.fully_loaded()
 
     bid_params = %{
       amount: 1.25
@@ -42,7 +46,8 @@ defmodule Oceanconnect.AuctionShowTest do
        supplier: supplier,
        supplier2: supplier2,
        supplier3: supplier3,
-       buyer_company: buyer_company
+       buyer_company: buyer_company,
+       fuel_id: fuel_id
      }}
   end
 
@@ -97,17 +102,19 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_values_from_params?(buyer_params)
     end
 
-    test "buyer can see the bid list", %{auction: auction} do
+    test "buyer can see the bid list", %{auction: auction, fuel_id: fuel_id} do
       [s1, s2, _s3] = auction.suppliers
-      Auctions.place_bid(auction, %{"amount" => 1.75, "is_traded_bid" => true}, s1.id)
-      Auctions.place_bid(auction, %{"amount" => 1.25, "is_traded_bid" => false}, s2.id)
+      create_bid(1.75, nil, s1.id, fuel_id, auction, true)
+      |> Auctions.place_bid(insert(:user, company: s1))
+      create_bid(1.75, nil, s2.id, fuel_id, auction, false)
+      |> Auctions.place_bid(insert(:user, company: s2))
 
       auction_state =
         auction
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.bids
+        auction_state.product_bids[fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -137,7 +144,6 @@ defmodule Oceanconnect.AuctionShowTest do
     setup %{auction: auction, supplier: supplier} do
       Auctions.start_auction(auction)
       login_user(supplier)
-      :timer.sleep(500)
       AuctionShowPage.visit(auction.id)
       :ok
     end
@@ -149,7 +155,8 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier can enter a bid", %{
       auction: auction,
-      bid_params: bid_params
+      bid_params: bid_params,
+      fuel_id: fuel_id
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
@@ -161,7 +168,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.bids
+        auction_state.product_bids[fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
@@ -177,7 +184,8 @@ defmodule Oceanconnect.AuctionShowTest do
     test "supplier can enter a traded bid", %{
       auction: auction,
       bid_params: bid_params,
-      buyer_company: buyer_company
+      buyer_company: buyer_company,
+      fuel_id: fuel_id
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.mark_as_traded_bid()
@@ -194,7 +202,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.bids
+        auction_state.product_bids[fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =

@@ -16,12 +16,16 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     supplier2_company = insert(:company)
     buyer_company = insert(:company, is_supplier: false)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
       insert(
         :auction,
         duration: 1_000,
         decision_duration: 60_000,
         suppliers: [supplier_company, supplier2_company],
+        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         buyer: buyer_company
       )
       |> Auctions.create_supplier_aliases()
@@ -42,13 +46,15 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
 
     Oceanconnect.FakeEventStorage.FakeEventStorageCache.start_link()
 
-    {:ok, %{auction: auction}}
+    {:ok, %{auction: auction, fuel_id: fuel_id}}
   end
 
-  test "rebuild auction state from event storage", %{auction: auction = %Auction{id: auction_id}} do
+  test "rebuild auction state from event storage", %{auction: auction = %Auction{id: auction_id}, fuel_id: fuel_id} do
     Auctions.start_auction(auction)
-    bid = Auctions.place_bid(auction, %{"amount" => 1.25}, hd(auction.suppliers).id)
-    Auctions.place_bid(auction, %{"amount" => 1.50}, hd(auction.suppliers).id)
+    bid = create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+    |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
+    create_bid(1.50, nil, hd(auction.suppliers).id, fuel_id, auction)
+    |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
     Auctions.end_auction(auction)
     Auctions.select_winning_bid(bid, "Winner Winner Chicken Dinner.")
     :timer.sleep(500)
@@ -73,11 +79,13 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   end
 
   test "rebuilding auction state emits a rebuilt event", %{
-    auction: auction = %Auction{id: auction_id}
+    auction: auction = %Auction{id: auction_id},
+    fuel_id: fuel_id
   } do
     :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     Auctions.start_auction(auction)
-    Auctions.place_bid(auction, %{"amount" => 1.50}, hd(auction.suppliers).id)
+    create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+    |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
     Auctions.end_auction(auction)
     :timer.sleep(500)
     # # Crash AuctionStore / AuctionSupervisor and let restart

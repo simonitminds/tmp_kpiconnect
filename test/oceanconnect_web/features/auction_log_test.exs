@@ -13,13 +13,17 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
+        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         duration: 600_000
-      )
+      ) |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
@@ -29,14 +33,8 @@ defmodule Oceanconnect.AuctionLogTest do
 
     Auctions.start_auction(auction)
 
-    bid =
-      Auctions.place_bid(
-        auction,
-        %{"amount" => 1.25},
-        supplier_company.id,
-        DateTime.utc_now(),
-        supplier
-      )
+    bid = create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+    |> Auctions.place_bid(supplier)
 
     Auctions.end_auction(auction)
     Auctions.select_winning_bid(bid, "test")

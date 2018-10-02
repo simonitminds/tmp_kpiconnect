@@ -8,8 +8,11 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     supplier = insert(:user, company: supplier_company)
     buyer = insert(:user)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
-      insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company])
+      insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company], auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]) |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
@@ -25,7 +28,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       )
 
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
-    bid_params = %{"bid" => %{"amount" => "3.50", "min_amount" => ""}}
+    bid_params = %{"bids" => %{"amount" => "3.50", "min_amount" => "", "fuel_id" => fuel_id}}
 
     {:ok,
      %{
@@ -162,7 +165,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       conn: conn,
       bid_params: params
     } do
-      params = put_in(params["bid"]["is_traded_bid"], "true")
+      params = put_in(params["bids"]["is_traded_bid"], true)
       conn = create_post(conn, auction, params)
 
       assert json_response(conn, 422) == %{
@@ -177,11 +180,14 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       auction: auction,
       buyer: buyer,
       supplier_company: supplier_company,
-      supplier2_company: supplier2_company
+      supplier2_company: supplier2_company,
+      fuel_id: fuel_id
     } do
       Auctions.start_auction(auction)
-      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
+      bid = create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      |> Auction.place_bid(insert(:user, company: supplier_company))
+      Auctions.place_bid(1.25, nil, supplier2_company.id, fuel_id, auction)
+      |> Auctions.place_bid(insert(:user, company: supplier2_company))
       authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
       Auctions.end_auction(auction)
       {:ok, %{conn: authed_conn, bid: bid}}

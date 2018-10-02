@@ -117,7 +117,8 @@ defmodule Oceanconnect.AuctionNewTest do
     show_params: show_params,
     port: port,
     selected_vessel: selected_vessel,
-    fuels: [selected_fuel | _rest]
+    fuels: [selected_fuel | _rest],
+    buyer_company: buyer_company
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
