@@ -9,9 +9,14 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       buyer_company = insert(:company, name: "FooCompany")
       supplier = insert(:company, name: "BarCompany")
       supplier_2 = insert(:company, name: "BazCompany")
+      supplier_user = insert(:user, company: supplier)
+      supplier_user2 = insert(:user, company: supplier_2)
+
+      fuel = insert(:fuel)
+      fuel_id = "#{fuel.id}"
 
       auction =
-        insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
+        insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2], auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)])
         |> Auctions.fully_loaded()
 
       {:ok, _pid} =
@@ -25,7 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       bid_params = %{"amount" => 1.25}
 
       {:ok,
-       %{auction: auction, supplier: supplier, bid_params: bid_params, supplier_2: supplier_2}}
+       %{auction: auction, supplier: supplier, bid_params: bid_params, supplier_2: supplier_2, supplier_user: supplier_user, supplier_user2: supplier_user2, fuel_id: fuel_id}}
     end
 
     test "returns state payload for a buyer with supplier names in the bid_list", %{
