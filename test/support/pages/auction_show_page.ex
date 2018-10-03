@@ -61,7 +61,7 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  defp value_equals_element_text?(key, element, value) do
+  defp value_equals_element_text?(_key, element, value) do
     text = element |> inner_text
     value == text
   end
@@ -274,7 +274,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
+  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}, _supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click
@@ -285,7 +285,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
+  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}, _supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click

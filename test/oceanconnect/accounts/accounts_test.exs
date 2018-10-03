@@ -300,7 +300,7 @@ defmodule Oceanconnect.AccountsTest do
         insert(:barge, companies: [company], is_active: true)
       ]
 
-      [barge1, barge2, barge3] = barges
+      [barge1, _barge2, barge3] = barges
       assert [barge1.id, barge3.id] == Enum.map(Accounts.list_company_barges(company.id), & &1.id)
 
       refute Enum.map(barges, & &1.id) ==

@@ -269,7 +269,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
-    test "winning bid can be selected", %{auction: auction, bid: bid} do
+    test "winning bid can be selected", %{auction: _auction, bid: _bid} do
     end
   end
 end

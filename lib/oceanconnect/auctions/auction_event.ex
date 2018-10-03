@@ -126,7 +126,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def bid_placed(
         bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered, is_traded_bid: true},
-        new_state = %AuctionState{},
+        new_state = %ProductBidState{},
         user
       ) do
     %AuctionEvent{
@@ -153,7 +153,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auto_bid_placed(
-    bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+    bid = %AuctionBid{auction_id: auction_id, time_entered: _time_entered},
     new_state = %ProductBidState{},
     nil
   ) do

@@ -40,13 +40,13 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
         bid: %AuctionBid{
           amount: bid_amount,
           supplier_id: supplier_id,
-          total_price: total_price
+          is_traded_bid: is_traded_bid
         }
       }
     },
     state
   ) do
-    AuctionNotifier.notify_auction_completed(bid_amount, total_price, supplier_id, auction_id)
+    AuctionNotifier.notify_auction_completed(bid_amount, supplier_id, auction_id, is_traded_bid)
     {:noreply, state}
   end
 

@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.Auction do
   import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{Auction, Port, Vessel, Fuel, AuctionVesselFuel}
+  alias Oceanconnect.Auctions.{Auction, Port, AuctionVesselFuel}
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
@@ -198,7 +198,7 @@ defmodule Oceanconnect.Auctions.Auction do
     )
   end
 
-  def validate_vessel_fuels(changeset, params = %{auction_vessel_fuels: vessel_fuels}) do
+  def validate_vessel_fuels(changeset, %{auction_vessel_fuels: vessel_fuels}) do
     cond do
       vessel_fuels == nil || length(vessel_fuels) < 1 ->
         add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
@@ -208,7 +208,7 @@ defmodule Oceanconnect.Auctions.Auction do
     end
   end
 
-  def validate_vessel_fuels(changeset, params = %{"auction_vessel_fuels" => vessel_fuels}) do
+  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) do
     cond do
       vessel_fuels == nil || length(vessel_fuels) < 1 ->
         add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")

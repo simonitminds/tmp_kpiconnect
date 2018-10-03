@@ -1,7 +1,6 @@
 defmodule OceanconnectWeb.EmailController do
   use OceanconnectWeb, :controller
 
-  alias Oceanconnect.Repo
   alias OceanconnectWeb.Email
   alias OceanconnectWeb.Mailer
 

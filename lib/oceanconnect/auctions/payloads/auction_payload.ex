@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionTimer, Barge}
+  alias Oceanconnect.Auctions.{Auction, AuctionTimer}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
@@ -37,7 +37,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
-  def get_bid_history(supplier_id, state = %AuctionState{product_bids: product_bids}) do
+  def get_bid_history(supplier_id, %AuctionState{product_bids: product_bids}) do
     Enum.map(product_bids, fn({_fuel_id, product_state}) ->
       Enum.filter(product_state.bids, fn(bid) -> bid.supplier_id == supplier_id end)
     end)

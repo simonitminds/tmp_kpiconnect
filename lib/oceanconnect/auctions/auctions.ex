@@ -25,16 +25,30 @@ defmodule Oceanconnect.Auctions do
 
   def place_bids(auction, bids_params = %{}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
     with  :ok <- duration_time_remaining?(auction),
-          bids <- Enum.map(bids_params, fn({product_id, bid_params}) ->
-            {:ok, bid} = make_bid(auction, product_id, bid_params, supplier_id, time_entered)
-            bid
-          end) do
+          {:ok, bids} <- make_bids(auction, bids_params, supplier_id, time_entered) do
       bids = Enum.map(bids, fn(bid) -> place_bid(bid, user) end)
       {:ok, bids}
     else
       {:error, :late_bid} -> {:error, :late_bid}
       {:invalid_bid, bid_params} -> {:invalid_bid, bid_params}
+      error -> error
     end
+  end
+
+  def place_bid(bid, user \\ nil) do
+    bid
+    |> Command.process_new_bid(user)
+    |> AuctionStore.process_command()
+    bid
+  end
+
+  def make_bids(auction, bids_params, supplier_id, time_entered) do
+    Enum.reduce_while(bids_params, {:ok, []}, fn({product_id, bid_params}, {:ok, acc}) ->
+      case make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
+        {:ok, bid} -> {:cont, {:ok, acc ++ [bid]}}
+        invalid -> {:halt, invalid}
+      end
+    end)
   end
 
   def make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
@@ -53,12 +67,6 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
-  def place_bid(bid, user \\ nil) do
-    bid
-    |> Command.process_new_bid(user)
-    |> AuctionStore.process_command()
-    bid
-  end
 
   defp maybe_add_amount(params = %{"amount" => _}), do: params
   defp maybe_add_amount(params), do: Map.put(params, "amount", nil)
@@ -242,19 +250,17 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
-    auction =
-      %Auction{}
-      |> Auction.changeset_for_scheduled_auction(attrs)
-      |> Repo.insert()
-      |> handle_auction_creation(user)
+    %Auction{}
+    |> Auction.changeset_for_scheduled_auction(attrs)
+    |> Repo.insert()
+    |> handle_auction_creation(user)
   end
 
   def create_auction(attrs, user) do
-    auction =
-      %Auction{}
-      |> Auction.changeset(attrs)
-      |> Repo.insert()
-      |> handle_auction_creation(user)
+    %Auction{}
+    |> Auction.changeset(attrs)
+    |> Repo.insert()
+    |> handle_auction_creation(user)
   end
 
   defp handle_auction_creation({:ok, auction}, user) do

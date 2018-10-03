@@ -38,13 +38,13 @@ defmodule OceanconnectWeb.AuctionView do
     supplier
   end
 
-  def auction_log_supplier(%{winning_bid: nil}), do: "—"
+  def auction_log_supplier(_), do: "—"
 
   def auction_log_winning_bid(%{winning_bid: %{amount: amount}}) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
 
-  def auction_log_winning_bid(%{winning_bid: nil}), do: "—"
+  def auction_log_winning_bid(_), do: "—"
 
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"
@@ -90,14 +90,14 @@ defmodule OceanconnectWeb.AuctionView do
   def barge_name_for_event(%AuctionEvent{
         data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}
       }) do
-    with %Barge{name: name} <- Occeanconnect.Repo.get(AuctionBarge, barge_id) do
+    with %Barge{name: name} <- Oceanconnect.Repo.get(AuctionBarge, barge_id) do
       name
     else
       _ -> ""
     end
   end
 
-  def barge_name_for_event(event = %AuctionEvent{}) do
+  def barge_name_for_event(%AuctionEvent{}) do
     ""
   end
 

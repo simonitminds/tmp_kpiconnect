@@ -55,7 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
 
     def from_auction(%Auction{id: auction_id, fuels: fuels})  do
-      product_bids = Enum.reduce(fuels, %{}, fn(fuel = %Fuel{id: fuel_id}, acc) ->
+      product_bids = Enum.reduce(fuels, %{}, fn(%Fuel{id: fuel_id}, acc) ->
         Map.put(acc, "#{fuel_id}", ProductBidState.for_product(fuel_id, auction_id))
       end)
       %AuctionState{
@@ -271,6 +271,21 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  def handle_cast(
+        {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
+        current_state
+      ) do
+    new_state = cancel_auction(current_state)
+
+    AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:notify_upcoming_auction, %{auction: auction = %Auction{}}, emit}, state) do
+    AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), emit)
+    {:noreply, state}
+  end
+
   defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{supplier_id: supplier_id}) do
     !Enum.any?(product_bids,
       fn({_product_key, %ProductBidState{bids: bids}}) ->
@@ -417,21 +432,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction
     |> Command.update_scheduled_start()
     |> AuctionScheduler.process_command()
-  end
-
-  def handle_cast(
-        {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
-        current_state
-      ) do
-    new_state = cancel_auction(current_state)
-
-    AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
-    {:noreply, new_state}
-  end
-
-  def handle_cast({:notify_upcoming_auction, %{auction: auction = %Auction{}}, emit}, state) do
-    AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), emit)
-    {:noreply, state}
   end
 
   defp end_auction(current_state, auction = %Auction{}) do

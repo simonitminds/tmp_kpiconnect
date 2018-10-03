@@ -22,7 +22,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
   # Best single supplier solution is the combination of bids from a given
   # supplier that has the lowest average price:
   #   ∑ (unit_price * fuel_quantity) / total_quantity.
-  defp calculate_solution(product_bids, _auction, :best_single_supplier, supplier_solutions: supplier_solutions) do
+  defp calculate_solution(_product_bids, _auction, :best_single_supplier, supplier_solutions: supplier_solutions) do
     supplier_solutions
     |> Map.values()
     |> Enum.filter(&(&1.valid))

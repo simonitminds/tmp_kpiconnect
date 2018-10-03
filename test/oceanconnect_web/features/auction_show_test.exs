@@ -276,10 +276,12 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "decision period" do
-    setup %{auction: auction, supplier: supplier, supplier2: supplier2} do
+    setup %{auction: auction, supplier: supplier, supplier2: supplier2, fuel_id: fuel_id} do
       Auctions.start_auction(auction)
-      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier.company_id)
-      bid2 = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2.company_id)
+      bid = create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
+      |> Auctions.place_bid()
+      bid2 = create_bid(1.25, nil, supplier2.company_id, fuel_id, auction)
+      |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
       {:ok, %{bid: bid, bid2: bid2}}

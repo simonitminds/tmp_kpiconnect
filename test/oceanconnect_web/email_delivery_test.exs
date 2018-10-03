@@ -51,7 +51,7 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
       is_traded_bid = true
 
       %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(100, 20000, winning_supplier_company, auction, is_traded_bid)
+        Email.auction_closed(100, winning_supplier_company, auction, is_traded_bid)
 
       for supplier_email <- supplier_emails do
         Mailer.deliver_now(supplier_email)

@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionVesselFuel do
   use Ecto.Schema
-  import Ecto.{Changeset, Query}
+  import Ecto.{Changeset}
   alias __MODULE__
 
   @derive {Poison.Encoder, except: [:__meta__, :auction]}

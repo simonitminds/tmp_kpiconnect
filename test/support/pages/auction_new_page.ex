@@ -85,8 +85,8 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def credit_margin_amount do
-      find_element(:css, ".qa-auction-credit_margin_amount")
-      |> inner_text
+    find_element(:css, ".qa-auction-credit_margin_amount")
+    |> inner_text
   end
 
   def is_traded_bid_allowed do

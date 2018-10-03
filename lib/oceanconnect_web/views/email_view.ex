@@ -20,6 +20,7 @@ defmodule OceanconnectWeb.EmailView do
     date = "#{leftpad(date_time.day)} #{month_abbreviation(date_time.month)} #{date_time.year}"
     "#{date} #{time}"
   end
+  def convert_date?(_), do: "—"
 
   def month_abbreviation(month) when month >= 1 and month <= 12 do
     Enum.at(
@@ -27,8 +28,6 @@ defmodule OceanconnectWeb.EmailView do
       month - 1
     )
   end
-
-  def convert_date?(_), do: "—"
 
   def format_price(amount) do
     amount = :erlang.float_to_binary(amount, decimals: 2)

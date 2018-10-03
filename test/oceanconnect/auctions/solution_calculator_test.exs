@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.SolutionCalculator
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, Fuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, Fuel}
 
   setup do
     supplier_company = insert(:company)
@@ -42,10 +42,10 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
         auction_id: auction_id,
         status: :open,
         product_bids: %{
-          fuel1_id => %{
+          "#{fuel1_id}" => %{
             lowest_bids: [fuel1_supplier1, fuel1_supplier2]
           },
-          fuel2_id => %{
+          "#{fuel2_id}" => %{
             lowest_bids: [fuel2_supplier2]
           }
         }
@@ -65,7 +65,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       fuel2: %Fuel{id: fuel2_id},
       supplier1: %{id: supplier1_id},
       supplier2: %{id: supplier2_id},
-      supplier3: %{id: supplier3_id},
+      supplier3: %{id: _supplier3_id},
     } do
       fuel1_supplier1 = %AuctionBid{amount: 2.00, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel1_id, active: true}
       fuel1_supplier2 = %AuctionBid{amount: 2.50, supplier_id: supplier2_id, auction_id: auction_id, fuel_id: fuel1_id, active: true}
@@ -75,10 +75,10 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
         auction_id: auction_id,
         status: :open,
         product_bids: %{
-          fuel1_id => %{
+          "#{fuel1_id}" => %{
             lowest_bids: [fuel1_supplier1, fuel1_supplier2]
           },
-          fuel2_id => %{
+          "#{fuel2_id}" => %{
             lowest_bids: [fuel2_supplier1]
           }
         }
@@ -104,7 +104,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       fuel2: %Fuel{id: fuel2_id},
       supplier1: %{id: supplier1_id},
       supplier2: %{id: supplier2_id},
-      supplier3: %{id: supplier3_id},
+      supplier3: %{id: _supplier3_id},
     } do
       fuel1_supplier1 = %AuctionBid{amount: 2.00, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel1_id, active: true}
       fuel2_supplier1 = %AuctionBid{amount: 3.00, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel2_id, active: true}
@@ -115,10 +115,10 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
         auction_id: auction_id,
         status: :open,
         product_bids: %{
-          fuel1_id => %{
+          "#{fuel1_id}" => %{
             lowest_bids: [fuel1_supplier1, fuel1_supplier2]
           },
-          fuel2_id => %{
+          "#{fuel2_id}" => %{
             lowest_bids: [fuel2_supplier2, fuel2_supplier1]
           }
         }
@@ -151,10 +151,10 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
         auction_id: auction_id,
         status: :open,
         product_bids: %{
-          fuel1_id => %{
+          "#{fuel1_id}" => %{
             lowest_bids: [fuel1_supplier1, fuel1_supplier2, fuel1_supplier3]
           },
-          fuel2_id => %{
+          "#{fuel2_id}" => %{
             lowest_bids: [fuel2_supplier1, fuel2_supplier2, fuel2_supplier3]
           }
         }

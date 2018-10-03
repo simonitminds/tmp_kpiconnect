@@ -200,7 +200,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "cancel_auction/1", %{auction: auction, buyer: buyer} do
       Auctions.cancel_auction(auction, buyer)
-      # TODO: Eventually shutdown the auction and commit the final state 
+      # TODO: Eventually shutdown the auction and commit the final state
       # assert {:error, "Auciton Suppervisor Not Started"} = Auctions.AuctionSupervisor.find_pid(auction.id)
       assert %AuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
     end
@@ -257,9 +257,11 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       buyer_company = insert(:company, is_supplier: false)
+      fuel = insert(:fuel)
+      fuel_id = "#{fuel.id}"
 
       auction =
-        insert(:auction, suppliers: [supplier_company], buyer: buyer_company)
+        insert(:auction, suppliers: [supplier_company], buyer: buyer_company, auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)])
         |> Auctions.fully_loaded()
 
       {:ok, _pid} =
@@ -290,11 +292,12 @@ defmodule Oceanconnect.AuctionsTest do
         end
       end)
 
-      {:ok, %{auction: auction, supplier_company: supplier_company}}
+      {:ok, %{auction: auction, fuel: fuel, fuel_id: fuel_id, supplier_company: supplier_company}}
     end
 
-    test "place_bid/3 enters bid in bid_list and runs lowest_bid logic", %{
+    test "place_bid/2 enters bid in bid_list and runs lowest_bid logic", %{
       auction: auction,
+      fuel_id: fuel_id,
       supplier_company: supplier_company
     } do
       amount = 1.25
@@ -302,13 +305,15 @@ defmodule Oceanconnect.AuctionsTest do
       expected_result = %{
         amount: amount,
         auction_id: auction.id,
+        fuel_id: fuel_id,
         supplier_id: supplier_company.id,
         time_entered: DateTime.utc_now()
       }
 
       assert bid =
                %AuctionBid{} =
-               Auctions.place_bid(auction, %{"amount" => amount}, supplier_company.id)
+               create_bid(amount, nil, supplier_company.id, fuel_id, auction)
+               |> Auctions.place_bid()
 
       assert Enum.all?(expected_result, fn {k, v} ->
                if k == :time_entered do
@@ -318,10 +323,11 @@ defmodule Oceanconnect.AuctionsTest do
                end
              end)
 
-      payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+      product_payload = auction_payload.product_bids["#{fuel_id}"]
 
-      assert hd(payload.bid_history).id == bid.id
-      assert hd(payload.lowest_bids).id == bid.id
+      assert hd(product_payload.bid_history).id == bid.id
+      assert hd(product_payload.lowest_bids).id == bid.id
     end
   end
 

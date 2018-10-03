@@ -9,7 +9,7 @@ defmodule OceanconnectWeb.Email do
   def auction_invitation(
         auction = %Auction{
           suppliers: supplier_companies,
-          buyer_id: buyer_id,
+          buyer_id: _buyer_id,
           buyer: buyer,
           vessels: vessels,
           port: port
@@ -86,7 +86,6 @@ defmodule OceanconnectWeb.Email do
 
   def auction_closed(
         bid_amount,
-        total_price,
         winning_supplier_company = %Company{},
         auction = %Auction{buyer_id: buyer_id, vessels: vessels, port: port},
         _is_traded_bid = false
@@ -110,7 +109,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: false
         )
       end)
@@ -126,7 +124,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: true
         )
       end)
@@ -136,7 +133,6 @@ defmodule OceanconnectWeb.Email do
 
   def auction_closed(
         bid_amount,
-        total_price,
         winning_supplier_company = %Company{},
         auction = %Auction{buyer_id: buyer_id, vessels: vessels, port: port},
         _is_traded_bid = true
@@ -162,7 +158,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: oceanconnect,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: false
         )
       end)
@@ -178,7 +173,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: true
         )
       end)
