@@ -1,12 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment';2
 import InputField from '../input-field';
 import CheckBoxField from '../check-box-field';
 import DateInput from '../date-input';
 import TimeInput from '../time-input';
 import { portLocalTime } from '../../utilities';
 import SupplierList  from './supplier-list';
+import VesselFuelForm from './vessel-fuel-form';
 
 const AuctionForm = (props) => {
   const {
@@ -150,6 +151,11 @@ const AuctionForm = (props) => {
                     selectedPort={selectedPort}
                     selectedSuppliers={selectedSuppliers}
                     suppliers={suppliers} />
+
+     <VesselFuelForm auction={auction}
+                     vessels={vessels}
+                     fuels={fuels}
+                     vessel_fuels={auction.vessel_fuels} />
 
       <section className="auction-info"> {/* Fuel info */}
         <div className="container">
