@@ -13,7 +13,10 @@ defmodule Oceanconnect.AuctionNewTest do
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
     supplier_companies = insert_list(3, :company, is_supplier: true)
-    port = insert(:port, companies: [buyer_company, buyer_company_with_no_credit] ++ supplier_companies)
+
+    port =
+      insert(:port, companies: [buyer_company, buyer_company_with_no_credit] ++ supplier_companies)
+
     selected_vessel = hd(buyer_vessels)
     selected_company1 = Enum.at(supplier_companies, 0)
     selected_company2 = Enum.at(supplier_companies, 2)
@@ -138,12 +141,13 @@ defmodule Oceanconnect.AuctionNewTest do
     end)
   end
 
-  test "a buyer should not be able to create a traded bid auction with no credit margin amount", %{
-    params: params,
-    show_params: show_params,
-    port: port,
-    buyer_with_no_credit: buyer_with_no_credit,
-  } do
+  test "a buyer should not be able to create a traded bid auction with no credit margin amount",
+       %{
+         params: params,
+         show_params: show_params,
+         port: port,
+         buyer_with_no_credit: buyer_with_no_credit
+       } do
     login_user(buyer_with_no_credit)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
