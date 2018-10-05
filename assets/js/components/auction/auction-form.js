@@ -351,7 +351,7 @@ const AuctionForm = (props) => {
                  />
                </div>
              </div>
-             { (credit_margin_amount !== "") &&
+             { (credit_margin_amount != 0) &&
                  <div className="field is-horizontal">
                    <div className="field-label"></div>
                    <div className="field-body field-body--columned">
