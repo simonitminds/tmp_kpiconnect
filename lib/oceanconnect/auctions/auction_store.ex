@@ -336,6 +336,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state
   end
 
+  defp replay_event(%AuctionEvent{type: :auto_bid_triggered, data: %{bid: bid}}, previous_state) do
+    previous_state
+  end
+
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
 
   defp replay_event(
@@ -450,8 +454,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
           bid = %{fuel_id: fuel_id}
         ) do
+    IO.inspect(bid, label: "BID PLACED")
     product_state = product_bids[fuel_id] || ProductBidState.for_product(fuel_id, auction_id)
+    IO.inspect(product_state, label: "OLD product state")
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
+    IO.inspect(new_product_state, label: "NEW product state")
     new_state = AuctionState.update_product_bids(current_state, fuel_id, new_product_state)
 
     # TODO: Not this

@@ -789,7 +789,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
       assert [
                %AuctionEvent{
-                 type: :auto_bid_placed,
+                 type: :auto_bid_triggered,
                  auction_id: auction_id,
                  data: %{
                    bid: %AuctionBid{
@@ -800,7 +800,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
                  }
                },
                %AuctionEvent{
-                 type: :auto_bid_placed,
+                 type: :auto_bid_triggered,
                  auction_id: auction_id,
                  data: %{
                    bid: %AuctionBid{
@@ -863,7 +863,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
       assert [
                %AuctionEvent{
-                 type: :auto_bid_placed,
+                 type: :auto_bid_triggered,
                  auction_id: ^auction_id,
                  data: %{
                    bid: %AuctionBid{

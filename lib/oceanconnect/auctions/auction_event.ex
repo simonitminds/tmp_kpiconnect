@@ -180,6 +180,20 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
+  def auto_bid_triggered(
+        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+        new_state = %ProductBidState{},
+        user \\ nil
+      ) do
+    %AuctionEvent{
+      type: :auto_bid_triggered,
+      auction_id: auction_id,
+      data: %{bid: bid, state: new_state},
+      time_entered: time_entered,
+      user: user
+    }
+  end
+
   def duration_extended(auction_id, extension_time) do
     %AuctionEvent{
       type: :duration_extended,
