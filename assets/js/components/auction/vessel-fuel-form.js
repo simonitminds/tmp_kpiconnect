@@ -68,9 +68,13 @@ export default class VesselFuelForm extends React.Component {
       return(
         <div className={`qa-auction-vessel-${fuel.id}`} key={fuel.id}>
           {fuel.name}
-          {_.map(this.state.selectedVessels, (vessel_id) => {
-            renderFuelQuantityInput(vessel_id, fuel.id);
-          })}
+          <button onClick={(ev) => {
+              this.removeFuel(fuel.id);
+              ev.preventDefault();
+          }}>
+            Remove
+          </button>
+          {_.map(this.state.selectedVessels, (vessel_id) => renderFuelQuantityInput(vessel_id, fuel.id))}
         </div>
       )
     }
@@ -79,22 +83,11 @@ export default class VesselFuelForm extends React.Component {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       return(
         <div>
-          <div className="field is-horizontal">
-            <div className="field-label">
-              <label htmlFor="auction_vessel_fuel_quantity" className="label">
-                {vessel.name}
-              </label>
-            </div>
-            <div className="field-body">
-              <div className="control">
-                <InputField model={'auction'}
-                            field={`auction_vessel_fuels[${fuel_id}][${vessel.id}]`}
-                            value=""
-                            isHorizontal={true}
-                            opts={{type: 'number', name: `vessel_fuel-${fuel_id}-quantity`}} />
-              </div>
-            </div>
-          </div>
+          <InputField model={'auction'}
+                      field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
+                      value=""
+                      isHorizontal={true}
+                      opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`}} />
         </div>
       )
     }
@@ -116,7 +109,7 @@ export default class VesselFuelForm extends React.Component {
                     <div className="control">
                       <div className="select is-fullwidth">
                         <select
-                          className="qa-auction-vessel-select"
+                          className="qa-auction-select-vessel"
                           onChange={this.addVessel.bind(this)}
                           defaultValue=""
                         >
@@ -146,9 +139,12 @@ export default class VesselFuelForm extends React.Component {
             <div className="content">
               <fieldset>
                 <legend className="subtitle is-4" >Fuels</legend>
+                {this.state.selectedVessels.length === 0 ?
+                 <i className="qa-auction-select-fuel"> Select Vessels to add Fuels</i>
+                :
                 <div className="field is-horizontal">
                   <div className="field-label">
-                    <label htmlFor="auction_vessel_id" className="label">
+                    <label htmlFor="auction_fuel_id" className="label">
                       Fuel Name
                     </label>
                   </div>
@@ -156,7 +152,7 @@ export default class VesselFuelForm extends React.Component {
                     <div className="control">
                       <div className="select is-fullwidth">
                         <select
-                          className="qa-auction-fuel-select"
+                          className="qa-auction-select-fuel"
                           onChange={this.addFuel.bind(this)}
                           defaultValue=""
                         >
@@ -173,6 +169,7 @@ export default class VesselFuelForm extends React.Component {
                     </div>
                   </div>
                 </div>
+                }
               </fieldset>
               <fieldset>
                 <div className="qa-auction-selected-vessels-fuel_quantities">

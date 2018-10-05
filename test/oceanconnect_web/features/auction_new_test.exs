@@ -81,7 +81,9 @@ defmodule Oceanconnect.AuctionNewTest do
              "is_traded_bid_allowed",
              "po",
              "port_id",
-             "select-port"
+             "select-fuel",
+             "select-port",
+             "select-vessel"
            ])
   end
 
