@@ -45,7 +45,7 @@ const mapDispatchToProps = (dispatch) => ({
       'bid': {
         'amount': elements.amount.value,
         'min_amount': elements.min_amount.value,
-        'is_traded_bid': elements.is_traded_bid.checked
+        'is_traded_bid': elements && elements.is_traded_bid && elements.is_traded_bid.checked
       }
     };
 
