@@ -35,7 +35,9 @@ export default class BuyerBestSolution extends React.Component {
       .value();
     const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
     const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
-    const setCommentForSolution = (bidIds) => { this.state.solutionCommentBidId == bidIds ? this.setSolutionCommentBidId.bind(this, null) : this.setSolutionCommentBidId.bind(this, bidIds)}
+    const onSelectSolution = (bidIds) => { this.setState({bidIds: bidIds}) }
+
+    //TODO: MOVE BID accept display to external component
 
      const bidAcceptDisplay = (bidIds) => {
       if(auctionStatus == 'closed'){
@@ -79,7 +81,7 @@ export default class BuyerBestSolution extends React.Component {
         );
       }
     }
-
+   //TODO: Move out Other Solution Display
     const otherSolutionDisplay = () => {
       if (remainingBids.length > 0) {
         return (

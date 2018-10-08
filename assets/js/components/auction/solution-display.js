@@ -17,6 +17,9 @@ const SolutionDisplay = ({auctionPayload, solution, title, acceptBid, best, onSe
   }
 
   //TODO: maybe put this on the SolutionPayload
+
+  //TODO: Handle Solution has been selected. pass in onSubmitAction into props
+
   const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
   const fuelQuantities = _.chain(fuels)
       .reduce((acc, fuel) => {
