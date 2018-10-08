@@ -143,13 +143,10 @@ defmodule Oceanconnect.AuctionNewTest do
 
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",
        %{
-         params: params,
-         show_params: show_params,
-         port: port,
          buyer_with_no_credit: buyer_with_no_credit
        } do
     login_user(buyer_with_no_credit)
     AuctionNewPage.visit()
-    AuctionNewPage.select_port(port.id)
+    assert_raise Hound.NoSuchElementError, fn -> AuctionNewPage.is_traded_bid_allowed() end
   end
 end
