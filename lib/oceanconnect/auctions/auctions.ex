@@ -17,11 +17,21 @@ defmodule Oceanconnect.Auctions do
     Fuel,
     Barge
   }
-
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
+
+  def bids_for_bid_ids(bid_ids, %AuctionState{product_bids: product_bids}) when is_list(bid_ids) do
+    product_bids
+    |> Enum.map(fn(product_bid_state) ->
+      Enum.filter(product_bid_state.active_bids, fn(bid) ->
+        bid in bid_ids
+      end)
+    end)
+    |> List.flatten
+  end
 
   def place_bids(auction, bids_params = %{}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
     with  :ok <- duration_time_remaining?(auction),
@@ -116,6 +126,12 @@ defmodule Oceanconnect.Auctions do
   defp maybe_pending(%{status: :pending}), do: :ok
   defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
   defp maybe_pending(_), do: :error
+
+  def select_winning_solutin(solution, comment, user \\ nil) do
+    solution
+    |> Command.select_winning_solution(comment, user)
+    |> AuctionStore.process_command()
+  end
 
 
   def select_winning_bid(bid, comment, user \\ nil) do

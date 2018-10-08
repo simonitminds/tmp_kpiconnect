@@ -52,8 +52,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :process_new_bid, data: %{bid: bid, user: user}}
   end
 
-  def select_winning_bid(bid = %AuctionBid{}, user) when not is_integer(user) do
-    %Command{command: :select_winning_bid, data: %{bid: bid, user: user}}
+  def select_winning_solution(bids, comment, user) when not is_integer(user) and is_list(bids) do
+    %Command{command: :select_winning_solution, data: %{bids: bids, comment: comment, user: user}}
   end
 
   def submit_barge(auction_barge = %AuctionBarge{}, user) do

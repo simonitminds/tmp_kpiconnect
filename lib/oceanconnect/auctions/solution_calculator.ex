@@ -38,7 +38,10 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     end)
     |> Enum.filter(&(&1))
 
-    Solution.from_bids(solution_bids, product_bids, auction)
+    case solution_bids do
+      [] -> %Solution{valid: false}
+      bids -> Solution.from_bids(bids, product_bids, auction)
+    end
   end
 
   # Returns a map of single supplier solutions keyed by the supplier's id.

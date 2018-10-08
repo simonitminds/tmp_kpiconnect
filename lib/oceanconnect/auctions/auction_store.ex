@@ -44,7 +44,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
               status: :pending,
               solutions: %SolutionCalculator{},
               submitted_barges: [],
-              product_bids: %{}
+              product_bids: %{},
+              winning_solution: []
 
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
@@ -216,12 +217,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:select_winning_bid, %{bid: bid, user: user}, emit},
+        {:select_winning_solution, %{bids: bids, user: user, comment: comment}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    new_state = select_winning_bid(bid, current_state)
+    new_state = select_winning_solution(bids, current_state)
 
-    AuctionEvent.emit(AuctionEvent.winning_bid_selected(bid, current_state, user), emit)
+    AuctionEvent.emit(AuctionEvent.winning_solution_selected(bids, current_state, user), emit)
     AuctionEvent.emit(AuctionEvent.auction_closed(auction_id, new_state), emit)
 
     {:noreply, new_state}
@@ -350,7 +351,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid}}, previous_state) do
-    select_winning_bid(bid, previous_state)
+    select_winning_solution([bid], previous_state)
   end
 
   defp replay_event(
@@ -454,11 +455,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
           bid = %{fuel_id: fuel_id}
         ) do
-    IO.inspect(bid, label: "BID PLACED")
     product_state = product_bids[fuel_id] || ProductBidState.for_product(fuel_id, auction_id)
-    IO.inspect(product_state, label: "OLD product state")
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
-    IO.inspect(new_product_state, label: "NEW product state")
     new_state = AuctionState.update_product_bids(current_state, fuel_id, new_product_state)
 
     # TODO: Not this
@@ -467,11 +465,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {new_product_state, events, new_state}
   end
 
-  defp select_winning_bid(bid, current_state = %{auction_id: auction_id}) do
+  defp select_winning_solution(bids, current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
     current_state
-    |> Map.put(:winning_bid, bid)
+    |> Map.put(:winning_solution, bids)
     |> Map.put(:status, :closed)
   end
 

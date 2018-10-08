@@ -47,17 +47,16 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  def select_bid(conn, %{"auction_id" => auction_id, "bid_id" => bid_id, "comment" => comment}) do
+  def select_bid(conn, %{"auction_id" => auction_id, "bid_ids" => bid_ids, "comment" => comment}) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
-         %{status: :decision, active_bids: bids} <- Auctions.get_auction_state!(auction),
-         bid = %AuctionBid{} <- Enum.find(bids, fn bid -> bid.id == bid_id end) do
-      Auctions.select_winning_bid(bid, comment, user)
-
+         state = %{status: :decision, active_bids: bids} <- Auctions.get_auction_state!(auction),
+         selected_bids <- Auctions.bids_for_bid_ids(bid_ids, state) do
+      Auctions.select_winning_solution(selected_bids, comment, user)
       render(conn, "show.json", %{success: true, message: ""})
     else
       _ ->
