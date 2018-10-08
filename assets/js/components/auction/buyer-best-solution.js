@@ -37,50 +37,7 @@ export default class BuyerBestSolution extends React.Component {
     const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
     const onSelectSolution = (bidIds) => { this.setState({bidIds: bidIds}) }
 
-    //TODO: MOVE BID accept display to external component
 
-     const bidAcceptDisplay = (bidIds) => {
-      if(auctionStatus == 'closed'){
-        return "";
-      } else {
-        return (
-          <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid.bind(this, auctionPayload.auction.id, bidIds)}>
-            { this.state.bestSolutionSelected ?
-            "" :
-            <span className="is-inline-block has-margin-bottom-lg"><strong>Are you sure that you want to accept this offer?</strong></span>
-            }
-
-            <SolutionComment showInput={!this.state.bestSolutionSelected} auctionStatus={auctionStatus} />
-
-            <div className="has-margin-top-md has-margin-bottom-sm"><i>Optional: Specify the Port Agent handling delivery</i></div>
-            <InputField
-              model={'auction'}
-              field={'port_agent'}
-              labelText={'Port Agent'}
-              value={auctionPayload.auction.port_agent}
-              expandedInput={true}
-              opts={{ labelClass: 'label is-capitalized has-text-left has-margin-bottom-xs' }}
-            />
-            <div className="field is-expanded is-grouped is-grouped-right">
-              <div className="control">
-                <button className="button is-gray-3" onClick={this.setSolutionCommentBidId.bind(this, null)}>
-                  Cancel
-                </button>
-              </div>
-              <div className="control">
-                  <button
-                    disabled={auctionPayload.status != 'decision'}
-                    className={`button is-success qa-accept-bid`}
-                    type="submit"
-                  >
-                    Accept Offer
-                  </button>
-              </div>
-            </div>
-          </form>
-        );
-      }
-    }
    //TODO: Move out Other Solution Display
     const otherSolutionDisplay = () => {
       if (remainingBids.length > 0) {
@@ -106,12 +63,8 @@ export default class BuyerBestSolution extends React.Component {
         <div className="box">
           <div className="box__subsection has-padding-bottom-none">
             <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} acceptBid={acceptBid} best={true} onSelectSolution={setCommentForSolution.bind(this)} >
-              { bidAcceptDisplay(this.state.solutionCommentBidId) }
-            </SolutionDisplay>
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Solution"} acceptBid={acceptBid} onSelectSolution={setCommentForSolution.bind(this)}>
-              { bidAcceptDisplay(this.state.solutionCommentBidId) }
-            </SolutionDisplay>
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} acceptBid={acceptBid} best={true} />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Solution"} acceptBid={acceptBid} />
           </div>
         </div>
       </div>

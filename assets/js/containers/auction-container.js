@@ -6,7 +6,7 @@ import AuctionShow from '../components/auction/show';
 import {
   getAllAuctionPayloads,
   getCompanyBarges,
-  acceptWinningBid,
+  acceptWinningSolution,
   setPortAgent,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
@@ -68,20 +68,20 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
     dispatch(rejectBarge(auctionId, bargeId, supplierId));
   },
-  acceptBid(auctionId, bidId, ev) {
+  acceptBid(auctionId, bidIds, ev) {
     ev.preventDefault();
 
     const elements = ev.target.elements;
-    let bidComment = {'comment': ''};
+    let solutionData = {'comment': '', 'bid_ids': bidIds};
     if(elements.comment) {
-      bidComment = {
+      solutionData = {
         'comment': elements.comment.value
       };
     }
     const portAgent = {'port_agent': elements.auction_port_agent.value};
 
     dispatch(setPortAgent(auctionId, portAgent));
-    dispatch(acceptWinningBid(auctionId, bidId, bidComment));
+    dispatch(acceptWinningSolution(auctionId, solutionData));
   },
   ...bindActionCreators({ updateBidStatus }, dispatch)
 });
