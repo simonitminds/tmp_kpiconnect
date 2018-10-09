@@ -7,11 +7,16 @@ defmodule Oceanconnect.AuctionNewTest do
   setup do
     buyer_company = insert(:company, credit_margin_amount: 5.40)
     buyer = insert(:user, company: buyer_company)
+    buyer_company_with_no_credit = insert(:company, credit_margin_amount: nil)
+    buyer_with_no_credit = insert(:user, company: buyer_company_with_no_credit)
     fuel = insert(:fuel)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     insert(:vessel)
     supplier_companies = insert_list(3, :company, is_supplier: true)
-    port = insert(:port, companies: [buyer_company] ++ supplier_companies)
+
+    port =
+      insert(:port, companies: [buyer_company, buyer_company_with_no_credit] ++ supplier_companies)
+
     selected_vessel = hd(buyer_vessels)
     selected_company1 = Enum.at(supplier_companies, 0)
     selected_company2 = Enum.at(supplier_companies, 2)
@@ -29,7 +34,6 @@ defmodule Oceanconnect.AuctionNewTest do
       etd_time: date_time,
       fuel_id: fuel.id,
       fuel_quantity: 1_000,
-      is_traded_bid_allowed: true,
       scheduled_start_date: date_time,
       scheduled_start_time: date_time,
       suppliers: [
@@ -52,6 +56,7 @@ defmodule Oceanconnect.AuctionNewTest do
     {:ok,
      %{
        buyer: buyer,
+       buyer_with_no_credit: buyer_with_no_credit,
        buyer_vessels: buyer_vessels,
        params: auction_params,
        buyer_company: buyer_company,
@@ -123,7 +128,7 @@ defmodule Oceanconnect.AuctionNewTest do
     login_user(buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(params)
+    AuctionNewPage.fill_form(Map.put(params, :is_traded_bid_allowed, true))
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
@@ -134,5 +139,14 @@ defmodule Oceanconnect.AuctionNewTest do
       assert current_path() =~ ~r/auctions\/\d/
       assert AuctionShowPage.has_values_from_params?(show_params)
     end)
+  end
+
+  test "a buyer should not be able to create a traded bid auction with no credit margin amount",
+       %{
+         buyer_with_no_credit: buyer_with_no_credit
+       } do
+    login_user(buyer_with_no_credit)
+    AuctionNewPage.visit()
+    assert_raise Hound.NoSuchElementError, fn -> AuctionNewPage.is_traded_bid_allowed() end
   end
 end
