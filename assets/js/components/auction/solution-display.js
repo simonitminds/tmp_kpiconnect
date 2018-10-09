@@ -5,7 +5,7 @@ import SupplierBidStatus from './supplier-bid-status';
 import BidAcceptDisplay from './bid-accept-display';
 
 export default class SolutionDisplay extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       selected: false
@@ -30,6 +30,7 @@ export default class SolutionDisplay extends React.Component {
   render() {
     const {auctionPayload, solution, title, acceptBid, best, children} = this.props;
     const auctionId = auctionPayload.auction.id;
+    const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
     const fuels = _.get(auctionPayload, 'auction.fuels');
     const {bids, normalized_price, total_price, latest_time_entered} = solution;
@@ -55,7 +56,7 @@ export default class SolutionDisplay extends React.Component {
           <div className="auction-solution__content">
             <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
             ({formatTime(latest_time_entered)})
-            { acceptable &&
+            { acceptable && auctionStatus == 'decision' &&
               <button className="button is-small has-margin-left-md" onClick={this.selectSolution.bind(this)}>Select</button>
             }
           </div>

@@ -47,6 +47,7 @@ const mapDispatchToProps = (dispatch) => ({
       return acc;
     }, {});
 
+    const elements = ev.target.elements;
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
@@ -74,9 +75,7 @@ const mapDispatchToProps = (dispatch) => ({
     const elements = ev.target.elements;
     let solutionData = {'comment': '', 'bid_ids': bidIds};
     if(elements.comment) {
-      solutionData = {
-        'comment': elements.comment.value
-      };
+      solutionData['comment'] = elements.comment.value;
     }
     const portAgent = {'port_agent': elements.auction_port_agent.value};
 

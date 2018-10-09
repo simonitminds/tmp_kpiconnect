@@ -7,6 +7,7 @@ import AuctionBreadCrumbs from './auction-bread-crumbs';
 import AuctionHeader from './auction-header';
 import BuyerLowestBid from './buyer-lowest-bid';
 import BuyerBestSolution from './buyer-best-solution';
+import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
 import SupplierLowestBid from './supplier-lowest-bid';
 import SupplierWinningBid from './supplier-winning-bid';
@@ -122,7 +123,6 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )

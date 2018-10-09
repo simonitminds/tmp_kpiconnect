@@ -5,7 +5,7 @@ import SolutionComment from './solution-comment';
 import SolutionDisplay from './solution-display';
 import InputField from '../input-field';
 
-const BuyerBestSolution = ({auctionPayload, acceptBid}) => {
+const OtherSolutions = ({auctionPayload, solutions, acceptBid}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const lowestBid = _.get(auctionPayload, 'lowest_bids[0]');
   const lowestBidId = _.get(lowestBid, 'id');
@@ -17,8 +17,6 @@ const BuyerBestSolution = ({auctionPayload, acceptBid}) => {
     .reject(['id', winningBidId])
     .orderBy(['amount', 'time_entered'],['asc', 'asc'])
     .value();
-  const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
-  const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
   const onSelectSolution = (bidIds) => { this.setState({bidIds: bidIds}) }
 
   return(
@@ -26,12 +24,14 @@ const BuyerBestSolution = ({auctionPayload, acceptBid}) => {
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title={"Best Solution"} acceptBid={acceptBid} best={true} />
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={"Best Solution"} acceptBid={acceptBid} />
+          { _.map(solutions, (solution) => {
+              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title="" acceptBid={acceptBid} best={false} />
+            })
+          }
         </div>
       </div>
     </div>
   );
 };
 
-export default BuyerBestSolution;
+export default OtherSolutions;

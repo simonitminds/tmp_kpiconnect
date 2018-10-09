@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
             is_leading: false,
             lead_is_tied: false
 
-  def get_solutions_payload!(_state = %AuctionState{solutions: solutions}, auction: auction = %Auction{buyer_id: buyer_id}, buyer: buyer_id) do
+  def get_solutions_payload!(_state = %AuctionState{solutions: solutions, winning_solution: winning_solution}, auction: auction = %Auction{buyer_id: buyer_id}, buyer: buyer_id) do
     %{
       best_single_supplier: scrub_solution_for_buyer(solutions.best_single_supplier, auction),
       best_overall: scrub_solution_for_buyer(solutions.best_overall, auction),
@@ -16,12 +16,14 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
         scrubbed_solution = scrub_solution_for_buyer(solution, auction)
         supplier_alias = get_name_or_alias(supplier_id, auction)
         Map.put(acc, supplier_alias, scrubbed_solution)
-      end)
+      end),
+      winning_solution: scrub_solution_for_buyer(winning_solution, auction)
     }
   end
-  def get_solutions_payload!(_state = %AuctionState{solutions: solutions}, auction: _auction, supplier: supplier_id) do
+  def get_solutions_payload!(_state = %AuctionState{solutions: solutions, winning_solution: winning_solution}, auction: _auction, supplier: supplier_id) do
     %{
-      best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id)
+      best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id),
+      winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id)
     }
   end
 

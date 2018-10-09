@@ -49,7 +49,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
               solutions: %SolutionCalculator{},
               submitted_barges: [],
               product_bids: %{},
-              winning_solution: []
+              winning_solution: nil
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
       %AuctionState{
@@ -488,7 +488,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {new_product_state, events, new_state}
   end
 
-  defp select_winning_solution(solution, current_state = %{auction_id: auction_id}) do
+  defp select_winning_solution(solution = %Solution{}, current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
     current_state

@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions do
     product_bids
     |> Enum.map(fn({_product_id, product_bid_state}) ->
       Enum.filter(product_bid_state.active_bids, fn(bid) ->
-        bid in bid_ids
+        bid.id in bid_ids
       end)
     end)
     |> List.flatten

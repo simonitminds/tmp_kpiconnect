@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Enum.sort_by(&(&1.time_entered))
   end
 
-  def get_supplier_auction_payload(auction = %Auction{}, supplier_id, state = %AuctionState{product_bids: product_bids, status: status}) do
+  def get_supplier_auction_payload(auction = %Auction{}, supplier_id, state = %AuctionState{product_bids: product_bids, status: status, winning_solution: winning_solution}) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  def get_buyer_auction_payload(auction = %Auction{}, buyer_id, state = %AuctionState{product_bids: product_bids, status: status}) do
+  def get_buyer_auction_payload(auction = %Auction{}, buyer_id, state = %AuctionState{product_bids: product_bids, status: status, winning_solution: winning_solution}) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time:  DateTime.utc_now(),
