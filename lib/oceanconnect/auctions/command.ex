@@ -1,5 +1,5 @@
 defmodule Oceanconnect.Auctions.Command do
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, Solution}
   alias __MODULE__
 
   defstruct command: :get_current_state, data: nil
@@ -52,8 +52,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :process_new_bid, data: %{bid: bid, user: user}}
   end
 
-  def select_winning_solution(bids, comment, user) when not is_integer(user) and is_list(bids) do
-    %Command{command: :select_winning_solution, data: %{bids: bids, comment: comment, user: user}}
+  def select_winning_solution(solution = %Solution{bids: bids}, user) do
+    %Command{command: :select_winning_solution, data: %{solution: solution, user: user}}
   end
 
   def submit_barge(auction_barge = %AuctionBarge{}, user) do

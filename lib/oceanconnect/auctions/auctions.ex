@@ -12,11 +12,13 @@ defmodule Oceanconnect.Auctions do
     AuctionSuppliers,
     AuctionBarge,
     AuctionTimer,
-    Port,
-    Vessel,
+    Barge,
     Fuel,
-    Barge
+    Port,
+    Solution,
+    Vessel
   }
+
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
@@ -25,7 +27,7 @@ defmodule Oceanconnect.Auctions do
 
   def bids_for_bid_ids(bid_ids, %AuctionState{product_bids: product_bids}) when is_list(bid_ids) do
     product_bids
-    |> Enum.map(fn(product_bid_state) ->
+    |> Enum.map(fn({_product_id, product_bid_state}) ->
       Enum.filter(product_bid_state.active_bids, fn(bid) ->
         bid in bid_ids
       end)
@@ -127,16 +129,10 @@ defmodule Oceanconnect.Auctions do
   defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
   defp maybe_pending(_), do: :error
 
-  def select_winning_solutin(solution, comment, user \\ nil) do
-    solution
-    |> Command.select_winning_solution(comment, user)
-    |> AuctionStore.process_command()
-  end
-
-
-  def select_winning_bid(bid, comment, user \\ nil) do
-    %{bid | comment: comment}
-    |> Command.select_winning_bid(user)
+  def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
+    solution = Solution.from_bids(bids, product_bids, auction)
+    %Solution{solution | comment: comment}
+    |> Command.select_winning_solution(user)
     |> AuctionStore.process_command()
   end
 

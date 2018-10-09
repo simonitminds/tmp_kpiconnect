@@ -52,11 +52,11 @@ defmodule OceanconnectWeb.Api.BidController do
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
-    with auction = %Auction{} <- Auctions.get_auction(auction_id),
+    with auction = %Auction{} <- Auctions.get_auction(auction_id) |> Auctions.fully_loaded,
          true <- auction.buyer_id == buyer_id,
-         state = %{status: :decision, active_bids: bids} <- Auctions.get_auction_state!(auction),
+         state = %{status: :decision, product_bids: product_bids} <- Auctions.get_auction_state!(auction),
          selected_bids <- Auctions.bids_for_bid_ids(bid_ids, state) do
-      Auctions.select_winning_solution(selected_bids, comment, user)
+      Auctions.select_winning_solution(selected_bids, product_bids, auction, comment, user)
       render(conn, "show.json", %{success: true, message: ""})
     else
       _ ->

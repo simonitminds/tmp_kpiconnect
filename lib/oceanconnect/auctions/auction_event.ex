@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent, Solution}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
 
   defstruct id: nil,
@@ -203,15 +203,15 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def winning_bid_selected(
-        bid = %AuctionBid{auction_id: auction_id},
+  def winning_solution_selected(
+        solution = %Solution{auction_id: auction_id},
         state = %AuctionState{},
         user
       ) do
     %AuctionEvent{
-      type: :winning_bid_selected,
+      type: :winning_solution_selected,
       auction_id: auction_id,
-      data: %{bid: bid, state: state},
+      data: %{solution: solution, state: state},
       time_entered: DateTime.utc_now(),
       user: user
     }

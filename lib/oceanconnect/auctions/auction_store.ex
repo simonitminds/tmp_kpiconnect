@@ -2,6 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   use GenServer
 
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionBarge,
@@ -14,7 +15,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionTimer,
     Command,
     Fuel,
-    SolutionCalculator
+    SolutionCalculator,
+    Solution
   }
 
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
@@ -22,6 +24,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defmodule ProductBidState do
     alias __MODULE__
+
     defstruct auction_id: nil,
               fuel_id: nil,
               lowest_bids: [],
@@ -40,13 +43,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defmodule AuctionState do
     alias __MODULE__
+
     defstruct auction_id: nil,
               status: :pending,
               solutions: %SolutionCalculator{},
               submitted_barges: [],
               product_bids: %{},
               winning_solution: []
-
 
     def from_auction(%Auction{id: auction_id, scheduled_start: nil}) do
       %AuctionState{
@@ -55,10 +58,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }
     end
 
-    def from_auction(%Auction{id: auction_id, fuels: fuels})  do
-      product_bids = Enum.reduce(fuels, %{}, fn(%Fuel{id: fuel_id}, acc) ->
-        Map.put(acc, "#{fuel_id}", ProductBidState.for_product(fuel_id, auction_id))
-      end)
+    def from_auction(%Auction{id: auction_id, fuels: fuels}) do
+      product_bids =
+        Enum.reduce(fuels, %{}, fn %Fuel{id: fuel_id}, acc ->
+          Map.put(acc, "#{fuel_id}", ProductBidState.for_product(fuel_id, auction_id))
+        end)
+
       %AuctionState{
         auction_id: auction_id,
         product_bids: product_bids
@@ -66,8 +71,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end
 
     def update_product_bids(state, product_key, new_product_state) do
-      %AuctionState{state |
-        product_bids: Map.put(state.product_bids, "#{product_key}", new_product_state)
+      %AuctionState{
+        state
+        | product_bids: Map.put(state.product_bids, "#{product_key}", new_product_state)
       }
     end
   end
@@ -100,6 +106,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
+  end
+
+  def process_command(%Command{
+        command: :select_winning_solution,
+        data: data = %{solution: %Solution{auction_id: auction_id}}
+      }) do
+    with {:ok, pid} <- find_pid(auction_id),
+         do: GenServer.cast(pid, {:select_winning_solution, data, true})
   end
 
   def process_command(%Command{
@@ -217,12 +231,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:select_winning_solution, %{bids: bids, user: user, comment: comment}, emit},
+        {:select_winning_solution, %{solution: solution = %Solution{bids: bids, comment: comment}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    new_state = select_winning_solution(bids, current_state)
+    new_state = select_winning_solution(solution, current_state)
 
-    AuctionEvent.emit(AuctionEvent.winning_solution_selected(bids, current_state, user), emit)
+    AuctionEvent.emit(AuctionEvent.winning_solution_selected(solution, current_state, user), emit)
     AuctionEvent.emit(AuctionEvent.auction_closed(auction_id, new_state), emit)
 
     {:noreply, new_state}
@@ -287,16 +301,25 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, state}
   end
 
-  defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{supplier_id: supplier_id}) do
-    !Enum.any?(product_bids,
-      fn({_product_key, %ProductBidState{bids: bids}}) ->
+  defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
+         supplier_id: supplier_id
+       }) do
+    !Enum.any?(
+      product_bids,
+      fn {_product_key, %ProductBidState{bids: bids}} ->
         Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
-    end)
+      end
+    )
   end
 
-  defp is_lowest_bid?(%AuctionState{product_bids: product_bids}, bid = %AuctionBid{fuel_id: fuel_id}) do
+  defp is_lowest_bid?(
+         %AuctionState{product_bids: product_bids},
+         bid = %AuctionBid{fuel_id: fuel_id}
+       ) do
     product_bids = product_bids[fuel_id]
-    length(product_bids.lowest_bids) == 0 || hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
+
+    length(product_bids.lowest_bids) == 0 ||
+      hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
   end
 
   defp replay_events(auction_id) do
@@ -350,8 +373,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end_auction(previous_state, auction)
   end
 
-  defp replay_event(%AuctionEvent{type: :winning_bid_selected, data: %{bid: bid}}, previous_state) do
-    select_winning_solution([bid], previous_state)
+  defp replay_event(%AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}}, previous_state) do
+    select_winning_solution(solution, previous_state)
   end
 
   defp replay_event(
@@ -452,9 +475,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp process_bid(
-          current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
-          bid = %{fuel_id: fuel_id}
-        ) do
+         current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
+         bid = %{fuel_id: fuel_id}
+       ) do
     product_state = product_bids[fuel_id] || ProductBidState.for_product(fuel_id, auction_id)
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
     new_state = AuctionState.update_product_bids(current_state, fuel_id, new_product_state)
@@ -465,11 +488,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {new_product_state, events, new_state}
   end
 
-  defp select_winning_solution(bids, current_state = %{auction_id: auction_id}) do
+  defp select_winning_solution(solution, current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
     current_state
-    |> Map.put(:winning_solution, bids)
+    |> Map.put(:winning_solution, solution)
     |> Map.put(:status, :closed)
   end
 
