@@ -384,7 +384,10 @@ defmodule Oceanconnect.Auctions do
         [suppliers: :users]
       ])
 
-    Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
+    fully_loaded_auction
+    |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
+    |> Map.put(:vessels, Enum.uniq(fully_loaded_auction.vessels))
+    |> Map.put(:fuels, Enum.uniq(fully_loaded_auction.fuels))
   end
 
   def fully_loaded(auctions) when is_list(auctions) do

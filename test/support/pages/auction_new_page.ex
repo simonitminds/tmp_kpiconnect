@@ -14,10 +14,11 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
-  def vessel_list() do
-    find_all_elements(:css, ".qa-auction-vessel_fuel-0-vessel_id option")
-    |> Enum.map(fn elem -> inner_text(elem) end)
-    |> Enum.reject(fn elem -> elem == "Please select" end)
+  def buyer_vessels_in_vessel_list?(vessels) do
+    element = find_element(:css, ".qa-auction-select-vessel")
+    Enum.all?(vessels, fn vessel ->
+      find_within_element(element, :id, "#{vessel.id}")
+    end)
   end
 
   def fill_form(params = %{}) do
@@ -46,20 +47,51 @@ defmodule Oceanconnect.AuctionNewPage do
     |> click
   end
 
+  def fill_form_element(element, "checkbox", value) do
+    if value == true do
+      click(element)
+    end
+  end
+
+  def fill_form_element(element, _type, value) when is_boolean(value) do
+    if value == true do
+      click(element)
+    end
+  end
+
   def fill_form_element(element, _type, value) do
     fill_field(element, value)
   end
 
-  def add_vessel_fuel(index, selected_vessel = %Vessel{}, selected_fuel = %Fuel{}, quantity) do
-    find_element(:css, ".qa-auction-vessel_fuel-#{index}-vessel_id")
-    |> fill_form_element("select", selected_vessel.id)
-
-    find_element(:css, ".qa-auction-vessel_fuel-#{index}-fuel_id")
-    |> fill_form_element("select", selected_fuel.id)
-
-    find_element(:css, ".qa-auction-vessel_fuel-#{index}-quantity")
-    |> fill_form_element("input", quantity)
+  def add_vessels(vessels) do
+    Enum.each(vessels, fn vessel ->
+      find_element(:css, ".qa-auction-select-vessel")
+      |> fill_form_element("select", vessel.id)
+    end)
   end
+
+  def add_vessel_fuel(fuel_id) do
+    find_element(:css, ".qa-auction-select-fuel")
+    |> fill_form_element("select", fuel_id)
+  end
+
+  def add_vessels_fuel_quantity(fuel_id, vessels, fuel_quantity) do
+    Enum.each(vessels, fn vessel ->
+      find_element(:css, ".qa-auction-vessel-#{vessel.id}-fuel-#{fuel_id}-quantity")
+      |> fill_form_element("input", fuel_quantity)
+    end)
+  end
+
+  # def add_vessel_fuel(index, selected_vessel = %Vessel{}, selected_fuel = %Fuel{}, quantity) do
+  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-vessel_id")
+  #   |> fill_form_element("select", selected_vessel.id)
+
+  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-fuel_id")
+  #   |> fill_form_element("select", selected_fuel.id)
+
+  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-quantity")
+  #   |> fill_form_element("input", quantity)
+  # end
 
   def select_port(port_id) do
     find_element(:css, ".qa-auction-port_id option[value='#{port_id}']")

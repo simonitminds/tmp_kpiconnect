@@ -12,7 +12,6 @@ defmodule Oceanconnect.AuctionNewTest do
     login_user(buyer)
     fuels = insert_list(2, :fuel)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
-    insert(:vessel)
     supplier_companies = insert_list(3, :company, is_supplier: true)
 
     port =
@@ -26,7 +25,7 @@ defmodule Oceanconnect.AuctionNewTest do
     suppliers = [selected_company1, selected_company2]
 
     auction_params = %{
-      anonymous_bidding: true,
+      anonymous_bidding: false,
       decision_duration: 15,
       duration: 10,
       eta_date: date_time,
@@ -47,7 +46,7 @@ defmodule Oceanconnect.AuctionNewTest do
     }
 
     show_params = %{
-      vessel: "#{selected_vessel.name} (#{selected_vessel.imo})",
+      vessels: buyer_vessels,
       port: port.name,
       suppliers: suppliers
     }
@@ -89,11 +88,7 @@ defmodule Oceanconnect.AuctionNewTest do
 
   test "vessels list is filtered by buyer company", %{buyer_vessels: buyer_vessels} do
     AuctionNewPage.visit()
-    buyer_vessels = Enum.map(buyer_vessels, fn v -> "#{v.name}, #{v.imo}" end)
-    vessels_on_page = MapSet.new(AuctionNewPage.vessel_list())
-    company_vessels = MapSet.new(buyer_vessels)
-
-    assert MapSet.equal?(vessels_on_page, company_vessels)
+    assert AuctionNewPage.buyer_vessels_in_vessel_list?(buyer_vessels)
   end
 
   test "port selection reveals port agent and supplier list", %{port: port} do
@@ -114,38 +109,65 @@ defmodule Oceanconnect.AuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
-  test "creating an auction with one vessel fuel", %{
+  test "creating an auction with one vessel fuel and one vessel", %{
     params: params,
     show_params: show_params,
     port: port,
-    selected_vessel: selected_vessel,
     fuels: [selected_fuel | _rest],
-    buyer_company: buyer_company
+    buyer_company: buyer_company,
+    buyer_vessels: [selected_vessel | _reset]
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(Map.put(params, :is_traded_bid_allowed, true))
-    AuctionNewPage.add_vessel_fuel(0, selected_vessel, selected_fuel, 1500)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels([selected_vessel])
+    AuctionNewPage.add_vessel_fuel(selected_fuel.id)
+    AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, [selected_vessel], 1500)
+    assert AuctionNewPage.credit_margin_amount() ==
+      :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+    AuctionNewPage.submit()
+
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(Map.put(show_params, :vessels, [selected_vessel]))
+  end
+
+  test "creating an auction with one vessel fuel and multiple vessels", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    fuels: [selected_fuel | _rest],
+    buyer_company: buyer_company,
+    buyer_vessels: buyer_vessels
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_vessel_fuel(selected_fuel.id)
+    AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, buyer_vessels, 1500)
+    assert AuctionNewPage.credit_margin_amount() ==
+      :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
     assert AuctionShowPage.has_values_from_params?(show_params)
-    assert AuctionNewPage.credit_margin_amount() ==
-             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
   end
 
   test "creating an auction with multiple vessel fuels", %{
     params: params,
     show_params: show_params,
     port: port,
-    buyer_vessels: [vessel1 | _],
-    fuels: [fuel1, fuel2 | _]
+    buyer_vessels: buyer_vessels,
+    fuels: fuels
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_vessel_fuel(0, vessel1, fuel1, 1500)
-    AuctionNewPage.add_vessel_fuel(1, vessel1, fuel2, 2000)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    Enum.each(fuels, fn fuel ->
+      AuctionNewPage.add_vessel_fuel(fuel.id)
+      AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
+    end)
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
@@ -156,18 +178,22 @@ defmodule Oceanconnect.AuctionNewTest do
     params: params,
     show_params: show_params,
     port: port,
-    buyer_vessels: [vessel1 | _],
-    fuels: [fuel1, fuel2 | _]
+    buyer_vessels: buyer_vessels,
+    fuels: fuels
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_vessel_fuel(0, vessel1, fuel1, 1500)
-    AuctionNewPage.add_vessel_fuel(1, vessel1, fuel2, 2000)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    Enum.each(fuels, fn fuel ->
+      AuctionNewPage.add_vessel_fuel(fuel.id)
+      AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
+    end)
     AuctionNewPage.disable_split_bidding()
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(show_params)
     assert AuctionShowPage.has_split_bidding_toggled?(true)
   end
 

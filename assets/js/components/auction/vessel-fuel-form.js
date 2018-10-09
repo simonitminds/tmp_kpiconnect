@@ -87,7 +87,7 @@ export default class VesselFuelForm extends React.Component {
                       field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
                       value=""
                       isHorizontal={true}
-                      opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`}} />
+                      opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}} />
         </div>
       )
     }
@@ -117,7 +117,7 @@ export default class VesselFuelForm extends React.Component {
                             Please select
                           </option>
                           {_.map(availableVessels, vessel => (
-                            <option key={vessel.id} value={vessel.id}>
+                            <option key={vessel.id} value={vessel.id} id={vessel.id}>
                               {vessel.name}, {vessel.imo}
                             </option>
                           ))}

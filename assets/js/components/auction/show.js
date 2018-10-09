@@ -71,7 +71,8 @@ export default class AuctionShow extends React.Component {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id,
       isAdmin: parseInt(this.props.currentUserCompanyId) === auction.buyer_id && window.isAdmin
     };
-    const fuel = _.get(auction, 'fuel.name');
+    const fuels = _.get(auction, 'fuels');
+    const vessels = _.get(auction, 'vessels');
 
     const additionInfoDisplay = (auction) => {
       if (auction.additional_information) {
@@ -252,9 +253,25 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Fuel Requirements</h3>
                             <ul className="list has-no-bullets">
-                              <li className="is-not-flex">
-                                <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
-                              </li>
+                              { _.map(fuels, (fuel) => {
+                                  return(
+                                    <li className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
+                                      <strong className="is-inline">{fuel.name}</strong>
+                                      <div className="qa-auction_vessel_fuels-quantities">
+                                      { _.map(vessels, (vessel) => {
+                                        let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                                          return(
+                                            <div>
+                                              <span className="is-inline">{vessel.name}</span> { filteredAuctionVesselFuels[0].quantity } MT
+                                            </div>
+                                          );
+                                        })
+                                      }
+                                      </div>
+                                    </li>
+                                  );
+                                })
+                              }
                             </ul>
                           </div>
                           <div className="box__subsection">
@@ -364,9 +381,25 @@ export default class AuctionShow extends React.Component {
                       <div className="box__subsection">
                         <h3 className="box__header">Fuel Requirements</h3>
                         <ul className="list has-no-bullets">
-                          <li className="is-not-flex">
-                            <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
-                          </li>
+                              { _.map(fuels, (fuel) => {
+                                  return(
+                                    <li className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
+                                      <strong className="is-inline">{fuel.name}</strong>
+                                      <div className="qa-auction_vessel_fuels-quantities">
+                                      { _.map(vessels, (vessel) => {
+                                        let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                                          return(
+                                            <div>
+                                              <span className="is-inline">{vessel.name}</span> { filteredAuctionVesselFuels[0].quantity } MT
+                                            </div>
+                                          );
+                                        })
+                                      }
+                                      </div>
+                                    </li>
+                                  );
+                                })
+                              }
                         </ul>
                       </div>
                       <div className="box__subsection">

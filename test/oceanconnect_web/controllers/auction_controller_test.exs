@@ -9,16 +9,19 @@ defmodule OceanconnectWeb.AuctionControllerTest do
   setup do
     buyer_company = insert(:company, is_supplier: true)
     buyer = insert(:user, company: buyer_company)
-    vessel = insert(:vessel, company: buyer_company)
-    fuel = insert(:fuel)
+    buyer_vessels = insert_list(3, :vessel, company: buyer_company)
+    selected_vessel = hd(buyer_vessels)
+    fuels = insert_list(3, :fuel)
+    selected_fuel = hd(fuels)
     supplier_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
 
+    auction_vessel_fuels = [build(:vessel_fuel, vessel: selected_vessel, fuel: selected_fuel, quantity: 1500), build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: List.last(fuels), quantity: 1500)]
     auction_params =
       string_params_for(
         :auction,
-        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 1500)],
+        auction_vessel_fuels: auction_vessel_fuels,
         port: port,
         is_traded_bid_allowed: true
       )
@@ -32,7 +35,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         :auction,
         port: port,
         buyer: buyer_company,
-        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 1500)],
+        auction_vessel_fuels: auction_vessel_fuels,
         suppliers: [supplier_company],
         is_traded_bid_allowed: true
       ) |> Auctions.fully_loaded()
@@ -43,7 +46,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
      auction: auction,
      buyer: buyer_company,
      supplier: supplier,
-     supplier_company: supplier_company}
+     supplier_company: supplier_company,
+     selected_vessel: selected_vessel,
+     selected_fuel: selected_fuel}
   end
 
   describe "index" do
@@ -80,7 +85,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn: conn,
       valid_auction_params: valid_auction_params,
       buyer: buyer,
-      supplier_company: supplier_company
+      supplier_company: supplier_company,
+      selected_vessel: selected_vessel,
+      selected_fuel: selected_fuel
     } do
       updated_params =
         valid_auction_params
@@ -95,7 +102,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn = get(conn, auction_path(conn, :show, id))
       assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == buyer.id
-      assert List.first(auction.suppliers).id == supplier_company.id
+      assert hd(auction.suppliers).id == supplier_company.id
+      assert hd(auction.auction_vessel_fuels).vessel.id == selected_vessel.id
+      assert hd(auction.auction_vessel_fuels).fuel.id == selected_fuel.id
     end
 
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do

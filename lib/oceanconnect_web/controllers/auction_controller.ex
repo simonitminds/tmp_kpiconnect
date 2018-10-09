@@ -241,8 +241,12 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels)
-       when is_map(auction_vessel_fuels) do
-    Enum.map(auction_vessel_fuels, fn {_, values} -> values end)
+  when is_map(auction_vessel_fuels) do
+    Enum.flat_map(auction_vessel_fuels, fn {fuel_id, values} ->
+      Enum.map(values, fn {vessel_id, quantity} ->
+        %{"fuel_id" => fuel_id, "vessel_id" => vessel_id, "quantity" => quantity}
+      end)
+    end)
   end
 
   defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels)

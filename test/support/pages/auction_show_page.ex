@@ -61,6 +61,16 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  defp value_equals_element_text?(:vessels, element, vessels) when is_list(vessels) do
+    Enum.all?(vessels, fn vessel ->
+      text =
+        find_within_element(element, :css, ".qa-auction-vessel-#{vessel.id}")
+        |> inner_text
+
+      "#{vessel.name} (#{vessel.imo})" == text
+    end)
+  end
+
   defp value_equals_element_text?(_key, element, value) do
     text = element |> inner_text
     value == text
