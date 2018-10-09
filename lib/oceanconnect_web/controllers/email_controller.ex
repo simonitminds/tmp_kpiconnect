@@ -56,7 +56,6 @@ defmodule OceanconnectWeb.EmailController do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       Email.auction_closed(
         200,
-        auction.fuel_quantity * 200,
         winning_supplier_company,
         auction,
         is_traded_bid
