@@ -59,7 +59,6 @@ export default class AuctionShow extends React.Component {
   render() {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
-
     const auction = auctionPayload.auction;
 
     const bidStatusDisplay = () => {
@@ -147,7 +146,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
+            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
             <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -155,7 +154,7 @@ export default class AuctionShow extends React.Component {
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <SupplierLowestBid auctionPayload={auctionPayload} />
+            <SupplierLowestBid auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -163,7 +162,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <SupplierWinningBid auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )

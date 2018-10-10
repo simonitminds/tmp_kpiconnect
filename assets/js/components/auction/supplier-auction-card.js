@@ -24,7 +24,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
       return (
         <div>
           <div className="card-content__bid-status">
-            <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} />
+            <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
             <div className="card-content__best-price">
               <strong>Best Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}
             </div>

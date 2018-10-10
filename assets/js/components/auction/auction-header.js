@@ -56,7 +56,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                           return(
                             <div key={vessel.name} className={`qa-auction-vessel-${vessel.id}`}>
                               {vessel.name}
-                              <span className="auction-header__vessel__imo">({vessel.imo})</span>
+                              <span className="auction-header__vessel__imo"> ({vessel.imo})</span>
                             </div>
                           );
                         })

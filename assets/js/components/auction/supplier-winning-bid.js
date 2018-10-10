@@ -4,7 +4,7 @@ import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 import SolutionComment from './solution-comment';
 
-const SupplierWinningBid = ({auctionPayload, connection}) => {
+const SupplierWinningBid = ({auctionPayload, connection, supplierId}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const fuel = _.get(auctionPayload, 'auction.fuel.name');
   const winningBid = _.get(auctionPayload, 'winning_bid');
@@ -39,7 +39,7 @@ const SupplierWinningBid = ({auctionPayload, connection}) => {
 
   return(
     <div className="auction-lowest-bid">
-      <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} />
+      <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={supplierId} />
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">Winning Bid</h3>
