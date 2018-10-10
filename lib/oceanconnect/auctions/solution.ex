@@ -44,7 +44,7 @@ defmodule Oceanconnect.Auctions.Solution do
   defp latest_time_entered(bids) do
     bids
     |> Enum.map(& &1.time_entered)
-    |> Enum.sort(&(DateTime.compare(&2, &1) == :gt))
+    |> Enum.sort(&(DateTime.compare(&1, &2) == :gt))
     |> hd()
   end
 

@@ -23,9 +23,11 @@ const OtherSolutions = ({auctionPayload, solutions, acceptBid}) => {
     <div className="auction-solution__container">
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
-          <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
+          <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
           { _.map(solutions, (solution) => {
-              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title="" acceptBid={acceptBid} best={false} />
+              return (
+                <SolutionDisplay auctionPayload={auctionPayload} solution={solution} acceptBid={acceptBid} best={false} />
+              );
             })
           }
         </div>

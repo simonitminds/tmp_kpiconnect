@@ -39,6 +39,12 @@ export default class SolutionDisplay extends React.Component {
       const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);
       return {fuel, bid};
     });
+    const solutionSuppliers = _.chain(bids)
+      .map((bid) => bid.supplier)
+      .uniq()
+      .value();
+    const isSingleSupplier = (solutionSuppliers.length == 1);
+
 
     const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
     const fuelQuantities = _.chain(fuels)
@@ -48,11 +54,30 @@ export default class SolutionDisplay extends React.Component {
         }, {})
         .value();
     const totalQuantity = _.sum(Object.values(fuelQuantities));
-    const acceptable = !!acceptBid
+    const acceptable = !!acceptBid;
+
+    const solutionTitle = () => {
+      if(title) {
+        return title;
+      } else if(isSingleSupplier) {
+        return solutionSuppliers[0];
+      } else {
+        return (
+          <span>
+            <span className="split-offer-indicator">Split Offer </span>
+            ({ _.join(solutionSuppliers, ", ") })
+          </span>
+        );
+      }
+    };
+
     return (
       <div className="box auction-solution">
         <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title is-inline-block"><i className="fas fa-minus has-padding-right-xs"></i> {title}</h3>
+          <h3 className="auction-solution__title is-inline-block">
+            <i className="fas fa-minus has-padding-right-xs"></i>
+            {solutionTitle()}
+          </h3>
           <div className="auction-solution__content">
             <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
             ({formatTime(latest_time_entered)})

@@ -105,17 +105,21 @@ export default class AuctionShow extends React.Component {
     }
 
     const buyerBidComponents = () => {
+      const otherSolutions = _.get(auctionPayload, 'solutions.other_solutions');
+
       if (auctionPayload.status == 'open') {
         return (
           <div>
             <BuyerLowestBid auctionPayload={auctionPayload} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptBid={this.props.acceptBid} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -123,6 +127,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptBid={this.props.acceptBid} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -255,13 +260,13 @@ export default class AuctionShow extends React.Component {
                             <ul className="list has-no-bullets">
                               { _.map(fuels, (fuel) => {
                                   return(
-                                    <li key={fuel.id} className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
+                                    <li className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
                                       <strong className="is-inline">{fuel.name}</strong>
                                       <div className="qa-auction_vessel_fuels-quantities">
                                       { _.map(vessels, (vessel) => {
                                           let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
                                           return(
-                                            <div key={vessel.id}>
+                                            <div>
                                               <span className="is-inline">{vessel.name}</span> { filteredAuctionVesselFuels[0].quantity } MT
                                             </div>
                                           );
