@@ -175,14 +175,15 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       bid = create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
       |> Auctions.place_bid()
       Auctions.end_auction(auction)
-      Auctions.select_winning_bid(bid, "Winner Winner Chicken Dinner.")
+      state = Auctions.get_auction_state!(auction)
+      Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.")
       :timer.sleep(500)
 
-      assert_received %AuctionEvent{type: :winning_bid_selected, auction_id: ^auction_id}
+      assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}
 
       assert [
                %AuctionEvent{type: :auction_closed, auction_id: ^auction_id, data: _},
-               %AuctionEvent{type: :winning_bid_selected, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},

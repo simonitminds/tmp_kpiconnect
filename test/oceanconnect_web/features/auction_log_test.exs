@@ -37,7 +37,10 @@ defmodule Oceanconnect.AuctionLogTest do
     |> Auctions.place_bid(supplier)
 
     Auctions.end_auction(auction)
-    Auctions.select_winning_bid(bid, "test")
+
+    state = Auctions.get_auction_state!(auction)
+    Auctions.select_winning_solution([bid], state.product_bids, auction, "test")
+
     :timer.sleep(500)
     login_user(buyer)
     AuctionLogPage.visit(auction.id)
