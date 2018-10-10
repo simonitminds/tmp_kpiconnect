@@ -13,6 +13,7 @@ import SupplierLowestBid from './supplier-lowest-bid';
 import SupplierWinningBid from './supplier-winning-bid';
 import BuyerBidList from './buyer-bid-list';
 import SupplierBidList from './supplier-bid-list';
+import SupplierBidStatus from './supplier-bid-status';
 import BiddingForm from './bidding-form';
 import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
@@ -132,7 +133,7 @@ export default class AuctionShow extends React.Component {
         )
       } else {
         return (
-          <div className = "auction-notification box is-gray-0" >
+          <div className="auction-notification box is-gray-0" >
             <h3 className="has-text-weight-bold">
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
             </h3>
@@ -162,14 +163,15 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierWinningBid auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
+            <SupplierBidStatus auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
+            <WinningSolution auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else {
         return (
           <div>
-            <div className = "auction-notification box is-gray-0" >
+            <div className="auction-notification box is-gray-0" >
               <h3 className="has-text-weight-bold is-flex">
                 <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
               </h3>
@@ -314,7 +316,7 @@ export default class AuctionShow extends React.Component {
                         </div>
                       </TabPanel>
                       {/* <TabPanel>
-                        <div className = "auction-notification box is-gray-0" >
+                        <div className="auction-notification box is-gray-0" >
                           <h3 className="has-text-weight-bold is-flex">
                           <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
                           </h3>
@@ -428,7 +430,7 @@ export default class AuctionShow extends React.Component {
                     </div>
                   </TabPanel>
                   {/* <TabPanel>
-                    <div className = "auction-notification box is-gray-0" >
+                    <div className="auction-notification box is-gray-0" >
                       <h3 className="has-text-weight-bold is-flex">
                       <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
                       </h3>

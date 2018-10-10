@@ -25,6 +25,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
   def get_solutions_payload!(_state = %AuctionState{solutions: solutions, winning_solution: winning_solution}, auction: _auction, supplier: supplier_id) do
     %{
+      best_single_supplier: scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
       best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id),
       winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id)
     }

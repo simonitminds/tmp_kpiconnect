@@ -229,7 +229,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 1.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -238,7 +238,7 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.enter_bid(%{amount: 0.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       end)
 
       change_session_to(:default)
