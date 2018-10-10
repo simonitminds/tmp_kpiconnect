@@ -61,11 +61,11 @@ const AuctionForm = (props) => {
       <input type="hidden" name="auction[eta]" className="qa-auction-eta" value={auction.eta ? moment(auction.eta).utc() : ""} />
       <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={auction.etd ? moment(auction.etd).utc() : ""} />
 
-      <section className="auction-info"> {/* Port info */}
+      <section className="auction-info is-gray-1"> {/* Port info */}
         <div className="container">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Arrival / Departure</legend>
+              <legend className="subtitle is-4" >Arrival/Departure</legend>
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_port_id" className="label">
@@ -157,7 +157,7 @@ const AuctionForm = (props) => {
                      fuels={fuels}
                      vessel_fuels={auction.vessel_fuels} />
 
-      <section className="auction-info"> {/* Add'l info */}
+      <section className="auction-info is-gray-1"> {/* Add'l info */}
         <div className="container">
           <div className="content">
             <fieldset>
@@ -260,7 +260,7 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-              <div className="field is-horizontal">
+              <div className="field is-horizontal has-margin-bottom-md">
                 <div className="field-label"></div>
                 <div className="field-body">
                   <CheckBoxField

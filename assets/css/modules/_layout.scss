@@ -43,6 +43,13 @@ main > div { // #auctions-app
   }
 }
 
+break { // Break for flexbox situations where you kinda wish there was a clear: both;
+  flex-basis: 100%;
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
 section {
   &.auction-list { // Bunker list divisions based on auction status.
     padding-bottom: 1.25rem;
@@ -77,13 +84,13 @@ section {
   &.auction-info { // Form divisions for Auction Create/Edit
     padding: 2rem 1rem;
 
-    &:nth-child(even) {
-      background-color: $gray-0;
-
-      .empty-list {
-        background-color: white;
-      }
-    }
+    // &:nth-child(even) {
+    //   background-color: $gray-0;
+    //
+    //   .empty-list {
+    //     background-color: white;
+    //   }
+    // }
 
     @media (max-width: 768px) { // Tighten up spacing for mobile.
       padding: 1.25rem 0.5rem;
