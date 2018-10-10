@@ -54,7 +54,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                     <h1 className="auction-header__vessel title has-text-weight-bold">
                       { _.map(auction.vessels, (vessel) => {
                           return(
-                            <div className={`qa-auction-vessel-${vessel.id}`}>
+                            <div key={vessel.id} className={`qa-auction-vessel-${vessel.id}`}>
                               {vessel.name}
                               <span className="auction-header__vessel__imo">({vessel.imo})</span>
                             </div>
