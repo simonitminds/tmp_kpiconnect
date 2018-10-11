@@ -33,8 +33,6 @@ const AuctionForm = (props) => {
     credit_margin_amount
   } = props;
 
-  const vesselFuel0 = auction.vessel_fuels[0] || {};
-  const vesselFuel1 = auction.vessel_fuels[1] || {};
   const port_id = auction.port_id ? auction.port_id : "";
   const selectedPort = _.chain(ports)
                         .filter(['id', auction.port_id])

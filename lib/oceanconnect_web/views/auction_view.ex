@@ -20,7 +20,7 @@ defmodule OceanconnectWeb.AuctionView do
       anonymous_bidding: auction_map.anonymous_bidding,
       split_bid_allowed: auction_map.split_bid_allowed,
       additional_information: auction_map.additional_information,
-      port: auction_map.port,
+      port_id: auction_map.port_id,
       buyer: auction_map.buyer,
       suppliers: auction_map.suppliers || [],
       vessel_fuels: auction_map.auction_vessel_fuels || []

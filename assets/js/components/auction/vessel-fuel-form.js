@@ -5,9 +5,13 @@ import InputField from '../input-field';
 export default class VesselFuelForm extends React.Component {
   constructor(props) {
     super(props);
+
+    const vesselFuels = this.props.vessel_fuels;
+    const selectedVessels = _.chain(vesselFuels).map('vessel_id').uniq().value();
+    const selectedFuels = _.chain(vesselFuels).map('fuel_id').uniq().value();
     this.state = {
-      selectedVessels: [],
-      selectedFuels: []
+      selectedVessels: selectedVessels,
+      selectedFuels: selectedFuels
     }
   }
 
@@ -43,6 +47,10 @@ export default class VesselFuelForm extends React.Component {
 
   render() {
     const { auction, vessels, fuels, vessel_fuels } = this.props;
+    const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
+      const vesselFuel = _.find(vessel_fuels, {vessel_id: vessel_id, fuel_id: fuel_id});
+      return vesselFuel && vesselFuel.quantity;
+    };
     const availableVessels = _.reject(vessels, (v) => {
       return _.some(this.state.selectedVessels, (sv) => v.id == sv);
     });
@@ -74,22 +82,25 @@ export default class VesselFuelForm extends React.Component {
             }}>
             <i className="fas fa-times"></i>
           </span>
-          <break></break>
+          <br/>
           <div className="selected-list__sublist">
             {_.map(this.state.selectedVessels, (vessel_id) => renderFuelQuantityInput(vessel_id, fuel.id))}
           </div>
         </div>
       )
     }
-
     const renderFuelQuantityInput = (vessel_id, fuel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
+      const initialQuantity = initialQuantityForVesselFuel(vessel.id, fuel_id);
       return(
-          <InputField model={'auction'}
-                      field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
-                      value=""
-                      isHorizontal={true}
-                      opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}} />
+          <InputField
+            key={`${fuel_id}-${vessel_id}`}
+            model={'auction'}
+            field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
+            value={initialQuantity}
+            isHorizontal={true}
+            opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
+            />
       )
     }
 
@@ -125,7 +136,7 @@ export default class VesselFuelForm extends React.Component {
                       </select>
                       </div>
                     </div>
-                    <break></break>
+                    <br/>
                     <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
                       {_.map(this.state.selectedVessels, renderVessel)}
                     </div>
@@ -169,7 +180,7 @@ export default class VesselFuelForm extends React.Component {
                         </select>
                       </div>
                     </div>
-                    <break></break>
+                    <br/>
                     <div className="box selected-list selected-list--fuels qa-auction-selected-vessels-fuel_quantities">
                       {_.map(this.state.selectedFuels, renderFuel)}
                     </div>
