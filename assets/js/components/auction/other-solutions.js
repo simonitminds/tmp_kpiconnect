@@ -20,13 +20,13 @@ const OtherSolutions = ({auctionPayload, solutions, acceptBid}) => {
   const onSelectSolution = (bidIds) => { this.setState({bidIds: bidIds}) }
 
   return(
-    <div className="auction-solution__container">
+    <div className="auction-solution__container qa-auction-other-solutions">
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
           { _.map(solutions, (solution) => {
               return (
-                <SolutionDisplay auctionPayload={auctionPayload} solution={solution} acceptBid={acceptBid} best={false} />
+                <SolutionDisplay auctionPayload={auctionPayload} solution={solution} acceptBid={acceptBid} best={false} className="qa-auction-other-solution" />
               );
             })
           }

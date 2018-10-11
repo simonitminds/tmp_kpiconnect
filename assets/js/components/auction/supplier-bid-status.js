@@ -21,7 +21,6 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const isInWinningSolution = _.includes(winningSolutionSupplierIds, supplierIdInt);
 
   const solutionIsTied = bestSingleSolutionPrice == bestOverallSolutionPrice && !isBestSingleSolution
-  // const rank = lowestBids.indexOf(suppliersLowestBid);
   const auctionStatus = _.get(auctionPayload, 'status');
 
   const messageDisplay = (message) => {
@@ -73,8 +72,8 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (solutionIsTied) {
     return (
-      <div className="auction-notification box is-success" >
-        {messageDisplay(`Your bid matches the best offer (${rank + 1}${quickOrdinal(rank + 1)})`)}
+      <div className="auction-notification box is-warning" >
+        {messageDisplay("Your bid matches the best offer")}
       </div>
     );
   } else if (isInBestSolution && isBestSingleSolution) {

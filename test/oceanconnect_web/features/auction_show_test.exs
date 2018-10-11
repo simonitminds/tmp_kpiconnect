@@ -176,9 +176,8 @@ defmodule Oceanconnect.AuctionShowTest do
           %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
         end)
 
-      assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
       assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
-      assert AuctionShowPage.has_bid_message?("Bid successfully placed")
+      assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
     test "supplier can enter a traded bid", %{
@@ -219,9 +218,8 @@ defmodule Oceanconnect.AuctionShowTest do
           }
         end)
 
-      assert AuctionShowPage.has_values_from_params?(%{"lowest-bid-amount" => "$1.25"})
       assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
-      assert AuctionShowPage.has_bid_message?("Bid successfully placed")
+      assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
     test "index displays bid status to suppliers", %{supplier2: supplier2, auction: auction} do
@@ -257,7 +255,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -291,14 +289,14 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer (1st)"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
 
     test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      assert has_css?(".qa-best-solution-#{bid.id}")
-      assert has_css?(".qa-other-solution-#{bid2.id}")
+      assert AuctionShowPage.solution_has_bids?(:best_overall, [bid])
+      assert AuctionShowPage.solution_has_bids?(0, [bid2])
     end
 
     test "buyer selects best solution", %{
@@ -310,11 +308,11 @@ defmodule Oceanconnect.AuctionShowTest do
     } do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      AuctionShowPage.select_bid(bid.id)
+      AuctionShowPage.select_solution(:best_overall)
       AuctionShowPage.accept_bid()
       :timer.sleep(200)
       assert AuctionShowPage.auction_status() == "CLOSED"
-      assert has_css?(".qa-winning-solution-#{bid.id}")
+      assert AuctionShowPage.winning_solution_has_bids?([bid])
 
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
@@ -345,14 +343,13 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
-      AuctionShowPage.select_bid(bid2.id)
-      AuctionShowPage.enter_bid_comment("Screw you!")
+      AuctionShowPage.select_solution(0)
+      AuctionShowPage.enter_solution_comment("Screw you!")
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
 
       assert AuctionShowPage.auction_status() == "CLOSED"
-      assert has_css?(".qa-winning-solution-#{bid2.id}")
-      assert AuctionShowPage.bid_comment() == "Screw you!"
+      assert AuctionShowPage.winning_solution_has_bids?([bid2])
 
       in_browser_session(:supplier, fn ->
         login_user(supplier)
@@ -361,7 +358,6 @@ defmodule Oceanconnect.AuctionShowTest do
         assert AuctionShowPage.auction_bid_status() =~
                  "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
 
-        assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 
@@ -369,14 +365,12 @@ defmodule Oceanconnect.AuctionShowTest do
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
         assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
-        assert AuctionShowPage.bid_comment() == "Screw you!"
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 
       in_browser_session(:supplier3, fn ->
         login_user(supplier3)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.bid_comment() == ""
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
     end
@@ -388,7 +382,7 @@ defmodule Oceanconnect.AuctionShowTest do
     } do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      AuctionShowPage.select_bid(bid.id)
+      AuctionShowPage.select_solution(:best_overall)
       AuctionShowPage.enter_port_agent("Test Agent")
       AuctionShowPage.accept_bid()
 

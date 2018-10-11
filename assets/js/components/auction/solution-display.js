@@ -28,7 +28,7 @@ export default class SolutionDisplay extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptBid, best, children} = this.props;
+    const {auctionPayload, solution, title, acceptBid, best, children, className} = this.props;
     const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -70,9 +70,18 @@ export default class SolutionDisplay extends React.Component {
         );
       }
     };
+    const isTradedBid = (bid) => {
+      return(
+        <span>
+          { bid.is_traded_bid ?
+            <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>
+          : "" }
+        </span>
+      );
+    }
 
     return (
-      <div className="box auction-solution">
+      <div className={`box auction-solution ${className}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title is-inline-block">
             <i className="fas fa-minus has-padding-right-xs"></i>
@@ -82,7 +91,7 @@ export default class SolutionDisplay extends React.Component {
             <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
             ({formatTime(latest_time_entered)})
             { acceptable && auctionStatus == 'decision' &&
-              <button className="button is-small has-margin-left-md" onClick={this.selectSolution.bind(this)}>Select</button>
+              <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
             }
           </div>
         </div>
@@ -99,14 +108,17 @@ export default class SolutionDisplay extends React.Component {
                   bids.length > 0  ?
                     fuelBids.map(({fuel, bid}) => {
                       return (
-                        <tr key={fuel.id}>
+                        <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
                           <td>{fuel.name}</td>
 
                           <td> { bid ?
-                              <span>${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>:
+                                 <span>
+                                  <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
+                                  <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
+                                 </span> :
                               <i>No bid</i> }
                           </td>
-                          <td>{ true ? bid.supplier : "" }</td>
+                          <td><span className="qa-auction-bid-supplier">{ true ? bid.supplier : "" }</span></td>
                         </tr>
                       );
                     })

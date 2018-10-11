@@ -124,35 +124,72 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def submit_bid() do
     find_element(:css, ".qa-auction-bid-submit")
-    |> click
+    |> click()
   end
 
   def winning_bid_amount() do
     find_element(:css, ".qa-winning-bid-amount")
-    |> inner_text
+    |> inner_text()
   end
 
   def auction_bid_status() do
     find_element(:css, ".qa-supplier-bid-status-message")
-    |> inner_text
+    |> inner_text()
   end
 
   def select_bid(bid_id) do
     find_element(:css, ".qa-select-bid-#{bid_id}")
-    |> click
+    |> click()
+  end
+
+  def select_solution(solution) when is_atom(solution) do
+    find_element(:css, ".qa-auction-solution-#{solution}")
+    |> find_within_element(:css, ".qa-auction-select-solution")
+    |> click()
+  end
+
+  def select_solution(index) when is_integer(index) do
+    find_element(:css, ".qa-auction-other-solutions")
+    |> find_all_within_element(:css, ".qa-auction-other-solution")
+    |> Enum.at(index)
+    |> find_within_element(:css, ".qa-auction-select-solution")
+    |> click()
+  end
+
+  def solution_has_bids?(solution, bids) when is_atom(solution) do
+    element = find_element(:css, ".qa-auction-solution-best_overall")
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
+  end
+
+  def solution_has_bids?(index, bids) when is_integer(index) do
+    element = find_element(:css, ".qa-auction-other-solutions")
+    |> find_all_within_element(:css, ".qa-auction-other-solution")
+    |> Enum.at(index)
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
+  end
+
+  def winning_solution_has_bids?(bids) do
+    element = find_element(:css, ".qa-auction-winning-solution")
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
   end
 
   def accept_bid() do
     find_element(:css, ".qa-accept-bid")
-    |> click
+    |> click()
   end
 
-  def enter_bid_comment(comment) do
-    fill_field({:css, ".qa-bid-comment"}, comment)
+  def enter_solution_comment(comment) do
+    fill_field({:css, ".qa-solution-comment"}, comment)
   end
 
-  def bid_comment() do
-    find_element(:css, ".qa-bid-comment")
+  def solution_comment() do
+    find_element(:css, ".qa-solution-comment")
     |> inner_text
   end
 
