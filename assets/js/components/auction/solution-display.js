@@ -84,7 +84,7 @@ export default class SolutionDisplay extends React.Component {
       <div className={`box auction-solution ${className}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title is-inline-block">
-            <i className="fas fa-minus has-padding-right-xs"></i>
+            <i className="fas fa-minus has-padding-right-sm"></i>
             {solutionTitle()}
           </h3>
           <div className="auction-solution__content">
@@ -97,7 +97,7 @@ export default class SolutionDisplay extends React.Component {
         </div>
         <div className="auction-solution__body">
           <div>
-            <table className="auction-solution__product-table table is-striped is-fullwidth">
+            <table className="auction-solution__product-table table is-striped">
               <thead>
                 <tr>
                   <th colSpan="3">Fuels</th>
@@ -124,7 +124,7 @@ export default class SolutionDisplay extends React.Component {
                     })
                     : <tr>
                         <td>
-                          <i>No bids had been placed on this auction</i>
+                          <i>No bids have been placed on this auction</i>
                         </td>
                       </tr>
                 }
@@ -139,4 +139,3 @@ export default class SolutionDisplay extends React.Component {
     );
   }
 };
-

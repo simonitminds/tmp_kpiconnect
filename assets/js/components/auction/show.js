@@ -268,7 +268,7 @@ export default class AuctionShow extends React.Component {
                                           let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
                                           return(
                                             <div>
-                                              <span className="is-inline">{vessel.name}</span> { filteredAuctionVesselFuels[0].quantity } MT
+                                              { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
                                             </div>
                                           );
                                         })
@@ -306,9 +306,8 @@ export default class AuctionShow extends React.Component {
                               </li>
                               <li className="qa-auction-anonymous_bidding">
                                 {
-                                  auction.anonymous_bidding ?
-                                    "Anonymous bidding is allowed for this auction." :
-                                    "Anonymous bidding is not allowed for this auction."
+                                  auction.anonymous_bidding &&
+                                    "Supplier bids on this auction are placed anonymously."
                                 }
                               </li>
                             </ul>
@@ -396,7 +395,7 @@ export default class AuctionShow extends React.Component {
                                           let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
                                           return(
                                             <div key={vessel.id}>
-                                              <span className="is-inline">{vessel.name}</span> { filteredAuctionVesselFuels[0].quantity } MT
+                                              { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
                                             </div>
                                           );
                                         })

@@ -58,12 +58,15 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
       <form onSubmit={formSubmit.bind(this, auction.id)}>
         <h3 className="auction-bidding__title title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
         { products.map((product) => renderProduct(product, auctionPayload)) }
-        <div className="field field--offset is-horizontal">
-          <label className="checkbox">
-            <input className="has-margin-right-sm" type="checkbox" />
-              <strong>Do not split my bid</strong>
-          </label>
-        </div>
+
+        {(auction.split_bid_allowed === true) &&
+          <div className="field field--offset is-horizontal">
+            <label className="checkbox">
+              <input className="has-margin-right-sm" type="checkbox" />
+                <strong>Do not split my bid</strong>
+            </label>
+          </div>
+        }
         { (is_traded_bid_allowed === true) &&
           <div className="field field--ribbon is-horizontal">
             <div className="field-label"></div>
@@ -80,7 +83,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
           </div>
         }
         <div className="field is-horizontal is-expanded">
-          <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm">
+          <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
             <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>
           </div>
         </div>

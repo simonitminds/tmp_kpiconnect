@@ -22,8 +22,8 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
           <table className="table is-fullwidth is-striped is-marginless qa-auction-bids">
             <thead>
               <tr>
-                <th> Amount </th>
                 <th>Product</th>
+                <th>Amount </th>
                 <th>Time</th>
               </tr>
             </thead>
@@ -31,11 +31,11 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
               {_.map(bidList, ({id, amount, min_amount, fuel_id, is_traded_bid, time_entered}) => {
                 return (
                   <tr key={id} className={`qa-auction-bid-${id}`}>
+                    <td className="qa-auction-bid-product">{fuels[fuel_id].name}</td>
                     <td className="qa-auction-bid-amount">
                       ${formatPrice(amount)} <i className="has-text-gray-4">(Min: ${formatPrice(min_amount)})</i>
                       <span className="qa-auction-bid-is_traded_bid">{is_traded_bid && <i className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3"></i>}</span>
                     </td>
-                    <td className="qa-auction-bid-product">{fuels[fuel_id].name}</td>
                     <td>{formatTime(time_entered)}</td>
                   </tr>
                 );
