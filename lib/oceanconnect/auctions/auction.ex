@@ -92,8 +92,8 @@ defmodule Oceanconnect.Auctions.Auction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields ++ [:scheduled_start])
-    |> cast_assoc(:buyer, required: true)
-    |> cast_assoc(:port, required: true)
+    |> cast_assoc(:buyer)
+    |> cast_assoc(:port)
     |> validate_vessel_fuels(attrs)
     |> maybe_add_vessel_fuels(attrs)
     |> maybe_add_suppliers(attrs)
