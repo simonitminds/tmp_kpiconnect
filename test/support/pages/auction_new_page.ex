@@ -2,8 +2,6 @@ defmodule Oceanconnect.AuctionNewPage do
   @page_path "/auctions/new"
   use Oceanconnect.Page
 
-  alias Oceanconnect.Auctions.{Fuel, Vessel}
-
   def visit do
     navigate_to(@page_path)
   end
