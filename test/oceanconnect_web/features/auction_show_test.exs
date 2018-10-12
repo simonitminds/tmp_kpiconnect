@@ -260,6 +260,7 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
+        :timer.sleep(500)
         AuctionShowPage.enter_bid(%{amount: 9.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)

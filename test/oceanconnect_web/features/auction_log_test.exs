@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionLogTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionLogPage
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.Payloads.SolutionsPayload
   alias OceanconnectWeb.AuctionView
 
   hound_session()
@@ -61,7 +62,8 @@ defmodule Oceanconnect.AuctionLogTest do
   end
 
   test "page has auction details", %{auction: auction, buyer_id: buyer_id} do
-    auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, buyer_id)
+    solutions_payload = Auctions.get_auction_state!(auction)
+    |> SolutionsPayload.get_solutions_payload!([auction: auction, buyer: buyer_id])
 
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
@@ -70,8 +72,8 @@ defmodule Oceanconnect.AuctionLogTest do
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
-      "winning-bid-amount" => "$#{auction_payload.winning_bid.amount}",
-      "winning-supplier" => auction_payload.winning_bid.supplier
+      "winning-solution-normalized-price" => "$#{solutions_payload.winning_solution.normalized_price}",
+      "winning-suppliers" => AuctionView.auction_log_suppliers(solutions_payload)
     }
 
     assert AuctionLogPage.has_details?(expected_details)

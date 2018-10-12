@@ -159,6 +159,12 @@ defmodule Oceanconnect.Accounts do
     |> Repo.paginate(params)
   end
 
+  def list_companies_by_ids(ids) do
+    ids
+    |> Company.by_ids()
+    |> Repo.all()
+  end
+
   def list_active_companies do
     Company.select_active()
     |> Repo.all()

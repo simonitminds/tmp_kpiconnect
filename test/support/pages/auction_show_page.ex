@@ -98,7 +98,7 @@ defmodule Oceanconnect.AuctionShowPage do
   def enter_bid(params = %{}) do
     params
     |> Enum.map(fn {key, value} ->
-      element = find_element(:class, "qa-auction-bid-#{key}")
+      element = find_element(:css, "input.qa-auction-bid-#{key}")
       type = Hound.Helpers.Element.tag_name(element)
       fill_form_element(key, element, type, value)
     end)

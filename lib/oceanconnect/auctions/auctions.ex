@@ -129,7 +129,7 @@ defmodule Oceanconnect.Auctions do
   defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
   defp maybe_pending(_), do: :error
 
-  def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
+ def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
     solution = Solution.from_bids(bids, product_bids, auction)
     %Solution{solution | comment: comment}
     |> Command.select_winning_solution(user)

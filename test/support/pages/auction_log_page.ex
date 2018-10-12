@@ -59,12 +59,16 @@ defmodule Oceanconnect.AuctionLogPage do
 
   def has_details?(details) do
     Enum.all?(details, fn {k, v} ->
+      v = case v do
+        [_] -> v = Enum.join(v)
+        _ -> v
+      end
       text =
         :class
         |> find_element("qa-auction-detail-#{k}")
         |> inner_text
 
-      text == v
+      text =~ v
     end)
   end
 end

@@ -46,11 +46,19 @@
           </tr>
           <tr>
             <th>Winning Bid</th>
-            <td class="qa-auction-detail-winning-bid-amount"><%= auction_log_winning_bid(@auction_payload) %></td>
+            <td class="qa-auction-detail-winning-solution-normalized-price"><%= auction_log_winning_solution(@solutions_payload) %></td>
           </tr>
           <tr>
             <th>Winning Bidder</th>
-            <td class="qa-auction-detail-winning-supplier"><%= auction_log_supplier(@auction_payload) %></td>
+            <td class="qa-auction-detail-winning-suppliers">
+            <%= if auction_log_suppliers(@solutions_payload) != "—" do %>
+              <%= for supplier <- auction_log_suppliers(@solutions_payload) do %>
+                <%= supplier %>
+              <% end %>
+            <% else %>
+              <%= auction_log_suppliers(@solutions_payload) %>
+            <% end %>
+            </td>
           </tr>
         </tbody>
       </table>

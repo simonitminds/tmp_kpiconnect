@@ -34,17 +34,19 @@ defmodule OceanconnectWeb.AuctionView do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 
-  def auction_log_supplier(%{winning_bid: %{supplier: supplier}}) do
-    supplier
+  def auction_log_suppliers(%{winning_solution: %{bids: bids}}) do
+    Enum.map(bids, fn bid ->
+      bid.supplier
+    end)
+    |> Enum.uniq()
   end
 
-  def auction_log_supplier(_), do: "—"
+  def auction_log_suppliers(_), do: "—"
 
-  def auction_log_winning_bid(%{winning_bid: %{amount: amount}}) do
-    "$#{:erlang.float_to_binary(amount, decimals: 2)}"
+  def auction_log_winning_solution(%{winning_solution: %{normalized_price: normalized_price}}) do
+    "$#{:erlang.float_to_binary(normalized_price, decimals: 2)}"
   end
-
-  def auction_log_winning_bid(_), do: "—"
+  def auction_log_winning_solution(_), do: "—"
 
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"

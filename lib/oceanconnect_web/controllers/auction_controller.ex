@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload}
+  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload, Payloads}
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -16,16 +16,18 @@ defmodule OceanconnectWeb.AuctionController do
       |> Auctions.get_auction!()
       |> Auctions.fully_loaded()
 
+    auction_state = Auctions.get_auction_state!(auction)
     with %Auction{} <- auction,
          true <- current_company_id == auction.buyer_id,
-         false <- Auctions.get_auction_state!(auction).status in [:pending, :open, :draft] do
+         false <- auction_state.status in [:pending, :open, :draft] do
       events =
         auction.id
         |> AuctionEventStore.event_list()
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+      solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
 
-      render(conn, "log.html", auction_payload: auction_payload, events: events)
+      render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
     else
       _ ->
         if(Auth.current_admin(conn)) do
@@ -34,8 +36,9 @@ defmodule OceanconnectWeb.AuctionController do
             |> AuctionEventStore.event_list()
 
           auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+          solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
 
-          render(conn, "log.html", auction_payload: auction_payload, events: events)
+          render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
         else
           redirect(conn, to: auction_path(conn, :index))
         end

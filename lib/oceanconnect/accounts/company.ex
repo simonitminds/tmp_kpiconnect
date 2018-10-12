@@ -76,6 +76,13 @@ defmodule Oceanconnect.Accounts.Company do
     )
   end
 
+  def by_ids(ids, query \\ Company) when is_list(ids) do
+    from(
+      q in query,
+      where: q.id in ^ids
+    )
+  end
+
   defp maybe_set_credit_margin_amount_to_nil(changeset) do
     case get_change(changeset, :credit_margin_amount) do
       0.0 -> put_change(changeset, :credit_margin_amount, nil)
