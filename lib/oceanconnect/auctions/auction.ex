@@ -92,8 +92,8 @@ defmodule Oceanconnect.Auctions.Auction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields ++ [:scheduled_start])
-    |> cast_assoc(:buyer)
-    |> cast_assoc(:port)
+    |> cast_assoc(:buyer, required: true)
+    |> cast_assoc(:port, required: true)
     |> validate_vessel_fuels(attrs)
     |> maybe_add_vessel_fuels(attrs)
     |> maybe_add_suppliers(attrs)
@@ -110,18 +110,21 @@ defmodule Oceanconnect.Auctions.Auction do
   def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def maybe_add_vessel_fuels(changeset, %{"auction_vessel_fuels" => auction_vessel_fuels}) do
+    vessel_fuel_changeset_proc =
+      case get_field(changeset, :scheduled_start) do
+        nil -> &AuctionVesselFuel.changeset_for_draft/2
+        _ -> &AuctionVesselFuel.changeset_for_new/2
+      end
+
     list_of_changesets =
       auction_vessel_fuels
-      |> Enum.reject(fn avf -> avf["vessel_id"] == nil || avf["fuel_id"] == nil end)
-      |> Enum.map(fn avf -> AuctionVesselFuel.changeset_for_new(%AuctionVesselFuel{}, avf) end)
+      |> Enum.map(fn avf -> vessel_fuel_changeset_proc.(%AuctionVesselFuel{}, avf) end)
 
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
-
   def maybe_add_vessel_fuels(changeset, %{auction_vessel_fuels: auction_vessel_fuels}) do
     put_assoc(changeset, :auction_vessel_fuels, auction_vessel_fuels)
   end
-
   def maybe_add_vessel_fuels(changeset, _attrs), do: changeset
 
   def from_params(params) do

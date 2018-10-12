@@ -86,8 +86,7 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def create(conn, %{"auction" => auction_params}) do
-    auction_vessel_fuels =
-      convert_auction_vessel_fuels_to_list(auction_params["auction_vessel_fuels"])
+    auction_vessel_fuels = vessel_fuels_from_params(auction_params)
 
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
@@ -165,7 +164,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
     auction_vessel_fuels =
-      convert_auction_vessel_fuels_to_list(auction_params["auction_vessel_fuels"])
+      vessel_fuels_from_params(auction_params)
 
     user = Auth.current_user(conn)
 
@@ -240,17 +239,36 @@ defmodule OceanconnectWeb.AuctionController do
     [auction, json_auction, suppliers]
   end
 
-  defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels) when is_map(auction_vessel_fuels) do
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_map(auction_vessel_fuels) do
     Enum.flat_map(auction_vessel_fuels, fn {fuel_id, vessel_quantities} ->
       Enum.map(vessel_quantities, fn {vessel_id, quantity} ->
         %{"fuel_id" => fuel_id, "vessel_id" => vessel_id, "quantity" => quantity}
       end)
     end)
   end
-
-  defp convert_auction_vessel_fuels_to_list(auction_vessel_fuels) when is_list(auction_vessel_fuels) do
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_list(auction_vessel_fuels) do
     auction_vessel_fuels
   end
+  # For draft auctions, there might only be vessels or fuels provided. Even
+  # though these are invalid for _scheduled_ auctions, they are still allowed
+  # for draft auctions as the values for fuels and quantities may not be known.
+  defp vessel_fuels_from_params(%{"vessels" => vessels, "fuels" => fuels}) when is_list(vessels) and is_list(fuels) do
+    Enum.map(fuels, fn(fuel_id) ->
+      Enum.flat_map(vessels, fn(vessel_id) ->
+        %{"vessel_id" => vessel_id, "fuel_id" => fuel_id}
+      end)
+    end)
+  end
+  defp vessel_fuels_from_params(%{"vessels" => vessels}) when is_list(vessels) do
+    Enum.map(vessels, fn(vessel_id) ->
+      %{"vessel_id" => vessel_id}
+    end)
+  end
+  defp vessel_fuels_from_params(%{"fuels" => fuels}) when is_list(fuels) do
+    Enum.map(fuels, fn(fuel_id) ->
+      %{"fuel_id" => fuel_id}
+    end)
+  end
 
-  defp convert_auction_vessel_fuels_to_list(_), do: []
+  defp vessel_fuels_from_params(_), do: []
 end

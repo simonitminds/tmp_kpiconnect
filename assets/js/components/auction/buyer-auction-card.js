@@ -78,7 +78,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction Edit/Delete */}
-            { auctionStatus != 'open' && auctionStatus != 'decision' ?
+            { auctionStatus == 'draft' || auctionStatus == 'pending' ?
               <div className="has-margin-left-auto">
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">

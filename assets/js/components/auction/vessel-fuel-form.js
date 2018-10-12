@@ -7,8 +7,8 @@ export default class VesselFuelForm extends React.Component {
     super(props);
 
     const vesselFuels = this.props.vessel_fuels;
-    const selectedVessels = _.chain(vesselFuels).map('vessel_id').uniq().value();
-    const selectedFuels = _.chain(vesselFuels).map('fuel_id').uniq().value();
+    const selectedVessels = _.chain(vesselFuels).map('vessel_id').uniq().filter().value();
+    const selectedFuels = _.chain(vesselFuels).map('fuel_id').uniq().filter().value();
     this.state = {
       selectedVessels: selectedVessels,
       selectedFuels: selectedFuels
@@ -68,6 +68,7 @@ export default class VesselFuelForm extends React.Component {
             }}>
             <i className="fas fa-times"></i>
           </span>
+          <input type="hidden" name="auction[vessels][]" value={vessel.id} />
         </div>
       );
     }
@@ -86,6 +87,7 @@ export default class VesselFuelForm extends React.Component {
           <div className="selected-list__sublist">
             {_.map(this.state.selectedVessels, (vessel_id) => renderFuelQuantityInput(vessel_id, fuel.id))}
           </div>
+          <input type="hidden" name="auction[fuels][]" value={fuel.id} />
         </div>
       )
     }

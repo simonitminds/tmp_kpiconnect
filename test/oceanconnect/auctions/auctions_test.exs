@@ -15,7 +15,10 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       auction = insert(:auction, @valid_attrs)
       |> Auctions.fully_loaded
-      {:ok, %{auction: Auctions.get_auction!(auction.id)}}
+      port = insert(:port)
+      vessel = insert(:vessel)
+      fuel = insert(:fuel)
+      {:ok, %{auction: Auctions.get_auction!(auction.id), port: port, vessel: vessel, fuel: fuel}}
     end
 
     test "#maybe_parse_date_field" do
@@ -51,6 +54,104 @@ defmodule Oceanconnect.AuctionsTest do
       %{"suppliers" => suppliers} = Auction.maybe_load_suppliers(params, "suppliers")
 
       assert List.first(suppliers).id == supplier.id
+    end
+
+    test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => nil,
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      assert changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => nil,
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      assert changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => nil,
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      assert changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is invalid without fuel quantities for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => DateTime.utc_now(),
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      refute changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => DateTime.utc_now(),
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => nil, "fuel_id" => fuel.id, "quantity" => 1500}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      refute changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => DateTime.utc_now(),
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id, "fuel_id" => nil, "quantity" => 1500}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      refute changeset.valid?
+    end
+
+    test "#maybe_add_vessel_fuels is valid with fuel quantities for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+      params = %{
+        "port_id" => port.id,
+        "eta" => DateTime.utc_now(),
+        "scheduled_start" => DateTime.utc_now(),
+        "auction_vessel_fuels" => [
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => 1500}
+        ]
+      }
+
+      changeset = Auction.changeset(%Auction{}, params)
+      assert changeset.valid?
     end
 
     test "list_auctions/0 returns all auctions", %{auction: auction} do
