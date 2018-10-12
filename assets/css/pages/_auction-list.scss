@@ -150,10 +150,6 @@
       left: -30px;
     }
 
-    &:nth-child(2) { // Throw a margin-left: auto on this for when it's the only action button.
-      margin-left: auto;
-    }
-
     .auction-card__status--decision ~ &,  .auction-card__status--open ~ &, {
       margin-left: auto;
     }
@@ -189,6 +185,10 @@
       left: -24px;
     }
   }
+}
+
+.auction-card__status + * {
+  margin-left: auto;
 }
 
 // Auction Listing Elements Ported to Auction Info
