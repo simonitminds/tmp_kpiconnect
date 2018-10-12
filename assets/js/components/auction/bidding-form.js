@@ -8,7 +8,7 @@ import CheckBoxField from '../check-box-field';
 const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.status;
-  const products = auction.fuels;
+  const products = _.sortBy(auction.fuels, 'id');
   const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'))
   const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
   const is_traded_bid = _.get(auctionPayload, 'bid_history[0].is_traded_bid');
@@ -23,7 +23,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
     const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
 
     return(
-    <div className="auction-bidding__product-group columns is-desktop" key={id}>
+      <div className="auction-bidding__product-group columns is-desktop" key={id}>
         <div className="column is-one-quarter-desktop"><strong>{name}</strong><br/><span className="has-text-gray-3">&times; {totalQuantity} MT </span></div>
         <div className="column">
           <div className="columns is-desktop">
