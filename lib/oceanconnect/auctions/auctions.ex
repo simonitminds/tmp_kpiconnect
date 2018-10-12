@@ -73,7 +73,11 @@ defmodule Oceanconnect.Auctions do
       |> Map.put("time_entered", time_entered)
       |> Map.put("fuel_id", product_id)
       |> AuctionBid.from_params_to_auction_bid(auction)
-      {:ok, bid}
+
+      case bid do
+        %{amount: nil, min_amount: nil} -> {:invalid_bid, bid_params}
+        _ -> {:ok, bid}
+      end
     else
       _ -> {:invalid_bid, bid_params}
     end

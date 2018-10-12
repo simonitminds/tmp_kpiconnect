@@ -245,7 +245,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 0.50})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer (2nd)"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer"
     end
 
     test "supplier places minimum bid and maintains winning position", %{

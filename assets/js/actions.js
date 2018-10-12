@@ -159,7 +159,7 @@ export function submitBid(auctionId, bidData) {
     .then(parseJSON)
     .then((response) => {
       return dispatch(updateBidStatus(auctionId, response));
-    }, (error)=> {
+    }, (error) => {
       return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
     });
   };
