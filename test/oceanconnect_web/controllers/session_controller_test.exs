@@ -1,6 +1,5 @@
 defmodule Oceanconnectweb.SessionControllerTest do
   use OceanconnectWeb.ConnCase
-  alias Oceanconnect.Accounts.User
 
   setup do
     user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})

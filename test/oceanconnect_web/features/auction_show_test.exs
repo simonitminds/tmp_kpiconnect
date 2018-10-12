@@ -378,7 +378,6 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "buyer selects best solution and specifies port agent", %{
       auction: auction,
-      bid: bid,
       buyer: buyer
     } do
       login_user(buyer)

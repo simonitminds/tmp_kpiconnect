@@ -183,6 +183,33 @@ export default class AuctionShow extends React.Component {
       }
     }
 
+    const fuelRequirementDisplay = (fuels) => {
+      if(fuels.length == 0) {
+        return (
+          <i>No fuels have been specified for this auction</i>
+        );
+      }
+
+      return _.map(fuels, (fuel) => {
+        return (
+          <li className={`is-not-flex qa-auction-fuel-${fuel.id}`} key={fuel.id}>
+            <strong className="is-inline">{fuel.name}</strong>
+            <div className="qa-auction_vessel_fuels-quantities">
+            { _.map(vessels, (vessel) => {
+                let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                return(
+                  <div key={vessel.id}>
+                    { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
+                  </div>
+                );
+              })
+            }
+            </div>
+          </li>
+        );
+      });
+    }
+
     return (
       <div className="auction-app">
         <MediaQuery query="(min-width: 769px)">
@@ -259,25 +286,7 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Fuel Requirements</h3>
                             <ul className="list has-no-bullets">
-                              { _.map(fuels, (fuel) => {
-                                  return(
-                                    <li className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
-                                      <strong className="is-inline">{fuel.name}</strong>
-                                      <div className="qa-auction_vessel_fuels-quantities">
-                                      { _.map(vessels, (vessel) => {
-                                          let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
-                                          return(
-                                            <div>
-                                              { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
-                                            </div>
-                                          );
-                                        })
-                                      }
-                                      </div>
-                                    </li>
-                                  );
-                                })
-                              }
+                              {fuelRequirementDisplay(fuels)}
                             </ul>
                           </div>
                           <div className="box__subsection">

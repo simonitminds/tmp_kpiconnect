@@ -14,7 +14,7 @@ export default class AuctionsIndex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: [],
+      timeRemaining: {},
       serverTime: moment().utc()
     };
   }
@@ -58,7 +58,7 @@ export default class AuctionsIndex extends React.Component {
       if(_.isEmpty(filteredPayloads)) {
         return(
           <div className="empty-list">
-            <em>{`You have no ${status} auctions`}</em>
+            <em>You have no {status} auctions</em>
           </div>);
       } else {
         return(

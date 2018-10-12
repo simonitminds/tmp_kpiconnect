@@ -30,6 +30,6 @@ defmodule Oceanconnect.AuctionEditTest do
       "select-fuel",
       "select-port",
       "select-vessel"
-           ])
+    ])
   end
 end

@@ -42,8 +42,6 @@ defmodule OceanconnectWeb.Admin.BargeControllerTest do
       barge: barge,
       companies: companies
     } do
-      company_ids = Enum.map(companies, fn company -> Integer.to_string(company.id) end)
-
       barge_params =
         string_params_for(:barge, port_id: barge.port_id)
         |> Map.put(

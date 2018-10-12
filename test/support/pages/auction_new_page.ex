@@ -70,7 +70,7 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
-  def add_vessel_fuel(fuel_id) do
+  def add_fuel(fuel_id) do
     find_element(:css, ".qa-auction-select-fuel")
     |> fill_form_element("select", fuel_id)
   end

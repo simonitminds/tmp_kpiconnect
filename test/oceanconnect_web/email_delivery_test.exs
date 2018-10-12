@@ -4,12 +4,10 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
 
   alias OceanconnectWeb.Email
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
 
   setup do
     buyer_company = insert(:company, is_supplier: false)
-    credit_company = insert(:company, name: "Ocean Connect Marine")
 
     supplier_companies = [
       insert(:company, is_supplier: true),

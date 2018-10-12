@@ -70,7 +70,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{port: port, vessel: vessel} do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -84,13 +84,13 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{port: port, fuel: fuel} do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id}
+          %{"fuel_id" => fuel.id}
         ]
       }
 
@@ -112,7 +112,7 @@ defmodule Oceanconnect.AuctionsTest do
       refute changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{port: port, fuel: fuel} do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -126,7 +126,7 @@ defmodule Oceanconnect.AuctionsTest do
       refute changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{port: port, vessel: vessel} do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
