@@ -43,7 +43,8 @@ main > div { // #auctions-app
   }
 }
 
-break { // Break for flexbox situations where you kinda wish there was a clear: both;
+span.break { // Break for flexbox situations where you kinda wish there was a clear: both;
+  display: block;
   flex-basis: 100%;
   width: 0px;
   height: 0px;

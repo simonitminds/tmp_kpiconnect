@@ -55,8 +55,9 @@
   &__vessel-item { // List of vessels involved in auction
     display: inline-block;
 
-    &:not(:first-child):before {
-      content: ", "
+    &:after {
+      content: " ";
+      white-space: pre;
     }
   }
 

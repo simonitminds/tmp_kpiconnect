@@ -138,7 +138,7 @@ export default class VesselFuelForm extends React.Component {
                       </select>
                       </div>
                     </div>
-                    <br/>
+                    <span className="break"></span>
                     <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
                       {_.map(this.state.selectedVessels, renderVessel)}
                     </div>
@@ -182,7 +182,7 @@ export default class VesselFuelForm extends React.Component {
                         </select>
                       </div>
                     </div>
-                    <br/>
+                    <span className="break"></span>
                     <div className="box selected-list selected-list--fuels qa-auction-selected-vessels-fuel_quantities">
                       {_.map(this.state.selectedFuels, renderFuel)}
                     </div>
