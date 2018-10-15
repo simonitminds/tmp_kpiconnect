@@ -34,7 +34,7 @@ defmodule Oceanconnect.Admin.User.IndexPage do
       |> find_within_element(:css, ".qa-admin-user-full_name")
       |> inner_text
 
-    name == user_name
+    user_name =~ name
   end
 
   def user_created_successfully? do
