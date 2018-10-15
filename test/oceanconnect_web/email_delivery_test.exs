@@ -8,7 +8,7 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
 
   setup do
     buyer_company = insert(:company, is_supplier: false)
-
+    _ocm = insert(:company, name: "Ocean Connect Marine")
     supplier_companies = [
       insert(:company, is_supplier: true),
       insert(:company, is_supplier: true)
