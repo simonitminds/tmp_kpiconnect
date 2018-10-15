@@ -69,9 +69,4 @@ defmodule Oceanconnect.Auctions.Solution do
       acc + bid.amount * quantity
     end)
   end
-
-  def less_equal(s1, s2) do
-    s1.total_price <= s2.total_price &&
-      DateTime.compare(s1.latest_time_entered, s2.latest_time_entered) != :gt
-  end
 end

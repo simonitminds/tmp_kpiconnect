@@ -6,13 +6,17 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const supplierIdInt = parseInt(supplierId);
   const bidList = _.get(auctionPayload, 'bid_history', []);
 
-  const bestSingleSolutionPrice = _.get(auctionPayload, 'solutions.best_single_supplier.normalized_price')
-  const bestSingleSolutionBids = _.get(auctionPayload, 'solutions.best_single_supplier.bids');
+  console.log('solutions: ', auctionPayload.solutions);
+
+  const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
+  const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
+
+  const bestSingleSolutionBids = _.get(bestSingleSolution, 'bids');
   const bestSingleSolutionSupplierIds = _.map(bestSingleSolutionBids, 'supplier_id');
   const isBestSingleSolution = _.includes(bestSingleSolutionSupplierIds, supplierIdInt);
 
-  const bestOverallSolutionPrice = _.get(auctionPayload, 'solutions.best_overall.normalized_price')
-  const bestOverallSolutionBids = _.get(auctionPayload, 'solutions.best_overall.bids');
+  const bestOverallSolution = _.get(auctionPayload, 'solutions.best_overall');
+  const bestOverallSolutionBids = _.get(bestOverallSolution, 'bids');
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
   const isInBestSolution = _.includes(bestSolutionSupplierIds, supplierIdInt);
 
@@ -20,7 +24,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const winningSolutionSupplierIds = _.map(winningSolutionBids, 'supplier_id');
   const isInWinningSolution = _.includes(winningSolutionSupplierIds, supplierIdInt);
 
-  const solutionIsTied = bestSingleSolutionPrice == bestOverallSolutionPrice && !isBestSingleSolution
+  const singleSolutionIsTied = suppliersBestSolution && !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
   const auctionStatus = _.get(auctionPayload, 'status');
 
   const messageDisplay = (message) => {
@@ -66,14 +70,20 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     )
   } else if (bidList.length == 0) {
     return (
-      <div className="auction-notification box is-warning" >
+      <div className="auction-notification box is-warning">
         {messageDisplay("You have not bid on this auction")}
       </div>
     );
-  } else if (solutionIsTied) {
+  } else if (singleSolutionIsTied && isBestSingleSolution) {
     return (
-      <div className="auction-notification box is-warning" >
-        {messageDisplay("Your bid matches the best offer")}
+      <div className="auction-notification box is-warning">
+        {messageDisplay("Your bid is the best single-supplier offer. Other suppliers have matched this offer")}
+      </div>
+    );
+  } else if (singleSolutionIsTied) {
+    return (
+      <div className="auction-notification box is-warning">
+        {messageDisplay("Your bid matches the best single-supplier offer, but was not the first")}
       </div>
     );
   } else if (isInBestSolution && isBestSingleSolution) {

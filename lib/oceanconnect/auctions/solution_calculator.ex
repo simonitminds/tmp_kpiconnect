@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     supplier_solutions
     |> Map.values()
     |> Enum.filter(&(&1.valid))
-    |> Enum.sort(&Solution.less_equal/2)
+    |> Enum.sort_by(&({&1.total_price, DateTime.to_unix(&1.latest_time_entered, :microsecond)}))
     |> Enum.at(0, %Solution{valid: false}) # list may be empty, so avoid `hd` and return `nil` instead.
   end
 

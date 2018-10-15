@@ -245,7 +245,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 0.50})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best single-supplier offer, but was not the first"
     end
 
     test "supplier places minimum bid and maintains winning position", %{
@@ -268,9 +268,9 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
 
       change_session_to(:default)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
   end
 
@@ -456,7 +456,7 @@ defmodule Oceanconnect.AuctionShowTest do
     :timer.sleep(500)
 
     AuctionShowPage.approve_barge(barge, supplier.company_id)
-    :timer.sleep(500)
+    :timer.sleep(700)
 
     AuctionShowPage.expand_supplier_barges(supplier.company_id)
     assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)

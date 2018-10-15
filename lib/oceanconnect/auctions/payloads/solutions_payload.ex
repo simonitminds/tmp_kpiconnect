@@ -31,13 +31,14 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   def get_solutions_payload!(
         _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
-        auction: _auction,
+        auction: auction,
         supplier: supplier_id
       ) do
+    suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
     %{
-      best_single_supplier:
-        scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
+      best_single_supplier: scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
       best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id),
+      suppliers_best_solution: scrub_solution_for_supplier(suppliers_best_solution, supplier_id),
       winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id)
     }
   end

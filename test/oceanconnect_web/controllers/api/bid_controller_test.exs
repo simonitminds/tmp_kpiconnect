@@ -182,7 +182,6 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       auction: auction,
       buyer: buyer,
       supplier_company: supplier_company,
-      supplier2_company: supplier2_company,
       fuel_id: fuel_id
     } do
       Auctions.start_auction(auction)
