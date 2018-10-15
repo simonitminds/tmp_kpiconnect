@@ -70,10 +70,9 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
-        state = %AuctionState{status: :draft}
+        %AuctionEvent{type: :auction_created, data: auction = %Auction{scheduled_start: nil}},
+        state
       ) do
-    AuctionNotifier.notify_participants(auction)
     {:noreply, state}
   end
 

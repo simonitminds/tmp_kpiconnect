@@ -6,17 +6,8 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(auction_state = %AuctionState{auction_id: auction_id}) do
     auction = Auctions.AuctionCache.read(auction_id)
-    participants = Auctions.auction_participant_ids(auction)
-
-    Enum.map(participants, fn user_id ->
-      payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(user_id, auction_state)
-
-      send_notification_to_participants("user_auctions", payload, [user_id])
-    end)
+    notify_participants(auction)
   end
-
   def notify_participants(auction = %Auction{}) do
     participants = Auctions.auction_participant_ids(auction)
 

@@ -60,7 +60,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       supplier_id: supplier_id
     } do
       channel = "user_auctions:#{Integer.to_string(supplier_id)}"
-      # event = "auctions_update"
 
       @endpoint.subscribe(channel)
 
