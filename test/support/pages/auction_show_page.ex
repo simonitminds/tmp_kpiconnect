@@ -41,14 +41,12 @@ defmodule Oceanconnect.AuctionShowPage do
     end
   end
 
-  def has_anonymous_bidding_toggled?(allowed) do
-    text = find_element(:css, ".qa-auction-anonymous_bidding")
-    |> inner_text
+  def has_anonymous_bidding_toggled?(_allowed = true) do
+    element = find_element(:css, ".qa-auction-anonymous_bidding")
+  end
 
-    case allowed do
-      true -> text =~ ~r/\ballowed/
-      false -> text =~ ~r/\bdisallowed/
-    end
+  def has_anonymous_bidding_toggled?(_allowed = false) do
+    {:error, _error} = search_element(:css, ".qa-auction-anonymous_bidding")
   end
 
   defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do

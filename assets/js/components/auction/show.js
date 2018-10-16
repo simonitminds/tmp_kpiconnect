@@ -10,7 +10,6 @@ import BuyerBestSolution from './buyer-best-solution';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
 import SupplierLowestBid from './supplier-lowest-bid';
-import SupplierWinningBid from './supplier-winning-bid';
 import BuyerBidList from './buyer-bid-list';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
@@ -118,8 +117,8 @@ export default class AuctionShow extends React.Component {
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid} />
-            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptBid={this.props.acceptBid} />
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={this.props.acceptSolution} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -127,7 +126,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
-            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptBid={this.props.acceptBid} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -307,18 +306,16 @@ export default class AuctionShow extends React.Component {
                                 {additionInfoDisplay(auction)}
                               </li>
                               <li className="qa-auction-split_bid_allowed">
-                                {
-                                  auction.split_bid_allowed ?
-                                    "Split bidding is allowed for this auction." :
-                                    "Split bidding is not allowed for this auction."
+                                { auction.split_bid_allowed
+                                  ? "Split bidding is allowed for this auction."
+                                  : "Split bidding is not allowed for this auction."
                                 }
                               </li>
-                              <li className="qa-auction-anonymous_bidding">
-                                {
-                                  auction.anonymous_bidding &&
-                                    "Supplier bids on this auction are placed anonymously."
-                                }
-                              </li>
+                              { auction.anonymous_bidding &&
+                                <li className="qa-auction-anonymous_bidding">
+                                  "Supplier bids on this auction are placed anonymously."
+                                </li>
+                              }
                             </ul>
                           </div>
                         </div>
@@ -395,25 +392,7 @@ export default class AuctionShow extends React.Component {
                       <div className="box__subsection">
                         <h3 className="box__header">Fuel Requirements</h3>
                         <ul className="list has-no-bullets">
-                              { _.map(fuels, (fuel) => {
-                                  return(
-                                    <li key={fuel.id} className={`is-not-flex qa-auction-fuel-${fuel.id}`}>
-                                      <strong className="is-inline">{fuel.name}</strong>
-                                      <div className="qa-auction_vessel_fuels-quantities">
-                                      { _.map(vessels, (vessel) => {
-                                          let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
-                                          return(
-                                            <div key={vessel.id}>
-                                              { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
-                                            </div>
-                                          );
-                                        })
-                                      }
-                                      </div>
-                                    </li>
-                                  );
-                                })
-                              }
+                          {fuelRequirementDisplay(fuels)}
                         </ul>
                       </div>
                       <div className="box__subsection">

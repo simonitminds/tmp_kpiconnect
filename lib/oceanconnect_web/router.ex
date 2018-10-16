@@ -36,7 +36,7 @@ defmodule OceanconnectWeb.Router do
     post(
       "/auctions/:auction_id/select_solution",
       BidController,
-      :select_bid,
+      :select_solution,
       as: :auction_bid_api
     )
 

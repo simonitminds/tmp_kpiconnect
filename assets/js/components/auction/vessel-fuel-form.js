@@ -57,6 +57,7 @@ export default class VesselFuelForm extends React.Component {
     const availableFuels = _.reject(fuels, (f) => {
       return _.some(this.state.selectedFuels, (sf) => f.id == sf);
     });
+
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       return (

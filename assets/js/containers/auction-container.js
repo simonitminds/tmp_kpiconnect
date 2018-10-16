@@ -69,7 +69,7 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
     dispatch(rejectBarge(auctionId, bargeId, supplierId));
   },
-  acceptBid(auctionId, bidIds, ev) {
+  acceptSolution(auctionId, bidIds, ev) {
     ev.preventDefault();
 
     const elements = ev.target.elements;

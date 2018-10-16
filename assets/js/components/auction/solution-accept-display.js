@@ -3,13 +3,13 @@ import _ from 'lodash';
 import InputField from '../input-field';
 import SolutionComment from './solution-comment';
 
-const BidAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, acceptBid, cancelSelection}) => {
+const SolutionAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, acceptSolution, cancelSelection}) => {
   const auctionStatus = auctionPayload.status;
   if(auctionStatus == 'closed'){
     return "";
   } else {
     return (
-        <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptBid}>
+        <form className="auction-solution__confirmation box box--nested-base box--nested-base--extra-nested box--best-solution-comment is-gray-1 has-padding-top-md" onSubmit={acceptSolution}>
         { bestSolutionSelected ?
         "" :
         <span className="is-inline-block has-margin-bottom-lg"><strong>Are you sure that you want to accept this offer?</strong></span>
@@ -46,4 +46,4 @@ const BidAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, acceptB
     );
   }
 }
-export default BidAcceptDisplay;
+export default SolutionAcceptDisplay;

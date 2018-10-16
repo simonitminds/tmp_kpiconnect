@@ -22,7 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
     {:ok,
      %{
        auction: auction,
-       fuel_id: vessel_fuel.id,
+       fuel_id: vessel_fuel.fuel_id,
        supplier1: supplier_company.id,
        supplier2: supplier2_company.id,
        supplier3: supplier3_company.id

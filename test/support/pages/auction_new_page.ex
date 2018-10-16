@@ -80,17 +80,6 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
-  # def add_vessel_fuel(index, selected_vessel = %Vessel{}, selected_fuel = %Fuel{}, quantity) do
-  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-vessel_id")
-  #   |> fill_form_element("select", selected_vessel.id)
-
-  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-fuel_id")
-  #   |> fill_form_element("select", selected_fuel.id)
-
-  #   find_element(:css, ".qa-auction-vessel_fuel-#{index}-quantity")
-  #   |> fill_form_element("input", quantity)
-  # end
-
   def select_port(port_id) do
     find_element(:css, ".qa-auction-port_id option[value='#{port_id}']")
     |> click

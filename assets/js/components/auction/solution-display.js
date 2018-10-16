@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status';
-import BidAcceptDisplay from './bid-accept-display';
+import SolutionAcceptDisplay from './solution-accept-display';
 
 export default class SolutionDisplay extends React.Component {
   constructor(props) {
@@ -23,12 +23,12 @@ export default class SolutionDisplay extends React.Component {
     event.preventDefault();
     const bidIds = _.map(this.props.solution.bids, 'id');
     const auctionId = this.props.auctionPayload.auction.id;
-    this.props.acceptBid(auctionId, bidIds, event);
+    this.props.acceptSolution(auctionId, bidIds, event);
     return(false)
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptBid, best, children, className} = this.props;
+    const {auctionPayload, solution, title, acceptSolution, best, children, className} = this.props;
     const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -54,7 +54,7 @@ export default class SolutionDisplay extends React.Component {
         }, {})
         .value();
     const totalQuantity = _.sum(Object.values(fuelQuantities));
-    const acceptable = !!acceptBid;
+    const acceptable = !!acceptSolution;
 
     const solutionTitle = () => {
       if(title) {
@@ -111,12 +111,14 @@ export default class SolutionDisplay extends React.Component {
                         <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
                           <td>{fuel.name}</td>
 
-                          <td> { bid ?
-                                 <span>
+                          <td>
+                            { bid
+                              ? <span>
                                   <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
                                   <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
-                                 </span> :
-                              <i>No bid</i> }
+                                </span>
+                              : <i>No bid</i>
+                            }
                           </td>
                           <td><span className="qa-auction-bid-supplier">{ true ? bid.supplier : "" }</span></td>
                         </tr>
@@ -133,7 +135,7 @@ export default class SolutionDisplay extends React.Component {
           </div>
         </div>
         { acceptable && this.state.selected &&
-          <BidAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptBid={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
+          <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
         }
       </div>
     );

@@ -47,7 +47,7 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  def select_bid(conn, %{"auction_id" => auction_id, "bid_ids" => bid_ids, "comment" => comment}) do
+  def select_solution(conn, %{"auction_id" => auction_id, "bid_ids" => bid_ids, "comment" => comment}) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
