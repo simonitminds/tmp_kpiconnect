@@ -108,7 +108,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id) do
-    %{bid | min_amount: nil, comment: nil, is_traded_bid: nil}
+    %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
     |> Map.from_struct()
     |> Map.delete(:supplier_id)
   end

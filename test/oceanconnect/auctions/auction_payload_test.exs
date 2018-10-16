@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, Solution, AuctionPayload, AuctionSupervisor}
 
   describe "get_auction_payload!/1" do
     setup do
@@ -238,13 +238,33 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
              )
     end
 
-    test "winning_bid added to payload", %{
-      auction: _auction,
-      supplier: _supplier,
-      supplier_2: _supplier_2,
-      fuel_id: _fuel_id
+    test "winning_solution added to payload", %{
+      auction: auction = %Auction{id: auction_id},
+      supplier: supplier,
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      IO.inspect("pending test")
+      _bid1 = create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      bid2 = create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      bid2_id = bid2.id
+
+      Auctions.end_auction(auction)
+      auction_state = Auctions.get_auction_state!(auction)
+      Auctions.select_winning_solution([bid2], auction_state.product_bids, auction, "you're winner")
+
+      auction_payload =
+        auction
+        |> AuctionPayload.get_auction_payload!(supplier_2.id)
+
+      assert %Solution{
+        auction_id: ^auction_id,
+        bids: [
+          %{id: ^bid2_id, amount: 1.25, fuel_id: ^fuel_id}
+        ],
+        comment: "you're winner"
+      } = auction_payload.solutions.winning_solution
     end
 
     test "includes submitted barges for supplier", %{auction: auction, supplier: supplier} do

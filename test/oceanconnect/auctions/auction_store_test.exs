@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor, Solution}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
 
   setup do
@@ -247,7 +247,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     end
   end
 
-  describe "winning bid" do
+  describe "winning solution" do
     setup %{
       auction: auction,
       supplier_company: supplier_company,
@@ -269,7 +269,23 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
-    test "winning bid can be selected", %{auction: _auction, bid: _bid} do
+    test "winning solution can be selected", %{auction: auction, bid: bid, fuel: fuel} do
+      auction_id = auction.id
+      fuel_id = "#{fuel.id}"
+      bid_id = bid.id
+
+      auction_state = Auctions.get_auction_state!(auction)
+      Auctions.select_winning_solution([bid], auction_state.product_bids, auction, "you win")
+
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert %Solution{
+        auction_id: ^auction_id,
+        bids: [
+          %{id: ^bid_id, amount: 1.25, fuel_id: ^fuel_id}
+        ],
+        comment: "you win"
+      } = auction_payload.solutions.winning_solution
     end
   end
 end
