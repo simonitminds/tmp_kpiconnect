@@ -67,4 +67,14 @@ defmodule Oceanconnect.AuctionLogPage do
       text =~ v
     end)
   end
+
+  def has_vessel_fuel?(%{id: id, vessel: vessel, fuel: fuel, quantity: quantity}) do
+    deliverable_text = find_element(:css, ".qa-auction-deliverable-#{id}")
+    |> inner_text
+
+    deliverable_text =~ vessel.name &&
+    deliverable_text =~ "#{vessel.imo}" &&
+    deliverable_text =~ "#{quantity}" &&
+    deliverable_text =~ fuel.name
+  end
 end

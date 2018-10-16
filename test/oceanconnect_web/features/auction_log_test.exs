@@ -78,4 +78,11 @@ defmodule Oceanconnect.AuctionLogTest do
 
     assert AuctionLogPage.has_details?(expected_details)
   end
+
+  test "auction log displays all vessel_fuels", %{auction: auction, buyer_id: buyer_id} do
+    vessel_fuels = auction.auction_vessel_fuels
+    Enum.all?(vessel_fuels, fn(vessel_fuel) ->
+      assert AuctionLogPage.has_vessel_fuel?(vessel_fuel)
+    end)
+  end
 end

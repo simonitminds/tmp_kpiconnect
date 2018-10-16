@@ -37,10 +37,19 @@
           <tr>
             <th>Auction Details</th>
             <td>
-              <span class="qa-auction-vessel"><%= List.first(@auction_payload.auction.vessels).name %> <span className="auction-header__vessel__imo">(<%= List.first(@auction_payload.auction.vessels).imo %>)</span></span></br>
-              <%= List.first(@auction_payload.auction.fuels).name %> (<%= List.first(@auction_payload.auction.auction_vessel_fuels).quantity %>)</br>
               <%= @auction_payload.auction.port.name %></br>
               <%= @auction_payload.auction.eta %></br>
+              <ul class="qa-auction-deliverables">
+                <%= for vessel_fuel <- @auction_payload.auction.auction_vessel_fuels do %>
+                  <li class="qa-auction-deliverable-<%= vessel_fuel.id %>">
+                    <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
+                    <span class="qa-auction-deliverable-fuel"><%= vessel_fuel.fuel.name %></span> to
+                    <span class="qa-auction-deliverable-vessel">
+                      <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
+                    </span>
+                  </li>
+                <% end %>
+              </ul>
               <%= @auction_payload.auction.additional_information %>
             </td>
           </tr>
