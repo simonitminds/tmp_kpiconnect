@@ -71,7 +71,7 @@
 
 .auction-solution__vessel-table, .auction-solution__product-table {
   width: calc(100% + 2rem);
-  margin: 0 -1rem;
+  margin: 0 -1rem !important;
 
   &:not(:last-child) {
     margin-bottom: 0.5rem;
