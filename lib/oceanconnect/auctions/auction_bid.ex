@@ -11,6 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
             supplier_id: nil,
             total_price: nil,
             time_entered: DateTime.utc_now(),
+            original_time_entered: DateTime.utc_now(),
             comment: nil,
             active: true
 
@@ -32,7 +33,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       fuel_id: fuel_id,
       min_amount: min_amount,
       supplier_id: supplier_id,
-      time_entered: time_entered
+      time_entered: time_entered,
+      original_time_entered: time_entered
     }
   end
 end

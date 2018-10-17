@@ -153,7 +153,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auto_bid_placed(
-    bid = %AuctionBid{auction_id: auction_id, time_entered: _time_entered},
+    bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
     new_state = %ProductBidState{},
     nil
   ) do
@@ -161,7 +161,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :auto_bid_placed,
       auction_id: auction_id,
       data: %{bid: bid, state: new_state},
-      time_entered: DateTime.utc_now(),
+      time_entered: time_entered,
       user: nil
     }
   end

@@ -79,38 +79,64 @@
       <thead>
         <tr>
           <th>Event</th>
-          <th>Company/User</th>
+          <th>Company / User</th>
           <th>Time</th>
-          <th>Bid Amount</th>
           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-            <th>Min Amount</th>
+            <th>Amount / Minimum</th>
             <th>Impersonator</th>
+          <% else %>
+            <th>Bid Amount</th>
           <% end %>
         </tr>
       </thead>
       <tbody>
         <%= for event <- @events do %>
-          <tr class="<%= "qa-event-#{event.id}" %>">
+          <tr class="qa-event-<%= event.id %> <%= if event_is_from_system?(event), do: "is-gray-2" %>">
             <td>
               <span class="qa-event-type has-text-weight-bold"><%= convert_event_type(event.type, event) %></span>
               <br>
               <small class="qa-event-type-extras"><%= convert_event_type_extras(event.type, event) %></small>
             </td>
+
             <td>
-              <span class="qa-event-company has-text-weight-bold"><%= event_company(event) %></span>
-              <br>
-              <small class="qa-event-user"><%= event_user(event) %></small>
+              <%= unless event_is_from_system?(event) do %>
+                <span class="qa-event-company has-text-weight-bold"><%= event_company(event) %></span>
+                <br>
+                <small class="qa-event-user"><%= event_user(event) %></small>
+              <% end %>
             </td>
+
             <td><%= convert_event_date_time?(event.time_entered) %></td>
-            <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>
+
+            <td>
+              <%= if event_has_bid_data?(event) do %>
+                <%= if event_bid_has_amount?(event) do %>
+                  <span class="qa-event-bid-amount has-text-weight-bold"><%= event_bid_amount(event) %></span>
+                <% else %>
+                  <i class="qa-event-bid-amount">No initial amount</i>
+                <% end %>
+                <%= if event_bid_is_traded?(event) do %>
+                  &nbsp;
+                  <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                <% end %>
+                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                  <br>
+                  <%= if event_bid_has_minimum?(event) do %>
+                    <small>Min: <span class="qa-event-bid-min-amount"><%=  event_bid_min_amount(event) %><span></small>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </td>
+
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <td class="qa-event-bid-min-amount"><%=  event_bid_min_amount(event) %></td>
-              <td class="qa-event-bid-amount"><%= event.user && Map.get(event.user, :impersonated_by) %></td>
+              <td class="qa-event-impersonator"><%= event.user && Map.get(event.user, :impersonated_by) %></td>
             <% end %>
           </tr>
         <% end %>
       </tbody>
     </table>
+
+
     <table class="table is-fullwidth is-striped report__table--log is-hidden-desktop">
       <thead>
         <tr>
@@ -121,15 +147,34 @@
         <%= for event <- @events do %>
           <tr>
             <td>
-            <strong class="qa-mobile-event-type"><%= convert_event_type(event.type, event) %></strong><br/>
-            <span class="qa-mobile-event-type-extras"><%= convert_event_type_extras(event.type, event) %></span><br/>
-            <strong><%= event_company(event) %><br/></strong>
-            <span><%= event_user(event) %></span></br>
-            <strong><%= convert_event_date_time?(event.time_entered) %><br/></strong>
-            <strong><%= event_bid_amount(event) %><br/></strong>
+            <span class="event__time-entered--mobile"><%= convert_event_date_time?(event.time_entered) %></span><br/>
+            <div class="event__type--mobile has-margin-top-sm">
+              <strong class="qa-mobile-event-type"><%= convert_event_type(event.type, event) %></strong><br/>
+              <span class="qa-mobile-event-type-extras"><%= convert_event_type_extras(event.type, event) %></span><br/>
+            </div>
+            <div class="event__user--mobile has-margin-top-sm">
+              <strong class="qa-mobile-event-company"><%= event_company(event) %></strong><br/>
+              <span class="qa-mobile-event-user"><%= event_user(event) %></span></br>
+            </div>
+            <%= if event_has_bid_data?(event) do %>
+              <div class="event__bid--mobile has-margin-top-sm">
+                <strong class="qa-mobile-event-bid_amount"><%= event_bid_amount(event) %></strong>
+                <%= if event_bid_is_traded?(event) do %>
+                  &nbsp;
+                  <i class="fas fa-exchange-alt has-text-gray-3 qa-mobile-event-bid-is_traded"></i>
+                <% end %>
+                <br/>
+                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                  <%= if event_bid_has_minimum?(event) do %>
+                    <span class="qa-mobile-event-bid_min_amount">Min: <%= event_bid_min_amount(event) %></span><br/>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <strong<%=  event_bid_min_amount(event) %><br/></strong>
-              <strong>Impersonator: <%= event.user && Map.get(event.user, :impersonated_by) %></strong>
+              <div class="event__impersonator--mobile has-margin-top-sm">
+                <strong class="qa-mobile-event-impersonator ">Impersonator: <%= event.user && Map.get(event.user, :impersonated_by) %></strong>
+              </div>
             <% end %>
             </td>
           </tr>

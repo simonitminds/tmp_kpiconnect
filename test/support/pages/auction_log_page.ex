@@ -11,7 +11,12 @@ defmodule Oceanconnect.AuctionLogPage do
       element = find_element(:class, "qa-event-#{event.id}")
       type = (find_within_element(element, :class, "qa-event-type") |> inner_text) =~ AuctionView.convert_event_type(event.type)
       company = (find_within_element(element, :class, "qa-event-company") |> inner_text) =~ AuctionView.event_company(event)
-      amount = (find_within_element(element, :class, "qa-event-bid-amount") |> inner_text) =~ AuctionView.event_bid_amount(event)
+      amount =
+        if AuctionView.event_has_bid_data?(event) do
+          (find_within_element(element, :class, "qa-event-bid-amount") |> inner_text) =~ AuctionView.event_bid_amount(event)
+        else
+          true
+        end
       [type, company, amount]
     end)
     |> List.flatten
