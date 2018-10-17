@@ -40,7 +40,7 @@ export const formatDateTime = (dateTime) => {
 
 export const formatTime = (dateTime) => {
   if (dateTime) {
-    return moment(dateTime).utc().format("HH:mm");
+    return moment(dateTime).utc().format("HH:mm:ss");
   } else {
     return ""
   }

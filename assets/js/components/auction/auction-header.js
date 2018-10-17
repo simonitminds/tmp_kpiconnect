@@ -12,6 +12,7 @@ import MediaQuery from 'react-responsive';
 
 const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
+
   const auctionStatus = _.get(auctionPayload, 'status');
   const displayAuctionStartTime = () => {
     if (auctionStatus == 'pending') {
@@ -49,11 +50,20 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                         </div>
                       </div>
                   </MediaQuery>
-
-                  <h1 className="auction-header__vessel title has-text-weight-bold qa-auction-vessel">
-                    {auction.vessel.name} <span className="auction-header__vessel__imo">({auction.vessel.imo})  {auction.is_traded_bid_allowed && <span><i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 auction__traded-bid-accepted-marker"></i> </span>}</span>
-                    <span className="auction-header__company">{auction.buyer.name}</span>
-                  </h1>
+                  <div className="qa-auction-vessels">
+                    <h1 className="auction-header__vessel title has-text-weight-bold">
+                      { _.map(auction.vessels, (vessel) => {
+                          return(
+                            <div key={vessel.name} className={`auction-header__vessel-item qa-auction-vessel-${vessel.id}`}>
+                              {vessel.name} <span className="auction-header__vessel__imo">({vessel.imo})</span>
+                            </div>
+                          );
+                        })
+                      }
+                      {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 auction__traded-bid-accepted-marker"></i></span>}
+                      <span className="auction-header__company">{auction.buyer.name}</span>
+                    </h1>
+                  </div>
                   <div className="auction-header__ports--mobile">
                     <span className="qa-auction-port has-text-weight-bold">{auction.port.name}</span>
                     <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> (ETA {formatUTCDateTime(auction.eta)})</span>

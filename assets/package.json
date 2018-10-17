@@ -28,7 +28,8 @@
     "react-tabs": "^2.2.2",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "serverdate": "^3.1.0"
+    "serverdate": "^3.1.0",
+    "dot-prop-immutable": "^1.4.0"
   },
   "devDependencies": {
     "babel-brunch": "6.1.1",

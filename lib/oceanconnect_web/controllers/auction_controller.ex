@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload}
+  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload, Payloads}
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -16,16 +16,18 @@ defmodule OceanconnectWeb.AuctionController do
       |> Auctions.get_auction!()
       |> Auctions.fully_loaded()
 
+    auction_state = Auctions.get_auction_state!(auction)
     with %Auction{} <- auction,
          true <- current_company_id == auction.buyer_id,
-         false <- Auctions.get_auction_state!(auction).status in [:pending, :open, :draft] do
+         false <- auction_state.status in [:pending, :open, :draft] do
       events =
         auction.id
         |> AuctionEventStore.event_list()
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+      solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
 
-      render(conn, "log.html", auction_payload: auction_payload, events: events)
+      render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
     else
       _ ->
         if(Auth.current_admin(conn)) do
@@ -34,8 +36,9 @@ defmodule OceanconnectWeb.AuctionController do
             |> AuctionEventStore.event_list()
 
           auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+          solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
 
-          render(conn, "log.html", auction_payload: auction_payload, events: events)
+          render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
         else
           redirect(conn, to: auction_path(conn, :index))
         end
@@ -72,16 +75,11 @@ defmodule OceanconnectWeb.AuctionController do
     changeset = Auctions.change_auction(%Auction{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
-    json_auction =
-      %Auction{}
-      |> Auctions.strip_non_loaded()
-      |> Poison.encode!()
-
     render(
       conn,
       "new.html",
       changeset: changeset,
-      json_auction: json_auction,
+      auction: %Auction{},
       fuels: fuels,
       ports: ports,
       vessels: vessels,
@@ -91,6 +89,8 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def create(conn, %{"auction" => auction_params}) do
+    auction_vessel_fuels = vessel_fuels_from_params(auction_params)
+
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
 
@@ -98,6 +98,7 @@ defmodule OceanconnectWeb.AuctionController do
       auction_params
       |> Auction.from_params()
       |> Map.put("buyer_id", user.company.id)
+      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
     case Auctions.create_auction(updated_params, user) do
       {:ok, auction} ->
@@ -165,12 +166,16 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
+    auction_vessel_fuels =
+      vessel_fuels_from_params(auction_params)
+
     user = Auth.current_user(conn)
 
     with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params = Auction.from_params(auction_params)
+      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
       case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->
@@ -236,4 +241,37 @@ defmodule OceanconnectWeb.AuctionController do
 
     [auction, json_auction, suppliers]
   end
+
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_map(auction_vessel_fuels) do
+    Enum.flat_map(auction_vessel_fuels, fn {fuel_id, vessel_quantities} ->
+      Enum.map(vessel_quantities, fn {vessel_id, quantity} ->
+        %{"fuel_id" => fuel_id, "vessel_id" => vessel_id, "quantity" => quantity}
+      end)
+    end)
+  end
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_list(auction_vessel_fuels) do
+    auction_vessel_fuels
+  end
+  # For draft auctions, there might only be vessels or fuels provided. Even
+  # though these are invalid for _scheduled_ auctions, they are still allowed
+  # for draft auctions as the values for fuels and quantities may not be known.
+  defp vessel_fuels_from_params(%{"vessels" => vessels, "fuels" => fuels}) when is_list(vessels) and is_list(fuels) do
+    Enum.map(fuels, fn(fuel_id) ->
+      Enum.flat_map(vessels, fn(vessel_id) ->
+        %{"vessel_id" => vessel_id, "fuel_id" => fuel_id}
+      end)
+    end)
+  end
+  defp vessel_fuels_from_params(%{"vessels" => vessels}) when is_list(vessels) do
+    Enum.map(vessels, fn(vessel_id) ->
+      %{"vessel_id" => vessel_id}
+    end)
+  end
+  defp vessel_fuels_from_params(%{"fuels" => fuels}) when is_list(fuels) do
+    Enum.map(fuels, fn(fuel_id) ->
+      %{"fuel_id" => fuel_id}
+    end)
+  end
+
+  defp vessel_fuels_from_params(_), do: []
 end

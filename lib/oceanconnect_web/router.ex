@@ -34,9 +34,9 @@ defmodule OceanconnectWeb.Router do
     post("/auctions/:auction_id/port_agent", PortAgentController, :update, as: :port_agent_api)
 
     post(
-      "/auctions/:auction_id/bids/:bid_id/select",
+      "/auctions/:auction_id/select_solution",
       BidController,
-      :select_bid,
+      :select_solution,
       as: :auction_bid_api
     )
 

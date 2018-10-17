@@ -4,13 +4,11 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
 
   alias OceanconnectWeb.Email
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
 
   setup do
     buyer_company = insert(:company, is_supplier: false)
-    credit_company = insert(:company, name: "Ocean Connect Marine")
-
+    _ocm = insert(:company, name: "Ocean Connect Marine")
     supplier_companies = [
       insert(:company, is_supplier: true),
       insert(:company, is_supplier: true)
@@ -51,7 +49,7 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
       is_traded_bid = true
 
       %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(100, 20000, winning_supplier_company, auction, is_traded_bid)
+        Email.auction_closed(100, winning_supplier_company, auction, is_traded_bid)
 
       for supplier_email <- supplier_emails do
         Mailer.deliver_now(supplier_email)

@@ -8,8 +8,11 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     supplier = insert(:user, company: supplier_company)
     buyer = insert(:user)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
-      insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company])
+      insert(:auction, buyer: buyer.company, suppliers: [supplier_company, supplier2_company], auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]) |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
@@ -25,7 +28,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       )
 
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
-    bid_params = %{"bid" => %{"amount" => "3.50", "min_amount" => ""}}
+    bid_params = %{"bids" => %{fuel_id => %{"amount" => "3.50", "min_amount" => ""}}}
 
     {:ok,
      %{
@@ -34,7 +37,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
        buyer: buyer,
        bid_params: bid_params,
        supplier_company: supplier_company,
-       supplier2_company: supplier2_company
+       supplier2_company: supplier2_company,
+       fuel_id: fuel_id
      }}
   end
 
@@ -95,11 +99,12 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "cannot enter bids of non $0.25 increments ", %{
       conn: conn,
       auction: auction,
-      bid_params: params
+      bid_params: params,
+      fuel_id: fuel_id
     } do
-      updated_params = Map.put(params, "bid", %{"amount" => "2.95", "min_amount" => ""})
+      updated_params = Map.put(params, "bids", %{ fuel_id => %{"amount" => "2.95", "min_amount" => "", "fuel_id" => fuel_id}})
       conn = create_post(conn, auction, updated_params)
-      assert json_response(conn, 422) == %{"success" => false, "message" => "Invalid bid"}
+      assert %{"success" => false, "message" => "Invalid bid"} = json_response(conn, 422)
     end
 
     test "creating a bid for an auction", %{auction: auction, conn: conn, bid_params: params} do
@@ -107,16 +112,16 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
       assert json_response(conn, 200) == %{
                "success" => true,
-               "message" => "Bid successfully placed"
+               "message" => "Bids successfully placed"
              }
     end
 
-    test "creating a minimum bid with no bid for an auction", %{auction: auction, conn: conn} do
-      conn = create_post(conn, auction, %{"bid" => %{"amount" => "", "min_amount" => "9.00"}})
+    test "creating a minimum bid with no bid for an auction", %{auction: auction, conn: conn, fuel_id: fuel_id} do
+      conn = create_post(conn, auction, %{"bids" => %{ fuel_id => %{"amount" => "", "min_amount" => "9.00", "fuel_id" => fuel_id}}})
 
       assert json_response(conn, 200) == %{
                "success" => true,
-               "message" => "Bid successfully placed"
+               "message" => "Bids successfully placed"
              }
     end
 
@@ -162,7 +167,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       conn: conn,
       bid_params: params
     } do
-      params = put_in(params["bid"]["is_traded_bid"], "true")
+      params = put_in(params["is_traded_bid"], true)
       conn = create_post(conn, auction, params)
 
       assert json_response(conn, 422) == %{
@@ -177,26 +182,25 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       auction: auction,
       buyer: buyer,
       supplier_company: supplier_company,
-      supplier2_company: supplier2_company
+      fuel_id: fuel_id
     } do
       Auctions.start_auction(auction)
-      bid = Auctions.place_bid(auction, %{"amount" => 1.25}, supplier_company.id)
-      Auctions.place_bid(auction, %{"amount" => 1.25}, supplier2_company.id)
+      bid = create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid(nil)
       authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
       Auctions.end_auction(auction)
       {:ok, %{conn: authed_conn, bid: bid}}
     end
 
     test "buyer selects winning bid", %{auction: auction, conn: conn, bid: bid} do
-      base_route = auction_bid_api_path(conn, :select_bid, auction.id, bid.id)
-      new_conn = post(conn, "#{base_route}?comment=test")
+      new_conn = post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{comment: "test", bid_ids: [bid.id]})
 
       assert json_response(new_conn, 200)
 
       auction_state = Auctions.get_auction_state!(auction)
 
-      assert auction_state.winning_bid.id == bid.id
-      assert auction_state.winning_bid.comment == "test"
+      assert bid in auction_state.winning_solution.bids
+      assert auction_state.winning_solution.comment == "test"
       assert auction_state.status == :closed
     end
   end

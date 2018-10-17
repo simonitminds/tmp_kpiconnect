@@ -3,12 +3,17 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
 const SupplierBidList = ({auctionPayload, buyer}) => {
-  const fuel = _.get(auctionPayload, 'auction.fuel.name');
+  const fuels = _.chain(auctionPayload)
+                .get('auction.fuels')
+                 .reduce((acc, fuel) => {
+                   acc[fuel.id] = fuel;
+                   return(acc);
+                 }, {})
+                .value();
+  const productBids = _.chain(auctionPayload)
+                   .get('product_bids');
+
   const bidList = _.get(auctionPayload, 'bid_history', []);
-  const lowestBidIds = _.chain(auctionPayload)
-    .get('lowest_bids', [])
-    .map('id')
-    .value();
 
     if (bidList.length > 0 ) {
       return(
@@ -17,14 +22,16 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
           <table className="table is-fullwidth is-striped is-marginless qa-auction-bids">
             <thead>
               <tr>
-                <th>{fuel}</th>
+                <th>Product</th>
+                <th>Amount </th>
                 <th>Time</th>
               </tr>
             </thead>
             <tbody>
-              {_.map(bidList, ({id, amount, min_amount, is_traded_bid, time_entered}) => {
+              {_.map(bidList, ({id, amount, min_amount, fuel_id, is_traded_bid, time_entered}) => {
                 return (
                   <tr key={id} className={`qa-auction-bid-${id}`}>
+                    <td className="qa-auction-bid-product">{fuels[fuel_id].name}</td>
                     <td className="qa-auction-bid-amount">
                       ${formatPrice(amount)} <i className="has-text-gray-4">(Min: ${formatPrice(min_amount)})</i>
                       <span className="qa-auction-bid-is_traded_bid">{is_traded_bid && <i className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3"></i>}</span>

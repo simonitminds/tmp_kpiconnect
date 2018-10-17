@@ -1,12 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 
-const SolutionComment = ({bid, showInput, auctionStatus}) => {
-  if (auctionStatus == "closed" && bid.comment) {
+const SolutionComment = ({bid, showInput, auctionStatus, solutionComment}) => {
+  if (auctionStatus == "closed" && solutionComment) {
     return (
       <div className="auction-comment box box--nested-base box--best-solution-comment box--best-solution-comment--completed is-gray-1 has-padding-top-md">
         <h3 className="has-text-weight-bold has-margin-bottom-sm">Comment from the Buyer:</h3>
-        <p className="qa-bid-comment">{bid.comment}</p>
+        <p className="qa-bid-comment">{solutionComment}</p>
       </div>
     )
   } else if (showInput) {
@@ -20,7 +20,7 @@ const SolutionComment = ({bid, showInput, auctionStatus}) => {
           </div>
           <div className="field-body">
             <div className="control is-expanded">
-              <textarea name="comment" className="textarea qa-bid-comment"/>
+              <textarea name="comment" className="textarea qa-solution-comment"/>
             </div>
           </div>
         </div>

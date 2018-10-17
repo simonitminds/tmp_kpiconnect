@@ -36,12 +36,18 @@ defmodule Oceanconnect.Factory do
       duration: 10 * 60_000,
       decision_duration: 15 * 60_000,
       eta: DateTime.utc_now(),
-      fuel: build(:fuel),
-      fuel_quantity: 1000,
+      auction_vessel_fuels: [build(:vessel_fuel)],
       port: build(:port),
-      vessel: build(:vessel),
       buyer: build(:company),
       suppliers: [build(:company, is_supplier: true)]
+    }
+  end
+
+  def vessel_fuel_factory() do
+    %Oceanconnect.Auctions.AuctionVesselFuel{
+      vessel: build(:vessel),
+      fuel: build(:fuel),
+      quantity: 1500
     }
   end
 
@@ -90,11 +96,13 @@ defmodule Oceanconnect.Factory do
     }
   end
 
-  def create_bid(amount, min_amount, supplier_id, auction) do
+  def create_bid(amount, min_amount, supplier_id, fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,
       "min_amount" => min_amount,
       "supplier_id" => supplier_id,
+      "fuel_id" => fuel_id,
+      "is_traded_bid" => is_traded_bid,
       "time_entered" => DateTime.utc_now()
     }
 

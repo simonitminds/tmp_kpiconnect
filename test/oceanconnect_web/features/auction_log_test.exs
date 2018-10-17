@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionLogTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionLogPage
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.Payloads.SolutionsPayload
   alias OceanconnectWeb.AuctionView
 
   hound_session()
@@ -13,13 +14,17 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
 
+    fuel = insert(:fuel)
+    fuel_id = "#{fuel.id}"
+
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
+        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         duration: 600_000
-      )
+      ) |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
@@ -29,17 +34,14 @@ defmodule Oceanconnect.AuctionLogTest do
 
     Auctions.start_auction(auction)
 
-    bid =
-      Auctions.place_bid(
-        auction,
-        %{"amount" => 1.25},
-        supplier_company.id,
-        DateTime.utc_now(),
-        supplier
-      )
+    bid = create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+    |> Auctions.place_bid(supplier)
 
     Auctions.end_auction(auction)
-    Auctions.select_winning_bid(bid, "test")
+
+    state = Auctions.get_auction_state!(auction)
+    Auctions.select_winning_solution([bid], state.product_bids, auction, "test")
+
     :timer.sleep(500)
     login_user(buyer)
     AuctionLogPage.visit(auction.id)
@@ -60,7 +62,8 @@ defmodule Oceanconnect.AuctionLogTest do
   end
 
   test "page has auction details", %{auction: auction, buyer_id: buyer_id} do
-    auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, buyer_id)
+    solutions_payload = Auctions.get_auction_state!(auction)
+    |> SolutionsPayload.get_solutions_payload!([auction: auction, buyer: buyer_id])
 
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
@@ -69,10 +72,17 @@ defmodule Oceanconnect.AuctionLogTest do
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
-      "winning-bid-amount" => "$#{auction_payload.winning_bid.amount}",
-      "winning-supplier" => auction_payload.winning_bid.supplier
+      "winning-solution-normalized-price" => "$#{solutions_payload.winning_solution.normalized_price}",
+      "winning-suppliers" => AuctionView.auction_log_suppliers(solutions_payload)
     }
 
     assert AuctionLogPage.has_details?(expected_details)
+  end
+
+  test "auction log displays all vessel_fuels", %{auction: auction, buyer_id: buyer_id} do
+    vessel_fuels = auction.auction_vessel_fuels
+    Enum.all?(vessel_fuels, fn(vessel_fuel) ->
+      assert AuctionLogPage.has_vessel_fuel?(vessel_fuel)
+    end)
   end
 end

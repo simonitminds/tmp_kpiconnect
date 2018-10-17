@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
   alias Oceanconnect.AdminPage
+  alias Oceanconnect.Auctions
 
   setup do
     buyer_company = insert(:company)
@@ -101,7 +102,9 @@ defmodule Oceanconnect.AuctionIndexTest do
 
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
-      auction = auctions |> hd
+      auction = auctions
+      |> hd()
+      |> Auctions.fully_loaded()
 
       {:ok, _pid} =
         start_supervised(

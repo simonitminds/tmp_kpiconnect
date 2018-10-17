@@ -7,11 +7,12 @@ import AuctionBreadCrumbs from './auction-bread-crumbs';
 import AuctionHeader from './auction-header';
 import BuyerLowestBid from './buyer-lowest-bid';
 import BuyerBestSolution from './buyer-best-solution';
+import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
 import SupplierLowestBid from './supplier-lowest-bid';
-import SupplierWinningBid from './supplier-winning-bid';
 import BuyerBidList from './buyer-bid-list';
 import SupplierBidList from './supplier-bid-list';
+import SupplierBidStatus from './supplier-bid-status';
 import BiddingForm from './bidding-form';
 import InvitedSuppliers from './invited-suppliers';
 import AuctionInvitation from './auction-invitation';
@@ -58,7 +59,6 @@ export default class AuctionShow extends React.Component {
   render() {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
-
     const auction = auctionPayload.auction;
 
     const bidStatusDisplay = () => {
@@ -71,7 +71,8 @@ export default class AuctionShow extends React.Component {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id,
       isAdmin: parseInt(this.props.currentUserCompanyId) === auction.buyer_id && window.isAdmin
     };
-    const fuel = _.get(auction, 'fuel.name');
+    const fuels = _.get(auction, 'fuels');
+    const vessels = _.get(auction, 'vessels');
 
     const additionInfoDisplay = (auction) => {
       if (auction.additional_information) {
@@ -103,17 +104,21 @@ export default class AuctionShow extends React.Component {
     }
 
     const buyerBidComponents = () => {
+      const otherSolutions = _.get(auctionPayload, 'solutions.other_solutions');
+
       if (auctionPayload.status == 'open') {
         return (
           <div>
             <BuyerLowestBid auctionPayload={auctionPayload} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={this.props.acceptSolution} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -121,13 +126,13 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptBid={this.props.acceptBid}/>
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else {
         return (
-          <div className = "auction-notification box is-gray-0" >
+          <div className="auction-notification box is-gray-0" >
             <h3 className="has-text-weight-bold">
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
             </h3>
@@ -141,7 +146,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} />
+            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
             <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -149,7 +154,7 @@ export default class AuctionShow extends React.Component {
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <SupplierLowestBid auctionPayload={auctionPayload} />
+            <SupplierLowestBid auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -157,14 +162,15 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierWinningBid auctionPayload={auctionPayload} />
+            <SupplierBidStatus auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
+            <WinningSolution auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
       } else {
         return (
           <div>
-            <div className = "auction-notification box is-gray-0" >
+            <div className="auction-notification box is-gray-0" >
               <h3 className="has-text-weight-bold is-flex">
                 <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
               </h3>
@@ -174,6 +180,33 @@ export default class AuctionShow extends React.Component {
           </div>
         )
       }
+    }
+
+    const fuelRequirementDisplay = (fuels) => {
+      if(fuels.length == 0) {
+        return (
+          <i>No fuels have been specified for this auction</i>
+        );
+      }
+
+      return _.map(fuels, (fuel) => {
+        return (
+          <li className={`is-not-flex qa-auction-fuel-${fuel.id}`} key={fuel.id}>
+            <strong className="is-inline">{fuel.name}</strong>
+            <div className="qa-auction_vessel_fuels-quantities">
+            { _.map(vessels, (vessel) => {
+                let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                return(
+                  <div key={vessel.id}>
+                    { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
+                  </div>
+                );
+              })
+            }
+            </div>
+          </li>
+        );
+      });
     }
 
     return (
@@ -252,9 +285,7 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Fuel Requirements</h3>
                             <ul className="list has-no-bullets">
-                              <li className="is-not-flex">
-                                <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
-                              </li>
+                              {fuelRequirementDisplay(fuels)}
                             </ul>
                           </div>
                           <div className="box__subsection">
@@ -273,13 +304,24 @@ export default class AuctionShow extends React.Component {
                             <ul className="list has-no-bullets">
                               <li>
                                 {additionInfoDisplay(auction)}
-                            </li>
+                              </li>
+                              <li className="qa-auction-split_bid_allowed">
+                                { auction.split_bid_allowed
+                                  ? "Split bidding is allowed for this auction."
+                                  : "Split bidding is not allowed for this auction."
+                                }
+                              </li>
+                              { auction.anonymous_bidding &&
+                                <li className="qa-auction-anonymous_bidding">
+                                  "Supplier bids on this auction are placed anonymously."
+                                </li>
+                              }
                             </ul>
                           </div>
                         </div>
                       </TabPanel>
                       {/* <TabPanel>
-                        <div className = "auction-notification box is-gray-0" >
+                        <div className="auction-notification box is-gray-0" >
                           <h3 className="has-text-weight-bold is-flex">
                           <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
                           </h3>
@@ -350,9 +392,7 @@ export default class AuctionShow extends React.Component {
                       <div className="box__subsection">
                         <h3 className="box__header">Fuel Requirements</h3>
                         <ul className="list has-no-bullets">
-                          <li className="is-not-flex">
-                            <strong className="is-inline">{fuel}</strong> {auction.fuel_quantity} MT
-                          </li>
+                          {fuelRequirementDisplay(fuels)}
                         </ul>
                       </div>
                       <div className="box__subsection">
@@ -377,7 +417,7 @@ export default class AuctionShow extends React.Component {
                     </div>
                   </TabPanel>
                   {/* <TabPanel>
-                    <div className = "auction-notification box is-gray-0" >
+                    <div className="auction-notification box is-gray-0" >
                       <h3 className="has-text-weight-bold is-flex">
                       <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
                       </h3>

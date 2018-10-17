@@ -2,42 +2,23 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionComment from './solution-comment';
+import SolutionDisplay from './solution-display';
 
 const WinningSolution = ({auctionPayload}) => {
-  const auctionStatus = _.get(auctionPayload, 'status');
-  const lowestBidId = _.get(auctionPayload, 'lowest_bids[0].id');
-  const winningBid = _.get(auctionPayload, 'winning_bid');
-
-  const winningSolutionDisplay = () => {
-    if (winningBid) {
-      return (
-        <div>
-          <div className={`box auction-solution auction-solution--best qa-winning-solution-${winningBid.id}`}>
-            <div className="auction-solution__header">
-              <h3 className="auction-solution__title is-inline-block">{winningBid.supplier}</h3>
-              <div className="auction-solution__content">
-                <span className="has-text-weight-bold has-padding-right-xs">
-                  ${formatPrice(winningBid.amount)}
-                </span> ({formatTime(winningBid.time_entered)})
-              </div>
-            </div>
-          </div>
-          <SolutionComment showInput={lowestBidId != winningBid.id} bid={winningBid} auctionStatus={auctionStatus} />
-        </div>
-      );
-    } else {
-      return <div className="auction-table-placeholder">
-        <i>A winning bid was not selected before the decision time expired</i>
-      </div>;
-    }
-  }
+  const solution = _.get(auctionPayload, 'solutions.winning_solution');
 
   return(
     <div className="auction-solution__container">
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered">Winning Solution</h3>
-          {winningSolutionDisplay()}
+          {
+            solution ?
+              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title={"Winning Solution"} best={true} className="qa-auction-winning-solution" />
+              : <div className="auction-table-placeholder">
+                <i>A winning bid was not selected before the decision time expired</i>
+              </div>
+          }
         </div>
       </div>
     </div>

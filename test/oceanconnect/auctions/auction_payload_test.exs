@@ -2,16 +2,21 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, Solution, AuctionPayload, AuctionSupervisor}
 
   describe "get_auction_payload!/1" do
     setup do
       buyer_company = insert(:company, name: "FooCompany")
       supplier = insert(:company, name: "BarCompany")
       supplier_2 = insert(:company, name: "BazCompany")
+      supplier_user = insert(:user, company: supplier)
+      supplier_user2 = insert(:user, company: supplier_2)
+
+      fuel = insert(:fuel)
+      fuel_id = "#{fuel.id}"
 
       auction =
-        insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2])
+        insert(:auction, buyer: buyer_company, suppliers: [supplier, supplier_2], auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)])
         |> Auctions.fully_loaded()
 
       {:ok, _pid} =
@@ -22,46 +27,50 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.start_auction(auction)
       :timer.sleep(500)
-      bid_params = %{"amount" => 1.25}
 
       {:ok,
-       %{auction: auction, supplier: supplier, bid_params: bid_params, supplier_2: supplier_2}}
+       %{auction: auction, supplier: supplier, supplier_2: supplier_2, supplier_user: supplier_user, supplier_user2: supplier_user2, fuel_id: fuel_id}}
     end
 
     test "returns state payload for a buyer with supplier names in the bid_list", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
 
-      payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      payload = auction_payload.product_bids[fuel_id]
 
       assert supplier.name in Enum.map(payload.bid_history, & &1.supplier)
-      assert payload.status == :open
       assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
+      assert auction_payload.status == :open
     end
 
     test "returns correct amount in the payload for a supplier", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, bid_params, supplier.id)
-      Auctions.place_bid(auction, %{"amount" => 1.5}, supplier_2.id)
+      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      create_bid(1.50, nil, supplier_2.id, fuel_id, auction)
+      |> Auctions.place_bid()
 
-      payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
+      payload = auction_payload.product_bids[fuel_id]
 
-      assert payload.status == :open
-      assert [%{amount: ^amount}, %{amount: 1.5}] = payload.lowest_bids
+      assert auction_payload.status == :open
+      assert [%{amount: 1.25}, %{amount: 1.5}] = payload.lowest_bids
       assert length(payload.bid_history) == 1
       assert payload.bid_history |> hd == payload.lowest_bids |> hd
-      assert [%{amount: ^amount}] = payload.bid_history
+      assert [%{amount: 1.25}] = payload.bid_history
 
       lowest_bid = hd(payload.lowest_bids)
       refute Map.has_key?(lowest_bid, :supplier)
@@ -71,80 +80,93 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "shows only own is_traded_bid information in lowest bids", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      bid_params = Map.put(bid_params, "is_traded_bid", true)
-      Auctions.place_bid(auction, bid_params, supplier.id)
-      Auctions.place_bid(auction, %{"amount" => 1.5, "is_traded_bid" => false}, supplier_2.id)
+      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
+      create_bid(1.50, nil, supplier_2.id, fuel_id, auction, false)
+      |> Auctions.place_bid()
 
       supplier1_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
+      supplier1_product_payload = supplier1_payload.product_bids[fuel_id]
 
-      assert [%{amount: ^amount, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: nil}] =
-               supplier1_payload.lowest_bids
+      assert [%{amount: 1.25, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: false}] =
+               supplier1_product_payload.lowest_bids
 
       supplier2_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
+      supplier2_product_payload = supplier2_payload.product_bids[fuel_id]
 
-      assert [%{amount: ^amount, is_traded_bid: nil}, %{amount: 1.5, is_traded_bid: false}] =
-               supplier2_payload.lowest_bids
+      assert [%{amount: 1.25, is_traded_bid: false}, %{amount: 1.5, is_traded_bid: false}] =
+               supplier2_product_payload.lowest_bids
     end
 
     test "contains is_traded_bid information in supplier's bid_history", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount}
+      fuel_id: fuel_id
     } do
-      bid_params = Map.put(bid_params, "is_traded_bid", true)
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
 
-      payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
+      payload = auction_payload.product_bids[fuel_id]
 
-      assert [%{amount: ^amount, is_traded_bid: true}] = payload.bid_history
+      assert [%{amount: 1.25, is_traded_bid: true}] = payload.bid_history
     end
 
     test "with an existing lowest bid", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, %{"amount" => 1.5}, supplier_2.id)
+      create_bid(1.50, nil, supplier_2.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
 
-      payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
+      payload = auction_payload.product_bids[fuel_id]
+
 
       assert [%{amount: 1.5}] = payload.lowest_bids
       assert length(payload.bid_history) == 0
 
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
 
-      updated_payload =
+      updated_auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
+      updated_payload = updated_auction_payload.product_bids[fuel_id]
 
-      assert updated_payload.status == :open
-      assert [%{amount: ^amount}, %{amount: 1.5}] = updated_payload.lowest_bids
+      assert updated_auction_payload.status == :open
+      assert [%{amount: 1.25}, %{amount: 1.5}] = updated_payload.lowest_bids
     end
 
     test "matching bids", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier_2.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
+      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      |> Auctions.place_bid()
 
-      payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
+      payload = auction_payload.product_bids[fuel_id]
 
-      assert [%{amount: ^amount}, %{amount: ^amount}] = payload.lowest_bids
+      assert [%{amount: 1.25}, %{amount: 1.25}] = payload.lowest_bids
 
-      buyer_payload =
+      buyer_auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      buyer_payload = buyer_auction_payload.product_bids[fuel_id]
 
       assert supplier.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       assert supplier_2.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
@@ -154,27 +176,30 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
     test "auction goes to decision", %{
       auction: auction,
-      bid_params: bid_params = %{"amount" => amount},
+      supplier: supplier,
       supplier_2: supplier_2,
-      supplier: supplier
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
 
-      payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier_2.id)
+      payload = auction_payload.product_bids[fuel_id]
 
-      assert [%{amount: ^amount}, %{amount: ^amount}] = payload.lowest_bids
+      assert [%{amount: 1.25}, %{amount: 1.25}] = payload.lowest_bids
     end
 
     test "anonymous_bidding", %{
       auction: auction,
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
       auction =
         Oceanconnect.Repo.update!(Ecto.Changeset.change(auction, %{anonymous_bidding: true}))
@@ -183,12 +208,15 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.update_cache(auction)
 
-      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-      Auctions.place_bid(auction, bid_params, supplier.id)
+      create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
 
-      buyer_payload =
+      buyer_auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      buyer_payload = buyer_auction_payload.product_bids[fuel_id]
 
       refute supplier.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       refute supplier_2.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
@@ -210,37 +238,33 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
              )
     end
 
-    test "winning_bid added to payload", %{
-      auction: auction,
+    test "winning_solution added to payload", %{
+      auction: auction = %Auction{id: auction_id},
       supplier: supplier,
-      bid_params: bid_params = %{"amount" => amount},
-      supplier_2: supplier_2
+      supplier_2: supplier_2,
+      fuel_id: fuel_id
     } do
-      Auctions.place_bid(auction, %{"amount" => amount}, supplier_2.id)
-      bid = Auctions.place_bid(auction, bid_params, supplier.id)
+      _bid1 = create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      bid2 = create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      bid2_id = bid2.id
+
       Auctions.end_auction(auction)
-      Auctions.select_winning_bid(bid, "test")
+      auction_state = Auctions.get_auction_state!(auction)
+      Auctions.select_winning_solution([bid2], auction_state.product_bids, auction, "you're winner")
 
-      buyer_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(auction.buyer_id)
-
-      assert bid.id == buyer_payload.winning_bid.id
-      assert supplier.name == buyer_payload.winning_bid.supplier
-
-      losing_supplier_payload =
+      auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier_2.id)
 
-      assert bid.id == losing_supplier_payload.winning_bid.id
-      refute Map.has_key?(losing_supplier_payload, :supplier_id)
-
-      winning_supplier_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier.id)
-
-      assert bid.id == winning_supplier_payload.winning_bid.id
-      refute Map.has_key?(winning_supplier_payload, :supplier_id)
+      assert %Solution{
+        auction_id: ^auction_id,
+        bids: [
+          %{id: ^bid2_id, amount: 1.25, fuel_id: ^fuel_id}
+        ],
+        comment: "you're winner"
+      } = auction_payload.solutions.winning_solution
     end
 
     test "includes submitted barges for supplier", %{auction: auction, supplier: supplier} do

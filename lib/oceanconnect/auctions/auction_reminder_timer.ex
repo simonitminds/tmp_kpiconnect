@@ -4,9 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionEvent,
-    AuctionEventStore,
-    AuctionCache,
-    AuctionNotifier
+    AuctionEventStore
   }
 
   @registry_name :auction_reminder_timers_registry
@@ -24,6 +22,9 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
     GenServer.start_link(__MODULE__, auction, name: get_reminder_timer_name(auction_id))
   end
 
+  def init(auction = %Auction{id: auction_id, scheduled_start: nil}) do
+    terminate(:normal)
+  end
   def init(auction = %Auction{id: auction_id, scheduled_start: start_time}) do
     if Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
          event.type == :upcoming_auction_notified
@@ -44,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
     {:stop, :normal, state}
   end
 
-  def handle_info({:remind_participants, auction = %Auction{id: auction_id}}, state) do
+  def handle_info({:remind_participants, auction = %Auction{}}, state) do
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), true)
     {:stop, :normal, state}
   end

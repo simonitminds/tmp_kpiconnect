@@ -1,6 +1,32 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge}
+
+  def auction_json_for_form(auction = %Auction{}) do
+    auction_map =
+      auction
+      |> Auctions.strip_non_loaded()
+
+    %{
+      po: auction_map.po,
+      port_agent: auction_map.port_agent,
+      eta: auction_map.eta,
+      etd: auction_map.etd,
+      scheduled_start: auction_map.scheduled_start,
+      auction_ended: auction_map.auction_ended,
+      duration: auction_map.duration,
+      decision_duration: auction_map.decision_duration,
+      anonymous_bidding: auction_map.anonymous_bidding,
+      split_bid_allowed: auction_map.split_bid_allowed,
+      additional_information: auction_map.additional_information,
+      port_id: auction_map.port_id,
+      buyer: auction_map.buyer,
+      suppliers: auction_map.suppliers || [],
+      vessel_fuels: auction_map.auction_vessel_fuels || []
+    }
+    |> Poison.encode!()
+  end
 
   def actual_duration(%Auction{auction_ended: nil}), do: "-"
 
@@ -8,17 +34,19 @@ defmodule OceanconnectWeb.AuctionView do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 
-  def auction_log_supplier(%{winning_bid: %{supplier: supplier}}) do
-    supplier
+  def auction_log_suppliers(%{winning_solution: %{bids: bids}}) do
+    Enum.map(bids, fn bid ->
+      bid.supplier
+    end)
+    |> Enum.uniq()
   end
 
-  def auction_log_supplier(%{winning_bid: nil}), do: "—"
+  def auction_log_suppliers(_), do: "—"
 
-  def auction_log_winning_bid(%{winning_bid: %{amount: amount}}) do
-    "$#{:erlang.float_to_binary(amount, decimals: 2)}"
+  def auction_log_winning_solution(%{winning_solution: %{normalized_price: normalized_price}}) do
+    "$#{:erlang.float_to_binary(normalized_price, decimals: 2)}"
   end
-
-  def auction_log_winning_bid(%{winning_bid: nil}), do: "—"
+  def auction_log_winning_solution(_), do: "—"
 
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"
@@ -64,14 +92,14 @@ defmodule OceanconnectWeb.AuctionView do
   def barge_name_for_event(%AuctionEvent{
         data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}
       }) do
-    with %Barge{name: name} <- Occeanconnect.Repo.get(AuctionBarge, barge_id) do
+    with %Barge{name: name} <- Oceanconnect.Repo.get(AuctionBarge, barge_id) do
       name
     else
       _ -> ""
     end
   end
 
-  def barge_name_for_event(event = %AuctionEvent{}) do
+  def barge_name_for_event(%AuctionEvent{}) do
     ""
   end
 

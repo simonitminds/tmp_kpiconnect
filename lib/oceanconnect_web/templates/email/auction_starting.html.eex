@@ -1,9 +1,9 @@
 <p style='font-family: "Arial";'><b>Dear <%= OceanconnectWeb.EmailView.full_name(@user) %>,</b></p>
 <br/>
 <%= if @is_buyer do %>
-<p style='font-family: "Arial";'>Your reverse auction for <b><%= @auction.vessel.name %></b> is scheduled to start in one hour. The auction details are listed below:</p>
+<p style='font-family: "Arial";'>Your reverse auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> is scheduled to start in one hour. The auction details are listed below:</p>
 <% else %>
-<p style='font-family: "Arial";'>The reverse auction for <b><%= @auction.vessel.name %></b> held by <b><%= @buyer_company.name %></b> is scheduled to start in one hour. The auction details are listed below:</p>
+<p style='font-family: "Arial";'>The reverse auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> held by <b><%= @buyer_company.name %></b> is scheduled to start in one hour. The auction details are listed below:</p>
 <% end %>
 <br/>
 <table style='background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: "Arial";'>
@@ -15,11 +15,16 @@
     <p style="margin-top: 0.25rem;"><b>Auction Start Time:</b> <%= convert_date?(@auction.scheduled_start) %></p>
     <p style="margin-top: 0.25rem;"><b>Transaction Duration:</b> <%= duration_minute_string(@auction.duration)%></p>
     <p style="margin-top: 0.25rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
-    <p style="margin-top: 0.25rem;"><b>Vessel:</b> <%= @auction.vessel.name %></p>
     <p style="margin-top: 0.25rem;"><b>Port:</b> <%= @auction.port.name %></p>
     <p style="margin-top: 0.25rem;"><b>ETA/ETD:</b> <%= convert_date?(@auction.eta) %> / <%= convert_date?(@auction.etd) %></p>
-    <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= @auction.fuel.name %></p>
-    <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= @auction.fuel_quantity %> MT</p>
+    <br>
+    <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Deliverables</h1>
+    <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
+    <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
+      <p style="margin-top: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
+      <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
+      <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
+    <% end %>
     <br>
     <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Buyer Information</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>

@@ -33,7 +33,7 @@ defmodule Oceanconnect.Admin.Fuel.IndexPage do
       find_element(:css, ".qa-admin-fuel-name")
       |> inner_text
 
-    name == fuel_name
+    fuel_name =~ name
   end
 
   def deactivate_fuel(fuel) do

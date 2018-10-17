@@ -3,6 +3,7 @@ import moment from 'moment';
 import { replaceListItem,
          formatPrice
  } from "../utilities";
+import dotProp from 'dot-prop-immutable';
 import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_DATE,
          UPDATE_INFORMATION,
@@ -48,6 +49,7 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
+          credit_margin_amount: formatPrice(action.data.credit_margin_amount),
           eta_date: setUTCDateTime(action.data.auction.eta),
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
@@ -61,20 +63,11 @@ export default function(state, action) {
           selectedSuppliers: supplierList,
           suppliers: _.get(action, 'data.suppliers', []),
           vessels: action.data.vessels,
-          credit_margin_amount: formatPrice(action.data.credit_margin_amount)
         };
       }
     }
     case UPDATE_INFORMATION: {
-      const property = action.data.property;
-      const split_property = _.split(property, '.');
-      if (split_property.length === 2) {
-        return {...state, [split_property[0]]: {...state[split_property[0]], [split_property[1]]: action.data.value}};
-      } else {
-        return { ...state,
-                 [property]: action.data.value,
-        };
-      }
+      return dotProp.set(state, action.data.property, action.data.value);
     }
     case UPDATE_DATE: {
       const auctionProperty = action.data.property.slice(0, -5);

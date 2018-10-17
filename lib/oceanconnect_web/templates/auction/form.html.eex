@@ -1,11 +1,11 @@
 <div class="form auction-app__body">
-<%= form_for @changeset, @action,[class: "control"], fn _f -> %>
+<%= form_for @changeset, @action, [class: "control"], fn _f -> %>
 
   <%= if @changeset.action do %>
     <div class="container is-fullhd">
       <div class="content has-margin-top-lg">
         <div class="alert alert-danger">
-          <p class="help is-danger">To save a future requirement auction, be sure a <strong>Vessel</strong>, <strong>Port</strong>, and <strong>Vessel</strong> are specified. To schedule an auction, <strong>Auction Start</strong>, <strong>Fuel</strong> and <strong>Fuel Quantity</strong> also need to be specified.</p>
+          <p class="help is-danger">To save a future requirement auction, be sure a <strong>Port</strong> and <strong>ETA</strong> are specified. To schedule an auction, <strong>Auction Start</strong>, <strong>Fuel</strong> and <strong>Fuel Quantity</strong> also need to be specified.</p>
         </div>
       </div>
     </div>
@@ -13,7 +13,7 @@
 
   <div id="auctions-app">
     <div id="AuctionFormContainer"
-      data-auction="<%= @json_auction %>"
+      data-auction="<%= auction_json_for_form(@auction) %>"
       data-suppliers="<%= @suppliers %>"
       data-fuels="<%= @fuels %>"
       data-ports="<%= @ports %>"
@@ -22,7 +22,7 @@
     ></div>
   </div>
 
-  <section class="auction-info is-white">
+  <section class="auction-info is-gray-1">
     <div class="container is-fullhd">
       <div class="content">
         <div class="field">

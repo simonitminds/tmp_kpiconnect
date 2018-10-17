@@ -6,7 +6,7 @@ import AuctionShow from '../components/auction/show';
 import {
   getAllAuctionPayloads,
   getCompanyBarges,
-  acceptWinningBid,
+  acceptWinningSolution,
   setPortAgent,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
@@ -40,18 +40,18 @@ const mapDispatchToProps = (dispatch) => ({
   formSubmit(auctionId, ev) {
     ev.preventDefault();
 
-    const elements = ev.target.elements;
-    const bidData = {
-      'bid': {
-        'amount': elements.amount.value,
-        'min_amount': elements.min_amount.value,
-        'is_traded_bid': elements && elements.is_traded_bid && elements.is_traded_bid.checked
-      }
-    };
+    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
+    const bidsByProduct = _.reduce(bidElements, (acc, e) => {
+      acc[e.dataset.product] = acc[e.dataset.product] || {};
+      acc[e.dataset.product][e.name] = e.value;
+      return acc;
+    }, {});
 
-    elements.amount.value = '';
-    elements.min_amount.value = '';
-    dispatch(submitBid(auctionId, bidData));
+    const elements = ev.target.elements;
+    dispatch(submitBid(auctionId, {
+      "bids": bidsByProduct,
+      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
+    }));
   },
   submitBargeForm(auctionId, bargeId, ev) {
     ev.preventDefault();
@@ -69,20 +69,18 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
     dispatch(rejectBarge(auctionId, bargeId, supplierId));
   },
-  acceptBid(auctionId, bidId, ev) {
+  acceptSolution(auctionId, bidIds, ev) {
     ev.preventDefault();
 
     const elements = ev.target.elements;
-    let bidComment = {'comment': ''};
+    let solutionData = {'comment': '', 'bid_ids': bidIds};
     if(elements.comment) {
-      bidComment = {
-        'comment': elements.comment.value
-      };
+      solutionData['comment'] = elements.comment.value;
     }
     const portAgent = {'port_agent': elements.auction_port_agent.value};
 
     dispatch(setPortAgent(auctionId, portAgent));
-    dispatch(acceptWinningBid(auctionId, bidId, bidComment));
+    dispatch(acceptWinningSolution(auctionId, solutionData));
   },
   ...bindActionCreators({ updateBidStatus }, dispatch)
 });

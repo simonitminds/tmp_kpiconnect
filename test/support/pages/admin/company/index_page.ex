@@ -34,7 +34,7 @@ defmodule Oceanconnect.Admin.Company.IndexPage do
       |> find_within_element(:css, ".qa-admin-company-name")
       |> inner_text
 
-    name == company_name
+    company_name =~ name
   end
 
   def company_created_successfully? do

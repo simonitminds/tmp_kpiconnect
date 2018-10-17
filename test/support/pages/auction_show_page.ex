@@ -31,6 +31,24 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def has_split_bidding_toggled?(allowed) do
+    text = find_element(:css, ".qa-auction-split_bid_allowed")
+    |> inner_text
+
+    case allowed do
+      true -> text =~ ~r/\ballowed/
+      false -> text =~ ~r/\bdisallowed/
+    end
+  end
+
+  def has_anonymous_bidding_toggled?(_allowed = true) do
+    element = find_element(:css, ".qa-auction-anonymous_bidding")
+  end
+
+  def has_anonymous_bidding_toggled?(_allowed = false) do
+    {:error, _error} = search_element(:css, ".qa-auction-anonymous_bidding")
+  end
+
   defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
     Enum.all?(suppliers, fn supplier ->
       text =
@@ -41,8 +59,19 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  defp value_equals_element_text?(:vessels, element, vessels) when is_list(vessels) do
+    Enum.all?(vessels, fn vessel ->
+      text =
+        find_within_element(element, :css, ".qa-auction-vessel-#{vessel.id}")
+        |> inner_text
+
+      "#{vessel.name} (#{vessel.imo})" == text
+    end)
+  end
+
   defp value_equals_element_text?(_key, element, value) do
-    value == element |> inner_text
+    text = element |> inner_text
+    value == text
   end
 
   def has_bid_list_bids?(bid_list) do
@@ -67,7 +96,7 @@ defmodule Oceanconnect.AuctionShowPage do
   def enter_bid(params = %{}) do
     params
     |> Enum.map(fn {key, value} ->
-      element = find_element(:class, "qa-auction-bid-#{key}")
+      element = find_element(:css, "input.qa-auction-bid-#{key}")
       type = Hound.Helpers.Element.tag_name(element)
       fill_form_element(key, element, type, value)
     end)
@@ -93,35 +122,72 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def submit_bid() do
     find_element(:css, ".qa-auction-bid-submit")
-    |> click
+    |> click()
   end
 
   def winning_bid_amount() do
     find_element(:css, ".qa-winning-bid-amount")
-    |> inner_text
+    |> inner_text()
   end
 
   def auction_bid_status() do
     find_element(:css, ".qa-supplier-bid-status-message")
-    |> inner_text
+    |> inner_text()
   end
 
   def select_bid(bid_id) do
     find_element(:css, ".qa-select-bid-#{bid_id}")
-    |> click
+    |> click()
+  end
+
+  def select_solution(solution) when is_atom(solution) do
+    find_element(:css, ".qa-auction-solution-#{solution}")
+    |> find_within_element(:css, ".qa-auction-select-solution")
+    |> click()
+  end
+
+  def select_solution(index) when is_integer(index) do
+    find_element(:css, ".qa-auction-other-solutions")
+    |> find_all_within_element(:css, ".qa-auction-other-solution")
+    |> Enum.at(index)
+    |> find_within_element(:css, ".qa-auction-select-solution")
+    |> click()
+  end
+
+  def solution_has_bids?(solution, bids) when is_atom(solution) do
+    element = find_element(:css, ".qa-auction-solution-best_overall")
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
+  end
+
+  def solution_has_bids?(index, bids) when is_integer(index) do
+    element = find_element(:css, ".qa-auction-other-solutions")
+    |> find_all_within_element(:css, ".qa-auction-other-solution")
+    |> Enum.at(index)
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
+  end
+
+  def winning_solution_has_bids?(bids) do
+    element = find_element(:css, ".qa-auction-winning-solution")
+    Enum.all?(bids, fn bid ->
+      find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
+    end)
   end
 
   def accept_bid() do
     find_element(:css, ".qa-accept-bid")
-    |> click
+    |> click()
   end
 
-  def enter_bid_comment(comment) do
-    fill_field({:css, ".qa-bid-comment"}, comment)
+  def enter_solution_comment(comment) do
+    fill_field({:css, ".qa-solution-comment"}, comment)
   end
 
-  def bid_comment() do
-    find_element(:css, ".qa-bid-comment")
+  def solution_comment() do
+    find_element(:css, ".qa-solution-comment")
     |> inner_text
   end
 
@@ -253,7 +319,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
+  def approve_barge(%Oceanconnect.Auctions.Barge{id: id}, _supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click
@@ -264,7 +330,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
-  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}, supplier_id) do
+  def reject_barge(%Oceanconnect.Auctions.Barge{id: id}, _supplier_id) do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click

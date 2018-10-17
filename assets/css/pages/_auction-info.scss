@@ -52,6 +52,14 @@
       color: $gray-3;
     }
   }
+  &__vessel-item { // List of vessels involved in auction
+    display: inline-block;
+
+    &:after {
+      content: " ";
+      white-space: pre;
+    }
+  }
 
   &__company { // Name of the Buyer (MOBILE ONLY)
     display: none;

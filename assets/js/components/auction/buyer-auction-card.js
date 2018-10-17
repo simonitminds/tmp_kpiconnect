@@ -7,7 +7,9 @@ import AuctionTimeRemaining from './auction-time-remaining';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const fuel = _.get(auction, 'fuel.name');
+  const vessels = _.get(auction, 'vessels');
+  const fuels = _.get(auction, 'fuels');
+  const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const lowestBid = _.chain(auctionPayload).get('lowest_bids').first().value();
@@ -63,6 +65,46 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     }
   }
 
+  const vesselNameDisplay = (vesselFuels) => {
+    const vesselNames = _.chain(vesselFuels)
+      .map((vf) => vf.vessel)
+      .filter()
+      .uniqBy('id')
+      .map("name")
+      .value();
+
+    return vesselNames.join(", ");
+  };
+
+  const fuelDisplay = (vesselFuels) => {
+    const uniqueFuels = _.chain(vesselFuels)
+      .map((vf) => vf.fuel)
+      .filter()
+      .uniqBy('id')
+      .value();
+
+    const fuelQuantities = _.chain(uniqueFuels)
+        .reduce((acc, fuel) => {
+          acc[fuel.id] = _.chain(vesselFuels)
+            .filter((vf) => vf.fuel_id == fuel.id)
+            .sumBy((vf) => vf.quantity)
+            .value();
+          return acc;
+        }, {})
+        .value();
+
+    return _.map(uniqueFuels, (fuel) => {
+      return(
+        <div className="card-content__product" key={fuel.id}>
+          {fuel.name} { fuelQuantities[fuel.id] ?
+            <span className="fuel-amount">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
+            : <span className="no-amount">(no amount given)</span>
+          }
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="column is-one-third-desktop is-half-tablet">
       <div className={`card card--auction ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
@@ -75,8 +117,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction Edit/Delete */}
-            { auctionStatus != 'open' && auctionStatus != 'decision' ?
-              <div className="has-margin-left-auto">
+            { auctionStatus == 'draft' || auctionStatus == 'pending' ?
+              <div>
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">
                     <i className="fas fa-lg fa-edit"></i>
@@ -97,25 +139,21 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             }
             {/* End Link to Auction Edit/Delete */}
             {/* Start Link to Auction */}
-
-                <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+              <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
             {/* End Link to Auction */}
           </div>
         </div>
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
-            {auction.vessel.name}  {auction.is_traded_bid_allowed && <span><i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
+            { vesselNameDisplay(vesselFuels) }
+            {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>
-        {fuel != null ?
-          <div className="card-content__products">
-            {fuel} ({auction.fuel_quantity}&nbsp;MT)
-          </div>
-          :
-          <div className="is-none"></div>
-        }
+        <div className="card-content__products">
+          { fuelDisplay(vesselFuels) }
+        </div>
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
             {/* <a href={`/auctions/${auction.id}/cancel`} className="card__cancel-auction button is-danger is-small qa-auction-cancel">

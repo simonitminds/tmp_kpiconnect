@@ -5,6 +5,12 @@ defmodule OceanconnectWeb.EmailView do
     "#{user.first_name} #{user.last_name}"
   end
 
+  def vessel_name_list(vessels) do
+    vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
+  end
+
   def duration_minute_string(duration) do
     "#{trunc(duration / 60_000)} minutes"
   end
@@ -14,6 +20,7 @@ defmodule OceanconnectWeb.EmailView do
     date = "#{leftpad(date_time.day)} #{month_abbreviation(date_time.month)} #{date_time.year}"
     "#{date} #{time}"
   end
+  def convert_date?(_), do: "—"
 
   def month_abbreviation(month) when month >= 1 and month <= 12 do
     Enum.at(
@@ -21,8 +28,6 @@ defmodule OceanconnectWeb.EmailView do
       month - 1
     )
   end
-
-  def convert_date?(_), do: "—"
 
   def format_price(amount) do
     amount = :erlang.float_to_binary(amount, decimals: 2)

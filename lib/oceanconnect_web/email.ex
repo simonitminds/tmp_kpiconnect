@@ -9,13 +9,16 @@ defmodule OceanconnectWeb.Email do
   def auction_invitation(
         auction = %Auction{
           suppliers: supplier_companies,
+          buyer_id: _buyer_id,
           buyer: buyer,
-          vessel: vessel,
+          vessels: vessels,
           port: port
         }
       ) do
     suppliers = Accounts.users_for_companies(supplier_companies)
-    vessel_name = vessel.name
+    vessel_name = vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
     port_name = port.name
 
     Enum.map(suppliers, fn supplier ->
@@ -36,12 +39,14 @@ defmodule OceanconnectWeb.Email do
         auction = %Auction{
           suppliers: supplier_companies,
           buyer: buyer_company,
-          vessel: vessel,
+          vessels: vessels,
           port: port
         }
       ) do
     buyers = buyer_company.users
-    vessel_name = vessel.name
+    vessel_name = vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
     port_name = port.name
 
     suppliers =
@@ -81,15 +86,16 @@ defmodule OceanconnectWeb.Email do
 
   def auction_closed(
         bid_amount,
-        total_price,
         winning_supplier_company = %Company{},
-        auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
+        auction = %Auction{buyer_id: buyer_id, vessels: vessels, port: port},
         _is_traded_bid = false
       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies([winning_supplier_company])
-    vessel_name = vessel.name
+    vessel_name = vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
     port_name = port.name
 
     supplier_emails =
@@ -103,7 +109,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: false
         )
       end)
@@ -119,7 +124,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: true
         )
       end)
@@ -129,9 +133,8 @@ defmodule OceanconnectWeb.Email do
 
   def auction_closed(
         bid_amount,
-        total_price,
         winning_supplier_company = %Company{},
-        auction = %Auction{buyer_id: buyer_id, vessel: vessel, port: port},
+        auction = %Auction{buyer_id: buyer_id, vessels: vessels, port: port},
         _is_traded_bid = true
       ) do
     oceanconnect = Accounts.get_ocm_company()
@@ -139,7 +142,9 @@ defmodule OceanconnectWeb.Email do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies([winning_supplier_company])
-    vessel_name = vessel.name
+    vessel_name = vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
     port_name = port.name
 
     supplier_emails =
@@ -153,7 +158,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: oceanconnect,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: false
         )
       end)
@@ -169,7 +173,6 @@ defmodule OceanconnectWeb.Email do
           auction: auction,
           buyer_company: buyer_company,
           bid_amount: bid_amount,
-          total_price: total_price,
           is_buyer: true
         )
       end)
@@ -181,14 +184,16 @@ defmodule OceanconnectWeb.Email do
         auction = %Auction{
           suppliers: supplier_companies,
           buyer_id: buyer_id,
-          vessel: vessel,
+          vessels: vessels,
           port: port
         }
       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies(supplier_companies)
-    vessel_name = vessel.name
+    vessel_name = vessels
+    |> Enum.map(&(&1.name))
+    |> Enum.join(", ")
     port_name = port.name
 
     supplier_emails =

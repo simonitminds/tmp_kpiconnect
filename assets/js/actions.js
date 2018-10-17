@@ -159,35 +159,17 @@ export function submitBid(auctionId, bidData) {
     .then(parseJSON)
     .then((response) => {
       return dispatch(updateBidStatus(auctionId, response));
-    }, (error)=> {
+    }).catch((error) => {
       return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
     });
   };
 }
-
-export function selectBid(auctionId, bidId) {
+export function acceptWinningSolution(auctionId, solution) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/bids/${bidId}/select`, {
+    fetch(`/api/auctions/${auctionId}/select_solution`, {
       headers: defaultHeaders,
       method: 'POST',
-      body: JSON.stringify({'comment': ''})
-    })
-      .then(checkStatus)
-      .then(parseJSON)
-      .then((response) => {
-        return dispatch(updateBidStatus(auctionId, response));
-      }, (error)=> {
-        return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
-      });
-  };
-}
-
-export function acceptWinningBid(auctionId, bidId, bidComment) {
-  return dispatch => {
-    fetch(`/api/auctions/${auctionId}/bids/${bidId}/select`, {
-      headers: defaultHeaders,
-      method: 'POST',
-      body: JSON.stringify(bidComment)
+      body: JSON.stringify(solution)
     })
       .then(checkStatus)
       .then(parseJSON)

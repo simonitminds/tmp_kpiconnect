@@ -11,32 +11,78 @@ defmodule Oceanconnect.Auctions do
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
-    Port,
-    Vessel,
+    AuctionTimer,
+    Barge,
     Fuel,
-    Barge
+    Port,
+    Solution,
+    Vessel
   }
 
+  alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def place_bid(auction, bid_params, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
-    bid =
-      bid_params
-      |> maybe_add_amount
-      |> maybe_add_min_amount
-      |> Map.put("supplier_id", supplier_id)
-      |> Map.put("time_entered", time_entered)
-      |> AuctionBid.from_params_to_auction_bid(auction)
+  def bids_for_bid_ids(bid_ids, %AuctionState{product_bids: product_bids}) when is_list(bid_ids) do
+    product_bids
+    |> Enum.map(fn({_product_id, product_bid_state}) ->
+      Enum.filter(product_bid_state.active_bids, fn(bid) ->
+        bid.id in bid_ids
+      end)
+    end)
+    |> List.flatten
+  end
 
+  def place_bids(auction, bids_params = %{}, supplier_id, time_entered \\ DateTime.utc_now(), user \\ nil) do
+    with  :ok <- duration_time_remaining?(auction),
+          {:ok, bids} <- make_bids(auction, bids_params, supplier_id, time_entered) do
+      bids = Enum.map(bids, fn(bid) -> place_bid(bid, user) end)
+      {:ok, bids}
+    else
+      {:error, :late_bid} -> {:error, :late_bid}
+      {:invalid_bid, bid_params} -> {:invalid_bid, bid_params}
+      error -> error
+    end
+  end
+
+  def place_bid(bid, user \\ nil) do
     bid
     |> Command.process_new_bid(user)
     |> AuctionStore.process_command()
-
     bid
   end
+
+  def make_bids(auction, bids_params, supplier_id, time_entered) do
+    Enum.reduce_while(bids_params, {:ok, []}, fn({product_id, bid_params}, {:ok, acc}) ->
+      case make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
+        {:ok, bid} -> {:cont, {:ok, acc ++ [bid]}}
+        invalid -> {:halt, invalid}
+      end
+    end)
+  end
+
+  def make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
+    with  bid_params <- maybe_add_amount(bid_params),
+          bid_params <- maybe_add_min_amount(bid_params),
+          bid_params <- convert_amounts(bid_params),
+          true <- check_quarter_increments(bid_params) do
+      bid = bid_params
+      |> Map.put("supplier_id", supplier_id)
+      |> Map.put("time_entered", time_entered)
+      |> Map.put("fuel_id", product_id)
+      |> AuctionBid.from_params_to_auction_bid(auction)
+
+      case bid do
+        %{amount: nil, min_amount: nil} -> {:invalid_bid, bid_params}
+        _ -> {:ok, bid}
+      end
+    else
+      _ -> {:invalid_bid, bid_params}
+    end
+  end
+
 
   defp maybe_add_amount(params = %{"amount" => _}), do: params
   defp maybe_add_amount(params), do: Map.put(params, "amount", nil)
@@ -44,9 +90,53 @@ defmodule Oceanconnect.Auctions do
   defp maybe_add_min_amount(params = %{"min_amount" => _}), do: params
   defp maybe_add_min_amount(params), do: Map.put(params, "min_amount", nil)
 
-  def select_winning_bid(bid, comment, user \\ nil) do
-    %{bid | comment: comment}
-    |> Command.select_winning_bid(user)
+  defp convert_amounts(bid_params = %{"amount" => amount, "min_amount" => min_amount}) do
+    bid_params
+    |> Map.put("amount", convert_currency_input(amount))
+    |> Map.put("min_amount", convert_currency_input(min_amount))
+  end
+  defp convert_amounts(bid_params = %{"amount" => amount}) do
+    bid_params
+    |> Map.put("amount", convert_currency_input(amount))
+  end
+  defp convert_amounts(bid_params = %{"min_amount" => min_amount}) do
+    bid_params
+    |> Map.put("min_amount", convert_currency_input(min_amount))
+  end
+  defp convert_amounts(bid_params) do
+    bid_params
+  end
+
+  defp convert_currency_input(""), do: nil
+  defp convert_currency_input(amount) when is_float(amount), do: amount
+  defp convert_currency_input(amount) do
+    {float_amount, _} = Float.parse(amount)
+    float_amount
+  end
+
+  defp check_quarter_increments(_params = %{"amount" => amount, "min_amount" => min_amount}) do
+    check_quarter_increment(amount) && check_quarter_increment(min_amount)
+  end
+  defp check_quarter_increment(nil), do: true
+  defp check_quarter_increment(amount) do
+    amount / 0.25 - Float.floor(amount / 0.25) == 0.0
+  end
+
+  defp duration_time_remaining?(auction = %Auction{id: auction_id}) do
+    case AuctionTimer.read_timer(auction_id, :duration) do
+      false -> maybe_pending(get_auction_state!(auction))
+      _ -> :ok
+    end
+  end
+
+  defp maybe_pending(%{status: :pending}), do: :ok
+  defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
+  defp maybe_pending(_), do: :error
+
+ def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
+    solution = Solution.from_bids(bids, product_bids, auction)
+    %Solution{solution | comment: comment}
+    |> Command.select_winning_solution(user)
     |> AuctionStore.process_command()
   end
 
@@ -112,7 +202,7 @@ defmodule Oceanconnect.Auctions do
 
     query
     |> Repo.all()
-    |> Repo.preload([:port, [vessel: :company], :fuel, :buyer])
+    |> fully_loaded
   end
 
   def get_auction(id) do
@@ -291,13 +381,17 @@ defmodule Oceanconnect.Auctions do
     fully_loaded_auction =
       Repo.preload(auction, [
         :port,
-        [vessel: :company],
-        :fuel,
-        [buyer: [:users]],
-        [suppliers: [:users]]
+        :vessels,
+        :fuels,
+        [auction_vessel_fuels: [:vessel, :fuel]],
+        [buyer: :users],
+        [suppliers: :users]
       ])
 
-    Map.put(fully_loaded_auction, :suppliers, suppliers_with_alias_names(fully_loaded_auction))
+    fully_loaded_auction
+    |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
+    |> Map.put(:vessels, Enum.uniq_by(fully_loaded_auction.vessels, &(&1.id)))
+    |> Map.put(:fuels, Enum.uniq_by(fully_loaded_auction.fuels, &(&1.id)))
   end
 
   def fully_loaded(auctions) when is_list(auctions) do

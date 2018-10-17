@@ -71,6 +71,10 @@
   }
 }
 
+.field-body--wrapped { // Allow line breaks in field body
+  flex-flow: row wrap;
+}
+
 .control.is-expanded { // The proper Bulma class doesn't seem to compile with the rest, so here's a shim for the meantime.
   width: 100%;
 }
@@ -125,4 +129,65 @@ fieldset {
 .checkbox--flex { // Align items so the checkbox doesn't look jank when using flex display for checkbox form elements
   display: flex;
   align-items: baseline;
+}
+
+.selected-list {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+
+  &:empty { display: none; }
+
+  &--vessels {
+    flex-basis: 223px;
+
+    &> div:not(:last-child) {
+      margin-bottom:  0.5rem;
+    }
+  }
+  &--fuels {
+    flex-basis: 500px;
+    padding-bottom: 0;
+
+    &>div {
+      margin: 0.5rem -0.75rem;
+      padding: 0.75rem;
+
+      &:first-child {
+        margin-top: 0;
+        padding-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+        border-radius: 5px;
+      }
+    }
+    &>div:nth-child(even) {
+      background-color: $gray-1;
+    }
+  }
+}
+
+.selected-list__item-delete {
+  margin-left: auto;
+  padding-left: 0.75rem;
+  color: $gray-3;
+
+  &:hover, &:focus {
+    color: darken($gray-3, 20%);
+  }
+}
+
+.selected-list__sublist {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.is-flex-wrapped {
+  flex-flow: row wrap;
+}
+.is-flex-column {
+  flex-direction: column;
 }

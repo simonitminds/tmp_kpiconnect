@@ -33,7 +33,7 @@ defmodule Oceanconnect.Admin.Barge.IndexPage do
       find_element(:css, ".qa-admin-barge-name")
       |> inner_text
 
-    name == barge_name
+    barge_name =~ name
   end
 
   def deactivate_barge(barge) do

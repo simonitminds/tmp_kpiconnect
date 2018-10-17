@@ -33,7 +33,7 @@ defmodule Oceanconnect.Admin.Port.IndexPage do
       find_element(:css, ".qa-admin-port-name")
       |> inner_text
 
-    name == port_name
+    port_name =~ name
   end
 
   def deactivate_port(port) do

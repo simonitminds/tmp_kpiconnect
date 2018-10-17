@@ -37,20 +37,37 @@
           <tr>
             <th>Auction Details</th>
             <td>
-              <span class="qa-auction-vessel"><%= @auction_payload.auction.vessel.name %> <span className="auction-header__vessel__imo">(<%= @auction_payload.auction.vessel.imo %>)</span></span></br>
-              <%= @auction_payload.auction.fuel.name %> (<%= @auction_payload.auction.fuel_quantity %>)</br>
               <%= @auction_payload.auction.port.name %></br>
               <%= @auction_payload.auction.eta %></br>
+              <ul class="qa-auction-deliverables">
+                <%= for vessel_fuel <- @auction_payload.auction.auction_vessel_fuels do %>
+                  <li class="qa-auction-deliverable-<%= vessel_fuel.id %>">
+                    <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
+                    <span class="qa-auction-deliverable-fuel"><%= vessel_fuel.fuel.name %></span> to
+                    <span class="qa-auction-deliverable-vessel">
+                      <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
+                    </span>
+                  </li>
+                <% end %>
+              </ul>
               <%= @auction_payload.auction.additional_information %>
             </td>
           </tr>
           <tr>
             <th>Winning Bid</th>
-            <td class="qa-auction-detail-winning-bid-amount"><%= auction_log_winning_bid(@auction_payload) %></td>
+            <td class="qa-auction-detail-winning-solution-normalized-price"><%= auction_log_winning_solution(@solutions_payload) %></td>
           </tr>
           <tr>
             <th>Winning Bidder</th>
-            <td class="qa-auction-detail-winning-supplier"><%= auction_log_supplier(@auction_payload) %></td>
+            <td class="qa-auction-detail-winning-suppliers">
+            <%= if auction_log_suppliers(@solutions_payload) != "—" do %>
+              <%= for supplier <- auction_log_suppliers(@solutions_payload) do %>
+                <%= supplier %>
+              <% end %>
+            <% else %>
+              <%= auction_log_suppliers(@solutions_payload) %>
+            <% end %>
+            </td>
           </tr>
         </tbody>
       </table>
