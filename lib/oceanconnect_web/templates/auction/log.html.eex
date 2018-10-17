@@ -72,27 +72,35 @@
         </tbody>
       </table>
     </div>
-    <h2>Bidding Activity Log</h2>
+
+
+    <h2>Activity Log</h2>
     <table class="table is-fullwidth is-striped report__table--log is-hidden-touch">
       <thead>
         <tr>
           <th>Event</th>
-          <th>User</th>
-          <th>Company</th>
+          <th>Company/User</th>
           <th>Time</th>
           <th>Bid Amount</th>
           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-          <th>Min Amount</th>
-          <th>Impersonator</th>
+            <th>Min Amount</th>
+            <th>Impersonator</th>
           <% end %>
         </tr>
       </thead>
       <tbody>
         <%= for event <- @events do %>
-          <tr class=<%= "qa-event-#{event.id}" %>>
-            <td class="qa-event-type"><%= convert_event_type(event.type, event) %></td>
-            <td class="qa-event-user"><%= event_user(event) %></td>
-            <td class="qa-event-company"><%= event_company(event) %></td>
+          <tr class="<%= "qa-event-#{event.id}" %>">
+            <td>
+              <span class="qa-event-type has-text-weight-bold"><%= convert_event_type(event.type, event) %></span>
+              <br>
+              <small class="qa-event-type-extras"><%= convert_event_type_extras(event.type, event) %></small>
+            </td>
+            <td>
+              <span class="qa-event-company has-text-weight-bold"><%= event_company(event) %></span>
+              <br>
+              <small class="qa-event-user"><%= event_user(event) %></small>
+            </td>
             <td><%= convert_event_date_time?(event.time_entered) %></td>
             <td class="qa-event-bid-amount"><%= event_bid_amount(event) %></td>
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
@@ -114,8 +122,9 @@
           <tr>
             <td>
             <strong class="qa-mobile-event-type"><%= convert_event_type(event.type, event) %></strong><br/>
-            <strong><%= event_user(event) %></strong></br>
+            <span class="qa-mobile-event-type-extras"><%= convert_event_type_extras(event.type, event) %></span><br/>
             <strong><%= event_company(event) %><br/></strong>
+            <span><%= event_user(event) %></span></br>
             <strong><%= convert_event_date_time?(event.time_entered) %><br/></strong>
             <strong><%= event_bid_amount(event) %><br/></strong>
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>

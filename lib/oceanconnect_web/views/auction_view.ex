@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel}
 
   def auction_json_for_form(auction = %Auction{}) do
     auction_map =
@@ -77,10 +77,19 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def convert_event_type(type, event) do
-    if type in [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted] do
-      "#{convert_event_type(type)}: #{barge_name_for_event(event)}"
-    else
-      convert_event_type(type)
+    convert_event_type(type)
+  end
+
+  def convert_event_type_extras(type, event) do
+    cond do
+      type in [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted] ->
+        barge_name_for_event(event)
+
+      type in [:bid_placed, :auto_bid_placed, :auto_bid_triggered] ->
+        product_name_for_event(event)
+
+      true ->
+        ""
     end
   end
 
@@ -88,7 +97,6 @@ defmodule OceanconnectWeb.AuctionView do
         data: %{auction_barge: %AuctionBarge{barge: %Barge{name: name}}}
       }),
       do: name
-
   def barge_name_for_event(%AuctionEvent{
         data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}
       }) do
@@ -98,8 +106,21 @@ defmodule OceanconnectWeb.AuctionView do
       _ -> ""
     end
   end
-
   def barge_name_for_event(%AuctionEvent{}) do
+    ""
+  end
+
+
+  def product_name_for_event(%AuctionEvent{
+        data: %{bid: %AuctionBid{fuel_id: fuel_id}}
+      }) do
+    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, fuel_id) do
+      name
+    else
+      _ -> ""
+    end
+  end
+  def product_name_for_event(%AuctionEvent{}) do
     ""
   end
 
