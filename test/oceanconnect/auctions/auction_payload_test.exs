@@ -91,13 +91,13 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       supplier1_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
       supplier1_product_payload = supplier1_payload.product_bids[fuel_id]
 
-      assert [%{amount: 1.25, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: nil}] =
+      assert [%{amount: 1.25, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: false}] =
                supplier1_product_payload.lowest_bids
 
       supplier2_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
       supplier2_product_payload = supplier2_payload.product_bids[fuel_id]
 
-      assert [%{amount: 1.25, is_traded_bid: nil}, %{amount: 1.5, is_traded_bid: false}] =
+      assert [%{amount: 1.25, is_traded_bid: false}, %{amount: 1.5, is_traded_bid: false}] =
                supplier2_product_payload.lowest_bids
     end
 
