@@ -31,16 +31,6 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  def has_split_bidding_toggled?(allowed) do
-    text = find_element(:css, ".qa-auction-split_bid_allowed")
-    |> inner_text
-
-    case allowed do
-      true -> text =~ ~r/\ballowed/
-      false -> text =~ ~r/\bdisallowed/
-    end
-  end
-
   def has_anonymous_bidding_toggled?(_allowed = true) do
     element = find_element(:css, ".qa-auction-anonymous_bidding")
   end
