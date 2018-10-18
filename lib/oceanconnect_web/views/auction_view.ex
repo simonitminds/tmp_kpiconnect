@@ -29,7 +29,6 @@ defmodule OceanconnectWeb.AuctionView do
       duration: auction_map.duration,
       decision_duration: auction_map.decision_duration,
       anonymous_bidding: auction_map.anonymous_bidding,
-      split_bid_allowed: auction_map.split_bid_allowed,
       additional_information: auction_map.additional_information,
       port_id: auction_map.port_id,
       buyer: auction_map.buyer,

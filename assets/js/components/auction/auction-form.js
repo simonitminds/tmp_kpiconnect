@@ -288,20 +288,6 @@ const AuctionForm = (props) => {
                     </div>
                   </div>
               }
-
-              <div className="field is-horizontal">
-                <div className="field-label"></div>
-                <div className="field-body">
-                  <CheckBoxField
-                      model={'auction'}
-                      field={'split_bid_allowed'}
-                      labelText={'allow split bidding'}
-                      value={auction.allow_split_bidding}
-                      opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                      onChange={updateInformation.bind(this, 'auction.split_bid_allowed')}
-                  />
-                </div>
-              </div>
             </fieldset>
           </div>
         </div>

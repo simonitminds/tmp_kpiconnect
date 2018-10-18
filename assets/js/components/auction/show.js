@@ -305,12 +305,6 @@ export default class AuctionShow extends React.Component {
                               <li>
                                 {additionInfoDisplay(auction)}
                               </li>
-                              <li className="qa-auction-split_bid_allowed">
-                                { auction.split_bid_allowed
-                                  ? "Split bidding is allowed for this auction."
-                                  : "Split bidding is not allowed for this auction."
-                                }
-                              </li>
                               { auction.anonymous_bidding &&
                                 <li className="qa-auction-anonymous_bidding">
                                   "Supplier bids on this auction are placed anonymously."

@@ -85,11 +85,6 @@ defmodule Oceanconnect.AuctionNewPage do
     |> click
   end
 
-  def disable_split_bidding() do
-    find_element(:css, ".qa-auction-split_bid_allowed")
-    |> click
-  end
-
   def has_suppliers?(suppliers) do
     Enum.all?(suppliers, fn supplier ->
       find_element(:css, ".qa-auction-supplier-#{supplier.id}")

@@ -189,12 +189,10 @@ defmodule Oceanconnect.AuctionNewTest do
       AuctionNewPage.add_fuel(fuel.id)
       AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
     end)
-    AuctionNewPage.disable_split_bidding()
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
     assert AuctionShowPage.has_values_from_params?(show_params)
-    assert AuctionShowPage.has_split_bidding_toggled?(true)
   end
 
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",

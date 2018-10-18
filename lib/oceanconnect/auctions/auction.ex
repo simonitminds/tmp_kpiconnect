@@ -41,7 +41,6 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
     field(:additional_information, :string)
-    field(:split_bid_allowed, :boolean, default: true)
 
     many_to_many(
       :suppliers,
@@ -73,8 +72,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :is_traded_bid_allowed,
     :po,
     :port_agent,
-    :scheduled_start,
-    :split_bid_allowed
+    :scheduled_start
   ]
 
   @doc false
