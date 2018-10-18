@@ -7,20 +7,10 @@ defmodule Oceanconnect.AuctionLogPage do
   end
 
   def has_events?(events) do
-    Enum.map(events, fn event ->
+    Enum.all?(events, fn event ->
       element = find_element(:class, "qa-event-#{event.id}")
-      type = (find_within_element(element, :class, "qa-event-type") |> inner_text) =~ AuctionView.convert_event_type(event.type)
-      company = (find_within_element(element, :class, "qa-event-company") |> inner_text) =~ AuctionView.event_company(event)
-      amount =
-        if AuctionView.event_has_bid_data?(event) do
-          (find_within_element(element, :class, "qa-event-bid-amount") |> inner_text) =~ AuctionView.event_bid_amount(event)
-        else
-          true
-        end
-      [type, company, amount]
+      (find_within_element(element, :class, "qa-event-type") |> inner_text) =~ AuctionView.convert_event_type(event.type)
     end)
-    |> List.flatten
-    |> Enum.all?(&(&1))
   end
 
   def bid_has_supplier_as_user?(events, supplier) do

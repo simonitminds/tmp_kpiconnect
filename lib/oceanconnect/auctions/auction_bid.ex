@@ -37,4 +37,18 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       original_time_entered: time_entered
     }
   end
+
+  # When replaying events, if the Bid struct has changed (particularly when new
+  # keys are added), the structs that come out of the events will be invalid.
+  # This function ensures that bids from events always have all of the values
+  # that the application currently expects from the structs.
+  def from_event_bid(bid) do
+    %__MODULE__{
+      auction_id: nil,
+      amount: nil,
+      supplier_id: nil,
+      fuel_id: nil
+    }
+    |> Map.merge(bid)
+  end
 end

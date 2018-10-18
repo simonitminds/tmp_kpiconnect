@@ -57,8 +57,6 @@ defmodule Oceanconnect.AuctionLogTest do
   test "auction log has log details", %{auction: auction, supplier: supplier} do
     event_list = Auctions.AuctionEventStore.event_list(auction.id)
     assert AuctionLogPage.has_events?(event_list)
-    assert AuctionLogPage.bid_has_supplier_as_user?(event_list, supplier)
-    assert AuctionLogPage.event_user_displayed?(event_list)
   end
 
   test "page has auction details", %{auction: auction, buyer_id: buyer_id} do
