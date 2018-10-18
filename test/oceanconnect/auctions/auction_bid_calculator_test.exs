@@ -115,7 +115,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       current_state = %ProductBidState{
@@ -132,7 +133,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       assert {%ProductBidState{
@@ -156,7 +158,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       current_state = %ProductBidState{
@@ -173,7 +176,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       assert {%ProductBidState{
@@ -196,7 +200,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       current_state = %ProductBidState{
@@ -212,7 +217,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       updated_prev_bid = %AuctionBid{prev_bid | active: false}
@@ -243,7 +249,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid = %AuctionBid{
@@ -252,7 +259,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -288,7 +296,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid = %AuctionBid{
@@ -297,7 +306,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -349,7 +359,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -358,7 +369,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -367,7 +379,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -400,7 +413,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -409,7 +423,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -418,7 +433,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -451,7 +467,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -460,7 +477,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -469,7 +487,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -502,7 +521,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -511,7 +531,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -520,7 +541,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -539,13 +561,12 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert [{1.25, ^supplier1}, {2.50, ^supplier2} | _rest] = lowest_bids
     end
 
-    test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten",
-         %{
-           auction: auction,
-           fuel_id: fuel_id,
-           supplier1: supplier1,
-           supplier2: supplier2
-         } do
+    test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten", %{
+       auction: auction,
+       fuel_id: fuel_id,
+       supplier1: supplier1,
+       supplier2: supplier2
+    } do
       auction_id = auction.id
 
       supplier1_bid1 = %AuctionBid{
@@ -554,7 +575,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -563,7 +585,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -572,7 +595,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -605,7 +629,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -614,7 +639,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid2 = %AuctionBid{
@@ -623,7 +649,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -657,7 +684,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -666,7 +694,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier3_bid1 = %AuctionBid{
@@ -675,7 +704,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier3,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -709,7 +739,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -718,7 +749,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -753,7 +785,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -762,7 +795,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier1_bid2 = %AuctionBid{
@@ -771,7 +805,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -827,7 +862,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -836,7 +872,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier1_bid2 = %AuctionBid{
@@ -845,7 +882,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{
@@ -892,7 +930,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier1,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       supplier2_bid1 = %AuctionBid{
@@ -901,7 +940,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         supplier_id: supplier2,
         auction_id: auction_id,
         fuel_id: fuel_id,
-        time_entered: DateTime.utc_now()
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
       }
 
       initial_state = %ProductBidState{

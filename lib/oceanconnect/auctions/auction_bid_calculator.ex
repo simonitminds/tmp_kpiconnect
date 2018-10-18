@@ -104,7 +104,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
 
   defp enter_auto_bids(state = %ProductBidState{}, remaining_min_bids, status) do
     Enum.reduce(remaining_min_bids, state, fn bid, acc ->
-      updated_bid = %AuctionBid{bid | id: UUID.uuid4(:hex)}
+      updated_bid = %AuctionBid{bid | id: UUID.uuid4(:hex), time_entered: DateTime.utc_now()}
 
       acc
       |> invalidate_previous_auto_bids(updated_bid)
@@ -134,7 +134,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       |> Enum.map(fn({bid, new_amount}) ->
         %AuctionBid{bid | amount: new_amount}
       end)
-      |> Enum.sort_by(&{&1.amount, &1.time_entered})
+      |> sort_bids()
 
     next_state = enter_auto_bids(state, decremented_auto_bids, :open)
 
@@ -210,7 +210,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     |> Enum.map(fn({bid, new_amount}) ->
       %AuctionBid{bid | amount: new_amount}
     end)
-    |> Enum.sort_by(&{&1.amount, &1.time_entered})
+    |> sort_bids()
   end
 
   defp enter_auto_bid(
@@ -238,6 +238,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
            auction_id: auction_id
          },
          bid = %AuctionBid{
+           auction_id: auction_id,
            min_amount: min_amount
          },
          :pending
@@ -293,7 +294,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   defp sort_lowest_bids(state = %ProductBidState{active_bids: active_bids}) do
     lowest_bids =
       active_bids
-      |> Enum.sort_by(&{&1.amount, DateTime.to_unix(&1.time_entered, :microsecond)})
+      |> sort_bids()
 
     %ProductBidState{state | lowest_bids: lowest_bids}
   end
@@ -354,5 +355,11 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         active_bids: active_bids,
         minimum_bids: others_bids
     }
+  end
+
+
+  defp sort_bids(bids) do
+    bids
+    |> Enum.sort_by(&{&1.amount, DateTime.to_unix(&1.original_time_entered, :microsecond)})
   end
 end

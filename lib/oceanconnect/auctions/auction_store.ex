@@ -231,7 +231,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:select_winning_solution, %{solution: solution = %Solution{bids: bids, comment: comment}, user: user}, emit},
+        {:select_winning_solution, %{solution: solution = %Solution{}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
     new_state = select_winning_solution(solution, current_state)
@@ -350,17 +350,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     update_auction(auction, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: bid}}, previous_state) do
+  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do
+    bid = AuctionBid.from_event_bid(event_bid)
     {_product_state, _events, new_state} = process_bid(previous_state, bid)
     new_state
   end
 
-  defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: bid}}, previous_state) do
+  defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: event_bid}}, previous_state) do
+    bid = AuctionBid.from_event_bid(event_bid)
     {_product_state, _events, new_state} = process_bid(previous_state, bid)
     new_state
   end
 
-  defp replay_event(%AuctionEvent{type: :auto_bid_triggered, data: %{bid: bid}}, previous_state) do
+  defp replay_event(%AuctionEvent{type: :auto_bid_triggered, data: %{bid: _bid}}, previous_state) do
     previous_state
   end
 

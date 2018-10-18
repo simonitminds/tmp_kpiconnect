@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   def get_solutions_payload!(
         _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
-        auction: auction,
+        auction: _auction,
         supplier: supplier_id
       ) do
     suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
@@ -44,8 +44,8 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   defp list_other_solutions(
-         solutions = %{
-           best_overall: best_overall,
+         _solutions = %{
+           best_overall: _best_overall,
            best_by_supplier: best_by_supplier,
            best_single_supplier: best_single_supplier
          },
@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   defp list_other_solutions(
-         solutions = %{
+         _solutions = %{
            best_overall: best_overall,
            best_by_supplier: best_by_supplier,
            best_single_supplier: best_single_supplier
@@ -84,17 +84,14 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
       | bids: Enum.map(bids, fn bid -> scrub_bid_for_supplier(bid, supplier_id) end)
     }
   end
-
   defp scrub_solutions_for_supplier(solutions, supplier_id) when is_list(solutions) do
-    Enum.map(solutions, fn solution -> scrub_solution_for_supplier(solution, auction) end)
+    Enum.map(solutions, fn solution -> scrub_solution_for_supplier(solution, supplier_id) end)
   end
 
   defp scrub_solution_for_buyer(nil, _auction), do: nil
-
   defp scrub_solution_for_buyer(solution = %Solution{bids: bids}, auction) do
     %Solution{solution | bids: Enum.map(bids, fn bid -> scrub_bid_for_buyer(bid, auction) end)}
   end
-
   defp scrub_solutions_for_buyer(solutions, auction) when is_list(solutions) do
     Enum.map(solutions, fn solution -> scrub_solution_for_buyer(solution, auction) end)
   end
@@ -133,7 +130,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   defp supplier_for_solution(nil), do: nil
 
-  defp supplier_for_solution(solution = %Solution{bids: bids}) when is_list(bids) do
+  defp supplier_for_solution(%Solution{bids: bids}) when is_list(bids) do
     case bids do
       [] -> nil
       [bid | _] -> bid.supplier_id
