@@ -4,7 +4,14 @@ defmodule OceanconnectWeb.AuctionView do
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel}
 
   @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered, :traded_bid_placed]
-  @events_from_system [:duration_extended, :auction_closed, :auction_state_rebuilt]
+  @events_from_system [
+    :duration_extended,
+    :auction_state_rebuilt,
+    :upcoming_auction_notified,
+    :auction_ended,
+    :auction_expired,
+    :auction_closed
+  ]
   @events_for_barges [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]
 
   def auction_json_for_form(auction = %Auction{}) do
