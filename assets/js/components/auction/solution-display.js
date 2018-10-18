@@ -131,7 +131,8 @@ export default class SolutionDisplay extends React.Component {
                               : <i>No bid</i>
                             }
                           </td>
-                          <td><span className="qa-auction-bid-supplier">{ true ? bid.supplier : "" }</span></td>
+                          <td><span className="qa-auction-bid-supplier">{ bid.supplier }</span></td>
+                          <td><span className="qa-auction-bid-supplier">{ formatTime(bid.time_entered) }</span></td>
                         </tr>
                       );
                     })
