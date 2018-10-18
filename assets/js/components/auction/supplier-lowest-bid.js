@@ -16,10 +16,15 @@ const SupplierLowestBid = ({auctionPayload, connection, supplierId}) => {
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Bid` : `Best Offer`}</h3>
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall Offer" />
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier Offer" />
-          { suppliersBestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} title="Your Best Offer" />
+          { bestSolution !== undefined ?
+            <div>
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall Offer" />
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title={`Best Single Supplier Offer`}/>
+              { suppliersBestSolution &&
+                <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} title="Your Best Offer" />
+              }
+            </div> :
+            <div class="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
           }
         </div>
       </div>

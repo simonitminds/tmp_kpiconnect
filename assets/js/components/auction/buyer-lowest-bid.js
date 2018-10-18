@@ -12,8 +12,16 @@ const BuyerLowestBid = ({auctionPayload}) => {
     <div className="box">
       <div className="box__subsection has-padding-bottom-none">
         <h3 className="box__header box__header--bordered">Lowest Bid(s)</h3>
-        <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall Offer" />
-        <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" />
+        { bestSolution == undefined ?
+          <div>
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall Offer" />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" />
+          </div> :
+          <div className="auction-table-placeholder">
+            <i>No bids have been placed on this auction</i>
+          </div>
+        }
+
       </div>
     </div>
   );
