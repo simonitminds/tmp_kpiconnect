@@ -14,7 +14,7 @@ const WinningSolution = ({auctionPayload}) => {
           <h3 className="box__header box__header--bordered">Winning Solution</h3>
           {
             solution ?
-              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title={"Winning Solution"} best={true} className="qa-auction-winning-solution" />
+              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title={"Winning Solution"} isExpanded={true} best={true} className="qa-auction-winning-solution" />
               : <div className="auction-table-placeholder">
                 <i>A winning bid was not selected before the decision time expired</i>
               </div>

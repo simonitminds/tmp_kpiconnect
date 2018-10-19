@@ -58,8 +58,20 @@
   border-bottom: 4px solid $teal;
 }
 
-.auction-solution__body {
+.auction-solution__header {
+  & + .auction-solution__body {
+    transition: max-height 0.3s ease;
+  }
+  &--open + .auction-solution__body {
+    max-height: 100%;
+  }
+  &--closed + .auction-solution__body {
+    overflow: hidden;
+    max-height: 0%;
+  }
+}
 
+.auction-solution__body {
 }
 
 .auction-solution__port-designation {

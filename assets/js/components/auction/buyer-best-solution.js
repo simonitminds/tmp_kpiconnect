@@ -14,8 +14,8 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
       <div className="box">
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Solution</h3>
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} acceptSolution={acceptSolution} best={true} className="qa-auction-solution-best_overall" />
-          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} acceptSolution={acceptSolution} className="qa-auction-solution-best_single_supplier" />
+          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} acceptSolution={acceptSolution} best={true} isExpanded={true} className="qa-auction-solution-best_overall" />
+          <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} acceptSolution={acceptSolution} isExpanded={true} className="qa-auction-solution-best_single_supplier" />
         </div>
       </div>
     </div>
