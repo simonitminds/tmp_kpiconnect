@@ -58,20 +58,25 @@
   border-bottom: 4px solid $teal;
 }
 
-.auction-solution__header {
-  & + .auction-solution__body {
-    transition: max-height 0.3s ease;
+.auction-solution {
+  transition: height 0.2s ease;
+// Toggled Open
+  &--open > .auction-solution__body {
+    height: auto;
   }
-  &--open + .auction-solution__body {
-    max-height: 100%;
-  }
-  &--closed + .auction-solution__body {
+// Toggled Closed
+  &--closed > .auction-solution__body {
     overflow: hidden;
-    max-height: 0%;
+    height: 0;
+  }
+  &--closed > .auction-solution__header--bordered {
+    border-bottom: none;
+    padding-bottom: 0.25rem;
   }
 }
 
 .auction-solution__body {
+  transition: height 300ms ease-in;
 }
 
 .auction-solution__port-designation {

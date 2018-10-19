@@ -92,8 +92,8 @@ export default class SolutionDisplay extends React.Component {
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title is-inline-block" onClick={this.toggleExpanded.bind(this)}>
             {isExpanded ?
-              <i className="fas fa-minus has-padding-right-sm"></i>:
-              <i className="fas fa-plus has-padding-right-sm"></i>
+              <i className="fas fa-minus has-padding-right-md"></i>:
+              <i className="fas fa-plus has-padding-right-md"></i>
             }
 
             {solutionTitle()}
