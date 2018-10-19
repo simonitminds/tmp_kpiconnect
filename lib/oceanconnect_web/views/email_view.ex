@@ -29,9 +29,28 @@ defmodule OceanconnectWeb.EmailView do
     )
   end
 
+  def format_price(amounts) when is_list(amounts) do
+    Enum.map(amounts, fn amount ->
+      :erlang.float_to_binary(amount, decimals: 2)
+      "$#{amount}"
+    end)
+    |> Enum.join(", ")
+  end
+
   def format_price(amount) do
-    amount = :erlang.float_to_binary(amount, decimals: 2)
-    "$#{amount}"
+    case amount do
+      "" -> ""
+      _ ->
+        amount = :erlang.float_to_binary(amount, decimals: 2)
+        "$#{amount}"
+    end
+  end
+
+  def price_for_vessel_fuel(winning_solution_bids, fuel_id) do
+    case winning_solution_bids[fuel_id] do
+      nil -> ""
+      _ -> Enum.map(winning_solution_bids[fuel_id], &(&1.amount))
+    end
   end
 
   defp leftpad(integer) do

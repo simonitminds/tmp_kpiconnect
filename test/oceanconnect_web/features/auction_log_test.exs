@@ -13,6 +13,7 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
+    insert(:company, name: "Ocean Connect Marine")
 
     fuel = insert(:fuel)
     fuel_id = "#{fuel.id}"

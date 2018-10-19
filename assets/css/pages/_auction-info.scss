@@ -311,24 +311,27 @@
   }
 }
 
+.auction__bid-amount {
+  display: inline-block;
+
+  &:not(:only-child) {
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.auction__traded-bid-tag {
+  display: inline-block;
+  background-color: $gray-3;
+  border-radius: 3px;
+  padding: 0.25rem 0.5rem;
+  color: $white;
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
 .auction__traded-bid-marker {
   position: relative;
-
-  &:hover:after {
-    content: attr(action-label);
-    position: absolute;
-    background-color: #363636;
-    color: #ffffff;
-    padding: 0.5rem 0.75rem;
-    border-radius: 5px;
-    z-index: 999;
-    top: -29px;
-    width: 78px;
-    text-align: center;
-    font-size: 0.75rem;
-    left: -29px;
-    font-family: $family-sans-serif;
-  }
 }
 
 .auction__traded-bid-accepted-marker {

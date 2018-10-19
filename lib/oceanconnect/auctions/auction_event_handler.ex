@@ -7,7 +7,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionBid,
     AuctionEvent,
     AuctionNotifier,
-    AuctionStore.AuctionState
+    AuctionStore.AuctionState,
+    Solution
   }
 
   @registry_name :auction_event_handler_registry
@@ -33,24 +34,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(%AuctionEvent{type: type}, state) when type == :auction_state_rebuilt do
-    {:noreply, state}
-  end
-
-  def handle_info(
-        %AuctionEvent{
-          auction_id: auction_id,
-          type: :winning_bid_selected,
-          data: %{
-            bid: %AuctionBid{
-              amount: bid_amount,
-              supplier_id: supplier_id,
-              is_traded_bid: is_traded_bid
-            }
-          }
-        },
-        state
-      ) do
-    AuctionNotifier.notify_auction_completed(bid_amount, supplier_id, auction_id, is_traded_bid)
     {:noreply, state}
   end
 
@@ -85,7 +68,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_created, data: auction = %Auction{scheduled_start: nil}},
+        %AuctionEvent{type: :auction_created, data: %Auction{scheduled_start: nil}},
         state
       ) do
     {:noreply, state}
