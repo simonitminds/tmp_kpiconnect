@@ -1,8 +1,8 @@
 language: elixir
 elixir:
-  - 1.6.6
+  - 1.7.3
 otp_release:
-  - 21.0.1
+  - 21.1
 # Have to be on Trusty for chromedriver to work properly
 dist: trusty
 sudo: required
