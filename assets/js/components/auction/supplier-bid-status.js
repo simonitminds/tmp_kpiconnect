@@ -6,8 +6,6 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const supplierIdInt = parseInt(supplierId);
   const bidList = _.get(auctionPayload, 'bid_history', []);
 
-  console.log('solutions: ', auctionPayload.solutions);
-
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
 

@@ -115,8 +115,7 @@ export default class SolutionDisplay extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {
-                  bids.length > 0  ?
+                { bids.length > 0  ?
                     fuelBids.map(({fuel, bid}) => {
                       return (
                         <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>

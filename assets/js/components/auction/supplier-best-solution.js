@@ -3,7 +3,7 @@ import _ from 'lodash';
 import SupplierBidStatus from './supplier-bid-status';
 import SolutionDisplay from './solution-display';
 
-const SupplierLowestBid = ({auctionPayload, connection, supplierId}) => {
+const SupplierBestSolution = ({auctionPayload, connection, supplierId}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const fuels = _.get(auctionPayload, 'auction.fuels');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
@@ -17,13 +17,18 @@ const SupplierLowestBid = ({auctionPayload, connection, supplierId}) => {
       <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={supplierId} />
       <div className="box">
         <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Bid` : `Best Offer`}</h3>
+          <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
           { bestSolution &&
             <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} title="Best Overall Offer" />
           }
           { bestSingleSupplier &&
             <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} title={`Best Single Supplier Offer`}/>
           }
+        </div>
+      </div>
+      <div className="box">
+        <div className="box__subsection">
+          <h3 className="box__header box__header--bordered">Your Best Offer</h3>
           { suppliersBestSolution &&
             <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} title="Your Best Offer" />
           }
@@ -36,4 +41,4 @@ const SupplierLowestBid = ({auctionPayload, connection, supplierId}) => {
   );
 };
 
-export default SupplierLowestBid;
+export default SupplierBestSolution;

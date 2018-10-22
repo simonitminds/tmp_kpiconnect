@@ -5,11 +5,10 @@ import moment from 'moment';
 import ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './auction-bread-crumbs';
 import AuctionHeader from './auction-header';
-import BuyerLowestBid from './buyer-lowest-bid';
 import BuyerBestSolution from './buyer-best-solution';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
-import SupplierLowestBid from './supplier-lowest-bid';
+import SupplierBestSolution from './supplier-best-solution';
 import BuyerBidList from './buyer-bid-list';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
@@ -109,7 +108,7 @@ export default class AuctionShow extends React.Component {
       if (auctionPayload.status == 'open') {
         return (
           <div>
-            <BuyerLowestBid auctionPayload={auctionPayload} />
+            <BuyerBestSolution auctionPayload={auctionPayload} />
             <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
@@ -146,7 +145,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierLowestBid auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
+            <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
             <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -154,7 +153,7 @@ export default class AuctionShow extends React.Component {
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <SupplierLowestBid auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
+            <SupplierBestSolution auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
