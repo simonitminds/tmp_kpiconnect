@@ -115,7 +115,6 @@ export function approveBarge(auctionId, bargeId, supplierId) {
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        console.log(response);
         dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
       });
   };
@@ -130,7 +129,6 @@ export function rejectBarge(auctionId, bargeId, supplierId) {
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        console.log(response);
         dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
       });
   };

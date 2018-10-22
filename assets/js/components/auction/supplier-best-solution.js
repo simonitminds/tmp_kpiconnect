@@ -19,10 +19,10 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId}) => {
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
           { bestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} title="Best Overall Offer" />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} title="Best Overall Offer" />
           }
           { bestSingleSupplier &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} title={`Best Single Supplier Offer`}/>
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} title={`Best Single Supplier Offer`}/>
           }
         </div>
       </div>
