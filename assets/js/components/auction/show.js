@@ -314,13 +314,6 @@ export default class AuctionShow extends React.Component {
                           </div>
                         </div>
                       </TabPanel>
-                      {/* <TabPanel>
-                        <div className="auction-notification box is-gray-0" >
-                          <h3 className="has-text-weight-bold is-flex">
-                          <span className="is-inline-block qa-supplier-bid-status-message">Messaging is coming soon!</span>
-                          </h3>
-                        </div>
-                      </TabPanel> */}
                     </Tabs>
                   </div>
                 </div>
@@ -337,7 +330,6 @@ export default class AuctionShow extends React.Component {
                     <TabList>
                       <Tab><h2 className="title is-size-5">Monitor</h2></Tab>
                       <Tab><h2 className="title is-size-5">Details</h2></Tab>
-                      {/* <Tab><h2 className="title is-size-5">Messages</h2></Tab> */}
                     </TabList>
                   </div>
                   <TabPanel>

@@ -7,8 +7,10 @@ import SolutionAcceptDisplay from './solution-accept-display';
 export default class SolutionDisplay extends React.Component {
   constructor(props) {
     super(props);
+    const isExpanded = this.props.isExpanded;
     this.state = {
-      selected: false
+      selected: false,
+      expanded: isExpanded
     }
   }
   cancelSelection(e) {
@@ -25,6 +27,10 @@ export default class SolutionDisplay extends React.Component {
     const auctionId = this.props.auctionPayload.auction.id;
     this.props.acceptSolution(auctionId, bidIds, event);
     return(false)
+  }
+  toggleExpanded(e) {
+    e.preventDefault();
+    this.setState({expanded: !this.state.expanded});
   }
 
   render() {
@@ -55,6 +61,7 @@ export default class SolutionDisplay extends React.Component {
         .value();
     const totalQuantity = _.sum(Object.values(fuelQuantities));
     const acceptable = !!acceptSolution;
+    const isExpanded = this.state.expanded;
 
     const solutionTitle = () => {
       if(title) {
@@ -81,10 +88,14 @@ export default class SolutionDisplay extends React.Component {
     }
 
     return (
-      <div className={`box auction-solution ${className}`}>
+      <div className={`box auction-solution ${className} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title is-inline-block">
-            <i className="fas fa-minus has-padding-right-sm"></i>
+          <h3 className="auction-solution__title is-inline-block" onClick={this.toggleExpanded.bind(this)}>
+            {isExpanded ?
+              <i className="fas fa-minus has-padding-right-md"></i>:
+              <i className="fas fa-plus has-padding-right-md"></i>
+            }
+
             {solutionTitle()}
           </h3>
           <div className="auction-solution__content">

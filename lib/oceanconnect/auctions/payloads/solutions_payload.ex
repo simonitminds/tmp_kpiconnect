@@ -77,7 +77,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   defp scrub_solution_for_supplier(nil, _supplier_id), do: nil
-
+  defp scrub_solution_for_supplier(%Solution{bids: []}, _auction), do: nil
   defp scrub_solution_for_supplier(solution = %Solution{bids: bids}, supplier_id) do
     %Solution{
       solution
@@ -89,6 +89,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   defp scrub_solution_for_buyer(nil, _auction), do: nil
+  defp scrub_solution_for_buyer(%Solution{bids: []}, _auction), do: nil
   defp scrub_solution_for_buyer(solution = %Solution{bids: bids}, auction) do
     %Solution{solution | bids: Enum.map(bids, fn bid -> scrub_bid_for_buyer(bid, auction) end)}
   end
