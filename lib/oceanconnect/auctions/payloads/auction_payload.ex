@@ -41,7 +41,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
     |> List.flatten()
-    |> Enum.sort_by(& &1.time_entered)
+    |> Enum.sort_by(& DateTime.to_unix(&1.time_entered, :microsecond))
+    |> Enum.reverse()
   end
 
   def get_supplier_auction_payload(

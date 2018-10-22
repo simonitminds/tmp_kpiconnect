@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
-import SupplierBidStatus from './supplier-bid-status';
 import SolutionAcceptDisplay from './solution-accept-display';
 
 export default class SolutionDisplay extends React.Component {
@@ -34,7 +33,7 @@ export default class SolutionDisplay extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, best, children, className} = this.props;
+    const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
     const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -87,8 +86,36 @@ export default class SolutionDisplay extends React.Component {
       );
     }
 
+    const supplierName = (bid) => {
+      if(supplierId) {
+        return bid.supplier_id == supplierId ? "Your Bid" : "";
+      } else {
+        return bid.supplier;
+      }
+    }
+
+    const renderBid = (bid, fuel) => {
+      return (
+        <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
+          <td>{fuel.name}</td>
+
+          <td>
+            { bid
+              ? <span>
+                  <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
+                  <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
+                </span>
+              : <i>No bid</i>
+            }
+          </td>
+          <td><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
+          <td><span className="qa-auction-bid-supplier">{ formatTime(bid.time_entered) }</span></td>
+        </tr>
+      );
+    }
+
     return (
-      <div className={`box auction-solution ${className} auction-solution--${isExpanded ? "open":"closed"}`}>
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title is-inline-block" onClick={this.toggleExpanded.bind(this)}>
             {isExpanded ?
@@ -115,26 +142,8 @@ export default class SolutionDisplay extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {
-                  bids.length > 0  ?
-                    fuelBids.map(({fuel, bid}) => {
-                      return (
-                        <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
-                          <td>{fuel.name}</td>
-
-                          <td>
-                            { bid
-                              ? <span>
-                                  <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
-                                  <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
-                                </span>
-                              : <i>No bid</i>
-                            }
-                          </td>
-                          <td><span className="qa-auction-bid-supplier">{ true ? bid.supplier : "" }</span></td>
-                        </tr>
-                      );
-                    })
+                { bids.length > 0  ?
+                    fuelBids.map(({fuel, bid}) => renderBid(bid, fuel))
                     : <tr>
                         <td>
                           <i>No bids have been placed on this auction</i>

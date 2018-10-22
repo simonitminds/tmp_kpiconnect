@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionView do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel}
 
-  @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered, :traded_bid_placed]
+  @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
   @events_from_system [
     :duration_extended,
     :auction_state_rebuilt,

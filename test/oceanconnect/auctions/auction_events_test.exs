@@ -143,11 +143,11 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       |> Auctions.place_bid()
 
       :timer.sleep(500)
-      assert_received %AuctionEvent{type: :traded_bid_placed, auction_id: ^auction_id}
+      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
 
       assert [
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
-               %AuctionEvent{type: :traded_bid_placed, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: %{bid: %{is_traded_bid: true}}},
                %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
              ] = AuctionEventStore.event_list(auction_id)
     end

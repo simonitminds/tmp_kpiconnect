@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Repo.Migrations.AddSplitBidAllowedToAuctions do
+defmodule Oceanconnect.Repo.Migrations.RemoveSplitBidAllowedToAuctions do
   use Ecto.Migration
 
   def up do
