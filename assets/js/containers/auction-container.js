@@ -54,8 +54,7 @@ const mapDispatchToProps = (dispatch) => ({
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
     }));
   },
-  revokeSupplierBid(auctionId, productId, ev) {
-    ev.preventDefault();
+  revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));
   },
   submitBargeForm(auctionId, bargeId, ev) {

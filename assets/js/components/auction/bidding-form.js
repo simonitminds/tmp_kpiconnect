@@ -22,6 +22,11 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
       .filter((avf) => avf.fuel_id == productId)
       .value();
     const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
+    const confirmBidCancellation = (ev) => {
+      ev.preventDefault();
+      return confirm('Are you sure you want to cancel your bid for this product?') ? revokeBid(auction.id, productId) : false;
+    };
+
 
     return(
       <div className="auction-bidding__product-group columns is-desktop" key={productId}>
@@ -29,7 +34,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
           { existingBid &&
-            <button className="button is-primary" onClick={revokeBid.bind(this, auction.id, productId)}>Revoke</button>
+            <button className="button is-primary" onClick={confirmBidCancellation}>Revoke</button>
           }
         </div>
         <div className="column">
