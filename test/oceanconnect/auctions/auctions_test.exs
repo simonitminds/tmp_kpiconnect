@@ -430,6 +430,42 @@ defmodule Oceanconnect.AuctionsTest do
       assert hd(product_payload.bid_history).id == bid.id
       assert hd(product_payload.lowest_bids).id == bid.id
     end
+
+    test "revoke_supplier_bids_for_product/4 enters bid in bid_list and runs lowest_bid logic", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier_company: supplier_company
+    } do
+      create_bid(1.50, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      :timer.sleep(100)
+
+      Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+      product_payload = auction_payload.product_bids["#{fuel_id}"]
+
+      # `bid_history` still contains the bid for auditing, but it is not in
+      # `lowest_bids` because it is inactive.
+      assert length(product_payload.bid_history) == 1
+      assert length(product_payload.lowest_bids) == 0
+    end
+
+    test "revoke_supplier_bids_for_product/4 fails when auction is in decision", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier_company: supplier_company
+    } do
+      result =
+        create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+        |> Auctions.place_bid()
+
+      Auctions.end_auction(auction)
+      :timer.sleep(50)
+
+      result = Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+      assert {:error, :late_bid} = result
+    end
   end
 
   describe "ports" do

@@ -8,6 +8,7 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
     is_traded_bid = Map.get(params, "is_traded_bid", false) == true
+    revoked_products = Map.get(params, "revoked_products", [])
 
     bids_params = bids_params
     |> Enum.reduce(%{}, fn({product_id, bid_params}, acc) ->
@@ -40,10 +41,27 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
-    case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
-      true -> :ok
-      false -> {:invalid_traded_bid, "Auction not accepting traded bids"}
+  def revoke(conn, params = %{"auction_id" => auction_id, "product" => product_id}) do
+    user = OceanconnectWeb.Plugs.Auth.current_user(conn)
+    supplier_id = user.company_id
+
+    with  auction = %Auction{} <- Auctions.get_auction(auction_id),
+          true <- supplier_id in Auctions.auction_supplier_ids(auction),
+          :ok <- Auctions.revoke_supplier_bids_for_product(auction, product_id, supplier_id, user) do
+      render(conn, "show.json", %{success: true, message: "Bid successfully revoked"})
+    else
+      {:error, :late_bid} ->
+        conn
+        |> put_status(409)
+        |> render("show.json", %{success: false, message: "Auction moved to decision before request was received"})
+      {:error, message} ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: message})
+      _ ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: "Invalid product"})
     end
   end
 
@@ -63,6 +81,14 @@ defmodule OceanconnectWeb.Api.BidController do
         conn
         |> put_status(422)
         |> render(OceanconnectWeb.ErrorView, "422.json", data: %{})
+    end
+  end
+
+
+  defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
+    case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
+      true -> :ok
+      false -> {:invalid_traded_bid, "Auction not accepting traded bids"}
     end
   end
 end

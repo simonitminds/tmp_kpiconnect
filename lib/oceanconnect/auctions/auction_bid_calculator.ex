@@ -91,6 +91,14 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     {next_state, events}
   end
 
+
+  def revoke_supplier_bids(state = %ProductBidState{}, supplier_id) when is_integer(supplier_id) do
+    state
+    |> invalidate_previous_auto_bids(supplier_id)
+    |> invalidate_previous_bids(supplier_id)
+    |> sort_lowest_bids()
+  end
+
   defp enter_opening_bids(state = %ProductBidState{minimum_bids: min_bids}) do
     enter_auto_bids(state, min_bids, :open)
   end
@@ -299,6 +307,9 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     %ProductBidState{state | lowest_bids: lowest_bids}
   end
 
+  defp invalidate_previous_bids(state, %AuctionBid{supplier_id: supplier_id}) do
+    invalidate_previous_bids(state, supplier_id)
+  end
   defp invalidate_previous_bids(
          state = %ProductBidState{
            bids: bids,
@@ -306,7 +317,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
            active_bids: active_bids,
            inactive_bids: _inactive_bids
          },
-         _new_bid = %AuctionBid{supplier_id: supplier_id}
+         supplier_id
        ) do
     {suppliers_old_bids, _others_bids} =
       Enum.split_with(active_bids, fn bid -> bid.supplier_id == supplier_id end)
@@ -330,12 +341,15 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     }
   end
 
+  defp invalidate_previous_auto_bids(state, %AuctionBid{supplier_id: supplier_id}) do
+    invalidate_previous_auto_bids(state, supplier_id)
+  end
   defp invalidate_previous_auto_bids(
          state = %ProductBidState{bids: bids, minimum_bids: min_bids},
-         new_bid = %AuctionBid{amount: _amount, min_amount: _min_amound}
+         supplier_id
        ) do
     {suppliers_old_bids, others_bids} =
-      Enum.split_with(min_bids, fn bid -> bid.supplier_id == new_bid.supplier_id end)
+      Enum.split_with(min_bids, fn bid -> bid.supplier_id == supplier_id end)
 
     updated_bids =
       bids

@@ -232,6 +232,53 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
                 inactive_bids: [^updated_prev_bid]
               }, _events} = AuctionBidCalculator.process(current_state, new_bid, :open)
     end
+
+    test "revoking a bid invalidates that bid", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid = %AuctionBid{
+        amount: 1.75,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid = %AuctionBid{
+        amount: 2.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      current_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [supplier1_bid, supplier2_bid],
+        active_bids: [supplier2_bid, supplier1_bid],
+        minimum_bids: [],
+        bids: [supplier2_bid, supplier1_bid],
+        inactive_bids: []
+      }
+
+      deactivated_supplier1_bid = %AuctionBid{supplier1_bid | active: false}
+
+      assert %ProductBidState{
+                auction_id: ^auction_id,
+                active_bids: [^supplier2_bid],
+                bids: [^supplier2_bid, ^deactivated_supplier1_bid],
+                inactive_bids: [^deactivated_supplier1_bid],
+                lowest_bids: [^supplier2_bid],
+                minimum_bids: [],
+              } = AuctionBidCalculator.revoke_supplier_bids(current_state, supplier1)
+    end
   end
 
   describe "auto bidding" do
@@ -767,6 +814,54 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
 
       lowest_bids = Enum.map(state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
       assert [{2.00, ^supplier1}, {2.00, ^supplier2}] = lowest_bids
+    end
+
+
+    test "revoking an auto bid invalidates that bid", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.75,
+        min_amount: 2.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: nil,
+        min_amount: 1.50,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [],
+        minimum_bids: [],
+        active_bids: [],
+        bids: []
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier1_bid1, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid1, :open)
+      state = AuctionBidCalculator.revoke_supplier_bids(state, supplier1)
+
+      refute Enum.any?(state.active_bids, fn bid -> bid.supplier_id == supplier1 end)
+      refute Enum.any?(state.minimum_bids, fn bid -> bid.supplier_id == supplier1 end)
+      refute Enum.any?(state.lowest_bids, fn bid -> bid.supplier_id == supplier1 end)
+      assert Enum.any?(state.bids, fn bid -> bid.supplier_id == supplier1 end)
     end
   end
 

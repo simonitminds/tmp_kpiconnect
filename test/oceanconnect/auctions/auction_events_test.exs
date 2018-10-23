@@ -116,8 +116,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       fuel_id: fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-
       Auctions.start_auction(auction)
+
       create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
       |> Auctions.place_bid()
 
@@ -131,12 +131,11 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
              ] = AuctionEventStore.event_list(auction_id)
     end
 
-    test "placing a traded bid adds a traded_bid_place event to the event store", %{
+    test "placing a traded bid adds a bid_placed event to the event store", %{
       auction: auction = %Auction{id: auction_id},
       fuel_id: fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-
       Auctions.start_auction(auction)
 
       create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction, true)
@@ -148,6 +147,31 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: %{bid: %{is_traded_bid: true}}},
+               %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
+             ] = AuctionEventStore.event_list(auction_id)
+    end
+
+    test "revoking a supplier's bids adds a supplier_bids_revoked event to the event store", %{
+      auction: auction = %Auction{id: auction_id},
+      fuel_id: fuel_id
+    } do
+      supplier_id = hd(auction.suppliers).id
+
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      Auctions.start_auction(auction)
+      create_bid(1.25, nil, supplier_id, fuel_id, auction)
+      |> Auctions.place_bid()
+
+      :timer.sleep(100)
+      Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_id)
+
+      :timer.sleep(500)
+      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
+
+      assert [
+               %AuctionEvent{type: :supplier_bids_revoked, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
              ] = AuctionEventStore.event_list(auction_id)
     end

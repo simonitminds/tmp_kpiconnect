@@ -70,6 +70,21 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
+        %AuctionEvent{
+          auction_id: auction_id,
+          type: :supplier_bids_revoked,
+          data: %{supplier_id: supplier_id}
+        },
+        state
+      ) do
+    auction_id
+    |> Auctions.AuctionCache.read()
+    |> AuctionNotifier.notify_participants()
+
+    {:noreply, state}
+  end
+
+  def handle_info(
         %AuctionEvent{type: :auction_created, data: auction = %Auction{scheduled_start: nil}},
         state
       ) do

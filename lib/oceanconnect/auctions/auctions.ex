@@ -83,6 +83,17 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def revoke_supplier_bids_for_product(auction, product_id, supplier_id, user \\ nil) do
+    with :ok <- duration_time_remaining?(auction) do
+      auction
+      |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+      |> AuctionStore.process_command()
+      :ok
+    else
+      {:error, :late_bid} -> {:error, :late_bid}
+      _ -> {:error, "error while revoking bid"}
+    end
+  end
 
   defp maybe_add_amount(params = %{"amount" => _}), do: params
   defp maybe_add_amount(params), do: Map.put(params, "amount", nil)
