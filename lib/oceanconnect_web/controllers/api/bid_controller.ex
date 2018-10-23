@@ -8,7 +8,6 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
     is_traded_bid = Map.get(params, "is_traded_bid", false) == true
-    revoked_products = Map.get(params, "revoked_products", [])
 
     bids_params = bids_params
     |> Enum.reduce(%{}, fn({product_id, bid_params}, acc) ->
@@ -41,7 +40,7 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  def revoke(conn, params = %{"auction_id" => auction_id, "product" => product_id}) do
+  def revoke(conn, %{"auction_id" => auction_id, "product" => product_id}) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
 

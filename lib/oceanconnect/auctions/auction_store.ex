@@ -235,7 +235,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         current_state = %{auction_id: auction_id}
       ) do
     new_state = revoke_supplier_bids(current_state, product, supplier_id)
-    AuctionEvent.emit(AuctionEvent.supplier_bids_revoked(auction_id, product, supplier_id, new_state, user), emit)
+    AuctionEvent.emit(AuctionEvent.bids_revoked(auction_id, product, supplier_id, new_state, user), emit)
     {:noreply, new_state}
   end
 

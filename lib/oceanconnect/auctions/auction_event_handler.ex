@@ -72,7 +72,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           auction_id: auction_id,
-          type: :supplier_bids_revoked,
+          type: :bids_revoked,
           data: %{supplier_id: supplier_id}
         },
         state

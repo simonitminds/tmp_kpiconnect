@@ -180,7 +180,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def supplier_bids_revoked(
+  def bids_revoked(
         auction_id,
         product,
         supplier_id,
@@ -188,7 +188,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
         user \\ nil
       ) do
     %AuctionEvent{
-      type: :supplier_bids_revoked,
+      type: :bids_revoked,
       auction_id: auction_id,
       data: %{product: product, supplier_id: supplier_id, state: new_state},
       time_entered: DateTime.utc_now(),

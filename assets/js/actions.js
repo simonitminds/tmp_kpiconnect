@@ -162,6 +162,24 @@ export function submitBid(auctionId, bidData) {
     });
   };
 }
+
+export function revokeBid(auctionId, bidData) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/revoke_bid`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(bidData)
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      return dispatch(updateBidStatus(auctionId, response));
+    }).catch((error) => {
+      return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
+    });
+  };
+}
+
 export function acceptWinningSolution(auctionId, solution) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/select_solution`, {

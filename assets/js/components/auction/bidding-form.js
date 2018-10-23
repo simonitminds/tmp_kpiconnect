@@ -5,7 +5,7 @@ import CollapsibleSection from './collapsible-section';
 import { formatPrice } from '../../utilities';
 import CheckBoxField from '../check-box-field';
 
-const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
+const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.status;
   const products = _.sortBy(auction.fuels, 'id');
@@ -13,18 +13,25 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
   const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
   const is_traded_bid = _.get(auctionPayload, 'bid_history[0].is_traded_bid');
 
-  const renderProduct = ({id, name}, auctionPayload) => {
-    const currentBidAmount = _.get(auctionPayload, `product_bids[${id}].bid_history[0].amount`);
-    const minimumBidAmount = _.get(auctionPayload, `product_bids[${id}].bid_history[0].min_amount`);
+  const renderProduct = ({id: productId, name}, auctionPayload) => {
+    const existingBid = _.get(auctionPayload, `product_bids[${productId}].bid_history[0]`);
+    const currentBidAmount = _.get(existingBid, `amount`);
+    const minimumBidAmount = _.get(existingBid, `min_amount`);
     const vesselFuels = _.chain(auctionPayload)
       .get('auction.auction_vessel_fuels')
-      .filter((avf) => avf.fuel_id == id)
+      .filter((avf) => avf.fuel_id == productId)
       .value();
     const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
 
     return(
-      <div className="auction-bidding__product-group columns is-desktop" key={id}>
-        <div className="column is-one-quarter-desktop"><strong>{name}</strong><br/><span className="has-text-gray-3">&times; {totalQuantity} MT </span></div>
+      <div className="auction-bidding__product-group columns is-desktop" key={productId}>
+        <div className="column is-one-quarter-desktop">
+          <strong>{name}</strong><br/>
+          <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
+          { existingBid &&
+            <button className="button is-primary" onClick={revokeBid.bind(this, auction.id, productId)}>Revoke</button>
+          }
+        </div>
         <div className="column">
           <div className="columns is-desktop">
             <div className="column">
@@ -33,7 +40,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
                   <div className="control"><label className="label" htmlFor="bid">Bid Amount<br/><span className="auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</span></label></div>
                 </div>
                 <div className="field-body auction-bidding__input">
-                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-amount" id="bid" name="amount" data-product={id}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
+                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-amount" id="bid" name="amount" data-product={productId}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
                 </div>
               </div>
             </div>
@@ -43,7 +50,7 @@ const BiddingForm = ({auctionPayload, formSubmit, barges}) => {
                   <div className="control"><label className="label" htmlFor="bid">Minimum Bid<br/><span className="auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</span></label></div>
                 </div>
                 <div className="field-body auction-bidding__input">
-                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-min_amount" id="minimumBid" name="min_amount" data-product={id}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
+                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-min_amount" id="minimumBid" name="min_amount" data-product={productId}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
                 </div>
               </div>
             </div>

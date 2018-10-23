@@ -22,7 +22,8 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const winningSolutionSupplierIds = _.map(winningSolutionBids, 'supplier_id');
   const isInWinningSolution = _.includes(winningSolutionSupplierIds, supplierIdInt);
 
-  const singleSolutionIsTied = suppliersBestSolution && !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
+  const singleSolutionIsTied = suppliersBestSolution && bestSingleSolution &&
+    !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
   const auctionStatus = _.get(auctionPayload, 'status');
 
   const messageDisplay = (message) => {

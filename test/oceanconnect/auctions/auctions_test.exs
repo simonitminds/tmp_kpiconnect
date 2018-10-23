@@ -456,9 +456,8 @@ defmodule Oceanconnect.AuctionsTest do
       fuel_id: fuel_id,
       supplier_company: supplier_company
     } do
-      result =
-        create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
-        |> Auctions.place_bid()
+      create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
       :timer.sleep(50)

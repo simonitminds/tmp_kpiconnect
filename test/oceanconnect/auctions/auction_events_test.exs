@@ -151,7 +151,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
              ] = AuctionEventStore.event_list(auction_id)
     end
 
-    test "revoking a supplier's bids adds a supplier_bids_revoked event to the event store", %{
+    test "revoking a supplier's bids adds a bids_revoked event to the event store", %{
       auction: auction = %Auction{id: auction_id},
       fuel_id: fuel_id
     } do
@@ -169,7 +169,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
 
       assert [
-               %AuctionEvent{type: :supplier_bids_revoked, auction_id: ^auction_id, data: _},
+               %AuctionEvent{type: :bids_revoked, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :bid_placed, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}

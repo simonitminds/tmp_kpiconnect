@@ -14,6 +14,7 @@ import {
   approveBarge,
   rejectBarge,
   submitBid,
+  revokeBid,
   updateBidStatus
 } from '../actions';
 
@@ -52,6 +53,10 @@ const mapDispatchToProps = (dispatch) => ({
       "bids": bidsByProduct,
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
     }));
+  },
+  revokeSupplierBid(auctionId, productId, ev) {
+    ev.preventDefault();
+    dispatch(revokeBid(auctionId, { "product": productId }));
   },
   submitBargeForm(auctionId, bargeId, ev) {
     ev.preventDefault();

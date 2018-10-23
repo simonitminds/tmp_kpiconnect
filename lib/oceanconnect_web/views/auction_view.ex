@@ -4,6 +4,12 @@ defmodule OceanconnectWeb.AuctionView do
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel}
 
   @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
+  @events_with_product_data [
+    :bid_placed,
+    :auto_bid_placed,
+    :auto_bid_triggered,
+    :bids_revoked
+  ]
   @events_from_system [
     :duration_extended,
     :auction_state_rebuilt,
@@ -91,7 +97,7 @@ defmodule OceanconnectWeb.AuctionView do
       type in @events_for_barges ->
         barge_name_for_event(event)
 
-      type in @events_with_bid_data ->
+      type in @events_with_product_data ->
         product_name_for_event(event)
 
       true ->
@@ -118,6 +124,15 @@ defmodule OceanconnectWeb.AuctionView do
 
   def product_name_for_event(%AuctionEvent{
         data: %{bid: %AuctionBid{fuel_id: fuel_id}}
+      }) do
+    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, fuel_id) do
+      name
+    else
+      _ -> ""
+    end
+  end
+  def product_name_for_event(%AuctionEvent{
+        data: %{product: fuel_id}
       }) do
     with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, fuel_id) do
       name
