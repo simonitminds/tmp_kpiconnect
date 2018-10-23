@@ -63,15 +63,15 @@ export default class SolutionDisplay extends React.Component {
     const isExpanded = this.state.expanded;
 
     const solutionTitle = () => {
-      if(title) {
-        return title;
-      } else if(isSingleSupplier) {
+      if(isSingleSupplier) {
         return solutionSuppliers[0];
       } else {
         return (
           <span>
             <span className="split-offer-indicator">Split Offer </span>
-            ({ _.join(solutionSuppliers, ", ") })
+            <span className="has-text-gray-3">
+              ({ _.join(solutionSuppliers, ", ") })
+            </span>
           </span>
         );
       }
@@ -117,13 +117,15 @@ export default class SolutionDisplay extends React.Component {
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title is-inline-block" onClick={this.toggleExpanded.bind(this)}>
+          <h3 className="auction-solution__title" onClick={this.toggleExpanded.bind(this)}>
             {isExpanded ?
               <i className="fas fa-minus has-padding-right-md"></i>:
               <i className="fas fa-plus has-padding-right-md"></i>
             }
-
-            {solutionTitle()}
+            <span class="is-inline-block">
+              <span className="auction-solution__title__category">{title}</span>
+              <span className="auction-solution__title__description">{solutionTitle()}</span>
+            </span>
           </h3>
           <div className="auction-solution__content">
             <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>

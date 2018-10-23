@@ -12,17 +12,16 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
-  const lowestBid = _.chain(auctionPayload).get('lowest_bids').first().value();
-  const lowestBidCount = _.get(auctionPayload, 'lowest_bids.length');
-  const winningBid = _.get(auctionPayload, 'winning_bid');
+  const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
+  const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
 
   const confirmCancellation = () => { return confirm('Are you sure you want to cancel this auction?') ? window.open(`/auctions/${auction.id}/cancel`) : false; };
 
   const lowestBidMessage = () => {
-    if (winningBid) {
+    if (winningSolution) {
       return (
         <div className="card-content__best-bidder card-content__best-bidder--winner">
-          <div className="card-content__best-bidder__name">Winner: {winningBid.supplier}</div>
+          <div className="card-content__best-bidder__name">Winner: {winningSolution.supplier}</div>
         </div>
       )
     } else if (auctionStatus == 'expired') {
@@ -31,16 +30,12 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <div className="card-content__best-bidder__name">No offer was selected</div>
         </div>
       )
-    } else if (lowestBid && lowestBidCount == 1) {
+    } else if (bestSolution) {
+
+      const suppliers = _.map(bestSolution.bids, "supplier");
       return (
         <div className="card-content__best-bidder">
-          <div className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}</div>
-        </div>
-      )
-    } else if (lowestBid && lowestBidCount > 1) {
-      return (
-        <div className="card-content__best-bidder">
-          <div className="card-content__best-bidder__name">Lowest Bid: {lowestBid.supplier}</div><div className="card-content__best-bidder__count">(of {lowestBidCount})</div>
+          <div className="card-content__best-bidder__name">Best Solution: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
         </div>
       )
     } else {
@@ -53,11 +48,11 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   }
 
   const bidStatusDisplay = () => {
-    if (auctionStatus != 'pending' && lowestBidCount > 0) {
+    if (auctionStatus != 'pending' && bestSolution) {
       return (
         <div className="card-content__bid-status">
           {lowestBidMessage()}
-          <div className="card-content__best-price"><strong>{ auctionStatus == 'closed' ? '' : 'Best'} Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}</div>
+          <div className="card-content__best-price"><strong>{ auctionStatus == 'closed' ? '' : 'Best'} Offer: </strong>{bestSolution.normalized_price == null ? <i>(None)</i> : `$` + formatPrice(bestSolution.normalized_price)}</div>
         </div>
       );
     } else {
