@@ -65,8 +65,9 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def has_bid_list_bids?(bid_list) do
+    bid_list_container = find_element(:css, ".qa-auction-bidlist")
     Enum.all?(bid_list, fn bid ->
-      element = find_element(:class, "qa-auction-bid-#{bid["id"]}")
+      element = find_within_element(bid_list_container, :css, ".qa-auction-bid-#{bid["id"]}")
 
       Enum.all?(bid["data"], fn {k, v} ->
         text =
