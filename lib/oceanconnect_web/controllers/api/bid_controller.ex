@@ -7,17 +7,14 @@ defmodule OceanconnectWeb.Api.BidController do
     time_entered = DateTime.utc_now()
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
-    is_traded_bid = Map.get(params, "is_traded_bid", false) == true
-
+    is_traded = Map.get(params, "is_traded_bid", false) == true
     bids_params = bids_params
-    |> Enum.reduce(%{}, fn({product_id, bid_params}, acc) ->
-      updated_bid_params = Map.put(bid_params, "is_traded_bid", is_traded_bid)
-      Map.put(acc, product_id, updated_bid_params)
-    end)
+    |> add_is_traded_to_bids(is_traded)
+    |> filter_placeable_bids()
 
     with  auction = %Auction{} <- Auctions.get_auction(auction_id),
           true <- supplier_id in Auctions.auction_supplier_ids(auction),
-          :ok <- validate_traded_bids(is_traded_bid, auction),
+          :ok <- validate_traded_bids(is_traded, auction),
           {:ok, _bids} <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
       render(conn, "show.json", %{success: true, message: "Bids successfully placed"})
     else
@@ -83,11 +80,34 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-
   defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
     case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
       true -> :ok
       false -> {:invalid_traded_bid, "Auction not accepting traded bids"}
     end
+  end
+
+  defp add_is_traded_to_bids(bids_params, is_traded) do
+    Enum.reduce(bids_params, %{}, fn({product_id, bid_params}, acc) ->
+      updated_bid_params = Map.put(bid_params, "is_traded_bid", is_traded)
+      Map.put(acc, product_id, updated_bid_params)
+    end)
+  end
+
+  defp filter_placeable_bids(bids_params) do
+    Enum.reduce(bids_params, %{}, fn({product_id, bid_params}, acc) ->
+      if bid_is_placeable(bid_params) do
+        Map.put(acc, product_id, bid_params)
+      else
+        acc
+      end
+    end)
+  end
+
+  defp bid_is_placeable(%{"amount" => amount, "min_amount" => min_amount}) do
+    amount_is_empty = (amount == "" || amount == nil)
+    min_amount_is_empty = (min_amount == "" || min_amount == nil)
+
+    !(amount_is_empty && min_amount_is_empty)
   end
 end

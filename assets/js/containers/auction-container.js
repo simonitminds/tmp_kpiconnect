@@ -49,6 +49,7 @@ const mapDispatchToProps = (dispatch) => ({
     }, {});
 
     const elements = ev.target.elements;
+    _.forEach(elements, (e) => e.value = "");
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
