@@ -14,7 +14,11 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
   const is_traded_bid = _.get(auctionPayload, 'bid_history[0].is_traded_bid');
 
   const renderProduct = ({id: productId, name}, auctionPayload) => {
-    const existingBid = _.get(auctionPayload, `product_bids[${productId}].bid_history[0]`);
+    const existingBid = _.chain(auctionPayload)
+      .get(`product_bids[${productId}].bid_history`)
+      .filter('active')
+      .first()
+      .value();
     const currentBidAmount = _.get(existingBid, `amount`);
     const minimumBidAmount = _.get(existingBid, `min_amount`);
     const vesselFuels = _.chain(auctionPayload)

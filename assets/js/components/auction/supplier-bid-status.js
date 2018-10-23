@@ -5,6 +5,7 @@ import { quickOrdinal } from '../../utilities';
 const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const supplierIdInt = parseInt(supplierId);
   const bidList = _.get(auctionPayload, 'bid_history', []);
+  const hasActiveBid = (_.filter(bidList, 'active').length > 0);
 
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
@@ -67,7 +68,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         {messageDisplay("Your connection to the server has been lost")}
       </div>
     )
-  } else if (bidList.length == 0) {
+  } else if (!hasActiveBid) {
     return (
       <div className="auction-notification box is-warning">
         {messageDisplay("You have not bid on this auction")}

@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
               fuel_id: nil,
               lowest_bids: [],
               minimum_bids: [],
-              bids: %{},
+              bids: [],
               active_bids: [],
               inactive_bids: []
 
@@ -375,6 +375,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     previous_state
   end
 
+  defp replay_event(%AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}}, previous_state) do
+    revoke_supplier_bids(previous_state, product, supplier_id)
+  end
+
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
 
   defp replay_event(
@@ -504,7 +508,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          product_id,
          supplier_id
       ) do
-    product_state = product_bids[product_id] || ProductBidState.for_product(product_id, auction_id)
+    product_state = product_bids["#{product_id}"] || ProductBidState.for_product(product_id, auction_id)
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)
 
