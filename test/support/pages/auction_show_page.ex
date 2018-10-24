@@ -116,6 +116,13 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click()
   end
 
+  def revoke_bid_for_product(product_id) do
+    find_element(:css, ".qa-auction-product-#{product_id}-revoke")
+    |> click()
+
+    Hound.Helpers.Dialog.accept_dialog()
+  end
+
   def winning_bid_amount() do
     find_element(:css, ".qa-winning-bid-amount")
     |> inner_text()

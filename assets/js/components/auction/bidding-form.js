@@ -38,7 +38,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
           { existingBid &&
-            <button className="button is-primary" onClick={confirmBidCancellation}>Revoke</button>
+            <button className={`button is-primary qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation}>Revoke</button>
           }
         </div>
         <div className="column">
