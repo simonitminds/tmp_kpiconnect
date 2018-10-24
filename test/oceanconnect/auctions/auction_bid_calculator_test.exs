@@ -816,6 +816,48 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert [{2.00, ^supplier1}, {2.00, ^supplier2}] = lowest_bids
     end
 
+    test "with differing lowest bids", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 500.00,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: nil,
+        min_amount: 510.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [],
+        minimum_bids: [],
+        active_bids: [],
+        bids: []
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier1_bid1, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid1, :open)
+
+      lowest_bids = Enum.map(state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{500.00, ^supplier1}, {510.00, ^supplier2}] = lowest_bids
+    end
 
     test "revoking an auto bid invalidates that bid", %{
       auction: auction,

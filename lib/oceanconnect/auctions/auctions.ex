@@ -119,7 +119,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   defp convert_currency_input(""), do: nil
-  defp convert_currency_input(amount) when is_float(amount), do: amount
+  defp convert_currency_input(amount) when is_number(amount), do: amount
   defp convert_currency_input(amount) do
     {float_amount, _} = Float.parse(amount)
     float_amount

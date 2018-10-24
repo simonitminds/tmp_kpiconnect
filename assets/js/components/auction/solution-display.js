@@ -122,7 +122,7 @@ export default class SolutionDisplay extends React.Component {
               <i className="fas fa-minus has-padding-right-md"></i>:
               <i className="fas fa-plus has-padding-right-md"></i>
             }
-            <span class="is-inline-block">
+            <span className="is-inline-block">
               <span className="auction-solution__title__category">{title}</span>
               <span className="auction-solution__title__description">{solutionTitle()}</span>
             </span>
