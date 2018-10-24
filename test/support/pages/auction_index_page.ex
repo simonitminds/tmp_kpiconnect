@@ -67,19 +67,4 @@ defmodule Oceanconnect.AuctionIndexPage do
       {:error, _} -> false
     end
   end
-
-  def open_messaging_window do
-    find_element(:css, ".qa-auction-messaging")
-    |> click()
-  end
-
-  def has_participating_auctions?(auctions) do
-    Enum.all?(auctions, fn auction ->
-      text = find_element(:css, ".qa-auction-messaging-auctions")
-      |> find_within_element(:css, ".qa-auction-messaging-auction-#{auction.id}")
-      |> inner_text
-
-      text =~ auction.vessel.name
-    end)
-  end
 end

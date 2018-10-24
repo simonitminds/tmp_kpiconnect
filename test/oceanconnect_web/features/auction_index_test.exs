@@ -114,7 +114,7 @@ defmodule Oceanconnect.AuctionIndexTest do
 
       login_user(supplier)
       AuctionIndexPage.visit()
-      {:ok, %{auction: auction, auctions: auctions}}
+      {:ok, %{auction: auction}}
     end
 
     test "supplier can see his view of the auction card", %{auction: auction} do
@@ -134,12 +134,6 @@ defmodule Oceanconnect.AuctionIndexTest do
       assert AuctionIndexPage.auction_is_status?(auction, "open")
       :timer.sleep(400)
       assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
-    end
-
-    test "supplier can see a list of all participating auctions in the chat window", %{auctions: auctions} do
-      assert AuctionIndexPage.is_current_path?()
-      AuctionIndexPage.open_messaging_window()
-      assert AuctionIndexPage.has_participating_auctions?(auctions)
     end
   end
 end

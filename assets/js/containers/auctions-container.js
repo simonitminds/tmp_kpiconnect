@@ -8,6 +8,7 @@ import { getAllAuctionPayloads, subscribeToAuctionUpdates, subscribeToAuctionMes
 const mapStateToProps = (state) => {
   return {
     auctionPayloads: state.auctionsReducer.auctionPayloads,
+    messagingPayloads: state.messagesReducer.messagingPayloads,
     connection: state.auctionsReducer.connection
   }
 };
@@ -34,7 +35,7 @@ export class AuctionsContainer extends React.Component {
     return (
       <div>
         <AuctionsIndex {...this.props} />
-        <AuctionMessaging {...this.props} />
+        <AuctionMessaging {...this.props}/>
       </div>
     );
   }

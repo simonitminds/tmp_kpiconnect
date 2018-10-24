@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
 import {
-  CHANNEL_CONNECTED,
-  CHANNEL_DISCONNECTED,
+  AUCTION_CHANNEL_CONNECTED,
+  AUCTION_CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_PAYLOADS,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
@@ -76,13 +76,13 @@ export default function(state, action) {
         loading: false
       };
     }
-    case CHANNEL_CONNECTED: {
+    case AUCTION_CHANNEL_CONNECTED: {
       return {
         ...state,
         connection: true
       };
     }
-    case CHANNEL_DISCONNECTED: {
+    case AUCTION_CHANNEL_DISCONNECTED: {
       return {
         ...state,
         connection: false

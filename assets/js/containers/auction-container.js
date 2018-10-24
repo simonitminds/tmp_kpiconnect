@@ -8,6 +8,7 @@ import {
   getCompanyBarges,
   acceptWinningSolution,
   setPortAgent,
+  subscribeToAuctionMessaging,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
   unsubmitBargeForApproval,
@@ -100,6 +101,7 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
+    this.props.dispatch(subscribeToAuctionMessaging());
     this.props.dispatch(getCompanyBarges(window.companyId));
   }
   componentDidMount() {
@@ -111,13 +113,15 @@ export class AuctionContainer extends React.Component {
     }
   }
 
-
   render() {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return <AuctionShow {...this.props}/>;
-      return <AuctionMessaging/>;
+      return (
+        <div>
+          <AuctionShow {...this.props}/>
+        </div>
+      );
     }
   }
 }

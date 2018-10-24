@@ -29,12 +29,7 @@ defmodule OceanconnectWeb.AuctionsChannel do
     case authed do
       {:ok, authed_socket} ->
         company_id = Guardian.Phoenix.Socket.current_resource(authed_socket).company_id
-
-        if company_id == String.to_integer(id) do
-          true
-        else
-          false
-        end
+        if company_id == String.to_integer(id), do: true, else: false
 
       {:error, _reason} ->
         false

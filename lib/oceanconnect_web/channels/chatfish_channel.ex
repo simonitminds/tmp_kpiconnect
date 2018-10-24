@@ -1,16 +1,37 @@
 defmodule OceanconnectWeb.ChatfishChannel do
   use OceanconnectWeb, :channel
 
-  def join("user_messaging", params, socket) do
-    case authenticated_company(socket, params) do
-      {:ok, company_id} ->
-        send(self, {:list_auctions})
-        {:ok, assign(socket, :company_id, company_id)}
+  def join("user_messaging:" <> id, payload, socket) do
+    IO.inspect "HERE"
+    if authorized?(socket, id, payload) do
+      {:ok, socket}
+    else
+      {:error, %{reason: "unauthorized"}}
+    end
+    # case authenticated_company(socket, params) do
+    #   {:ok, company_id} ->
+    #     send(self, {:list_auctions})
+    #     {:ok, assign(socket, :company_id, company_id)}
+    #
+    #   {:error, _reason} ->
+    #     {:error, %{reason: "could not load company id"}}
+    # end
+  end
+
+  defp authorized?(socket, id, %{"token" => token}) do
+    authed = Guardian.Phoenix.Socket.authenticate(socket, Oceanconnect.Guardian, token)
+
+    case authed do
+      {:ok, authed_socket} ->
+        company_id = Guardian.Phoenix.Socket.current_resource(authed_socket).company_id
+        if company_id == String.to_integer(id), do: true, else: false
 
       {:error, _reason} ->
-        {:error, %{reason: "could not load company id"}}
+        false
     end
   end
+
+  defp authorized?(_, _, _), do: false
 
   def handle_info({:list_auctions}, socket) do
     company_id = socket.assigns[:company_id]

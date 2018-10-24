@@ -4,21 +4,24 @@ import thunk from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
 import {
-  CHANNEL_CONNECTED,
-  CHANNEL_DISCONNECTED,
+  AUCTION_CHANNEL_CONNECTED,
+  AUCTION_CHANNEL_DISCONNECTED,
+  DESELECT_ALL_SUPPLIERS,
+  MESSAGING_CHANNEL_CONNECTED,
+  MESSAGING_CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_COMPANY_BARGES,
+  RECEIVE_MESSAGE_PAYLOADS,
+  RECEIVE_SUPPLIERS,
+  SELECT_ALL_SUPPLIERS,
+  SELECT_PORT,
+  TOGGLE_SUPPLIER,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
   UPDATE_DATE,
   UPDATE_INFORMATION,
-  TOGGLE_SUPPLIER,
-  SELECT_ALL_SUPPLIERS,
-  DESELECT_ALL_SUPPLIERS,
-  SELECT_PORT,
-  RECEIVE_SUPPLIERS,
-  MESSAGING_AUCTION_LIST,
+  UPDATE_MESSAGE_PAYLOAD
 } from "./constants";
 
 let auctionChannel, messagingChannel, socket;
@@ -27,7 +30,7 @@ if(window.userToken && window.userToken != "" && window.companyId && window.comp
   socket.connect();
 
   auctionChannel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
-  messagingChannel = socket.channel('user_messaging', {token: window.userToken});
+  messagingChannel = socket.channel(`user_messaging:${window.companyId}`, {token: window.userToken});
 };
 
 const defaultHeaders = {
@@ -42,16 +45,18 @@ export function subscribeToAuctionMessaging() {
     messagingChannel.join()
       .receive("ok", resp => {
         console.log("Joined chat successfully", resp);
+        dispatch({type: MESSAGING_CHANNEL_CONNECTED});
+        dispatch(getAllMessagePayloads());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     messagingChannel.on("auction_list", payload => {
-      dispatch({type: MESSAGING_AUCTION_LIST, messagingPayload: payload});
+      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagingPayloads: payload});
     });
 
     messagingChannel.onError( () => {
       const { connection } = getState().auctionsReducer;
-      if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
+      if (connection) {dispatch({type: MESSAGING_CHANNEL_DISCONNECTED})};
     });
   };
 }
@@ -61,7 +66,7 @@ export function subscribeToAuctionUpdates() {
     auctionChannel.join()
       .receive("ok", resp => {
         console.log("Joined successful", resp);
-        dispatch({type: CHANNEL_CONNECTED});
+        dispatch({type: AUCTION_CHANNEL_CONNECTED});
         dispatch(getAllAuctionPayloads());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
@@ -72,7 +77,7 @@ export function subscribeToAuctionUpdates() {
 
     auctionChannel.onError( () => {
       const { connection } = getState().auctionsReducer;
-      if (connection) {dispatch({type: CHANNEL_DISCONNECTED})};
+      if (connection) {dispatch({type: AUCTION_CHANNEL_DISCONNECTED})};
     });
   };
 }
@@ -84,6 +89,17 @@ export function getAllAuctionPayloads() {
       .then(parseJSON)
       .then((response) => {
         return dispatch(receiveAuctionPayloads(response.data));
+      });
+  };
+}
+
+export function getAllMessagePayloads() {
+  return dispatch => {
+    fetch('/api/auctions', { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveMessagePayloads(response.data));
       });
   };
 }
@@ -242,6 +258,11 @@ export function updateBidStatus(auctionId, response) {
 export function receiveAuctionPayloads(auctionPayloads) {
   return {type: RECEIVE_AUCTION_PAYLOADS,
           auctionPayloads: auctionPayloads};
+}
+
+export function receiveMessagePayloads(messagePayloads) {
+  return {type: RECEIVE_MESSAGE_PAYLOADS,
+          messagePayloads: messagePayloads};
 }
 
 export function receiveSuppliers(port, suppliers) {

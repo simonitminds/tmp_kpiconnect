@@ -32,7 +32,7 @@ const messagingToggle = () => {
 };
 
 const filteredAuctionsPayloads = () => {
-  return _.filter(this.props.messagingPayload, (auctionPayload) => {
+  return _.filter(this.props.messagingPayloads, (auctionPayload) => {
     _.includes(["pending", "open", "decision", "closed"], auctionPayload.status);
   });
 }
@@ -41,7 +41,7 @@ const filteredAuctionsCount = () => {
   return filteredAuctionsPayloads().length;
 }
 
-const AuctionMessaging = ({messagingPayload}) => {
+const AuctionMessaging = ({messagingPayloads}) => {
   return(
     <div className="messaging qa-auction-messaging">
       <div className="messaging__notification-context">
