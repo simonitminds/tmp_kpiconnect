@@ -73,7 +73,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
       </div>
     )
-  } else if (!hasActiveBid) {
+  } else if (auctionStatus == "open" && !hasActiveBid) {
     return (
       <div className="auction-notification box is-warning">
         <div className="auction-notification__show-message">

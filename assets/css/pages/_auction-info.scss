@@ -334,3 +334,30 @@
     font-family: $family-sans-serif;
   }
 }
+
+.revoke-bid__status {
+  font-family: $family-sans-serif;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.revoke-bid__button {
+  position: relative;
+  background-color: $gray-2 !important;
+  &:hover, &:focus {
+    background-color: darken($gray-2, 5%) !important;
+
+    &:after {
+      display: block;
+      position: absolute;
+      content: "Revoke Bid";
+      background-color: $black;
+      color: $white;
+      border-radius: $radius;
+      padding: 0.25rem 0.5rem;
+      top: -2rem;
+      text-transform: capitalize;
+      font-family: $family-sans-serif;
+      font-size: 0.75rem;
+    }
+  }
+}
