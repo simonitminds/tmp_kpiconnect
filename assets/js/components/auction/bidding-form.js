@@ -38,9 +38,19 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
           { existingBid &&
-            <button className={`button is-primary qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation}>Revoke</button>
+            <div className="tags has-addons has-margin-top-xs">
+              <div className="tag is-success"><i className="fas fa-check"></i></div>
+              <div className="tag is-white">Bid Active</div>
+              <button className={`tag is-gray-2 qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation}><i className="fas fa-undo"></i></button>
+            </div>
           }
-        </div>
+          { !existingBid &&
+            <div className="tags has-addons has-margin-top-xs">
+              <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
+              <div className="tag is-white">No Active Bid</div>
+            </div>
+          }
+      </div>
         <div className="column">
           <div className="columns is-desktop">
             <div className="column">
