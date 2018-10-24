@@ -19,9 +19,10 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
 
   const lowestBidMessage = () => {
     if (winningSolution) {
+      const suppliers = _.map(winningSolution.bids, "supplier");
       return (
         <div className="card-content__best-bidder card-content__best-bidder--winner">
-          <div className="card-content__best-bidder__name">Winner: {winningSolution.supplier}</div>
+          <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
         </div>
       )
     } else if (auctionStatus == 'expired') {
@@ -31,7 +32,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
       )
     } else if (bestSolution) {
-
       const suppliers = _.map(bestSolution.bids, "supplier");
       return (
         <div className="card-content__best-bidder">
