@@ -50,7 +50,7 @@ export function subscribeToAuctionMessaging() {
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
-    messagingChannel.on("auction_list", payload => {
+    messagingChannel.on("messages_update", payload => {
       dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagingPayloads: payload});
     });
 

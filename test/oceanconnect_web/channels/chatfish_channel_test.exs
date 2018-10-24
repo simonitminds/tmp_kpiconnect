@@ -1,7 +1,6 @@
 defmodule OceanconnectWeb.ChatfishChannelTest do
   use OceanconnectWeb.ChannelCase
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Accounts
+  alias Oceanconnect.{Accounts, Auctions}
   alias OceanconnectWeb.ChatfishChannel
 
 
@@ -30,13 +29,13 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users}
   end
 
-  test "supplier can see a list of auctions that they are a participant in", %{
+  test "supplier can only see messages between them and buyer for auctions they participate in", %{
     auction: auction,
     auction2: auction2,
     supplier_users: [supplier_user | _]
   } do
-    channel = "user_messaging"
-    event = "auction_list"
+    channel = "user_messaging:#{Integer.to_string(supplier_user.company_id)}"
+    event = "messages_update"
 
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier_user)
 
@@ -46,16 +45,17 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     auction_id = auction.id
     auction2_id = auction2.id
     receive do
-      %Phoenix.Socket.Message{
+      %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          auctions: auction_payloads
+          message_payloads: message_payloads
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(auction_payloads, &(&1.auction.id))
-        assert Enum.member?(auction_ids, auction_id)
-        refute Enum.member?(auction_ids, auction2_id)
+        assert message_payloads == ["supplier"]
+        # auction_ids = Enum.map(message_payloads, &(&1.auction_id))
+        # assert Enum.member?(auction_ids, auction_id)
+        # refute Enum.member?(auction_ids, auction2_id)
 
     after 5000 ->
         assert false, "Expected message received nothing."
@@ -63,9 +63,13 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
   end
 
 
-  test "buyer can see a list of auctions that they are the buyer for", %{auction: auction, auction2: auction2, buyer_users: [buyer_user | _]} do
-    channel = "user_messaging"
-    event = "auction_list"
+  test "buyer can see all buyer to supplier messages for their auctions", %{
+    auction: auction,
+    auction2: auction2,
+    buyer_users: [buyer_user | _]
+  } do
+    channel = "user_messaging:#{Integer.to_string(buyer_user.company_id)}"
+    event = "messages_update"
 
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer_user)
     {:ok, _, _socket} =
@@ -74,16 +78,17 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     auction_id = auction.id
     auction2_id = auction2.id
     receive do
-      %Phoenix.Socket.Message{
+      %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          auctions: auction_payloads
+          message_payloads: message_payloads
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(auction_payloads, &(&1.auction.id))
-        assert Enum.member?(auction_ids, auction_id)
-        assert Enum.member?(auction_ids, auction2_id)
+        assert message_payloads == ["buyer", "buyer"]
+        # auction_ids = Enum.map(message_payloads, &(&1.auction_id))
+        # assert Enum.member?(auction_ids, auction_id)
+        # assert Enum.member?(auction_ids, auction2_id)
     after 5000 ->
         assert false, "Expected message received nothing."
     end
