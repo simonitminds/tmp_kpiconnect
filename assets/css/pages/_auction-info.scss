@@ -268,6 +268,22 @@
   }
 }
 
+.auction-bidding {
+  max-height: 93vh;
+
+  .body--admin & {
+    max-height: 85vh;
+  }
+}
+
+.auction-bidding__form-body {
+  @media(max-width: 768px) {
+    max-height: 70vh;
+    overflow-y: scroll;
+    padding-bottom: 1.5rem;
+  }
+}
+
 .auction-bidding.box {
   background-color: $gray-1;
 }
