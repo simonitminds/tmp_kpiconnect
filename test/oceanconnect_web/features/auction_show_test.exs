@@ -291,7 +291,7 @@ defmodule Oceanconnect.AuctionShowTest do
           }
         end)
 
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
+      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
     end
   end
 
