@@ -38,6 +38,9 @@ $info: $gray-1;
 
 //// Associated Utilities
 
+.is-white{
+  background-color: $white !important;
+}
 .is-gray-0 {
   background-color: $gray-0 !important;
 }

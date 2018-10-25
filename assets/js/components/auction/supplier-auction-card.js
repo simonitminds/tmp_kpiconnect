@@ -5,7 +5,7 @@ import { formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 import AuctionTimeRemaining from './auction-time-remaining';
 
-const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
+const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
@@ -16,8 +16,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
 
   const bidStatusDisplay = () => {
     const lowestBid = _.chain(auctionPayload)
-      .get('lowest_bids')
-      .first()
+      .get('solutions.best_overall')
       .value();
 
     if (lowestBid && auctionStatus != 'pending') {
@@ -26,7 +25,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection}) => {
           <div className="card-content__bid-status">
             <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
             <div className="card-content__best-price">
-              <strong>Best Offer: </strong>{lowestBid.amount == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.amount)}
+              <strong>Best Offer: </strong>{lowestBid.normalized_price == null ? <i>(None)</i> : `$` + formatPrice(lowestBid.normalized_price)}
             </div>
           </div>
 {/*

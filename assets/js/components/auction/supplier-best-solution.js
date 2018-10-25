@@ -32,8 +32,8 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId}) => {
           { suppliersBestSolution &&
             <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} title="Your Best Offer" />
           }
-          { !anySolutionExists &&
-            <div class="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
+          { !suppliersBestSolution &&
+            <div className="auction-table-placeholder"><i>You have not bid on this auction</i></div>
           }
         </div>
       </div>

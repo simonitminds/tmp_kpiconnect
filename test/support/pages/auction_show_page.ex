@@ -65,8 +65,9 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def has_bid_list_bids?(bid_list) do
+    bid_list_container = find_element(:css, ".qa-auction-bidlist")
     Enum.all?(bid_list, fn bid ->
-      element = find_element(:class, "qa-auction-bid-#{bid["id"]}")
+      element = find_within_element(bid_list_container, :css, ".qa-auction-bid-#{bid["id"]}")
 
       Enum.all?(bid["data"], fn {k, v} ->
         text =
@@ -113,6 +114,13 @@ defmodule Oceanconnect.AuctionShowPage do
   def submit_bid() do
     find_element(:css, ".qa-auction-bid-submit")
     |> click()
+  end
+
+  def revoke_bid_for_product(product_id) do
+    find_element(:css, ".qa-auction-product-#{product_id}-revoke")
+    |> click()
+
+    Hound.Helpers.Dialog.accept_dialog()
   end
 
   def winning_bid_amount() do

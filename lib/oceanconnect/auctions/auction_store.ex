@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
               fuel_id: nil,
               lowest_bids: [],
               minimum_bids: [],
-              bids: %{},
+              bids: [],
               active_bids: [],
               inactive_bids: []
 
@@ -231,6 +231,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
+        {:revoke_supplier_bids, %{product: product, supplier_id: supplier_id, user: user}, emit},
+        current_state = %{auction_id: auction_id}
+      ) do
+    new_state = revoke_supplier_bids(current_state, product, supplier_id)
+    AuctionEvent.emit(AuctionEvent.bids_revoked(auction_id, product, supplier_id, new_state, user), emit)
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
         {:select_winning_solution, %{solution: solution = %Solution{}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
@@ -366,6 +375,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     previous_state
   end
 
+  defp replay_event(%AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}}, previous_state) do
+    revoke_supplier_bids(previous_state, product, supplier_id)
+  end
+
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
 
   defp replay_event(
@@ -488,6 +501,21 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
     new_state = SolutionCalculator.process(new_state, auction)
     {new_product_state, events, new_state}
+  end
+
+  defp revoke_supplier_bids(
+         current_state = %{auction_id: auction_id, product_bids: product_bids},
+         product_id,
+         supplier_id
+      ) do
+    product_state = product_bids["#{product_id}"] || ProductBidState.for_product(product_id, auction_id)
+    new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
+    new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)
+
+    # TODO: Not this
+    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    new_state = SolutionCalculator.process(new_state, auction)
+    new_state
   end
 
   defp select_winning_solution(solution = %Solution{}, current_state = %{auction_id: auction_id}) do

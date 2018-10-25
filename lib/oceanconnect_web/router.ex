@@ -31,6 +31,7 @@ defmodule OceanconnectWeb.Router do
     pipe_through(:authenticated)
     get("/auctions", AuctionController, :index, as: :auction_api)
     post("/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api)
+    post("/auctions/:auction_id/revoke_bid", BidController, :revoke, as: :auction_bid_api)
     post("/auctions/:auction_id/port_agent", PortAgentController, :update, as: :port_agent_api)
 
     post(

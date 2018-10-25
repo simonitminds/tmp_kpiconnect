@@ -19,11 +19,21 @@
 
   .auction-solution__header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
   }
   .auction-solution__title {
+    display: flex;
+    align-items: baseline;
     font-weight: 700;
+  }
+  .auction-solution__title__category {
+    &:not(:empty) {
+      & + .auction-solution__title__description:not(:empty):before {
+        // Provide colon between offer category and suppliers
+        content: ": "
+      }
+    }
   }
   .auction-solution__content {
     margin-left: auto;

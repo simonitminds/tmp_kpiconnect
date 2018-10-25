@@ -430,6 +430,41 @@ defmodule Oceanconnect.AuctionsTest do
       assert hd(product_payload.bid_history).id == bid.id
       assert hd(product_payload.lowest_bids).id == bid.id
     end
+
+    test "revoke_supplier_bids_for_product/4 enters bid in bid_list and runs lowest_bid logic", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier_company: supplier_company
+    } do
+      create_bid(1.50, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid()
+      :timer.sleep(100)
+
+      Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
+      product_payload = auction_payload.product_bids["#{fuel_id}"]
+
+      # `bid_history` still contains the bid for auditing, but it is not in
+      # `lowest_bids` because it is inactive.
+      assert length(product_payload.bid_history) == 1
+      assert length(product_payload.lowest_bids) == 0
+    end
+
+    test "revoke_supplier_bids_for_product/4 fails when auction is in decision", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier_company: supplier_company
+    } do
+      create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid()
+
+      Auctions.end_auction(auction)
+      :timer.sleep(50)
+
+      result = Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+      assert {:error, :late_bid} = result
+    end
   end
 
   describe "ports" do
@@ -1147,11 +1182,10 @@ defmodule Oceanconnect.AuctionsTest do
       inactive_barge: inactive_barge,
       barge_with_no_supplier: barge2
     } do
-      assert Enum.map(Auctions.list_barges(), fn b -> b.id end) == [
-               barge.id,
-               inactive_barge.id,
-               barge2.id
-             ]
+      barge_ids = Enum.map(Auctions.list_barges(), fn b -> b.id end)
+      assert barge.id in barge_ids
+      assert inactive_barge.id in barge_ids
+      assert barge2.id in barge_ids
     end
 
     test "list_barges/1 returns a paginated list of all barges", %{
@@ -1160,7 +1194,10 @@ defmodule Oceanconnect.AuctionsTest do
       barge_with_no_supplier: barge2
     } do
       page = Auctions.list_barges(%{})
-      assert Enum.map(page.entries, fn b -> b.id end) == [barge2.id, barge.id, inactive_barge.id]
+      barge_ids = Enum.map(page.entries, fn b -> b.id end)
+      assert barge2.id in barge_ids
+      assert barge.id in barge_ids
+      assert inactive_barge.id in barge_ids
     end
 
     test "list_active_barges/0 returns all barges marked as active", %{
@@ -1168,12 +1205,12 @@ defmodule Oceanconnect.AuctionsTest do
       inactive_barge: inactive_barge,
       barge_with_no_supplier: barge2
     } do
-      assert Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [barge.id, barge2.id]
+      barge_ids = Enum.map(Auctions.list_active_barges(), fn b -> b.id end)
 
-      refute Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [
-               barge.id,
-               inactive_barge.id
-             ]
+      assert barge.id in barge_ids
+      assert barge2.id in barge_ids
+
+      refute inactive_barge.id in barge_ids
     end
 
     test "get_barge!/1 returns the barge with given id", %{barge: barge} do

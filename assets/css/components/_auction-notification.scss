@@ -198,7 +198,7 @@
 
 .auction-notification__show-message {
   display: block;
-  
+
  .card-content__bid-status & {
    display: none;
  }
@@ -206,6 +206,9 @@
 
 .auction-notification__card-message {
   display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 
   .auction-lowest-bid  &{
     display: none;
