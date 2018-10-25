@@ -1182,11 +1182,10 @@ defmodule Oceanconnect.AuctionsTest do
       inactive_barge: inactive_barge,
       barge_with_no_supplier: barge2
     } do
-      assert Enum.map(Auctions.list_barges(), fn b -> b.id end) == [
-               barge.id,
-               inactive_barge.id,
-               barge2.id
-             ]
+      barge_ids = Enum.map(Auctions.list_barges(), fn b -> b.id end)
+      assert barge.id in barge_ids
+      assert inactive_barge.id in barge_ids
+      assert barge2.id in barge_ids
     end
 
     test "list_barges/1 returns a paginated list of all barges", %{
@@ -1195,7 +1194,10 @@ defmodule Oceanconnect.AuctionsTest do
       barge_with_no_supplier: barge2
     } do
       page = Auctions.list_barges(%{})
-      assert Enum.map(page.entries, fn b -> b.id end) == [barge2.id, barge.id, inactive_barge.id]
+      barge_ids = Enum.map(page.entries, fn b -> b.id end)
+      assert barge2.id in barge_ids
+      assert barge.id in barge_ids
+      assert inactive_barge.id in barge_ids
     end
 
     test "list_active_barges/0 returns all barges marked as active", %{
@@ -1203,12 +1205,12 @@ defmodule Oceanconnect.AuctionsTest do
       inactive_barge: inactive_barge,
       barge_with_no_supplier: barge2
     } do
-      assert Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [barge.id, barge2.id]
+      barge_ids = Enum.map(Auctions.list_active_barges(), fn b -> b.id end)
 
-      refute Enum.map(Auctions.list_active_barges(), fn b -> b.id end) == [
-               barge.id,
-               inactive_barge.id
-             ]
+      assert barge.id in barge_ids
+      assert barge2.id in barge_ids
+
+      refute inactive_barge.id in barge_ids
     end
 
     test "get_barge!/1 returns the barge with given id", %{barge: barge} do
