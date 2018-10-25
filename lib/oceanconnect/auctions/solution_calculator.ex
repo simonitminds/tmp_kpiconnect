@@ -9,11 +9,13 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
 
   def process(current_state = %AuctionState{product_bids: product_bids}, auction = %Auction{}) do
     best_by_supplier = best_solutions_by_supplier(product_bids, auction)
+    best_single_supplier = calculate_solution(product_bids, auction, :best_single_supplier, supplier_solutions: best_by_supplier)
+    best_overall = calculate_solution(product_bids, auction, :best_overall, best_single_supplier: best_single_supplier)
 
     solution_state = %__MODULE__{
-      best_overall: calculate_solution(product_bids, auction, :best_overall),
       best_by_supplier: best_by_supplier,
-      best_single_supplier: calculate_solution(product_bids, auction, :best_single_supplier, supplier_solutions: best_by_supplier)
+      best_single_supplier: best_single_supplier,
+      best_overall: best_overall
     }
 
     Map.put(current_state, :solutions, solution_state)
@@ -26,22 +28,29 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     supplier_solutions
     |> Map.values()
     |> Enum.filter(&(&1.valid))
-    |> Enum.sort_by(&({&1.total_price, DateTime.to_unix(&1.latest_time_entered, :microsecond)}))
-    |> Enum.at(0, %Solution{valid: false}) # list may be empty, so avoid `hd` and return `nil` instead.
+    |> Enum.sort_by(&solution_tuple/1)
+    |> Enum.at(0, %Solution{valid: false}) # list may be empty, so avoid `hd` and return a blank solution instead.
   end
 
-  # Best overall solution is the combination of the lowest bids for each fuel.
-  defp calculate_solution(product_bids, auction, :best_overall) do
+  # Best overall solution is the combination of the lowest bids for each fuel,
+  # respecting supplier's do_not_split requests.
+  defp calculate_solution(product_bids, auction, :best_overall, best_single_supplier: best_single_supplier) do
     solution_bids = product_bids
     |> Enum.map(fn({_product_id, bid_state}) ->
-      Enum.at(bid_state.lowest_bids, 0)
+      bid_state.lowest_bids
+      |> Enum.reject(&(&1.do_not_split))
+      |> Enum.at(0)
     end)
     |> Enum.filter(&(&1))
 
-    case solution_bids do
-      [] -> %Solution{valid: false}
-      bids -> Solution.from_bids(bids, product_bids, auction)
-    end
+    best_split =
+      case solution_bids do
+        [] -> %Solution{valid: false}
+        bids -> Solution.from_bids(bids, product_bids, auction)
+      end
+
+    [best_split, best_single_supplier]
+    |> Enum.min_by(&solution_tuple/1)
   end
 
   # Returns a map of single supplier solutions keyed by the supplier's id.
@@ -61,5 +70,17 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     Enum.reduce(lowest_bids_by_supplier, %{}, fn({supplier_id, bids}, acc) ->
       Map.put(acc, supplier_id, Solution.from_bids(bids, product_bids, auction))
     end)
+  end
+
+  def solution_tuple(solution) do
+    # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.
+    valid_indicator = if solution.valid, do: 0, else: 1
+    latest_time_entered =
+      if solution.latest_time_entered do
+        DateTime.to_unix(solution.latest_time_entered, :microsecond)
+      else
+        DateTime.utc_now()
+      end
+    {valid_indicator, solution.total_price, latest_time_entered}
   end
 end

@@ -100,6 +100,11 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click()
   end
 
+  def mark_as_do_not_split do
+    find_element(:css, ".qa-auction-bid-do_not_split")
+    |> click()
+  end
+
   def fill_form_element(:additional_charges, element, _type, _value) do
     element |> click
   end

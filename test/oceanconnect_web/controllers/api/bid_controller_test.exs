@@ -188,6 +188,20 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
              }
     end
 
+    test "creating a non-splittable bid", %{
+      auction: auction,
+      conn: conn,
+      bid_params: params
+    } do
+      params = put_in(params["do_not_split"], true)
+      conn = create_post(conn, auction, params)
+
+      assert json_response(conn, 200) == %{
+               "success" => true,
+               "message" => "Bids successfully placed"
+             }
+    end
+
     test "creating a bid for an auction in decision", %{
       auction: auction,
       conn: conn,

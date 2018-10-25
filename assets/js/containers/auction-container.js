@@ -52,7 +52,8 @@ const mapDispatchToProps = (dispatch) => ({
     _.forEach(elements, (e) => e.value = "");
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
-      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
+      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked,
+      "do_not_split": elements && elements.do_not_split && elements.do_not_split.checked
     }));
   },
   revokeSupplierBid(auctionId, productId) {
