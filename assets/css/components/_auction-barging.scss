@@ -49,12 +49,6 @@
     border-top-color: transparent;
   }
 
-  &.is-closed .content h2 {
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
   & .content h2 {
     transition: margin-bottom 300ms ease-in;
   }
@@ -150,7 +144,6 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     &> .content {
       display: flex;
       align-items: center;
-      // justify-content: flex-start;
     }
   }
 
@@ -167,23 +160,12 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     border-top-color: transparent;
   }
 
-  &.is-closed .content h2 {
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
   & .content h2 {
     display: flex;
-    // transition: margin-bottom 300ms ease-in;
     margin: 0.5rem 0;
+    padding: 0.5rem 0.25rem 0.5rem 0;
   }
 
-  .collapsing-barge__barge__trigger {
-    // display: flex;
-    // align-items: center;
-    // justify-content: flex-start;
-  }
   .collapsing-barge__barge__trigger > .collapsible-section__category-icon { // Ersatz header. Probably a little brittle.
     margin-right: 0.5rem;
     font-size: 1rem;
@@ -197,6 +179,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
   .collapsing-barge__barge__trigger > .collapsible-section__title { // Ersatz header. Probably a little brittle.
     font-size: 1rem;
     font-weight: bold;
+    line-height: 1.3;
     text-transform: capitalize;
   }
   .collapsing-barge__barge__trigger > .collapsible-section__toggle-icon { // Toggle button. Probably a little brittle.
@@ -300,5 +283,38 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
 
   &> *:last-child {
     margin-left: auto;
+  }
+}
+
+
+@media (max-width: 1216px) and (min-width: 768px) {
+  .collapsing-barge__barge > .container > .content {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .collapsing-barge__barge__trigger {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .collapsing-barge__barge__button {
+      margin-left: 0rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .collapsing-barge__barge > .container > .content {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .collapsing-barge__barge__trigger {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .collapsing-barge__barge__button {
+      margin-left: 0rem;
+    }
   }
 }
