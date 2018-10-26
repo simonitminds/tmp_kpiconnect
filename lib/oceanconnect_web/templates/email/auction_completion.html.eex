@@ -16,16 +16,24 @@
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port:</b> <%= @auction.port.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>ETA/ETD:</b> <%= convert_date?(@auction.eta) %> / <%= convert_date?(@auction.etd) %></p>
     <br>
-    <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Deliverables</h1>
+    <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Approved Barges</h1>
+    <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
+    <ul>
+      <%= for auction_barge <- @approved_barges do %>
+        <li style="margin-top: 0.25rem;"><%= auction_barge.barge.name %></span> <span style="color: #888">(<%= auction_barge.barge.imo_number %>)</span><li>
+      <% end %>
+    </ul>
+    <br>
+    <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
       <p style="margin-top: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
       <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
       <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
+      <p style="margin-top: 0.25rem;"><b>Price:</b> <%= format_price(price_for_vessel_fuel(@winning_solution_bids, vessel_fuel.fuel.id)) %></p>
     <% end %>
     <br>
 
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Price:</b> <%= OceanconnectWeb.EmailView.format_price(@bid_amount) %> </p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Delivery:</b> Fully Delivered Price</p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Payment:</b> 30 days from date of delivery</p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Additional Information:</b> <%= @auction.additional_information %></p><br/>

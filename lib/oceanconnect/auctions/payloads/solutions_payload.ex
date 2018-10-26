@@ -84,9 +84,6 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
       | bids: Enum.map(bids, fn bid -> scrub_bid_for_supplier(bid, supplier_id) end)
     }
   end
-  defp scrub_solutions_for_supplier(solutions, supplier_id) when is_list(solutions) do
-    Enum.map(solutions, fn solution -> scrub_solution_for_supplier(solution, supplier_id) end)
-  end
 
   defp scrub_solution_for_buyer(nil, _auction), do: nil
   defp scrub_solution_for_buyer(%Solution{bids: []}, _auction), do: nil

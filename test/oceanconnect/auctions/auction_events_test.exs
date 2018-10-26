@@ -17,7 +17,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier2_company],
         auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
-        buyer: buyer_company
+        buyer: buyer_company,
+        is_traded_bid_allowed: true
       )
       |> Auctions.fully_loaded()
 
@@ -192,11 +193,11 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
              ] = AuctionEventStore.event_list(auction.id)
     end
 
-    test "selecting the winning bid", %{auction: auction = %Auction{id: auction_id}, fuel_id: fuel_id} do
+    test "selecting the winning solution", %{auction: auction = %Auction{id: auction_id}, fuel_id: fuel_id} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
-      bid = create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+      bid = create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction, true)
       |> Auctions.place_bid()
       Auctions.end_auction(auction)
       state = Auctions.get_auction_state!(auction)

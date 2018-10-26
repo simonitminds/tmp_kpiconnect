@@ -32,7 +32,7 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def has_anonymous_bidding_toggled?(_allowed = true) do
-    element = find_element(:css, ".qa-auction-anonymous_bidding")
+    find_element(:css, ".qa-auction-anonymous_bidding")
   end
 
   def has_anonymous_bidding_toggled?(_allowed = false) do
@@ -64,10 +64,12 @@ defmodule Oceanconnect.AuctionShowPage do
     value == text
   end
 
-  def has_bid_list_bids?(bid_list) do
-    bid_list_container = find_element(:css, ".qa-auction-bidlist")
+  def bid_list_has_bids?(company_type, bid_list) do
     Enum.all?(bid_list, fn bid ->
-      element = find_within_element(bid_list_container, :css, ".qa-auction-bid-#{bid["id"]}")
+      element =
+        :css
+        |> find_element(".qa-#{company_type}-bid-history")
+        |> find_within_element(:css, ".qa-auction-bid-#{bid["id"]}")
 
       Enum.all?(bid["data"], fn {k, v} ->
         text =
@@ -216,14 +218,6 @@ defmodule Oceanconnect.AuctionShowPage do
     Enum.filter(bid_list, fn bid -> bid.supplier_id == supplier_id end)
   end
 
-  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
-  end
-
-  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
-  end
-
   def has_available_barge?(%Oceanconnect.Auctions.Barge{name: name, imo_number: imo_number}) do
     available_barges =
       find_element(:css, ".qa-available-barges")
@@ -345,5 +339,38 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
 
     :timer.sleep(200)
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
+  end
+
+  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
+  end
+
+  defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
+    Enum.all?(suppliers, fn supplier ->
+      text =
+        find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}-name")
+        |> inner_text
+
+      supplier.name == text
+    end)
+  end
+
+  defp value_equals_element_text?(:vessels, element, vessels) when is_list(vessels) do
+    Enum.all?(vessels, fn vessel ->
+      text =
+        find_within_element(element, :css, ".qa-auction-vessel-#{vessel.id}")
+        |> inner_text
+
+      "#{vessel.name} (#{vessel.imo})" == text
+    end)
+  end
+
+  defp value_equals_element_text?(_key, element, value) do
+    text = element |> inner_text
+    value == text
   end
 end

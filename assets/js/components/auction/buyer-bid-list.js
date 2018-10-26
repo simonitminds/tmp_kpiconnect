@@ -20,13 +20,13 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
 
   if (bidList.length > 0) {
     return(
-      <div className="box">
+      <div className="box qa-buyer-bid-history">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         { _.map(products, (fuel_id) => {
-            const lowest_bids = productBids[fuel_id].lowest_bids;
+            const lowestBids = productBids[fuel_id].lowest_bids;
 
             return (
-              <table key={fuel_id} className="table is-fullwidth is-striped is-marginless qa-auction-bidlist">
+              <table key={fuel_id} className="table is-fullwidth is-striped is-marginless">
                 <thead>
                   <tr>
                     <th>{fuels[fuel_id].name}</th>
@@ -36,13 +36,19 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
                 </thead>
                 <tbody>
 
-                  { _.map(lowest_bids, ({id, amount, fuel_id, is_traded_bid, time_entered, supplier}) => {
+                  { _.map(lowestBids, ({id, amount, fuel_id, is_traded_bid, time_entered, supplier}) => {
                       return (
                         <tr key={id} className={`qa-auction-bid-${id}`}>
                           <td className="qa-auction-bid-supplier">{supplier}</td>
-                          <td>
-                            <span className="qa-auction-bid-amount">${formatPrice(amount)}</span>
-                            <span className="qa-auction-bid-is_traded_bid">{is_traded_bid && <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>}</span>
+                          <td className="qa-auction-bid-amount"><span className="auction__bid-amount">${formatPrice(amount)}</span>
+                            <span className="qa-auction-bid-is_traded_bid">
+                              {is_traded_bid &&
+                                <span className="auction__traded-bid-tag">
+                                  <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-sm auction__traded-bid-marker"></i>
+                                  Traded Bid
+                                </span>
+                              }
+                            </span>
                           </td>
                           <td>{formatTime(time_entered)}</td>
                         </tr>

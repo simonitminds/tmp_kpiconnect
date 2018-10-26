@@ -110,6 +110,9 @@ $info: $gray-1;
 .is-none { // Just a casual utility to display: none
   display: none !important;
 }
+.has-border-radius {
+  border-radius: 3px;
+}
 
 // ===== TYPOGRAPHY ===== //
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,400i');

@@ -80,8 +80,12 @@ export default class SolutionDisplay extends React.Component {
       return(
         <span>
           { bid.is_traded_bid ?
-            <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-left-sm has-text-gray-3 auction__traded-bid-marker"></i>
+            <span className="auction__traded-bid-tag">
+              <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-sm auction__traded-bid-marker"></i>
+              Traded Bid
+            </span>
           : "" }
+
         </span>
       );
     }
@@ -102,7 +106,7 @@ export default class SolutionDisplay extends React.Component {
           <td>
             { bid
               ? <span>
-                  <span className="qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
+                  <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
                   <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
                 </span>
               : <i>No bid</i>

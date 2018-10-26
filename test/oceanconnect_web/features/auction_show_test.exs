@@ -15,6 +15,7 @@ defmodule Oceanconnect.AuctionShowTest do
     supplier = insert(:user, company: supplier_company)
     supplier2 = insert(:user, company: supplier_company2)
     supplier3 = insert(:user, company: supplier_company3)
+    insert(:company, name: "Ocean Connect Marine")
 
     fuel = insert(:fuel)
     fuel_id = "#{fuel.id}"
@@ -119,24 +120,16 @@ defmodule Oceanconnect.AuctionShowTest do
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          is_traded_bid_content =
-            case bid.is_traded_bid do
-              true -> ""
-              false -> ""
-            end
+          is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
 
           %{
             "id" => bid.id,
-            "data" => %{
-              "amount" => "$#{bid.amount}",
-              "supplier" => bid.supplier,
-              "is_traded_bid" => is_traded_bid_content
-            }
+            "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier, "is_traded_bid" => is_traded_bid}
           }
         end)
 
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
+      assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_card_expectations)
     end
   end
 
@@ -176,7 +169,7 @@ defmodule Oceanconnect.AuctionShowTest do
           %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
         end)
 
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_params)
+      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_params)
       assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
@@ -206,19 +199,15 @@ defmodule Oceanconnect.AuctionShowTest do
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
-          is_traded_bid_content =
-            case bid.is_traded_bid do
-              true -> ""
-              false -> ""
-            end
+          is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
 
           %{
             "id" => bid.id,
-            "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid_content}
+            "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid}
           }
         end)
 
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
+      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
       assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
@@ -302,7 +291,7 @@ defmodule Oceanconnect.AuctionShowTest do
           }
         end)
 
-      assert AuctionShowPage.has_bid_list_bids?(bid_list_card_expectations)
+      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
     end
   end
 
@@ -397,6 +386,7 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
+        :timer.sleep(500)
         assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)

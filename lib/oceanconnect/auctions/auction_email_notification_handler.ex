@@ -5,9 +5,9 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionEvent,
-    AuctionBid,
-    AuctionNotifier,
-    AuctionStore.AuctionState
+    AuctionEmailNotifier,
+    AuctionStore.AuctionState,
+    Solution
   }
 
   @registry_name :auction_email_notification_handler_registry
@@ -26,7 +26,6 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   end
 
   # Server
-
   def init(auction_id) do
     Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     {:ok, auction_id}
@@ -35,18 +34,19 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   def handle_info(
     %AuctionEvent{
       auction_id: auction_id,
-      type: :winning_bid_selected,
+      type: :winning_solution_selected,
       data: %{
-        bid: %AuctionBid{
-          amount: bid_amount,
-          supplier_id: supplier_id,
-          is_traded_bid: is_traded_bid
+        solution: %Solution{
+          bids: winning_solution_bids
+        },
+        auction_state: %AuctionState{
+          submitted_barges: submitted_barges
         }
       }
     },
     state
   ) do
-    AuctionNotifier.notify_auction_completed(bid_amount, supplier_id, auction_id, is_traded_bid)
+    AuctionEmailNotifier.notify_auction_completed(winning_solution_bids, submitted_barges, auction_id)
     {:noreply, state}
   end
 
@@ -54,7 +54,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
     state = %AuctionState{status: :pending}
   ) do
-    AuctionNotifier.notify_auction_created(auction)
+    AuctionEmailNotifier.notify_auction_created(auction)
     {:noreply, state}
   end
 
@@ -62,7 +62,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     %AuctionEvent{type: :upcoming_auction_notified, data: auction = %Auction{}},
     state
   ) do
-    AuctionNotifier.notify_upcoming_auction(auction)
+    AuctionEmailNotifier.notify_upcoming_auction(auction)
     {:noreply, state}
   end
 
@@ -73,7 +73,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     auction_id
     |> Auctions.get_auction!()
     |> Auctions.fully_loaded()
-    |> AuctionNotifier.notify_auction_canceled()
+    |> AuctionEmailNotifier.notify_auction_canceled()
 
     {:noreply, state}
   end

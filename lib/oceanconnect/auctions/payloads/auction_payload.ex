@@ -51,7 +51,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         state = %AuctionState{
           product_bids: product_bids,
           status: status,
-          winning_solution: winning_solution
         }
       ) do
     %AuctionPayload{
@@ -84,7 +83,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         state = %AuctionState{
           product_bids: product_bids,
           status: status,
-          winning_solution: winning_solution
         }
       ) do
     %AuctionPayload{
