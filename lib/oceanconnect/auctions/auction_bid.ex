@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       auction_id: auction.id,
       amount: amount,
       is_traded_bid: Map.get(params, "is_traded_bid", false),
-      do_not_split: Map.get(params, "do_not_split", false),
+      do_not_split: !Map.get(params, "allow_split", true),
       fuel_id: fuel_id,
       min_amount: min_amount,
       supplier_id: supplier_id,

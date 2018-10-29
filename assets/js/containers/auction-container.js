@@ -44,7 +44,15 @@ const mapDispatchToProps = (dispatch) => ({
     const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
     const bidsByProduct = _.reduce(bidElements, (acc, e) => {
       acc[e.dataset.product] = acc[e.dataset.product] || {};
-      acc[e.dataset.product][e.name] = e.value;
+      switch(e.type) {
+        case 'checkbox':
+          acc[e.dataset.product][e.name] = e.checked;
+          break;
+
+        default:
+          acc[e.dataset.product][e.name] = e.value;
+          break;
+      }
       return acc;
     }, {});
 
@@ -52,8 +60,7 @@ const mapDispatchToProps = (dispatch) => ({
     _.forEach(elements, (e) => e.value = "");
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
-      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked,
-      "do_not_split": elements && elements.do_not_split && elements.do_not_split.checked
+      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
     }));
   },
   revokeSupplierBid(auctionId, productId) {

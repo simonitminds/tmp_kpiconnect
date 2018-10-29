@@ -8,9 +8,8 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
     is_traded = Map.get(params, "is_traded_bid", false) == true
-    do_not_split = Map.get(params, "do_not_split", false) == true
     bids_params = bids_params
-    |> add_flags_to_bids(is_traded, do_not_split)
+    |> add_flags_to_bids(is_traded)
     |> filter_placeable_bids()
 
     with  auction = %Auction{} <- Auctions.get_auction(auction_id),
@@ -88,11 +87,10 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  defp add_flags_to_bids(bids_params, is_traded_bid, do_not_split) do
+  defp add_flags_to_bids(bids_params, is_traded_bid) do
     Enum.reduce(bids_params, %{}, fn({product_id, bid_params}, acc) ->
       updated_bid_params = bid_params
       |> Map.put("is_traded_bid", is_traded_bid)
-      |> Map.put("do_not_split", do_not_split)
       Map.put(acc, product_id, updated_bid_params)
     end)
   end

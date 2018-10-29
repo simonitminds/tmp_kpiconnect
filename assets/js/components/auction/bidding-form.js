@@ -44,7 +44,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
             <div className="tags has-addons has-margin-top-xs">
               <div className="tag is-success"><i className="fas fa-check"></i></div>
               <div className="tag revoke-bid__status is-white">Bid Active</div>
-              <button className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabindex="-1"><i className="fas fa-minus"></i></button>
+              <button className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></button>
             </div>
           }
           { !existingBid &&
@@ -53,7 +53,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
               <div className="tag is-white revoke-bid__status">No Active Bid</div>
             </div>
           }
-      </div>
+        </div>
         <div className="column">
           <div className="columns is-desktop">
             <div className="column">
@@ -77,6 +77,12 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
               </div>
             </div>
           </div>
+        </div>
+        <div className="column is-narrow">
+          <label class="checkbox">
+            <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" data-product={productId}/>
+            Allow Split?
+          </label>
         </div>
       </div>
     );
@@ -105,19 +111,6 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
             }
 
             { products.map((product) => renderProduct(product, auctionPayload)) }
-          </div>
-
-          <div className="field field--ribbon is-horizontal">
-            <div className="field-label"></div>
-            <div className="field-body">
-              <CheckBoxField
-                model={'auction-bid'}
-                field={'do_not_split'}
-                labelText={'Do not split my bid'}
-                value={do_not_split}
-                opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-              />
-            </div>
           </div>
 
           <div className="field is-horizontal is-expanded">
@@ -155,18 +148,6 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
               { products.map((product) => renderProduct(product, auctionPayload)) }
             </div>
 
-            <div className="field field--ribbon is-horizontal">
-              <div className="field-label"></div>
-              <div className="field-body">
-                <CheckBoxField
-                  model={'auction-bid'}
-                  field={'do_not_split'}
-                  labelText={'Do not split my bid'}
-                  value={do_not_split}
-                  opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                />
-              </div>
-            </div>
             <div className="field is-horizontal is-expanded">
               <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
                 <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>
