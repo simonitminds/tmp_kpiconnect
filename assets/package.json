@@ -12,6 +12,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "bulma": "^0.6.1",
+    "dot-prop-immutable": "^1.4.0",
     "es6-promise": "^4.2.2",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
@@ -28,10 +29,10 @@
     "react-tabs": "^2.2.2",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "serverdate": "^3.1.0",
-    "dot-prop-immutable": "^1.4.0"
+    "serverdate": "^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.2",
     "babel-brunch": "6.1.1",
     "brunch": "2.10.9",
     "clean-css-brunch": "2.10.0",
