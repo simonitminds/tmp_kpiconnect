@@ -12,7 +12,7 @@ defmodule Oceanconnect.AuctionMessagingPage do
       |> find_within_element(:css, ".qa-auction-messaging-auction-#{auction.id}")
       |> inner_text
 
-      text =~ auction.vessel.name
+      Enum.any?(auction.vessels, &(text =~ &1.name))
     end)
   end
 end

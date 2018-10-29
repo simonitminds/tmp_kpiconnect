@@ -32,6 +32,8 @@ const mapStateToProps = (state) => {
 
   return {
     auctionPayload,
+    auctionPayloads: state.auctionsReducer.auctionPayloads,
+    messagingPayloads: state.messagesReducer.messagingPayloads,
     companyProfile,
     connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
