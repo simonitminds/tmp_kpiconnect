@@ -35,7 +35,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
                     <td className="qa-auction-bid-amount">
                       <span className="auction__bid-amount">${formatPrice(amount)}</span>
                       { min_amount &&
-                        <i className="has-text-gray-4">(Min: ${formatPrice(min_amount)})</i>
+                        <i className="has-text-gray-4">(Min: ${formatPrice(min_amount)}) </i>
                       }
                       <span className="qa-auction-bid-is_traded_bid">{is_traded_bid &&
                         <span class="auction__traded-bid-tag">
