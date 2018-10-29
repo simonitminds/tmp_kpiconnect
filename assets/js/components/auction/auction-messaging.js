@@ -15,7 +15,6 @@ const stripOpenState = () => { messagingContexts.map( container => container.cla
 const messagingBoxToggle = () => {
   messagingBox.classList.toggle('active');
 }
-
 const messagingNotificationsToggle = () => {
   messagingNotifications.parentElement.parentElement.classList.toggle('open');
 }
@@ -41,7 +40,21 @@ const filteredAuctionsCount = () => {
   return filteredAuctionsPayloads().length;
 }
 
-const AuctionMessaging = ({messagingPayloads}) => {
+const renderSupplierContext = () => {
+  return _.map(filteredAuctionsPayloads, (auctionPayload) => {
+    <li>
+      <h2>
+      <div className=`auction-header__status auction-header__status-${auctionPayload.status} tag is-rounded has-margin-bottom-non has-margin-right-xs is-capitalized`>{auctionPayload.status}</div>
+      _.map(auctionPayload.auction.vessels, (vessel) => {
+        {vessel.name} <span className="has-text-gray-3">{vessel.imo}</span>
+      })
+      <br>
+      <span className="is-inline-block has-margin-left-xs has-margin-top-xs">{auctionPayload.auction.buyer.name}<span className="has-text-gray-3 has-margin-left-xs">(Buyer)</span></span>
+    </li>
+  });
+}
+
+const AuctionMessaging = ({messagingPayloads, auctionPayloads}) => {
   return(
     <div className="messaging qa-auction-messaging">
       <div className="messaging__notification-context">
@@ -55,8 +68,8 @@ const AuctionMessaging = ({messagingPayloads}) => {
           <CollapsibleSection
             trigger="Messages"
             classParentString="messaging__context-list qa-auction-messaging-auctions"
-            contentChildCount={filteredAuctionsCount()}
-            open={filteredAuctionsCount() > 0}
+      contentChildCount={filteredAuctionsCount.bind(this).length}
+      open={filteredAuctionsCount.bind(this).length > 0}
           />
           <ul className="messaging__context-list">
             <li className="messaging__context-list"></li>

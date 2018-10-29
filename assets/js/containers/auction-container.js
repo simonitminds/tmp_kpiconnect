@@ -3,6 +3,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
+import AuctionMessaging from '../components/auction/auction-messaging';
 import {
   getAllAuctionPayloads,
   getCompanyBarges,
@@ -120,6 +121,7 @@ export class AuctionContainer extends React.Component {
       return (
         <div>
           <AuctionShow {...this.props}/>
+          <AuctionMessaging {...this.props}/>
         </div>
       );
     }

@@ -42,17 +42,23 @@ function getDataForComponent(componentName) {
 
 let currentUserCompanyId = null;
 if(window.companyId && window.companyId != ""){
-  currentUserCompanyId = window.companyId;
+currentUserCompanyId = window.companyId;
 }
 
 if (document.getElementById('auctions-app')) {
-  const store = createStore(
+const store =
+  window.__REDUX_DEVTOOLS_EXTENSION__
+  ? createStore(
     rootReducer,
     compose(
-      applyMiddleware(thunk),
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-    )
-  );
+        applyMiddleware(thunk),
+        window.__REDUX_DEVTOOLS_EXTENSION__()
+    ))
+  : createStore(
+      rootReducer,
+      compose(
+        applyMiddleware(thunk)
+    ));
 
   const setContainer = () => {
     switch (window.container) {
