@@ -19,6 +19,9 @@ users_users:
   - user: lwoodrick
     name: "Lauren Woodrick"
     github: lwoodrick
+  - user: stamates
+    name: "John Stamates"
+    github: stamates
 
 
 # Users with sudo permission who should be set up on all servers.
@@ -28,4 +31,4 @@ users_global_admin_users:
  - st23am
  - cam
  - lwoodrick
-
+ - stamates
