@@ -43,7 +43,7 @@ export default class AuctionShow extends React.Component {
 
   componentDidUpdate() {
     // For adjusting the auction app body and header
-    // portions based on header content
+    // portions based on header content in mobile
     updateAuctionBodySize();
   }
 
@@ -324,7 +324,7 @@ export default class AuctionShow extends React.Component {
           <div className="auction-app__body">
             <section className="auction-page"> {/* Auction details */}
               <div className="container has-padding-left-none has-padding-right-none">
-                <Tabs className="auction-content">
+                <Tabs className="auction-content auction-content--mobile">
                   <div className="tabs is-fullwidth is-medium">
                     <TabList>
                       <Tab><h2 className="title is-size-5">Monitor</h2></Tab>
@@ -426,18 +426,19 @@ function updateAuctionBodySize() {
         auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
         auctionTabBidContentHeight = collapsingBidHeight ? `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20 + collapsingBidHeight}px)` : `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
         auctionTabWithAlertHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 42}px)`,
-        auctionTabContent = document.querySelector('.react-tabs__tab-panel--selected'),
+        auctionTabContent = document.querySelector('.auction-content--mobile .react-tabs__tab-panel--selected'),
         alertPresence = document.querySelector('.alert:not(:empty)'),
         bidPresence = document.querySelector('.auction-bidding');
 
+  if(auctionTabContent != null) {
+    if(alertPresence) {
+      auctionTabContent.style.height = auctionTabWithAlertHeight;
+    } else {
+      auctionTabContent.style.height = auctionTabContentHeight;
+    }
 
-  if(alertPresence) {
-    auctionTabContent.style.height = auctionTabWithAlertHeight;
-  } else {
-    auctionTabContent.style.height = auctionTabContentHeight;
-  }
-
-  if(bidPresence && window.screen.width <= 768) {
-    auctionTabContent.style.height = auctionTabBidContentHeight;
+    if(bidPresence) {
+      auctionTabContent.style.height = auctionTabBidContentHeight;
+    }
   }
 }

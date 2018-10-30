@@ -27,6 +27,12 @@ $navbar-background-color: $primary;
   }
 }
 
+.navbar-menu {
+  @media (max-width: 768px) {
+    background-color: $white !important;
+  }
+}
+
 .navbar-dropdown { // Set the nav dropdown to be flush right
   right: 0;
   left: auto !important;

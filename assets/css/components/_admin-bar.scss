@@ -9,16 +9,16 @@
 // Blocks
 
 .navbar--admin {
-  display: none;
+  display: none !important;
 }
 
 .body--admin .navbar--admin {
-  display: block;
-  top: 3.25rem;
-  left: 0;
-  position: fixed !important;
-  right: 0;
+  display: block !important;
   z-index: 29;
+}
+
+.navbar-dropdown {
+  z-index: 30 !important;
 }
 
 .navbar-dropdown__admin { // Styles related to Admin/Agent Toggle
