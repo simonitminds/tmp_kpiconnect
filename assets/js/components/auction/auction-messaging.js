@@ -42,11 +42,10 @@ export default class AuctionMessaging extends React.Component {
                   <div className={`auction-header__status auction-header__status-${auctionPayload.status} tag is-rounded has-margin-bottom-non has-margin-right-xs is-capitalized`}>{auctionPayload.status}</div>
                   { _.map(auctionPayload.auction.vessels, (vessel) => {
                     return(
-                        <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">{vessel.imo}</span></span>
+                        <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
                     );
                   }) }
                 </h2>
-                <span className="is-inline-block has-margin-left-xs has-margin-top-xs">{auctionPayload.auction.buyer.name}<span className="has-text-gray-3 has-margin-left-xs">(Buyer)</span></span>
               </li>
             );
           })}
@@ -55,7 +54,7 @@ export default class AuctionMessaging extends React.Component {
     }
 
     return(
-      <div className={`messaging qa-auction-messaging ${isExpanded ? "open" : "closed"}`} onClick={this.toggleExpanded.bind(this)}>
+      <div className={`qa-auction-messaging ${isExpanded ? "open" : "closed"}`} onClick={this.toggleExpanded.bind(this)}>
         <div className="messaging__notification-context">
           <div className="messaging__menu-bar">
             <h1 className="messaging__menu-bar__title">Messages</h1>

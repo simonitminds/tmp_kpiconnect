@@ -48,14 +48,13 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          message_payloads: message_payloads
+          messaging_payloads: messaging_payloads
         },
         topic: ^channel
       } ->
-        assert message_payloads == ["supplier"]
-        # auction_ids = Enum.map(message_payloads, &(&1.auction_id))
-        # assert Enum.member?(auction_ids, auction_id)
-        # refute Enum.member?(auction_ids, auction2_id)
+        auction_ids = Enum.map(messaging_payloads, &(&1.id))
+        assert Enum.member?(auction_ids, auction_id)
+        refute Enum.member?(auction_ids, auction2_id)
 
     after 5000 ->
         assert false, "Expected message received nothing."
@@ -81,14 +80,13 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          message_payloads: message_payloads
+          messaging_payloads: messaging_payloads
         },
         topic: ^channel
       } ->
-        assert message_payloads == ["buyer", "buyer"]
-        # auction_ids = Enum.map(message_payloads, &(&1.auction_id))
-        # assert Enum.member?(auction_ids, auction_id)
-        # assert Enum.member?(auction_ids, auction2_id)
+        auction_ids = Enum.map(messaging_payloads, &(&1.id))
+        assert Enum.member?(auction_ids, auction_id)
+        assert Enum.member?(auction_ids, auction2_id)
     after 5000 ->
         assert false, "Expected message received nothing."
     end
