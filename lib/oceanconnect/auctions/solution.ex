@@ -49,24 +49,24 @@ defmodule Oceanconnect.Auctions.Solution do
   end
 
   defp normalized_price(bids, product_quantities) do
-    total_price = total_price(bids, product_quantities)
+    {total_price, total_quantity} =
+      Enum.reduce(bids, {0, 0}, fn(bid, acc = {total_price, total_quantity}) ->
+        if quantity = Map.get(product_quantities, "#{bid.fuel_id}") do
+          total_quantity = total_quantity + quantity
+          total_price = total_price + (bid.amount * quantity)
+          {total_price, total_quantity}
+        else
+          acc
+        end
+      end)
 
-    total_quantity =
-      product_quantities
-      |> Map.values()
-      |> Enum.sum()
-
-    try do
-      total_price / total_quantity
-    rescue
-      _ -> nil
-    end
+    total_price / total_quantity
   end
 
   defp total_price(bids, product_quantities) do
     Enum.reduce(bids, 0, fn bid, acc ->
       quantity = product_quantities["#{bid.fuel_id}"]
-      acc + bid.amount * quantity
+      acc + (bid.amount * quantity)
     end)
   end
 end

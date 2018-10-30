@@ -20,7 +20,7 @@ export default class BidStatus extends React.Component {
             className="auction-notification auction-notification--flash is-success"
             onAnimationEnd={this.handleAnimationEnd.bind(this)}
           >
-            <h3 className="has-text-weight-bold qa-auction-bid-status ">{message}</h3>
+            <h3 className="has-text-weight-bold qa-auction-bid-status">{message}</h3>
           </div>
         )
       } else {
@@ -29,7 +29,7 @@ export default class BidStatus extends React.Component {
             className="auction-notification auction-notification--flash is-danger"
             onAnimationEnd={this.handleAnimationEnd.bind(this)}
           >
-            <h3 className="has-text-weight-bold qa-auction-bid-status ">{message}</h3>
+            <h3 className="has-text-weight-bold qa-auction-bid-status">{message}</h3>
           </div>
         )
       }

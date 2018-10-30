@@ -38,7 +38,7 @@ export default class SolutionDisplay extends React.Component {
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
     const fuels = _.get(auctionPayload, 'auction.fuels');
-    const {bids, normalized_price, total_price, latest_time_entered} = solution;
+    const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const bidIds = _.map(bids, 'id');
     const fuelBids = _.map(bids, (bid) => {
       const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);

@@ -103,6 +103,7 @@ defmodule Oceanconnect.Factory do
       "supplier_id" => supplier_id,
       "fuel_id" => fuel_id,
       "is_traded_bid" => is_traded_bid,
+      "allow_split" => true,
       "time_entered" => DateTime.utc_now()
     }
 

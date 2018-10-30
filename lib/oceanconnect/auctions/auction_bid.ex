@@ -2,18 +2,19 @@ defmodule Oceanconnect.Auctions.AuctionBid do
   @enforce_keys [:auction_id, :amount, :supplier_id, :fuel_id]
   defstruct id: nil,
             auction_id: nil,
-            amount: nil,
-            credit_terms: nil,
-            fuel_id: nil,
-            expiration: nil,
-            is_traded_bid: false,
-            min_amount: nil,
             supplier_id: nil,
-            total_price: nil,
+            fuel_id: nil,
+            active: true,
+            comment: nil,
+            amount: nil,
+            min_amount: nil,
+            allow_split: true,
+            is_traded_bid: false,
             time_entered: DateTime.utc_now(),
             original_time_entered: DateTime.utc_now(),
-            comment: nil,
-            active: true
+            credit_terms: nil,
+            expiration: nil,
+            total_price: nil
 
   def from_params_to_auction_bid(
         params = %{
@@ -21,7 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered
+          "time_entered" => time_entered,
+          "allow_split" => allow_split,
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do
@@ -30,6 +32,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       auction_id: auction.id,
       amount: amount,
       is_traded_bid: Map.get(params, "is_traded_bid", false),
+      allow_split: allow_split,
       fuel_id: fuel_id,
       min_amount: min_amount,
       supplier_id: supplier_id,

@@ -11,7 +11,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
   const auction = auctionPayload.auction;
   const auctionState = auctionPayload.status;
   const products = _.sortBy(auction.fuels, 'id');
-  const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'))
+  const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'));
   const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
   const is_traded_bid = _.get(auctionPayload, 'bid_history[0].is_traded_bid');
 
@@ -23,6 +23,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
       .value();
     const currentBidAmount = _.get(existingBid, `amount`);
     const minimumBidAmount = _.get(existingBid, `min_amount`);
+    const allowSplit = _.get(existingBid, 'allow_split', true);
     const vesselFuels = _.chain(auctionPayload)
       .get('auction.auction_vessel_fuels')
       .filter((avf) => avf.fuel_id == productId)
@@ -39,20 +40,18 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
-          { existingBid &&
-            <div className="tags has-addons has-margin-top-xs">
-              <div className="tag is-success"><i className="fas fa-check"></i></div>
-              <div className="tag revoke-bid__status is-white">Bid Active</div>
-              <button className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation}><i className="fas fa-minus"></i></button>
-            </div>
+          { existingBid
+            ? <div className="tags has-addons has-margin-top-xs">
+                <div className="tag is-success"><i className="fas fa-check"></i></div>
+                <div className="tag revoke-bid__status is-white">Bid Active</div>
+                <button className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></button>
+              </div>
+            : <div className="tags has-addons has-margin-top-xs">
+                <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
+                <div className="tag is-white revoke-bid__status">No Active Bid</div>
+              </div>
           }
-          { !existingBid &&
-            <div className="tags has-addons has-margin-top-xs">
-              <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
-              <div className="tag is-white revoke-bid__status">No Active Bid</div>
-            </div>
-          }
-      </div>
+        </div>
         <div className="column">
           <div className="columns is-desktop">
             <div className="column">
@@ -76,6 +75,11 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
               </div>
             </div>
           </div>
+        </div>
+        <div className="column is-narrow">
+          <label className="checkbox">
+            <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Allow Split?
+          </label>
         </div>
       </div>
     );
@@ -105,12 +109,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
 
             { products.map((product) => renderProduct(product, auctionPayload)) }
           </div>
-          <div className="field field--offset is-horizontal">
-            <label className="checkbox">
-              <input className="has-margin-right-sm" type="checkbox" />
-                <strong>Do not split my bid</strong>
-            </label>
-          </div>
+
           <div className="field is-horizontal is-expanded">
             <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
               <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>
@@ -145,12 +144,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
 
               { products.map((product) => renderProduct(product, auctionPayload)) }
             </div>
-            <div className="field field--offset is-horizontal">
-              <label className="checkbox">
-                <input className="has-margin-right-sm" type="checkbox" />
-                  <strong>Do not split my bid</strong>
-              </label>
-            </div>
+
             <div className="field is-horizontal is-expanded">
               <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
                 <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>

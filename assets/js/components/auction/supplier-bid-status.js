@@ -18,6 +18,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const bestOverallSolutionBids = _.get(bestOverallSolution, 'bids');
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
   const isInBestSolution = _.includes(bestSolutionSupplierIds, supplierIdInt);
+  const isBestOverallSolution = !_.some(bestSolutionSupplierIds, (id) => id != supplierIdInt);
 
   const winningSolutionBids = _.get(auctionPayload, "solutions.winning_solution.bids");
   const winningSolutionSupplierIds = _.map(winningSolutionBids, 'supplier_id');
@@ -84,11 +85,33 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
       </div>
     );
+  } else if (isBestOverallSolution) {
+    return (
+      <div className="auction-notification box is-success">
+        <div className="auction-notification__show-message">
+          {messageDisplay("Your bid is the best overall offer.")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("Your bid is the best overall offer")}
+        </div>
+      </div>
+    );
   } else if (singleSolutionIsTied && isBestSingleSolution) {
     return (
       <div className="auction-notification box is-warning">
         <div className="auction-notification__show-message">
           {messageDisplay("Your bid is the best single-supplier offer. Other suppliers have matched this offer")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("Your bid is the best single-supplier offer")}
+        </div>
+      </div>
+    );
+  } else if (isBestSingleSolution) {
+    return (
+      <div className="auction-notification box is-success">
+        <div className="auction-notification__show-message">
+          {messageDisplay("Your bid is the best single-supplier offer.")}
         </div>
         <div className="auction-notification__card-message">
           {messageDisplay("Your bid is the best single-supplier offer")}

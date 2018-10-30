@@ -44,7 +44,15 @@ const mapDispatchToProps = (dispatch) => ({
     const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
     const bidsByProduct = _.reduce(bidElements, (acc, e) => {
       acc[e.dataset.product] = acc[e.dataset.product] || {};
-      acc[e.dataset.product][e.name] = e.value;
+      switch(e.type) {
+        case 'checkbox':
+          acc[e.dataset.product][e.name] = e.checked;
+          break;
+
+        default:
+          acc[e.dataset.product][e.name] = e.value;
+          break;
+      }
       return acc;
     }, {});
 

@@ -187,7 +187,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       AuctionShowPage.submit_bid()
 
-      :timer.sleep(500)
+      :timer.sleep(300)
 
       auction_state =
         auction
@@ -216,7 +216,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 1.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -225,7 +225,7 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.enter_bid(%{amount: 0.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       end)
 
       change_session_to(:default)
@@ -244,7 +244,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -257,9 +257,9 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
 
       change_session_to(:default)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
 
     test "supplier can revoke their bid for a product", %{
@@ -269,7 +269,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(300)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       AuctionShowPage.revoke_bid_for_product(fuel_id)
       :timer.sleep(200)
@@ -311,7 +311,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
 
     test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
@@ -413,99 +413,101 @@ defmodule Oceanconnect.AuctionShowTest do
     end
   end
 
-  test "supplier views a list of their barges", %{
-    auction: auction,
-    supplier: supplier
-  } do
-    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
-    login_user(supplier)
-    AuctionShowPage.visit(auction.id)
-    assert AuctionShowPage.has_available_barge?(barge)
-  end
+  describe "barges" do
+    test "supplier views a list of their barges", %{
+      auction: auction,
+      supplier: supplier
+    } do
+      barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.has_available_barge?(barge)
+    end
 
-  test "supplier can submit barge for approval", %{
-    auction: auction,
-    supplier: supplier
-  } do
-    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+    test "supplier can submit barge for approval", %{
+      auction: auction,
+      supplier: supplier
+    } do
+      barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
 
-    inactive_barge =
-      insert(:barge, companies: [supplier.company], imo_number: "1234568", is_active: false)
+      inactive_barge =
+        insert(:barge, companies: [supplier.company], imo_number: "1234568", is_active: false)
 
-    login_user(supplier)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(1000)
-    assert AuctionShowPage.has_available_barge?(barge)
-    refute AuctionShowPage.has_available_barge?(inactive_barge)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(1000)
+      assert AuctionShowPage.has_available_barge?(barge)
+      refute AuctionShowPage.has_available_barge?(inactive_barge)
 
-    AuctionShowPage.submit_barge(barge)
-    :timer.sleep(1000)
-    assert AuctionShowPage.has_submitted_barge?(barge)
-  end
+      AuctionShowPage.submit_barge(barge)
+      :timer.sleep(1000)
+      assert AuctionShowPage.has_submitted_barge?(barge)
+    end
 
-  test "supplier can unsubmit barge from approval", %{
-    auction: auction,
-    supplier: supplier
-  } do
-    barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
-    login_user(supplier)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(1000)
-    assert AuctionShowPage.has_available_barge?(barge)
+    test "supplier can unsubmit barge from approval", %{
+      auction: auction,
+      supplier: supplier
+    } do
+      barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(1000)
+      assert AuctionShowPage.has_available_barge?(barge)
 
-    AuctionShowPage.submit_barge(barge)
-    :timer.sleep(1000)
-    AuctionShowPage.unsubmit_barge(barge)
-    :timer.sleep(1000)
-    assert AuctionShowPage.has_no_submitted_barges?()
-    assert AuctionShowPage.has_available_barge?(barge)
-  end
+      AuctionShowPage.submit_barge(barge)
+      :timer.sleep(1000)
+      AuctionShowPage.unsubmit_barge(barge)
+      :timer.sleep(1000)
+      assert AuctionShowPage.has_no_submitted_barges?()
+      assert AuctionShowPage.has_available_barge?(barge)
+    end
 
-  test "buyer can approve submitted barges", %{
-    auction: auction,
-    buyer: buyer,
-    supplier: supplier,
-    supplier2: supplier2
-  } do
-    barge =
-      insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+    test "buyer can approve submitted barges", %{
+      auction: auction,
+      buyer: buyer,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
+      barge =
+        insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
-    Auctions.submit_barge(auction, barge, supplier.company_id)
-    Auctions.submit_barge(auction, barge, supplier2.company_id)
+      Auctions.submit_barge(auction, barge, supplier.company_id)
+      Auctions.submit_barge(auction, barge, supplier2.company_id)
 
-    login_user(buyer)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(500)
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(500)
 
-    AuctionShowPage.approve_barge(barge, supplier.company_id)
-    :timer.sleep(700)
+      AuctionShowPage.approve_barge(barge, supplier.company_id)
+      :timer.sleep(700)
 
-    AuctionShowPage.expand_supplier_barges(supplier.company_id)
-    assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
-    assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
-  end
+      AuctionShowPage.expand_supplier_barges(supplier.company_id)
+      assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
+    end
 
-  test "buyer can reject submitted barges", %{
-    auction: auction,
-    buyer: buyer,
-    supplier: supplier,
-    supplier2: supplier2
-  } do
-    barge =
-      insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
+    test "buyer can reject submitted barges", %{
+      auction: auction,
+      buyer: buyer,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
+      barge =
+        insert(:barge, companies: [supplier.company, supplier2.company], imo_number: "1234567")
 
-    Auctions.submit_barge(auction, barge, supplier.company_id)
-    Auctions.submit_barge(auction, barge, supplier2.company_id)
+      Auctions.submit_barge(auction, barge, supplier.company_id)
+      Auctions.submit_barge(auction, barge, supplier2.company_id)
 
-    login_user(buyer)
-    AuctionShowPage.visit(auction.id)
-    :timer.sleep(500)
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(500)
 
-    AuctionShowPage.reject_barge(barge, supplier.company_id)
-    :timer.sleep(500)
+      AuctionShowPage.reject_barge(barge, supplier.company_id)
+      :timer.sleep(500)
 
-    AuctionShowPage.expand_supplier_barges(supplier.company_id)
-    assert AuctionShowPage.has_rejected_barge?(barge, supplier.company_id)
-    assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
+      AuctionShowPage.expand_supplier_barges(supplier.company_id)
+      assert AuctionShowPage.has_rejected_barge?(barge, supplier.company_id)
+      assert AuctionShowPage.has_pending_barge?(barge, supplier2.company_id)
+    end
   end
 end
