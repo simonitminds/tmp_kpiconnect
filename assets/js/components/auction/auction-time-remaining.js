@@ -7,6 +7,7 @@ const AuctionTimeRemaining = ({auctionPayload, auctionTimer}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const auctionStartTime = _.get(auctionPayload, 'auction.scheduled_start');
   const auctionEndTime = _.get(auctionPayload, 'auction.auction_ended');
+  const auctionClosedTime = _.get(auctionPayload, 'auction.auction_closed_time');
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
   if (auctionStatus == "open" || auctionStatus == "decision") {
@@ -39,14 +40,14 @@ const AuctionTimeRemaining = ({auctionPayload, auctionTimer}) => {
     return (
       <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
         <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-        {cardDateFormat(auctionStartTime)}
+        {cardDateFormat(auctionClosedTime)}
       </span>
     );
   } else {
     return (
       <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, auctionTimer)}`}>
         <span className="icon has-margin-right-xs"><i className="far fa-clock"></i></span>
-        {cardDateFormat(auctionEndTime)}
+        {cardDateFormat(auctionClosedTime)}
       </span>
     );
   }
