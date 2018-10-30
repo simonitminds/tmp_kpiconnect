@@ -26,7 +26,9 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       |> insert(buyer: buyer_company, suppliers: [supplier2])
       |> Auctions.fully_loaded()
 
-    {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users}
+    messages = insert_list(3, :message, auction: auction, author_company: hd(supplier_companies), recipient_company: buyer)
+
+    {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users, messages: messages}
   end
 
   test "supplier can only see messages between them and buyer for auctions they participate in", %{
