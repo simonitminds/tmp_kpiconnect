@@ -216,7 +216,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 1.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -225,7 +225,7 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.enter_bid(%{amount: 0.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       end)
 
       change_session_to(:default)
@@ -244,7 +244,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -257,9 +257,9 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
 
       change_session_to(:default)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
 
     test "supplier can revoke their bid for a product", %{
@@ -269,7 +269,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(300)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       AuctionShowPage.revoke_bid_for_product(fuel_id)
       :timer.sleep(200)
@@ -311,7 +311,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is part of the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
     end
 
     test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do

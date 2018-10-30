@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
             comment: nil,
             amount: nil,
             min_amount: nil,
-            do_not_split: false,
+            allow_split: true,
             is_traded_bid: false,
             time_entered: DateTime.utc_now(),
             original_time_entered: DateTime.utc_now(),
@@ -22,7 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered
+          "time_entered" => time_entered,
+          "allow_split" => allow_split,
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do
@@ -31,7 +32,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       auction_id: auction.id,
       amount: amount,
       is_traded_bid: Map.get(params, "is_traded_bid", false),
-      do_not_split: !Map.get(params, "allow_split", true),
+      allow_split: allow_split,
       fuel_id: fuel_id,
       min_amount: min_amount,
       supplier_id: supplier_id,

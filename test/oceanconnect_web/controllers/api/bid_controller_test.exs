@@ -39,7 +39,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       )
 
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
-    bid_params = %{"bids" => %{fuel1_id => %{"amount" => "3.50", "min_amount" => ""}}}
+    bid_params = %{"bids" => %{fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}}}
 
     {:ok,
      %{
@@ -114,7 +114,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       bid_params: params,
       fuel1_id: fuel1_id
     } do
-      updated_params = Map.put(params, "bids", %{ fuel1_id => %{"amount" => "2.95", "min_amount" => "", "fuel1_id" => fuel1_id}})
+      updated_params = Map.put(params, "bids", %{ fuel1_id => %{"amount" => "2.95", "min_amount" => "", "allow_split" => "true"}})
       conn = create_post(conn, auction, updated_params)
       assert %{"success" => false, "message" => "Invalid bid"} = json_response(conn, 422)
     end
@@ -130,8 +130,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
     test "creating multiple bids in a single request", %{auction: auction, conn: conn, fuel1_id: fuel1_id, fuel2_id: fuel2_id} do
       bid_params = %{"bids" => %{
-        fuel1_id => %{"amount" => "3.50", "min_amount" => ""},
-        fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00"},
+        fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "true"},
+        fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "true"},
       }}
 
       conn = create_post(conn, auction, bid_params)
@@ -143,7 +143,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     end
 
     test "creating a minimum bid with no bid for an auction", %{auction: auction, conn: conn, fuel1_id: fuel1_id} do
-      conn = create_post(conn, auction, %{"bids" => %{ fuel1_id => %{"amount" => "", "min_amount" => "9.00"}}})
+      conn = create_post(conn, auction, %{"bids" => %{ fuel1_id => %{"amount" => "", "min_amount" => "9.00", "allow_split" => "true"}}})
 
       assert json_response(conn, 200) == %{
                "success" => true,
@@ -191,9 +191,13 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "creating a non-splittable bid", %{
       auction: auction,
       conn: conn,
-      bid_params: params
+      fuel1_id: fuel1_id,
+      fuel2_id: fuel2_id
     } do
-      params = put_in(params["do_not_split"], true)
+      params = %{"bids" => %{
+        fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "false"},
+        fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "false"},
+      }}
       conn = create_post(conn, auction, params)
 
       assert json_response(conn, 200) == %{
@@ -222,8 +226,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       Auctions.start_auction(auction)
 
       bid_params = %{"bids" => %{
-        fuel1_id => %{"amount" => "3.50", "min_amount" => ""},
-        fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00"},
+        fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "true"},
+        fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "true"},
       }}
 
       create_post(conn, auction, bid_params)

@@ -33,12 +33,12 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
   end
 
   # Best overall solution is the combination of the lowest bids for each fuel,
-  # respecting supplier's do_not_split requests.
+  # respecting supplier's allow_split requests.
   defp calculate_solution(product_bids, auction, :best_overall, best_single_supplier: best_single_supplier) do
     solution_bids = product_bids
     |> Enum.map(fn({_product_id, bid_state}) ->
       bid_state.lowest_bids
-      |> Enum.reject(&(&1.do_not_split))
+      |> Enum.filter(&(&1.allow_split))
       |> Enum.at(0)
     end)
     |> Enum.filter(&(&1))

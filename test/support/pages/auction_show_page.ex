@@ -101,7 +101,7 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def mark_as_do_not_split do
-    find_element(:css, ".qa-auction-bid-do_not_split")
+    find_element(:css, ".qa-auction-bid-allow_split")
     |> click()
   end
 
