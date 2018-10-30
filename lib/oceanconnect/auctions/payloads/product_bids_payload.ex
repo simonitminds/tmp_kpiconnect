@@ -1,5 +1,5 @@
 defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
-  alias Oceanconnect.Auctions.{Auction, AuctionBid}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers}
   alias Oceanconnect.Auctions.AuctionStore.ProductBidState
 
   defstruct lowest_bids: [],
@@ -37,7 +37,7 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
 
   defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
   defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %Auction{}) do
-    supplier = get_name_or_alias(bid.supplier_id, auction)
+    supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
     %{ bid |
        supplier_id: nil,
        min_amount: nil
@@ -59,12 +59,5 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
     tied_bids = lowest_bids
     |> Enum.count(fn(bid) -> bid.amount == lowest.amount end)
      tied_bids > 1
-  end
-
-  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
-  end
-  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 end
