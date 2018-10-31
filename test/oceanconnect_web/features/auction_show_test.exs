@@ -365,6 +365,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
+      :timer.sleep(100)
       AuctionShowPage.select_solution(0)
       AuctionShowPage.enter_solution_comment("Screw you!")
       AuctionShowPage.accept_bid()
