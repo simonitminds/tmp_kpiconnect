@@ -360,6 +360,10 @@ defmodule Oceanconnect.Auctions do
     Map.put(attrs, :auction_ended, fix_time_weirdness(auction_ended))
   end
 
+  defp clean_timestamps(attrs = %{auction_closed_time: auction_ended}) do
+    Map.put(attrs, :auction_closed_time, fix_time_weirdness(auction_ended))
+  end
+
   defp clean_timestamps(attrs), do: attrs
 
   defp fix_time_weirdness(date_time = %DateTime{microsecond: microsecond}) do
