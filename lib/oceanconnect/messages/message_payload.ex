@@ -9,7 +9,7 @@ defmodule Oceanconnect.Messages.MessagePayload do
             anonymous_bidding: false,
             status: :pending,
             vessels: [],
-            messages: []
+            conversations: []
 
   def get_message_payloads_for_company(company_id) do
     company_id
@@ -25,16 +25,20 @@ defmodule Oceanconnect.Messages.MessagePayload do
     auction
     |> Repo.preload([:vessels])
     |> Map.take([:id, :anonymous_bidding, :buyer_id, :vessels])
-    |> Map.put(:auction_id, &(&1.id))
-    |> Map.delete(:id)
+    |> replace_id_with_auction_id()
     |> Map.merge(auction |> Auctions.get_auction_state!() |> Map.take([:status]))
   end
 
-  defp get_auction_messages_for_payload(message_payload, company_id) do
-    Map.put(message_payload, :messages, group_auction_messages(message_payload, company_id))
+  defp replace_id_with_auction_id(messages_map) do
+    Map.put(messages_map, :auction_id, messages_map.id)
+    |> Map.delete(:id)
   end
 
-  defp group_auction_messages(%{id: auction_id} = message_payload, company_id) do
+  defp get_auction_messages_for_payload(message_payload, company_id) do
+    Map.put(message_payload, :conversations, group_auction_messages(message_payload, company_id))
+  end
+
+  defp group_auction_messages(%{auction_id: auction_id} = message_payload, company_id) do
     auction_id
     |> Messages.list_auction_messages_for_company(company_id)
     |> Enum.group_by(&get_correspondence_company_id(&1, company_id))

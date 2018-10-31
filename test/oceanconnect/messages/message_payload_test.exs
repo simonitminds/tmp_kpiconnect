@@ -39,7 +39,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         |> Auctions.fully_loaded()
 
       insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
-      insert_list(4, :message, auction: auction2, author_company: buyer_company, recipient_company: supplier2_company)
+      insert_list(4, :message, auction: auction2, author_company: buyer_company, recipient_company: supplier_company2)
 
       {:ok, %{buyer_company: buyer_company, supplier_company: supplier_company, supplier_company2: supplier_company2, vessels: vessels, auction: auction, auction2: auction2}}
     end
@@ -48,13 +48,19 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       # assert length of payload messages
       # assertions for correct auctions, vessels, and status
       message_payloads_for_author = MessagePayload.get_message_payloads_for_company(author_company.id)
-      # assert length(Enum.flat_map(message_payloads_for_author, &(&1.messages))) == 3
-      assert Enum.all?(message_payloads_for_author, &(&1.auction_id == auction.id))
+      assert length(Enum.flat_map(message_payloads_for_author, fn message_payload ->
+        Enum.flat_map(message_payload.conversations, &(&1.messages))
+      end)) == 7
 
-      messages_for_recipient = MessagePayload.get_message_payloads_for_company(recipient_company.id)
-      # assert length(Enum.flat_map(message_payloads_for_recipient, &(&1.messages))) == 3
-      assert Enum.all?(messages_for_recipient, &(&1.auction_id == auction.id))
-      refute Enum.all?(messages_for_recipient, &(&1.auction_id == auction2.id))
+      assert Enum.any?(message_payloads_for_author, &(&1.auction_id == auction.id))
+      assert Enum.any?(message_payloads_for_author, &(&1.auction_id == auction2.id))
+
+      message_payloads_for_recipient = MessagePayload.get_message_payloads_for_company(recipient_company.id)
+      assert length(Enum.flat_map(message_payloads_for_recipient, fn message_payload ->
+        Enum.flat_map(message_payload.conversations, &(&1.messages))
+      end)) == 3
+      assert Enum.all?(message_payloads_for_recipient, &(&1.auction_id == auction.id))
+      refute Enum.all?(message_payloads_for_recipient, &(&1.auction_id == auction2.id))
     end
 
     test "does not return message payloads for auctions a company is not participating in" do

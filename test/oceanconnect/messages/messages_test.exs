@@ -2,6 +2,8 @@ defmodule Oceanconnect.MessagesTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Messages
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Repo
 
   describe "messages" do
     alias Oceanconnect.Messages.Message
@@ -22,25 +24,6 @@ defmodule Oceanconnect.MessagesTest do
     test "list_messages/0 returns all messages" do
       message = message_fixture()
       assert Messages.list_messages() == [message]
-    end
-
-    test "list_messages_for_company/2 returns all messages where the given company is either an author or the recipient" do
-      company = insert(:company)
-      auction = insert(:auction)
-      messages = insert_list(4, :message, auction: auction, recipient_company: company)
-
-      assert length((Messages.list_auction_messages_for_company(auction.id, company.id))) == 4
-      assert Enum.all?(Messages.list_auction_messages_for_company(auction.id, company.id), &(&1.recipient_company_id == company.id))
-    end
-
-    test "list_messages_for_company/2 does not return messages that don't belong to the given company" do
-      non_participating_company = insert(:company)
-      participating_company = insert(:company)
-      auction = insert(:auction)
-      messages = insert_list(4, :message, auction: auction, recipient_company: participating_company)
-
-      assert length((Messages.list_auction_messages_for_company(auction.id, non_participating_company.id))) == 0
-      refute Enum.all?(Messages.list_auction_messages_for_company(auction.id, participating_company.id), &(&1.recipient_company_id == non_participating_company.id))
     end
 
     test "get_message!/1 returns the message with given id" do
@@ -81,6 +64,40 @@ defmodule Oceanconnect.MessagesTest do
     test "change_message/1 returns a message changeset" do
       message = message_fixture()
       assert %Ecto.Changeset{} = Messages.change_message(message)
+    end
+  end
+
+  describe "list_messages_for_company/2" do
+    test "returns all messages where the given company is either an author or the recipient" do
+      company = insert(:company)
+      auction = insert(:auction)
+      insert_list(4, :message, auction: auction, recipient_company: company)
+
+      assert length((Messages.list_auction_messages_for_company(auction.id, company.id))) == 4
+      assert Enum.all?(Messages.list_auction_messages_for_company(auction.id, company.id), &(&1.recipient_company_id == company.id))
+    end
+
+    test "does not return messages that don't belong to the given company" do
+      supplier_company = insert(:company)
+      supplier_company2 = insert(:company)
+      auction = insert(:auction)
+      insert_list(4, :message, auction: auction, recipient_company: supplier_company)
+      insert_list(3, :message, auction: auction, recipient_company: supplier_company2)
+
+      refute Enum.all?(Messages.list_auction_messages_for_company(auction.id, supplier_company.id), &(&1.recipient_company_id == supplier_company2.id))
+    end
+
+    test "returns aliased names for an anonymous auctions" do
+      supplier_company = insert(:company)
+      anon_auction =
+        :auction
+        |> insert(anonymous_bidding: true, suppliers: [supplier_company])
+        |> Auctions.create_supplier_aliases()
+        |> Auctions.fully_loaded()
+
+      insert_list(3, :message, auction: anon_auction, recipient_company: hd(anon_auction.suppliers))
+      messages_for_supplier = Messages.list_auction_messages_for_company(anon_auction.id, supplier_company.id) |> Repo.preload(:recipient_company)
+      refute Enum.all?(messages_for_supplier, &(&1.recipient_company.name == supplier_company.name))
     end
   end
 end
