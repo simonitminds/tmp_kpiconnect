@@ -112,6 +112,22 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:noreply, state}
   end
 
+  def handle_info(
+        %AuctionEvent{
+          type: type,
+          data: %{state: auction_state = %AuctionState{}, auction: auction},
+          time_entered: time_entered
+        },
+        state
+      )
+      when type in [:auction_expired, :auction_canceled, :auction_closed] do
+    auction
+    |> Auctions.update_auction_without_event_storage!(%{auction_closed_time: time_entered})
+
+    AuctionNotifier.notify_participants(auction_state)
+    {:noreply, state}
+  end
+
   def handle_info(%AuctionEvent{type: _, data: auction = %Auction{scheduled_start: start}}, state)
       when not is_nil(start) do
     AuctionNotifier.notify_participants(auction)
