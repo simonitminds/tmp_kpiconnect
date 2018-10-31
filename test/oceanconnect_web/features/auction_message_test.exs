@@ -1,6 +1,6 @@
-defmodule Oceanconnect.AuctionMessagingTest do
+defmodule Oceanconnect.AuctionMessageTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.{AuctionIndexPage, AuctionMessagingPage, AuctionShowPage}
+  alias Oceanconnect.{AuctionIndexPage, AuctionMessagePage, AuctionShowPage}
   alias Oceanconnect.AdminPage
   alias Oceanconnect.Auctions
 
@@ -38,16 +38,16 @@ defmodule Oceanconnect.AuctionMessagingTest do
   #
   #   test "admin can see a list of all auctions in the chat window", %{auction: auction} do
   #     assert AuctionIndexPage.is_current_path?()
-  #     AuctionMessagingPage.open_messaging_window()
-  #     assert AuctionMessagingPage.has_participating_auctions?([auction])
+  #     AuctionMessagePage.open_message_window()
+  #     assert AuctionMessagePage.has_participating_auctions?([auction])
   #   end
   #
   #   test "admin can see chat window on show page with all auctions", %{auctions: auctions} do
   #     [auction | _tail] = auctions
   #     AuctionShowPage.visit(auction.id)
   #     assert AuctionShowPage.is_current_path?(auction.id)
-  #     AuctionMessagingPage.open_messaging_window()
-  #     assert AuctionMessagingPage.has_participating_auctions?(auctions)
+  #     AuctionMessagePage.open_message_window()
+  #     assert AuctionMessagePage.has_participating_auctions?(auctions)
   #   end
   # end
 
@@ -67,15 +67,15 @@ defmodule Oceanconnect.AuctionMessagingTest do
     test "buyer can see a list of all participating auctions in the chat window", %{auction: auction} do
       assert AuctionIndexPage.is_current_path?()
       Hound.Helpers.Screenshot.take_screenshot()
-      AuctionMessagingPage.open_messaging_window()
-      assert AuctionMessagingPage.has_participating_auctions?([auction])
+      AuctionMessagePage.open_message_window()
+      assert AuctionMessagePage.has_participating_auctions?([auction])
     end
 
     test "buyer can see chat window on show page with all auctions", %{auction: auction} do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.is_current_path?(auction.id)
-      AuctionMessagingPage.open_messaging_window()
-      assert AuctionMessagingPage.has_participating_auctions?([auction])
+      AuctionMessagePage.open_message_window()
+      assert AuctionMessagePage.has_participating_auctions?([auction])
     end
   end
 
@@ -95,15 +95,15 @@ defmodule Oceanconnect.AuctionMessagingTest do
 
     test "supplier can see a list of all participating auctions in the chat window", %{auction: auction} do
       assert AuctionIndexPage.is_current_path?()
-      AuctionMessagingPage.open_messaging_window()
-      assert AuctionMessagingPage.has_participating_auctions?([auction])
+      AuctionMessagePage.open_message_window()
+      assert AuctionMessagePage.has_participating_auctions?([auction])
     end
 
     test "supplier can see chat window on show page with all auctions", %{auction: auction} do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.is_current_path?(auction.id)
-      AuctionMessagingPage.open_messaging_window()
-      assert AuctionMessagingPage.has_participating_auctions?([auction])
+      AuctionMessagePage.open_message_window()
+      assert AuctionMessagePage.has_participating_auctions?([auction])
     end
   end
 end

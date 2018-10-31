@@ -7,8 +7,8 @@ import {
   AUCTION_CHANNEL_CONNECTED,
   AUCTION_CHANNEL_DISCONNECTED,
   DESELECT_ALL_SUPPLIERS,
-  MESSAGING_CHANNEL_CONNECTED,
-  MESSAGING_CHANNEL_DISCONNECTED,
+  MESSAGE_CHANNEL_CONNECTED,
+  MESSAGE_CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_COMPANY_BARGES,
@@ -24,13 +24,13 @@ import {
   UPDATE_MESSAGE_PAYLOAD
 } from "./constants";
 
-let auctionChannel, messagingChannel, socket;
+let auctionChannel, messageChannel, socket;
 if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
   socket = new Socket("/socket", {params: {token: window.userToken}});
   socket.connect();
 
   auctionChannel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
-  messagingChannel = socket.channel(`user_messaging:${window.companyId}`, {token: window.userToken});
+  messageChannel = socket.channel(`user_messages:${window.companyId}`, {token: window.userToken});
 };
 
 const defaultHeaders = {
@@ -40,23 +40,23 @@ const defaultHeaders = {
   'x-expires': window.expiration
 };
 
-export function subscribeToAuctionMessaging() {
+export function subscribeToAuctionMessages() {
   return (dispatch, getState) => {
-    messagingChannel.join()
+    messageChannel.join()
       .receive("ok", resp => {
         console.log("Joined chat successfully", resp);
-        dispatch({type: MESSAGING_CHANNEL_CONNECTED});
+        dispatch({type: MESSAGE_CHANNEL_CONNECTED});
         dispatch(getAllMessagePayloads());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
-    messagingChannel.on("messages_update", payload => {
-      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagingPayloads: payload});
+    messageChannel.on("messages_update", payload => {
+      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagePayloads: payload});
     });
 
-    messagingChannel.onError( () => {
+    messageChannel.onError( () => {
       const { connection } = getState().auctionsReducer;
-      if (connection) {dispatch({type: MESSAGING_CHANNEL_DISCONNECTED})};
+      if (connection) {dispatch({type: MESSAGE_CHANNEL_DISCONNECTED})};
     });
   };
 }

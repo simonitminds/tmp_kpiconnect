@@ -29,7 +29,18 @@ defmodule Oceanconnect.MessagesTest do
       auction = insert(:auction)
       messages = insert_list(4, :message, auction: auction, recipient_company: company)
 
+      assert length((Messages.list_auction_messages_for_company(auction.id, company.id))) == 4
       assert Enum.all?(Messages.list_auction_messages_for_company(auction.id, company.id), &(&1.recipient_company_id == company.id))
+    end
+
+    test "list_messages_for_company/2 does not return messages that don't belong to the given company" do
+      non_participating_company = insert(:company)
+      participating_company = insert(:company)
+      auction = insert(:auction)
+      messages = insert_list(4, :message, auction: auction, recipient_company: participating_company)
+
+      assert length((Messages.list_auction_messages_for_company(auction.id, non_participating_company.id))) == 0
+      refute Enum.all?(Messages.list_auction_messages_for_company(auction.id, participating_company.id), &(&1.recipient_company_id == non_participating_company.id))
     end
 
     test "get_message!/1 returns the message with given id" do

@@ -2,11 +2,11 @@ defmodule OceanconnectWeb.ChatfishChannel do
   use OceanconnectWeb, :channel
   import Ecto.Query
 
-  alias Oceanconnect.Messages.MessagingPayload
+  alias Oceanconnect.Messages.MessagePayload
 
-  def join("user_messaging:" <> id, payload, socket) do
+  def join("user_messages:" <> id, payload, socket) do
     if authorized?(socket, id, payload) do
-      send(self, {:messages_update, "user_messaging:" <> id, String.to_integer(id)})
+      send(self, {:messages_update, "user_messages:" <> id, String.to_integer(id)})
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -14,8 +14,8 @@ defmodule OceanconnectWeb.ChatfishChannel do
   end
 
   def handle_info({:messages_update, channel, company_id}, socket) do
-    messaging_payloads = MessagingPayload.get_messaging_payloads_for_company(company_id)
-    broadcast! socket, "messages_update", %{messaging_payloads: messaging_payloads}
+    message_payloads = MessagePayload.get_message_payloads_for_company(company_id)
+    broadcast! socket, "messages_update", %{message_payloads: message_payloads}
     {:noreply, socket}
   end
 

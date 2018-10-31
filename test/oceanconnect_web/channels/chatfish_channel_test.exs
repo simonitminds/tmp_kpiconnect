@@ -26,7 +26,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       |> insert(buyer: buyer_company, suppliers: [supplier2])
       |> Auctions.fully_loaded()
 
-    messages = insert_list(3, :message, auction: auction, author_company: hd(supplier_companies), recipient_company: buyer)
+    messages = insert_list(3, :message, auction: auction, author_company: hd(supplier_companies), recipient_company: buyer_company)
 
     {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users, messages: messages}
   end
@@ -36,7 +36,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     auction2: auction2,
     supplier_users: [supplier_user | _]
   } do
-    channel = "user_messaging:#{Integer.to_string(supplier_user.company_id)}"
+    channel = "user_messages:#{Integer.to_string(supplier_user.company_id)}"
     event = "messages_update"
 
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier_user)
@@ -50,11 +50,11 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          messaging_payloads: messaging_payloads
+          message_payloads: message_payloads
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(messaging_payloads, &(&1.id))
+        auction_ids = Enum.map(message_payloads, &(&1.id))
         assert Enum.member?(auction_ids, auction_id)
         refute Enum.member?(auction_ids, auction2_id)
 
@@ -69,7 +69,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     auction2: auction2,
     buyer_users: [buyer_user | _]
   } do
-    channel = "user_messaging:#{Integer.to_string(buyer_user.company_id)}"
+    channel = "user_messages:#{Integer.to_string(buyer_user.company_id)}"
     event = "messages_update"
 
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer_user)
@@ -82,11 +82,11 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       %Phoenix.Socket.Broadcast{
         event: ^event,
         payload: %{
-          messaging_payloads: messaging_payloads
+          message_payloads: message_payloads
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(messaging_payloads, &(&1.id))
+        auction_ids = Enum.map(message_payloads, &(&1.id))
         assert Enum.member?(auction_ids, auction_id)
         assert Enum.member?(auction_ids, auction2_id)
     after 5000 ->

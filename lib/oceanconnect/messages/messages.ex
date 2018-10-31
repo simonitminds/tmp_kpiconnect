@@ -23,9 +23,7 @@ defmodule Oceanconnect.Messages do
 
   def list_auction_messages_for_company(auction_id, company_id) do
     auction_id
-    |> Message.by_auction()
-    |> Message.includes_author_company(company_id)
-    |> Message.includes_recipient_company(company_id)
+    |> Message.auction_messages_for_company(company_id)
     |> Repo.all()
   end
 

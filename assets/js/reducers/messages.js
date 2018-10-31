@@ -1,14 +1,14 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
 import {
-  MESSAGING_CHANNEL_CONNECTED,
-  MESSAGING_CHANNEL_DISCONNECTED,
+  MESSAGE_CHANNEL_CONNECTED,
+  MESSAGE_CHANNEL_DISCONNECTED,
   RECEIVE_MESSAGE_PAYLOADS,
   UPDATE_MESSAGE_PAYLOAD
 } from "../constants";
 
 const initialState = {
-  messagingPayloads: [],
+  messagePayloads: [],
   connection: false,
   loading: true
 };
@@ -19,48 +19,48 @@ let updatedAuctionPayload;
 export default function(state, action) {
   switch(action.type) {
     case RECEIVE_MESSAGE_PAYLOADS: {
-      if(_.isEmpty(action.messagingPayloads)) {
+      if(_.isEmpty(action.messagePayloads)) {
         return state;
       } else {
         return {
           ...state,
-          messagingPayloads: action.messagingPayloads,
+          messagePayloads: action.messagePayloads,
           loading: false
         };
       }
     }
     case UPDATE_MESSAGE_PAYLOAD: {
-      // const origAuctionPayload = _.chain(state.messagingPayloads)
-      //       .filter(['auction.id', action.messagingPayload.auction.id])
+      // const origAuctionPayload = _.chain(state.messagePayloads)
+      //       .filter(['auction.id', action.messagePayload.auction.id])
       //       .first()
       //       .value();
       // if (origAuctionPayload) {
       //   updatedAuctionPayload = {
-      //     ...action.messagingPayload,
+      //     ...action.messagePayload,
       //     success: origAuctionPayload.success,
       //     message: origAuctionPayload.message
       //   };
       //   newAuctionPayloadList = replaceListItem(
-      //     state.messagingPayloads,
+      //     state.messagePayloads,
       //     origAuctionPayload,
       //     updatedAuctionPayload
       //   );
       // } else {
-      //   newAuctionPayloadList = _.concat(state.messagingPayloads, action.messagingPayload);
+      //   newAuctionPayloadList = _.concat(state.messagePayloads, action.messagePayload);
       // }
       return {
         ...state,
-        messagingPayloads: action.messagingPayloads,
+        messagePayloads: action.messagePayloads,
         loading: false
       };
     }
-    case MESSAGING_CHANNEL_CONNECTED: {
+    case MESSAGE_CHANNEL_CONNECTED: {
       return {
         ...state,
         connection: true
       };
     }
-    case MESSAGING_CHANNEL_DISCONNECTED: {
+    case MESSAGE_CHANNEL_DISCONNECTED: {
       return {
         ...state,
         connection: false

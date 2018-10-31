@@ -2,13 +2,13 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionsIndex from '../components/auction/index'
-import AuctionMessaging from '../components/auction/auction-messaging.js'
-import { getAllAuctionPayloads, subscribeToAuctionUpdates, subscribeToAuctionMessaging } from '../actions';
+import AuctionMessages from '../components/auction/auction-messages.js'
+import { getAllAuctionPayloads, subscribeToAuctionUpdates, subscribeToAuctionMessages } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
     auctionPayloads: state.auctionsReducer.auctionPayloads,
-    messagingPayloads: state.messagesReducer.messagingPayloads,
+    messagePayloads: state.messagesReducer.messagePayloads,
     connection: state.auctionsReducer.connection
   }
 };
@@ -21,7 +21,7 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionsContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
-    this.props.dispatch(subscribeToAuctionMessaging());
+    this.props.dispatch(subscribeToAuctionMessages());
   }
   componentDidMount() {
     this.dispatchItem();
@@ -35,7 +35,7 @@ export class AuctionsContainer extends React.Component {
     return (
       <div>
         <AuctionsIndex {...this.props} />
-        <AuctionMessaging {...this.props}/>
+        <AuctionMessages {...this.props}/>
       </div>
     );
   }
