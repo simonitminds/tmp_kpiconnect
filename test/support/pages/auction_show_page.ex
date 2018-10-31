@@ -145,12 +145,24 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click()
   end
 
+  def expand_solution(solution) when is_atom(solution) do
+    find_element(:css, ".qa-auction-solution-#{solution}")
+    |> find_within_element(:css, ".qa-auction-solution-expand")
+    |> click()
+  end
+  def expand_solution(index) when is_integer(index) do
+    find_element(:css, ".qa-auction-other-solutions")
+    |> find_all_within_element(:css, ".qa-auction-other-solution")
+    |> Enum.at(index)
+    |> find_within_element(:css, ".qa-auction-solution-expand")
+    |> click()
+  end
+
   def select_solution(solution) when is_atom(solution) do
     find_element(:css, ".qa-auction-solution-#{solution}")
     |> find_within_element(:css, ".qa-auction-select-solution")
     |> click()
   end
-
   def select_solution(index) when is_integer(index) do
     find_element(:css, ".qa-auction-other-solutions")
     |> find_all_within_element(:css, ".qa-auction-other-solution")
@@ -352,30 +364,5 @@ defmodule Oceanconnect.AuctionShowPage do
 
   defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
-  end
-
-  defp value_equals_element_text?(:suppliers, element, suppliers) when is_list(suppliers) do
-    Enum.all?(suppliers, fn supplier ->
-      text =
-        find_within_element(element, :css, ".qa-auction-supplier-#{supplier.id}-name")
-        |> inner_text
-
-      supplier.name == text
-    end)
-  end
-
-  defp value_equals_element_text?(:vessels, element, vessels) when is_list(vessels) do
-    Enum.all?(vessels, fn vessel ->
-      text =
-        find_within_element(element, :css, ".qa-auction-vessel-#{vessel.id}")
-        |> inner_text
-
-      "#{vessel.name} (#{vessel.imo})" == text
-    end)
-  end
-
-  defp value_equals_element_text?(_key, element, value) do
-    text = element |> inner_text
-    value == text
   end
 end
