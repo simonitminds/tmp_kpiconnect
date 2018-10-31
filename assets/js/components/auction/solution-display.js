@@ -12,9 +12,12 @@ export default class SolutionDisplay extends React.Component {
       expanded: isExpanded
     }
   }
+
   cancelSelection(e) {
     e.preventDefault();
-    this.setState({selected: false})
+    const selectionWindow = document.querySelector(`.${this.props.className} > .auction-solution__confirmation`);
+    selectionWindow.classList.add("clear");
+    setTimeout(function(){this.setState({selected: false})}.bind(this), 750);
     return(false);
   }
   selectSolution() {
