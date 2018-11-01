@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import CollapsibleSection from './collapsible-section';
 
-export default class AuctionMessaging extends React.Component {
+export default class AuctionMessage extends React.Component {
   constructor(props) {
     super(props);
     const isExpanded = this.props.isExpanded;
@@ -34,7 +34,7 @@ export default class AuctionMessaging extends React.Component {
 
     const renderSupplierContext = (auctionPayloads) => {
       return (
-        <ul className="messaging__context-list">
+        <ul className="message__context-list">
           { _.map(filteredAuctionsPayloads(auctionPayloads), (auctionPayload) => {
             return(
                 <li key={auctionPayload.auction.id} className={`qa-auction-messages-auction-${auctionPayload.auction.id}`}>
@@ -55,15 +55,15 @@ export default class AuctionMessaging extends React.Component {
 
     return(
       <div className={`qa-auction-messages ${isExpanded ? "open" : "closed"}`} onClick={this.toggleExpanded.bind(this)}>
-        <div className="messaging__notification-context">
-          <div className="messaging__menu-bar">
-            <h1 className="messaging__menu-bar__title">Messages</h1>
-            <div className="messaging__notifications messaging__notifications--has-unread">
+        <div className="message__notification-context">
+          <div className="message__menu-bar">
+            <h1 className="message__menu-bar__title">Messages</h1>
+            <div className="message__notifications message__notifications--has-unread">
               <i className="fas fa-envelope has-margin-right-sm"></i>
             </div>
           </div>
         </div>
-        <div className="messaging__conversation-list qa-auction-messages-auctions">
+        <div className="message__conversation-list qa-auction-messages-auctions">
           {isExpanded && renderSupplierContext(auctionPayloads)}
         </div>
       </div>

@@ -1,4 +1,4 @@
-defmodule Oceanconnect.AuctionMessagePage do
+defmodule Oceanconnect.MessagesPage do
   use Oceanconnect.Page
 
   def open_message_window do

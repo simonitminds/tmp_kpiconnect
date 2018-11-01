@@ -1,4 +1,4 @@
-.messaging {
+.message {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -31,13 +31,13 @@
     }
   }
 
-  // Messaging Headers
+  // Message Headers
 
   h1, h2 { font-weight: bold;}
 
-  // Messaging Toggle Buttons
+  // Message Toggle Buttons
 
-  .messaging__toggle {
+  .message__toggle {
     display: flex;
     align-items: baseline;
     padding: 1rem;
@@ -53,9 +53,9 @@
     }
   }
 
-  // Messaging Containers
+  // Message Containers
 
-  &> div { // Hit all children of messaging...
+  &> div { // Hit all children of message...
     display: flex;
     transition: max-height 0.2s ease;
   }
@@ -66,11 +66,11 @@
     flex-shrink: 0 !important;
     flex-direction: column;
 
-    .messaging__menu-bar {
+    .message__menu-bar {
       display: flex;
       flex-direction: row;
 
-      // & + .messaging__conversation-list {
+      // & + .message__conversation-list {
       //   max-height: 0%;
       //
       //   &.open {
@@ -79,7 +79,7 @@
       // }
     }
 
-    .messaging__menu-bar__title {
+    .message__menu-bar__title {
       flex-grow: 2;
       padding: 1rem;
     }
@@ -110,7 +110,7 @@
 
 
     &.open {
-      .messaging__toggle i { transform: rotate(180deg);}
+      .message__toggle i { transform: rotate(180deg);}
     }
   }
   &__user-context { // Menu Bar showing notifications and allowing collapsibility
@@ -120,7 +120,7 @@
 
     &.open {
 
-      .messaging__toggle i { transform: rotate(180deg);}
+      .message__toggle i { transform: rotate(180deg);}
     }
   }
   &__conversation { // Menu Bar showing notifications and allowing collapsibility
@@ -150,7 +150,7 @@
       margin-top: 0;
     }
   }
-  &__message { // Individual messaging unit
+  &__message { // Individual message unit
     margin-bottom: 1rem;
 
     &__bubble { // Message contents
@@ -192,7 +192,7 @@
     }
   }
   &__message--self { // Variation for when it's you sending the message, I guess.
-    .messaging__message__bubble {
+    .message__message__bubble {
       background-color: $gray-2;
 
       &:after {
@@ -205,7 +205,7 @@
   }
 }
 
-.messaging__conversation-list {
+.message__conversation-list {
   border-top: 1px solid $gray-2;
   overflow: hidden;
   max-height: 0;
@@ -215,7 +215,7 @@
   }
 }
 
-.messaging__input {
+.message__input {
   flex-shrink: 0;
   padding: 1rem;
   background-color: $gray-2;
@@ -228,12 +228,12 @@
     flex-grow: 2;
   }
 
-  .messaging__conversation.open & {
+  .message__conversation.open & {
     display: block;
   }
 }
 
-.messaging__context-list {
+.message__context-list {
   width: 100%;
 
   li {
@@ -250,7 +250,7 @@
     }
   }
 
-  .messaging__context-list__instruction {
+  .message__context-list__instruction {
     background-color: $gray-1;
     font-style: italic;
     border-left: 0;
@@ -259,12 +259,12 @@
     }
   }
 
-  .messaging__context-list__active-convo {
+  .message__context-list__active-convo {
     border-left: 8px solid $green;
   }
 }
 
-.messaging__message-container {
+.message__message-container {
   overflow-y: scroll;
   flex-grow: 2;
   flex-shrink: 2;
