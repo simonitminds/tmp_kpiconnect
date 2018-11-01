@@ -311,8 +311,6 @@ defmodule Oceanconnect.AuctionShowPage do
     |> find_within_element(:css, ".qa-barge-header")
     |> click
 
-    :timer.sleep(1000)
-
     find_element(:css, ".qa-auction-barge-submit-#{id}")
     |> click
   end
@@ -321,8 +319,6 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-barge-#{id}")
     |> find_within_element(:css, ".qa-barge-header")
     |> click
-
-    :timer.sleep(1000)
 
     find_element(:css, ".qa-auction-barge-unsubmit-#{id}")
     |> click
@@ -333,8 +329,6 @@ defmodule Oceanconnect.AuctionShowPage do
     |> find_within_element(:css, ".qa-barge-header")
     |> click
 
-    :timer.sleep(1000)
-
     find_element(:css, ".qa-auction-barge-approve-#{id}")
     |> click
   end
@@ -344,8 +338,6 @@ defmodule Oceanconnect.AuctionShowPage do
     |> find_within_element(:css, ".qa-barge-header")
     |> click
 
-    :timer.sleep(1000)
-
     find_element(:css, ".qa-auction-barge-reject-#{id}")
     |> click
   end
@@ -354,8 +346,6 @@ defmodule Oceanconnect.AuctionShowPage do
     find_element(:css, ".qa-auction-supplier-#{supplier_id}")
     |> find_within_element(:css, ".qa-open-barges-list")
     |> click
-
-    :timer.sleep(200)
   end
 
   defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do

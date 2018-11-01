@@ -81,6 +81,7 @@ defmodule Oceanconnect.AuctionShowTest do
     assert AuctionShowPage.auction_status() == "PENDING"
 
     Auctions.start_auction(auction)
+    :timer.sleep(300)
 
     assert AuctionShowPage.is_current_path?(auction.id)
     assert AuctionShowPage.auction_status() == "OPEN"
@@ -138,6 +139,7 @@ defmodule Oceanconnect.AuctionShowTest do
       Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
+      :timer.sleep(200)
       :ok
     end
 
@@ -187,7 +189,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       AuctionShowPage.submit_bid()
 
-      :timer.sleep(300)
+      :timer.sleep(500)
 
       auction_state =
         auction
@@ -268,7 +270,7 @@ defmodule Oceanconnect.AuctionShowTest do
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
-      :timer.sleep(300)
+      :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
       AuctionShowPage.revoke_bid_for_product(fuel_id)
@@ -331,9 +333,9 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(:best_overall)
-      :timer.sleep(500)
+      :timer.sleep(100)
       AuctionShowPage.accept_bid()
-      :timer.sleep(200)
+      :timer.sleep(500)
       assert AuctionShowPage.auction_status() == "CLOSED"
       assert AuctionShowPage.winning_solution_has_bids?([bid])
 
@@ -367,9 +369,8 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.expand_solution(0)
-      :timer.sleep(500)
       AuctionShowPage.select_solution(0)
-      :timer.sleep(800)
+      :timer.sleep(100)
       AuctionShowPage.enter_solution_comment("Screw you!")
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
@@ -409,11 +410,11 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(:best_overall)
-      :timer.sleep(500)
+      :timer.sleep(100)
       AuctionShowPage.enter_port_agent("Test Agent")
       AuctionShowPage.accept_bid()
-
       :timer.sleep(500)
+
       assert AuctionShowPage.port_agent() == "Test Agent"
     end
   end
@@ -440,12 +441,12 @@ defmodule Oceanconnect.AuctionShowTest do
 
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
-      :timer.sleep(1000)
+      :timer.sleep(500)
       assert AuctionShowPage.has_available_barge?(barge)
       refute AuctionShowPage.has_available_barge?(inactive_barge)
 
       AuctionShowPage.submit_barge(barge)
-      :timer.sleep(1000)
+      :timer.sleep(500)
       assert AuctionShowPage.has_submitted_barge?(barge)
     end
 
@@ -456,13 +457,13 @@ defmodule Oceanconnect.AuctionShowTest do
       barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
-      :timer.sleep(1000)
+      :timer.sleep(400)
       assert AuctionShowPage.has_available_barge?(barge)
 
       AuctionShowPage.submit_barge(barge)
-      :timer.sleep(1000)
+      :timer.sleep(400)
       AuctionShowPage.unsubmit_barge(barge)
-      :timer.sleep(1000)
+      :timer.sleep(400)
       assert AuctionShowPage.has_no_submitted_barges?()
       assert AuctionShowPage.has_available_barge?(barge)
     end
@@ -484,7 +485,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
 
       AuctionShowPage.approve_barge(barge, supplier.company_id)
-      :timer.sleep(700)
+      :timer.sleep(400)
 
       AuctionShowPage.expand_supplier_barges(supplier.company_id)
       assert AuctionShowPage.has_approved_barge?(barge, supplier.company_id)
@@ -505,10 +506,10 @@ defmodule Oceanconnect.AuctionShowTest do
 
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      :timer.sleep(500)
+      :timer.sleep(400)
 
       AuctionShowPage.reject_barge(barge, supplier.company_id)
-      :timer.sleep(500)
+      :timer.sleep(400)
 
       AuctionShowPage.expand_supplier_barges(supplier.company_id)
       assert AuctionShowPage.has_rejected_barge?(barge, supplier.company_id)
