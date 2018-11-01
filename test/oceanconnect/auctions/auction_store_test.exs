@@ -101,10 +101,10 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
   test "auction status is decision after duration timeout", %{auction: auction} do
     Auctions.start_auction(auction)
-    :timer.sleep(500)
+    :timer.sleep(300)
 
     assert AuctionStore.get_current_state(auction).status == :open
-
+    # Need to sleep longer than the auction duration (1000ms)
     :timer.sleep(1_000)
 
     expected_state =

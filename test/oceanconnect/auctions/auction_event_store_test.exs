@@ -58,7 +58,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     Auctions.end_auction(auction)
     state = Auctions.get_auction_state!(auction)
     Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.")
-    :timer.sleep(500)
+    :timer.sleep(200)
 
     current_cache = AuctionCache.read(auction_id)
     current_state = Auctions.get_auction_state!(auction)
@@ -68,13 +68,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, pid} = AuctionStore.find_pid(auction_id)
     Process.exit(pid, :shutdown)
     refute Process.alive?(pid)
-    :timer.sleep(500)
+    :timer.sleep(200)
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
 
-    :timer.sleep(500)
+    :timer.sleep(200)
     assert current_cache == AuctionCache.read(auction_id)
-    :timer.sleep(1000)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end
@@ -88,15 +87,15 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
     |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
     Auctions.end_auction(auction)
-    :timer.sleep(500)
+    :timer.sleep(200)
     # # Crash AuctionStore / AuctionSupervisor and let restart
     {:ok, pid} = AuctionStore.find_pid(auction_id)
     Process.exit(pid, :shutdown)
     refute Process.alive?(pid)
-    :timer.sleep(500)
+    :timer.sleep(200)
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
-    :timer.sleep(1_000)
+    :timer.sleep(200)
 
     assert_received %AuctionEvent{type: :auction_state_rebuilt, auction_id: ^auction_id}
 
@@ -124,11 +123,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, pid} = AuctionStore.find_pid(auction_id)
     Process.exit(pid, :shutdown)
     refute Process.alive?(pid)
-    :timer.sleep(500)
+    :timer.sleep(200)
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
 
-    :timer.sleep(1_000)
+    :timer.sleep(200)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end
