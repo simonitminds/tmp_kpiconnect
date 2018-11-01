@@ -37,6 +37,7 @@ export default class SolutionDisplay extends React.Component {
 
   render() {
     const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
+    const isSupplier = !!supplierId;
     const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -189,9 +190,11 @@ export default class SolutionDisplay extends React.Component {
           </div>
         </div>
         <div className="auction-solution__body">
-          <div className="auction-solution__barge-section">
-            <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
-          </div>
+          { !isSupplier &&
+            <div className="auction-solution__barge-section">
+              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
+            </div>
+          }
           <div>
             <table className="auction-solution__product-table table is-striped">
               <thead>
