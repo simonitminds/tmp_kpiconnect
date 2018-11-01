@@ -121,20 +121,30 @@ export default class SolutionDisplay extends React.Component {
     }
 
     const renderBarges = (auctionBarges) => {
-      return (
-        <div className="auction-solution__barge-list">
-          {
-            auctionBarges.map((auctionBarge) => {
-              const barge = auctionBarge.barge;
-              return (
-                <div key={auctionBarge.id} className="auction-solution__barge">
-                  { barge.name } ({barge.imo_number})
-                </div>
-              );
-            })
-          }
-        </div>
-      );
+      if(auctionBarges.length > 0) {
+        return (
+          <div className="auction-solution__barge-list">
+            {
+              auctionBarges.map((auctionBarge) => {
+                const barge = auctionBarge.barge;
+                return (
+                  <span key={auctionBarge.id} className="auction-solution__barge">
+                    { barge.name } ({barge.imo_number})
+                  </span>
+                );
+              })
+            }
+          </div>
+        );
+      }
+      else {
+        return (
+          <div className="auction-solution__barge-list">
+            <i>None</i>
+          </div>
+        );
+      }
+
     }
 
     const renderBid = (bid, fuel) => {
@@ -179,9 +189,9 @@ export default class SolutionDisplay extends React.Component {
           </div>
         </div>
         <div className="auction-solution__body">
-          <strong>Barges</strong>
-          {renderBarges(approvedAuctionBargesForSolution)}
-
+          <div className="auction-solution__barge-section">
+            <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
+          </div>
           <div>
             <table className="auction-solution__product-table table is-striped">
               <thead>

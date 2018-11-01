@@ -24,7 +24,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
             const barge = auctionBarge.barge;
             return (
               <CollapsingBarge
-                trigger={ `${barge.name.toLowerCase()} (${barge.imo_number})` }
+                trigger={ `${barge.name} (${barge.imo_number})` }
                 classParentString="collapsing-barge__barge"
                 easing="ease"
                 open={false}
