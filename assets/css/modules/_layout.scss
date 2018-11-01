@@ -6,9 +6,14 @@
 
 // ======= CONTAINER ======= //
 
+body {
+}
+
 header {
-  // position: fixed;
+  position: sticky;
   height: 3.25rem;
+  top: 0;
+  z-index: 2;
 
   .body--admin & {
     height: 7.25rem;
@@ -35,6 +40,10 @@ main {
   overflow-y: scroll;
   @media (max-width: 768px) {
     height: calc(100vh - 3.25rem);
+
+    .body--admin > & {
+      height: calc(100vh - 7.25rem);
+    }
   }
 }
 
@@ -132,12 +141,12 @@ section {
 // ==== STICKY MOBILE LAYOUT ==== //
 
 #auction-app {
-  overflow-y: scroll;
+  // overflow-y: scroll;
 }
 
 .auction-app { // Not to be confused with the ID... probably going to rename in a bit.
-  overflow-y: scroll;
-  height: auto;
+  // overflow-y: scroll;
+  // height: auto;
 
   .alert:not(:empty) + main & { // Adjust the height when there's a notification in the header...
     height: calc(100vh - 89px);

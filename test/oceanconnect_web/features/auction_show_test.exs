@@ -331,6 +331,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(:best_overall)
+      :timer.sleep(500)
       AuctionShowPage.accept_bid()
       :timer.sleep(200)
       assert AuctionShowPage.auction_status() == "CLOSED"
@@ -365,7 +366,10 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
+      AuctionShowPage.expand_solution(0)
+      :timer.sleep(500)
       AuctionShowPage.select_solution(0)
+      :timer.sleep(800)
       AuctionShowPage.enter_solution_comment("Screw you!")
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
@@ -405,6 +409,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(:best_overall)
+      :timer.sleep(500)
       AuctionShowPage.enter_port_agent("Test Agent")
       AuctionShowPage.accept_bid()
 

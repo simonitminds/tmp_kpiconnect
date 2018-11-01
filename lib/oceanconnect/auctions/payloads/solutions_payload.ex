@@ -56,7 +56,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
     best_by_supplier
     |> Map.delete(supplier_id)
     |> Map.values()
-    |> Enum.sort_by(fn solution -> solution.normalized_price end)
+    |> Enum.sort_by(&Solution.sort_tuple/1)
   end
 
   defp list_other_solutions(

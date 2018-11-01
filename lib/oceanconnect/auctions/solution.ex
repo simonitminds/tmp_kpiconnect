@@ -33,14 +33,26 @@ defmodule Oceanconnect.Auctions.Solution do
     }
   end
 
-  def is_valid?(bids, product_ids) do
+  def sort_tuple(solution) do
+    # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.
+    valid_indicator = if solution.valid, do: 0, else: 1
+    latest_time_entered =
+      if solution.latest_time_entered do
+        DateTime.to_unix(solution.latest_time_entered, :microsecond)
+      else
+        DateTime.utc_now()
+      end
+    {valid_indicator, solution.total_price, latest_time_entered}
+  end
+
+
+  defp is_valid?(bids, product_ids) do
     Enum.all?(product_ids, fn product_id ->
       Enum.any?(bids, fn bid -> "#{bid.fuel_id}" == product_id end)
     end)
   end
 
   defp latest_time_entered([]), do: nil
-
   defp latest_time_entered(bids) do
     bids
     |> Enum.map(& &1.time_entered)

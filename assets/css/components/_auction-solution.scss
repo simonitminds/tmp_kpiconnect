@@ -14,7 +14,7 @@
 
 .auction-solution { // Each line containing an auction solution.
   margin-top: 1rem;
-  margin-bottom: 0.5rem !important;
+  margin-bottom: -0.5rem;
   padding: 0.5rem 1rem !important;
 
   .auction-solution__header {
@@ -36,15 +36,46 @@
     }
   }
   .auction-solution__content {
+    display: flex;
     margin-left: auto;
   }
   .auction-solution__confirmation {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    animation: confirm-open 0.75s ease;
+    overflow: hidden;
+
     &> .field.is-expanded {
       flex-direction: row;
 
       &> .control {
         width: auto;
       }
+    }
+  }
+  .auction-solution__confirmation.clear { // Transition for the cancellation of bid acceptance.
+    max-height: 0;
+    animation: confirm-close 0.75s cubic-bezier(0, 1, 0, 1);
+  }
+
+  @keyframes confirm-open {
+    from {
+      max-height: 0;
+    }
+    to {
+      max-height: 1000px;
+    }
+  }
+
+  @keyframes confirm-close {
+    from {
+      max-height: 1000px;
+      padding-bottom: 1rem;
+    }
+    to {
+      max-height: 0;
+
+      padding-bottom: 0;
     }
   }
 
@@ -66,27 +97,46 @@
   margin-right: -1rem;
   padding: 0.25rem 1rem 0.5rem 1rem;
   border-bottom: 4px solid $teal;
+  transition: border-bottom 0.4s ease, padding-bottom 0.4s ease;
 }
 
 .auction-solution {
-  transition: height 0.2s ease;
-// Toggled Open
-  &--open > .auction-solution__body {
-    height: auto;
-  }
-// Toggled Closed
-  &--closed > .auction-solution__body {
+  overflow: hidden;
+  // max-height: 42px;
+  transition: max-height 0.75s cubic-bezier(0, 1, 0, 1);
+
+  .auction-solution__body {
     overflow: hidden;
-    height: 0;
+    margin: 0 -1rem 0.5rem -1rem;
+    padding: 0 1rem;
+
+    &:last-child {
+      margin-bottom: 0rem;
+    }
   }
+
+  &--open {
+    transition: max-height 0.75s ease-in;
+
+    &> .auction-solution__body {
+      transition: max-height 0.75s ease-in;
+      max-height: 1000px;
+    }
+  }
+
+  &--closed {
+    margin-bottom: 0.5rem;
+
+    &> .auction-solution__body {
+      transition: max-height 0.75s cubic-bezier(0, 1, 0, 1);
+      max-height: 0px;
+    }
+  }
+
   &--closed > .auction-solution__header--bordered {
-    border-bottom: none;
+    border-bottom: 0px solid rgba($teal, 0);
     padding-bottom: 0.25rem;
   }
-}
-
-.auction-solution__body {
-  transition: height 300ms ease-in;
 }
 
 .auction-solution__port-designation {
@@ -128,7 +178,7 @@
 }
 
 .auction-bidding__title {
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px) {
     border-bottom: 1px solid $gray-2;
     padding: 0.5rem 1.25rem 0.5rem 1.25rem;
     margin: 0 -1.25rem;

@@ -27,6 +27,12 @@ $navbar-background-color: $primary;
   }
 }
 
+.navbar-menu {
+  @media (max-width: 1023px) {
+    background-color: $white !important;
+  }
+}
+
 .navbar-dropdown { // Set the nav dropdown to be flush right
   right: 0;
   left: auto !important;
@@ -58,7 +64,7 @@ $navbar-background-color: $primary;
 
   &--user {
 
-    @media (max-width: 1024px) { // Have some user name distinction in hamburger menu
+    @media (max-width: 1023px) { // Have some user name distinction in hamburger menu
       background-color: $gray-1;
       padding: 1rem 1.25rem !important;
       margin-top: -0.5rem;
