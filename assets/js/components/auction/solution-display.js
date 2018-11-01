@@ -37,6 +37,7 @@ export default class SolutionDisplay extends React.Component {
 
   render() {
     const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
+    const isSupplier = !!supplierId;
     const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -64,6 +65,25 @@ export default class SolutionDisplay extends React.Component {
     const totalQuantity = _.sum(Object.values(fuelQuantities));
     const acceptable = !!acceptSolution;
     const isExpanded = this.state.expanded;
+
+
+    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
+    const bidSupplierIDs = _.chain(bids)
+      .map((bid) => {
+        if(bid.supplier_id) {
+          return bid.supplier_id;
+        } else {
+          const supplier = _.find(suppliers, {name: bid.supplier});
+          return supplier && supplier.id;
+        }
+      })
+      .uniq()
+      .value();
+    const approvedAuctionBargesForSolution = _.chain(auctionBarges)
+      .filter((auctionBarge) => _.includes(bidSupplierIDs, auctionBarge.supplier_id))
+      .filter({approval_status: "APPROVED"})
+      .value();
+
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -99,6 +119,33 @@ export default class SolutionDisplay extends React.Component {
       } else {
         return bid.supplier;
       }
+    }
+
+    const renderBarges = (auctionBarges) => {
+      if(auctionBarges.length > 0) {
+        return (
+          <div className="auction-solution__barge-list">
+            {
+              auctionBarges.map((auctionBarge) => {
+                const barge = auctionBarge.barge;
+                return (
+                  <span key={auctionBarge.id} className="auction-solution__barge">
+                    { barge.name } ({barge.imo_number})
+                  </span>
+                );
+              })
+            }
+          </div>
+        );
+      }
+      else {
+        return (
+          <div className="auction-solution__barge-list">
+            <i>None</i>
+          </div>
+        );
+      }
+
     }
 
     const renderBid = (bid, fuel) => {
@@ -143,6 +190,11 @@ export default class SolutionDisplay extends React.Component {
           </div>
         </div>
         <div className="auction-solution__body">
+          { !isSupplier &&
+            <div className="auction-solution__barge-section">
+              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
+            </div>
+          }
           <div>
             <table className="auction-solution__product-table table is-striped">
               <thead>

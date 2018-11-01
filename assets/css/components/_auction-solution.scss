@@ -84,6 +84,27 @@
   }
 }
 
+.auction-solution__barge-section {
+  margin: 0.5rem -1rem;
+  padding: 0.5rem 1rem;
+  background-color: $gray-1;
+}
+
+.auction-solution__barge-list {
+  display: inline-block;
+
+  .auction-solution__barge {
+    display: inline-block;
+
+    &:not(:last-child) {
+      margin-right: 0.25rem;
+      &:after {
+        content: ','
+      }
+    }
+  }
+}
+
 .auction-comment {
   margin-bottom: -2.25rem !important;
 

@@ -208,6 +208,10 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
       margin-right: 1rem;
     }
 
+    &--unsubmit {
+      margin-right: 1rem;
+    }
+
     a {
       color: $gray-3;
       transition: color 0.1s ease-in;
@@ -300,6 +304,19 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     .collapsing-barge__barge__button {
       margin-left: 0rem;
     }
+
+    &.submitted {
+      flex-direction: row;
+      align-items: center;
+
+      .collapsing-barge__barge__trigger {
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .collapsing-barge__barge__button {
+        margin-left: auto;
+      }
+    }
   }
 }
 
@@ -315,6 +332,19 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
 
     .collapsing-barge__barge__button {
       margin-left: 0rem;
+    }
+
+    &.submitted {
+      flex-direction: row;
+      align-items: center;
+
+      .collapsing-barge__barge__trigger {
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .collapsing-barge__barge__button {
+        margin-left: auto;
+      }
     }
   }
 }

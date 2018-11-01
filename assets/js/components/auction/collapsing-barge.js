@@ -214,7 +214,7 @@ class CollapsingBarge extends Component {
               </div>)
           default:
             return (
-              <div className="collapsing-barge__barge__button">
+              <div className="collapsing-barge__barge__button collapsing-barge__barge__button--unsubmit">
                 <a onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `qa-auction-barge-unsubmit-${barge.id}` }><i className="fas fa-times"></i></a>
               </div>)
         }
@@ -224,7 +224,7 @@ class CollapsingBarge extends Component {
     return(
       <section className={`qa-barge-${barge.id} qa-barge-status-${bargeStatus} ${parentClassString.trim()}`}>
         <div className="container is-fullhd">
-          <div className="content has-gray-lighter">
+          <div className={`content has-gray-lighter${bargeStatus != 'available' ? ' submitted' : ''}`}>
             <h2
               className={"qa-barge-header " + triggerClassString.trim()}
               onClick={this.handleTriggerClick}

@@ -44,7 +44,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
             ? <div className="tags has-addons has-margin-top-xs">
                 <div className="tag is-success"><i className="fas fa-check"></i></div>
                 <div className="tag revoke-bid__status is-white">Bid Active</div>
-                <button className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></button>
+                <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
               </div>
             : <div className="tags has-addons has-margin-top-xs">
                 <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
