@@ -20,7 +20,7 @@ defmodule Oceanconnect.AuctionIndexTest do
     AuctionIndexPage.visit()
     :timer.sleep(500)
     AuctionIndexPage.cancel_auction(auction)
-    :timer.sleep(500)
+    :timer.sleep(300)
     assert AuctionIndexPage.auction_is_status?(auction, "canceled")
   end
 
@@ -91,11 +91,11 @@ defmodule Oceanconnect.AuctionIndexTest do
       AdminPage.impersonate_user(buyer)
       assert AdminPage.logged_in_as?(buyer)
       # Ensures auction card is rendered after reveal animation
-      :timer.sleep(1_000)
+      :timer.sleep(100)
       assert AuctionIndexPage.auction_is_status?(auction, "pending")
       AuctionIndexPage.start_auction(auction)
       # Ensures auction card is rendered after reveal animation
-      :timer.sleep(1_000)
+      :timer.sleep(100)
       assert AuctionIndexPage.auction_is_status?(auction, "open")
     end
   end

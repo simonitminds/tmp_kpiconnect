@@ -66,7 +66,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         ])
 
       {:ok, new_auction} = Auctions.create_auction(auction_attrs)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert Enum.any?(AuctionEventStore.event_list(new_auction.id), fn event ->
                event.type == :auction_created && event.auction_id == new_auction.id
@@ -78,7 +78,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.update_auction(auction, %{anonymous_bidding: true}, nil)
-      :timer.sleep(500)
+      :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
 
       assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] =
@@ -89,7 +89,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
          %{auction: auction = %Auction{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true}, nil)
-      :timer.sleep(500)
+      :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
 
       assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] =
@@ -104,7 +104,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
-      :timer.sleep(500)
+      :timer.sleep(400)
       assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
 
       assert [
@@ -122,7 +122,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
       |> Auctions.place_bid()
 
-      :timer.sleep(500)
+      :timer.sleep(200)
       assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
 
       assert [
@@ -142,7 +142,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction, true)
       |> Auctions.place_bid()
 
-      :timer.sleep(500)
+      :timer.sleep(200)
       assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
 
       assert [
@@ -166,7 +166,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       :timer.sleep(100)
       Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_id)
 
-      :timer.sleep(500)
+      :timer.sleep(200)
       assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
 
       assert [
@@ -183,7 +183,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
       Auctions.end_auction(auction)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
 
@@ -202,7 +202,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.end_auction(auction)
       state = Auctions.get_auction_state!(auction)
       Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.")
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}
 
@@ -225,7 +225,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       create_bid(1.50, nil, hd(auction.suppliers).id, fuel_id, auction)
       |> Auctions.place_bid()
       Auctions.end_auction(auction)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert [
                %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
@@ -242,7 +242,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
 
@@ -260,7 +260,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       Auctions.submit_barge(auction, barge, supplier.id)
       Auctions.unsubmit_barge(auction, barge, supplier.id)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id}
 
@@ -276,7 +276,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       Auctions.submit_barge(auction, barge, supplier.id)
       Auctions.approve_barge(auction, barge, supplier.id)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :barge_approved, auction_id: ^auction_id}
 
@@ -292,7 +292,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       Auctions.submit_barge(auction, barge, supplier.id)
       Auctions.reject_barge(auction, barge, supplier.id)
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id}
 

@@ -339,7 +339,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.start_auction()
       |> Auctions.end_auction()
 
-      :timer.sleep(500)
+      :timer.sleep(200)
 
       auction_ended_event =
         auction_id

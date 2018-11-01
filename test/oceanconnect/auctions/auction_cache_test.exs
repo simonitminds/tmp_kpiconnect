@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
     auction
     |> Auctions.update_auction!(%{po: "TEST STRING"}, nil)
 
-    :timer.sleep(500)
+    :timer.sleep(200)
 
     assert %Auction{po: "TEST STRING"} = AuctionCache.read(auction.id)
   end
