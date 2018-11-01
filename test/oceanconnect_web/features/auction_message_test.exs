@@ -66,7 +66,6 @@ defmodule Oceanconnect.AuctionMessageTest do
 
     test "buyer can see a list of all participating auctions in the chat window", %{auction: auction} do
       assert AuctionIndexPage.is_current_path?()
-      Hound.Helpers.Screenshot.take_screenshot()
       AuctionMessagePage.open_message_window()
       assert AuctionMessagePage.has_participating_auctions?([auction])
     end

@@ -7,9 +7,10 @@ defmodule Oceanconnect.Messages.MessagePayload do
 
   defstruct auction_id: nil,
             anonymous_bidding: false,
+            buyer_id: nil,
+            conversations: [],
             status: :pending,
-            vessels: [],
-            conversations: []
+            vessels: []
 
   def get_message_payloads_for_company(company_id) do
     company_id
@@ -25,13 +26,14 @@ defmodule Oceanconnect.Messages.MessagePayload do
     auction
     |> Repo.preload([:vessels])
     |> Map.take([:id, :anonymous_bidding, :buyer_id, :vessels])
-    |> replace_id_with_auction_id()
+    |> build_message_payload_struct()
     |> Map.merge(auction |> Auctions.get_auction_state!() |> Map.take([:status]))
   end
 
-  defp replace_id_with_auction_id(messages_map) do
-    Map.put(messages_map, :auction_id, messages_map.id)
-    |> Map.delete(:id)
+  defp build_message_payload_struct(messages_map) do
+    __MODULE__
+    |> struct(messages_map)
+    |> Map.put(:auction_id, messages_map.id)
   end
 
   defp get_auction_messages_for_payload(message_payload, company_id) do
@@ -52,9 +54,9 @@ defmodule Oceanconnect.Messages.MessagePayload do
     messages_map
     |> Enum.reduce([], fn({k, v}, acc) ->
       company_message_payload = %{
-      company_name: AuctionSuppliers.get_name_or_alias(k, message_payload),
-      messages: v
-    }
+        company_name: AuctionSuppliers.get_name_or_alias(k, message_payload),
+        messages: v
+      }
       [company_message_payload | acc]
     end)
     |> Enum.sort_by(& &1.company_name)

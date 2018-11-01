@@ -2,12 +2,9 @@ defmodule Oceanconnect.MessagesTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Messages
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Repo
+  alias Oceanconnect.Messages.Message
 
   describe "messages" do
-    alias Oceanconnect.Messages.Message
-
     @valid_attrs %{content: "some content", has_been_seen: true}
     @update_attrs %{content: "some updated content", has_been_seen: false}
     @invalid_attrs %{content: nil, has_been_seen: nil}
@@ -85,19 +82,6 @@ defmodule Oceanconnect.MessagesTest do
       insert_list(3, :message, auction: auction, recipient_company: supplier_company2)
 
       refute Enum.all?(Messages.list_auction_messages_for_company(auction.id, supplier_company.id), &(&1.recipient_company_id == supplier_company2.id))
-    end
-
-    test "returns aliased names for an anonymous auctions" do
-      supplier_company = insert(:company)
-      anon_auction =
-        :auction
-        |> insert(anonymous_bidding: true, suppliers: [supplier_company])
-        |> Auctions.create_supplier_aliases()
-        |> Auctions.fully_loaded()
-
-      insert_list(3, :message, auction: anon_auction, recipient_company: hd(anon_auction.suppliers))
-      messages_for_supplier = Messages.list_auction_messages_for_company(anon_auction.id, supplier_company.id) |> Repo.preload(:recipient_company)
-      refute Enum.all?(messages_for_supplier, &(&1.recipient_company.name == supplier_company.name))
     end
   end
 end

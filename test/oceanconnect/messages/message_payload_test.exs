@@ -1,22 +1,20 @@
 defmodule Oceanconnect.Messages.MessagePayloadTest do
   use Oceanconnect.DataCase
 
-  alias Oceanconnect.{Messages, Auctions}
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionSupervisor
-  alias Oceanconnect.Messages.{Message, MessagePayload}
+  alias Oceanconnect.Messages.MessagePayload
 
   describe "get_message_payloads_for_company/1" do
     setup do
       buyer_company = insert(:company)
       supplier_company = insert(:company)
       supplier_company2 = insert(:company)
-      vessels = insert_list(2, :vessel)
 
       auction =
         :auction
         |> insert(
           buyer: buyer_company,
-          vessels: vessels,
           suppliers: [supplier_company]
         )
         |> Auctions.fully_loaded()
@@ -29,42 +27,51 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
 
       Auctions.start_auction(auction)
 
-      auction2 =
+      anon_auction =
         :auction
         |> insert(
+          anonymous_bidding: true,
           buyer: buyer_company,
-          vessels: vessels,
-          suppliers: [supplier_company2]
+          suppliers: [supplier_company, supplier_company2]
         )
+        |> Auctions.create_supplier_aliases()
         |> Auctions.fully_loaded()
 
       insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
-      insert_list(4, :message, auction: auction2, author_company: buyer_company, recipient_company: supplier_company2)
+      insert_list(4, :message, auction: anon_auction, author_company: buyer_company, recipient_company: supplier_company2)
+      insert_list(2, :message, auction: anon_auction, author_company: supplier_company, recipient_company: buyer_company)
 
-      {:ok, %{buyer_company: buyer_company, supplier_company: supplier_company, supplier_company2: supplier_company2, vessels: vessels, auction: auction, auction2: auction2}}
+      {:ok, %{anon_auction: anon_auction, auction: auction, buyer_company: buyer_company, supplier_company: supplier_company, supplier_company2: supplier_company2}}
     end
 
-    test "returns message payloads for auctions that a company is participating in", %{buyer_company: author_company, supplier_company: recipient_company, auction: auction, auction2: auction2, vessels: vessels} do
-      # assert length of payload messages
-      # assertions for correct auctions, vessels, and status
-      message_payloads_for_author = MessagePayload.get_message_payloads_for_company(author_company.id)
-      assert length(Enum.flat_map(message_payloads_for_author, fn message_payload ->
+    test "returns message payloads for a buyer's auctions", %{anon_auction: anon_auction, auction: auction, buyer_company: buyer_company} do
+      message_payloads_for_company = MessagePayload.get_message_payloads_for_company(buyer_company.id)
+      assert length(Enum.flat_map(message_payloads_for_company, fn message_payload ->
         Enum.flat_map(message_payload.conversations, &(&1.messages))
-      end)) == 7
+      end)) == 9
+      assert Enum.all?(message_payloads_for_company, &(&1.auction_id == auction.id or &1.auction_id == anon_auction.id))
 
-      assert Enum.any?(message_payloads_for_author, &(&1.auction_id == auction.id))
-      assert Enum.any?(message_payloads_for_author, &(&1.auction_id == auction2.id))
-
-      message_payloads_for_recipient = MessagePayload.get_message_payloads_for_company(recipient_company.id)
-      assert length(Enum.flat_map(message_payloads_for_recipient, fn message_payload ->
-        Enum.flat_map(message_payload.conversations, &(&1.messages))
-      end)) == 3
-      assert Enum.all?(message_payloads_for_recipient, &(&1.auction_id == auction.id))
-      refute Enum.all?(message_payloads_for_recipient, &(&1.auction_id == auction2.id))
+      message_payload_for_anon_auction = Enum.find(message_payloads_for_company, & &1.auction_id == anon_auction.id)
+      assert %MessagePayload{} = message_payload_for_anon_auction
+      assert length(message_payload_for_anon_auction.conversations) == 2
+      vessel_names = Enum.map(anon_auction.vessels, & &1.name)
+      assert Enum.all?(message_payload_for_anon_auction.vessels, & &1.name in vessel_names)
     end
 
-    test "does not return message payloads for auctions a company is not participating in" do
+    test "does not return message payloads for auctions a company is not participating in", %{anon_auction: anon_auction, supplier_company2: supplier_company2} do
+      message_payloads_for_company = MessagePayload.get_message_payloads_for_company(supplier_company2.id)
+      assert length(Enum.flat_map(message_payloads_for_company, fn message_payload ->
+        Enum.flat_map(message_payload.conversations, &(&1.messages))
+      end)) == 4
+      assert Enum.all?(message_payloads_for_company, &(&1.auction_id == anon_auction.id))
+    end
 
+    test "returns aliased names for buyer in an anonymous auction", %{anon_auction: %{id: auction_id}, buyer_company: buyer_company, supplier_company2: %{name: supplier_name}} do
+      buyer_message_payload_for_anon_auction =
+        buyer_company.id
+        |> MessagePayload.get_message_payloads_for_company()
+        |> Enum.find(& &1.auction_id == auction_id)
+      refute hd(buyer_message_payload_for_anon_auction.conversations).company_name == supplier_name
     end
   end
 end

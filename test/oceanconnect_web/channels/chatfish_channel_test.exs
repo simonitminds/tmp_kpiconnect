@@ -26,9 +26,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       |> insert(buyer: buyer_company, suppliers: [supplier2])
       |> Auctions.fully_loaded()
 
-    messages = insert_list(3, :message, auction: auction, author_company: hd(supplier_companies), recipient_company: buyer_company)
-
-    {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users, messages: messages}
+    {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users}
   end
 
   test "supplier can only see messages between them and buyer for auctions they participate in", %{
@@ -54,7 +52,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(message_payloads, &(&1.id))
+        auction_ids = Enum.map(message_payloads, &(&1.auction_id))
         assert Enum.member?(auction_ids, auction_id)
         refute Enum.member?(auction_ids, auction2_id)
 
@@ -86,7 +84,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(message_payloads, &(&1.id))
+        auction_ids = Enum.map(message_payloads, &(&1.auction_id))
         assert Enum.member?(auction_ids, auction_id)
         assert Enum.member?(auction_ids, auction2_id)
     after 5000 ->
