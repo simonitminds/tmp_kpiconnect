@@ -257,6 +257,15 @@
 // Auction Bid box
 
 .auction-bidding {
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-height: 93vh;
+
+    .body--admin & {
+      max-height: 85vh;
+    }
+  }
+
+
   @media (max-width: 768px) {
     position: fixed;
     bottom: 0;
@@ -265,14 +274,6 @@
     padding-top: 1rem;
     width: 100vw;
     background-color: $gray-1;
-  }
-}
-
-.auction-bidding {
-  max-height: 93vh;
-
-  .body--admin & {
-    max-height: 85vh;
   }
 }
 
@@ -303,9 +304,9 @@
 }
 
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
-  margin: 1.25rem -1.275rem -1rem -1.275rem;
+  // margin: 1.25rem -1.275rem -1rem -1.275rem;
   box-shadow: none;
-  border-top: 1px solid $gray-2;
+  border: 1px solid $gray-2;
 
   @media (max-width: 768px) {
     margin: 0 -2.25rem;

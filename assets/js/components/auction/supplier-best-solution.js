@@ -14,24 +14,28 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId}) => {
 
   return(
     <div className="auction-lowest-bid">
-      <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={supplierId} />
-      <div className="box">
-        <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
-          { bestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} title="Best Overall Offer" />
-          }
-          { bestSingleSupplier &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} title={`Best Single Supplier Offer`}/>
-          }
-          { !bestSolution &&
-            <div className="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
-          }
+      { auctionStatus != 'pending' &&
+        <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={supplierId} />
+      }
+      { auctionStatus != 'pending' &&
+        <div className="box">
+          <div className="box__subsection">
+            <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
+            { bestSolution &&
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} title="Best Overall Offer" />
+            }
+            { bestSingleSupplier &&
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} title={`Best Single Supplier Offer`}/>
+            }
+            { !bestSolution &&
+              <div className="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
+            }
+          </div>
         </div>
-      </div>
+      }
       <div className="box">
         <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">Your Best Offer</h3>
+          <h3 className="box__header box__header--bordered">Your {auctionStatus == 'pending' ? 'Opening Offer' : 'Best Offer'}</h3>
           { suppliersBestSolution &&
             <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} title="Your Best Offer" />
           }
