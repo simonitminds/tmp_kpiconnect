@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import AuctionMessages from '../components/auction/auction-messages';
 import {
-  getAllAuctionPayloads,
   getCompanyBarges,
   acceptWinningSolution,
   setPortAgent,

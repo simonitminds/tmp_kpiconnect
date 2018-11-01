@@ -82,7 +82,7 @@ export function subscribeToAuctionUpdates() {
   };
 }
 
-export function getAllAuctionPayloads() {
+function getAllAuctionPayloads() {
   return dispatch => {
     fetch('/api/auctions', { headers: defaultHeaders })
       .then(checkStatus)

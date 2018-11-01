@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionsIndex from '../components/auction/index'
 import AuctionMessages from '../components/auction/auction-messages.js'
-import { getAllAuctionPayloads, subscribeToAuctionUpdates, subscribeToAuctionMessages } from '../actions';
+import { subscribeToAuctionUpdates, subscribeToAuctionMessages } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
