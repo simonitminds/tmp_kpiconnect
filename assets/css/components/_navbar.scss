@@ -28,7 +28,7 @@ $navbar-background-color: $primary;
 }
 
 .navbar-menu {
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     background-color: $white !important;
   }
 }
