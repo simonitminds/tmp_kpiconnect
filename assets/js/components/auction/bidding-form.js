@@ -55,30 +55,30 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
         <div className="column">
           <div className="columns is-desktop">
             <div className="column">
-              <div className="field is-horizontal is-expanded">
-                <div className="field-label">
-                  <div className="control"><label className="label" htmlFor="bid">Bid Amount<br/><span className="auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</span></label></div>
+              <div className="field">
+                <label className="label" htmlFor="bid">Bid Amount</label>
+                <div className="control auction-bidding__input has-icons-left">
+                  <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                  <input type="number" step="0.25" min="0" className="input qa-auction-bid-amount" id="bid" name="amount" data-product={productId}/>
                 </div>
-                <div className="field-body auction-bidding__input">
-                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-amount" id="bid" name="amount" data-product={productId}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
-                </div>
+                <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
               </div>
             </div>
             <div className="column">
-              <div className="field is-horizontal is-expanded">
-                <div className="field-label">
-                  <div className="control"><label className="label" htmlFor="bid">Minimum Bid<br/><span className="auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</span></label></div>
+              <div className="field">
+                <label className="label" htmlFor="bid">Minimum Bid</label>
+                <div className="control auction-bidding__input has-icons-left">
+                  <input type="number" step="0.25" min="0" className="input qa-auction-bid-min_amount" id="minimumBid" name="min_amount" data-product={productId}/>
+                  <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
                 </div>
-                <div className="field-body auction-bidding__input">
-                  <div className="control is-expanded has-icons-left"><input type="number" step="0.25" min="0" className="input qa-auction-bid-min_amount" id="minimumBid" name="min_amount" data-product={productId}/><span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span></div>
-                </div>
+                <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
               </div>
             </div>
           </div>
         </div>
         <div className="column is-narrow">
           <label className="checkbox">
-            <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Allow Split?
+            <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
           </label>
         </div>
       </div>

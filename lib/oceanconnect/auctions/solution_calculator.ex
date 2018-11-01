@@ -28,7 +28,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     supplier_solutions
     |> Map.values()
     |> Enum.filter(&(&1.valid))
-    |> Enum.sort_by(&solution_tuple/1)
+    |> Enum.sort_by(&Solution.sort_tuple/1)
     |> Enum.at(0, %Solution{valid: false}) # list may be empty, so avoid `hd` and return a blank solution instead.
   end
 
@@ -50,7 +50,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
       end
 
     [best_split, best_single_supplier]
-    |> Enum.min_by(&solution_tuple/1)
+    |> Enum.min_by(&Solution.sort_tuple/1)
   end
 
   # Returns a map of single supplier solutions keyed by the supplier's id.
@@ -70,17 +70,5 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
     Enum.reduce(lowest_bids_by_supplier, %{}, fn({supplier_id, bids}, acc) ->
       Map.put(acc, supplier_id, Solution.from_bids(bids, product_bids, auction))
     end)
-  end
-
-  def solution_tuple(solution) do
-    # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.
-    valid_indicator = if solution.valid, do: 0, else: 1
-    latest_time_entered =
-      if solution.latest_time_entered do
-        DateTime.to_unix(solution.latest_time_entered, :microsecond)
-      else
-        DateTime.utc_now()
-      end
-    {valid_indicator, solution.total_price, latest_time_entered}
   end
 end
