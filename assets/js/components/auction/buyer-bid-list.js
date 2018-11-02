@@ -26,7 +26,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
             const lowestBids = productBids[fuel_id].lowest_bids;
 
             return (
-              <table key={fuel_id} className="table is-fullwidth is-striped is-marginless">
+              <table key={fuel_id} className="table table--grade-display is-fullwidth is-striped is-marginless">
                 <thead>
                   <tr>
                     <th>{fuels[fuel_id].name}</th>
@@ -44,13 +44,13 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
                             <span className="qa-auction-bid-is_traded_bid">
                               {is_traded_bid &&
                                 <span className="auction__traded-bid-tag">
-                                  <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-sm auction__traded-bid-marker"></i>
-                                  Traded Bid
+                                  <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+                                  <span className="has-padding-left-sm">Traded Bid</span>
                                 </span>
                               }
                             </span>
                           </td>
-                          <td>{formatTime(time_entered)}</td>
+                          <td>({formatTime(time_entered)})</td>
                         </tr>
                       );
                     })
