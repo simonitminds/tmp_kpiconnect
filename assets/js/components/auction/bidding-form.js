@@ -94,7 +94,7 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
             { (is_traded_bid_allowed === true) &&
               <div className="field field--ribbon is-horizontal">
                 <div className="field-label"></div>
-                <div className="field-body">
+                <div className="field-body field-body--wrapped">
                   <CheckBoxField
                     model={'auction-bid'}
                     field={'is_traded_bid'}
@@ -102,11 +102,13 @@ const BiddingForm = ({auctionPayload, formSubmit, revokeBid, barges}) => {
                     value={is_traded_bid}
                     opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                   />
+                  <i>Buyer's Credit Margin with OCM: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
                 </div>
-              <i>Buyer's Credit Margin with OCM: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
               </div>
             }
-
+            <div className="traded-bid-help-text notification is-turquoise">
+              <i className="fas fa-info-circle is-inline-block has-margin-right-sm"></i> Add the above credit margin to your baseline price when placing your bid
+            </div>
             { products.map((product) => renderProduct(product, auctionPayload)) }
           </div>
 

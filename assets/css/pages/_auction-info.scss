@@ -324,12 +324,19 @@
 
 .auction__traded-bid-tag {
   display: inline-block;
-  background-color: $gray-3;
-  border-radius: 3px;
+  margin-left: auto;
   padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  background-color: $gray-3;
   color: $white;
   font-size: 0.85rem;
   vertical-align: middle;
+
+  @media(max-width: 768px) and (min-width: 480px) {
+    span { // Hide text when on mobile.
+      display: none;
+    }
+  }
 }
 
 .auction__traded-bid-marker {
@@ -354,6 +361,14 @@
     left: -39px;
     font-family: $family-sans-serif;
   }
+}
+
+.traded-bid-help-text {
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  background-color: $white;
 }
 
 .revoke-bid__status {

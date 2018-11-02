@@ -6,7 +6,7 @@ const CheckBoxField = ({model, field, labelText, value, onChange, opts = {}}) =>
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
 
   return (
-    <div className="field">
+    <div className="field has-margin-bottom-none">
       <div className="control">
         <input name={`${model}[${field}]`} type="hidden" value="false" />
         <input
