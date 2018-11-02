@@ -34,6 +34,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:etd, :utc_datetime)
     field(:scheduled_start, :utc_datetime)
     field(:auction_ended, :utc_datetime)
+    field(:auction_closed_time, :utc_datetime)
     # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
     # milliseconds
@@ -65,6 +66,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :additional_information,
     :anonymous_bidding,
     :auction_ended,
+    :auction_closed_time,
     :buyer_id,
     :decision_duration,
     :duration,
