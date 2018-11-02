@@ -1,49 +1,35 @@
 defmodule OceanconnectWeb.ChatfishChannelTest do
   use OceanconnectWeb.ChannelCase
-  alias Oceanconnect.{Accounts, Auctions}
+  alias Oceanconnect.{Auctions, Repo}
+  alias Oceanconnect.Messages.{Message, MessagePayload}
   alias OceanconnectWeb.ChatfishChannel
 
 
   setup do
     buyer_company = insert(:company, is_supplier: true)
-    buyer_users = insert_list(2, :user, company: buyer_company)
-    supplier_companies = insert_list(2, :company, is_supplier: true)
-    supplier_users = for company <- supplier_companies do
-      :user
-      |> insert(company: company)
-      |> Accounts.load_company_on_user()
-    end
-
-    [supplier, supplier2] = supplier_companies
+    buyer = insert(:user, company: buyer_company)
+    supplier_company = insert(:company, is_supplier: true)
+    supplier = insert(:user, company: supplier_company)
 
     auction =
       :auction
-      |> insert(buyer: buyer_company, suppliers: [supplier])
+      |> insert(buyer: buyer_company, suppliers: [supplier_company])
       |> Auctions.fully_loaded()
 
-    auction2 =
-      :auction
-      |> insert(buyer: buyer_company, suppliers: [supplier2])
-      |> Auctions.fully_loaded()
+    messages = insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
 
-    {:ok, auction: auction, auction2: auction2, buyer_company: buyer_company, buyer_users: buyer_users, supplier_companies: supplier_companies, supplier_users: supplier_users}
+    {:ok, auction: auction, buyer: buyer, messages: messages, supplier: supplier}
   end
 
-  test "supplier can only see messages between them and buyer for auctions they participate in", %{
-    auction: auction,
-    auction2: auction2,
-    supplier_users: [supplier_user | _]
-  } do
-    channel = "user_messages:#{Integer.to_string(supplier_user.company_id)}"
+  test "supplier can get message payloads", %{supplier: supplier} do
+    channel = "user_messages:#{Integer.to_string(supplier.company_id)}"
     event = "messages_update"
 
-    {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier_user)
+    {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
 
     {:ok, _, _socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
 
-    auction_id = auction.id
-    auction2_id = auction2.id
     receive do
       %Phoenix.Socket.Broadcast{
         event: ^event,
@@ -52,30 +38,21 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(message_payloads, &(&1.auction_id))
-        assert Enum.member?(auction_ids, auction_id)
-        refute Enum.member?(auction_ids, auction2_id)
+        assert %MessagePayload{} = hd(message_payloads)
 
     after 5000 ->
-        assert false, "Expected message received nothing."
+      assert false, "Expected message received nothing."
     end
   end
 
-
-  test "buyer can see all buyer to supplier messages for their auctions", %{
-    auction: auction,
-    auction2: auction2,
-    buyer_users: [buyer_user | _]
-  } do
-    channel = "user_messages:#{Integer.to_string(buyer_user.company_id)}"
+  test "buyer can get message payloads", %{buyer: buyer} do
+    channel = "user_messages:#{Integer.to_string(buyer.company_id)}"
     event = "messages_update"
 
-    {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer_user)
+    {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
     {:ok, _, _socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => buyer_token})
 
-    auction_id = auction.id
-    auction2_id = auction2.id
     receive do
       %Phoenix.Socket.Broadcast{
         event: ^event,
@@ -84,11 +61,26 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         },
         topic: ^channel
       } ->
-        auction_ids = Enum.map(message_payloads, &(&1.auction_id))
-        assert Enum.member?(auction_ids, auction_id)
-        assert Enum.member?(auction_ids, auction2_id)
+        assert %MessagePayload{} = hd(message_payloads)
     after 5000 ->
-        assert false, "Expected message received nothing."
+      assert false, "Expected message received nothing."
     end
+  end
+
+  test "recipient can mark messages as seen", %{messages: messages, supplier: supplier} do
+    channel = "user_messages:#{Integer.to_string(supplier.company_id)}"
+    event = "seen"
+
+    [%{id: message_id} | unseen_messages] = messages
+    {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
+
+    {:ok, _, socket} =
+      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
+
+    push(socket, event, %{"ids" => [message_id]})
+
+    :timer.sleep(100)
+    assert Enum.all?(unseen_messages, &Repo.get(Message, &1.id).has_been_seen == false)
+    assert Repo.get(Message, message_id).has_been_seen
   end
 end

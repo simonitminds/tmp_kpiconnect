@@ -1,6 +1,7 @@
 defmodule OceanconnectWeb.ChatfishChannel do
   use OceanconnectWeb, :channel
 
+  alias Oceanconnect.Messages
   alias Oceanconnect.Messages.MessagePayload
 
   def join("user_messages:" <> id, payload, socket) do
@@ -14,7 +15,12 @@ defmodule OceanconnectWeb.ChatfishChannel do
 
   def handle_info({:messages_update, company_id}, socket) do
     message_payloads = MessagePayload.get_message_payloads_for_company(company_id)
-    broadcast! socket, "messages_update", %{message_payloads: message_payloads}
+    broadcast!(socket, "messages_update", %{message_payloads: message_payloads})
+    {:noreply, socket}
+  end
+
+  def handle_in("seen", %{"ids" => message_ids}, socket) do
+    Enum.each(message_ids, &(&1) |> Messages.get_message!() |> Messages.update_message(%{has_been_seen: true}))
     {:noreply, socket}
   end
 
