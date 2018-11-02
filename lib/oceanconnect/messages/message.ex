@@ -19,7 +19,7 @@ defmodule Oceanconnect.Messages.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:content, :has_been_seen])
+    |> cast(attrs, [:author_id, :author_company_id, :auction_id, :content, :has_been_seen, :recipient_company_id])
     |> validate_required([:content, :has_been_seen])
   end
 
