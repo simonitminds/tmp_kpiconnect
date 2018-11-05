@@ -132,7 +132,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       } = solution
     end
 
-    test "uses latest time entered to break ties", %{
+    test "uses latest original time entered to break ties", %{
       auction: auction = %Auction{id: auction_id},
       fuel1: %Fuel{id: fuel1_id},
       fuel2: %Fuel{id: fuel2_id},
@@ -140,12 +140,12 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       supplier2: %{id: supplier2_id},
       supplier3: %{id: supplier3_id},
     } do
-      fuel1_supplier2 = %AuctionBid{amount: 2.00, supplier_id: supplier2_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now()}
-      fuel2_supplier2 = %AuctionBid{amount: 2.50, supplier_id: supplier2_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now()}
-      fuel1_supplier1 = %AuctionBid{amount: 2.00, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now()}
-      fuel2_supplier1 = %AuctionBid{amount: 2.50, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now()}
-      fuel1_supplier3 = %AuctionBid{amount: 2.00, supplier_id: supplier3_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now()}
-      fuel2_supplier3 = %AuctionBid{amount: 3.00, supplier_id: supplier3_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now()}
+      fuel1_supplier2 = %AuctionBid{amount: 2.00, supplier_id: supplier2_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
+      fuel2_supplier2 = %AuctionBid{amount: 2.50, supplier_id: supplier2_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
+      fuel1_supplier1 = %AuctionBid{amount: 2.00, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
+      fuel2_supplier1 = %AuctionBid{amount: 2.50, supplier_id: supplier1_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
+      fuel1_supplier3 = %AuctionBid{amount: 2.00, supplier_id: supplier3_id, auction_id: auction_id, fuel_id: fuel1_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
+      fuel2_supplier3 = %AuctionBid{amount: 3.00, supplier_id: supplier3_id, auction_id: auction_id, fuel_id: fuel2_id, active: true, time_entered: DateTime.utc_now(), original_time_entered: DateTime.utc_now()}
 
       current_state = %AuctionState{
         auction_id: auction_id,
