@@ -67,11 +67,11 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     end
   end
 
-  test "recipient can mark messages as seen", %{messages: messages, supplier: supplier} do
+  test "recipient can mark messages as seen and author is notified", %{messages: messages, buyer: buyer, supplier: supplier} do
     channel = "user_messages:#{supplier.company_id}"
     event = "seen"
 
-    [%{id: message_id} | unseen_messages] = messages
+    [%{id: message_id} | _] = messages
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
 
     {:ok, _, socket} =
@@ -79,9 +79,28 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
 
     push(socket, event, %{"ids" => [message_id]})
 
-    :timer.sleep(100)
-    assert Enum.all?(unseen_messages, &Repo.get(Message, &1.id).has_been_seen == false)
-    assert Repo.get(Message, message_id).has_been_seen
+    author_channel = "user_messages:#{buyer.company_id}"
+    author_event = "messages_update"
+
+    {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
+
+    {:ok, _, _socket} =
+      subscribe_and_join(socket(), ChatfishChannel, author_channel, %{"token" => buyer_token})
+
+    receive do
+      %Phoenix.Socket.Broadcast{
+        event: ^author_event,
+        payload: %{
+          message_payloads: message_payloads
+        },
+        topic: ^author_channel
+      } ->
+        assert message_payload = %MessagePayload{} = hd(message_payloads)
+        messages = hd(message_payload.conversations).messages
+        assert messages |> Enum.filter(& &1.id == message_id) |> hd() |> Map.get(:has_been_seen)
+    after 5000 ->
+      assert false, "Expected message received nothing."
+    end
   end
 
   test "cannot mark messages as seen if not recipient", %{messages: messages, buyer: buyer} do

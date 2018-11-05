@@ -19,6 +19,10 @@ defmodule OceanconnectWeb.ChatfishChannel do
     {:noreply, socket}
   end
 
+  def handle_info({:messages_update, nil}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_info({:messages_update, company_id}, socket) do
     message_payloads = MessagePayload.get_message_payloads_for_company(company_id)
     OceanconnectWeb.Endpoint.broadcast("user_messages:#{company_id}", "messages_update", %{message_payloads: message_payloads})
@@ -27,7 +31,16 @@ defmodule OceanconnectWeb.ChatfishChannel do
 
   def handle_in("seen", %{"ids" => message_ids}, socket) do
     current_company_id = Guardian.Phoenix.Socket.current_resource(socket).company_id
-    Enum.each(message_ids, &(&1) |> Messages.get_message!() |> maybe_update_message(current_company_id))
+    message_ids
+    |> Enum.map(fn(message_id) ->
+      message_id
+      |> Messages.get_message!()
+      |> maybe_update_message(current_company_id)
+      |> Messages.get_related_company_ids()
+    end)
+    |> List.flatten()
+    |> Enum.uniq()
+    |> Enum.each(&send(self(), {:messages_update, &1}))
     {:noreply, socket}
   end
 
