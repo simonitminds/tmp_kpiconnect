@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   import Ecto.Changeset
   alias __MODULE__
   alias Oceanconnect.Accounts.Company
-  alias Oceanconnect.Auctions.AuctionSuppliers
+  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers}
   alias Oceanconnect.Repo
 
   schema "auction_suppliers" do
@@ -25,11 +25,11 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     |> foreign_key_constraint(:barge_id)
   end
 
-  def get_name_or_alias(supplier_id, %{anonymous_bidding: true, suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
-  end
-  def get_name_or_alias(buyer_id, %{anonymous_bidding: true, buyer_id: buyer_id}) do
+  def get_name_or_alias(buyer_id, %{buyer_id: buyer_id}) do
     Repo.get(Company, buyer_id).name
+  end
+  def get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
   def get_name_or_alias(supplier_id, %{anonymous_bidding: true, auction_id: auction_id}) do
     Repo.get_by!(__MODULE__, %{auction_id: auction_id, supplier_id: supplier_id}).alias_name

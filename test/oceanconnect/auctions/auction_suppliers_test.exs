@@ -15,6 +15,14 @@ defmodule Oceanconnect.AuctionSuppliersTest do
       {:ok, %{auction: auction, anon_auction: anon_auction}}
     end
 
+    test "provides name for buyer on non anon_auction", %{auction: %Auction{buyer: buyer} = auction} do
+      assert AuctionSuppliers.get_name_or_alias(buyer.id, auction) == buyer.name
+    end
+
+    test "provides name for buyer on anon_auction", %{anon_auction: %Auction{buyer: buyer} = anon_auction} do
+      assert AuctionSuppliers.get_name_or_alias(buyer.id, anon_auction) == buyer.name
+    end
+
     test "provides name for non anon_auction", %{auction: %Auction{suppliers: [supplier | _]} = auction} do
       assert AuctionSuppliers.get_name_or_alias(supplier.id, auction) == supplier.name
     end

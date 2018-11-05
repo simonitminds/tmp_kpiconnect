@@ -10,12 +10,13 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       buyer_company = insert(:company)
       supplier_company = insert(:company)
       supplier_company2 = insert(:company)
+      supplier_company3 = insert(:company)
 
       auction =
         :auction
         |> insert(
           buyer: buyer_company,
-          suppliers: [supplier_company]
+          suppliers: [supplier_company, supplier_company3]
         )
         |> Auctions.fully_loaded()
 
@@ -37,11 +38,20 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         |> Auctions.create_supplier_aliases()
         |> Auctions.fully_loaded()
 
+      buyer_company2 = insert(:company)
+      auction2 =
+        :auction
+        |> insert(
+          buyer: buyer_company2,
+          suppliers: [supplier_company3]
+        )
+        |> Auctions.fully_loaded()
+
       insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
       insert_list(4, :message, auction: anon_auction, author_company: buyer_company, recipient_company: supplier_company2)
       insert_list(2, :message, auction: anon_auction, author_company: supplier_company, recipient_company: buyer_company)
 
-      {:ok, %{anon_auction: anon_auction, auction: auction, buyer_company: buyer_company, supplier_company: supplier_company, supplier_company2: supplier_company2}}
+      {:ok, %{anon_auction: anon_auction, auction: auction, auction2: auction2, buyer_company: buyer_company, supplier_company: supplier_company, supplier_company2: supplier_company2, supplier_company3: supplier_company3}}
     end
 
     test "returns message payloads for a buyer's auctions", %{anon_auction: anon_auction, auction: auction, buyer_company: buyer_company, supplier_company: supplier_company} do
@@ -62,6 +72,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       anon_auction_supplier_alias_name = Enum.find(anon_auction.suppliers, & &1.id == supplier_company.id).alias_name
       assert Enum.find(message_payload_for_anon_auction.conversations, & &1.company_name == anon_auction_supplier_alias_name).unseen_messages == 2
 
+      assert message_payload_for_anon_auction.suppliers == []
       [message | _] = hd(message_payload_for_anon_auction.conversations).messages
       refute Enum.any?([:author_id, :author_compnay_id, :recipient_company_id], &Map.has_key?(message, &1))
     end
@@ -92,6 +103,22 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         |> MessagePayload.get_message_payloads_for_company()
         |> Enum.find(& &1.auction_id == auction_id)
       refute hd(buyer_message_payload_for_anon_auction.conversations).company_name == supplier_name
+    end
+
+    test "buyer's conversation list includes supplier with no correspondence", %{auction: %{id: auction_id}, buyer_company: buyer_company, supplier_company3: %{name: supplier_name}} do
+      buyer_message_payload_for_auction =
+        buyer_company.id
+        |> MessagePayload.get_message_payloads_for_company()
+        |> Enum.find(& &1.auction_id == auction_id)
+      assert supplier_name in Enum.map(buyer_message_payload_for_auction.conversations, & &1.company_name)
+    end
+
+    test "supplier's conversation list includes buyer with no correspondence", %{auction2: %{id: auction_id, buyer: %{name: buyer_name}}, supplier_company3: supplier_company} do
+      supplier_message_payload_for_auction =
+        supplier_company.id
+        |> MessagePayload.get_message_payloads_for_company()
+        |> Enum.find(& &1.auction_id == auction_id)
+      assert buyer_name in Enum.map(supplier_message_payload_for_auction.conversations, & &1.company_name)
     end
   end
 end

@@ -8,6 +8,7 @@ defmodule Oceanconnect.Messages.MessagePayload do
             buyer_id: nil,
             conversations: [],
             status: :pending,
+            suppliers: [],
             unseen_messages: nil,
             vessels: []
 
@@ -19,13 +20,14 @@ defmodule Oceanconnect.Messages.MessagePayload do
       |> load_auction_info_for_message_payload()
       |> get_auction_messages_for_payload(company_id)
       |> add_unseen_message_totals()
+      |> Map.put(:suppliers, [])
     end)
   end
 
   defp load_auction_info_for_message_payload(%Auction{} = auction) do
     auction
-    |> Repo.preload([:vessels])
-    |> Map.take([:id, :anonymous_bidding, :buyer_id, :vessels])
+    |> Repo.preload([:suppliers, :vessels])
+    |> Map.take([:id, :anonymous_bidding, :buyer_id, :suppliers, :vessels])
     |> build_message_payload_struct()
     |> Map.merge(auction |> Auctions.get_auction_state!() |> Map.take([:status]))
   end
@@ -44,11 +46,21 @@ defmodule Oceanconnect.Messages.MessagePayload do
     auction_id
     |> Messages.list_auction_messages_for_company(company_id)
     |> Enum.group_by(&get_correspondence_company_id(&1, company_id))
+    |> maybe_add_companies_with_no_correspondence(message_payload, company_id)
     |> build_message_payload_with_supplier_name(message_payload, company_id)
   end
 
   defp get_correspondence_company_id(%{author_company_id: company_id, recipient_company_id: id}, company_id), do: id
   defp get_correspondence_company_id(%{author_company_id: id}, _company_id), do: id
+
+  defp maybe_add_companies_with_no_correspondence(messages_map, %{buyer_id: buyer_id, suppliers: suppliers}, buyer_id) do
+    empty_supplier_messages_map = Enum.reduce(suppliers, %{}, fn(%{id: id}, acc) -> Map.put(acc, id, []) end)
+    Map.merge(empty_supplier_messages_map, messages_map)
+  end
+
+  defp maybe_add_companies_with_no_correspondence(messages_map, %{buyer_id: buyer_id}, _company_id) do
+    Map.merge(%{buyer_id => []}, messages_map)
+  end
 
   defp build_message_payload_with_supplier_name(messages_map, message_payload, company_id) do
     messages_map
