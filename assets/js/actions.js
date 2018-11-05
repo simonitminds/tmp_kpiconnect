@@ -12,7 +12,6 @@ import {
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_COMPANY_BARGES,
-  RECEIVE_MESSAGE_PAYLOADS,
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
   SELECT_PORT,
@@ -40,27 +39,6 @@ const defaultHeaders = {
   'x-expires': window.expiration
 };
 
-export function subscribeToAuctionMessages() {
-  return (dispatch, getState) => {
-    messageChannel.join()
-      .receive("ok", resp => {
-        console.log("Joined chat successfully", resp);
-        dispatch({type: MESSAGE_CHANNEL_CONNECTED});
-        dispatch(getAllMessagePayloads());
-      })
-      .receive("error", resp => { console.log("Unable to join", resp); });
-
-    messageChannel.on("messages_update", payload => {
-      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagePayloads: payload});
-    });
-
-    messageChannel.onError( () => {
-      const { connection } = getState().auctionsReducer;
-      if (connection) {dispatch({type: MESSAGE_CHANNEL_DISCONNECTED})};
-    });
-  };
-}
-
 export function subscribeToAuctionUpdates() {
   return (dispatch, getState) => {
     auctionChannel.join()
@@ -82,6 +60,34 @@ export function subscribeToAuctionUpdates() {
   };
 }
 
+export function subscribeToMessageUpdates() {
+  return (dispatch, getState) => {
+    messageChannel.join()
+      .receive("ok", resp => {
+        console.log("Joined chat successfully", resp);
+        dispatch({type: MESSAGE_CHANNEL_CONNECTED});
+      })
+      .receive("error", resp => { console.log("Unable to join", resp); });
+
+    messageChannel.on("messages_update", payload => {
+      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagePayloads: payload.message_payloads});
+    });
+
+    messageChannel.onError( () => {
+      const { connection } = getState().auctionsReducer;
+      if (connection) {dispatch({type: MESSAGE_CHANNEL_DISCONNECTED})};
+    });
+  };
+}
+
+export function markMessagesAsSeen(messageIds) {
+  messageChannel.push('seen', {ids: messageIds})
+}
+
+export function sendMessage(auctionId, recipientCompanyId, content) {
+  messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompanyId, content: content})
+}
+
 function getAllAuctionPayloads() {
   return dispatch => {
     fetch('/api/auctions', { headers: defaultHeaders })
@@ -89,17 +95,6 @@ function getAllAuctionPayloads() {
       .then(parseJSON)
       .then((response) => {
         return dispatch(receiveAuctionPayloads(response.data));
-      });
-  };
-}
-
-export function getAllMessagePayloads() {
-  return dispatch => {
-    fetch('/api/auctions', { headers: defaultHeaders })
-      .then(checkStatus)
-      .then(parseJSON)
-      .then((response) => {
-        return dispatch(receiveMessagePayloads(response.data));
       });
   };
 }
@@ -258,11 +253,6 @@ export function updateBidStatus(auctionId, response) {
 export function receiveAuctionPayloads(auctionPayloads) {
   return {type: RECEIVE_AUCTION_PAYLOADS,
           auctionPayloads: auctionPayloads};
-}
-
-export function receiveMessagePayloads(messagePayloads) {
-  return {type: RECEIVE_MESSAGE_PAYLOADS,
-          messagePayloads: messagePayloads};
 }
 
 export function receiveSuppliers(port, suppliers) {

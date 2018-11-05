@@ -27,6 +27,7 @@ import { receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import AuctionContainer from './containers/auction-container';
+import MessagesContainer from './containers/messages-container';
 
 
 function getDataForComponent(componentName) {
@@ -41,8 +42,8 @@ function getDataForComponent(componentName) {
 }
 
 let currentUserCompanyId = null;
-if(window.companyId && window.companyId != ""){
-currentUserCompanyId = window.companyId;
+if (window.companyId && window.companyId != "") {
+  currentUserCompanyId = window.companyId;
 }
 
 if (document.getElementById('auctions-app')) {
@@ -62,8 +63,18 @@ const store =
 
   const setContainer = () => {
     switch (window.container) {
-      case "index": { return <AuctionsContainer currentUserCompanyId={currentUserCompanyId} /> }
-      case "show": { return <AuctionContainer currentUserCompanyId={currentUserCompanyId} /> }
+      case "index": { return (
+        <div>
+          <AuctionsContainer currentUserCompanyId={currentUserCompanyId} />
+          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+        </div>
+      )}
+      case "show": { return (
+        <div>
+          <AuctionContainer currentUserCompanyId={currentUserCompanyId} />
+          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+        </div>
+      )}
       case "edit": { return getDataForComponent("AuctionFormContainer")}
       case "new": { return getDataForComponent("AuctionFormContainer")}
       default: {return(<div></div>)}

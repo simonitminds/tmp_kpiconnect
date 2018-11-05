@@ -1,14 +1,15 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AuctionsIndex from '../components/auction/index'
-import { subscribeToAuctionUpdates } from '../actions';
+import Messages from '../components/auction/messages.js'
+import { subscribeToMessageUpdates } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
-    auctionPayloads: state.auctionsReducer.auctionPayloads,
-    connection: state.auctionsReducer.connection,
-    loading: state.auctionsReducer.loading
+    connection: state.messagesReducer.connection,
+    expandedConversation: state.messagesReducer.expandedConversation,
+    loading: state.messagesReducer.loading,
+    messagePayloads: state.messagesReducer.messagePayloads
   }
 };
 
@@ -17,9 +18,9 @@ const mapDispatchToProps = (dispatch) => ({
   ...bindActionCreators(dispatch)
 });
 
-export class AuctionsContainer extends React.Component {
+export class MessagesContainer extends React.Component {
   dispatchItem() {
-    this.props.dispatch(subscribeToAuctionUpdates());
+    this.props.dispatch(subscribeToMessageUpdates());
   }
   componentDidMount() {
     this.dispatchItem();
@@ -33,9 +34,9 @@ export class AuctionsContainer extends React.Component {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return <AuctionsIndex {...this.props} />
+      return <Messages {...this.props}/>
     }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuctionsContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(MessagesContainer);

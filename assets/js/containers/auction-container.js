@@ -3,12 +3,11 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
-import AuctionMessages from '../components/auction/auction-messages';
+import Messages from '../components/auction/messages';
 import {
   getCompanyBarges,
   acceptWinningSolution,
   setPortAgent,
-  subscribeToAuctionMessages,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
   unsubmitBargeForApproval,
@@ -32,7 +31,6 @@ const mapStateToProps = (state) => {
   return {
     auctionPayload,
     auctionPayloads: state.auctionsReducer.auctionPayloads,
-    messagePayloads: state.messagesReducer.messagePayloads,
     companyProfile,
     connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
@@ -103,7 +101,6 @@ const mapDispatchToProps = (dispatch) => ({
 export class AuctionContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
-    this.props.dispatch(subscribeToAuctionMessages());
     this.props.dispatch(getCompanyBarges(window.companyId));
   }
   componentDidMount() {
@@ -119,12 +116,7 @@ export class AuctionContainer extends React.Component {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return (
-        <div>
-          <AuctionShow {...this.props}/>
-          <AuctionMessages {...this.props}/>
-        </div>
-      );
+      return <AuctionShow {...this.props}/>
     }
   }
 }

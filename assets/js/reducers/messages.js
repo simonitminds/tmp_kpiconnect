@@ -1,57 +1,25 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
 import {
+  EXPAND_CONVERSATION,
   MESSAGE_CHANNEL_CONNECTED,
   MESSAGE_CHANNEL_DISCONNECTED,
-  RECEIVE_MESSAGE_PAYLOADS,
   UPDATE_MESSAGE_PAYLOAD
 } from "../constants";
 
 const initialState = {
-  messagePayloads: [],
   connection: false,
-  loading: true
+  expandedConversation: null,
+  loading: true,
+  messagePayloads: []
 };
-
-let newAuctionPayloadList;
-let updatedAuctionPayload;
 
 export default function(state, action) {
   switch(action.type) {
-    case RECEIVE_MESSAGE_PAYLOADS: {
-      if(_.isEmpty(action.messagePayloads)) {
-        return state;
-      } else {
-        return {
-          ...state,
-          messagePayloads: action.messagePayloads,
-          loading: false
-        };
-      }
-    }
-    case UPDATE_MESSAGE_PAYLOAD: {
-      // const origAuctionPayload = _.chain(state.messagePayloads)
-      //       .filter(['auction.id', action.messagePayload.auction.id])
-      //       .first()
-      //       .value();
-      // if (origAuctionPayload) {
-      //   updatedAuctionPayload = {
-      //     ...action.messagePayload,
-      //     success: origAuctionPayload.success,
-      //     message: origAuctionPayload.message
-      //   };
-      //   newAuctionPayloadList = replaceListItem(
-      //     state.messagePayloads,
-      //     origAuctionPayload,
-      //     updatedAuctionPayload
-      //   );
-      // } else {
-      //   newAuctionPayloadList = _.concat(state.messagePayloads, action.messagePayload);
-      // }
+    case EXPAND_CONVERSATION: {
       return {
         ...state,
-        messagePayloads: action.messagePayloads,
-        loading: false
+        expandedConversation: action.conversation.id
       };
     }
     case MESSAGE_CHANNEL_CONNECTED: {
@@ -65,6 +33,17 @@ export default function(state, action) {
         ...state,
         connection: false
       };
+    }
+    case UPDATE_MESSAGE_PAYLOAD: {
+      if(_.isEmpty(action.messagePayloads)) {
+        return state;
+      } else {
+        return {
+          ...state,
+          messagePayloads: action.messagePayloads,
+          loading: false
+        };
+      }
     }
     default: {
       return state || initialState;

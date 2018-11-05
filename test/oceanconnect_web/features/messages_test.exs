@@ -15,7 +15,9 @@ defmodule Oceanconnect.MessagesTest do
       |> insert(buyer: buyer_company, suppliers: [supplier_company], vessels: [vessel], auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel)])
       |> Auctions.fully_loaded()
 
-    {:ok, %{auction: auction, buyer: buyer, supplier: supplier}}
+    messages = insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
+
+    {:ok, %{auction: auction, buyer: buyer, messages: messages, supplier: supplier}}
   end
 
   # TODO: test will not pass until Admin can see all ongoing auctions
@@ -101,6 +103,12 @@ defmodule Oceanconnect.MessagesTest do
       assert AuctionShowPage.is_current_path?(auction.id)
       MessagesPage.open_message_window()
       assert MessagesPage.has_participating_auctions?([auction])
+    end
+
+    test "unread messages are marked as read when recipient expands conversation", %{auction: auction, messages: messages} do
+      AuctionShowPage.visit(auction.id)
+      MessagesPage.open_message_window()
+      assert Enum.all?(messages, &MessagesPage.message_is_unread?(&1))
     end
   end
 end

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import CollapsibleSection from './collapsible-section';
 
-export default class AuctionMessage extends React.Component {
+export default class Message extends React.Component {
   constructor(props) {
     super(props);
     const isExpanded = this.props.isExpanded;
@@ -17,34 +17,30 @@ export default class AuctionMessage extends React.Component {
   }
 
   render() {
-    const {messagePayloads, auctionPayloads} = this.props;
+    const messagePayloads = this.props.messagePayloads;
     const isExpanded = this.state.expanded;
-
-    const filteredAuctionsPayloads = (auctionPayloads) => {
-      return _.filter(auctionPayloads, (auctionPayload) => {
-        return _.includes(["pending", "open", "decision", "closed", "expired"], auctionPayload.status);
-      });
-    }
-
-    const filteredAuctionsCount = (auctionPayloads) => {
-      return filteredAuctionsPayloads(auctionPayloads).length;
-    }
-
-    const auctionCount = filteredAuctionsCount(auctionPayloads);
-
-    const renderSupplierContext = (auctionPayloads) => {
+    const renderMessagesInterface = (messagePayloads) => {
       return (
         <ul className="message__context-list">
-          { _.map(filteredAuctionsPayloads(auctionPayloads), (auctionPayload) => {
+          { _.map(messagePayloads, (messagePayload) => {
             return(
-                <li key={auctionPayload.auction.id} className={`qa-auction-messages-auction-${auctionPayload.auction.id}`}>
+                <li key={messagePayload.auction_id} className={`qa-auction-${messagePayload.auction_id}-message-payloads`}>
                 <h2>
-                  <div className={`auction-header__status auction-header__status-${auctionPayload.status} tag is-rounded has-margin-bottom-non has-margin-right-xs is-capitalized`}>{auctionPayload.status}</div>
-                  { _.map(auctionPayload.auction.vessels, (vessel) => {
+                  <div className={`auction-header__status auction-header__status-${messagePayload.status} tag is-rounded has-margin-bottom-non has-margin-right-xs is-capitalized`}>
+                    {messagePayload.status}
+                  </div>
+                  { _.map(messagePayload.vessels, (vessel) => {
                     return(
-                        <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
+                      <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
                     );
                   }) }
+                  <ul className="qa-conversations">
+                    { _.map(messagePayload.conversations, (conversation) => {
+                      return(
+                        <li key={conversation.company_name}>{conversation.company_name}</li>
+                      );
+                    }) }
+                  </ul>
                 </h2>
               </li>
             );
@@ -64,7 +60,7 @@ export default class AuctionMessage extends React.Component {
           </div>
         </div>
         <div className="message__conversation-list qa-auction-messages-auctions">
-          {isExpanded && renderSupplierContext(auctionPayloads)}
+          {isExpanded && renderMessagesInterface(messagePayloads)}
         </div>
       </div>
     );
