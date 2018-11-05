@@ -1,11 +1,8 @@
 defmodule OceanconnectWeb.EmailController do
   use OceanconnectWeb, :controller
-  import Ecto.Query, only: [preload: 2]
-  alias Oceanconnect.Repo
-
   alias OceanconnectWeb.Email
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.{Auctions, Accounts}
+  alias Oceanconnect.{Auctions}
   alias Oceanconnect.Auctions.AuctionBid
 
   def send_invitation(conn, _) do
@@ -54,13 +51,9 @@ defmodule OceanconnectWeb.EmailController do
 
   def send_completion(conn, _) do
     auction = Oceanconnect.Auctions.get_auction!(3) |> Oceanconnect.Auctions.fully_loaded()
-    winning_supplier_company = hd(auction.suppliers)
-    winning_supplier_company2 = List.last(auction.suppliers)
+#    winning_supplier_company = hd(auction.suppliers)
+#    winning_supplier_company2 = List.last(auction.suppliers)
     fuel_id = hd(auction.auction_vessel_fuels).fuel_id
-    # barge = hd(Accounts.list_company_barges(winning_supplier_company2.id))
-    # approved_barge = Map.put(barge, :approval_status, "APPROVED")
-    # |> Repo.preload(:companies)
-    # Auctions.submit_barge(auction, approved_barge, winning_supplier_company2.id)
     approved_barges = Auctions.list_auction_barges(auction)
     |> Enum.uniq_by(&(&1.barge_id))
     |> Enum.map(&(Map.put(&1, :supplier_id, winning_supplier_company2.id)))
