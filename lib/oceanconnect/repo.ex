@@ -1,5 +1,7 @@
 defmodule Oceanconnect.Repo do
-  use Ecto.Repo, otp_app: :oceanconnect
+  use Ecto.Repo,
+    otp_app: :oceanconnect,
+    adapter: Ecto.Adapters.Postgres
   use Scrivener, page_size: 10
 
   @doc """

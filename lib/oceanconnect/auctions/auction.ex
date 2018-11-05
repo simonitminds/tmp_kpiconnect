@@ -30,11 +30,11 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     field(:po, :string)
     field(:port_agent, :string)
-    field(:eta, :utc_datetime)
-    field(:etd, :utc_datetime)
-    field(:scheduled_start, :utc_datetime)
-    field(:auction_ended, :utc_datetime)
-    field(:auction_closed_time, :utc_datetime)
+    field(:eta, :utc_datetime_usec)
+    field(:etd, :utc_datetime_usec)
+    field(:scheduled_start, :utc_datetime_usec)
+    field(:auction_ended, :utc_datetime_usec)
+    field(:auction_closed_time, :utc_datetime_usec)
     # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
     # milliseconds
