@@ -112,30 +112,27 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction Edit/Delete */}
-            { auctionStatus == 'draft' || auctionStatus == 'pending' ?
-              <div>
+            <div>
+              { (auctionStatus == 'draft' || auctionStatus == 'pending') &&
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">
                     <i className="fas fa-lg fa-edit"></i>
                   </span>
                 </a>
-                {auctionStatus != 'canceled' ?
-                 <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
-                  <span className="icon is-medium has-text-right">
-                    <i className="fas fa-lg fa-times"></i>
-                  </span>
+              }
+              { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
+                ? <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
+                    <span className="icon is-medium has-text-right">
+                      <i className="fas fa-lg fa-times"></i>
+                    </span>
                   </a>
-                  :
-                  <span></span>
-                }
-              </div>
-              :
-              <div></div>
-            }
-            {/* End Link to Auction Edit/Delete */}
-            {/* Start Link to Auction */}
-              <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
-            {/* End Link to Auction */}
+                : <span></span>
+              }
+              {/* End Link to Auction Edit/Delete */}
+              {/* Start Link to Auction */}
+                <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+              {/* End Link to Auction */}
+            </div>
           </div>
         </div>
         <div className="card-title">
