@@ -147,10 +147,10 @@
       width: 87px;
       text-align: center;
       font-size: 0.75rem;
-      left: -30px;
+      left: -52px;
     }
 
-    .auction-card__status--decision ~ &,  .auction-card__status--open ~ &, {
+    .auction-card__status ~ & {
       margin-left: auto;
     }
   }
@@ -166,11 +166,11 @@
       padding: 0.25rem 0.5rem;
       border-radius: 5px;
       z-index: 999;
-      top: -30px;
+      top: -24px;
       width: 87px;
       text-align: center;
       font-size: 0.75rem;
-      left: -30px;
+      left: -24px;
     }
 
     @media (max-width: 420px) {
@@ -187,8 +187,9 @@
   }
 }
 
-.auction-card__status + * {
+.auction-card__buttons {
   margin-left: auto;
+  display: flex;
 }
 
 // Auction Listing Elements Ported to Auction Info
