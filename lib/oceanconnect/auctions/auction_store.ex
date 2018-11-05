@@ -388,6 +388,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end_auction(previous_state, auction)
   end
 
+  defp replay_event(
+         %AuctionEvent{type: :auction_canceled, data: %{}},
+         previous_state
+       ) do
+    cancel_auction(previous_state)
+  end
+
   defp replay_event(%AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}}, previous_state) do
     select_winning_solution(solution, previous_state)
   end
