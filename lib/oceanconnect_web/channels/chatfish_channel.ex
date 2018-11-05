@@ -72,8 +72,6 @@ defmodule OceanconnectWeb.ChatfishChannel do
     end
   end
 
-  defp authorized?(_, _, _), do: false
-
   defp maybe_update_message(%Message{recipient_company_id: current_company_id} = message, current_company_id), do:
     Messages.update_message(message, %{has_been_seen: true})
   defp maybe_update_message(_message, _current_company_id), do: nil

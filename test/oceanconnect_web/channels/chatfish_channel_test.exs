@@ -137,7 +137,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         [conversation | _] = message_payload.conversations
         assert conversation.company_name == supplier.company.name
 
-        %{messages: [%Message{content: content} | _tail]} = conversation
+        %{messages: [%{content: content} | _tail]} = conversation
         assert content == "Hello!"
     after 5000 ->
       assert false, "Expected message received nothing."
