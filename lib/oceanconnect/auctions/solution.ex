@@ -7,6 +7,7 @@ defmodule Oceanconnect.Auctions.Solution do
             normalized_price: nil,
             total_price: nil,
             latest_time_entered: nil,
+            latest_original_time_entered: nil,
             comment: nil
 
   def from_bids(bids, product_bids, %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
@@ -29,20 +30,21 @@ defmodule Oceanconnect.Auctions.Solution do
       valid: is_valid?(bids, product_ids),
       normalized_price: normalized_price(bids, product_quantities),
       total_price: total_price(bids, product_quantities),
-      latest_time_entered: latest_time_entered(bids)
+      latest_time_entered: latest_time_entered(bids),
+      latest_original_time_entered: latest_original_time_entered(bids)
     }
   end
 
   def sort_tuple(solution) do
     # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.
     valid_indicator = if solution.valid, do: 0, else: 1
-    latest_time_entered =
-      if solution.latest_time_entered do
-        DateTime.to_unix(solution.latest_time_entered, :microsecond)
+    latest_original_time_entered =
+      if solution.latest_original_time_entered do
+        DateTime.to_unix(solution.latest_original_time_entered, :microsecond)
       else
         DateTime.utc_now()
       end
-    {valid_indicator, solution.total_price, latest_time_entered}
+    {valid_indicator, solution.total_price, latest_original_time_entered}
   end
 
 
@@ -56,6 +58,15 @@ defmodule Oceanconnect.Auctions.Solution do
   defp latest_time_entered(bids) do
     bids
     |> Enum.map(& &1.time_entered)
+    |> Enum.sort(&(DateTime.compare(&1, &2) == :gt))
+    |> hd()
+  end
+
+
+  defp latest_original_time_entered([]), do: nil
+  defp latest_original_time_entered(bids) do
+    bids
+    |> Enum.map(& &1.original_time_entered)
     |> Enum.sort(&(DateTime.compare(&1, &2) == :gt))
     |> hd()
   end
