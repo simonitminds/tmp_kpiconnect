@@ -230,7 +230,7 @@ defmodule OceanconnectWeb.AuctionController do
 
         _ ->
           auction.port
-          |> Auctions.supplier_list_for_auction(auction.buyer_id)
+          |> Auctions.supplier_list_for_port(auction.buyer_id)
           |> Poison.encode!()
       end
 

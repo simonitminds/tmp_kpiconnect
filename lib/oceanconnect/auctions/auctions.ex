@@ -670,13 +670,13 @@ defmodule Oceanconnect.Auctions do
     |> Repo.all()
   end
 
-  def supplier_list_for_auction(%Port{id: id}) do
+  def supplier_list_for_port(%Port{id: id}) do
     id
     |> Port.suppliers_for_port_id()
     |> Repo.all()
   end
 
-  def supplier_list_for_auction(%Port{id: port_id}, buyer_id) do
+  def supplier_list_for_port(%Port{id: port_id}, buyer_id) do
     port_id
     |> Port.suppliers_for_port_id(buyer_id)
     |> Repo.all()
