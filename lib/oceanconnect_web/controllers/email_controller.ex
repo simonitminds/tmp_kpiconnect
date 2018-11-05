@@ -51,8 +51,7 @@ defmodule OceanconnectWeb.EmailController do
 
   def send_completion(conn, _) do
     auction = Oceanconnect.Auctions.get_auction!(3) |> Oceanconnect.Auctions.fully_loaded()
-#    winning_supplier_company = hd(auction.suppliers)
-#    winning_supplier_company2 = List.last(auction.suppliers)
+    winning_supplier_company2 = List.last(auction.suppliers)
     fuel_id = hd(auction.auction_vessel_fuels).fuel_id
     approved_barges = Auctions.list_auction_barges(auction)
     |> Enum.uniq_by(&(&1.barge_id))
