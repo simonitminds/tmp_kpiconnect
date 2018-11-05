@@ -16,11 +16,13 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   def emit(%AuctionEvent{}, false), do: nil
 
   def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data, user: _user}, _emit) do
-    Phoenix.PubSub.broadcast(
+    :ok = Phoenix.PubSub.broadcast(
       :auction_pubsub,
       "auction:#{id}",
       Map.put(event, :id, UUID.uuid4(:hex))
     )
+
+    {:ok, event}
   end
 
   def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}, _emit) do
@@ -29,7 +31,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       |> Map.put(:id, UUID.uuid4(:hex))
       |> Map.put(:user, nil)
 
-    Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", updated_event)
+    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", updated_event)
+    {:ok, updated_event}
   end
 
   def auction_created(auction = %Auction{id: auction_id}, user) do

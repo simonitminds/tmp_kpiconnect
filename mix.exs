@@ -59,7 +59,7 @@ defmodule Oceanconnect.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.2"},
-      {:hackney, "~> 1.14", override: true},
+      {:hackney, "~> 1.14"},
       {:hound, "~> 1.0", only: :test},
       {:guardian, "~> 1.1"},
       {:gettext, "~> 0.16"},
