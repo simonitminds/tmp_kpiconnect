@@ -133,13 +133,26 @@ fieldset {
 }
 
 .selected-list {
-  margin-top: 0.5rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0rem !important;
   padding: 0.5rem 0.75rem;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 
   &:empty { display: none; }
 
+  &+ .break + .control > .select > select {
+    margin-left: -1px;
+  }
+
+  &:not(:empty) + .break + .control > .select > select {
+
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+
   &--vessels {
-    flex-basis: 223px;
+    flex-basis: 245px;
 
     &> div:not(:last-child) {
       margin-bottom:  0.5rem;

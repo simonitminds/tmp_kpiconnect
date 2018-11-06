@@ -121,7 +121,11 @@ export default class VesselFuelForm extends React.Component {
                     </label>
                   </div>
                   <div className="field-body field-body--wrapped">
-                    <div className="control has-margin-right-none">
+                  <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
+                    {_.map(this.state.selectedVessels, renderVessel)}
+                  </div>
+                  <span className="break"></span>
+                    <div className="control has-icons-left has-margin-right-none">
                       <div className="select is-fullwidth">
                         <select
                           className="qa-auction-select-vessel"
@@ -129,7 +133,7 @@ export default class VesselFuelForm extends React.Component {
                           defaultValue=""
                         >
                           <option disabled value="" >
-                            Please select
+                            Please Select
                           </option>
                           {_.map(availableVessels, vessel => (
                             <option key={vessel.id} value={vessel.id} id={vessel.id}>
@@ -137,11 +141,10 @@ export default class VesselFuelForm extends React.Component {
                             </option>
                           ))}
                       </select>
+                      <div className="icon is-small is-left">
+                        <i className="fas fa-plus"></i>
                       </div>
-                    </div>
-                    <span className="break"></span>
-                    <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
-                      {_.map(this.state.selectedVessels, renderVessel)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -165,7 +168,11 @@ export default class VesselFuelForm extends React.Component {
                     </label>
                   </div>
                   <div className="field-body field-body--wrapped">
-                    <div className="control has-margin-right-none">
+                    <div className="box selected-list selected-list--fuels qa-auction-selected-vessels-fuel_quantities">
+                      {_.map(this.state.selectedFuels, renderFuel)}
+                    </div>
+                    <span className="break"></span>
+                    <div className="control has-icons-left has-margin-right-none">
                       <div className="select is-fullwidth">
                         <select
                           className="qa-auction-select-fuel"
@@ -181,11 +188,10 @@ export default class VesselFuelForm extends React.Component {
                             </option>
                           ))}
                         </select>
+                        <div className="icon is-small is-left">
+                          <i className="fas fa-plus"></i>
+                        </div>
                       </div>
-                    </div>
-                    <span className="break"></span>
-                    <div className="box selected-list selected-list--fuels qa-auction-selected-vessels-fuel_quantities">
-                      {_.map(this.state.selectedFuels, renderFuel)}
                     </div>
                   </div>
                 </div>
