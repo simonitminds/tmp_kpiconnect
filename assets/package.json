@@ -2,7 +2,7 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
-    "deploy": "parcel build css/app.scss js/app.js --out-dir ../priv/static/",
+    "build": "parcel build css/app.scss js/app.js --out-dir ../priv/static/",
     "watch": "parcel watch --no-hmr css/app.scss js/app.js --out-dir ../priv/static/",
     "test": "jest"
   },
@@ -25,7 +25,8 @@
     "react-tabs": "^2.2.2",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "serverdate": "^3.1.0"
+    "serverdate": "^3.1.0",
+    "yarn": "^1.12.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

@@ -11,9 +11,11 @@ addons:
   postgresql: 9.6
 # Cache build files to speed up builds a little bit.
 cache:
+  yarn: true
   directories:
     - _build
     - deps
+    - assets/node_modules
 # Don't bother cloning too many commits in the history.
 git:
   depth: 5
@@ -38,7 +40,7 @@ install:
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
-  - (cd assets && npm install && node_modules/webpack/bin/webpack.js --mode production)
+  - (cd assets && npm install && yarn build)
   - mix compile
   - mix phx.digest
 
