@@ -12,6 +12,8 @@ ul.list {
 // Unordered List (No bullets)
 
  &.has-no-bullets {
+   background-color: transparent;
+   box-shadow: none;
    margin-top: 0;
    margin-left: 0;
    list-style: none;
