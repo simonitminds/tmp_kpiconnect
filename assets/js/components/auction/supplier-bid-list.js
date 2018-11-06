@@ -17,9 +17,9 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
 
     if (bidList.length > 0 ) {
       return(
-        <div className="qa-supplier-bid-history box has-margin-top-lg">
+        <div className="qa-supplier-bid-history box has-margin-top-md">
           <h3 className="box__header box__header--bordered">Your Bid History</h3>
-          <table className="table is-fullwidth is-striped is-marginless qa-auction-bidlist">
+          <table className="table table--supplier-bid-history is-fullwidth is-striped is-marginless qa-auction-bidlist">
             <thead>
               <tr>
                 <th>Product</th>
@@ -38,13 +38,13 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
                         <i className="has-text-gray-4"> (Min: ${formatPrice(min_amount)})</i>
                       }
                       <span className="qa-auction-bid-is_traded_bid">{is_traded_bid &&
-                        <span class="auction__traded-bid-tag">
-                          <i action-label="Traded Bid" className="fas fa-exchange-alt has-margin-right-sm auction__traded-bid-marker"></i>
-                          Traded Bid
+                        <span className="auction__traded-bid-tag">
+                          <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+                          <span className="has-padding-left-sm">Traded Bid</span>
                         </span>}
                       </span>
                     </td>
-                    <td>{formatTime(time_entered)}</td>
+                    <td>({formatTime(time_entered)})</td>
                   </tr>
                 );
               })}

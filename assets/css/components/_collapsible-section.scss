@@ -13,6 +13,7 @@
 
   h2.auction-list__trigger {
     display: flex;
+    font-weight: 400;
     @media(max-width: 768px) {
       font-size: 1.25rem;
       margin: 0.25rem 0 0.75rem 0;

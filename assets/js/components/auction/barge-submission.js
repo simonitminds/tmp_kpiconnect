@@ -79,6 +79,9 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
               { availableBarges.map(renderAvailableBarge) }
             </div>
           )}
+          { submittedBarges.length == 0 && availableBarges.length == 0 && (
+            <div className="auction-table-placeholder is-white has-margin-top-md has-margin-bottom-md has-margin-left-xs has-margin-right-xs"><i>No barges are associated with your company</i></div>
+          )}
         </form>
       </div>
     </div>
