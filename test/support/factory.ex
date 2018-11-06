@@ -105,13 +105,13 @@ defmodule Oceanconnect.Factory do
   end
 
   def message_factory() do
-    user = insert(:user)
+    company = build(:company)
     %Oceanconnect.Messages.Message{
       auction: build(:auction),
       content: "Hi!",
       has_been_seen: false,
-      author: user,
-      author_company: user.company,
+      author: build(:user, company: company),
+      author_company: company,
       recipient_company: build(:company)
     }
   end
