@@ -133,7 +133,7 @@ export default class VesselFuelForm extends React.Component {
                           defaultValue=""
                         >
                           <option disabled value="" >
-                            Please Select
+                            Add a Vessel
                           </option>
                           {_.map(availableVessels, vessel => (
                             <option key={vessel.id} value={vessel.id} id={vessel.id}>
@@ -180,7 +180,7 @@ export default class VesselFuelForm extends React.Component {
                           defaultValue=""
                         >
                           <option disabled value="">
-                            Please Select
+                            Add a Fuel
                           </option>
                           {_.map(availableFuels, fuel => (
                             <option key={fuel.id} value={fuel.id}>
