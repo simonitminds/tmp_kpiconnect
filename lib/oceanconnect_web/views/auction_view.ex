@@ -174,7 +174,7 @@ defmodule OceanconnectWeb.AuctionView do
 
   def event_bid_has_amount?(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: false
   def event_bid_has_amount?(%AuctionEvent{data: %{bid: %AuctionBid{amount: _amount}}}), do: true
-  def event_bid_has_amount?(%AuctionEvent{type: :winning_solution_selected, data: %{solution: %{normalized_price: amount}}}), do: true
+  def event_bid_has_amount?(%AuctionEvent{type: :winning_solution_selected, data: %{solution: %{normalized_price: _amount}}}), do: true
   def event_bid_has_amount?(_event), do: false
 
   def event_bid_has_minimum?(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: nil}}}), do: false

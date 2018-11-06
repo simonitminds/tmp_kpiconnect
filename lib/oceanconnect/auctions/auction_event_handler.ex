@@ -8,7 +8,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionEvent,
     AuctionNotifier,
     AuctionStore.AuctionState,
-    Solution
   }
 
   @registry_name :auction_event_handler_registry
@@ -56,7 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         %AuctionEvent{
           auction_id: auction_id,
           type: :bids_revoked,
-          data: %{supplier_id: supplier_id}
+          data: %{supplier_id: _supplier_id}
         },
         state
       ) do

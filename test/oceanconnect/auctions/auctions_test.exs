@@ -2,7 +2,7 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEventStore}
+  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   describe "auctions" do
@@ -335,20 +335,18 @@ defmodule Oceanconnect.AuctionsTest do
     test "ending an auction saves the auction_ended timestamp on the auction", %{
       auction: auction = %Auction{id: auction_id}
     } do
+
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
       auction
       |> Auctions.start_auction()
       |> Auctions.end_auction()
 
-      :timer.sleep(200)
 
-      auction_ended_event =
-        auction_id
-        |> AuctionEventStore.event_list()
-        |> Enum.filter(fn event -> event.type == :auction_ended end)
-        |> hd
-
-      updated_auction = Auctions.get_auction(auction_id)
-      assert auction_ended_event.time_entered == updated_auction.auction_ended
+      assert_receive %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert_receive %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, time_entered: time_entered}
+      assert_receive %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: data = %Auction{auction_ended: auction_ended}}
+      assert time_entered == auction_ended
     end
   end
 

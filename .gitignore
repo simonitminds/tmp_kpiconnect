@@ -4,12 +4,15 @@
 /deps
 /*.ez
 .env
+.cache
 
 # Generated on crash by the VM
 erl_crash.dump
 
 # Generated on crash by NPM
 npm-debug.log
+yarn-error.log
+
 
 # Static artifacts
 /assets/node_modules
