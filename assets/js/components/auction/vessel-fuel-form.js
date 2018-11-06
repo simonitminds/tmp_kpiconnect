@@ -120,11 +120,10 @@ export default class VesselFuelForm extends React.Component {
                       Vessel Name
                     </label>
                   </div>
-                  <div className="field-body field-body--wrapped">
-                  <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
-                    {_.map(this.state.selectedVessels, renderVessel)}
-                  </div>
-                  <span className="break"></span>
+                  <div className="field-body field-body--select">
+                    <div className="selected-list selected-list--vessels box qa-auction-selected-vessels">
+                      {_.map(this.state.selectedVessels, renderVessel)}
+                    </div>
                     <div className="control has-icons-left has-margin-right-none">
                       <div className="select is-fullwidth">
                         <select
@@ -167,11 +166,10 @@ export default class VesselFuelForm extends React.Component {
                       Fuel Name
                     </label>
                   </div>
-                  <div className="field-body field-body--wrapped">
+                  <div className="field-body field-body--select">
                     <div className="box selected-list selected-list--fuels qa-auction-selected-vessels-fuel_quantities">
                       {_.map(this.state.selectedFuels, renderFuel)}
                     </div>
-                    <span className="break"></span>
                     <div className="control has-icons-left has-margin-right-none">
                       <div className="select is-fullwidth">
                         <select

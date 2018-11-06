@@ -76,6 +76,31 @@
   flex-flow: row wrap;
 }
 
+.field-body--select { // Special styling for multi-selects.
+  display: flex;
+  flex-direction: column;
+
+  &> div {
+
+    &.selected-list--vessels {
+      max-width: 300px;
+      flex-grow: 0;
+      &+ .control {
+        max-width: 300px;
+        margin-top: 0 !important;
+      }
+    }
+    &.selected-list--fuels {
+      max-width: 400px;
+      flex-grow: 0;
+      &+ .control {
+        max-width: 400px;
+        margin-top: 0 !important;
+      }
+    }
+  }
+}
+
 .control.is-expanded { // The proper Bulma class doesn't seem to compile with the rest, so here's a shim for the meantime.
   width: 100%;
 }
@@ -136,30 +161,24 @@ fieldset {
   margin-top: -0.5rem;
   margin-bottom: 0rem !important;
   padding: 0.5rem 0.75rem;
+  box-shadow: none;
+  border: 1px solid $gray-2;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 
-  &:empty { display: none; }
-
-  &+ .break + .control > .select > select {
-    margin-left: -1px;
+  @media (max-width: 768px) {
+    margin-top: 0;
   }
 
-  &:not(:empty) + .break + .control > .select > select {
+  &:empty { display: none; }
 
+  &:not(:empty) + .control > .select > select {
+    margin-top: -1px;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
   }
 
-  &--vessels {
-    flex-basis: 245px;
-
-    &> div:not(:last-child) {
-      margin-bottom:  0.5rem;
-    }
-  }
-  &--fuels {
-    flex-basis: 500px;
+  &--vessels, &--fuels {
     padding-bottom: 0;
 
     &>div {
@@ -170,13 +189,29 @@ fieldset {
         margin-top: 0;
         padding-top: 0;
       }
+      &:not(:first-child) {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
       &:last-child {
         margin-bottom: 0;
-        border-radius: 5px;
       }
     }
     &>div:nth-child(even) {
       background-color: $gray-1;
+    }
+  }
+  &--vessels { // Specific adaptations for Vessels...
+    padding-top: 0;
+    margin-top: -10px;
+
+    &>div:first-child {
+      margin: 0 -0.75rem;
+      padding: 0.75rem;
+    }
+    &>div:not(:first-child) {
+      margin: 0 -0.75rem;
+      padding: 0.75rem;
     }
   }
 }
@@ -197,6 +232,10 @@ fieldset {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;
+
+  .field-label {
+    flex-grow: 3;
+  }
 }
 
 .is-flex-wrapped {
