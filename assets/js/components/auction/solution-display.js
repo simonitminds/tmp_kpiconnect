@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionAcceptDisplay from './solution-accept-display';
+import MediaQuery from 'react-responsive';
 
 export default class SolutionDisplay extends React.Component {
   constructor(props) {
@@ -180,13 +181,21 @@ export default class SolutionDisplay extends React.Component {
               <span className="auction-solution__title__category">{title}</span>
               <span className="auction-solution__title__description">{solutionTitle()}</span>
             </span>
+            <MediaQuery query="(max-width: 480px)">
+              { acceptable && auctionStatus == 'decision' &&
+                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+              }
+            </MediaQuery>
           </h3>
           <div className="auction-solution__content">
             <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
             ({formatTime(latest_time_entered)})
-            { acceptable && auctionStatus == 'decision' &&
-              <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-            }
+            <MediaQuery query="(min-width: 480px)">
+              { acceptable && auctionStatus == 'decision' &&
+                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+              }
+            </MediaQuery>
+
           </div>
         </div>
         <div className="auction-solution__body">

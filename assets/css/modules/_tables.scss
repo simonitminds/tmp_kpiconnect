@@ -168,7 +168,7 @@
       }
     }
   }
-  @media (max-width: 480px) {
+  @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
     thead tr, tbody tr {
       flex-direction: column;
       padding: 0.5rem 1rem;
@@ -181,6 +181,9 @@
         &:nth-child(2) { // Amount
           margin-top: 0.5rem;
           margin-left: 0;
+          flex: 0 0 auto;
+        }
+        &:nth-child(3) { // Supplier
           flex: 0 0 auto;
         }
         &:last-child { // Time
