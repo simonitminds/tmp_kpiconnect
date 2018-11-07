@@ -108,6 +108,6 @@ defmodule Oceanconnect.Messages do
     Message.changeset(message, %{})
   end
 
-  def get_related_company_ids(%Message{} = message), do: [message.author_company_id, message.recipient_company_id]
+  def get_related_company_ids(%Message{} = message), do: message.recipient_company_id
   def get_related_company_ids(_), do: nil
 end

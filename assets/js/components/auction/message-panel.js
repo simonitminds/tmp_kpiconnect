@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import moment from 'moment';
 
 export default class MessagePanel extends React.Component {
   constructor(props) {
@@ -35,7 +36,9 @@ export default class MessagePanel extends React.Component {
                   <strong>{message.user}</strong>
                 </div>
                 <div className='message__message__timestamp__time'>
-                  <strong className='inline-block has-margin-left-auto'>{message.inserted_at}</strong>
+                  <strong className='inline-block has-margin-left-auto'>
+                    {moment(message.inserted_at).format('MMM Do h:mm a')}
+                  </strong>
                 </div>
               </div>
             </div>

@@ -67,7 +67,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     end
   end
 
-  test "recipient can mark messages as seen and author is notified", %{messages: messages, buyer: buyer, supplier: supplier} do
+  test "recipient can mark messages as seen and recipient is notified", %{messages: messages, supplier: supplier} do
     channel = "user_messages:#{supplier.company_id}"
     event = "seen"
 
@@ -77,23 +77,25 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, _, socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
 
+    # Skip first broadcast after joining
+    receive do
+      %Phoenix.Socket.Broadcast{
+        event: "messages_update",
+        topic: ^channel
+      } -> nil
+    after 5000 ->
+      assert false, "Expected message received nothing."
+    end
+
     push(socket, event, %{"ids" => [message_id]})
-
-    author_channel = "user_messages:#{buyer.company_id}"
-    author_event = "messages_update"
-
-    {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
-
-    {:ok, _, _socket} =
-      subscribe_and_join(socket(), ChatfishChannel, author_channel, %{"token" => buyer_token})
 
     receive do
       %Phoenix.Socket.Broadcast{
-        event: ^author_event,
+        event: "messages_update",
         payload: %{
           message_payloads: message_payloads
         },
-        topic: ^author_channel
+        topic: ^channel
       } ->
         assert message_payload = %MessagePayload{} = hd(message_payloads)
         messages = hd(message_payload.conversations).messages
@@ -132,7 +134,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, _, socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
 
-    push(socket, event, %{"auctionId" => auction_id, "recipient" => buyer.company_id, "content" => "Hello!"})
+    push(socket, event, %{"auctionId" => auction_id, "recipient" => buyer.company.name, "content" => "Hello!"})
 
     :timer.sleep(100)
     recipient_channel = "user_messages:#{buyer.company_id}"
@@ -156,7 +158,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         [conversation | _] = message_payload.conversations
         assert conversation.company_name == supplier.company.name
 
-        %{messages: [%{content: content} | _tail]} = conversation
+        [%{content: content} | _tail] = Enum.reverse(conversation.messages)
         assert content == "Hello!"
     after 5000 ->
       assert false, "Expected message received nothing."

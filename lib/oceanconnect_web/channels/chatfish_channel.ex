@@ -39,7 +39,6 @@ defmodule OceanconnectWeb.ChatfishChannel do
       |> maybe_update_message(current_company_id)
       |> Messages.get_related_company_ids()
     end)
-    |> List.flatten()
     |> Enum.uniq()
     |> Enum.each(&send(self(), {:messages_update, &1}))
     {:noreply, socket}
@@ -92,7 +91,10 @@ defmodule OceanconnectWeb.ChatfishChannel do
     end
   end
 
-  defp maybe_update_message(%Message{recipient_company_id: current_company_id} = message, current_company_id), do:
-    Messages.update_message(message, %{has_been_seen: true})
+  defp maybe_update_message(%Message{recipient_company_id: current_company_id} = message, current_company_id) do
+    {:ok, message} = Messages.update_message(message, %{has_been_seen: true})
+    message
+  end
+
   defp maybe_update_message(_message, _current_company_id), do: nil
 end

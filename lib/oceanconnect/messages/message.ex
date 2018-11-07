@@ -24,6 +24,8 @@ defmodule Oceanconnect.Messages.Message do
   end
 
   def auction_messages_for_company(auction_id, company_id) do
-    from m in Message, where: m.auction_id == ^auction_id and (m.author_company_id == ^company_id or m.recipient_company_id == ^company_id)
+    Message
+    |> where([m], m.auction_id == ^auction_id and (m.author_company_id == ^company_id or m.recipient_company_id == ^company_id))
+    |> order_by(asc: :inserted_at)
   end
 end
