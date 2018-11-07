@@ -35,7 +35,7 @@ echo "Compiling"
 mix compile
 
 echo "Updating node libraries"
-(cd assets && npm install && yarn build)
+(cd assets && yarn build)
 
 echo "Building release"
 mix do phx.digest, release

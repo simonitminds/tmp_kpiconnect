@@ -92,6 +92,13 @@ We're using Ansible to manage server provisioning and deployments. For the most 
 New users will need to add their account information to `ansible/inventory/group_vars/all/users/yml` before they will be able to access the servers.
 
 
+### Setting up `yarn`
+
+This project now depends on `yarn` for managing dependencies and building assets with `parcel`. After all the ansible setup has been completed, you'll need to install `yarn` using the installation method suggested for the server's OS here: https://yarnpkg.com/en/docs/install#debian-stable.
+
+Without this, you'll get an error that `yarn` could not be found and `./scripts/build-release.sh` will fail.
+
+
 ### Provisioning new servers
 
 Ansible should make this fairly easy. If you've added the host names to `./ansible/inventory/hosts`, setup should be as simple as:
