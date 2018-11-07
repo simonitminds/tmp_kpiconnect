@@ -88,11 +88,15 @@ export function toggleExpanded(expandedItem, value) {
 }
 
 export function markMessagesAsSeen(messageIds) {
-  messageChannel.push('seen', {ids: messageIds})
+  return dispatch => {
+    messageChannel.push('seen', {ids: messageIds})
+  };
 }
 
 export function sendMessage(auctionId, recipientCompany, content) {
-  messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompany, content: content})
+  return dispatch => {
+    messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompany, content: content})
+  };
 }
 
 function getAllAuctionPayloads() {

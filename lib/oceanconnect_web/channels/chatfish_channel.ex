@@ -1,6 +1,7 @@
 defmodule OceanconnectWeb.ChatfishChannel do
   use OceanconnectWeb, :channel
 
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Messages
   alias Oceanconnect.Messages.{Message, MessagePayload}
 
@@ -44,7 +45,13 @@ defmodule OceanconnectWeb.ChatfishChannel do
     {:noreply, socket}
   end
 
-  def handle_in("send", %{"auctionId" => auction_id, "recipient" => recipient_company_id, "content" => content}, socket) do
+  def handle_in("send", %{"auctionId" => auction_id, "recipient" => recipient_company_name, "content" => content}, socket) do
+    recipient_company_id =
+      auction_id
+      |> Auctions.get_participant_name_and_ids_for_auction()
+      |> Enum.filter(& &1.name == recipient_company_name)
+      |> hd()
+      |> Map.get(:id)
     current_user = Guardian.Phoenix.Socket.current_resource(socket)
     {:ok, _message} = Messages.create_message(%{
       auction_id: auction_id,

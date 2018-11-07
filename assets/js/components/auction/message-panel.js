@@ -5,13 +5,20 @@ export default class MessagePanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newMessage: null
+      newMessage: ""
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props !== prevProps) {
+      this.setState({
+        newMessage: ""
+      })
     }
   }
 
   setMessage(event) {
-    console.log(event);
-    this.setState({newMessage: event.data})
+    this.setState({newMessage: event.target.value})
   }
 
   render() {
@@ -21,7 +28,7 @@ export default class MessagePanel extends React.Component {
       <div className='message__message-container'>
         { _.map(messages, (message) => {
           return (
-            <div className={`message__message ${message.author_is_me ? 'message__message--self' : ''}`}>
+            <div key={message.id} className={`message__message ${message.author_is_me ? 'message__message--self' : ''}`}>
               <div className='message__message__bubble'>{message.content}</div>
               <div className='message__message__timestamp'>
                 <div className='message__message__timestamp__name'>
@@ -34,7 +41,7 @@ export default class MessagePanel extends React.Component {
             </div>
           )
         })}
-        <input placeholder='Type message here' onChange={this.setMessage.bind(this)}>{newMessage}</input>
+        <input placeholder='Type message here' value={newMessage} onChange={this.setMessage.bind(this)} />
         <button
           value='Send'
           className='button is-turquoise'
