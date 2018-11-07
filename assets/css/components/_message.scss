@@ -84,7 +84,7 @@
       padding: 1rem;
     }
   }
-  &__notifications { // Marker in Menu Bar indicating unread messages
+  &__notifications { // Marker in Menu Bar indicating unseen messages
     background-color: $gray-1;
     margin-left: auto;
     padding: 1rem;
@@ -94,13 +94,13 @@
       background-color: darken($gray-1, 5%);
     }
 
-    &--has-unread {
+    &--has-unseen {
       background-color: $red;
       color: $white;
 
-          &:hover, &:focus {
-      background-color: darken($red, 5%);
-    }
+      &:hover, &:focus {
+        background-color: darken($red, 5%);
+      }
     }
   }
   &__auction-context { // Menu Bar showing notifications and allowing collapsibility
@@ -119,7 +119,6 @@
     flex-direction: column;
 
     &.open {
-
       .message__toggle i { transform: rotate(180deg);}
     }
   }

@@ -14,6 +14,12 @@ const Messages = (props) => {
     toggleExpanded
   } = props;
 
+  const unseenMessageCount = (unseenMessageCount) => {
+    if (unseenMessageCount > 0) {
+      return <span className="message__notifications">{unseenMessageCount}</span>
+    }
+  }
+
   const expansionToggle = (isExpanded) => {
     return (
       <span className="collapsible-section__toggle-icon">
@@ -33,6 +39,11 @@ const Messages = (props) => {
   }
 
   const renderExpandableConversation = (auctionId, conversation, isExpanded) => {
+    const unseenCount = _.chain(conversation.messages)
+      .filter(['has_been_seen', false])
+      .filter(['author_is_me', false])
+      .size()
+      .value()
     return (
       <li
         key={conversation.company_name}
@@ -42,6 +53,7 @@ const Messages = (props) => {
         <h2>
           { expansionToggle(isExpanded) }
           {conversation.company_name}
+          { unseenMessageCount(unseenCount) }
           { isExpanded && messagePanel(auctionId, conversation) }
         </h2>
       </li>
@@ -79,6 +91,7 @@ const Messages = (props) => {
               <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
             );
           })}
+          { unseenMessageCount(messagePayload.unseen_messages) }
           { renderConversations(messagePayload, isExpanded) }
         </h2>
       </li>
@@ -95,10 +108,10 @@ const Messages = (props) => {
     );
   }
 
-  const unseenMessages = (unseenMessageCount) => {
+  const unseenMessagesEnvelope = (unseenMessageCount) => {
     if (unseenMessageCount > 0) {
       return (
-        <div className="message__notifications message__notifications--has-unread">
+        <div className="message__notifications message__notifications--has-unseen">
           <i className="fas fa-envelope has-margin-right-sm"> {unseenMessageCount}</i>
         </div>
       )
@@ -116,7 +129,7 @@ const Messages = (props) => {
       <div onClick={toggleExpanded.bind(this, 'messagePanelIsExpanded', null)}>
         <div className="message__menu-bar">
           <h1 className="message__menu-bar__title">Messages</h1>
-          { unseenMessages(messagePayloads.unseen_messages) }
+          { unseenMessagesEnvelope(_.chain(messagePayloads).map('unseen_messages').sum().value()) }
         </div>
       </div>
       <div className="message__conversation-list qa-auction-messages-auctions">

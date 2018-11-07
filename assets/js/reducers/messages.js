@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
+import { markMessagesAsSeen } from '../actions';
 import {
   MESSAGE_CHANNEL_CONNECTED,
   MESSAGE_CHANNEL_DISCONNECTED,
@@ -35,6 +36,21 @@ export default function(state, action) {
         }
       }
       if (expandedItem === 'expandedConversation' && state.expandedConversation != value) {
+        const conversation = _.chain(state.messagePayloads)
+          .filter(['auction_id', state.expandedAuction])
+          .first()
+          .get('conversations')
+          .filter(['company_name', value])
+          .first()
+          .value()
+        if (conversation.unseen_messages > 0) {
+          const unseenMessageIds = _.chain(conversation.messages)
+            .filter(['has_been_seen', false])
+            .filter(['author_is_me', false])
+            .map('id')
+            .value()
+          markMessagesAsSeen(unseenMessageIds)
+        }
         return {
           ...state,
           [expandedItem]: value

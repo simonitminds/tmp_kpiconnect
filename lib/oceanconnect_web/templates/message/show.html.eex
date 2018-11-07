@@ -2,7 +2,7 @@
   <div class="message__notification-context">
     <div class="message__menu-bar">
       <h1 class="message__menu-bar__title">Messages</h1>
-      <div class="message__notifications message__notifications--has-unread">
+      <div class="message__notifications message__notifications--has-unseen">
         <i class="fas fa-envelope has-margin-right-sm"></i> 3
       </div>
     </div>

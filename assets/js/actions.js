@@ -88,6 +88,7 @@ export function toggleExpanded(expandedItem, value) {
 }
 
 export function markMessagesAsSeen(messageIds) {
+  debugger;
   return dispatch => {
     messageChannel.push('seen', {ids: messageIds})
   };

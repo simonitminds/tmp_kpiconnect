@@ -12,7 +12,7 @@ defmodule Oceanconnect.MessagesPage do
     end)
   end
 
-  def message_is_unread?(%Message{id: id}) do
+  def message_is_unseen?(%Message{id: id}) do
     has_css?(".qa-message-id-#{id} [data-has-been-seen='true'")
   end
 
