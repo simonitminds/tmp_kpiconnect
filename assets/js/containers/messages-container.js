@@ -2,20 +2,22 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Messages from '../components/auction/messages.js'
-import { subscribeToMessageUpdates } from '../actions';
+import { subscribeToMessageUpdates, sendMessage, toggleExpanded } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
     connection: state.messagesReducer.connection,
+    expandedAuction: state.messagesReducer.expandedAuction,
     expandedConversation: state.messagesReducer.expandedConversation,
     loading: state.messagesReducer.loading,
+    messagePanelIsExpanded: state.messagesReducer.messagePanelIsExpanded,
     messagePayloads: state.messagesReducer.messagePayloads
   }
 };
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  ...bindActionCreators(dispatch)
+  ...bindActionCreators({ sendMessage, toggleExpanded }, dispatch)
 });
 
 export class MessagesContainer extends React.Component {

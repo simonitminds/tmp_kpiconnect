@@ -1,6 +1,6 @@
 defmodule Oceanconnect.Messages.MessagePayload do
   alias __MODULE__
-  alias Oceanconnect.{Auctions, Messages, Repo}
+  alias Oceanconnect.{Accounts, Auctions, Messages, Repo}
   alias Oceanconnect.Auctions.{Auction, AuctionSuppliers}
 
   defstruct auction_id: nil,
@@ -67,7 +67,7 @@ defmodule Oceanconnect.Messages.MessagePayload do
     |> Enum.reduce([], fn({k, v}, acc) ->
       company_message_payload = %{
         company_name: AuctionSuppliers.get_name_or_alias(k, message_payload),
-        messages: sanitize_messages(v, company_id),
+        messages: sanitize_messages(v, company_id, message_payload),
         unseen_messages: count_unseen_messages(v, company_id)
       }
       [company_message_payload | acc]
@@ -75,13 +75,18 @@ defmodule Oceanconnect.Messages.MessagePayload do
     |> Enum.sort_by(& &1.company_name)
   end
 
-  defp sanitize_messages(messages, company_id) do
+  defp sanitize_messages(messages, company_id, %{anonymous_bidding: anon}) do
     Enum.map(messages, fn(message) ->
       message
       |> Map.take([:id, :content, :has_been_seen, :inserted_at])
       |> Map.put(:author_is_me, message.author_company_id == company_id)
+      |> Map.put(:user, get_user_name_or_anon(message, company_id, anon))
     end)
   end
+
+  defp get_user_name_or_anon(%{author_id: author_id, author_company_id: company_id}, company_id, _anon), do: Accounts.get_user_name!(author_id)
+  defp get_user_name_or_anon(_message, _company_id, true = _anon), do: "Anonymous"
+  defp get_user_name_or_anon(%{author_id: author_id}, _company_id, _anon), do: Accounts.get_user_name!(author_id)
 
   defp count_unseen_messages(messages, company_id) do
     Enum.count(messages, &unseen_by_recipient?(&1, company_id))

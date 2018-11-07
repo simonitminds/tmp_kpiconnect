@@ -105,9 +105,9 @@ defmodule Oceanconnect.MessagesTest do
       assert MessagesPage.has_participating_auctions?([auction])
     end
 
-    test "unread messages are marked as read when recipient expands conversation", %{auction: auction, messages: messages} do
+    test "unread messages are marked as read when recipient expands conversation", %{auction: auction, messages: messages, supplier_company: supplier_company} do
       AuctionShowPage.visit(auction.id)
-      MessagesPage.open_message_window()
+      MessagesPage.open_auction_conversation(auction.id, )
       assert Enum.all?(messages, &MessagesPage.message_is_unread?(&1))
     end
   end

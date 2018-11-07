@@ -3,7 +3,7 @@ import messagesReducer, {
   initialState
 } from '../../js/reducers/messages';
 import {
-  EXPAND_CONVERSATION,
+  TOGGLE_EXPANDED,
   UPDATE_MESSAGE_PAYLOAD
 } from '../../js/constants';
 
@@ -67,17 +67,47 @@ test('update_message_payload replaces the payload', ()=> {
   expect(output.messagePayloads).toEqual(action.messagePayloads);
 });
 
-describe('expand_conversation', ()=> {
-  test('replaces expanded conversation', ()=> {
+describe('toggle_expanded', ()=> {
+  test('toggles message panel expansion', ()=> {
+    const action = {
+      type: TOGGLE_EXPANDED,
+      expandedItem: 'messagePanelIsExpanded',
+      value: null
+    }
+    const output = messagesReducer(initialState, action);
+
+    expect(output.messagePanelIsExpanded).toEqual(true);
+  });
+
+  test('toggles expanded auction', ()=> {
     const state = Object.assign({}, initialState, {
-      expandedConversation: '2-Company-1'
+      expandedAuction: 1,
+      expandedConversation: 'Company-1'
     });
     const action = {
-      type: EXPAND_CONVERSATION,
-      conversation: { id: '1-Company-0' }
+      type: TOGGLE_EXPANDED,
+      expandedItem: 'expandedAuction',
+      value: 2
     }
     const output = messagesReducer(state, action);
 
-    expect(output.expandedConversation).toEqual('1-Company-0');
+    expect(output.expandedAuction).toEqual(2);
+    expect(output.expandedConversation).toEqual(null);
+  });
+
+  test('toggles expanded conversation', ()=> {
+    const state = Object.assign({}, initialState, {
+      expandedAuction: 1,
+      expandedConversation: 'Company-1'
+    });
+    const action = {
+      type: TOGGLE_EXPANDED,
+      expandedItem: 'expandedConversation',
+      value: 'Company-2'
+    }
+    const output = messagesReducer(state, action);
+
+    expect(output.expandedAuction).toEqual(1);
+    expect(output.expandedConversation).toEqual('Company-2');
   });
 });

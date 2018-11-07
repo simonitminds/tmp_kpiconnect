@@ -15,6 +15,7 @@ import {
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
   SELECT_PORT,
+  TOGGLE_EXPANDED,
   TOGGLE_SUPPLIER,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
@@ -80,12 +81,18 @@ export function subscribeToMessageUpdates() {
   };
 }
 
+export function toggleExpanded(expandedItem, value) {
+  return {type: TOGGLE_EXPANDED,
+          expandedItem,
+          value};
+}
+
 export function markMessagesAsSeen(messageIds) {
   messageChannel.push('seen', {ids: messageIds})
 }
 
-export function sendMessage(auctionId, recipientCompanyId, content) {
-  messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompanyId, content: content})
+export function sendMessage(auctionId, recipientCompany, content) {
+  messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompany, content: content})
 }
 
 function getAllAuctionPayloads() {
@@ -241,7 +248,6 @@ export function setPortAgent(auctionId, portAgent) {
       });
   };
 }
-
 
 export function updateBidStatus(auctionId, response) {
   return {type: UPDATE_BID_STATUS,
