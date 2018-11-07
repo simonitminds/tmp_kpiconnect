@@ -3,23 +3,23 @@ defmodule OceanconnectWeb.Email do
   use Bamboo.Phoenix, view: OceanconnectWeb.EmailView
 
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid}
 
-  def auction_invitation(
-        auction = %Auction{
-          suppliers: supplier_companies,
-          buyer_id: _buyer_id,
-          buyer: buyer,
-          vessels: vessels,
-          port: port
-        }
-      ) do
+  def auction_invitation(auction = %Auction{}) do
+    auction = Auctions.fully_loaded(auction)
+    %Auction{
+        buyer: buyer,
+        port: port,
+        suppliers: supplier_companies,
+        vessels: vessels
+      } = auction
+
     suppliers = Accounts.users_for_companies(supplier_companies)
-    vessel_name = vessels
-    |> Enum.map(&(&1.name))
-    |> Enum.join(", ")
+    vessel_name =
+      vessels
+      |> Enum.map(& &1.name)
+      |> Enum.join(", ")
     port_name = port.name
 
     Enum.map(suppliers, fn supplier ->
@@ -36,20 +36,21 @@ defmodule OceanconnectWeb.Email do
     end)
   end
 
-  def auction_starting_soon(
-        auction = %Auction{
-          suppliers: supplier_companies,
-          buyer: buyer_company,
-          vessels: vessels,
-          port: port
-        }
-      ) do
-    buyers = buyer_company.users
-    vessel_name = vessels
-    |> Enum.map(&(&1.name))
-    |> Enum.join(", ")
-    port_name = port.name
+  def auction_starting_soon(auction = %Auction{}) do
+    auction = Auctions.fully_loaded(auction)
+    %Auction{
+        suppliers: supplier_companies,
+        buyer: buyer_company,
+        vessels: vessels,
+        port: port
+      } = auction
 
+    buyers = buyer_company.users
+    vessel_name =
+      vessels
+      |> Enum.map(& &1.name)
+      |> Enum.join(", ")
+    port_name = port.name
     suppliers =
       Enum.map(supplier_companies, fn supplier_company ->
         Enum.map(supplier_company.users, fn user -> user end)
@@ -88,19 +89,27 @@ defmodule OceanconnectWeb.Email do
   def auction_closed(
         bids,
         approved_barges,
-        auction = %Auction{buyer_id: buyer_id, vessels: vessels, port: port}
+        auction = %Auction{}
       ) do
+    auction = Auctions.fully_loaded(auction)
+    %Auction{
+        buyer_id: buyer_id,
+        vessels: vessels,
+        port: port
+      } = auction
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
-    vessel_name = vessels
-    |> Enum.map(&(&1.name))
-    |> Enum.join(", ")
+    vessel_name =
+      vessels
+      |> Enum.map(& &1.name)
+      |> Enum.join(", ")
     port_name = port.name
 
     supplier_emails =
       Enum.flat_map(bids, fn bid ->
         supplier_company = Accounts.get_company!(bid.supplier_id)
         suppliers = Accounts.users_for_companies([supplier_company])
+
         Enum.map(suppliers, fn supplier ->
           base_email(supplier)
           |> subject("You have won Auction #{auction.id} for #{vessel_name} at #{port_name}!")
@@ -119,8 +128,6 @@ defmodule OceanconnectWeb.Email do
 
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
-        %{buyer_id: buyer_id} = Auctions.get_auction!(bid.auction_id)
-        buyer_company = Accounts.get_company!(buyer_id)
         Enum.map(buyers, fn buyer ->
           base_email(buyer)
           |> subject("Auction #{auction.id} for #{vessel_name} at #{port_name} has closed.")
@@ -142,7 +149,7 @@ defmodule OceanconnectWeb.Email do
 
   def product_bids_for_supplier(bids, supplier_id) do
     Enum.filter(bids, &(&1.supplier_id == supplier_id))
-    |> Enum.group_by(&(&1.fuel_id))
+    |> Enum.group_by(& &1.fuel_id)
   end
 
   def approved_barges_for_supplier(approved_barges, supplier_id) do
@@ -151,7 +158,7 @@ defmodule OceanconnectWeb.Email do
   end
 
   def product_bids_for_buyer(bids) do
-    Enum.group_by(bids, &(&1.fuel_id))
+    Enum.group_by(bids, & &1.fuel_id)
   end
 
   def buyer_company_for_bid(%AuctionBid{is_traded_bid: true}) do
@@ -162,8 +169,6 @@ defmodule OceanconnectWeb.Email do
     Accounts.get_company!(buyer_id)
   end
 
-  # def buyer_company_for_bids(bids) when is_list(bids), do: Enum.map(bids, &buyer_company_for_bid/1)
-
   def supplier_company_for_bid(%AuctionBid{is_traded_bid: true}) do
     Accounts.get_ocm_company()
   end
@@ -171,22 +176,21 @@ defmodule OceanconnectWeb.Email do
     Accounts.get_company!(supplier_id)
   end
 
-  # def supplier_companies_for_bids(bids) when is_list(bids), do: Enum.map(bids, &supplier_company_for_bid/1)
-
-  def auction_canceled(
-        auction = %Auction{
+  def auction_canceled(auction = %Auction{}) do
+    auction = Auctions.fully_loaded(auction)
+    %Auction{
           suppliers: supplier_companies,
           buyer_id: buyer_id,
           vessels: vessels,
           port: port
-        }
-      ) do
+        } = auction
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies(supplier_companies)
-    vessel_name = vessels
-    |> Enum.map(&(&1.name))
-    |> Enum.join(", ")
+    vessel_name =
+      vessels
+      |> Enum.map(& &1.name)
+      |> Enum.join(", ")
     port_name = port.name
 
     supplier_emails =
