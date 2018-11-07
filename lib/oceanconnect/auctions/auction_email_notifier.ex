@@ -47,11 +47,11 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
 
   defp deliver_emails(emails) do
     {:ok, pid} = Task.Supervisor.start_link()
+    require Logger
+    Logger.info("HI WE ARE DELIVERING EMAILS")
 
-    @task_supervisor.async_nolink(pid, fn ->
-      Enum.map(emails, fn email ->
-        OceanconnectWeb.Mailer.deliver_now(email)
-      end)
+    Enum.map(emails, fn email ->
+      OceanconnectWeb.Mailer.deliver_later(email)
     end)
   end
 end
