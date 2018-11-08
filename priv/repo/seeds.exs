@@ -161,7 +161,7 @@ companies =
     Repo.get_or_insert!(Company, company)
   end)
 
-suppliers = [chevron, nigeria, qatargas, petrochina, global, shell, chemoil]
+suppliers = [qatargas, petrochina, global, shell, chemoil]
 # User creation doesn't use get_or_insert! fn due to virtual password field
 
 Enum.map(companies, fn c ->
