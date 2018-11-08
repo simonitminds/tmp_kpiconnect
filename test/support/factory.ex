@@ -24,6 +24,13 @@ defmodule Oceanconnect.Factory do
     |> set_password
   end
 
+  def draft_auction_factory() do
+    %Oceanconnect.Auctions.Auction{
+      eta: DateTime.utc_now(),
+      port: build(:port)
+    }
+  end
+
   def auction_factory() do
     start =
       DateTime.utc_now()
@@ -31,16 +38,17 @@ defmodule Oceanconnect.Factory do
       |> NaiveDateTime.add(20)
       |> DateTime.from_naive!("Etc/UTC")
 
-    %Oceanconnect.Auctions.Auction{
-      scheduled_start: start,
-      duration: 10 * 60_000,
-      decision_duration: 15 * 60_000,
-      eta: DateTime.utc_now(),
-      auction_vessel_fuels: [build(:vessel_fuel)],
-      port: build(:port),
-      buyer: build(:company),
-      suppliers: [build(:company, is_supplier: true)]
-    }
+    struct!(
+      draft_auction_factory(),
+      %{
+        scheduled_start: start,
+        duration: 10 * 60_000,
+        decision_duration: 15 * 60_000,
+        auction_vessel_fuels: [build(:vessel_fuel)],
+        buyer: build(:company),
+        suppliers: [build(:company, is_supplier: true)]
+      }
+    )
   end
 
   def vessel_fuel_factory() do
