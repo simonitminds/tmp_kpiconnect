@@ -2,8 +2,6 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction}
 
-  @task_supervisor Application.get_env(:oceanconnect, :email_task_supervisor) || Task.Supervisor
-
   def notify_auction_created(auction = %Auction{}) do
     auction = auction |> Auctions.fully_loaded()
     invitation_emails = OceanconnectWeb.Email.auction_invitation(auction)
@@ -46,10 +44,6 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
   end
 
   defp deliver_emails(emails) do
-    {:ok, pid} = Task.Supervisor.start_link()
-    require Logger
-    Logger.info("HI WE ARE DELIVERING EMAILS")
-
     Enum.map(emails, fn email ->
       OceanconnectWeb.Mailer.deliver_later(email)
     end)
