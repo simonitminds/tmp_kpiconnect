@@ -20,11 +20,19 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const lowestBidMessage = () => {
     if (winningSolution) {
       const suppliers = _.map(winningSolution.bids, "supplier");
-      return (
-        <div className="card-content__best-bidder card-content__best-bidder--winner">
-          <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
-        </div>
-      )
+      if(suppliers.length == 1) {
+        return (
+          <div className="card-content__best-bidder card-content__best-bidder--winner">
+            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div>
+          </div>
+        )
+      } else {
+        return (
+          <div className="card-content__best-bidder card-content__best-bidder--winner">
+            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
+          </div>
+        )
+      }
     } else if (auctionStatus == 'expired') {
       return (
         <div className="card-content__best-bidder">
@@ -70,7 +78,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     return vesselNames.join(", ");
   };
 
-  const fuelDisplay = (vesselFuels) => {
+  const fuelPriceDisplay = (vesselFuels, solution) => {
     const uniqueFuels = _.chain(vesselFuels)
       .map((vf) => vf.fuel)
       .filter()
@@ -87,14 +95,31 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }, {})
         .value();
 
+    const solutionBidsByFuel = _.chain(solution)
+      .get('bids', [])
+      .reduce((acc, bid) => {
+        acc[bid.fuel_id] = bid;
+        return acc;
+      }, {})
+      .value();
+
+
     return _.map(uniqueFuels, (fuel) => {
+      const fuelBid = solutionBidsByFuel[fuel.id];
+
       return(
         <div className="card-content__product" key={fuel.id}>
-            <span className="fuel-name">{fuel.name}</span> { fuelQuantities[fuel.id] ?
-            <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
-            : <span className="no-amount has-text-gray-3">(no amount given)</span>
+          <span className="fuel-name">{fuel.name}</span>
+          { fuelQuantities[fuel.id]
+            ? <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
+            : <span className="no-amount has-text-gray-3">(no quantity given)</span>
           }
-          <span className="card-content__best-price">$390.00</span>
+          <span className="card-content__best-price">
+            { fuelBid
+              ? `$${formatPrice(fuelBid.amount)}`
+              : "No bid"
+            }
+          </span>
         </div>
       );
     });
@@ -146,9 +171,9 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-content__products">
           { auctionStatus != 'pending' &&
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning':'Best'} Prices</span>
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
           }
-          { fuelDisplay(vesselFuels) }
+          { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
         </div>
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
