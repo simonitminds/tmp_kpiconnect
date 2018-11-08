@@ -92,6 +92,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
   defp scrub_solutions_for_buyer(solutions, auction) when is_list(solutions) do
     Enum.map(solutions, fn solution -> scrub_solution_for_buyer(solution, auction) end)
+    |> Enum.filter(&(&1))
   end
 
   # TODO: dedupe this across payloads
