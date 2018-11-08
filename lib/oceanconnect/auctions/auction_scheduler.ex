@@ -80,7 +80,10 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
         {:update_scheduled_start, %{scheduled_start: scheduled_start}},
         state = %{timer_ref: nil}
       ) do
-    new_state = Map.put(state, :scheduled_start, scheduled_start)
+    delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
+    timer_ref = Process.send_after(self(), :start_auction, delay)
+    new_state = %{state | scheduled_start: scheduled_start, timer_ref: timer_ref}
+
     {:noreply, new_state}
   end
 
