@@ -48,7 +48,7 @@
             <td>
                 <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
                         vessel_fuel <- vessel_fuels do %>
-                  <p class="qa-auction-deliverable-<%= vessel_fuel.id %>">
+                  <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
                     <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
                     <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
                     <span class="qa-auction-deliverable-vessel">
@@ -68,7 +68,7 @@
             <td>
               <%= if winning_solution = auction_log_winning_solution(@solutions_payload) do %>
                 <%= for bid <- bids_for_solution(winning_solution) do %>
-                  <p class="qa-auction-detail-winning-solution-entry">
+                  <p class="qa-auction-detail-winning-solution-entry has-margin-bottom-sm">
                     <span class="qa-auction-detail-winning-solution-entry-amount"><%= format_price(bid.amount) %></span>/unit
                     for
                     <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_fuel_id(@auction_payload.auction, bid.fuel_id) %></span>
@@ -102,12 +102,12 @@
           <div class="qa-event-<%= event.id %> <%= if event_is_from_system?(event), do: "is-gray-2" %>">
             <div><%= convert_event_date_time?(event.time_entered) %></div>
             <div>
-              <span class="qa-event-type has-text-weight-bold"><%= convert_event_type(event.type, event) %></span>
+              <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(event.type, event) %></span>
+              <span class="qa-event-type-extras"><%= convert_event_type_extras(event.type, event) %></span>
               <br>
-              <small class="qa-event-type-extras"><%= convert_event_type_extras(event.type, event) %></small>
               <%= if event_has_bid_data?(event) do %>
                 <%= if event_bid_has_amount?(event) do %>
-                  <span class="qa-event-bid-amount has-text-weight-bold"><%= event_bid_amount(event) %></span>
+                  <span class="qa-event-bid-amount has-text-weight-bold has-padding-right-xs"><%= event_bid_amount(event) %></span>
                 <% else %>
                   <i class="qa-event-bid-amount has-text-gray-3">No initial amount</i>
                 <% end %>
@@ -116,21 +116,20 @@
                   <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
                 <% end %>
                 <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                  <br>
                   <%= if event_bid_has_minimum?(event) do %>
-                    <small>Min: <span class="qa-event-bid-min-amount"><%=  event_bid_min_amount(event) %><span></small>
+                    <span class="has-text-gray-3">Min: <span class="qa-event-bid-min-amount"><%=  event_bid_min_amount(event) %></span></span>
+                    <br>
                   <% end %>
                 <% end %>
               <% end %>
               <%= unless event_is_from_system?(event) do %>
-                <span class="qa-event-company has-text-weight-bold"><%= event_company(event) %></span>
-                <br>
-                <small class="qa-event-user"><%= event_user(event) %></small>
+                <span class="qa-event-company has-text-weight-bold has-padding-right-xs"><%= event_company(event) %></span>
+                <span class="qa-event-user">(<%= event_user(event) %>)</span>
               <% end %>
             </div>
 
             <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <div class="qa-event-impersonator"><%= event.user && Map.get(event.user, :impersonated_by) %></div>
+              <div class="qa-event-impersonator"><b class="is-hidden-tablet has-text-gray-3">Impersonator:</b> <%= event.user && Map.get(event.user, :impersonated_by) %></div>
             <% end %>
           </div>
         <% end %>
