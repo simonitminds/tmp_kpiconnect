@@ -2,6 +2,8 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   use GenServer
   alias Oceanconnect.Auctions
 
+  require Logger
+
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionEvent,
@@ -39,21 +41,23 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
         solution: %Solution{
           bids: winning_solution_bids
         },
-        auction_state: %AuctionState{
+        state: %AuctionState{
           submitted_barges: submitted_barges
         }
       }
     },
     state
   ) do
+    Logger.info("HANDLED WINNING SOLUTION EMAIL")
     AuctionEmailNotifier.notify_auction_completed(winning_solution_bids, submitted_barges, auction_id)
     {:noreply, state}
   end
 
   def handle_info(
     %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
-    state = %AuctionState{status: :pending}
+    state
   ) do
+    Logger.info("HANDLED CREATED EMAIL")
     AuctionEmailNotifier.notify_auction_created(auction)
     {:noreply, state}
   end
@@ -62,6 +66,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     %AuctionEvent{type: :upcoming_auction_notified, data: auction = %Auction{}},
     state
   ) do
+    Logger.info("HANDLED UPCOMING EMAIL")
     AuctionEmailNotifier.notify_upcoming_auction(auction)
     {:noreply, state}
   end
@@ -70,6 +75,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     %AuctionEvent{auction_id: auction_id, type: :auction_canceled, data: %AuctionState{}},
     state
   ) do
+    Logger.info("HANDLED CANCELED EMAIL")
     auction_id
     |> Auctions.get_auction!()
     |> Auctions.fully_loaded()
@@ -78,7 +84,9 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     {:noreply, state}
   end
 
-  def handle_info(_event, state) do
+  def handle_info(event, state) do
+    Logger.info("THE BAD THING HAPPENED")
+    Logger.info(event)
     {:noreply, state}
   end
 

@@ -15,11 +15,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             submitted_barges: []
 
   def get_auction_payload!(auction = %Auction{buyer_id: buyer_id}, buyer_id) do
+    # auction = Auctions.fully_loaded(auction)
     auction_state = Auctions.get_auction_state!(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
   def get_auction_payload!(auction = %Auction{}, supplier_id) do
+    # auction = Auctions.fully_loaded(auction)
     auction_state = Auctions.get_auction_state!(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
@@ -29,10 +31,12 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         auction_state = %AuctionState{}
       ) do
+    # auction = Auctions.fully_loaded(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
   def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %AuctionState{}) do
+    # auction = Auctions.fully_loaded(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
