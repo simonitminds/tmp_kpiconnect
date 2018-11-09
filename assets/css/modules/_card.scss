@@ -9,10 +9,6 @@
 
 // Adaptations
 
-.card {
-  padding-bottom: 0.5rem;
-}
-
 .card--auction { // Card elements on the auction index page
   &> div:last-child {
 
@@ -63,25 +59,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  // overflow: hidden;
   font-weight: bold;
-  // max-width: 425px;
   background-color: $gray-3;
   color: $white;
   padding: 0.5rem 1rem;
   margin: 0;
-  margin-top: 0.75rem;
   margin-bottom: -1rem;
 }
 
 .card-content__best-bidder {
-  width: calc(100% - 150px);
+  width: calc(100% - 25px);
   display: flex;
   vertical-align: middle;
-  padding-right: 1rem;
 
   &--winner {
-    width: calc(100% - 120px);
+    width: calc(100% - 25px);
   }
 
   &__name { // containing span that'll cut to ellipsis
@@ -105,19 +97,46 @@
   background-color: $highlight;
   color: $black !important;
   padding: 0.25rem 0.75rem;
-  margin: 0 -0.25rem 0 0;
-  border-radius: 3px;
+  margin: 0 0 0 auto;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 .card-content__products {
-  margin-top: 1rem;
-  padding: 0 1rem;
+  background-color: $gray-2;
+  padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+}
+
+.card-content__product-header {
+  display: block;
   font-weight: bold;
+  padding: 0 0.5rem;
+}
+
+.card-content__product {
+  display: flex;
+  margin: 0.5rem;
+  margin-bottom: 0;
+  padding: 0 0 0 1rem;
+  font-weight: bold;
+  align-items: center;
+  background-color: $white;
+  border-radius: 3px;
+
+  .fuel-name {
+    max-width: calc(100% - 124px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .fuel-amount {
+    padding: 0 0.5rem 0 0.25rem;
+  }
 
   @media (max-width: 768px) {
     margin-top: 0.5rem;
 
-    &+ .card-content__products {
+    &+ .card-content__product {
       margin-top: 0.75rem;
     }
   }

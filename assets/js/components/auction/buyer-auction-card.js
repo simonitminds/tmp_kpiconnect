@@ -20,11 +20,19 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const lowestBidMessage = () => {
     if (winningSolution) {
       const suppliers = _.map(winningSolution.bids, "supplier");
-      return (
-        <div className="card-content__best-bidder card-content__best-bidder--winner">
-          <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
-        </div>
-      )
+      if(suppliers.length == 1) {
+        return (
+          <div className="card-content__best-bidder card-content__best-bidder--winner">
+            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div>
+          </div>
+        )
+      } else {
+        return (
+          <div className="card-content__best-bidder card-content__best-bidder--winner">
+            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
+          </div>
+        )
+      }
     } else if (auctionStatus == 'expired') {
       return (
         <div className="card-content__best-bidder">
@@ -52,7 +60,6 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
       return (
         <div className="card-content__bid-status">
           {lowestBidMessage()}
-          <div className="card-content__best-price"><strong>{ auctionStatus == 'closed' ? '' : 'Best'} Offer: </strong>{bestSolution.normalized_price == null ? <i>(None)</i> : `$` + formatPrice(bestSolution.normalized_price)}</div>
         </div>
       );
     } else {
@@ -71,7 +78,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     return vesselNames.join(", ");
   };
 
-  const fuelDisplay = (vesselFuels) => {
+  const fuelPriceDisplay = (vesselFuels, solution) => {
     const uniqueFuels = _.chain(vesselFuels)
       .map((vf) => vf.fuel)
       .filter()
@@ -88,13 +95,31 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }, {})
         .value();
 
+    const solutionBidsByFuel = _.chain(solution)
+      .get('bids', [])
+      .reduce((acc, bid) => {
+        acc[bid.fuel_id] = bid;
+        return acc;
+      }, {})
+      .value();
+
+
     return _.map(uniqueFuels, (fuel) => {
+      const fuelBid = solutionBidsByFuel[fuel.id];
+
       return(
         <div className="card-content__product" key={fuel.id}>
-          {fuel.name} { fuelQuantities[fuel.id] ?
-            <span className="fuel-amount">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
-            : <span className="no-amount">(no amount given)</span>
+          <span className="fuel-name">{fuel.name}</span>
+          { fuelQuantities[fuel.id]
+            ? <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
+            : <span className="no-amount has-text-gray-3">(no quantity given)</span>
           }
+          <span className="card-content__best-price">
+            { fuelBid
+              ? `$${formatPrice(fuelBid.amount)}`
+              : "No bid"
+            }
+          </span>
         </div>
       );
     });
@@ -137,6 +162,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
+          <span className="has-text-gray-3 is-inline-block has-padding-right-sm">{auction.id}</span>
             { vesselNameDisplay(vesselFuels) }
             {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
           </h3>
@@ -144,13 +170,13 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
         </div>
         <div className="card-content__products">
-          { fuelDisplay(vesselFuels) }
+          { auctionStatus != 'pending' &&
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
+          }
+          { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
         </div>
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
-            {/* <a href={`/auctions/${auction.id}/cancel`} className="card__cancel-auction button is-danger is-small qa-auction-cancel">
-              <span className="icon is-inline-block has-margin-right-xs"><i className="fas fa-times"></i></span> Cancel Auction
-            </a> */}
           { window.isAdmin &&
             <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
               <span className="icon"><i className="fas fa-play"></i></span> Start Auction
