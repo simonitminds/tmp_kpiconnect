@@ -49,8 +49,11 @@ defmodule OceanconnectWeb.ChatfishChannel do
       auction_id
       |> Auctions.get_participant_name_and_ids_for_auction()
       |> Enum.filter(& &1.name == recipient_company_name)
-      |> hd()
-      |> Map.get(:id)
+      |> List.first()
+      |> case do
+        nil -> nil
+        map -> Map.get(map, :id)
+      end
     current_user = Guardian.Phoenix.Socket.current_resource(socket)
     {:ok, _message} = Messages.create_message(%{
       auction_id: auction_id,
@@ -58,6 +61,7 @@ defmodule OceanconnectWeb.ChatfishChannel do
       author_id: current_user.id,
       content: content,
       has_been_seen: false,
+      impersonator_id: current_user.impersonated_by,
       recipient_company_id: recipient_company_id
     })
     Enum.each([current_user.company_id, recipient_company_id], &send(self(), {:messages_update, &1}))
