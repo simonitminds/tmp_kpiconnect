@@ -24,7 +24,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId}) => {
             { bestSolution &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} title="Best Overall Offer" />
             }
-            { bestSingleSupplier &&
+            { bestSingleSupplier && fuels && fuels.length > 1 &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} title={`Best Single Supplier Offer`}/>
             }
             { !bestSolution &&

@@ -30,6 +30,7 @@ class BiddingForm extends React.Component {
     const products = _.sortBy(auction.fuels, 'id');
     const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'));
     const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
+    const fuels = _.get(auctionPayload, 'auction.fuels');
 
     const renderProduct = ({id: productId, name}, auctionPayload) => {
       const existingBid = _.chain(auctionPayload)
@@ -49,7 +50,6 @@ class BiddingForm extends React.Component {
         ev.preventDefault();
         return confirm('Are you sure you want to cancel your bid for this product?') ? revokeBid(auction.id, productId) : false;
       };
-
 
       return(
         <div className="auction-bidding__product-group columns is-desktop" key={productId}>
@@ -92,11 +92,14 @@ class BiddingForm extends React.Component {
               </div>
             </div>
           </div>
+          { fuels && fuels.length > 1 ?
           <div className="column is-narrow">
             <label className="checkbox">
               <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
             </label>
-          </div>
+          </div>  :
+            <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
+          }
         </div>
       );
     };
