@@ -1,6 +1,7 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Auctions
+  alias Oceanconnect.{Accounts, Auctions}
+  alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel, Solution}
 
   @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
@@ -256,6 +257,8 @@ defmodule OceanconnectWeb.AuctionView do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
   def format_price(amount), do: amount
+  def user_name(%User{} = user), do: Accounts.get_user_name!(user)
+  def user_name(_), do: "-"
 
   defp leftpad(integer, length \\ 2) do
     String.pad_leading(Integer.to_string(integer), length, "0")

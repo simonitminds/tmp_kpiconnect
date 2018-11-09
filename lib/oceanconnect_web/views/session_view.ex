@@ -38,7 +38,7 @@ defmodule OceanconnectWeb.SessionView do
   def current_user(conn) do
     case Auth.current_user(conn) do
       nil -> ""
-      user -> "#{user.first_name} #{user.last_name}"
+      user -> Accounts.get_user_name!(user)
     end
   end
 

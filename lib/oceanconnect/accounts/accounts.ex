@@ -53,9 +53,14 @@ defmodule Oceanconnect.Accounts do
     |> Repo.get!(id)
   end
 
+  def get_user_name!(%User{} = user) do
+    User.full_name(user)
+  end
+
   def get_user_name!(id) do
-    user = Repo.get!(User, id)
-    "#{user.first_name} #{user.last_name}"
+    id
+    |> get_user!()
+    |> User.full_name()
   end
 
   @doc """
