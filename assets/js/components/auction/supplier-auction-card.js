@@ -12,6 +12,8 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
   const vessels = _.get(auction, 'vessels');
   const fuels = _.get(auction, 'fuels');
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
+  const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
+  const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
 
 
   const bidStatusDisplay = () => {
@@ -43,7 +45,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
     return vesselNames.join(", ");
   };
 
-  const fuelDisplay = (vesselFuels) => {
+  const fuelPriceDisplay = (vesselFuels, solution) => {
     const uniqueFuels = _.chain(vesselFuels)
       .map((vf) => vf.fuel)
       .filter()
@@ -60,15 +62,31 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
         }, {})
         .value();
 
+    const solutionBidsByFuel = _.chain(solution)
+      .get('bids', [])
+      .reduce((acc, bid) => {
+        acc[bid.fuel_id] = bid;
+        return acc;
+      }, {})
+      .value();
+
+
     return _.map(uniqueFuels, (fuel) => {
+      const fuelBid = solutionBidsByFuel[fuel.id];
+
       return(
         <div className="card-content__product" key={fuel.id}>
-          <span className="fuel-name">{fuel.name}</span> { fuelQuantities[fuel.id] ?
-            <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
-            : <span className="no-amount has-text-gray-3">(no amount given)</span>
+          <span className="fuel-name">{fuel.name}</span>
+          { fuelQuantities[fuel.id]
+            ? <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
+            : <span className="no-amount has-text-gray-3">(no quantity given)</span>
           }
-          <span className="card-content__best-price">$390.00</span>
-
+          <span className="card-content__best-price">
+            { fuelBid
+              ? `$${formatPrice(fuelBid.amount)}`
+              : "No bid"
+            }
+          </span>
         </div>
       );
     });
@@ -101,9 +119,9 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
         </div>
         <div className="card-content__products">
           { auctionStatus != 'pending' &&
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning':'Best'} Prices</span>
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
           }
-          {fuelDisplay(vesselFuels)}
+          { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
         </div>
 
         {/* <div>
