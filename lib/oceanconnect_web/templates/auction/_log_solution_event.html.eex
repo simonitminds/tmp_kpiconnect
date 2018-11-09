@@ -1,0 +1,28 @@
+<div class="qa-event-<%= @event.id %>">
+  <div><%= convert_event_date_time?(@event.time_entered) %></div>
+  <div>
+    <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
+    <span class="qa-event-type-extras"><%= convert_event_type_extras(@event.type, @event) %></span>
+    <br>
+    <%= for bid <- bids_for_solution(solution_from_event(@event)) do %>
+      <span class="qa-auction-detail-winning-solution-entry has-margin-bottom-sm">
+        <span class="qa-auction-detail-winning-solution-entry-amount has-text-weight-bold has-margin-bottom-xs"><%= format_price(bid.amount) %></span>/unit
+        for
+        <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_id(@auction_payload.auction, bid.fuel_id) %></span>
+        from
+        <span><%= auction_log_supplier_from_id(@auction_payload.auction, bid.supplier_id) %></span>
+        <%= if bid_is_traded?(bid) do %>
+          &nbsp;
+          <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+        <% end %>
+      </span>
+      <br>
+    <% end %>
+    <span class="qa-event-company has-padding-right-xs"><%= event_company(@event) %></span>
+    <span class="qa-event-user">(<%= event_user(@event) %>)</span>
+  </div>
+
+  <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+    <div class="qa-event-impersonator"><b class="is-hidden-tablet has-text-gray-3">Impersonator:</b> <%= @event.user && Map.get(@event.user, :impersonated_by) %></div>
+  <% end %>
+</div>

@@ -3,7 +3,8 @@ defmodule OceanconnectWeb.AuctionView do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel, Solution}
 
-  @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered, :winning_solution_selected]
+  @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
+  @events_with_solution_data [:winning_solution_selected]
   @events_with_product_data [
     :bid_placed,
     :auto_bid_placed,
@@ -72,13 +73,25 @@ defmodule OceanconnectWeb.AuctionView do
   end
   def auction_log_winning_solution(_), do: "—"
 
-  def auction_log_fuel_from_fuel_id(%{fuels: fuels}, fuel_id) do
+  def solution_from_event(%{type: :winning_solution_selected, data: %{solution: solution}}), do: solution
+
+
+  def auction_log_fuel_from_id(%{fuels: fuels}, fuel_id) do
     case Enum.find(fuels, nil, &("#{&1.id}" == fuel_id)) do
       nil -> "Fuel ##{fuel_id}"
       %Fuel{name: name} -> name
     end
   end
-  def auction_log_fuel_from_fuel_id(_payload, fuel_id), do: "Fuel ##{fuel_id}"
+  def auction_log_fuel_from_id(_auction, fuel_id), do: "Fuel ##{fuel_id}"
+
+  def auction_log_supplier_from_id(%{suppliers: suppliers}, supplier_id) do
+    case Enum.find(suppliers, nil, &(&1.id == supplier_id)) do
+      nil -> "Supplier ##{supplier_id}"
+      %{name: name} -> name
+    end
+  end
+  def auction_log_supplier_from_id(_auction, supplier_id), do: "Supplier ##{supplier_id}"
+
 
   def bids_for_solution(%Solution{bids: bids}), do: bids
 
@@ -162,6 +175,10 @@ defmodule OceanconnectWeb.AuctionView do
     ""
   end
 
+  def bid_is_traded?(%{is_traded_bid: true}), do: true
+  def bid_is_traded?(_bid), do: false
+
+
   def event_has_bid_data?(event) do
     event.type in @events_with_bid_data
   end
@@ -213,6 +230,16 @@ defmodule OceanconnectWeb.AuctionView do
   def event_user(%AuctionEvent{user: nil}), do: "—"
   def event_user(%AuctionEvent{user: user}), do: "#{user.first_name} #{user.last_name}"
   def event_user(_), do: "—"
+
+  def event_template_partial_name(event) do
+    cond do
+      event.type in @events_from_system -> "_log_system_event.html"
+      event.type in @events_with_solution_data -> "_log_solution_event.html"
+      event.type in @events_with_bid_data -> "_log_bid_event.html"
+      event.type in @events_for_barges -> "_log_barge_event.html"
+      true -> "_log_normal_event.html"
+    end
+  end
 
   def format_price(amount) when is_float(amount) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
