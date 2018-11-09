@@ -10,8 +10,8 @@
       <ul class="message__context-list">
         <li class="message__context-list__active-convo">
           <h2>
-            <div class="auction-header__status
-                      auction-header__status--open
+            <div class="auction-status
+                      auction-status--open
                       tag
                       is-rounded
                       has-margin-bottom-none has-margin-right-xs">
@@ -21,8 +21,8 @@
         </li>
         <li class="message__context-list__active-convo">
           <h2>
-            <div class="auction-header__status
-                      auction-header__status--pending
+            <div class="auction-status
+                      auction-status--pending
                       tag
                       is-rounded
                       has-margin-bottom-none has-margin-right-xs">
@@ -32,8 +32,8 @@
         </li>
         <li class="message__context-list__active-convo">
           <h2>
-            <div class="auction-header__status
-                      auction-header__status--closed
+            <div class="auction-status
+                      auction-status--closed
                       tag
                       is-rounded
                       has-margin-bottom-none has-margin-right-xs">
@@ -47,8 +47,8 @@
   <div class="message__auction-context">
     <a class="message__toggle">
       <h2>
-        <div class="auction-header__status
-                  auction-header__status--closed
+        <div class="auction-status
+                  auction-status--closed
                   tag
                   is-rounded
                   has-margin-bottom-none has-margin-right-xs">
@@ -88,7 +88,7 @@
       </div>
   </div>
   <div class="message__conversation open">
-    <div class="message__message-container">
+    <div class="messaging__message-container">
       <div class="message__datestamp">
         20 September 2018, 17:23 GMT
       </div>

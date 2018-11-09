@@ -78,20 +78,6 @@
 
   // LEFT COLUMN
 
-  &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
-    @extend .tag, .is-rounded;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: $white !important;
-
-    // Color Auction Status tags based on... auction status.
-    &--open { background-color: $green !important; }
-    &--draft { background-color: $gray-3 !important; }
-    &--pending { background-color: $teal !important; }
-    &--closed { background-color: $gray-3 !important; }
-    &--canceled { background-color: $red !important; }
-  }
-
   &__time-remaining {
     display: inline-block;
     height: 1.7rem;
@@ -103,7 +89,7 @@
     transition: all 0.2s ease-in;
     overflow: hidden;
 
-    .auction-card__status--open &{
+    .auction-status--open &{
       background-color: $gray-3 !important;
       color: $white !important;
       width: 150px !important;
@@ -112,7 +98,7 @@
       &--under-3 { background-color: $gold !important; width: 150px !important;}
     }
 
-    .auction-card__status--decision &{
+    .auction-status--decision &{
       background-color: $gray-3 !important;
       color: $white !important;
       width: 150px !important;
@@ -150,7 +136,7 @@
       left: -52px;
     }
 
-    .auction-card__status ~ & {
+    .auction-status ~ & {
       margin-left: auto;
     }
   }

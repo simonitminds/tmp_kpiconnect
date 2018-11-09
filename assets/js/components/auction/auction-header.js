@@ -30,7 +30,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
             <div className="auction-header">
               <div className="columns has-margin-bottom-none">
                 <div className="column">
-                  <div className={`auction-header__status auction-header__status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
+                  <div className={`auction-status auction-status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
                     {auctionStatus}
                   </div>
                   <MediaQuery query="(max-width: 768px)">

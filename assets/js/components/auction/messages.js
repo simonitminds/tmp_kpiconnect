@@ -16,7 +16,7 @@ const Messages = (props) => {
 
   const unseenMessageCount = (unseenMessageCount) => {
     if (unseenMessageCount > 0) {
-      return <span className="message__notifications">{unseenMessageCount}</span>
+      return <span className="messaging__notifications">{unseenMessageCount}</span>
     }
   }
 
@@ -63,7 +63,7 @@ const Messages = (props) => {
   const renderConversations = (messagePayload, isExpanded) => {
     if (isExpanded) {
       return (
-        <ul className="qa-conversations">
+        <ul className="messaging__context-list qa-conversations">
           { _.map(messagePayload.conversations, (conversation) => {
              return renderExpandableConversation(messagePayload.auction_id, conversation, expandedConversation == conversation.company_name)
            })}
@@ -83,7 +83,7 @@ const Messages = (props) => {
       >
         <h2>
           { expansionToggle(isExpanded) }
-          <div className={`auction-header__status auction-header__status-${messagePayload.status} tag is-rounded has-margin-bottom-non has-margin-right-xs is-capitalized`}>
+          <div className={`auction-status auction-status--${messagePayload.status}`}>
             {messagePayload.status}
           </div>
           { _.map(messagePayload.vessels, (vessel) => {
@@ -100,7 +100,7 @@ const Messages = (props) => {
 
   const renderMessagesInterface = (messagePayloads) => {
     return (
-      <ul className="message__context-list">
+      <ul className="messaging__top-context">
         { _.map(messagePayloads, (messagePayload) => {
           return renderExpandableAuctionMessagePayload(messagePayload, expandedAuction == messagePayload.auction_id)
         })}
@@ -111,13 +111,14 @@ const Messages = (props) => {
   const unseenMessagesEnvelope = (unseenMessageCount) => {
     if (unseenMessageCount > 0) {
       return (
-        <div className="message__notifications message__notifications--has-unseen">
-          <i className="fas fa-envelope has-margin-right-sm"> {unseenMessageCount}</i>
+        <div className="messaging__notifications messaging__notifications--has-unseen">
+          <i className="fas fa-envelope has-margin-right-sm"></i>
+          <span>{unseenMessageCount}</span>
         </div>
       )
     } else {
       return (
-        <div className="message__notifications message__notifications">
+        <div className="messaging__notifications">
           <i className="fas fa-envelope has-margin-right-sm"></i>
         </div>
       )
@@ -125,15 +126,15 @@ const Messages = (props) => {
   }
 
   return (
-    <div className={`message__notification-context ${messagePanelIsExpanded ? "open" : "closed"} qa-auction-messages`}>
-      <div onClick={toggleExpanded.bind(this, 'messagePanelIsExpanded', null)}>
-        <div className="message__menu-bar">
-          <h1 className="message__menu-bar__title">Messages</h1>
+    <div className={`messaging ${messagePanelIsExpanded ? "open" : "closed"}`}>
+      <div className="messaging__notification-context qa-auction-messages">
+        <div className="messaging__menu-bar" onClick={toggleExpanded.bind(this, 'messagePanelIsExpanded', null)}>
+          <h1 className="messaging__menu-bar__title">Messages</h1>
           { unseenMessagesEnvelope(_.chain(messagePayloads).map('unseen_messages').sum().value()) }
         </div>
-      </div>
-      <div className="message__conversation-list qa-auction-messages-auctions">
-        {messagePanelIsExpanded && renderMessagesInterface(messagePayloads)}
+        <div className="]qa-auction-messages-auctions">
+          {messagePanelIsExpanded && renderMessagesInterface(messagePayloads)}
+        </div>
       </div>
     </div>
   );

@@ -98,7 +98,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
         <div className="card-content qa-auction-supplier-card">
           <div className="is-clearfix is-flex">
             {/* Start Status/Time Bubble */}
-            <div className={`auction-card__status auction-card__status--${auctionStatus}`}>
+            <div className={`auction-status auction-status--${auctionStatus}`}>
               <span className="qa-auction-status">{auctionStatus}</span>
               <AuctionTimeRemaining auctionPayload={auctionPayload} auctionTimer={timeRemaining} />
             </div>
