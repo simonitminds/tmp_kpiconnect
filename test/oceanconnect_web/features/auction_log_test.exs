@@ -2,7 +2,6 @@ defmodule Oceanconnect.AuctionLogTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionLogPage
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.Payloads.SolutionsPayload
   alias OceanconnectWeb.AuctionView
 
   hound_session()
@@ -52,7 +51,7 @@ defmodule Oceanconnect.AuctionLogTest do
       |> Oceanconnect.Repo.get(auction.id)
       |> Auctions.fully_loaded()
 
-    {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier}}
+    {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier, fuel: fuel}}
   end
 
   test "auction log has log details", %{auction: auction} do
@@ -60,10 +59,7 @@ defmodule Oceanconnect.AuctionLogTest do
     assert AuctionLogPage.has_events?(event_list)
   end
 
-  test "page has auction details", %{auction: auction, buyer_id: buyer_id} do
-    solutions_payload = Auctions.get_auction_state!(auction)
-    |> SolutionsPayload.get_solutions_payload!([auction: auction, buyer: buyer_id])
-
+  test "page has auction details", %{auction: auction, fuel: fuel, supplier: supplier} do
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
       "buyer-name" => auction.buyer.name,
@@ -71,8 +67,7 @@ defmodule Oceanconnect.AuctionLogTest do
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
-      "winning-solution-normalized-price" => "$#{solutions_payload.winning_solution.normalized_price}",
-      "winning-suppliers" => AuctionView.auction_log_suppliers(solutions_payload)
+      "winning-solution-entry" => "$1.25/unit for #{fuel.name} from #{supplier.company.name}"
     }
 
     assert AuctionLogPage.has_details?(expected_details)

@@ -35,38 +35,54 @@
             <td class="qa-auction-detail-actual-duration"><%= actual_duration(@auction_payload.auction) %></td>
           </tr>
           <tr>
-            <th>Auction Details</th>
+          <tr>
+            <th>Port</th>
+            <td><%= @auction_payload.auction.port.name %></td>
+          </tr>
+          <tr>
+            <th>ETA</th>
+            <td><%= @auction_payload.auction.eta %></td>
+          </tr>
+          <tr>
+            <th>Deliverables</th>
             <td>
-              <%= @auction_payload.auction.port.name %></br>
-              <%= @auction_payload.auction.eta %></br>
-              <ul class="qa-auction-deliverables">
-                <%= for vessel_fuel <- @auction_payload.auction.auction_vessel_fuels do %>
-                  <li class="qa-auction-deliverable-<%= vessel_fuel.id %>">
+                <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
+                        vessel_fuel <- vessel_fuels do %>
+                  <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
                     <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
-                    <span class="qa-auction-deliverable-fuel"><%= vessel_fuel.fuel.name %></span> to
+                    <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
                     <span class="qa-auction-deliverable-vessel">
                       <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
                     </span>
-                  </li>
+                  </p>
                 <% end %>
               </ul>
-              <%= @auction_payload.auction.additional_information %>
             </td>
           </tr>
           <tr>
-            <th>Winning Bid</th>
-            <td class="qa-auction-detail-winning-solution-normalized-price"><%= auction_log_winning_solution(@solutions_payload) %></td>
+            <th>Additional Information</th>
+            <td><%= additional_information(@auction_payload.auction) %></td>
           </tr>
           <tr>
-            <th>Winning Bidder</th>
-            <td class="qa-auction-detail-winning-suppliers">
-            <%= if auction_log_suppliers(@solutions_payload) != "—" do %>
-              <%= for supplier <- auction_log_suppliers(@solutions_payload) do %>
-                <%= supplier %>
+            <th>Winning Bids</th>
+            <td>
+              <%= if winning_solution = auction_log_winning_solution(@solutions_payload) do %>
+                <%= for bid <- bids_for_solution(winning_solution) do %>
+                  <p class="qa-auction-detail-winning-solution-entry has-margin-bottom-sm">
+                    <span class="qa-auction-detail-winning-solution-entry-amount"><%= format_price(bid.amount) %></span>/unit
+                    for
+                    <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_id(@auction_payload.auction, bid.fuel_id) %></span>
+                    from
+                    <span><%= bid.supplier %></span>
+                    <%= if bid_is_traded?(bid) do %>
+                      &nbsp;
+                      <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                    <% end %>
+                  </p>
+                <% end %>
+              <% else %>
+                —
               <% end %>
-            <% else %>
-              <%= auction_log_suppliers(@solutions_payload) %>
-            <% end %>
             </td>
           </tr>
         </tbody>
@@ -75,63 +91,21 @@
 
 
     <h2>Activity Log</h2>
-    <table class="table is-fullwidth is-striped report__table--log">
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Event</th>
-          <th>Bid Amount</th>
-          <th>Company / User</th>
+    <div class="report__log">
+      <div class="report__log__header">
+        <div>
+          <div>Time</div>
+          <div>Event</div>
           <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-            <th>Impersonator</th>
+            <div>Impersonator</div>
           <% end %>
-        </tr>
-      </thead>
-      <tbody>
+        </div>
+      </div>
+      <div class="report__log__body">
         <%= for event <- @events do %>
-          <tr class="qa-event-<%= event.id %> <%= if event_is_from_system?(event), do: "is-gray-2" %>">
-            <td><%= convert_event_date_time?(event.time_entered) %></td>
-
-            <td>
-              <span class="qa-event-type has-text-weight-bold"><%= convert_event_type(event.type, event) %></span>
-              <br>
-              <small class="qa-event-type-extras"><%= convert_event_type_extras(event.type, event) %></small>
-            </td>
-
-            <td>
-              <%= if event_has_bid_data?(event) do %>
-                <%= if event_bid_has_amount?(event) do %>
-                  <span class="qa-event-bid-amount has-text-weight-bold"><%= event_bid_amount(event) %></span>
-                <% else %>
-                  <i class="qa-event-bid-amount has-text-gray-3">No initial amount</i>
-                <% end %>
-                <%= if event_bid_is_traded?(event) do %>
-                  &nbsp;
-                  <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
-                <% end %>
-                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                  <br>
-                  <%= if event_bid_has_minimum?(event) do %>
-                    <small>Min: <span class="qa-event-bid-min-amount"><%=  event_bid_min_amount(event) %><span></small>
-                  <% end %>
-                <% end %>
-              <% end %>
-            </td>
-
-            <td>
-              <%= unless event_is_from_system?(event) do %>
-                <span class="qa-event-company has-text-weight-bold"><%= event_company(event) %></span>
-                <br>
-                <small class="qa-event-user"><%= event_user(event) %></small>
-              <% end %>
-            </td>
-
-            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <td class="qa-event-impersonator"><%= event.user && Map.get(event.user, :impersonated_by) %></td>
-            <% end %>
-          </tr>
+          <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
         <% end %>
-      </tbody>
-    </table>
+      </div>
+    </div>
   </div>
 </div>

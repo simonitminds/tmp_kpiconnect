@@ -18,19 +18,21 @@
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Approved Barges</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <ul>
+    <ul style="padding-left: 0.5rem;">
       <%= for auction_barge <- @approved_barges do %>
-        <li style="margin-top: 0.25rem;"><%= auction_barge.barge.name %></span> <span style="color: #888">(<%= auction_barge.barge.imo_number %>)</span><li>
+        <li style="margin-top: 0.25rem;"><%= auction_barge.barge.name %></span> <span style="color: #888">(<%= auction_barge.barge.imo_number %>)</span></li>
       <% end %>
     </ul>
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
-      <p style="margin-top: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
-      <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
-      <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
-      <p style="margin-top: 0.25rem;"><b>Price:</b> <%= format_price(price_for_vessel_fuel(@winning_solution_bids, vessel_fuel.fuel.id)) %></p>
+
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
+      <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> <%= format_price(price_for_vessel_fuel(@winning_solution_bids, vessel_fuel.fuel.id)) %></p>
+
     <% end %>
     <br>
 

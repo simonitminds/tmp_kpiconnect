@@ -21,31 +21,98 @@
   }
 }
 
-.report__table--log {
-  td:nth-child(3), th:nth-child(3) { // Get the JSON column under control...
-    word-wrap: break-word;
-    max-width: 400px;
-  }
-  td:only-child { // Get the JSON column under control... (mobile)
-    word-wrap: break-word;
-    max-width: calc(100vw - 2rem);
-  }
+.report__log {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
 }
 
-.report__table--auction-details {
-  th {
-    width: 160px;
-  }
+.report__log__header {
+  font-weight: bold;
+  border-bottom: 3px solid $gray-2;
 }
 
-table[class*=" report__table"] {
-  .content & {
-    tr:hover {
-      background-color: transparent;
+.report__log__header, .report__log__body {
+  &> div { // tr facsimile
+    display: flex;
+    flex-direction: row;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid $gray-2;
+
+    &:nth-child(even) {
+      background-color: $gray-1;
+    }
+
+    &> div { // General Table Cell Styles
+
+    }
+
+    &> div:first-child { // Time
+      flex: 0 0 220px;
+    }
+
+    &> div:nth-child(2) { // Event
+      flex: 2 0 auto;
+    }
+
+    &> div:last-child { // Impersonator
+      flex: 0 0 90px;
+      margin-left: auto;
     }
   }
 }
 
+.report__log__header {
+  &> div { // tr facsimile
+    border-bottom: 5px solid $gray-3;
+  }
+  @media (max-width: 768px) {
+    &> div { // tr facsimile
+
+      &> div:first-child { // Time
+        display: none;
+      }
+
+      &> div:nth-child(2) { // Event
+        flex: 2 0 auto;
+      }
+
+      &> div:last-child { // Impersonator
+        display: none;
+      }
+    }
+  }
+}
+
+.report__log__body {
+  display: flex;
+  flex-direction: column;
+
+  &> div { // tr facsimile
+    display: flex;
+    flex-direction: row;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 768px) {
+    &> div { // tr facsimile
+      flex-direction: column;
+
+      &> div:first-child { // Time
+        flex: 0 0 auto;
+      }
+
+      &> div:nth-child(2) { // Event
+        flex: 0 0 auto;
+      }
+
+      &> div:last-child { // Impersonator
+        flex: 0 0 auto;
+        margin-left: 0;
+      }
+    }
+  }
+}
 
 .report__logo--print {
   width: 300px;
