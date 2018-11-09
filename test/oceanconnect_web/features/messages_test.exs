@@ -1,6 +1,6 @@
 defmodule Oceanconnect.MessagesTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.{AdminPage, Auctions, AuctionIndexPage, AuctionShowPage, MessagesPage}
+  alias Oceanconnect.{Auctions, AuctionIndexPage, AuctionShowPage, MessagesPage}
 
   setup do
     buyer_company = insert(:company)
@@ -19,37 +19,6 @@ defmodule Oceanconnect.MessagesTest do
 
     {:ok, %{auction: auction, buyer: buyer, messages: messages, supplier: supplier}}
   end
-
-  # TODO: test will not pass until Admin can see all ongoing auctions
-  # describe "admin login" do
-  #   setup %{auction: auction, buyer: buyer} do
-  #     admin_company = insert(:company)
-  #     admin = insert(:user, company: admin_company, is_admin: true)
-  #
-  #     {:ok, _pid} =
-  #       start_supervised(
-  #         {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}}
-  #       )
-  #
-  #     login_user(admin)
-  #     AuctionIndexPage.visit()
-  #     {:ok, %{auction: auction, buyer: buyer}}
-  #   end
-  #
-  #   test "admin can see a list of all auctions in the chat window", %{auction: auction} do
-  #     assert AuctionIndexPage.is_current_path?()
-  #     MessagesPage.open_message_window()
-  #     assert MessagesPage.has_participating_auctions?([auction])
-  #   end
-  #
-  #   test "admin can see chat window on show page with all auctions", %{auctions: auctions} do
-  #     [auction | _tail] = auctions
-  #     AuctionShowPage.visit(auction.id)
-  #     assert AuctionShowPage.is_current_path?(auction.id)
-  #     MessagesPage.open_message_window()
-  #     assert MessagesPage.has_participating_auctions?(auctions)
-  #   end
-  # end
 
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
@@ -107,7 +76,7 @@ defmodule Oceanconnect.MessagesTest do
 
     test "unseen messages are marked as seen when recipient expands conversation", %{auction: auction, messages: messages, supplier_company: supplier_company} do
       AuctionShowPage.visit(auction.id)
-      MessagesPage.open_auction_conversation(auction.id, )
+      MessagesPage.open_auction_conversation(auction.id, auction.buyer.name)
       assert Enum.all?(messages, &MessagesPage.message_is_unseen?(&1))
     end
   end

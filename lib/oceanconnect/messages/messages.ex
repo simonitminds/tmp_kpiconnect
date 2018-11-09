@@ -27,6 +27,8 @@ defmodule Oceanconnect.Messages do
     |> Repo.all()
   end
 
+  def preload_messages(messages), do: Repo.preload(messages, [:author, :author_company, :impersonator, :recipient_company])
+
   @doc """
   Gets a single message.
 
