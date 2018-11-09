@@ -132,7 +132,7 @@ const Messages = (props) => {
           <h1 className="messaging__menu-bar__title">Messages</h1>
           { unseenMessagesEnvelope(_.chain(messagePayloads).map('unseen_messages').sum().value()) }
         </div>
-        <div className="]qa-auction-messages-auctions">
+        <div className="qa-auction-messages-auctions">
           {messagePanelIsExpanded && renderMessagesInterface(messagePayloads)}
         </div>
       </div>

@@ -60,9 +60,9 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       message_payloads_for_company = MessagePayload.get_message_payloads_for_company(buyer_company.id)
       assert length(Enum.flat_map(message_payloads_for_company, fn message_payload ->
         Enum.flat_map(message_payload.conversations, &(&1.messages))
-      end)) == 9
+      end)) == 10
       assert Enum.all?(message_payloads_for_company, &(&1.auction_id == auction.id or &1.auction_id == anon_auction.id))
-      assert Enum.map(message_payloads_for_company, & &1.unseen_messages) == [0, 2]
+      assert Enum.map(message_payloads_for_company, & &1.unseen_messages) == [1, 2]
 
       message_payload_for_anon_auction = Enum.find(message_payloads_for_company, & &1.auction_id == anon_auction.id)
       assert %MessagePayload{} = message_payload_for_anon_auction
@@ -89,7 +89,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       message_payloads_for_company = MessagePayload.get_message_payloads_for_company(supplier_company.id)
       assert length(Enum.flat_map(message_payloads_for_company, fn message_payload ->
         Enum.flat_map(message_payload.conversations, &(&1.messages))
-      end)) == 5
+      end)) == 6
       assert Enum.all?(message_payloads_for_company, &(&1.auction_id == auction.id or &1.auction_id == anon_auction.id))
       assert Enum.map(message_payloads_for_company, & &1.unseen_messages) == [3, 0]
 

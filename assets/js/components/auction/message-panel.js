@@ -29,7 +29,11 @@ export default class MessagePanel extends React.Component {
       <div className='messaging__message-container'>
         { _.map(messages, (message) => {
           return (
-            <div key={message.id} className={`messaging__message ${message.author_is_me ? 'messaging__message--self' : ''}`}>
+            <div
+              key={message.id}
+              className={`qa-message-id-${message.id} messaging__message ${message.author_is_me ? 'messaging__message--self' : ''}`}
+              data-has-been-seen={message.has_been_seen}
+            >
               <div className='messaging__message__bubble'>{message.content}</div>
               <div className='messaging__message__timestamp'>
                 <div className='messaging__message__timestamp__name'>

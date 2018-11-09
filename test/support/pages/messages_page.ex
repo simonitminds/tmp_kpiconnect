@@ -13,24 +13,19 @@ defmodule Oceanconnect.MessagesPage do
   end
 
   def message_is_unseen?(%Message{id: id}) do
-    has_css?(".qa-message-id-#{id} [data-has-been-seen='true'")
+    has_css?(".qa-message-id-#{id}")
   end
 
   def open_auction_conversation(auction_id, company_name) do
     :css
-    |> find_element(".qa-auction-messages")
-    |> click()
-    |> find_within_element(:css, ".qa-auction-#{auction_id}-message-payloads")
-    |> click()
+    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
     |> find_within_element(:css, ".qa-conversation-company-#{company_name}")
     |> click()
   end
 
   def open_auction_message_payload(auction_id) do
     :css
-    |> find_element(".qa-auction-messages")
-    |> click()
-    |> find_within_element(:css, ".qa-auction-#{auction_id}-message-payloads")
+    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
     |> click()
   end
 

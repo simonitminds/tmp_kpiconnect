@@ -84,11 +84,14 @@ defmodule Oceanconnect.AuctionLogTest do
     end)
   end
 
-  test "page has message details", %{auction: auction, messages: messages} do
+  test "page has message details", %{auction: auction, messages: [message | _]} do
     expected_details = %{
-      "created" => nil
+      "time" => AuctionView.convert_date_time?(message.inserted_at),
+      "content" => message.content,
+      "author" => AuctionView.author_name_and_company(message),
+      "recipient" => message.recipient_company.name
     }
 
-    assert AuctionLogPage.has_details?(expected_details)
+    assert AuctionLogPage.has_message_details?(message.id, expected_details)
   end
 end
