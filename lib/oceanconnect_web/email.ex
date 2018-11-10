@@ -127,7 +127,7 @@ defmodule OceanconnectWeb.Email do
             winning_supplier_company: supplier_company,
             auction: auction,
             buyer_company: buyer_company_for_bid(bid),
-            deliverables: deliverables_for_supplier(deliverables, supplier_company.id),
+            deliverables: deliverables_for_bid(deliverables, bid),
             approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: false
           )
@@ -147,8 +147,8 @@ defmodule OceanconnectWeb.Email do
             winning_supplier_company: supplier_company_for_bid(bid),
             auction: auction,
             buyer_company: buyer_company,
-            deliverables: deliverables_for_supplier(deliverables, supplier_company.id),
-            approved_barges: approved_barges,
+            deliverables: deliverables_for_bid(deliverables, bid),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: true
           )
         end)
@@ -203,9 +203,9 @@ defmodule OceanconnectWeb.Email do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
   end
 
-  defp deliverables_for_supplier(deliverables, supplier_id) do
+  defp deliverables_for_bid(deliverables, bid) do
     deliverables
-    |> Enum.filter(&(&1.bid.supplier_id == supplier_id))
+    |> Enum.filter(&(&1.bid == bid))
   end
 
   defp approved_barges_for_supplier(approved_barges, supplier_id) do
