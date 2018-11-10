@@ -95,6 +95,7 @@ defmodule OceanconnectWeb.Email do
     %Auction{
         buyer_id: buyer_id,
         vessels: vessels,
+        auction_vessel_fuels: vessel_fuels,
         port: port
       } = auction
     buyer_company = Accounts.get_company!(buyer_id)
@@ -104,6 +105,13 @@ defmodule OceanconnectWeb.Email do
       |> Enum.map(& &1.name)
       |> Enum.join(", ")
     port_name = port.name
+
+    deliverables =
+      vessel_fuels
+      |> Enum.map(fn(vessel_fuel) ->
+        bid_for_vessel_fuel = Enum.find(bids, &(&1.fuel_id == "#{vessel_fuel.fuel_id}"))
+        Map.put(vessel_fuel, :bid, bid_for_vessel_fuel)
+      end)
 
     supplier_emails =
       Enum.flat_map(bids, fn bid ->
@@ -119,8 +127,8 @@ defmodule OceanconnectWeb.Email do
             winning_supplier_company: supplier_company,
             auction: auction,
             buyer_company: buyer_company_for_bid(bid),
-            winning_solution_bids: product_bids_for_supplier(bids, supplier_company.id),
-            approved_barges: approved_barges_for_supplier(approved_barges, supplier.id),
+            deliverables: deliverables_for_supplier(deliverables, supplier_company.id),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: false
           )
         end)
@@ -129,6 +137,8 @@ defmodule OceanconnectWeb.Email do
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
         Enum.map(buyers, fn buyer ->
+          supplier_company = Accounts.get_company!(bid.supplier_id)
+
           base_email(buyer)
           |> subject("Auction #{auction.id} for #{vessel_name} at #{port_name} has closed.")
           |> render(
@@ -137,7 +147,7 @@ defmodule OceanconnectWeb.Email do
             winning_supplier_company: supplier_company_for_bid(bid),
             auction: auction,
             buyer_company: buyer_company,
-            winning_solution_bids: product_bids_for_buyer(bids),
+            deliverables: deliverables_for_supplier(deliverables, supplier_company.id),
             approved_barges: approved_barges,
             is_buyer: true
           )
@@ -145,35 +155,6 @@ defmodule OceanconnectWeb.Email do
       end)
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
-  end
-
-  def product_bids_for_supplier(bids, supplier_id) do
-    Enum.filter(bids, &(&1.supplier_id == supplier_id))
-    |> Enum.group_by(& &1.fuel_id)
-  end
-
-  def approved_barges_for_supplier(approved_barges, supplier_id) do
-    Enum.filter(approved_barges, &(&1.supplier_id == supplier_id))
-    |> Enum.uniq()
-  end
-
-  def product_bids_for_buyer(bids) do
-    Enum.group_by(bids, & &1.fuel_id)
-  end
-
-  def buyer_company_for_bid(%AuctionBid{is_traded_bid: true}) do
-    Accounts.get_ocm_company()
-  end
-  def buyer_company_for_bid(%AuctionBid{auction_id: auction_id}) do
-    %{buyer_id: buyer_id} = Auctions.get_auction!(auction_id)
-    Accounts.get_company!(buyer_id)
-  end
-
-  def supplier_company_for_bid(%AuctionBid{is_traded_bid: true}) do
-    Accounts.get_ocm_company()
-  end
-  def supplier_company_for_bid(%AuctionBid{supplier_id: supplier_id}) do
-    Accounts.get_company!(supplier_id)
   end
 
   def auction_canceled(auction = %Auction{}) do
@@ -220,6 +201,31 @@ defmodule OceanconnectWeb.Email do
       end)
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
+  end
+
+  defp deliverables_for_supplier(deliverables, supplier_id) do
+    deliverables
+    |> Enum.filter(&(&1.bid.supplier_id == supplier_id))
+  end
+
+  defp approved_barges_for_supplier(approved_barges, supplier_id) do
+    Enum.filter(approved_barges, &(&1.supplier_id == supplier_id))
+    |> Enum.uniq()
+  end
+
+  defp buyer_company_for_bid(%AuctionBid{is_traded_bid: true}) do
+    Accounts.get_ocm_company()
+  end
+  defp buyer_company_for_bid(%AuctionBid{auction_id: auction_id}) do
+    %{buyer_id: buyer_id} = Auctions.get_auction!(auction_id)
+    Accounts.get_company!(buyer_id)
+  end
+
+  defp supplier_company_for_bid(%AuctionBid{is_traded_bid: true}) do
+    Accounts.get_ocm_company()
+  end
+  defp supplier_company_for_bid(%AuctionBid{supplier_id: supplier_id}) do
+    Accounts.get_company!(supplier_id)
   end
 
   defp base_email(user) do

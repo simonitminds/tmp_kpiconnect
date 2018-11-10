@@ -45,7 +45,7 @@ defmodule OceanconnectWeb.EmailView do
 
   def price_for_vessel_fuel(winning_solution_bids, fuel_id) do
     case winning_solution_bids[fuel_id] do
-      nil -> "No bid was selected for this deliverable"
+      nil -> nil
       _ -> Enum.map(winning_solution_bids[fuel_id], &(&1.amount))
     end
   end

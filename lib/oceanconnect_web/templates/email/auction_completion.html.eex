@@ -26,13 +26,15 @@
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
-
-      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
-      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
-      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
-      <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> <%= format_price(price_for_vessel_fuel(@winning_solution_bids, vessel_fuel.fuel.id)) %></p>
-
+    <%= for deliverable <- @deliverables do %>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= deliverable.vessel.name %> (<%= deliverable.vessel.imo %>)</p>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>
+      <%= if price = deliverable.bid.amount do %>
+        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> <%= format_price(deliverable.bid.amount) %></p>
+      <% else %>
+        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> No bid was selected for this deliverable</p>
+      <% end %>
     <% end %>
     <br>
 
