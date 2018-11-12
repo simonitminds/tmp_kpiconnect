@@ -56,8 +56,8 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :revoke_supplier_bids, data: %{auction: auction, product: product, supplier_id: supplier_id, user: user}}
   end
 
-  def select_winning_solution(solution = %Solution{bids: _bids}, user) do
-    %Command{command: :select_winning_solution, data: %{solution: solution, user: user}}
+  def select_winning_solution(solution = %Solution{bids: _bids}, auction, user) do
+    %Command{command: :select_winning_solution, data: %{solution: solution, auction: auction, user: user}}
   end
 
   def submit_barge(auction_barge = %AuctionBarge{}, user) do

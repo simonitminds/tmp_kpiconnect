@@ -147,7 +147,7 @@ defmodule Oceanconnect.Auctions do
  def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
     solution = Solution.from_bids(bids, product_bids, auction)
     %Solution{solution | comment: comment}
-    |> Command.select_winning_solution(user)
+    |> Command.select_winning_solution(auction, user)
     |> AuctionStore.process_command()
   end
 
@@ -259,19 +259,23 @@ defmodule Oceanconnect.Auctions do
   end
 
   def expire_auction(auction = %Auction{}) do
-    auction
+    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
+
+    updated_auction
     |> Command.end_auction_decision_period()
     |> AuctionStore.process_command()
 
-    auction
+    updated_auction
   end
 
   def cancel_auction(auction = %Auction{}, user) do
-    auction
+    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
+
+    updated_auction
     |> Command.cancel_auction(user)
     |> AuctionStore.process_command()
 
-    auction
+    updated_auction
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)

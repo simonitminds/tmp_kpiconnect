@@ -66,11 +66,10 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   end
 
   def handle_info(
-    %AuctionEvent{auction_id: auction_id, type: :auction_canceled, data: %AuctionState{}},
+    %AuctionEvent{type: :auction_canceled, data: %{auction: auction = %Auction{}}},
     state
   ) do
-    auction_id
-    |> Auctions.get_auction!()
+    auction
     |> Auctions.fully_loaded()
     |> AuctionEmailNotifier.notify_auction_canceled()
 

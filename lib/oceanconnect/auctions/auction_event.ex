@@ -90,30 +90,30 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_expired(auction_id, new_state = %AuctionState{}) do
+  def auction_expired(auction = %Auction{id: auction_id}, new_state = %AuctionState{}) do
     %AuctionEvent{
       type: :auction_expired,
       auction_id: auction_id,
-      data: new_state,
+      data: %{state: new_state, auction: auction},
       time_entered: DateTime.utc_now()
     }
   end
 
-  def auction_canceled(%Auction{id: auction_id}, new_state = %AuctionState{}, user) do
+  def auction_canceled(auction = %Auction{id: auction_id}, new_state = %AuctionState{}, user) do
     %AuctionEvent{
       type: :auction_canceled,
       auction_id: auction_id,
-      data: new_state,
+      data: %{state: new_state, auction: auction},
       time_entered: DateTime.utc_now(),
       user: user
     }
   end
 
-  def auction_closed(auction_id, new_state = %AuctionState{}) do
+  def auction_closed(auction = %Auction{id: auction_id}, new_state = %AuctionState{}) do
     %AuctionEvent{
       type: :auction_closed,
       auction_id: auction_id,
-      data: new_state,
+      data: %{state: new_state, auction: auction},
       time_entered: DateTime.utc_now()
     }
   end
