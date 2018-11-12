@@ -2,11 +2,19 @@ defmodule Oceanconnect.MessagesPage do
   use Oceanconnect.Page
   alias Oceanconnect.Messages.Message
 
+  def auction_conversation_unseen_count(auction_id, company_name) do
+    :css
+    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
+    |> find_within_element(:css, ".qa-conversation-company-#{company_name}")
+    |> find_within_element(:css, ".qa-messages-unseen-count")
+    |> inner_text()
+  end
+
   def has_participating_auctions?(auctions) do
     Enum.all?(auctions, fn auction ->
       text = find_element(:css, ".qa-auction-messages-auctions")
       |> find_within_element(:css, ".qa-auction-#{auction.id}-message-payloads")
-      |> inner_text
+      |> inner_text()
 
       Enum.any?(auction.vessels, &(text =~ &1.name))
     end)

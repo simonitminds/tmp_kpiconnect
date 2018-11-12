@@ -3,7 +3,6 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
-import Messages from '../components/auction/messages';
 import {
   getCompanyBarges,
   acceptWinningSolution,

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import CollapsibleSection from './collapsible-section';
+import CollapsibleSection from './auction/collapsible-section';
 import MessagePanel from './message-panel';
 
 const Messages = (props) => {
@@ -16,7 +16,7 @@ const Messages = (props) => {
 
   const unseenMessageCount = (unseenMessageCount) => {
     if (unseenMessageCount > 0) {
-      return <span className="messaging__notifications">{unseenMessageCount}</span>
+      return <span className="messaging__notifications qa-messages-unseen-count">{unseenMessageCount}</span>
     }
   }
 
@@ -52,7 +52,7 @@ const Messages = (props) => {
       >
         <h2>
           { expansionToggle(isExpanded) }
-          {conversation.company_name}
+          { conversation.company_name }
           { unseenMessageCount(unseenCount) }
           { isExpanded && messagePanel(auctionId, conversation) }
         </h2>

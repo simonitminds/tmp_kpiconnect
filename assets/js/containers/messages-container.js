@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Messages from '../components/auction/messages.js'
+import Messages from '../components/messages.js'
 import { subscribeToMessageUpdates, sendMessage, toggleExpanded } from '../actions';
 
 const mapStateToProps = (state) => {
