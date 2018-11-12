@@ -905,6 +905,173 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       refute Enum.any?(state.lowest_bids, fn bid -> bid.supplier_id == supplier1 end)
       assert Enum.any?(state.bids, fn bid -> bid.supplier_id == supplier1 end)
     end
+
+    test "with no initial amount and existing lowest bid from same supplier maintains existing amount", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: nil,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 1.50,
+        min_amount: nil,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid2 = %AuctionBid{
+        amount: nil,
+        min_amount: 1.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [supplier2_bid1, supplier1_bid1],
+        minimum_bids: [],
+        active_bids: [supplier2_bid1, supplier1_bid1],
+        bids: [supplier2_bid1, supplier1_bid1]
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid2, :open)
+      {final_state, _events} = AuctionBidCalculator.process(state, :open)
+
+      lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{1.50, ^supplier2}, {2.00, ^supplier1}] = lowest_bids
+    end
+
+    test "with no initial amount and existing non-lowest bid from same supplier beats lowest existing amount", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 1.50,
+        min_amount: nil,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 2.00,
+        min_amount: nil,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid2 = %AuctionBid{
+        amount: nil,
+        min_amount: 1.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [supplier2_bid1, supplier1_bid1],
+        minimum_bids: [],
+        active_bids: [supplier2_bid1, supplier1_bid1],
+        bids: [supplier2_bid1, supplier1_bid1]
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid2, :open)
+      {final_state, _events} = AuctionBidCalculator.process(state, :open)
+
+      lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{1.25, ^supplier2}, {1.50, ^supplier1}] = lowest_bids
+    end
+
+    test "with revoked intermediate bid does not raise existing min bid amounts", %{
+      auction: auction,
+      fuel_id: fuel_id,
+      supplier1: supplier1,
+      supplier2: supplier2,
+      supplier3: supplier3
+    } do
+      auction_id = auction.id
+
+      supplier1_bid1 = %AuctionBid{
+        amount: 5.00,
+        min_amount: nil,
+        supplier_id: supplier1,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier2_bid1 = %AuctionBid{
+        amount: 6.00,
+        min_amount: 1.00,
+        supplier_id: supplier2,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      supplier3_bid1 = %AuctionBid{
+        amount: 3.00,
+        min_amount: nil,
+        supplier_id: supplier3,
+        auction_id: auction_id,
+        fuel_id: fuel_id,
+        time_entered: DateTime.utc_now(),
+        original_time_entered: DateTime.utc_now()
+      }
+
+      initial_state = %ProductBidState{
+        auction_id: auction_id,
+        lowest_bids: [],
+        minimum_bids: [],
+        active_bids: [],
+        bids: []
+      }
+
+      {state, _events} = AuctionBidCalculator.process(initial_state, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier1_bid1, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier2_bid1, :open)
+      {state, _events} = AuctionBidCalculator.process(state, supplier3_bid1, :open)
+      {state, _events} = AuctionBidCalculator.process(state, :open)
+      state = AuctionBidCalculator.revoke_supplier_bids(state, supplier3)
+      {final_state, _events} = AuctionBidCalculator.process(state, :open)
+
+      lowest_bids = Enum.map(final_state.lowest_bids, fn bid -> {bid.amount, bid.supplier_id} end)
+      assert [{2.75, ^supplier2}, {5.00, ^supplier1}] = lowest_bids
+    end
   end
 
   describe "events" do
