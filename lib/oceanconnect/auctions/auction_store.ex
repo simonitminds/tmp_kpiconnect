@@ -129,14 +129,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          do: GenServer.cast(pid, {cmd, data, true})
   end
 
-  def process_command(%Command{command: :end_auction, data: auction = %Auction{id: auction_id}}) do
+  def process_command(%Command{command: cmd, data: auction = %Auction{id: auction_id}}) do
     with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.cast(pid, {:end_auction, auction, true})
-  end
-
-  def process_command(%Command{command: cmd, data: %Auction{id: auction_id}}) do
-    with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.cast(pid, {cmd, auction_id, true})
+         do: GenServer.cast(pid, {cmd, auction, true})
   end
 
   # Server
@@ -186,16 +181,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
-  def handle_cast({:end_auction, _auction_id, _emit}, current_state),
+  def handle_cast({:end_auction, _auction, _emit}, current_state),
     do: {:noreply, current_state}
 
   def handle_cast(
-        {:end_auction_decision_period, _data, emit},
-        current_state = %{auction_id: auction_id}
+        {:end_auction_decision_period, auction = %Auction{}, emit},
+        current_state
       ) do
     new_state = expire_auction(current_state)
 
-    AuctionEvent.emit(AuctionEvent.auction_expired(auction_id, new_state), emit)
+    AuctionEvent.emit(AuctionEvent.auction_expired(auction, new_state), emit)
 
     {:noreply, new_state}
   end
@@ -240,13 +235,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:select_winning_solution, %{solution: solution = %Solution{}, user: user}, emit},
-        current_state = %{auction_id: auction_id}
+        {:select_winning_solution, %{solution: solution = %Solution{}, auction: auction = %Auction{}, user: user}, emit},
+        current_state
       ) do
     new_state = select_winning_solution(solution, current_state)
 
     AuctionEvent.emit(AuctionEvent.winning_solution_selected(solution, current_state, user), emit)
-    AuctionEvent.emit(AuctionEvent.auction_closed(auction_id, new_state), emit)
+    AuctionEvent.emit(AuctionEvent.auction_closed(auction, new_state), emit)
 
     {:noreply, new_state}
   end
@@ -431,7 +426,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     expire_auction(previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_closed, data: state}, _previous_state), do: state
+  defp replay_event(%AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state), do: state
 
   defp replay_event(%AuctionEvent{type: :auction_state_rebuilt, data: _state}, _previous_state),
     do: nil
