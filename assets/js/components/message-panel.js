@@ -68,6 +68,9 @@ export default class MessagePanel extends React.Component {
             </div>
           )
         })}
+        { messages.length == 0 &&
+          <div className="is-gray-0 has-text-weight-normal has-padding-md has-margin-bottom-md is-italic">No messages yet.</div>
+        }
         <div className="messaging__input">
           <div className="field has-addons">
             <div className="control">
