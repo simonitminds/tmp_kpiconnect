@@ -24,7 +24,7 @@ import {
   UPDATE_MESSAGE_PAYLOAD
 } from "./constants";
 
-let auctionChannel, messageChannel, socket;
+let auctionChannel, connection, messageChannel, socket;
 if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
   socket = new Socket("/socket", {params: {token: window.userToken}});
   socket.connect();
@@ -55,7 +55,7 @@ export function subscribeToAuctionUpdates() {
     });
 
     auctionChannel.onError( () => {
-      const { connection } = getState().auctionsReducer;
+      connection = getState().auctionsReducer.connection;
       if (connection) {dispatch({type: AUCTION_CHANNEL_DISCONNECTED})};
     });
   };
@@ -75,7 +75,7 @@ export function subscribeToMessageUpdates() {
     });
 
     messageChannel.onError( () => {
-      const { connection } = getState().auctionsReducer;
+      connection = getState().messagesReducer.connection;
       if (connection) {dispatch({type: MESSAGE_CHANNEL_DISCONNECTED})};
     });
   };

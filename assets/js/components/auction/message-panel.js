@@ -25,6 +25,26 @@ export default class MessagePanel extends React.Component {
   render() {
     const {auctionId, recipientCompany, connection, messages, sendMessage} = this.props;
     const newMessage = this.state.newMessage;
+    const renderSendButton = () => {
+      if (connection) {
+        return (
+          <button
+            value='Send'
+            className='button is-turquoise'
+            onClick={sendMessage.bind(this, auctionId, recipientCompany, newMessage)}
+          >Send</button>
+        )
+      } else {
+        return (
+          <button
+            value='Send'
+            className='button is-disabled'
+            disabled
+          >Send</button>
+        )
+      }
+    }
+
     return (
       <div className='messaging__message-container'>
         { _.map(messages, (message) => {
@@ -54,11 +74,7 @@ export default class MessagePanel extends React.Component {
               <input className="input" placeholder='Type message here' value={newMessage} onChange={this.setMessage.bind(this)} />
             </div>
             <div className="control">
-              <button
-                value='Send'
-                className='button is-turquoise'
-                onClick={sendMessage.bind(this, auctionId, recipientCompany, newMessage)}
-              >Send</button>
+              {renderSendButton()}
             </div>
           </div>
         </div>
