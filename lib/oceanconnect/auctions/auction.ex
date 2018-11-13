@@ -7,7 +7,11 @@ defmodule Oceanconnect.Auctions.Auction do
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
     belongs_to(:port, Port)
-    has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel, on_replace: :delete, on_delete: :delete_all)
+
+    has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel,
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
 
     many_to_many(
       :vessels,
@@ -122,19 +126,37 @@ defmodule Oceanconnect.Auctions.Auction do
 
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
+
   def maybe_add_vessel_fuels(changeset, %{auction_vessel_fuels: auction_vessel_fuels}) do
     put_assoc(changeset, :auction_vessel_fuels, auction_vessel_fuels)
   end
+
   def maybe_add_vessel_fuels(changeset, _attrs), do: changeset
 
   def from_params(params) do
     params
     |> maybe_parse_date_field("scheduled_start")
+    |> maybe_convert_checkbox("is_traded_bid_allowed")
+    |> maybe_convert_checkbox("anonymous_bidding")
     |> maybe_parse_date_field("eta")
     |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
     |> maybe_load_suppliers("suppliers")
+  end
+
+  def maybe_convert_checkbox(params, key) do
+    case params do
+      %{^key => value} ->
+        if value == "on" || value == true || value == "true" do
+          Map.put(params, key, true)
+        else
+          Map.put(params, key, false)
+        end
+
+      _ ->
+        params
+    end
   end
 
   def maybe_parse_date_field(params, key) do

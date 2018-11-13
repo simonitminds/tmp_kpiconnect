@@ -11,10 +11,13 @@ class BiddingForm extends React.Component {
 
   constructor(props){
     super(props);
-    const is_traded_bid = _.get(props.auctionPayload, 'bid_history[0].is_traded_bid');
-    this.state = {
-      tradedBidChecked: is_traded_bid
-    }
+    const is_traded_bid = _.chain(props.auctionPayload)
+                           .get('bid_history')
+                           .filter('active')
+                           .some('is_traded_bid')
+                           .value()
+
+    this.state = {tradedBidChecked: is_traded_bid}
   }
 
   handleTradedBidCheckboxChange(e) {
@@ -118,7 +121,7 @@ class BiddingForm extends React.Component {
                       model={'auction-bid'}
                       field={'is_traded_bid'}
                       labelText={'mark as traded bid'}
-                      value={this.state.tradedBidChecked}
+                      defaultChecked={this.state.tradedBidChecked}
                       onChange={this.handleTradedBidCheckboxChange.bind(this)}
                       opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                     />

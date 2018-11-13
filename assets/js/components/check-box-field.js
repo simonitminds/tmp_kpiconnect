@@ -1,10 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 
-const CheckBoxField = ({model, field, labelText, value, onChange, opts = {}}) => {
+const CheckBoxField = ({model, field, labelText, defaultChecked, onChange, opts = {}}) => {
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
-
   return (
     <div className="field has-margin-bottom-none">
       <div className="control">
@@ -14,7 +13,7 @@ const CheckBoxField = ({model, field, labelText, value, onChange, opts = {}}) =>
           id={`${field}`}
           name={`${model}[${field}]`}
           type="checkbox"
-          value="true"
+          defaultChecked={defaultChecked}
           onChange={onChange}
         />
         <label htmlFor={`${model}_${field}`} className={labelClass}>

@@ -28,7 +28,8 @@ const initialState = {
   selectedSuppliers: [],
   suppliers: null,
   vessels: null,
-  credit_margin_amount: null
+  credit_margin_amount: null,
+  is_traded_bid_allowed: null
 };
 
 const setUTCDateTime = (dateTime) => {
@@ -50,6 +51,7 @@ export default function(state, action) {
           ...state,
           auction: action.data.auction,
           credit_margin_amount: formatPrice(action.data.credit_margin_amount),
+          is_traded_bid_allowed: _.get(action, 'data.auction.is_traded_bid_allowed'),
           eta_date: setUTCDateTime(action.data.auction.eta),
           eta_time: setUTCDateTime(action.data.auction.eta),
           etd_date: setUTCDateTime(action.data.auction.etd),
