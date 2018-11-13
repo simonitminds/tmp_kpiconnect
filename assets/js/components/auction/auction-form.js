@@ -30,7 +30,7 @@ const AuctionForm = (props) => {
     updateInformation,
     updateInformationFromCheckbox,
     vessels,
-    credit_margin_amount
+    credit_margin_amount,
   } = props;
 
   const port_id = auction.port_id ? auction.port_id : "";
@@ -52,7 +52,6 @@ const AuctionForm = (props) => {
       />;
     }
   };
-
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
@@ -265,7 +264,7 @@ const AuctionForm = (props) => {
                       model={'auction'}
                       field={'anonymous_bidding'}
                       labelText={'anonymous bidding'}
-                      value={auction.anonymous_bidding}
+                      defaultChecked={auction.anonymous_bidding}
                       opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                       onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
                   />
@@ -280,7 +279,7 @@ const AuctionForm = (props) => {
                           model={'auction'}
                           field={'is_traded_bid_allowed'}
                           labelText={'accept traded bids'}
-                          value={auction.is_traded_bid_allowed}
+                          defaultChecked={auction.is_traded_bid_allowed}
                           opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                           onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
                       />

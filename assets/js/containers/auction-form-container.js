@@ -27,6 +27,7 @@ const mapStateToProps = (state, props) => {
     ports: state.auctionFormReducer.ports || props.ports,
     vessels: state.auctionFormReducer.vessels || props.vessels,
     credit_margin_amount: state.auctionFormReducer.credit_margin_amount || props.credit_margin_amount,
+    is_traded_bid_allowed: state.auctionFormReducer.is_traded_bid_allowed || props.is_traded_bid_allowed,
     loading: state.auctionFormReducer.loading,
     selectedSuppliers: state.auctionFormReducer.selectedSuppliers
   };
@@ -55,9 +56,8 @@ export class AuctionFormContainer extends React.Component {
       this.dispatchItem();
     }
   }
-
   render() {
-    if (this.props.loading) {
+      if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>;
     } else {
       return <AuctionForm {...this.props} />;

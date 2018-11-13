@@ -135,6 +135,19 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
     |> maybe_load_suppliers("suppliers")
+    |> maybe_convert_checkbox("is_traded_bid_allowed")
+    |> maybe_convert_checkbox("anonymous_bidding")
+  end
+
+  def maybe_convert_checkbox(params, key) do
+    case params do
+      %{^key => value} ->
+        if value == "on"  || value == true || value == "true" do
+          Map.put(params, key, true)
+        else
+          Map.put(params, key, false)
+        end
+    end
   end
 
   def maybe_parse_date_field(params, key) do

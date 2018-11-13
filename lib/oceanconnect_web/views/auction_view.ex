@@ -40,7 +40,8 @@ defmodule OceanconnectWeb.AuctionView do
       port_id: auction_map.port_id,
       buyer: auction_map.buyer,
       suppliers: auction_map.suppliers || [],
-      vessel_fuels: auction_map.auction_vessel_fuels || []
+      vessel_fuels: auction_map.auction_vessel_fuels || [],
+      is_traded_bid_allowed: auction_map.is_traded_bid_allowed
     }
     |> Poison.encode!()
   end
