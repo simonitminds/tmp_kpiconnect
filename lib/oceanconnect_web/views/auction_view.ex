@@ -32,6 +32,7 @@ defmodule OceanconnectWeb.AuctionView do
       eta: auction_map.eta,
       etd: auction_map.etd,
       scheduled_start: auction_map.scheduled_start,
+      auction_started: auction_map.auction_started,
       auction_ended: auction_map.auction_ended,
       duration: auction_map.duration,
       decision_duration: auction_map.decision_duration,
@@ -48,7 +49,7 @@ defmodule OceanconnectWeb.AuctionView do
 
   def actual_duration(%Auction{auction_ended: nil}), do: "—"
 
-  def actual_duration(%Auction{scheduled_start: started, auction_ended: ended}) do
+  def actual_duration(%Auction{auction_started: started, auction_ended: ended}) do
     "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
   end
 
