@@ -281,6 +281,34 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "starting an auction" do
+    setup do
+      admin = insert(:user, is_admin: true)
+
+      {:ok, scheduled_start} = DateTime.to_unix(DateTime.utc_now()) + 60_000
+      |> DateTime.from_unix()
+
+      auction =
+        :auction
+        |> insert(scheduled_start: scheduled_start, duration: 1_000, decision_duration: 1_000)
+        |> Auctions.fully_loaded()
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+            {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
+
+      {:ok, %{auction: auction, admin: admin}}
+    end
+
+    test "start_auction/2 starts the given auction and adds auction_started field to auction", %{auction: auction, admin: admin} do
+      auction = Auctions.start_auction(auction, admin)
+      assert auction.auction_started != nil
+      assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
+    end
+  end
+
   describe "canceling an auction" do
     setup do
       buyer_company = insert(:company)

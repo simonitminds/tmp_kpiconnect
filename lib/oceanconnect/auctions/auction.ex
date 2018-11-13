@@ -37,6 +37,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:eta, :utc_datetime_usec)
     field(:etd, :utc_datetime_usec)
     field(:scheduled_start, :utc_datetime_usec)
+    field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
     field(:auction_closed_time, :utc_datetime_usec)
     # milliseconds
