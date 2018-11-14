@@ -34,6 +34,7 @@ defmodule OceanconnectWeb.AuctionView do
       scheduled_start: auction_map.scheduled_start,
       auction_started: auction_map.auction_started,
       auction_ended: auction_map.auction_ended,
+      auction_closed_time: auction_map.auction_closed_time,
       duration: auction_map.duration,
       decision_duration: auction_map.decision_duration,
       anonymous_bidding: auction_map.anonymous_bidding,
@@ -47,10 +48,18 @@ defmodule OceanconnectWeb.AuctionView do
     |> Poison.encode!()
   end
 
-  def actual_duration(%Auction{auction_ended: nil}), do: "—"
+  def actual_duration(events) when is_list(events) do
+    [started, ended] =
+      events
+      |> Enum.filter(fn event ->
+        event.type in [:auction_started, :auction_ended, :auction_canceled]
+      end)
+      |> Enum.map(&(&1.time_entered))
 
-  def actual_duration(%Auction{auction_started: started, auction_ended: ended}) do
-    "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
+    case ended do
+      nil -> "—"
+      _ -> "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
+    end
   end
 
   def additional_information(%Auction{additional_information: nil}), do: "—"

@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       ) do
     auction
-    |> Auctions.update_auction_without_event_storage!(%{scheduled_start: time_entered})
+    |> Auctions.update_auction_without_event_storage!(%{auction_started: time_entered})
 
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
