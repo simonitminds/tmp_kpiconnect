@@ -47,15 +47,15 @@ const Messages = (props) => {
     return (
       <li
         key={conversation.company_name}
-        className={`qa-conversation-company-${conversation.company_name} ${isExpanded ? "open" : "closed"}`}
+        className={`qa-conversation-company-${conversation.company_name} ${isExpanded ? "open" : "closed"} ${unseenCount > 0 ? "with-unseen" : ""}`}
         onClick={toggleExpanded.bind(this, 'expandedConversation', conversation.company_name)}
       >
-        <h2>
+        <div>
           { expansionToggle(isExpanded) }
           { conversation.company_name }
           { unseenMessageCount(unseenCount) }
-          { isExpanded && messagePanel(auctionId, conversation) }
-        </h2>
+        </div>
+        { isExpanded && messagePanel(auctionId, conversation) }
       </li>
     )
   }
@@ -78,10 +78,10 @@ const Messages = (props) => {
     return (
       <li
         key={messagePayload.auction_id}
-        className={`qa-auction-${messagePayload.auction_id}-message-payloads ${isExpanded ? "open" : "closed"}`}
+        className={`qa-auction-${messagePayload.auction_id}-message-payloads ${isExpanded ? "open" : "closed"} ${messagePayload.unseen_messages && "with-unseen"}`}
         onClick={toggleExpanded.bind(this, 'expandedAuction', messagePayload.auction_id)}
       >
-        <h2>
+        <div>
           { expansionToggle(isExpanded) }
           <div className={`auction-status auction-status--${messagePayload.status}`}>
             {messagePayload.status}
@@ -92,8 +92,8 @@ const Messages = (props) => {
             );
           })}
           { unseenMessageCount(messagePayload.unseen_messages) }
-          { renderConversations(messagePayload, isExpanded) }
-        </h2>
+        </div>
+        { renderConversations(messagePayload, isExpanded) }
       </li>
     )
   }
