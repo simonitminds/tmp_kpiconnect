@@ -8,7 +8,6 @@ import MediaQuery from 'react-responsive';
 
 
 class BiddingForm extends React.Component {
-
   constructor(props){
     super(props);
     const is_traded_bid = _.chain(props.auctionPayload)
@@ -16,23 +15,71 @@ class BiddingForm extends React.Component {
                            .filter('active')
                            .some('is_traded_bid')
                            .value()
-
-    this.state = {tradedBidChecked: is_traded_bid}
+    this.state = {
+      tradedBidChecked: is_traded_bid,
+      isSubmittable: false
+    }
   }
 
-  handleTradedBidCheckboxChange(e) {
+  handleTradedBidCheckboxChange(ev) {
     this.setState({
-      tradedBidChecked: e.target.checked
-    })
+      tradedBidChecked: ev.target.checked
+    });
+  }
+
+  updateSubmittability(ev) {
+    const form = ev.target.form;
+    const bidElements = _.reject(form.elements, (e) => !e.dataset.product);
+    const bidsByProduct = _.reduce(bidElements, (acc, e) => {
+      acc[e.dataset.product] = acc[e.dataset.product] || {};
+      switch(e.type) {
+        case 'checkbox':
+          acc[e.dataset.product][e.name] = e.checked;
+          break;
+
+        default:
+          acc[e.dataset.product][e.name] = e.value;
+          break;
+      }
+      return acc;
+    }, {});
+
+    const hasAnyBids = _.some(Object.values(bidsByProduct), ({amount, min_amount}) => {
+      return amount || min_amount;
+    });
+    const hasNecessaryAmounts = _.every(bidsByProduct, (bid) => {
+      const {amount, min_amount, existing_bid} = bid;
+      console.log(amount, min_amount, bid)
+      return existing_bid ? true : (min_amount ? amount : true);
+    });
+
+    console.log(bidsByProduct);
+
+    const isSubmittable = hasAnyBids && hasNecessaryAmounts;
+
+    this.setState({
+      isSubmittable: isSubmittable
+    });
+  }
+
+  submitForm(ev) {
+    ev.preventDefault();
+    const {auctionPayload, formSubmit} = this.props;
+    const {auction} = auctionPayload;
+
+    if(this.state.isSubmittable) {
+      formSubmit(auction.id, ev);
+    }
   }
 
   render(){
-    const {auctionPayload, formSubmit, revokeBid, barges} = this.props;
+    const {auctionPayload, revokeBid, barges} = this.props;
+    const {isSubmittable} = this.state;
     const auction = auctionPayload.auction;
     const auctionState = auctionPayload.status;
     const products = _.sortBy(auction.fuels, 'id');
     const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'));
-    const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
+    const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed');
     const fuels = _.get(auctionPayload, 'auction.fuels');
 
     const renderProduct = ({id: productId, name}, auctionPayload) => {
@@ -64,6 +111,7 @@ class BiddingForm extends React.Component {
                   <div className="tag is-success"><i className="fas fa-check"></i></div>
                   <div className="tag revoke-bid__status is-white">Bid Active</div>
                   <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
+                  <input type="hidden" name="existing_bid" value="true" data-product={productId} />
                 </div>
               : <div className="tags has-addons has-margin-top-xs">
                   <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
@@ -78,7 +126,16 @@ class BiddingForm extends React.Component {
                   <label className="label" htmlFor="bid">Bid Amount</label>
                   <div className="control auction-bidding__input has-icons-left">
                     <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
-                    <input type="number" step="0.25" min="0" className="input qa-auction-bid-amount" id="bid" name="amount" data-product={productId}/>
+                    <input
+                      type="number"
+                      step="0.25"
+                      min="0"
+                      className="input qa-auction-bid-amount"
+                      id="bid"
+                      name="amount"
+                      onChange={this.updateSubmittability.bind(this)}
+                      data-product={productId}
+                    />
                   </div>
                   <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
                 </div>
@@ -87,7 +144,16 @@ class BiddingForm extends React.Component {
                 <div className="field">
                   <label className="label" htmlFor="bid">Minimum Bid</label>
                   <div className="control auction-bidding__input has-icons-left">
-                    <input type="number" step="0.25" min="0" className="input qa-auction-bid-min_amount" id="minimumBid" name="min_amount" data-product={productId}/>
+                    <input
+                      type="number"
+                      step="0.25"
+                      min="0"
+                      className="input qa-auction-bid-min_amount"
+                      id="minimumBid"
+                      name="min_amount"
+                      onChange={this.updateSubmittability.bind(this)}
+                      data-product={productId}
+                    />
                     <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
                   </div>
                   <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
@@ -110,7 +176,7 @@ class BiddingForm extends React.Component {
     return(
       <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
         <MediaQuery query="(min-width: 769px)">
-          <form onSubmit={formSubmit.bind(this, auction.id)}>
+          <form onSubmit={this.submitForm.bind(this)}>
             <h3 className="auction-bidding__title title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
             <div className="auction-bidding__form-body">
               { (is_traded_bid_allowed === true) &&
@@ -139,7 +205,9 @@ class BiddingForm extends React.Component {
 
             <div className="field is-horizontal is-expanded">
               <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
-                <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>
+                <div className="control">
+                  <button type="submit" className="button is-primary qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
+                </div>
               </div>
             </div>
           </form>
@@ -150,7 +218,7 @@ class BiddingForm extends React.Component {
             classParentString="collapsing-auction-bidding"
             open={true}
           >
-            <form onSubmit={formSubmit.bind(this, auction.id)}>
+            <form onSubmit={this.submitForm.bind(this)}>
               <h3 className="auction-bidding__title title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
               <div className="auction-bidding__form-body">
                 { (is_traded_bid_allowed === true) &&
@@ -175,7 +243,9 @@ class BiddingForm extends React.Component {
 
               <div className="field is-horizontal is-expanded">
                 <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
-                  <div className="control"><button type="submit" className="button is-primary qa-auction-bid-submit">Place Bid</button></div>
+                  <div className="control">
+                    <button type="submit" className="button is-primary qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
+                  </div>
                 </div>
               </div>
             </form>

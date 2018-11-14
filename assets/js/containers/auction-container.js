@@ -39,8 +39,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
   formSubmit(auctionId, ev) {
-    ev.preventDefault();
-
     const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
     const bidsByProduct = _.reduce(bidElements, (acc, e) => {
       acc[e.dataset.product] = acc[e.dataset.product] || {};
@@ -56,12 +54,13 @@ const mapDispatchToProps = (dispatch) => ({
       return acc;
     }, {});
 
-    const elements = ev.target.elements;
-    _.forEach(elements, (e) => e.value = "");
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
     }));
+
+    const elements = ev.target.elements;
+    _.forEach(elements, (e) => e.value = "");
   },
   revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));
