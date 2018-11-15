@@ -55,7 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auction_started(
-        auction = %Auction{id: auction_id, scheduled_start: scheduled_start},
+        auction = %Auction{id: auction_id, auction_started: auction_started},
         new_state = %AuctionState{},
         user
       ) do
@@ -63,7 +63,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :auction_started,
       auction_id: auction_id,
       data: %{state: new_state, auction: auction},
-      time_entered: scheduled_start,
+      time_entered: auction_started,
       user: user
     }
   end

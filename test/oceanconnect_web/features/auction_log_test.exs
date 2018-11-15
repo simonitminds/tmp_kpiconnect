@@ -51,21 +51,22 @@ defmodule Oceanconnect.AuctionLogTest do
       |> Oceanconnect.Repo.get(auction.id)
       |> Auctions.fully_loaded()
 
-    {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier, fuel: fuel}}
+    auction_events = Auctions.AuctionEventStore.event_list(updated_auction.id)
+
+    {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier, fuel: fuel, auction_events: auction_events}}
   end
 
-  test "auction log has log details", %{auction: auction} do
-    event_list = Auctions.AuctionEventStore.event_list(auction.id)
-    assert AuctionLogPage.has_events?(event_list)
+  test "auction log has log details", %{auction_events: auction_events} do
+    assert AuctionLogPage.has_events?(auction_events)
   end
 
-  test "page has auction details", %{auction: auction, fuel: fuel, supplier: supplier} do
+  test "page has auction details", %{auction: auction, fuel: fuel, supplier: supplier, auction_events: auction_events} do
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
       "buyer-name" => auction.buyer.name,
       "auction_started" => AuctionView.convert_date?(auction.scheduled_start),
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
-      "actual-duration" => AuctionView.actual_duration(auction),
+      "actual-duration" => AuctionView.actual_duration(auction_events),
       "duration" => AuctionView.convert_duration(auction.duration),
       "winning-solution-entry" => "$1.25/unit for #{fuel.name} from #{supplier.company.name}"
     }
