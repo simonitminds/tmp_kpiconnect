@@ -201,7 +201,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       |> Auctions.place_bid()
       Auctions.end_auction(auction)
       state = Auctions.get_auction_state!(auction)
-      Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.")
+      Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.", "Agent 9")
       :timer.sleep(200)
 
       assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}

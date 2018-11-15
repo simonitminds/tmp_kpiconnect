@@ -40,6 +40,10 @@
             <td><%= @auction_payload.auction.port.name %></td>
           </tr>
           <tr>
+            <th>Port Agent</th>
+            <td><%= @auction_payload.auction.port_agent || "—" %></td>
+          </tr>
+          <tr>
             <th>ETA</th>
             <td><%= @auction_payload.auction.eta %></td>
           </tr>

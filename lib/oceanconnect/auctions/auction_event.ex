@@ -210,13 +210,14 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def winning_solution_selected(
         solution = %Solution{auction_id: auction_id},
+        port_agent,
         state = %AuctionState{},
         user
       ) do
     %AuctionEvent{
       type: :winning_solution_selected,
       auction_id: auction_id,
-      data: %{solution: solution, state: state},
+      data: %{solution: solution, port_agent: port_agent, state: state},
       time_entered: DateTime.utc_now(),
       user: user
     }

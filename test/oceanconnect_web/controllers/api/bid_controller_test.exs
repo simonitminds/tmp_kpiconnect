@@ -277,7 +277,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     end
 
     test "buyer selects winning bid", %{auction: auction, conn: conn, bid: bid} do
-      new_conn = post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{comment: "test", bid_ids: [bid.id]})
+      new_conn = post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{comment: "test", port_agent: "", bid_ids: [bid.id]})
 
       assert json_response(new_conn, 200)
 
