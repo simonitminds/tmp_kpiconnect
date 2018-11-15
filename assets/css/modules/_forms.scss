@@ -24,6 +24,10 @@
     margin-right: 0.25rem;
     flex-grow: 0;
   }
+
+  @media (max-width: 768px) {
+    margin: 0;
+  }
 }
 
 .field-body--columned {

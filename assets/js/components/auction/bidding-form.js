@@ -162,6 +162,7 @@ class BiddingForm extends React.Component {
           <div className="column is-narrow">
             <label className="checkbox">
               <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
+              <i class="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
             </label>
           </div>  :
             <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
