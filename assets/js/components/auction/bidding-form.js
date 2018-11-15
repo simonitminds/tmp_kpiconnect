@@ -53,8 +53,6 @@ class BiddingForm extends React.Component {
       return existing_bid ? true : (min_amount ? amount : true);
     });
 
-    console.log(bidsByProduct);
-
     const isSubmittable = hasAnyBids && hasNecessaryAmounts;
 
     this.setState({
@@ -66,7 +64,6 @@ class BiddingForm extends React.Component {
     ev.preventDefault();
     const {auctionPayload, formSubmit} = this.props;
     const {auction} = auctionPayload;
-
     if(this.state.isSubmittable) {
       formSubmit(auction.id, ev);
     }
@@ -229,7 +226,7 @@ class BiddingForm extends React.Component {
                         model={'auction-bid'}
                         field={'is_traded_bid'}
                         labelText={'mark as traded bid'}
-                        value={this.state.tradedBidChecked}
+                        defaultChecked={this.state.tradedBidChecked}
                         onChange={this.handleTradedBidCheckboxChange.bind(this)}
                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                       />
