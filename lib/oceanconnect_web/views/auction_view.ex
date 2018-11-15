@@ -130,6 +130,13 @@ defmodule OceanconnectWeb.AuctionView do
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
+  def convert_event_date_time?(date_time = %{}) do
+    time =
+      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{leftpad(elem(date_time.microsecond, 0), 6)}"
+
+    date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
+    "#{date} #{time}"
+  end
 
   def convert_event_type(type) do
     ~r/_/
