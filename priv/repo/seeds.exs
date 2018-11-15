@@ -75,7 +75,8 @@ companies =
       email: "nigeria@example.com",
       main_phone: "+234 1 2611275",
       mobile_phone: "+234 80 3938 0297",
-      postal_code: ""
+      postal_code: "",
+      credit_margin_amount: 5.00
     },
     %{
       name: "Qatargas Operating Company Limited",
@@ -88,7 +89,8 @@ companies =
       email: "qatargas@example.com",
       main_phone: "+974 4452 3043",
       mobile_phone: "+44 7803 632226",
-      postal_code: "22666"
+      postal_code: "22666",
+      credit_margin_amount: 5.00
     },
     %{
       name: "Petrochina International (Singapore) Pte Ltd",
@@ -627,7 +629,8 @@ auctions_params = [
     po: "3456789",
     buyer_id: qatargas.id,
     duration: 10 * 60_000,
-    decision_duration: 15 * 60_000
+    decision_duration: 15 * 60_000,
+    is_traded_bid_allowed: true
   }
 ]
 

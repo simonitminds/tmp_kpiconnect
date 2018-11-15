@@ -54,13 +54,13 @@ const mapDispatchToProps = (dispatch) => ({
       return acc;
     }, {});
 
+    const elements = ev.target.elements;
+    _.forEach(elements, (e) => e.value = "");
+
     dispatch(submitBid(auctionId, {
       "bids": bidsByProduct,
       "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
     }));
-
-    const elements = ev.target.elements;
-    _.forEach(elements, (e) => e.value = "");
   },
   revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));
