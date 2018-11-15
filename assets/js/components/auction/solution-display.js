@@ -113,6 +113,19 @@ export default class SolutionDisplay extends React.Component {
         </span>
       );
     }
+    const isNonsplittableBid = (bid) => {
+      return(
+        <span>
+          { bid.allow_split == false ?
+            <span className="auction__nonsplittable-bid-tag">
+              <i action-label="Can't Be Split" className="fas fa-ban auction__nonsplittable-bid-marker"></i>
+              <span className="has-padding-left-sm">Unsplittable</span>
+            </span>
+          : "" }
+
+        </span>
+      );
+    }
 
     const supplierName = (bid) => {
       if(supplierId) {
@@ -158,7 +171,8 @@ export default class SolutionDisplay extends React.Component {
             { bid
               ? <span>
                   <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
-                  <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
+                  <span className="auction__traded-bid-tag__container qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
+                  <span className="auction__nonsplittable-bid-tag__container qa-auction-bid-is_nonsplittable_bid">{isNonsplittableBid(bid)}</span>
                 </span>
               : <i>No bid</i>
             }
