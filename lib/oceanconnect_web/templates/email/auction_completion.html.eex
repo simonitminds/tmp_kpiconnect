@@ -14,6 +14,7 @@
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel:</b> <%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port:</b> <%= @auction.port.name %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port Agent:</b> <%= @auction.port_agent %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>ETA/ETD:</b> <%= convert_date?(@auction.eta) %> / <%= convert_date?(@auction.etd) %></p>
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Approved Barges</h1>

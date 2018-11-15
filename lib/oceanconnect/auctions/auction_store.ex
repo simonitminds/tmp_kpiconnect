@@ -235,12 +235,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:select_winning_solution, %{solution: solution = %Solution{}, auction: auction = %Auction{}, user: user}, emit},
+        {:select_winning_solution, %{solution: solution = %Solution{}, auction: auction = %Auction{}, port_agent: port_agent, user: user}, emit},
         current_state
       ) do
     new_state = select_winning_solution(solution, current_state)
 
-    AuctionEvent.emit(AuctionEvent.winning_solution_selected(solution, current_state, user), emit)
+    AuctionEvent.emit(AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user), emit)
     AuctionEvent.emit(AuctionEvent.auction_closed(auction, new_state), emit)
 
     {:noreply, new_state}

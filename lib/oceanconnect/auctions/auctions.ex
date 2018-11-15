@@ -144,11 +144,16 @@ defmodule Oceanconnect.Auctions do
   defp maybe_pending(%{status: :decision}), do: {:error, :late_bid}
   defp maybe_pending(_), do: :error
 
- def select_winning_solution(bids, product_bids, auction, comment, user \\ nil) do
+ def select_winning_solution(bids, product_bids, auction, comment, port_agent, user \\ nil) do
     solution = Solution.from_bids(bids, product_bids, auction)
+
     %Solution{solution | comment: comment}
-    |> Command.select_winning_solution(auction, user)
+    |> Command.select_winning_solution(auction, port_agent, user)
     |> AuctionStore.process_command()
+  end
+
+  def set_port_agent(auction = %Auction{}, port_agent) do
+    update_auction_without_event_storage!(auction, %{port_agent: port_agent})
   end
 
   def is_participant?(auction = %Auction{}, company_id) do

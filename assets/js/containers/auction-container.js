@@ -85,20 +85,19 @@ const mapDispatchToProps = (dispatch) => ({
     ev.preventDefault();
 
     const elements = ev.target.elements;
-    let solutionData = {'comment': '', 'bid_ids': bidIds};
-    if(elements.comment) {
-      solutionData['comment'] = elements.comment.value;
-    }
-    const portAgent = {'port_agent': elements.auction_port_agent.value};
+    let solutionData = {
+      'comment': elements.comment ? elements.comment.value : '',
+      'bid_ids': bidIds,
+      'port_agent': elements.auction_port_agent ? elements.auction_port_agent.value : ''
+    };
 
-    dispatch(setPortAgent(auctionId, portAgent));
     dispatch(acceptWinningSolution(auctionId, solutionData));
   },
   ...bindActionCreators({ updateBidStatus }, dispatch)
 });
 
-export class AuctionContainer extends React.Component {
 
+export class AuctionContainer extends React.Component {
   dispatchItem() {
     this.props.dispatch(subscribeToAuctionUpdates());
     this.props.dispatch(getCompanyBarges(window.companyId));

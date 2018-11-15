@@ -252,7 +252,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.end_auction(auction)
       auction_state = Auctions.get_auction_state!(auction)
-      Auctions.select_winning_solution([bid2], auction_state.product_bids, auction, "you're winner")
+      Auctions.select_winning_solution([bid2], auction_state.product_bids, auction, "you're winner", "Agent 9")
 
       auction_payload =
         auction

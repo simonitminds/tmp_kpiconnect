@@ -275,7 +275,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       bid_id = bid.id
 
       auction_state = Auctions.get_auction_state!(auction)
-      Auctions.select_winning_solution([bid], auction_state.product_bids, auction, "you win")
+      Auctions.select_winning_solution([bid], auction_state.product_bids, auction, "you win", "Agent 9")
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 

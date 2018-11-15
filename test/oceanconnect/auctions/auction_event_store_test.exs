@@ -57,7 +57,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
     Auctions.end_auction(auction)
     state = Auctions.get_auction_state!(auction)
-    Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.")
+    Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.", "Agent 9")
     :timer.sleep(200)
 
     current_cache = AuctionCache.read(auction_id)
