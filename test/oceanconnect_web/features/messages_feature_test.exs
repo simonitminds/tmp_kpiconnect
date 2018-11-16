@@ -1,4 +1,4 @@
-defmodule Oceanconnect.MessagesTest do
+defmodule Oceanconnect.MessagesFeatureTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{Auctions, AuctionIndexPage, AuctionShowPage, MessagesPage}
 
