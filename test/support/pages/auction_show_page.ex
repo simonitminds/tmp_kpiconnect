@@ -348,6 +348,21 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click
   end
 
+  def open_message_window do
+    find_element(:css, ".qa-auction-message")
+    |> click()
+  end
+
+  def has_participating_auctions?(auctions) do
+    Enum.all?(auctions, fn auction ->
+      text = find_element(:css, ".qa-auction-message-auctions")
+      |> find_within_element(:css, ".qa-auction-message-auction-#{auction.id}")
+      |> inner_text
+
+      text =~ auction.vessel.name
+    end)
+  end
+
   defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end

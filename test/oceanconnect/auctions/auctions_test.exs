@@ -309,6 +309,25 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "get_participant_name_and_ids_for_auction/1" do
+    setup do
+      auction = :auction |> insert() |> Auctions.fully_loaded()
+      anon_auction = :auction |> insert(anonymous_bidding: true) |> Auctions.create_supplier_aliases() |> Auctions.fully_loaded()
+
+      {:ok, %{anon_auction: anon_auction, auction: auction}}
+    end
+
+    test "returns ids and names for auction participants", %{auction: auction} do
+      expected_result = [%{id: auction.buyer_id, name: auction.buyer.name} | Enum.map(auction.suppliers, &%{id: &1.id, name: &1.name})]
+      assert Enum.all?(Auctions.get_participant_name_and_ids_for_auction(auction.id), & &1 in expected_result)
+    end
+
+    test "returns ids and alias names for anon_auction participants", %{anon_auction: anon_auction} do
+      expected_result = [%{id: anon_auction.buyer_id, name: anon_auction.buyer.name} | Enum.map(anon_auction.suppliers, &%{id: &1.id, name: &1.alias_name})]
+      assert Enum.all?(Auctions.get_participant_name_and_ids_for_auction(anon_auction.id), & &1 in expected_result)
+    end
+  end
+
   describe "canceling an auction" do
     setup do
       buyer_company = insert(:company)
@@ -680,22 +699,22 @@ defmodule Oceanconnect.AuctionsTest do
        }}
     end
 
-    test "supplier_list_for_auction/1 returns only supplier companies for given port", %{
+    test "supplier_list_for_port/1 returns only supplier companies for given port", %{
       p1: p1,
       p2: p2,
       c1: c1,
       c2: c2,
       c3: c3
     } do
-      companies = Auctions.supplier_list_for_auction(p1)
+      companies = Auctions.supplier_list_for_port(p1)
       assert Enum.all?(companies, fn c -> c.id in [c1.id, c2.id] end)
       assert length(companies) == 2
-      assert Enum.all?(Auctions.supplier_list_for_auction(p2), fn c -> c.id in [c2.id, c3.id] end)
+      assert Enum.all?(Auctions.supplier_list_for_port(p2), fn c -> c.id in [c2.id, c3.id] end)
     end
 
-    test "supplier_list_for_auction/2 returns only supplier companies for given port and not buyer",
+    test "supplier_list_for_port/2 returns only supplier companies for given port and not buyer",
          %{p1: p1, c1: buyer, c2: c2} do
-      companies = Auctions.supplier_list_for_auction(p1, buyer.id)
+      companies = Auctions.supplier_list_for_port(p1, buyer.id)
       assert length(companies) == 1
       assert hd(companies).id == c2.id
     end

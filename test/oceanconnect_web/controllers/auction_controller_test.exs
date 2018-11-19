@@ -312,7 +312,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn, 302) == "/auctions"
     end
 
-    test "a buyer can view log for an closed auction", %{auction: auction, conn: authed_conn} do
+    test "a buyer can view log for a closed auction", %{auction: auction, conn: authed_conn} do
       auction
       |> Auctions.start_auction()
       |> Auctions.end_auction()
@@ -322,6 +322,19 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         |> get(auction_path(build_conn(), :log, auction))
 
       assert html_response(conn, 200)
+    end
+
+    test "the log includes messages", %{auction: auction, conn: authed_conn} do
+      insert_list(4, :message, auction: auction, author_company: auction.buyer)
+      auction
+      |> Auctions.start_auction()
+      |> Auctions.end_auction()
+
+      conn =
+        authed_conn
+        |> get(auction_path(build_conn(), :log, auction))
+
+      assert length(conn.assigns.messages) == 4
     end
   end
 end

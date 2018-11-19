@@ -11,15 +11,15 @@ describe('receive_auctions', ()=> {
   test('overwrites existing', ()=> {
     const state = Object.assign({}, initialState, {
       auctionPayloads: [
-        { auction: {id: 1 }},
-        { auction: {id: 2 }}
+        { auction: { id: 1 }},
+        { auction: { id: 2 }}
       ]
     });
     const action = {
       type: RECEIVE_AUCTION_PAYLOADS,
       auctionPayloads: [
-        { auction: {id: 3 }},
-        { auction: {id: 4 }}
+        { auction: { id: 3 }},
+        { auction: { id: 4 }}
       ]
     }
 
@@ -31,8 +31,8 @@ describe('receive_auctions', ()=> {
   test('if no auctions received, state is maintained', ()=> {
     const state = Object.assign({}, initialState, {
       auctionPayloads: [
-        { auction: {id: 1 }},
-        { auction: {id: 2 }}
+        { auction: { id: 1 }},
+        { auction: { id: 2 }}
       ]
     });
     const action = {
@@ -52,11 +52,11 @@ describe('update_auction_state', ()=> {
     const state = Object.assign({}, initialState, {
       auctionPayloads: [
         {
-          auction: {id: 1 },
+          auction: { id: 1 },
           state: { status: "open" },
           bid_list: []
         }, {
-          auction: {id: 2 },
+          auction: { id: 2 },
           state: { status: "pending" },
           bid_list: []
         }
@@ -65,7 +65,7 @@ describe('update_auction_state', ()=> {
     const action = {
       type: UPDATE_AUCTION_PAYLOAD,
       auctionPayload: {
-        auction: {id: 2 },
+        auction: { id: 2 },
         state: { status: "open" },
         bid_list: [{ id: "first bid" }]
       }
@@ -74,10 +74,10 @@ describe('update_auction_state', ()=> {
     const output = auctionsReducer(state, action);
 
     expect(output.auctionPayloads.length).toEqual(2);
-    const target_auction = _.chain(output.auctionPayloads)
+    const targetAuction = _.chain(output.auctionPayloads)
       .filter(['auction.id', action.auctionPayload.auction.id])
       .first()
       .value();
-    expect(target_auction).toEqual(action.auctionPayload);
+    expect(targetAuction).toEqual(action.auctionPayload);
   });
 });

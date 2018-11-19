@@ -161,7 +161,7 @@ companies =
     Repo.get_or_insert!(Company, company)
   end)
 
-suppliers = [chevron, nigeria, qatargas, petrochina, global, shell, chemoil]
+suppliers = [qatargas, petrochina, global, shell, chemoil]
 # User creation doesn't use get_or_insert! fn due to virtual password field
 
 Enum.map(companies, fn c ->
@@ -604,7 +604,7 @@ auctions_params = [
   },
   %Auction{
     auction_vessel_fuels: [
-      %AuctionVesselFuel{vessel_id: vessel1.id, fuel_id: fuel1.id, quantity: 1500}
+      %AuctionVesselFuel{vessel_id: hd(vessels).id, fuel_id: fuel1.id, quantity: 1500}
     ],
     port_id: fujairah.id,
     scheduled_start: date_time,

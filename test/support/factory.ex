@@ -104,6 +104,18 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def message_factory() do
+    company = build(:company)
+    %Oceanconnect.Messages.Message{
+      auction: build(:auction),
+      content: "Hi!",
+      has_been_seen: false,
+      author: build(:user, company: company),
+      author_company: company,
+      recipient_company: build(:company)
+    }
+  end
+
   def create_bid(amount, min_amount, supplier_id, fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,

@@ -63,6 +63,24 @@ defmodule Oceanconnect.AuctionLogPage do
     end)
   end
 
+  def has_message_details?(message_id, details) do
+    message_element = find_element(:class, "qa-message-#{message_id}")
+    Enum.all?(details, fn {k, v} ->
+      v =
+        case v do
+          [_] -> Enum.join(v)
+          _ -> v
+        end
+
+      text =
+        message_element
+        |> find_within_element(:class, "qa-message-#{k}")
+        |> inner_text
+
+      text =~ v
+    end)
+  end
+
   def has_vessel_fuel?(%{id: id, vessel: vessel, fuel: fuel, quantity: quantity}) do
     deliverable_text = find_element(:css, ".qa-auction-deliverable-#{id}")
     |> inner_text

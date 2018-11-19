@@ -111,5 +111,35 @@
         <% end %>
       </div>
     </div>
+
+    <%= if length(@messages) > 0 do %>
+      <h2>Message Log</h2>
+      <table class="table is-fullwidth is-striped report__table--log">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Message</th>
+            <th>Author</th>
+            <th>Recipient Company</th>
+            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+              <th>Impersonator</th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for message <- @messages do %>
+            <tr class="qa-message-<%= message.id %>">
+              <td class="qa-message-time"><%= convert_date_time?(message.inserted_at) %></td>
+              <td class="qa-message-content"><%= message.content %></td>
+              <td class="qa-message-author"><%= "#{user_name(message.author)} - #{message.author_company.name}" %></td>
+              <td class="qa-message-recipient"><%= message.recipient_company.name %></td>
+              <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                <td class="qa-message-impersonator"><%= user_name(message.impersonator) %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   </div>
 </div>

@@ -169,6 +169,17 @@ defmodule Oceanconnect.Auctions do
     Enum.map(auction_with_participants.suppliers, & &1.id)
   end
 
+  def get_participant_name_and_ids_for_auction(auction_id) when is_integer(auction_id) do
+    auction =
+      auction_id
+      |> get_auction!()
+      |> fully_loaded()
+
+    auction
+    |> auction_participant_ids()
+    |> Enum.map(&%{id: &1, name: AuctionSuppliers.get_name_or_alias(&1, auction)})
+  end
+
   def list_auctions do
     Repo.all(Auction)
     |> fully_loaded
@@ -670,13 +681,13 @@ defmodule Oceanconnect.Auctions do
     |> Repo.all()
   end
 
-  def supplier_list_for_auction(%Port{id: id}) do
+  def supplier_list_for_port(%Port{id: id}) do
     id
     |> Port.suppliers_for_port_id()
     |> Repo.all()
   end
 
-  def supplier_list_for_auction(%Port{id: port_id}, buyer_id) do
+  def supplier_list_for_port(%Port{id: port_id}, buyer_id) do
     port_id
     |> Port.suppliers_for_port_id(buyer_id)
     |> Repo.all()

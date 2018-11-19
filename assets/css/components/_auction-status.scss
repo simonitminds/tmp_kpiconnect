@@ -1,0 +1,48 @@
+// ========================== //
+// ========================== //
+// Auction
+// ========================== //
+// ========================== //
+
+// Context-Agnostic Auction Status tags
+
+.auction-status {  // Auction Status (Open, Closed, Scheduled, Cancelled)
+  @extend .tag, .is-rounded;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: $white !important;
+
+  // Color Auction Status tags based on... auction status.
+  &--open { background-color: $green !important; }
+  &--draft { background-color: $gray-3 !important; }
+  &--pending { background-color: $teal !important; }
+  &--closed { background-color: $gray-3 !important; }
+  &--expired { background-color: $turquoise !important; }
+  &--canceled { background-color: $red !important; }
+}
+
+// Contextual Edits
+
+// Auction Header on Show Page
+
+.auction-header .auction-status {
+  @media (max-width: 768px) {
+    margin-left: -0.5rem; // Visual adjustment to align edge of tag copy with vessel name
+    margin-bottom: 0.75rem; // Give re-placed auction timer more space
+  }
+
+  &--pending { // Additional adjustments for mobile pending auction view...
+    @media (max-width: 496px) {
+      margin-top: 30px;
+    }
+  }
+}
+
+// Auction Card on List page
+
+// Tag in Messaging Context
+
+.messaging .auction-status {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}

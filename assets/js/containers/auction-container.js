@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import {
-  getAllAuctionPayloads,
   getCompanyBarges,
   acceptWinningSolution,
   setPortAgent,
@@ -30,6 +29,7 @@ const mapStateToProps = (state) => {
 
   return {
     auctionPayload,
+    auctionPayloads: state.auctionsReducer.auctionPayloads,
     companyProfile,
     connection: state.auctionsReducer.connection,
     loading: state.auctionsReducer.loading
@@ -111,12 +111,11 @@ export class AuctionContainer extends React.Component {
     }
   }
 
-
   render() {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return <AuctionShow {...this.props}/>;
+      return <AuctionShow {...this.props}/>
     }
   }
 }

@@ -1,7 +1,10 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Auctions
+  alias Oceanconnect.{Accounts, Auctions}
+  alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel, Solution}
+  alias Oceanconnect.Messages.Message
+
 
   @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
   @events_with_solution_data [:winning_solution_selected]
@@ -106,6 +109,9 @@ defmodule OceanconnectWeb.AuctionView do
 
   def bids_for_solution(%Solution{bids: bids}), do: bids
 
+  def author_name_and_company(%Message{} = message), do: "#{user_name(message.author)} - #{message.author_company.name}"
+  def author_name_and_company(_), do: "-"
+
   def convert_duration(duration) do
     "#{trunc(duration / 60_000)} minutes"
   end
@@ -117,6 +123,13 @@ defmodule OceanconnectWeb.AuctionView do
   end
   def convert_date?(_), do: "—"
 
+  def convert_date_time?(date_time = %{}) do
+    time =
+      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{leftpad(elem(date_time.microsecond, 0), 6)}"
+
+    date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
+    "#{date} #{time}"
+  end
   def convert_event_date_time?(date_time = %{}) do
     time =
       "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{leftpad(elem(date_time.microsecond, 0), 6)}"
@@ -256,6 +269,8 @@ defmodule OceanconnectWeb.AuctionView do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
   def format_price(amount), do: amount
+  def user_name(%User{} = user), do: Accounts.get_user_name!(user)
+  def user_name(_), do: "-"
 
   defp leftpad(integer, length \\ 2) do
     String.pad_leading(Integer.to_string(integer), length, "0")

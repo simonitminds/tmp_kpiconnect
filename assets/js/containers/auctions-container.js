@@ -2,12 +2,13 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionsIndex from '../components/auction/index'
-import { getAllAuctionPayloads, subscribeToAuctionUpdates } from '../actions';
+import { subscribeToAuctionUpdates } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
     auctionPayloads: state.auctionsReducer.auctionPayloads,
-    connection: state.auctionsReducer.connection
+    connection: state.auctionsReducer.connection,
+    loading: state.auctionsReducer.loading
   }
 };
 
@@ -29,7 +30,11 @@ export class AuctionsContainer extends React.Component {
     }
   }
   render() {
-    return <AuctionsIndex {...this.props} />;
+    if (this.props.loading) {
+      return <div className="alert is-info">Loading...</div>
+    } else {
+      return <AuctionsIndex {...this.props} />
+    }
   }
 }
 

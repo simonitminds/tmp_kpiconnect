@@ -1,6 +1,6 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
-  alias Oceanconnect.Auctions
+  alias Oceanconnect.{Auctions, Messages}
   alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload, Payloads}
   alias OceanconnectWeb.Plugs.Auth
 
@@ -18,30 +18,24 @@ defmodule OceanconnectWeb.AuctionController do
 
     auction_state = Auctions.get_auction_state!(auction)
     with %Auction{} <- auction,
-         true <- current_company_id == auction.buyer_id,
-         false <- auction_state.status in [:pending, :open, :draft] do
-      events =
-        auction.id
-        |> AuctionEventStore.event_list()
+         true <- current_company_id == auction.buyer_id or Auth.current_admin(conn),
+         true <- auction_state.status not in [:draft, :pending, :open] or Auth.current_admin(conn) do
 
-      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
-      solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
-
-      render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
+      render(
+        conn,
+        "log.html",
+        auction_payload: AuctionPayload.get_auction_payload!(auction, auction.buyer_id),
+        events: AuctionEventStore.event_list(auction.id),
+        messages: auction.id
+          |> Messages.list_auction_messages_for_company(auction.buyer_id)
+          |> Messages.preload_messages(),
+        solutions_payload: Payloads.SolutionsPayload.get_solutions_payload!(
+          auction_state,
+          [auction: auction, buyer: auction.buyer_id]
+        )
+      )
     else
-      _ ->
-        if(Auth.current_admin(conn)) do
-          events =
-            auction.id
-            |> AuctionEventStore.event_list()
-
-          auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
-          solutions_payload = Payloads.SolutionsPayload.get_solutions_payload!(auction_state, [auction: auction, buyer: auction.buyer_id])
-
-          render(conn, "log.html", auction_payload: auction_payload, solutions_payload: solutions_payload, events: events)
-        else
-          redirect(conn, to: auction_path(conn, :index))
-        end
+      _ -> redirect(conn, to: auction_path(conn, :index))
     end
   end
 
@@ -230,7 +224,7 @@ defmodule OceanconnectWeb.AuctionController do
 
         _ ->
           auction.port
-          |> Auctions.supplier_list_for_auction(auction.buyer_id)
+          |> Auctions.supplier_list_for_port(auction.buyer_id)
           |> Poison.encode!()
       end
 

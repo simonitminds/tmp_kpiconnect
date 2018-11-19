@@ -17,28 +17,7 @@
       padding-top: 0;
     }
   }
-
-  &__status { // Auction Status (Open, Closed, Scheduled, Cancelled)
-    margin-bottom: 0.5rem;
-    color: $white !important;
-
-    @media (max-width: 768px) {
-      margin-left: -0.5rem; // Visual adjustment to align edge of tag copy with vessel name
-      margin-bottom: 0.75rem; // Give re-placed auction timer more space
-    }
-
-    // Color Auction Status tags based on... auction status.
-    &--open { background-color: $green !important; }
-    &--pending { background-color: $teal !important; }
-    &--completed { background-color: $gray-3 !important; }
-
-    // Additional adjustments for mobile pending auction view...
-    &--pending {
-      @media (max-width: 496px) {
-        margin-top: 30px;
-      }
-    }
-  }
+  
   &__po { // Auction PO
     margin-bottom: 0.125rem;
     color: $gray-3;

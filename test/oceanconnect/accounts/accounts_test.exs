@@ -59,6 +59,10 @@ defmodule Oceanconnect.AccountsTest do
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_active_user!(inactive_user.id) end
     end
 
+    test "get_user_name!/1 returns the first and last name of the user", %{user: user} do
+      assert Accounts.get_user_name!(user.id) == "#{user.first_name} #{user.last_name}"
+    end
+
     test "create_user/1 with valid data creates a user", %{company: company} do
       assert {:ok, %User{} = user} =
                Accounts.create_user(

@@ -53,6 +53,16 @@ defmodule Oceanconnect.Accounts do
     |> Repo.get!(id)
   end
 
+  def get_user_name!(%User{} = user) do
+    User.full_name(user)
+  end
+
+  def get_user_name!(id) do
+    id
+    |> get_user!()
+    |> User.full_name()
+  end
+
   @doc """
   Creates a user.
 

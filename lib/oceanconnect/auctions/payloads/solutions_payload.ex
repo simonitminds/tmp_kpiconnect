@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
-  alias Oceanconnect.Auctions.{Auction, AuctionBid}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers, Solution}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
-  alias Oceanconnect.Auctions.Solution
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -21,7 +20,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
       best_by_supplier:
         Enum.reduce(solutions.best_by_supplier, %{}, fn {supplier_id, solution}, acc ->
           scrubbed_solution = scrub_solution_for_buyer(solution, auction)
-          supplier_alias = get_name_or_alias(supplier_id, auction)
+          supplier_alias = AuctionSuppliers.get_name_or_alias(supplier_id, auction)
           Map.put(acc, supplier_alias, scrubbed_solution)
         end),
       winning_solution: scrub_solution_for_buyer(winning_solution, auction),
@@ -112,19 +111,11 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   defp scrub_bid_for_buyer(nil, _auction), do: nil
 
   defp scrub_bid_for_buyer(bid = %AuctionBid{}, auction = %Auction{}) do
-    supplier = get_name_or_alias(bid.supplier_id, auction)
+    supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
 
     %{bid | supplier_id: nil, min_amount: nil}
     |> Map.from_struct()
     |> Map.put(:supplier, supplier)
-  end
-
-  defp get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
-  end
-
-  defp get_name_or_alias(supplier_id, %Auction{suppliers: suppliers}) do
-    hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
 
   defp supplier_for_solution(nil), do: nil
