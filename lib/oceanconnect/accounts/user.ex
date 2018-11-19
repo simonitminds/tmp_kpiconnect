@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Accounts.User do
   use Ecto.Schema
   import Ecto.{Changeset, Query}
-  alias Oceanconnect.Accounts.User
+  alias Oceanconnect.Accounts.{User, Company}
 
   @derive {Poison.Encoder, only: [:email, :company]}
 
@@ -39,6 +39,8 @@ defmodule Oceanconnect.Accounts.User do
     from(
       q in query,
       where: q.is_admin == false,
+      join: c in Company, where: c.id == q.company_id,
+      order_by: [asc: c.name, asc: q.first_name, asc: q.last_name],
       preload: [:company]
     )
   end
