@@ -321,6 +321,13 @@
   }
 }
 
+.messaging__top-context__selector, .messaging__context-list__selector { // Help Text
+  background-color: $gray-1 !important;
+  border-left: none !important;
+  font-weight: bold;
+  font-style: italic;
+}
+
 .messaging__message-container {
   background-color: $white;
   overflow-y: scroll;

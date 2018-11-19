@@ -28,19 +28,21 @@ export default class MessagePanel extends React.Component {
     const renderSendButton = () => {
       if (connection) {
         return (
-          <button
+          <input
+            type="submit"
             value='Send'
             className='button is-turquoise'
             onClick={sendMessage.bind(this, auctionId, recipientCompany, newMessage)}
-          >Send</button>
+          ></input>
         )
       } else {
         return (
-          <button
+          <input
+            type="submit"
             value='Send'
             className='button is-disabled'
             disabled
-          >Send</button>
+          ></input>
         )
       }
     }

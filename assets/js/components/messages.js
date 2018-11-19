@@ -64,6 +64,7 @@ const Messages = (props) => {
     if (isExpanded) {
       return (
         <ul className="messaging__context-list qa-conversations">
+          <li className="messaging__context-list__selector">Select a Conversation</li>
           { _.map(messagePayload.conversations, (conversation) => {
              return renderExpandableConversation(messagePayload.auction_id, conversation, expandedConversation == conversation.company_name)
            })}
@@ -101,6 +102,7 @@ const Messages = (props) => {
   const renderMessagesInterface = (messagePayloads) => {
     return (
       <ul className="messaging__top-context">
+        <li className="messaging__top-context__selector">Select an Auction</li>
         { _.map(messagePayloads, (messagePayload) => {
           return renderExpandableAuctionMessagePayload(messagePayload, expandedAuction == messagePayload.auction_id)
         })}
