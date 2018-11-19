@@ -47,19 +47,19 @@ if (window.companyId && window.companyId != "") {
 }
 
 if (document.getElementById('auctions-app')) {
-const store =
-  window.__REDUX_DEVTOOLS_EXTENSION__
-  ? createStore(
-    rootReducer,
-    compose(
-        applyMiddleware(thunk),
-        window.__REDUX_DEVTOOLS_EXTENSION__()
-    ))
-  : createStore(
-      rootReducer,
-      compose(
-        applyMiddleware(thunk)
-    ));
+  const store =
+    window.__REDUX_DEVTOOLS_EXTENSION__
+      ? createStore(
+        rootReducer,
+        compose(
+            applyMiddleware(thunk),
+            window.__REDUX_DEVTOOLS_EXTENSION__()
+        ))
+      : createStore(
+          rootReducer,
+          compose(
+            applyMiddleware(thunk)
+        ));
 
   const setContainer = () => {
     switch (window.container) {

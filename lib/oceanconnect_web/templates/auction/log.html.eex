@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <%= if length(@messages) > 0 do %>
+    <%= unless Enum.empty?(@messages_by_company) do %>
       <h2>Message Log</h2>
       <table class="table is-fullwidth is-striped report__table--log">
         <thead>
@@ -127,16 +127,22 @@
           </tr>
         </thead>
         <tbody>
-          <%= for message <- @messages do %>
-            <tr class="qa-message-<%= message.id %>">
-              <td class="qa-message-time"><%= convert_date_time?(message.inserted_at) %></td>
-              <td class="qa-message-content"><%= message.content %></td>
-              <td class="qa-message-author"><%= "#{user_name(message.author)} - #{message.author_company.name}" %></td>
-              <td class="qa-message-recipient"><%= message.recipient_company.name %></td>
-              <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                <td class="qa-message-impersonator"><%= user_name(message.impersonator) %></td>
-              <% end %>
+          <%= for {{author_company, recipient_company}, thread} <- @messages_by_company do %>
+            <tr>
+              <th>Thread <%= author_company.name %>:<%= recipient_company.name %></th>
             </tr>
+
+            <%= for message <- thread do %>
+              <tr class="qa-message-<%= message.id %>">
+                <td class="qa-message-time"><%= convert_date_time?(message.inserted_at) %></td>
+                <td class="qa-message-content"><%= message.content %></td>
+                <td class="qa-message-author"><%= "#{user_name(message.author)} - #{message.author_company.name}" %></td>
+                <td class="qa-message-recipient"><%= message.recipient_company.name %></td>
+                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                  <td class="qa-message-impersonator"><%= user_name(message.impersonator) %></td>
+                <% end %>
+              </tr>
+            <% end %>
           <% end %>
         </tbody>
       </table>
