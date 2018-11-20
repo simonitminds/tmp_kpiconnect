@@ -103,7 +103,7 @@ class Messages extends React.Component {
             </div>
             { _.map(messagePayload.vessels, (vessel) => {
               return(
-                <span key={vessel.id}>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
+                <span key={vessel.id}><span className="has-text-gray-3">{messagePayload.auction_id}</span> {vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
               );
             })}
             { unseenMessageCount(messagePayload.unseen_messages) }

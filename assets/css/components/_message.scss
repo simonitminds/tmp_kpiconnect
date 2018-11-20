@@ -244,9 +244,9 @@
     border-top: 1px solid $gray-2;
     font-weight: bold;
 
-    // &:last-child {
-    //   border-bottom: 1px solid $gray-2;
-    // }
+    &:last-child {
+      border-bottom: 1px solid $gray-2;
+    }
 
     &.open {
       flex: 2 1 auto;
@@ -377,7 +377,7 @@
 .messaging__notifications { // Number of new messages by auction/conversation
   .messaging__top-context > li.with-unseen > div > & {
     margin-top: -1rem;
-    margin-bottom: -1rem;
+    margin-bottom: -0.5rem;
     margin-right: -1rem;
     width: calc(4rem + 2px);
   }
