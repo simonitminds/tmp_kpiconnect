@@ -34,7 +34,11 @@ defmodule Oceanconnect.Messages do
     |> list_auction_messages_for_company(buyer_id)
     |> preload_messages()
     |> Enum.group_by(fn(message) ->
-      {message.author_company, message.recipient_company}
+      cond do
+        buyer_id == message.author_company_id -> message.recipient_company
+        buyer_id == message.recipient_company_id -> message.author_company
+        true -> nil
+      end
     end)
   end
 

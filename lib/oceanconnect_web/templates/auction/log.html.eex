@@ -127,9 +127,9 @@
           </tr>
         </thead>
         <tbody>
-          <%= for {{author_company, recipient_company}, thread} <- @messages_by_company do %>
+          <%= for {supplier_company, thread} <- @messages_by_company do %>
             <tr>
-              <th>Thread <%= author_company.name %>:<%= recipient_company.name %></th>
+              <th>Thread with <%= supplier_company.name %></th>
             </tr>
 
             <%= for message <- thread do %>
