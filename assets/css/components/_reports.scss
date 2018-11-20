@@ -29,7 +29,7 @@
 
 .report__log__header {
   font-weight: bold;
-  border-bottom: 3px solid $gray-2;
+  // border-bottom: 3px solid $gray-2;
 }
 
 .report__log__header, .report__log__body {
@@ -116,4 +116,58 @@
 
 .report__logo--print {
   width: 300px;
+}
+
+// Message Log
+
+.report__message-log {
+
+}
+
+.report__message-log__thread {
+}
+
+.report__message-log__thread__title {
+  color: $gray-3 !important;
+}
+
+.report__message-log__thread__table-header {
+  border-bottom: 5px solid #888888;
+  font-weight: bold;
+}
+
+.report__message-log__thread__table-body {
+  margin-bottom: 3rem;
+
+  & > div {
+    border-bottom: 1px solid #dbdbdb;
+
+    &:nth-child(even) {
+      background-color: $gray-1;
+    }
+  }
+}
+
+.report__message-log__thread__table-header, .report__message-log__thread__table-body > div {
+  display: flex;
+  width: 100%;
+  padding: 0.5rem 1rem;
+
+  // Time
+  & > div:nth-child(1) {
+    flex: 0 0 9rem;
+  }
+  // Message
+  & > div:nth-child(2) {
+    flex: 2 0 auto;
+  }
+  // Author
+  & > div:nth-child(3) {
+    flex: 0 0 20rem;
+    padding-right: 1rem;
+  }
+  // Impersonator
+  & > div:nth-child(4) {
+    flex: 0 0 7rem;
+  }
 }
