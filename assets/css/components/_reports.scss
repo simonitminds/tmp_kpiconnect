@@ -129,6 +129,10 @@
 
 .report__message-log__thread__title {
   color: $gray-3 !important;
+
+  @media (max-width: 768px) {
+    line-height: 1.3;
+  }
 }
 
 .report__message-log__thread__table-header {
@@ -169,5 +173,30 @@
   // Impersonator
   & > div:nth-child(4) {
     flex: 0 0 7rem;
+  }
+
+  // Mobile Message $table-head-cell-border-width
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    // Time
+    & > div:nth-child(1) {
+      flex: 0 0 auto;
+    }
+    // Message
+    & > div:nth-child(2) {
+      flex: 0 0 auto;
+      padding: 0.5rem 0;
+    }
+    // Author
+    & > div:nth-child(3) {
+      flex: 0 0 auto;
+      padding-right: 0rem;
+    }
+    // Impersonator
+    & > div:nth-child(4) {
+      flex: 0 0 auto;
+    }
   }
 }

@@ -119,11 +119,11 @@
           <div class="report__message-log__thread">
             <h3 class="report__message-log__thread__title">Thread with <%= supplier_company.name %></h3>
             <div class="report__message-log__thread__table-header">
-              <div>Time</div>
+              <div class="is-hidden-touch">Time</div>
               <div>Message</div>
-              <div>Author</div>
+              <div class="is-hidden-touch">Author</div>
               <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                <div>Impersonator</div>
+                <div class="is-hidden-touch">Impersonator</div>
               <% end %>
             </div>
             <div class="report__message-log__thread__table-body">
@@ -135,7 +135,7 @@
                 </div>
                 <div class="qa-message-author"><span class="has-text-weight-bold"><%= "#{user_name(message.author)}"%> <span class="has-text-gray-3"><%= "(#{message.author_company.name})" %></span></span></div>
                 <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                  <div class="qa-message-impersonator"><%= user_name(message.impersonator) %></div>
+                  <div class="qa-message-impersonator"><b class="is-hidden-desktop has-text-gray-3">Impersonator: </b><%= user_name(message.impersonator) %></div>
                 <% end %>
                 </div>
               <% end %>
