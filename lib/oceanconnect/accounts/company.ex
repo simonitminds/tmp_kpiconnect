@@ -15,6 +15,7 @@ defmodule Oceanconnect.Accounts.Company do
     field(:email, :string)
     field(:is_active, :boolean, default: true)
     field(:is_supplier, :boolean, default: false)
+    field(:is_ocm, :boolean, default: false)
     field(:main_phone, :string)
     field(:mobile_phone, :string)
     field(:name, :string)
@@ -56,6 +57,7 @@ defmodule Oceanconnect.Accounts.Company do
     :email,
     :is_active,
     :is_supplier,
+    :is_ocm,
     :main_phone,
     :mobile_phone,
     :postal_code
