@@ -10,7 +10,11 @@ class Messages extends React.Component {
   }
 
   componentDidUpdate() {
+    const messageBody = document.querySelector('.messaging__message-container__list');
 
+    if(messageBody) {
+      messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+    }
   }
 
   render() {
@@ -33,7 +37,7 @@ class Messages extends React.Component {
     const expansionToggle = (isExpanded) => {
       return (
         <span className="collapsible-section__toggle-icon">
-          <i className={`fas ${isExpanded ? `fa-angle-down` : `fa-angle-up`}`}></i>
+          <i className={`fas ${isExpanded ? `fa-angle-down` : `fa-angle-right has-padding-right-nudge`}`}></i>
         </span>
       )
     }

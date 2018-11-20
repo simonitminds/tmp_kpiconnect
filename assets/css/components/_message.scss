@@ -62,19 +62,24 @@
   }
 
   &__notification-context { // Menu Bar showing notifications and allowing collapsibility
+    display: flex;
+    flex: 1 0 100% !important;
     background-color: $white;
     border-top: none !important;
-    flex-shrink: 0 !important;
     flex-direction: column;
 
     .messaging__menu-bar {
       display: flex;
       flex-direction: row;
+      flex: 0 0 48px;
 
       .messaging__menu-bar__title {
         flex-grow: 2;
         padding: 1rem;
       }
+    }
+    &> div:last-child {
+      flex: 2 1 auto;
     }
   }
   &__notifications { // Marker in Menu Bar indicating unseen messages
@@ -202,6 +207,7 @@
 }
 
 .messaging__input {
+  position: relative;
   flex-shrink: 0;
   padding: 1rem;
   background-color: $gray-2;
@@ -238,15 +244,17 @@
     border-top: 1px solid $gray-2;
     font-weight: bold;
 
-    &:last-child {
-      border-bottom: 1px solid $gray-2;
-    }
+    // &:last-child {
+    //   border-bottom: 1px solid $gray-2;
+    // }
 
     &.open {
+      flex: 2 1 auto;
       padding-bottom: 0;
 
     }
     &.closed {
+      flex: 0 0 auto;
       padding-bottom: 0.5rem;
 
       &:hover, &:focus {
@@ -257,6 +265,7 @@
     &> div {
       display: flex;
       width: 100%;
+      flex: 0 0 auto;
     }
 
     &> div > .messaging__notifications {
@@ -271,8 +280,11 @@
 }
 
 .messaging__context-list {
+  display: flex;
+  flex-direction: column;
   width: calc(100% + 2rem);
   margin: 0.5rem -1rem 0 -1rem;
+  flex: 2 1 auto;
 
   li {
     display: flex;
@@ -283,8 +295,10 @@
     border-left: 8px solid $gray-2;
     border-top: 1px solid $gray-2;
     font-weight: bold;
+    flex: 0 0 auto;
 
     &.open {
+      flex: 2 1 auto;
       padding-bottom: 0;
     }
 
@@ -303,7 +317,12 @@
     & > div:first-child {
       display: flex;
       flex-direction: row;
+      flex: 0 0 21px;
       width: calc(100% + 1rem);
+    }
+
+    &:last-child {
+      border-bottom: 1px solid $gray-2;
     }
   }
 
@@ -322,6 +341,7 @@
 }
 
 .messaging__top-context__selector, .messaging__context-list__selector { // Help Text
+  flex: 0 0 auto;
   background-color: $gray-1 !important;
   border-left: none !important;
   font-weight: bold;
@@ -329,16 +349,29 @@
 }
 
 .messaging__message-container {
+  display: flex;
+  flex-direction: column;
   background-color: $white;
   overflow-y: scroll;
-  flex-grow: 2;
-  flex-shrink: 2;
+  flex: 2 2 auto;
   padding: 1rem;
+  padding-top: 0;
   padding-bottom: 0;
   margin-top: 1rem;
   margin-left: -1.65rem;
   width: calc(100% + 2.75rem);
   border-top: 1px solid $gray-2;
+
+  &> div:first-child {
+    margin-top: auto;
+  }
+}
+
+.messaging__message-container__list {
+  flex: 1 2 auto;
+  overflow: auto;
+  margin: -1rem;
+  padding: 1rem;
 }
 
 .messaging__notifications { // Number of new messages by auction/conversation
