@@ -13,11 +13,11 @@ const MessagesConversationHeader = ({conversation, onSelect}) => {
         className={`qa-conversation-company-${conversation.company_name} ${unseenCount > 0 ? "with-unseen" : ""}`}
         onClick={() => onSelect && onSelect()}>
       { onSelect &&
-        <i className="fas fa-angle-right has-padding-right-nudge"></i>
+        <i className="fas fa-angle-right has-padding-right-sm"></i>
       }
       { conversation.company_name }
       { unseenCount > 0 &&
-        <span className="messaging__notifications qa-messages-unseen-count">{unseenCount}</span>
+        <span className="messaging__notifications qa-messages-unseen-count"><i className="fas fa-envelope has-margin-right-xs"></i> {unseenCount}</span>
       }
     </div>
   );

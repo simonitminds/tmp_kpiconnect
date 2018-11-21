@@ -70,12 +70,11 @@ export default class MessagePanel extends React.Component {
 
     return (
       <div className='messaging__message-container'>
-        <div className="message__message-container__header has-padding-top-md has-padding-bottom-md">
-          <div className="back-indicator has-padding-left-md has-padding-bottom-md" onClick={() => collapseMessagesConversation(auctionId, company_name)}>
-            <i className="fas fa-angle-left has-margin-right-sm"></i> Go Back
+        <div className="messaging__message-container__header">
+          <h1>{company_name}</h1>
+          <div className="messaging__back-indicator" onClick={() => collapseMessagesConversation(auctionId, company_name)}>
+            <i className="fas fa-angle-left has-margin-right-sm"></i> Select
           </div>
-
-          <h1>Conversation with {company_name}</h1>
         </div>
         <div className='messaging__message-container__list'>
           {
