@@ -56,6 +56,16 @@ defmodule Oceanconnect.AuctionsTest do
       assert List.first(suppliers).id == supplier.id
     end
 
+    test "#participation_for_supplier" do
+      supplier = insert(:company, is_supplier: true)
+      auction = insert(:auction, suppliers: [supplier])
+
+      assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == nil
+      Auctions.update_participation_for_supplier(auction.id, supplier.id, "yes")
+      assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == "yes"
+    end
+
+
     test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
       params = %{
         "port_id" => port.id,

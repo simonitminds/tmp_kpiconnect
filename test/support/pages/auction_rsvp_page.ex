@@ -3,15 +3,15 @@ defmodule Oceanconnect.AuctionRsvpPage do
   alias Oceanconnect.Auctions.Auction
 
   def respond_yes(%Auction{id: id}) do
-    navigate_to("/auctions/rsvp/auction/#{id}?response='yes'")
+    navigate_to("/auctions/#{id}/rsvp?response=yes")
   end
 
   def respond_no(%Auction{id: id}) do
-    navigate_to("/auctions/rsvp/auction/#{id}?response='no'")
+    navigate_to("/auctions/#{id}/rsvp?response=no")
   end
 
   def respond_maybe(%Auction{id: id}) do
-    navigate_to("/auctions/rsvp/auction/#{id}?response='maybe'")
+    navigate_to("/auctions/#{id}/rsvp?response=maybe")
   end
 
   def current_response_as_supplier(%Auction{id: auction_id}) do

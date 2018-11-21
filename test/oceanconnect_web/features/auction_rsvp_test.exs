@@ -1,4 +1,4 @@
-defmodule Oceanconnect.AuctionLogTest do
+defmodule Oceanconnect.AuctionRsvpFeatureTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
@@ -59,7 +59,7 @@ defmodule Oceanconnect.AuctionLogTest do
     assert AuctionRsvpPage.current_response_as_supplier(auction) == "Maybe"
   end
 
-  test "buyer can view a suppliers rsvp response"
+  test "buyer can view a suppliers rsvp responses"
 
-  test "changing response updates the response"
+  test "changing a response updates the response"
 end
