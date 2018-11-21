@@ -21,7 +21,7 @@ const MessagesAuctionHeader = ({payload, onSelect}) => {
         })
       }
       { payload.unseen_messages > 0 &&
-        <span className="messaging__notifications qa-messages-unseen-count">{payload.unseen_messages}</span>
+        <span className="messaging__notifications qa-messages-unseen-count"><i className="fas fa-envelope has-margin-right-xs"></i> {payload.unseen_messages}</span>
       }
     </div>
   );

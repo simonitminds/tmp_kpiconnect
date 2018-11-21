@@ -57,7 +57,7 @@ class Messages extends React.Component {
           <div className="messaging__menu-bar" onClick={togglePanelExpanded}>
             <h1 className="messaging__menu-bar__title">Messages</h1>
 
-            <div className={`messaging__notifications ${hasUnseen ? 'messaging__notifications--has-unseen' : ''}`}>
+            <div className={`messaging__notifications messaging__notifications--menu-bar ${hasUnseen ? 'messaging__notifications--has-unseen' : ''}`}>
               <i className="fas fa-envelope has-margin-right-sm"></i>
               { hasUnseen &&
                 <span>{unseenMessageCount}</span>
@@ -72,7 +72,7 @@ class Messages extends React.Component {
                 actions={actions}
                 connection={connection}
               />
-            : <div className="qa-auction-messages-auctions">
+            : <div className="qa-auction-messages-auctions overflow--auto">
                 { panelIsExpanded &&
                   <ul className="messaging__top-context">
                     <li className="messaging__top-context__selector">Select an Auction</li>
