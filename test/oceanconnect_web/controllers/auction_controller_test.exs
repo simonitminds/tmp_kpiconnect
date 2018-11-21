@@ -334,7 +334,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         authed_conn
         |> get(auction_path(build_conn(), :log, auction))
 
-      assert length(conn.assigns.messages) == 4
+      assert length(Map.keys(conn.assigns.messages_by_company)) == 4
     end
   end
 end

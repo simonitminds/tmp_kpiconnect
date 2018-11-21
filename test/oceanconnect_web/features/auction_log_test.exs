@@ -88,8 +88,7 @@ defmodule Oceanconnect.AuctionLogTest do
     expected_details = %{
       "time" => AuctionView.convert_date_time?(message.inserted_at),
       "content" => message.content,
-      "author" => AuctionView.author_name_and_company(message),
-      "recipient" => message.recipient_company.name
+      "author" => AuctionView.author_name_and_company(message)
     }
 
     assert AuctionLogPage.has_message_details?(message.id, expected_details)
