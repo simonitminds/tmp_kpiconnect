@@ -105,16 +105,13 @@ export default function(state, action) {
     }
 
     case UPDATE_MESSAGE_PAYLOAD: {
-      if(_.isEmpty(action.messagePayloads)) {
-        return state;
-      } else {
-        const updatedState = {
-          ...state,
-          messagePayloads: action.messagePayloads,
-          loading: false
-        }
-        return updatedState;
+      const updatedState = {
+        ...state,
+        messagePayloads: action.messagePayloads,
+        loading: false
       }
+      maybeMarkSeenMessages(updatedState, state.expandedConversation)
+      return updatedState;
     }
 
     default: {
