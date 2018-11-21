@@ -23,7 +23,7 @@ class Messages extends React.Component {
   togglePanelExpanded() {
     this.setState({
       panelIsExpanded: !this.state.panelIsExpanded
-    })
+    });
   }
 
 
@@ -43,6 +43,13 @@ class Messages extends React.Component {
     const hasUnseen = unseenMessageCount > 0;
 
     const togglePanelExpanded = this.togglePanelExpanded.bind(this);
+
+    const sortedMessagePayloads = _.chain(messagePayloads)
+      .sortBy((payload) => {
+        const statusIndex = _.indexOf(["decision", "open", "pending", "closed", "canceled", "expired"], payload.status);
+        return [statusIndex, payload.id];
+      })
+      .value();
 
     return (
       <div className={`messaging ${panelIsExpanded ? "open" : "closed"}`}>
@@ -70,7 +77,7 @@ class Messages extends React.Component {
                   <ul className="messaging__top-context">
                     <li className="messaging__top-context__selector">Select an Auction</li>
                     {
-                      _.map(messagePayloads, (payload) => {
+                      _.map(sortedMessagePayloads, (payload) => {
                         return (
                           <li key={payload.auction_id}>
                             <MessagesAuctionHeader payload={payload} onSelect={expandMessagesAuction} />

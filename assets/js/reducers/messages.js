@@ -46,12 +46,14 @@ export default function(state, action) {
         connection: true
       };
     }
+
     case MESSAGE_CHANNEL_DISCONNECTED: {
       return {
         ...state,
         connection: false
       };
     }
+
     case EXPAND_MESSAGES_AUCTION: {
       const {auctionId} = action;
       const auctionState = state.auctionStates[auctionId] || {selectedConversation: null};
@@ -62,14 +64,16 @@ export default function(state, action) {
           ...state.auctionStates,
           [auctionId]: auctionState
         }
-      }
+      };
     }
+
     case COLLAPSE_MESSAGES_AUCTION: {
       return {
         ...state,
         selectedAuction: null
-      }
+      };
     }
+
     case EXPAND_MESSAGES_CONVERSATION: {
       const {auctionId, conversation} = action;
 
@@ -82,8 +86,9 @@ export default function(state, action) {
             selectedConversation: conversation
           }
         }
-      }
+      };
     }
+
     case COLLAPSE_MESSAGES_CONVERSATION: {
       const {auctionId} = action;
 
@@ -96,8 +101,9 @@ export default function(state, action) {
             selectedConversation: null
           }
         }
-      }
+      };
     }
+
     case UPDATE_MESSAGE_PAYLOAD: {
       if(_.isEmpty(action.messagePayloads)) {
         return state;
@@ -107,10 +113,10 @@ export default function(state, action) {
           messagePayloads: action.messagePayloads,
           loading: false
         }
-        maybeMarkSeenMessages(updatedState, state.expandedConversation)
         return updatedState;
       }
     }
+
     default: {
       return state || initialState;
     }
