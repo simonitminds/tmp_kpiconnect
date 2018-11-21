@@ -67,6 +67,7 @@
     background-color: $white;
     border-top: none !important;
     flex-direction: column;
+    overflow-y: scroll;
 
     .messaging__menu-bar {
       display: flex;
