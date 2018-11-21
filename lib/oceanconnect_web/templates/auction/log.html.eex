@@ -112,34 +112,36 @@
       </div>
     </div>
 
-    <%= if length(@messages) > 0 do %>
+    <%= unless Enum.empty?(@messages_by_company) do %>
       <h2>Message Log</h2>
-      <table class="table is-fullwidth is-striped report__table--log">
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Message</th>
-            <th>Author</th>
-            <th>Recipient Company</th>
-            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-              <th>Impersonator</th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody>
-          <%= for message <- @messages do %>
-            <tr class="qa-message-<%= message.id %>">
-              <td class="qa-message-time"><%= convert_date_time?(message.inserted_at) %></td>
-              <td class="qa-message-content"><%= message.content %></td>
-              <td class="qa-message-author"><%= "#{user_name(message.author)} - #{message.author_company.name}" %></td>
-              <td class="qa-message-recipient"><%= message.recipient_company.name %></td>
+      <div class="report__message-log">
+        <%= for {supplier_company, thread} <- @messages_by_company do %>
+          <div class="report__message-log__thread">
+            <h3 class="report__message-log__thread__title">Thread with <%= supplier_company.name %></h3>
+            <div class="report__message-log__thread__table-header">
+              <div class="is-hidden-touch">Time</div>
+              <div>Message</div>
+              <div class="is-hidden-touch">Author</div>
               <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-                <td class="qa-message-impersonator"><%= user_name(message.impersonator) %></td>
+                <div class="is-hidden-touch">Impersonator</div>
               <% end %>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+            </div>
+            <div class="report__message-log__thread__table-body">
+             <%= for message <- thread do %>
+              <div class="qa-message-<%= message.id %>">
+                <div class="qa-message-time"><%= convert_date_time?(message.inserted_at) %></div>
+                <div class="qa-message-content">
+                  <%= message.content %>
+                </div>
+                <div class="qa-message-author"><span class="has-text-weight-bold"><%= "#{user_name(message.author)}"%> <span class="has-text-gray-3"><%= "(#{message.author_company.name})" %></span></span></div>
+                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                  <div class="qa-message-impersonator"><b class="is-hidden-desktop has-text-gray-3">Impersonator: </b><%= user_name(message.impersonator) %></div>
+                <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
     <% end %>
-  </div>
 </div>

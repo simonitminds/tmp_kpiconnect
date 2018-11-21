@@ -1,25 +1,28 @@
 import _ from "lodash";
 import { replaceListItem } from "../utilities";
-import { markSeenMessages, markMessagesAsSeen } from '../actions';
+import { markMessagesAsSeen } from '../actions';
 import {
   MESSAGE_CHANNEL_CONNECTED,
   MESSAGE_CHANNEL_DISCONNECTED,
-  TOGGLE_EXPANDED,
+  EXPAND_MESSAGES_AUCTION,
+  EXPAND_MESSAGES_CONVERSATION,
+  COLLAPSE_MESSAGES_AUCTION,
+  COLLAPSE_MESSAGES_CONVERSATION,
   UPDATE_MESSAGE_PAYLOAD
 } from "../constants";
 
 export const initialState = {
   connection: false,
-  expandedAuction: null,
-  expandedConversation: null,
   loading: true,
   messagePanelIsExpanded: false,
+  selectedAuction: null,
+  auctionStates: {},
   messagePayloads: []
 };
 
-function maybeMarkSeenMessages(state, companyName) {
+function maybeMarkSeenMessages(state, auctionId, companyName) {
   const conversation = _.chain(state.messagePayloads)
-    .filter(['auction_id', state.expandedAuction])
+    .filter(['auction_id', auctionId])
     .first()
     .get('conversations')
     .filter(['company_name', companyName])
@@ -43,37 +46,64 @@ export default function(state, action) {
         connection: true
       };
     }
+
     case MESSAGE_CHANNEL_DISCONNECTED: {
       return {
         ...state,
         connection: false
       };
     }
-    case TOGGLE_EXPANDED: {
-      const expandedItem = action.expandedItem;
-      const value = action.value;
-      if (expandedItem === 'messagePanelIsExpanded') {
-        return {
-          ...state,
-          [expandedItem]: !state.messagePanelIsExpanded
+
+    case EXPAND_MESSAGES_AUCTION: {
+      const {auctionId} = action;
+      const auctionState = state.auctionStates[auctionId] || {selectedConversation: null};
+      return {
+        ...state,
+        selectedAuction: auctionId,
+        auctionStates: {
+          ...state.auctionStates,
+          [auctionId]: auctionState
         }
-      }
-      if (expandedItem === 'expandedAuction' && state.expandedAuction != value) {
-        return {
-          ...state,
-          [expandedItem]: value,
-          expandedConversation: null
-        }
-      }
-      if (expandedItem === 'expandedConversation') {
-        maybeMarkSeenMessages(state, value)
-        return {
-          ...state,
-          [expandedItem]: value
-        }
-      }
-      return state
+      };
     }
+
+    case COLLAPSE_MESSAGES_AUCTION: {
+      return {
+        ...state,
+        selectedAuction: null
+      };
+    }
+
+    case EXPAND_MESSAGES_CONVERSATION: {
+      const {auctionId, conversation} = action;
+
+      return {
+        ...state,
+        auctionStates: {
+          ...state.auctionStates,
+          [auctionId]: {
+            ...state.auctionStates[auctionId],
+            selectedConversation: conversation
+          }
+        }
+      };
+    }
+
+    case COLLAPSE_MESSAGES_CONVERSATION: {
+      const {auctionId} = action;
+
+      return {
+        ...state,
+        auctionStates: {
+          ...state.auctionStates,
+          [auctionId]: {
+            ...state.auctionStates[auctionId],
+            selectedConversation: null
+          }
+        }
+      };
+    }
+
     case UPDATE_MESSAGE_PAYLOAD: {
       if(_.isEmpty(action.messagePayloads)) {
         return state;
@@ -83,10 +113,10 @@ export default function(state, action) {
           messagePayloads: action.messagePayloads,
           loading: false
         }
-        maybeMarkSeenMessages(updatedState, state.expandedConversation)
         return updatedState;
       }
     }
+
     default: {
       return state || initialState;
     }

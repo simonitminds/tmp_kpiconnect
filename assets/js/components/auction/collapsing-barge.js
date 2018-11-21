@@ -230,7 +230,7 @@ class CollapsingBarge extends Component {
               onClick={this.handleTriggerClick}
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
-              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
+              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-right has-padding-right-nudge` : `fa-angle-down`}`}></i></span>
               <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
             </h2>

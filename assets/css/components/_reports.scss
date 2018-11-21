@@ -29,7 +29,7 @@
 
 .report__log__header {
   font-weight: bold;
-  border-bottom: 3px solid $gray-2;
+  // border-bottom: 3px solid $gray-2;
 }
 
 .report__log__header, .report__log__body {
@@ -116,4 +116,87 @@
 
 .report__logo--print {
   width: 300px;
+}
+
+// Message Log
+
+.report__message-log {
+
+}
+
+.report__message-log__thread {
+}
+
+.report__message-log__thread__title {
+  color: $gray-3 !important;
+
+  @media (max-width: 768px) {
+    line-height: 1.3;
+  }
+}
+
+.report__message-log__thread__table-header {
+  border-bottom: 5px solid #888888;
+  font-weight: bold;
+}
+
+.report__message-log__thread__table-body {
+  margin-bottom: 3rem;
+
+  & > div {
+    border-bottom: 1px solid #dbdbdb;
+
+    &:nth-child(even) {
+      background-color: $gray-1;
+    }
+  }
+}
+
+.report__message-log__thread__table-header, .report__message-log__thread__table-body > div {
+  display: flex;
+  width: 100%;
+  padding: 0.5rem 1rem;
+
+  // Time
+  & > div:nth-child(1) {
+    flex: 0 0 9rem;
+  }
+  // Message
+  & > div:nth-child(2) {
+    flex: 2 0 auto;
+  }
+  // Author
+  & > div:nth-child(3) {
+    flex: 0 0 20rem;
+    padding-right: 1rem;
+  }
+  // Impersonator
+  & > div:nth-child(4) {
+    flex: 0 0 7rem;
+  }
+
+  // Mobile Message $table-head-cell-border-width
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    // Time
+    & > div:nth-child(1) {
+      flex: 0 0 auto;
+    }
+    // Message
+    & > div:nth-child(2) {
+      flex: 0 0 auto;
+      padding: 0.5rem 0;
+    }
+    // Author
+    & > div:nth-child(3) {
+      flex: 0 0 auto;
+      padding-right: 0rem;
+    }
+    // Impersonator
+    & > div:nth-child(4) {
+      flex: 0 0 auto;
+    }
+  }
 }

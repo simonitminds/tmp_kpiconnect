@@ -15,7 +15,10 @@ import {
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
   SELECT_PORT,
-  TOGGLE_EXPANDED,
+  EXPAND_MESSAGES_AUCTION,
+  EXPAND_MESSAGES_CONVERSATION,
+  COLLAPSE_MESSAGES_AUCTION,
+  COLLAPSE_MESSAGES_CONVERSATION,
   TOGGLE_SUPPLIER,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
@@ -81,10 +84,25 @@ export function subscribeToMessageUpdates() {
   };
 }
 
-export function toggleExpanded(expandedItem, value) {
-  return {type: TOGGLE_EXPANDED,
-          expandedItem,
-          value};
+export function expandMessagesAuction(auctionId, value) {
+  return {type: EXPAND_MESSAGES_AUCTION,
+          auctionId};
+}
+
+export function expandMessagesConversation(auctionId, conversation, value) {
+  return {type: EXPAND_MESSAGES_CONVERSATION,
+          auctionId,
+          conversation};
+}
+export function collapseMessagesAuction(auctionId, value) {
+  return {type: COLLAPSE_MESSAGES_AUCTION,
+          auctionId};
+}
+
+export function collapseMessagesConversation(auctionId, conversation, value) {
+  return {type: COLLAPSE_MESSAGES_CONVERSATION,
+          auctionId,
+          conversation};
 }
 
 export function markMessagesAsSeen(messageIds) {

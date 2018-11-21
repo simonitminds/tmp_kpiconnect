@@ -109,7 +109,7 @@ defmodule OceanconnectWeb.AuctionView do
 
   def bids_for_solution(%Solution{bids: bids}), do: bids
 
-  def author_name_and_company(%Message{} = message), do: "#{user_name(message.author)} - #{message.author_company.name}"
+  def author_name_and_company(%Message{} = message), do: "#{user_name(message.author)} (#{message.author_company.name})"
   def author_name_and_company(_), do: "-"
 
   def convert_duration(duration) do
