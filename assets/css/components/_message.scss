@@ -55,11 +55,11 @@
 
   // Message Containers
 
-  &> div > div { // Hit all grandchildren of message...
-    display: flex;
-    width: 100%;
-    transition: max-height 0.2s ease;
-  }
+  // &> div > div { // Hit all grandchildren of message...
+  //   display: flex;
+  //   width: 100%;
+  //   transition: max-height 0.2s ease;
+  // }
 
   &__notification-context { // Menu Bar showing notifications and allowing collapsibility
     display: flex;
@@ -358,8 +358,8 @@
   padding-top: 0;
   padding-bottom: 0;
   margin-top: 1rem;
-  margin-left: -1.65rem;
-  width: calc(100% + 2.75rem);
+  // margin-left: -1.65rem;
+  width: calc(100%);
   border-top: 1px solid $gray-2;
 
   &> div:first-child {
