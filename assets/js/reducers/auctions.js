@@ -20,15 +20,11 @@ let updatedAuctionPayload;
 export default function(state, action) {
   switch(action.type) {
     case RECEIVE_AUCTION_PAYLOADS: {
-      if(_.isEmpty(action.auctionPayloads)) {
-        return state;
-      } else {
-        return {
-          ...state,
-          auctionPayloads: action.auctionPayloads,
-          loading: false
-        };
-      }
+      return {
+        ...state,
+        auctionPayloads: action.auctionPayloads,
+        loading: false
+      };
     }
     case UPDATE_AUCTION_PAYLOAD: {
       const origAuctionPayload = _.chain(state.auctionPayloads)
@@ -49,6 +45,7 @@ export default function(state, action) {
       } else {
         newAuctionPayloadList = _.concat(state.auctionPayloads, action.auctionPayload);
       }
+      console.log(state)
       return {
         ...state,
         auctionPayloads: newAuctionPayloadList,
