@@ -451,6 +451,7 @@ defmodule Oceanconnect.Auctions do
         :port,
         :vessels,
         :fuels,
+        :auction_suppliers,
         [auction_vessel_fuels: [:vessel, :fuel]],
         [buyer: :users],
         [suppliers: :users]

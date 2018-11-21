@@ -43,15 +43,15 @@ defmodule OceanconnectWeb.AuctionRsvpControllerTest do
     supplier_company_id: supplier_company_id
   } do
 
-    updated_conn = put(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "yes"}))
+    updated_conn = get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "yes"}))
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
     assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "yes"
 
-    updated_conn = put(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "no"}))
+    updated_conn = get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "no"}))
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
     assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "no"
 
-    updated_conn = put(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "maybe"}))
+    updated_conn = get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "maybe"}))
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
     assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "maybe"
   end
@@ -61,7 +61,7 @@ defmodule OceanconnectWeb.AuctionRsvpControllerTest do
     supplier_company_id: supplier_company_id,
     other_auction: %Auction{id: other_auction_id}
   } do
-    updated_conn = put(conn, auction_rsvp_path(conn, :update, other_auction_id, %{"response" => "yes"}))
+    updated_conn = get(conn, auction_rsvp_path(conn, :update, other_auction_id, %{"response" => "yes"}))
     assert html_response(updated_conn, 302)
     assert redirected_to(updated_conn) == auction_path(conn, :index)
     refute Auctions.get_auction_supplier(other_auction_id, supplier_company_id)

@@ -9,6 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             current_server_time: nil,
             auction: nil,
             status: :pending,
+            participations: %{},
             bid_history: [],
             product_bids: %{},
             solutions: %{},
@@ -61,6 +62,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
       auction: scrub_auction(auction, supplier_id),
+      participations: %{supplier_id => Enum.find(auction.auction_suppliers, fn(supplier) -> supplier.supplier_id == supplier_id end).participation},
       status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
@@ -82,7 +84,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_buyer_auction_payload(
-        auction = %Auction{},
+        auction = %Auction{anonymous_bidding: anonymous_bidding},
         buyer_id,
         state = %AuctionState{
           product_bids: product_bids,
@@ -97,6 +99,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
       bid_history: [],
+      participations: get_participations(anonymous_bidding),
       product_bids:
         Enum.reduce(product_bids, %{}, fn {fuel_id, product_state}, acc ->
           Map.put(
@@ -110,6 +113,12 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         end),
       submitted_barges: BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id)
     }
+  end
+
+  defp get_participations(%Auction{anonymous_bidding:  true}), do: %{}
+  defp get_participations(%Auction{auction_suppliers:  auction_suppliers}) do
+    auction_suppliers
+    |> Enum.reduce(%{}, fn(auction_supplier, acc) -> Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation) end)
   end
 
   defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :open}) do
@@ -135,6 +144,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         bid_history: bid_history,
         status: status,
         product_bids: product_bids,
+        participations: participations,
         solutions: solutions,
         submitted_barges: submitted_barges
       }) do
@@ -145,6 +155,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: bid_history,
       status: status,
       product_bids: product_bids,
+      participations: participations,
       solutions: solutions,
       submitted_barges: submitted_barges
     }

@@ -1,24 +1,27 @@
 import React from 'react';
 import _ from 'lodash';
 
-const AuctionInvitation = ({auction}) => {
+const AuctionInvitation = ({auctionPayload, supplierId}) => {
+  const {auction, participations} = auctionPayload
+  const suppliersParticipationStatus = participations[supplierId]
+
   return(
     <div className="auction-invitation auction-invitation--large qa-auction-invitation-controls">
       <div className="auction-invitation__status box box--bordered-left">
         <h3 className="auction-invitation__status__copy">Do you intend to participate in the auction?</h3>
         <div className="field has-addons has-margin-right-md">
           <p className="control">
-            <a className="button is-success">
+            <a className="button is-success" data-selected={suppliersParticipationStatus == "yes"} href={`/auctions/${auction.id}/rsvp?response=yes`}>
               <span>Accept</span>
             </a>
           </p>
           <p className="control">
-            <a className="button is-danger">
+            <a className="button is-danger" data-selected={suppliersParticipationStatus == "no"} href={`/auctions/${auction.id}/rsvp?response=no`}>
               <span>Decline</span>
             </a>
           </p>
           <p className="control">
-            <a className="button is-gray-3">
+            <a className="button is-gray-3" data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
               <span>Maybe</span>
             </a>
           </p>
