@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import TimePicker from 'rc-time-picker';
 import moment from 'moment';
@@ -23,6 +24,38 @@ export default class TimeInput extends React.Component {
       model, field, labelText, onChange
     } = this.props;
 
+    const {time} = this.state;
+
+    const currentDate = moment();
+
+    const disabledHours = () => {
+      if (time.isSame(currentDate, 'day')) {
+        return _.range(currentDate.hour());
+      } else if (time.isBefore(currentDate, 'day')) {
+        return _.range(0, 25);
+      }
+
+      return [];
+    }
+
+    const disabledMinutes = (selectedHour) => {
+      if (time.isBefore(currentDate, 'day')) {
+        return _.range(0, 61);
+      }
+
+      if (time.isAfter(currentDate, 'day')) {
+        return [];
+      }
+
+      if (time.hour() == selectedHour) {
+        return _.range(currentDate.minute());
+      } else if (time.hour() < selectedHour) {
+        return _.range(0, 61);
+      }
+
+      return [];
+    }
+
     return(
       <div className={`qa-${model}-${field}_time`}>
         <TimePicker
@@ -36,6 +69,8 @@ export default class TimeInput extends React.Component {
               this.setState({ time: value });
             }
           }
+          disabledHours={disabledHours}
+          disabledMinutes={disabledMinutes}
         />
       </div>
     );
