@@ -2,7 +2,7 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
-  alias Oceanconnect.{AuctionRsvpPage, AuctionShowPage}
+  alias Oceanconnect.{AuctionRsvpPage, AuctionShowPage, AuctionIndexPage}
 
   setup do
     buyer_company = insert(:company)
@@ -57,6 +57,15 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
 
     assert AuctionShowPage.is_current_path?(auction_id)
     assert AuctionRsvpPage.current_response_as_supplier(auction) == "Maybe"
+  end
+
+  test "supplier can respond from the index page", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+    login_user(supplier)
+    AuctionIndexPage.visit()
+    assert AuctionIndexPage.is_current_path?()
+    AuctionRsvpPage.respond_to_invitation(auction, "yes")
+    assert AuctionShowPage.is_current_path?(auction_id)
+    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Yes"
   end
 
   test "buyer can view a suppliers rsvp responses"

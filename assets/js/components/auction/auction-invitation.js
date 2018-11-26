@@ -1,3 +1,4 @@
+
 import React from 'react';
 import _ from 'lodash';
 
@@ -11,17 +12,17 @@ const AuctionInvitation = ({auctionPayload, supplierId}) => {
         <h3 className="auction-invitation__status__copy">Do you intend to participate in the auction?</h3>
         <div className="field has-addons has-margin-right-md">
           <p className="control">
-            <a className="button is-success" data-selected={suppliersParticipationStatus == "yes"} href={`/auctions/${auction.id}/rsvp?response=yes`}>
+            <a className={`button is-success qa-auction-${auction.id}-invitation-yes`} data-selected={suppliersParticipationStatus == "yes"} href={`/auctions/${auction.id}/rsvp?response=yes`}>
               <span>Accept</span>
             </a>
           </p>
           <p className="control">
-            <a className="button is-danger" data-selected={suppliersParticipationStatus == "no"} href={`/auctions/${auction.id}/rsvp?response=no`}>
+            <a className={`button is-danger qa-auction-${auction.id}-invitation-no`} data-selected={suppliersParticipationStatus == "no"} href={`/auctions/${auction.id}/rsvp?response=no`}>
               <span>Decline</span>
             </a>
           </p>
           <p className="control">
-            <a className="button is-gray-3" data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
+            <a className={`button is-gray-3 qa-auction-${auction.id}-inivitation-maybe`} data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
               <span>Maybe</span>
             </a>
           </p>
