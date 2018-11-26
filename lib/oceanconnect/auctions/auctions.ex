@@ -275,7 +275,8 @@ defmodule Oceanconnect.Auctions do
     query =
       from(auction_supplier in AuctionSuppliers,
         where:
-          auction_supplier.auction_id == ^auction_id and auction_supplier.supplier_id == ^supplier_id
+          auction_supplier.auction_id == ^auction_id and
+            auction_supplier.supplier_id == ^supplier_id
       )
       |> Repo.update_all(set: [participation: response])
   end
@@ -323,20 +324,28 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
-    %Auction{}
-    |> Auction.changeset_for_scheduled_auction(attrs)
-    |> Repo.insert()
-    |> handle_auction_creation(user)
+    with {:ok, auction} <- %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert()
+    do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
   end
 
   def create_auction(attrs, user) do
-    %Auction{}
-    |> Auction.changeset(attrs)
-    |> Repo.insert()
-    |> handle_auction_creation(user)
+    with {:ok, auction} <-  %Auction{} |> Auction.changeset(attrs) |> Repo.insert()
+    do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
   end
 
-  defp handle_auction_creation({:ok, auction}, user) do
+  defp handle_auction_creation(auction, user) do
     user_on_record =
       case user do
         nil -> auction |> Repo.preload([:buyer]) |> Map.fetch!(:buyer)
@@ -352,8 +361,6 @@ defmodule Oceanconnect.Auctions do
     AuctionEvent.emit(event, true)
     {:ok, auction}
   end
-
-  defp handle_auction_creation({:error, changeset}, _user), do: {:error, changeset}
 
   def update_cache(auction = %Auction{}) do
     auction
@@ -397,6 +404,7 @@ defmodule Oceanconnect.Auctions do
       auction
       |> Auction.changeset(cleaned_attrs)
       |> Repo.update!()
+      |> fully_loaded
 
     updated_auction
     |> AuctionEvent.auction_updated(nil)
@@ -440,7 +448,12 @@ defmodule Oceanconnect.Auctions do
 
   def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
     Enum.map(suppliers, fn supplier ->
-      alias_name = get_auction_supplier(auction.id, supplier.id).alias_name
+      alias_name =
+        case get_auction_supplier(auction.id, supplier.id) do
+          supplier = %Company{} -> supplier.alias_name
+          _ -> nil
+        end
+
       Map.put(supplier, :alias_name, alias_name)
     end)
   end

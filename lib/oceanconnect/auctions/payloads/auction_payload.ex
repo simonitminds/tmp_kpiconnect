@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionTimer, AuctionSuppliers}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
@@ -63,10 +63,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       current_server_time: DateTime.utc_now(),
       auction: scrub_auction(auction, supplier_id),
       participations: %{
-        supplier_id =>
-          Enum.find(auction.auction_suppliers, fn supplier ->
-            supplier.supplier_id == supplier_id
-          end).participation
+        supplier_id => get_supplier_participation(auction.auction_suppliers, supplier_id)
       },
       status: status,
       solutions:
@@ -89,7 +86,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_buyer_auction_payload(
-        auction = %Auction{anonymous_bidding: anonymous_bidding},
+        auction = %Auction{},
         buyer_id,
         state = %AuctionState{
           product_bids: product_bids,
@@ -118,6 +115,14 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         end),
       submitted_barges: BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id)
     }
+  end
+
+  defp get_supplier_participation(auction_suppliers, supplier_id) do
+    with %AuctionSuppliers{participation: participation} <- Enum.find(auction_suppliers, fn supplier -> supplier.supplier_id == supplier_id end) do
+      participation
+    else
+      nil -> nil
+    end
   end
 
   defp get_participations(%Auction{anonymous_bidding: true}), do: %{}
