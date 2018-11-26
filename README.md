@@ -121,13 +121,15 @@ Alternatively, since we mainly run all components (web, build, and db) on a sing
 
 In order for `*_url` helpers to work properly, Phoenix needs to be configured with the hostname that the site lives at. By default, Ansible will set this up as `localhost`, which is obviously not correct for remote servers. Since this is generally a per-server configuration, it has not been added as a configurable option there.
 
-Instead, you'll need to log in to the new server as the `deploy` user and edit the `config/prod.secret.exs` file manually to change the `hostname` value to whatever domain name the deployment lives on:
+Instead, you'll need to log in to the new server as the `deploy` user and edit the `config/prod.secret.exs` file manually to set the `url.host` value to whatever domain name the deployment lives on:
 
 ```bash
 ssh -A deploy@auctionstaging.oceanconnectmarine.com
 cd ~/build/oceanconnect
+cat config/prod.exs
+# Copy the `OceanconnectWeb.Endpoint` configuration block
 nano config/prod.secret.exs
-# Edit the `hostname:` line with the domain name
+# Paste the `Endpoint` config and replace the `System.get_env("APP_HOST")` with the proper domain name.
 ```
 
 
