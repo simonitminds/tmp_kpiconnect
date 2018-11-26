@@ -117,6 +117,20 @@ Here, `<server-group>` is a host group defined in `./ansible/inventory/hosts`. Y
 Alternatively, since we mainly run all components (web, build, and db) on a single server, you can make a new host group for your servers and provision them that way. For example, a `demo-servers` group could list the hosts for a demo instance of the app.
 
 
+### Setting hostname
+
+In order for `*_url` helpers to work properly, Phoenix needs to be configured with the hostname that the site lives at. By default, Ansible will set this up as `localhost`, which is obviously not correct for remote servers. Since this is generally a per-server configuration, it has not been added as a configurable option there.
+
+Instead, you'll need to log in to the new server as the `deploy` user and edit the `config/prod.secret.exs` file manually to change the `hostname` value to whatever domain name the deployment lives on:
+
+```bash
+ssh -A deploy@auctionstaging.oceanconnectmarine.com
+cd ~/build/oceanconnect
+nano config/prod.secret.exs
+# Edit the `hostname:` line with the domain name
+```
+
+
 ### SSH errors
 
 If you get an error while running `setup-build.yml` about cloning the repository, make sure that your SSH key tied to your GitHub account is addded to the active SSH keyring running on your computer. You can check this with `ssh-add -l`. If it is not listed there, add it with `ssh-add -k <key_path>`.
