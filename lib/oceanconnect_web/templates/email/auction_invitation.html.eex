@@ -2,6 +2,14 @@
 <br/>
 <p style='font-family: "Arial";'>We have just created a new Reverse Auction with you as the point of contact.</p>
 <br/>
+Please let the buyer know if you are able to attend by clicking the appropriate link below.
+
+<!-- TODO: HAVE LAUREN STYLE THIS -->
+<a href="<%= auction_rsvp_url(OceanconnectWeb.Endpoint, :update, @auction, %{"response" => "yes"}) %>">Yes</a>
+<a href="<%= auction_rsvp_url(OceanconnectWeb.Endpoint, :update, @auction, %{"response" => "maybe"}) %>">Maybe</a>
+<a href="<%= auction_rsvp_url(OceanconnectWeb.Endpoint, :update, @auction, %{"response" => "no"}) %>">No</a>
+<!-- END TODO -->
+
 <table style="background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: 'Arial';">
   <tr>
     <td style="padding: 1rem;">

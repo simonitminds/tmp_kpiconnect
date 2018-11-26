@@ -46,7 +46,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
     |> List.flatten()
-    |> Enum.sort_by(& DateTime.to_unix(&1.time_entered, :microsecond))
+    |> Enum.sort_by(&DateTime.to_unix(&1.time_entered, :microsecond))
     |> Enum.reverse()
   end
 
@@ -55,14 +55,19 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         supplier_id,
         state = %AuctionState{
           product_bids: product_bids,
-          status: status,
+          status: status
         }
       ) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
       auction: scrub_auction(auction, supplier_id),
-      participations: %{supplier_id => Enum.find(auction.auction_suppliers, fn(supplier) -> supplier.supplier_id == supplier_id end).participation},
+      participations: %{
+        supplier_id =>
+          Enum.find(auction.auction_suppliers, fn supplier ->
+            supplier.supplier_id == supplier_id
+          end).participation
+      },
       status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
@@ -88,7 +93,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         state = %AuctionState{
           product_bids: product_bids,
-          status: status,
+          status: status
         }
       ) do
     %AuctionPayload{
@@ -99,7 +104,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
       bid_history: [],
-      participations: get_participations(anonymous_bidding),
+      participations: get_participations(auction),
       product_bids:
         Enum.reduce(product_bids, %{}, fn {fuel_id, product_state}, acc ->
           Map.put(
@@ -115,10 +120,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp get_participations(%Auction{anonymous_bidding:  true}), do: %{}
-  defp get_participations(%Auction{auction_suppliers:  auction_suppliers}) do
+  defp get_participations(%Auction{anonymous_bidding: true}), do: %{}
+
+  defp get_participations(%Auction{auction_suppliers: auction_suppliers}) do
     auction_suppliers
-    |> Enum.reduce(%{}, fn(auction_supplier, acc) -> Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation) end)
+    |> Enum.reduce(%{}, fn auction_supplier, acc ->
+      Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation)
+    end)
   end
 
   defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :open}) do
