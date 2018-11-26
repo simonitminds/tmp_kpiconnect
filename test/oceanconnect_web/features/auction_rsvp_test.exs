@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
+  alias Oceanconnect.Accounts.Company
   alias Oceanconnect.{AuctionRsvpPage, AuctionShowPage, AuctionIndexPage}
 
   setup do
@@ -29,7 +30,7 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
          {auction, %{exclude_children: [:auction_scheduler]}}}
       )
 
-      {:ok, auction: auction, supplier: supplier}
+      {:ok, %{auction: auction, supplier: supplier, buyer: buyer, supplier_company: supplier_company}}
     end
 
   test "responding YES to auction invitation", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
@@ -68,7 +69,16 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
     assert AuctionRsvpPage.current_response_as_supplier(auction) == "Yes"
   end
 
-  test "buyer can view a suppliers rsvp responses"
+  test "buyer can view a suppliers rsvp responses", %{auction: auction = %Auction{id: auction_id}, supplier: supplier, buyer: buyer, supplier_company: %Company{id: supplier_company_id}} do
+    login_user(supplier)
+    AuctionRsvpPage.respond_yes(auction)
+    logout_user()
+
+    login_user(buyer)
+    AuctionShowPage.visit(auction_id)
+    Hound.Helpers.Screenshot.take_screenshot()
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Yes"
+  end
 
   test "changing a response updates the response"
 end

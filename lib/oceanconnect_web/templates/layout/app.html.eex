@@ -50,7 +50,7 @@
               <% end %>
             </div>
             <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>
-              <div class="navbar-item navbar-item--burger has-dropdown is-hoverable">
+              <div class="navbar-item navbar-item--burger has-dropdown is-hoverable qa-app-navbar">
                 <a href="#" class="navbar-link is-hidden-touch"><i class="fas fa-bars has-margin-right-md"></i> Menu</a>
                 <div class="navbar-dropdown">
                   <a href="/auctions" class="navbar-item">Current Auctions</a>

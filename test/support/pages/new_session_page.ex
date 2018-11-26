@@ -15,4 +15,12 @@ defmodule Oceanconnect.NewSessionPage do
   def submit do
     click({:class, "qa-session-submit"})
   end
+
+  def logout do
+    find_element(:css, ".qa-app-navbar")
+    |> click()
+
+    find_element(:css, ".qa-logout")
+    |> click()
+  end
 end

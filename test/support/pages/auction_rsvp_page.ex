@@ -28,4 +28,17 @@ defmodule Oceanconnect.AuctionRsvpPage do
     find_element(:css, ".qa-auction-#{auction_id}-rsvp-response-#{supplier_company_id}")
     |> inner_text
   end
+
+  def supplier_response_as_buyer(supplier_company_id) do
+    response =
+      find_element(:css, ".qa-auction-suppliers")
+      |> find_within_element(:css, ".qa-rsvp-response-#{supplier_company_id}")
+      |> inner_html
+
+    cond do
+      response =~ "fa-check-circle" -> "Yes"
+      response =~ "fa-check-times" -> "No"
+      response =~ "fa-check-minus" -> "Maybe"
+    end
+  end
 end

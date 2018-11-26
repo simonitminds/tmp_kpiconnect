@@ -30,8 +30,10 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
           </div>
         </div>
       );
-    } else {
+    } else if (auctionStatus == 'pending') {
       return <AuctionInvitation auctionPayload={auctionPayload} supplierId={currentUserCompanyId}/>;
+    } else {
+      return "";
     }
   }
 
