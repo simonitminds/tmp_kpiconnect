@@ -5,7 +5,7 @@ defmodule OceanconnectWeb.EmailView do
 
   def vessel_name_list(vessels) do
     vessels
-    |> Enum.map(&(&1.name))
+    |> Enum.map(& &1.name)
     |> Enum.join(", ")
   end
 
@@ -18,6 +18,7 @@ defmodule OceanconnectWeb.EmailView do
     date = "#{leftpad(date_time.day)} #{month_abbreviation(date_time.month)} #{date_time.year}"
     "#{date} #{time}"
   end
+
   def convert_date?(_), do: "—"
 
   def month_abbreviation(month) when month >= 1 and month <= 12 do
@@ -37,14 +38,16 @@ defmodule OceanconnectWeb.EmailView do
       amount when is_float(amount) ->
         amount = :erlang.float_to_binary(amount, decimals: 2)
         "$#{amount}"
-      _ -> amount
+
+      _ ->
+        amount
     end
   end
 
   def price_for_vessel_fuel(winning_solution_bids, fuel_id) do
     case winning_solution_bids[fuel_id] do
       nil -> nil
-      _ -> Enum.map(winning_solution_bids[fuel_id], &(&1.amount))
+      _ -> Enum.map(winning_solution_bids[fuel_id], & &1.amount)
     end
   end
 

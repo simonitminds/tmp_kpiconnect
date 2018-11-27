@@ -25,6 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   def init(%Auction{id: _auction_id, scheduled_start: nil}) do
     terminate(:normal)
   end
+
   def init(auction = %Auction{id: auction_id, scheduled_start: start_time}) do
     if Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
          event.type == :upcoming_auction_notified

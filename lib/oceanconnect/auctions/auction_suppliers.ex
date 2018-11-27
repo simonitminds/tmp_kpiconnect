@@ -28,15 +28,19 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   def get_name_or_alias(buyer_id, %{buyer_id: buyer_id}) do
     Repo.get(Company, buyer_id).name
   end
+
   def get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
+
   def get_name_or_alias(supplier_id, %{anonymous_bidding: true, auction_id: auction_id}) do
     Repo.get_by!(__MODULE__, %{auction_id: auction_id, supplier_id: supplier_id}).alias_name
   end
+
   def get_name_or_alias(supplier_id, %{suppliers: suppliers}) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
+
   def get_name_or_alias(supplier_id, _) do
     Repo.get(Company, supplier_id).name
   end

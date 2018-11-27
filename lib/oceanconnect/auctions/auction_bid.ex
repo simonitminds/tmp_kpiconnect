@@ -22,7 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered,
+          "time_entered" => time_entered
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do
@@ -39,7 +39,6 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       original_time_entered: time_entered
     }
   end
-
 
   # When replaying events, if the Bid struct has changed (particularly when new
   # keys are added), the structs that come out of the events will be invalid.

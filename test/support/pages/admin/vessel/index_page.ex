@@ -32,6 +32,7 @@ defmodule Oceanconnect.Admin.Vessel.IndexPage do
     vessel_name =
       find_element(:css, ".qa-admin-vessel-name")
       |> inner_text
+
     vessel_name =~ name
   end
 

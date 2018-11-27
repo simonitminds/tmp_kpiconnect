@@ -4,7 +4,6 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
   alias Oceanconnect.Messages.{Message, MessagePayload}
   alias OceanconnectWeb.ChatfishChannel
 
-
   setup do
     buyer_company = insert(:company, is_supplier: true)
     buyer = insert(:user, company: buyer_company)
@@ -16,7 +15,12 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       |> insert(buyer: buyer_company, suppliers: [supplier_company])
       |> Auctions.fully_loaded()
 
-    messages = insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
+    messages =
+      insert_list(3, :message,
+        auction: auction,
+        author_company: buyer_company,
+        recipient_company: supplier_company
+      )
 
     {:ok, auction: auction, buyer: buyer, messages: messages, supplier: supplier}
   end
@@ -39,9 +43,9 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         topic: ^channel
       } ->
         assert %MessagePayload{} = hd(message_payloads)
-
-    after 5000 ->
-      assert false, "Expected message received nothing."
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
     end
   end
 
@@ -50,6 +54,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     event = "messages_update"
 
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
+
     {:ok, _, _socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => buyer_token})
 
@@ -62,12 +67,16 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
         topic: ^channel
       } ->
         assert %MessagePayload{} = hd(message_payloads)
-    after 5000 ->
-      assert false, "Expected message received nothing."
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
     end
   end
 
-  test "recipient can mark messages as seen and recipient is notified", %{messages: messages, supplier: supplier} do
+  test "recipient can mark messages as seen and recipient is notified", %{
+    messages: messages,
+    supplier: supplier
+  } do
     channel = "user_messages:#{supplier.company_id}"
     event = "seen"
 
@@ -82,9 +91,11 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       %Phoenix.Socket.Broadcast{
         event: "messages_update",
         topic: ^channel
-      } -> nil
-    after 5000 ->
-      assert false, "Expected message received nothing."
+      } ->
+        nil
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
     end
 
     push(socket, event, %{"ids" => [message_id]})
@@ -99,9 +110,10 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       } ->
         assert message_payload = %MessagePayload{} = hd(message_payloads)
         messages = hd(message_payload.conversations).messages
-        assert messages |> Enum.filter(& &1.id == message_id) |> hd() |> Map.get(:has_been_seen)
-    after 5000 ->
-      assert false, "Expected message received nothing."
+        assert messages |> Enum.filter(&(&1.id == message_id)) |> hd() |> Map.get(:has_been_seen)
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
     end
   end
 
@@ -118,7 +130,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     push(socket, event, %{"ids" => [message_id]})
 
     :timer.sleep(100)
-    assert Enum.all?(messages, &Repo.get(Message, &1.id).has_been_seen == false)
+    assert Enum.all?(messages, &(Repo.get(Message, &1.id).has_been_seen == false))
   end
 
   test "author can send a message that recipient receives", %{
@@ -134,7 +146,11 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, _, socket} =
       subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
 
-    push(socket, event, %{"auctionId" => auction_id, "recipient" => buyer.company.name, "content" => "Hello!"})
+    push(socket, event, %{
+      "auctionId" => auction_id,
+      "recipient" => buyer.company.name,
+      "content" => "Hello!"
+    })
 
     :timer.sleep(100)
     recipient_channel = "user_messages:#{buyer.company_id}"
@@ -160,8 +176,9 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
 
         [%{content: content} | _tail] = Enum.reverse(conversation.messages)
         assert content == "Hello!"
-    after 5000 ->
-      assert false, "Expected message received nothing."
+    after
+      5000 ->
+        assert false, "Expected message received nothing."
     end
   end
 end

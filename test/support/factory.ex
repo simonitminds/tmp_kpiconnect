@@ -106,6 +106,7 @@ defmodule Oceanconnect.Factory do
 
   def message_factory() do
     company = build(:company)
+
     %Oceanconnect.Messages.Message{
       auction: build(:auction),
       content: "Hi!",

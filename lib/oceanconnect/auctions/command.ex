@@ -52,12 +52,19 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{command: :process_new_bid, data: %{bid: bid, user: user}}
   end
 
-  def revoke_supplier_bids(auction, product, supplier_id, user) when is_integer(supplier_id) and not is_integer(user) do
-    %Command{command: :revoke_supplier_bids, data: %{auction: auction, product: product, supplier_id: supplier_id, user: user}}
+  def revoke_supplier_bids(auction, product, supplier_id, user)
+      when is_integer(supplier_id) and not is_integer(user) do
+    %Command{
+      command: :revoke_supplier_bids,
+      data: %{auction: auction, product: product, supplier_id: supplier_id, user: user}
+    }
   end
 
   def select_winning_solution(solution = %Solution{bids: _bids}, auction, port_agent, user) do
-    %Command{command: :select_winning_solution, data: %{solution: solution, auction: auction, port_agent: port_agent, user: user}}
+    %Command{
+      command: :select_winning_solution,
+      data: %{solution: solution, auction: auction, port_agent: port_agent, user: user}
+    }
   end
 
   def submit_barge(auction_barge = %AuctionBarge{}, user) do

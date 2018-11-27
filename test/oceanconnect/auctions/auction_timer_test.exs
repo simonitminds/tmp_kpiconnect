@@ -4,8 +4,9 @@ defmodule Oceanconnect.Auctions.AuctionTimerTest do
   alias Oceanconnect.Auctions.{AuctionTimer, AuctionSupervisor, Command}
 
   setup do
-    auction = insert(:auction, duration: 15 * 60_000, decision_duration: 10 * 60_000)
-    |> Auctions.fully_loaded()
+    auction =
+      insert(:auction, duration: 15 * 60_000, decision_duration: 10 * 60_000)
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(

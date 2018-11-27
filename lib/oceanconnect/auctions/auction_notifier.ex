@@ -8,6 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     auction = Auctions.AuctionCache.read(auction_id)
     notify_participants(auction)
   end
+
   def notify_participants(auction = %Auction{}) do
     participants = Auctions.auction_participant_ids(auction)
 

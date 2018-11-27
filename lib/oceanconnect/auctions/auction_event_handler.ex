@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionBid,
     AuctionEvent,
     AuctionNotifier,
-    AuctionStore.AuctionState,
+    AuctionStore.AuctionState
   }
 
   @registry_name :auction_event_handler_registry

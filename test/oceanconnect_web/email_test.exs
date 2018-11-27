@@ -40,7 +40,15 @@ defmodule OceanconnectWeb.EmailTest do
       |> Auctions.fully_loaded()
 
     vessel_fuels = auction.auction_vessel_fuels
-    approved_barges = [insert(:auction_barge, auction: auction, barge: barge1, supplier: hd(supplier_companies)), insert(:auction_barge, auction: auction, barge: barge2, supplier: List.last(supplier_companies))]
+
+    approved_barges = [
+      insert(:auction_barge, auction: auction, barge: barge1, supplier: hd(supplier_companies)),
+      insert(:auction_barge,
+        auction: auction,
+        barge: barge2,
+        supplier: List.last(supplier_companies)
+      )
+    ]
 
     suppliers = Accounts.users_for_companies(supplier_companies)
     winning_suppliers = Accounts.users_for_companies([winning_supplier_company])

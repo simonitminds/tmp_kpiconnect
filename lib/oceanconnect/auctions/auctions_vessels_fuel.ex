@@ -44,7 +44,9 @@ defmodule Oceanconnect.Auctions.AuctionVesselFuel do
       nil ->
         add_error(changeset, :vessel_id, "at least one of vessel_id or fuel_id must be given")
         add_error(changeset, :fuel_id, "at least one of vessel_id or fuel_id must be given")
-      _ -> changeset
+
+      _ ->
+        changeset
     end
   end
 end

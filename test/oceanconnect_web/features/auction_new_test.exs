@@ -123,12 +123,17 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.add_vessels([selected_vessel])
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, [selected_vessel], 1500)
+
     assert AuctionNewPage.credit_margin_amount() ==
-      :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
-    assert AuctionShowPage.has_values_from_params?(Map.put(show_params, :vessels, [selected_vessel]))
+
+    assert AuctionShowPage.has_values_from_params?(
+             Map.put(show_params, :vessels, [selected_vessel])
+           )
   end
 
   test "creating an auction with one vessel fuel and multiple vessels", %{
@@ -145,8 +150,10 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.add_vessels(buyer_vessels)
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, buyer_vessels, 1500)
+
     assert AuctionNewPage.credit_margin_amount() ==
-      :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
@@ -164,10 +171,12 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
+
     Enum.each(fuels, fn fuel ->
       AuctionNewPage.add_fuel(fuel.id)
       AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
     end)
+
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
@@ -185,10 +194,12 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
+
     Enum.each(fuels, fn fuel ->
       AuctionNewPage.add_fuel(fuel.id)
       AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
     end)
+
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/

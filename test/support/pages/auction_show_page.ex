@@ -150,6 +150,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> find_within_element(:css, ".qa-auction-solution-expand")
     |> click()
   end
+
   def expand_solution(index) when is_integer(index) do
     find_element(:css, ".qa-auction-other-solutions")
     |> find_all_within_element(:css, ".qa-auction-other-solution")
@@ -163,6 +164,7 @@ defmodule Oceanconnect.AuctionShowPage do
     |> find_within_element(:css, ".qa-auction-select-solution")
     |> click()
   end
+
   def select_solution(index) when is_integer(index) do
     find_element(:css, ".qa-auction-other-solutions")
     |> find_all_within_element(:css, ".qa-auction-other-solution")
@@ -173,15 +175,18 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def solution_has_bids?(solution, bids) when is_atom(solution) do
     element = find_element(:css, ".qa-auction-solution-best_overall")
+
     Enum.all?(bids, fn bid ->
       find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
     end)
   end
 
   def solution_has_bids?(index, bids) when is_integer(index) do
-    element = find_element(:css, ".qa-auction-other-solutions")
-    |> find_all_within_element(:css, ".qa-auction-other-solution")
-    |> Enum.at(index)
+    element =
+      find_element(:css, ".qa-auction-other-solutions")
+      |> find_all_within_element(:css, ".qa-auction-other-solution")
+      |> Enum.at(index)
+
     Enum.all?(bids, fn bid ->
       find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
     end)
@@ -189,6 +194,7 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def winning_solution_has_bids?(bids) do
     element = find_element(:css, ".qa-auction-winning-solution")
+
     Enum.all?(bids, fn bid ->
       find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")
     end)
@@ -355,9 +361,10 @@ defmodule Oceanconnect.AuctionShowPage do
 
   def has_participating_auctions?(auctions) do
     Enum.all?(auctions, fn auction ->
-      text = find_element(:css, ".qa-auction-message-auctions")
-      |> find_within_element(:css, ".qa-auction-message-auction-#{auction.id}")
-      |> inner_text
+      text =
+        find_element(:css, ".qa-auction-message-auctions")
+        |> find_within_element(:css, ".qa-auction-message-auction-#{auction.id}")
+        |> inner_text
 
       text =~ auction.vessel.name
     end)

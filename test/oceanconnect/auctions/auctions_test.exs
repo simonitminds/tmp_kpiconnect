@@ -13,8 +13,10 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction = insert(:auction, @valid_attrs)
-      |> Auctions.fully_loaded
+      auction =
+        insert(:auction, @valid_attrs)
+        |> Auctions.fully_loaded()
+
       port = insert(:port)
       vessel = insert(:vessel)
       fuel = insert(:fuel)
@@ -65,8 +67,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == "yes"
     end
 
-
-    test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{
+      port: port,
+      vessel: vessel,
+      fuel: fuel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -80,7 +85,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{port: port, vessel: vessel} do
+    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{
+      port: port,
+      vessel: vessel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -94,7 +102,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{port: port, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{
+      port: port,
+      fuel: fuel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -108,7 +119,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is invalid without fuel quantities for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is invalid without fuel quantities for scheduled auctions", %{
+      port: port,
+      vessel: vessel,
+      fuel: fuel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -122,7 +137,10 @@ defmodule Oceanconnect.AuctionsTest do
       refute changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{port: port, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{
+      port: port,
+      fuel: fuel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -136,7 +154,10 @@ defmodule Oceanconnect.AuctionsTest do
       refute changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{port: port, vessel: vessel} do
+    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{
+      port: port,
+      vessel: vessel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -150,7 +171,11 @@ defmodule Oceanconnect.AuctionsTest do
       refute changeset.valid?
     end
 
-    test "#maybe_add_vessel_fuels is valid with fuel quantities for scheduled auctions", %{port: port, vessel: vessel, fuel: fuel} do
+    test "#maybe_add_vessel_fuels is valid with fuel quantities for scheduled auctions", %{
+      port: port,
+      vessel: vessel,
+      fuel: fuel
+    } do
       params = %{
         "port_id" => port.id,
         "eta" => DateTime.utc_now(),
@@ -225,8 +250,9 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do
-      auction_with_participants = Auctions.with_participants(auction)
-      |> Auctions.fully_loaded
+      auction_with_participants =
+        Auctions.with_participants(auction)
+        |> Auctions.fully_loaded()
 
       auction_attrs =
         auction_with_participants
@@ -234,6 +260,7 @@ defmodule Oceanconnect.AuctionsTest do
           [:scheduled_start, :eta, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
             Map.keys(@valid_attrs)
         )
+
       assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
       # create_auction has a side effect of starting the AuctionsSupervisor, thus the sleep
       :timer.sleep(200)
@@ -295,8 +322,9 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       admin = insert(:user, is_admin: true)
 
-      {:ok, scheduled_start} = DateTime.to_unix(DateTime.utc_now()) + 60_000
-      |> DateTime.from_unix()
+      {:ok, scheduled_start} =
+        (DateTime.to_unix(DateTime.utc_now()) + 60_000)
+        |> DateTime.from_unix()
 
       auction =
         :auction
@@ -306,13 +334,16 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok, _pid} =
         start_supervised(
           {AuctionSupervisor,
-            {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
         )
 
       {:ok, %{auction: auction, admin: admin}}
     end
 
-    test "start_auction/2 starts the given auction and adds auction_started field to auction", %{auction: auction, admin: admin} do
+    test "start_auction/2 starts the given auction and adds auction_started field to auction", %{
+      auction: auction,
+      admin: admin
+    } do
       auction = Auctions.start_auction(auction, admin)
       assert auction.auction_started != nil
       assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
@@ -322,19 +353,40 @@ defmodule Oceanconnect.AuctionsTest do
   describe "get_participant_name_and_ids_for_auction/1" do
     setup do
       auction = :auction |> insert() |> Auctions.fully_loaded()
-      anon_auction = :auction |> insert(anonymous_bidding: true) |> Auctions.create_supplier_aliases() |> Auctions.fully_loaded()
+
+      anon_auction =
+        :auction
+        |> insert(anonymous_bidding: true)
+        |> Auctions.create_supplier_aliases()
+        |> Auctions.fully_loaded()
 
       {:ok, %{anon_auction: anon_auction, auction: auction}}
     end
 
     test "returns ids and names for auction participants", %{auction: auction} do
-      expected_result = [%{id: auction.buyer_id, name: auction.buyer.name} | Enum.map(auction.suppliers, &%{id: &1.id, name: &1.name})]
-      assert Enum.all?(Auctions.get_participant_name_and_ids_for_auction(auction.id), & &1 in expected_result)
+      expected_result = [
+        %{id: auction.buyer_id, name: auction.buyer.name}
+        | Enum.map(auction.suppliers, &%{id: &1.id, name: &1.name})
+      ]
+
+      assert Enum.all?(
+               Auctions.get_participant_name_and_ids_for_auction(auction.id),
+               &(&1 in expected_result)
+             )
     end
 
-    test "returns ids and alias names for anon_auction participants", %{anon_auction: anon_auction} do
-      expected_result = [%{id: anon_auction.buyer_id, name: anon_auction.buyer.name} | Enum.map(anon_auction.suppliers, &%{id: &1.id, name: &1.alias_name})]
-      assert Enum.all?(Auctions.get_participant_name_and_ids_for_auction(anon_auction.id), & &1 in expected_result)
+    test "returns ids and alias names for anon_auction participants", %{
+      anon_auction: anon_auction
+    } do
+      expected_result = [
+        %{id: anon_auction.buyer_id, name: anon_auction.buyer.name}
+        | Enum.map(anon_auction.suppliers, &%{id: &1.id, name: &1.alias_name})
+      ]
+
+      assert Enum.all?(
+               Auctions.get_participant_name_and_ids_for_auction(anon_auction.id),
+               &(&1 in expected_result)
+             )
     end
   end
 
@@ -392,17 +444,26 @@ defmodule Oceanconnect.AuctionsTest do
     test "ending an auction saves the auction_ended timestamp on the auction", %{
       auction: auction = %Auction{id: auction_id}
     } do
-
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       auction
       |> Auctions.start_auction()
       |> Auctions.end_auction()
 
-
       assert_receive %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-      assert_receive %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, time_entered: time_entered}
-      assert_receive %AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: data = %Auction{auction_ended: auction_ended}}
+
+      assert_receive %AuctionEvent{
+        type: :auction_ended,
+        auction_id: ^auction_id,
+        time_entered: time_entered
+      }
+
+      assert_receive %AuctionEvent{
+        type: :auction_updated,
+        auction_id: ^auction_id,
+        data: data = %Auction{auction_ended: auction_ended}
+      }
+
       assert time_entered == auction_ended
     end
   end
@@ -417,7 +478,11 @@ defmodule Oceanconnect.AuctionsTest do
       fuel_id = "#{fuel.id}"
 
       auction =
-        insert(:auction, suppliers: [supplier_company], buyer: buyer_company, auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)])
+        insert(:auction,
+          suppliers: [supplier_company],
+          buyer: buyer_company,
+          auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]
+        )
         |> Auctions.fully_loaded()
 
       {:ok, _pid} =
@@ -493,6 +558,7 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       create_bid(1.50, nil, supplier_company.id, fuel_id, auction)
       |> Auctions.place_bid()
+
       :timer.sleep(100)
 
       Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)

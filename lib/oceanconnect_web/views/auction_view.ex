@@ -2,9 +2,18 @@ defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
   alias Oceanconnect.{Accounts, Auctions}
   alias Oceanconnect.Accounts.User
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionEvent, AuctionBarge, Barge, Fuel, Solution}
-  alias Oceanconnect.Messages.Message
 
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionBid,
+    AuctionEvent,
+    AuctionBarge,
+    Barge,
+    Fuel,
+    Solution
+  }
+
+  alias Oceanconnect.Messages.Message
 
   @events_with_bid_data [:bid_placed, :auto_bid_placed, :auto_bid_triggered]
   @events_with_solution_data [:winning_solution_selected]
@@ -57,7 +66,7 @@ defmodule OceanconnectWeb.AuctionView do
       |> Enum.filter(fn event ->
         event.type in [:auction_started, :auction_ended, :auction_canceled]
       end)
-      |> Enum.map(&(&1.time_entered))
+      |> Enum.map(& &1.time_entered)
 
     case ended do
       nil -> "—"
@@ -67,7 +76,8 @@ defmodule OceanconnectWeb.AuctionView do
 
   def additional_information(%Auction{additional_information: nil}), do: "—"
 
-  def additional_information(%Auction{additional_information: additional_information}), do: additional_information
+  def additional_information(%Auction{additional_information: additional_information}),
+    do: additional_information
 
   def auction_log_suppliers(%{winning_solution: %{bids: bids}}) do
     Enum.map(bids, fn bid ->
@@ -79,16 +89,17 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_log_suppliers(_), do: "—"
 
   def auction_log_vessel_fuels_by_fuel(%{auction_vessel_fuels: auction_vessel_fuels}) do
-    Enum.group_by(auction_vessel_fuels, &(&1.fuel))
+    Enum.group_by(auction_vessel_fuels, & &1.fuel)
   end
 
   def auction_log_winning_solution(%{winning_solution: winning_solution}) do
     winning_solution
   end
+
   def auction_log_winning_solution(_), do: "—"
 
-  def solution_from_event(%{type: :winning_solution_selected, data: %{solution: solution}}), do: solution
-
+  def solution_from_event(%{type: :winning_solution_selected, data: %{solution: solution}}),
+    do: solution
 
   def auction_log_fuel_from_id(%{fuels: fuels}, fuel_id) do
     case Enum.find(fuels, nil, &("#{&1.id}" == fuel_id)) do
@@ -96,6 +107,7 @@ defmodule OceanconnectWeb.AuctionView do
       %Fuel{name: name} -> name
     end
   end
+
   def auction_log_fuel_from_id(_auction, fuel_id), do: "Fuel ##{fuel_id}"
 
   def auction_log_supplier_from_id(%{suppliers: suppliers}, supplier_id) do
@@ -104,12 +116,14 @@ defmodule OceanconnectWeb.AuctionView do
       %{name: name} -> name
     end
   end
-  def auction_log_supplier_from_id(_auction, supplier_id), do: "Supplier ##{supplier_id}"
 
+  def auction_log_supplier_from_id(_auction, supplier_id), do: "Supplier ##{supplier_id}"
 
   def bids_for_solution(%Solution{bids: bids}), do: bids
 
-  def author_name_and_company(%Message{} = message), do: "#{user_name(message.author)} (#{message.author_company.name})"
+  def author_name_and_company(%Message{} = message),
+    do: "#{user_name(message.author)} (#{message.author_company.name})"
+
   def author_name_and_company(_), do: "-"
 
   def convert_duration(duration) do
@@ -121,18 +135,24 @@ defmodule OceanconnectWeb.AuctionView do
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
+
   def convert_date?(_), do: "—"
 
   def convert_date_time?(date_time = %{}) do
     time =
-      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{leftpad(elem(date_time.microsecond, 0), 6)}"
+      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{
+        leftpad(elem(date_time.microsecond, 0), 6)
+      }"
 
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
+
   def convert_event_date_time?(date_time = %{}) do
     time =
-      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{leftpad(elem(date_time.microsecond, 0), 6)}"
+      "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{
+        leftpad(elem(date_time.microsecond, 0), 6)
+      }"
 
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
@@ -143,6 +163,7 @@ defmodule OceanconnectWeb.AuctionView do
     |> Regex.replace(Atom.to_string(type), " ")
     |> String.capitalize()
   end
+
   def convert_event_type(type, _event) do
     convert_event_type(type)
   end
@@ -164,6 +185,7 @@ defmodule OceanconnectWeb.AuctionView do
         data: %{auction_barge: %AuctionBarge{barge: %Barge{name: name}}}
       }),
       do: name
+
   def barge_name_for_event(%AuctionEvent{
         data: %{auction_barge: %AuctionBarge{barge_id: barge_id}}
       }) do
@@ -173,6 +195,7 @@ defmodule OceanconnectWeb.AuctionView do
       _ -> ""
     end
   end
+
   def barge_name_for_event(%AuctionEvent{}) do
     ""
   end
@@ -186,6 +209,7 @@ defmodule OceanconnectWeb.AuctionView do
       _ -> ""
     end
   end
+
   def product_name_for_event(%AuctionEvent{
         data: %{product: fuel_id}
       }) do
@@ -195,13 +219,13 @@ defmodule OceanconnectWeb.AuctionView do
       _ -> ""
     end
   end
+
   def product_name_for_event(%AuctionEvent{}) do
     ""
   end
 
   def bid_is_traded?(%{is_traded_bid: true}), do: true
   def bid_is_traded?(_bid), do: false
-
 
   def event_has_bid_data?(event) do
     event.type in @events_with_bid_data
@@ -214,41 +238,63 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: ""
+
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: amount}}}) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
-  def event_bid_amount(%AuctionEvent{type: :winning_solution_selected, data: %{solution: %{normalized_price: amount}}}) do
+
+  def event_bid_amount(%AuctionEvent{
+        type: :winning_solution_selected,
+        data: %{solution: %{normalized_price: amount}}
+      }) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
+
   def event_bid_amount(_event), do: "—"
 
   def event_bid_min_amount(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: nil}}}), do: ""
+
   def event_bid_min_amount(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: amount}}}) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
+
   def event_bid_min_amount(_event), do: "—"
 
-  def event_bid_is_traded?(%AuctionEvent{data: %{bid: %AuctionBid{is_traded_bid: true}}}), do: true
+  def event_bid_is_traded?(%AuctionEvent{data: %{bid: %AuctionBid{is_traded_bid: true}}}),
+    do: true
+
   def event_bid_is_traded?(_event), do: false
 
   def event_bid_has_amount?(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: false
   def event_bid_has_amount?(%AuctionEvent{data: %{bid: %AuctionBid{amount: _amount}}}), do: true
-  def event_bid_has_amount?(%AuctionEvent{type: :winning_solution_selected, data: %{solution: %{normalized_price: _amount}}}), do: true
+
+  def event_bid_has_amount?(%AuctionEvent{
+        type: :winning_solution_selected,
+        data: %{solution: %{normalized_price: _amount}}
+      }),
+      do: true
+
   def event_bid_has_amount?(_event), do: false
 
   def event_bid_has_minimum?(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: nil}}}), do: false
-  def event_bid_has_minimum?(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: _amount}}}), do: true
-  def event_bid_has_minimum?(_event), do: false
 
+  def event_bid_has_minimum?(%AuctionEvent{data: %{bid: %AuctionBid{min_amount: _amount}}}),
+    do: true
+
+  def event_bid_has_minimum?(_event), do: false
 
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
+
   def event_company(%AuctionEvent{data: %{bid: %{supplier_id: supplier_id}}}),
     do: Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, supplier_id).name
+
   def event_company(%AuctionEvent{data: %{auction: %Auction{buyer: buyer}}}), do: buyer.name
+
   def event_company(%AuctionEvent{data: %Auction{buyer_id: buyer_id}}) do
     Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, buyer_id).name
   end
+
   def event_company(_), do: "—"
 
   def event_user(%AuctionEvent{user: nil}), do: "—"
@@ -268,6 +314,7 @@ defmodule OceanconnectWeb.AuctionView do
   def format_price(amount) when is_float(amount) do
     "$#{:erlang.float_to_binary(amount, decimals: 2)}"
   end
+
   def format_price(amount), do: amount
   def user_name(%User{} = user), do: Accounts.get_user_name!(user)
   def user_name(_), do: "-"
