@@ -27,6 +27,17 @@ defmodule OceanconnectWeb.Plugs.Auth do
     Guardian.Plug.current_resource(conn, key: :admin)
   end
 
+  def current_user_is_admin?(conn) do
+    user = Guardian.Plug.current_resource(conn)
+    impersonator = Guardian.Plug.current_resource(conn, key: :admin)
+
+    cond do
+      user && user.is_admin -> true
+      impersonator && impersonator.is_admin -> true
+      true -> false
+    end
+  end
+
   def browser_logout(conn) do
     conn
     |> Guardian.Plug.sign_out()
