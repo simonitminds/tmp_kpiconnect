@@ -74,7 +74,7 @@ defmodule Oceanconnect.MessagesFeatureTest do
       assert MessagesPage.has_participating_auctions?([auction])
     end
 
-    test "unseen messages are marked as seen when recipient expands conversation", %{auction: auction, messages: messages} do
+    test "unseen messages are marked as seen when recipient expands conversation", %{auction: _auction, messages: _messages} do
       # AuctionShowPage.visit(auction.id)
       # assert AuctionShowPage.is_current_path?(auction.id)
       # MessagesPage.open_message_window()

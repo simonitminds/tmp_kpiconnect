@@ -266,6 +266,8 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def get_auction_supplier(_auction_id, nil), do: nil
+  def get_auction_supplier(nil, _supplier_id), do: nil
   def get_auction_supplier(auction_id, supplier_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
@@ -324,8 +326,8 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
-    with {:ok, auction} <- %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert()
-    do
+    with {:ok, auction} <-
+           %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
       |> fully_loaded
       |> handle_auction_creation(user)
@@ -335,8 +337,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_auction(attrs, user) do
-    with {:ok, auction} <-  %Auction{} |> Auction.changeset(attrs) |> Repo.insert()
-    do
+    with {:ok, auction} <- %Auction{} |> Auction.changeset(attrs) |> Repo.insert() do
       auction
       |> fully_loaded
       |> handle_auction_creation(user)
@@ -444,13 +445,12 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:buyer, :suppliers])
   end
 
-  def suppliers_with_alias_names(%Auction{id: nil, suppliers: suppliers}), do: suppliers
-
+  def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil
   def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
         case get_auction_supplier(auction.id, supplier.id) do
-          supplier = %Company{} -> supplier.alias_name
+          %{alias_name: alias_name} -> alias_name
           _ -> nil
         end
 
