@@ -20,9 +20,10 @@
 
   &__status {
     display: flex !important;
+    flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    padding: 0.75rem 2px 0.75rem 0 !important;
+    padding: 0.75rem 2px 0.75rem 0;
     background-color: $gray-1 !important;
 
     &> * {
@@ -66,5 +67,48 @@
     margin-left: auto;
     padding: 0;
     color: $gray-3 !important;
+  }
+}
+
+// Location-Based Variants
+
+// Auction List Page
+
+.card {
+  .auction-invitation {
+    .auction-invitation__status {
+      padding: 0;
+      padding-top: 1rem;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .auction-invitation__status__copy {
+      font-size: 1rem;
+    }
+    .auction-invitation__status > div { // Row of RSVP buttons
+      margin-left: 1rem;
+    }
+  }
+}
+
+// Auction Show Page
+
+.auction-content {
+  .auction-invitation {
+    .auction-invitation__status {
+      padding: 0;
+      padding-top: 1rem;
+
+    }
+    .auction-invitation__status__copy {
+      margin-left: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .auction-invitation__status > div { // Row of RSVP buttons
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+    }
   }
 }
