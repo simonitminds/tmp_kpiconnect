@@ -12,7 +12,6 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
     supplier_company2 = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     fuel = insert(:fuel)
-    fuel_id = "#{fuel.id}"
 
     auction =
       insert(
@@ -21,8 +20,8 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
         suppliers: [supplier_company, supplier_company2],
         auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         duration: 600_000
-      ) |> Auctions.fully_loaded()
-
+      )
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(
@@ -30,28 +29,38 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
          {auction, %{exclude_children: [:auction_scheduler]}}}
       )
 
-      {:ok, %{auction: auction, supplier: supplier, buyer: buyer, supplier_company: supplier_company}}
-    end
+    {:ok,
+     %{auction: auction, supplier: supplier, buyer: buyer, supplier_company: supplier_company}}
+  end
 
-  test "responding YES to auction invitation", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+  test "responding YES to auction invitation", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier
+  } do
     login_user(supplier)
 
     AuctionRsvpPage.respond_yes(auction)
 
     assert AuctionShowPage.is_current_path?(auction_id)
-    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Yes"
+    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Accept"
   end
 
-  test "responding NO to auction invitation", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+  test "responding NO to auction invitation", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier
+  } do
     login_user(supplier)
 
     AuctionRsvpPage.respond_no(auction)
 
     assert AuctionShowPage.is_current_path?(auction_id)
-    assert AuctionRsvpPage.current_response_as_supplier(auction) == "No"
+    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Decline"
   end
 
-  test "responding MAYBE to auction invitation", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+  test "responding MAYBE to auction invitation", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier
+  } do
     login_user(supplier)
 
     AuctionRsvpPage.respond_maybe(auction)
@@ -60,25 +69,58 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
     assert AuctionRsvpPage.current_response_as_supplier(auction) == "Maybe"
   end
 
-  test "supplier can respond from the index page", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
+  test "supplier can respond from the index page", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier
+  } do
     login_user(supplier)
     AuctionIndexPage.visit()
     assert AuctionIndexPage.is_current_path?()
     AuctionRsvpPage.respond_to_invitation(auction, "yes")
     assert AuctionShowPage.is_current_path?(auction_id)
-    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Yes"
+    assert AuctionRsvpPage.current_response_as_supplier(auction) == "Accept"
   end
 
-  test "buyer can view a suppliers rsvp responses", %{auction: auction = %Auction{id: auction_id}, supplier: supplier, buyer: buyer, supplier_company: %Company{id: supplier_company_id}} do
+  test "buyer can view a suppliers rsvp responses", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier,
+    buyer: buyer,
+    supplier_company: %Company{id: supplier_company_id}
+  } do
     login_user(supplier)
     AuctionRsvpPage.respond_yes(auction)
     logout_user()
 
     login_user(buyer)
     AuctionShowPage.visit(auction_id)
-    Hound.Helpers.Screenshot.take_screenshot()
-    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Yes"
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Accept"
   end
 
-  test "changing a response updates the response"
+  test "changing a response updates the response", %{
+    auction: auction = %Auction{id: auction_id},
+    supplier: supplier,
+    buyer: buyer,
+    supplier_company: %Company{id: supplier_company_id}
+  } do
+    login_user(supplier)
+    AuctionRsvpPage.respond_yes(auction)
+    logout_user()
+
+    :timer.sleep(200)
+    login_user(buyer)
+    AuctionShowPage.visit(auction_id)
+
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Accept"
+    logout_user()
+
+    login_user(supplier)
+    AuctionRsvpPage.respond_no(auction)
+    logout_user()
+
+    :timer.sleep(200)
+    login_user(buyer)
+    AuctionShowPage.visit(auction_id)
+
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Decline"
+  end
 end

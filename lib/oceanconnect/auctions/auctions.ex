@@ -250,10 +250,12 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction(id) do
     Repo.get(Auction, id)
+    |> fully_loaded
   end
 
   def get_auction!(id) do
     Repo.get!(Auction, id)
+    |> fully_loaded
   end
 
   def get_auction_state!(auction = %Auction{}) do

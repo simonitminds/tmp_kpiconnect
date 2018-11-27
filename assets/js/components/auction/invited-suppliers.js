@@ -48,11 +48,13 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
 
   const renderSupplierParticipation = (status, supplier) => {
     if (status == "yes") {
-      return <span className={`icon has-text-success has-margin-right-sm qa-rsvp-response-${supplier.id}`}><i className="fas fa-check-circle"></i></span>;
+      return <span className={`icon has-text-success has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-check-circle"></i></span>;
     } else if (status == "no") {
-      return <span className={`icon has-text-danger has-margin-right-sm qa-rsvp-response-${supplier.id}`}><i className="fas fa-times-circle"></i></span>;
-    } else {
-      return <span className={`icon has-text-gray-3 has-margin-right-sm qa-rsvp-response-${supplier.id}`}><i className="fas fa-minus-circle"></i></span>;
+      return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-times-circle"></i></span>;
+    } else if (status == "maybe"){
+        return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-adjust-circle"></i></span>;
+    else {
+      return <span className={`icon has-text-gray-3 has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-question-circle"></i></span>;
     }
   }
 

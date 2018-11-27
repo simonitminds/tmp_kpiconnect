@@ -32,12 +32,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         auction_state = %AuctionState{}
       ) do
-    # auction = Auctions.fully_loaded(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
   def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %AuctionState{}) do
-    # auction = Auctions.fully_loaded(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 

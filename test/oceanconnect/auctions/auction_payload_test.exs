@@ -221,9 +221,6 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       refute supplier.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       refute supplier_2.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       refute supplier_2.name in Enum.map(buyer_payload.lowest_bids, & &1.supplier)
-      IO.inspect(Repo.all(Oceanconnect.Auctions.AuctionSuppliers))
-      IO.inspect([supplier.id, auction.id], label: "Supplier ID and Auction ID")
-      IO.inspect(Auctions.get_auction_supplier(auction.id, supplier.id), label: "SUPPLIER")
       assert Auctions.get_auction_supplier(auction.id, supplier.id).alias_name in Enum.map(
                buyer_payload.bid_history,
                & &1.supplier

@@ -15,13 +15,14 @@ defmodule Oceanconnect.AuctionRsvpPage do
   end
 
   def respond_to_invitation(%Auction{id: auction_id}, response) do
-    find_element(:css, ".qa-auction-#{auction_id}-invitation-#{response}")
+    find_element(:css, ".qa-auction-#{auction_id}-rsvp-response-#{response}")
     |> click()
   end
 
   def current_response_as_supplier(%Auction{id: auction_id}) do
-    find_element(:css, ".qa-auction-#{auction_id}-rsvp-response .selected")
+    find_element(:css, ".qa-auction-#{auction_id}-rsvp-response[data-selected=true]")
     |> inner_text()
+    |> String.trim()
   end
 
   def supplier_response(supplier_company_id, %Auction{id: auction_id}) do
@@ -32,13 +33,13 @@ defmodule Oceanconnect.AuctionRsvpPage do
   def supplier_response_as_buyer(supplier_company_id) do
     response =
       find_element(:css, ".qa-auction-suppliers")
-      |> find_within_element(:css, ".qa-rsvp-response-#{supplier_company_id}")
+      |> find_within_element(:css, ".qa-auction-rsvp-response-#{supplier_company_id}")
       |> inner_html
 
     cond do
-      response =~ "fa-check-circle" -> "Yes"
-      response =~ "fa-check-times" -> "No"
-      response =~ "fa-check-minus" -> "Maybe"
+      response =~ "fa-check-circle" -> "Accept"
+      response =~ "fa-adjust-circle" -> "Decline"
+      response =~ "fa-minus-circle" -> "Maybe"
     end
   end
 end
