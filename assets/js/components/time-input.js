@@ -29,17 +29,16 @@ export default class TimeInput extends React.Component {
     const currentDate = moment();
 
     const disabledHours = () => {
-      if (time.isSame(currentDate, 'day')) {
-        return _.range(currentDate.hour());
-      } else if (time.isBefore(currentDate, 'day')) {
+      if (time === null || time.isBefore(currentDate, 'day')) {
         return _.range(0, 25);
+      } else if (time.isSame(currentDate, 'day')) {
+        return _.range(currentDate.hour());
       }
-
       return [];
     }
 
     const disabledMinutes = (selectedHour) => {
-      if (time.isBefore(currentDate, 'day')) {
+      if (time === null || time.isBefore(currentDate, 'day')) {
         return _.range(0, 61);
       }
 
