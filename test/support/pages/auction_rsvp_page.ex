@@ -37,8 +37,9 @@ defmodule Oceanconnect.AuctionRsvpPage do
       |> inner_html
 
     cond do
+      response =~ "fa-adjust-circle" -> "No Response"
       response =~ "fa-check-circle" -> "Accept"
-      response =~ "fa-adjust-circle" -> "Decline"
+      response =~ "fa-times-circle" -> "Decline"
       response =~ "fa-minus-circle" -> "Maybe"
     end
   end
