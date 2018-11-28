@@ -20,7 +20,9 @@ defmodule OceanconnectWeb.AuctionController do
 
     with %Auction{} <- auction,
          true <- current_company_id == auction.buyer_id or Auth.current_user_is_admin?(conn),
-         true <- auction_state.status not in [:draft, :pending, :open] or Auth.current_user_is_admin?(conn) do
+         true <-
+           auction_state.status not in [:draft, :pending, :open] or
+             Auth.current_user_is_admin?(conn) do
       render(
         conn,
         "log.html",

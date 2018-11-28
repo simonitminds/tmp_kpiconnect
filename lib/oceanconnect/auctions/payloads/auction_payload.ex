@@ -116,7 +116,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   defp get_supplier_participation(auction_suppliers, supplier_id) do
-    with %AuctionSuppliers{participation: participation} <- Enum.find(auction_suppliers, fn supplier -> supplier.supplier_id == supplier_id end) do
+    with %AuctionSuppliers{participation: participation} <-
+           Enum.find(auction_suppliers, fn supplier -> supplier.supplier_id == supplier_id end) do
       participation
     else
       nil -> nil
