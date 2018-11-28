@@ -1,4 +1,4 @@
-defmodule OceanconnectWeb.ChatfishChannel do
+defmodule OceanconnectWeb.ChatChannel do
   use OceanconnectWeb, :channel
 
   alias Oceanconnect.Auctions

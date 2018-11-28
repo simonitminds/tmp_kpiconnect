@@ -1,8 +1,8 @@
-defmodule OceanconnectWeb.ChatfishChannelTest do
+defmodule OceanconnectWeb.ChatChannelTest do
   use OceanconnectWeb.ChannelCase
   alias Oceanconnect.{Auctions, Repo}
   alias Oceanconnect.Messages.{Message, MessagePayload}
-  alias OceanconnectWeb.ChatfishChannel
+  alias OceanconnectWeb.ChatChannel
 
   setup do
     buyer_company = insert(:company, is_supplier: true)
@@ -32,7 +32,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
 
     {:ok, _, _socket} =
-      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
+      subscribe_and_join(socket(), ChatChannel, channel, %{"token" => supplier_token})
 
     receive do
       %Phoenix.Socket.Broadcast{
@@ -56,7 +56,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
 
     {:ok, _, _socket} =
-      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => buyer_token})
+      subscribe_and_join(socket(), ChatChannel, channel, %{"token" => buyer_token})
 
     receive do
       %Phoenix.Socket.Broadcast{
@@ -84,7 +84,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
 
     {:ok, _, socket} =
-      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
+      subscribe_and_join(socket(), ChatChannel, channel, %{"token" => supplier_token})
 
     # Skip first broadcast after joining
     receive do
@@ -125,7 +125,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
 
     {:ok, _, socket} =
-      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => buyer_token})
+      subscribe_and_join(socket(), ChatChannel, channel, %{"token" => buyer_token})
 
     push(socket, event, %{"ids" => [message_id]})
 
@@ -144,7 +144,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, supplier_token, _claims} = Oceanconnect.Guardian.encode_and_sign(supplier)
 
     {:ok, _, socket} =
-      subscribe_and_join(socket(), ChatfishChannel, channel, %{"token" => supplier_token})
+      subscribe_and_join(socket(), ChatChannel, channel, %{"token" => supplier_token})
 
     push(socket, event, %{
       "auctionId" => auction_id,
@@ -159,7 +159,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
     {:ok, buyer_token, _claims} = Oceanconnect.Guardian.encode_and_sign(buyer)
 
     {:ok, _, _socket} =
-      subscribe_and_join(socket(), ChatfishChannel, recipient_channel, %{"token" => buyer_token})
+      subscribe_and_join(socket(), ChatChannel, recipient_channel, %{"token" => buyer_token})
 
     receive do
       %Phoenix.Socket.Broadcast{
@@ -171,7 +171,7 @@ defmodule OceanconnectWeb.ChatfishChannelTest do
       } ->
         assert message_payload.auction_id == auction_id
 
-        [conversation | _] = message_payload.conversations
+        [_ , conversation | _]  = message_payload.conversations
         assert conversation.company_name == supplier.company.name
 
         [%{content: content} | _tail] = Enum.reverse(conversation.messages)

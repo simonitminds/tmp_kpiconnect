@@ -113,7 +113,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         Enum.find(message_payloads_for_company, &(&1.auction_id == anon_auction.id))
 
       assert %MessagePayload{} = message_payload_for_anon_auction
-      assert length(message_payload_for_anon_auction.conversations) == 2
+      assert length(message_payload_for_anon_auction.conversations) == 3
 
       vessel_names = Enum.map(anon_auction.vessels, & &1.name)
       assert Enum.all?(message_payload_for_anon_auction.vessels, &(&1.name in vessel_names))
@@ -139,7 +139,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
 
       assert message.user == "Anonymous"
 
-      [supplier_company2_conversation] =
+      [buyer_company_conversation, supplier_company2_conversation] =
         Enum.reject(
           message_payload_for_anon_auction.conversations,
           &(&1 == supplier_company_conversation)
@@ -220,10 +220,10 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         Enum.map(buyer_message_payload_for_auction.conversations, & &1.company_name)
 
       assert supplier_name in conversation_companies
-      refute buyer_company.name in conversation_companies
+      assert buyer_company.name in conversation_companies # Buyers can have a conversation between themselves
     end
 
-    test "buyer's with no correspondence is not in their own conversation list" do
+    test "buyer's with no correspondence are in their own conversation list" do
       buyer_company = insert(:company)
 
       %{id: auction_id, suppliers: [%{name: supplier_name} | _]} =
@@ -238,7 +238,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         Enum.map(buyer_message_payload_for_auction.conversations, & &1.company_name)
 
       assert supplier_name in conversation_companies
-      refute buyer_company.name in conversation_companies
+      assert buyer_company.name in conversation_companies
     end
 
     test "supplier's conversation list includes buyer with no correspondence", %{
