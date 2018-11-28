@@ -17,7 +17,13 @@ defmodule OceanconnectWeb.SessionView do
         conn
         |> Auth.current_user()
         |> Accounts.impersonable_users_for()
-        |> Enum.map(&[value: &1.id, key: "#{&1.first_name} #{&1.last_name} (#{&1.company.name})"])
+        |> Enum.reduce(%{}, fn(user, acc) ->
+          company_name = user.company.name
+          user_value = [value: user.id, key: "#{user.first_name} #{user.last_name}"]
+          user_list = Map.get(acc, user.company.name, [])
+
+          Map.put(acc, company_name, [user_value | user_list])
+        end)
 
       false ->
         []
