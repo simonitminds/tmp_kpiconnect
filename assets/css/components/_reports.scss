@@ -51,13 +51,14 @@
       flex: 0 0 220px;
     }
 
-    &> div:nth-child(2) { // Event
-      flex: 2 0 auto;
-    }
-
     &> div:last-child { // Impersonator
       flex: 0 0 90px;
       margin-left: auto;
+    }
+
+    &> div:nth-child(2) { // Event
+      flex: 2 0 auto;
+      margin-left: none;
     }
   }
 }
