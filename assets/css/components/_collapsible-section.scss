@@ -53,6 +53,10 @@
 .collapsing-auction-bidding {
   margin: -1rem -1.25rem;
 
+  &.is-open{
+    padding-bottom: 3rem;
+  }
+
   h3.title { // Hide default header
     display: none;
   }

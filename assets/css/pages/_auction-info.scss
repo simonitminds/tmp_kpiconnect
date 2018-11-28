@@ -17,7 +17,7 @@
       padding-top: 0;
     }
   }
-  
+
   &__po { // Auction PO
     margin-bottom: 0.125rem;
     color: $gray-3;
@@ -248,10 +248,11 @@
   @media (max-width: 768px) {
     position: fixed;
     bottom: 0;
-    margin: 0 -1rem;
+    margin: 0 calc(-1rem - 1px);
+    border-radius: 0;
     margin-bottom: 0 !important;
-    padding-top: 1rem;
-    width: 100vw;
+    padding: 1.25rem 1.25rem 1.5rem;
+    width: calc(100vw + 2px);
     background-color: $gray-1;
   }
 }
@@ -283,13 +284,8 @@
 }
 
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
-  // margin: 1.25rem -1.275rem -1rem -1.275rem;
   box-shadow: none;
   border: 1px solid $gray-2;
-
-  @media (max-width: 768px) {
-    margin: 0 -2.25rem;
-  }
 }
 
 .auction__bid-amount {

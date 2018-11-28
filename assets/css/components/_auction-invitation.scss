@@ -20,53 +20,24 @@
 
   &__status {
     display: flex !important;
-    flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     padding: 0.75rem 2px 0.75rem 0;
     background-color: $gray-1 !important;
+    border-left: 10px solid $turquoise;
 
     &> * {
       display: flex !important;
     }
 
+    &__form {
+      display: flex;
+      flex-direction: column;
+    }
+
     &__copy {
-      margin-left: 1rem;
       font-weight: bold;
     }
-
-    &__marker {
-      border-top-left-radius: 5px;
-      border-bottom-left-radius: 5px;
-      margin: -12px 0 -11px 0 !important;
-      padding: 0 0.25rem;
-      flex-basis: 32px;
-      align-items: center;
-      display: inline-flex;
-      justify-content: center;
-      color: #fff;
-      text-align: center;
-
-      .auction-invitation__status--accepted & { background-color: $green; }
-      .auction-invitation__status--maybe & { background-color: $gold; }
-      .auction-invitation__status--decline & { background-color: $red; }
-      .auction-invitation__status--unanswered & { background-color: $gray-3; }
-
-    }
-
-  }
-
-  .auction-invitation__status__edit { // Pencil edit button for auction view invite
-    width: 2rem;
-    height: 2rem;
-    margin-left: auto;
-    padding: 0 0.5rem;
-    color: $gray-3 !important;
-  }
-  .auction-invitation__status__button { // Pencil edit button for auction view invite
-    margin-left: auto;
-    padding: 0;
-    color: $gray-3 !important;
   }
 }
 
@@ -83,6 +54,20 @@
       border: none;
       box-shadow: none;
     }
+
+    .auction-invitation__status > .auction-invitation__status__marker {
+      display: none !important;
+    }
+
+    .auction-invitation__status__marker {
+      padding-right: 0.75rem;
+    }
+
+    .auction-invitation__status--accepted .auction-invitation__status__marker { background-color: none; color: $green; }
+    .auction-invitation__status--maybe .auction-invitation__status__marker { background-color: none; color: $gold; }
+    .auction-invitation__status--declined .auction-invitation__status__marker { background-color: none; color: $red; }
+    .auction-invitation__status--unanswered .auction-invitation__status__marker { background-color: none; color: $gray-3; }
+
     .auction-invitation__status__copy {
       font-size: 1rem;
     }
@@ -99,12 +84,31 @@
     .auction-invitation__status {
       padding: 0;
       padding-top: 1rem;
-
     }
+    .auction-invitation__status__marker {
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      margin: -15px 0 0 -10px !important;
+      padding: 0 0.25rem;
+      flex-basis: 32px;
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+
+    .auction-invitation__status--accepted .auction-invitation__status__marker { background-color: $green; }
+    .auction-invitation__status--maybe .auction-invitation__status__marker { background-color: $gold; }
+    .auction-invitation__status--declined .auction-invitation__status__marker { background-color: $red; }
+    .auction-invitation__status--unanswered .auction-invitation__status__marker { background-color: $gray-3; }
+
     .auction-invitation__status__copy {
-      margin-left: 1rem;
+      margin-right: 1rem;
       margin-bottom: 0.5rem;
       font-size: 1rem;
+
+      .auction-invitation__status__marker { display: none; }
     }
     .auction-invitation__status > div { // Row of RSVP buttons
       margin-left: 1rem;

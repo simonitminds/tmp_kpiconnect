@@ -53,7 +53,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
       return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-times-circle"></i></span>;
     } else if (status == "maybe"){
         return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-adjust-circle"></i></span>;
-    else {
+    } else {
       return <span className={`icon has-text-gray-3 has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-question-circle"></i></span>;
     }
   }
