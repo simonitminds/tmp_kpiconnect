@@ -56,6 +56,9 @@
     <p style='font-family: "Arial"; margin-bottom: 0;'><%= @buyer_company.email %></p><br/>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Seller Information</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
+    <%= if is_traded_bid do %>
+      <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Physical Supplier:</b> <%= @physical_supplier.name %></p>
+    <% end %>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Seller Name:</b> <%= @winning_supplier_company.contact_name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Organization:</b> <%= @winning_supplier_company.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Address:</b></p>
