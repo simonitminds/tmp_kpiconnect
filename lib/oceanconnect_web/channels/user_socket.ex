@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.UserSocket do
 
   ## Channels
   channel("user_auctions:*", OceanconnectWeb.AuctionsChannel)
-  channel("user_messages:*", OceanconnectWeb.ChatfishChannel)
+  channel("user_messages:*", OceanconnectWeb.ChatChannel)
 
   ## Transports
   transport(:websocket, Phoenix.Transports.WebSocket)
