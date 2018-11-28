@@ -53,21 +53,25 @@ defmodule OceanconnectWeb.EmailController do
     auction = Oceanconnect.Auctions.get_auction!(3) |> Oceanconnect.Auctions.fully_loaded()
     winning_supplier_company2 = List.last(auction.suppliers)
     fuels = auction.fuels
-    approved_barges = Auctions.list_auction_barges(auction)
-    |> Enum.uniq_by(&(&1.barge_id))
-    |> Enum.map(&(Map.put(&1, :supplier_id, winning_supplier_company2.id)))
+
+    approved_barges =
+      Auctions.list_auction_barges(auction)
+      |> Enum.uniq_by(& &1.barge_id)
+      |> Enum.map(&Map.put(&1, :supplier_id, winning_supplier_company2.id))
+
     winning_solution = %{
       valid: true,
       auction_id: auction.id,
-      bids: Enum.map(fuels, fn(fuel) ->
-        %AuctionBid{
-          auction_id: auction.id,
-          amount: 200.00,
-          fuel_id: fuel.id,
-          supplier_id: winning_supplier_company2.id,
-          is_traded_bid: false
-        }
-      end)
+      bids:
+        Enum.map(fuels, fn fuel ->
+          %AuctionBid{
+            auction_id: auction.id,
+            amount: 200.00,
+            fuel_id: fuel.id,
+            supplier_id: winning_supplier_company2.id,
+            is_traded_bid: false
+          }
+        end)
     }
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =

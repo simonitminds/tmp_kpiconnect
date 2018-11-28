@@ -12,17 +12,26 @@ defmodule Oceanconnect.MessagesFeatureTest do
 
     auction =
       :auction
-      |> insert(buyer: buyer_company, suppliers: [supplier_company], vessels: [vessel], auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel)])
+      |> insert(
+        buyer: buyer_company,
+        suppliers: [supplier_company],
+        vessels: [vessel],
+        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel)]
+      )
       |> Auctions.fully_loaded()
 
-    messages = insert_list(3, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
+    messages =
+      insert_list(3, :message,
+        auction: auction,
+        author_company: buyer_company,
+        recipient_company: supplier_company
+      )
 
     {:ok, %{auction: auction, buyer: buyer, messages: messages, supplier: supplier}}
   end
 
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
-
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{handle_events: true}}}
@@ -33,7 +42,9 @@ defmodule Oceanconnect.MessagesFeatureTest do
       {:ok, %{auction: auction}}
     end
 
-    test "buyer can see a list of all participating auctions in the chat window", %{auction: auction} do
+    test "buyer can see a list of all participating auctions in the chat window", %{
+      auction: auction
+    } do
       assert AuctionIndexPage.is_current_path?()
       MessagesPage.open_message_window()
       assert MessagesPage.has_participating_auctions?([auction])
@@ -49,7 +60,6 @@ defmodule Oceanconnect.MessagesFeatureTest do
 
   describe "supplier login" do
     setup %{auction: auction, supplier: supplier} do
-
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor,
@@ -61,7 +71,9 @@ defmodule Oceanconnect.MessagesFeatureTest do
       {:ok, %{auction: auction}}
     end
 
-    test "supplier can see a list of all participating auctions in the chat window", %{auction: auction} do
+    test "supplier can see a list of all participating auctions in the chat window", %{
+      auction: auction
+    } do
       assert AuctionIndexPage.is_current_path?()
       MessagesPage.open_message_window()
       assert MessagesPage.has_participating_auctions?([auction])
@@ -74,7 +86,10 @@ defmodule Oceanconnect.MessagesFeatureTest do
       assert MessagesPage.has_participating_auctions?([auction])
     end
 
-    test "unseen messages are marked as seen when recipient expands conversation", %{auction: _auction, messages: _messages} do
+    test "unseen messages are marked as seen when recipient expands conversation", %{
+      auction: _auction,
+      messages: _messages
+    } do
       # AuctionShowPage.visit(auction.id)
       # assert AuctionShowPage.is_current_path?(auction.id)
       # MessagesPage.open_message_window()

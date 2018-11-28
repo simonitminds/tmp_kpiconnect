@@ -102,9 +102,10 @@ defmodule Oceanconnect.AuctionIndexTest do
 
   describe "supplier login" do
     setup %{auctions: auctions, supplier: supplier} do
-      auction = auctions
-      |> hd()
-      |> Auctions.fully_loaded()
+      auction =
+        auctions
+        |> hd()
+        |> Auctions.fully_loaded()
 
       {:ok, _pid} =
         start_supervised(

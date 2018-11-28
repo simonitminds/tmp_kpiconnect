@@ -24,10 +24,22 @@ defmodule Oceanconnect.AuctionLogTest do
         suppliers: [supplier_company, supplier_company2],
         auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         duration: 600_000
-      ) |> Auctions.fully_loaded()
+      )
+      |> Auctions.fully_loaded()
 
-    message = insert(:message, auction: auction, author_company: supplier_company2, recipient_company: buyer_company)
-    messages = insert_list(2, :message, auction: auction, author_company: buyer_company, recipient_company: supplier_company)
+    message =
+      insert(:message,
+        auction: auction,
+        author_company: supplier_company2,
+        recipient_company: buyer_company
+      )
+
+    messages =
+      insert_list(2, :message,
+        auction: auction,
+        author_company: buyer_company,
+        recipient_company: supplier_company
+      )
 
     {:ok, _pid} =
       start_supervised(
@@ -37,8 +49,9 @@ defmodule Oceanconnect.AuctionLogTest do
 
     Auctions.start_auction(auction)
 
-    bid = create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
-    |> Auctions.place_bid(supplier)
+    bid =
+      create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      |> Auctions.place_bid(supplier)
 
     Auctions.end_auction(auction)
 
@@ -56,14 +69,27 @@ defmodule Oceanconnect.AuctionLogTest do
 
     auction_events = Auctions.AuctionEventStore.event_list(updated_auction.id)
 
-    {:ok, %{auction: updated_auction, buyer_id: buyer_company.id, supplier: supplier, fuel: fuel, auction_events: auction_events, messages: [message | messages]}}
+    {:ok,
+     %{
+       auction: updated_auction,
+       buyer_id: buyer_company.id,
+       supplier: supplier,
+       fuel: fuel,
+       auction_events: auction_events,
+       messages: [message | messages]
+     }}
   end
 
   test "auction log has log details", %{auction_events: auction_events} do
     assert AuctionLogPage.has_events?(auction_events)
   end
 
-  test "page has auction details", %{auction: auction, fuel: fuel, supplier: supplier, auction_events: auction_events} do
+  test "page has auction details", %{
+    auction: auction,
+    fuel: fuel,
+    supplier: supplier,
+    auction_events: auction_events
+  } do
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),
       "buyer-name" => auction.buyer.name,
@@ -79,7 +105,8 @@ defmodule Oceanconnect.AuctionLogTest do
 
   test "auction log displays all vessel_fuels", %{auction: auction} do
     vessel_fuels = auction.auction_vessel_fuels
-    Enum.all?(vessel_fuels, fn(vessel_fuel) ->
+
+    Enum.all?(vessel_fuels, fn vessel_fuel ->
       assert AuctionLogPage.has_vessel_fuel?(vessel_fuel)
     end)
   end

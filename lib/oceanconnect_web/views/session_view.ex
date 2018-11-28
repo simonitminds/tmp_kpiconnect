@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.SessionView do
         conn
         |> Auth.current_user()
         |> Accounts.impersonable_users_for()
-        |> Enum.reduce(%{}, fn(user, acc) ->
+        |> Enum.reduce(%{}, fn user, acc ->
           company_name = user.company.name
           user_value = [value: user.id, key: "#{user.first_name} #{user.last_name}"]
           user_list = Map.get(acc, user.company.name, [])
@@ -64,7 +64,11 @@ defmodule OceanconnectWeb.SessionView do
 
   def log_in_logout_link(conn) do
     if current_user(conn) != "" do
-      link("Log Out", to: session_path(conn, :delete), method: :delete, class: "navbar-item qa-logout")
+      link("Log Out",
+        to: session_path(conn, :delete),
+        method: :delete,
+        class: "navbar-item qa-logout"
+      )
     end
   end
 

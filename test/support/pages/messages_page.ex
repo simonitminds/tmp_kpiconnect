@@ -4,7 +4,7 @@ defmodule Oceanconnect.MessagesPage do
 
   def auction_conversation_unseen_count(auction_id, company_name) do
     :css
-    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
+    |> find_element(".qa-auction-#{auction_id}-message-payloads")
     |> find_within_element(:css, ".qa-conversation-company-#{company_name}")
     |> find_within_element(:css, ".qa-messages-unseen-count")
     |> inner_text()
@@ -12,9 +12,10 @@ defmodule Oceanconnect.MessagesPage do
 
   def has_participating_auctions?(auctions) do
     Enum.all?(auctions, fn auction ->
-      text = find_element(:css, ".qa-auction-messages-auctions")
-      |> find_within_element(:css, ".qa-auction-#{auction.id}-message-payloads")
-      |> inner_text()
+      text =
+        find_element(:css, ".qa-auction-messages-auctions")
+        |> find_within_element(:css, ".qa-auction-#{auction.id}-message-payloads")
+        |> inner_text()
 
       Enum.any?(auction.vessels, &(text =~ &1.name))
     end)
@@ -26,14 +27,14 @@ defmodule Oceanconnect.MessagesPage do
 
   def open_auction_conversation(auction_id, company_name) do
     :css
-    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
+    |> find_element(".qa-auction-#{auction_id}-message-payloads")
     |> find_within_element(:css, ".qa-conversation-company-#{company_name}")
     |> click()
   end
 
   def open_auction_message_payload(auction_id) do
     :css
-    |> find_element( ".qa-auction-#{auction_id}-message-payloads")
+    |> find_element(".qa-auction-#{auction_id}-message-payloads")
     |> click()
   end
 

@@ -9,8 +9,8 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   def get_solutions_payload!(
         _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
-        [auction: auction = %Auction{buyer_id: buyer_id},
-        buyer: buyer_id]
+        auction: auction = %Auction{buyer_id: buyer_id},
+        buyer: buyer_id
       ) do
     other_solutions = list_other_solutions(solutions, winning_solution)
 
@@ -34,8 +34,10 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
         supplier: supplier_id
       ) do
     suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
+
     %{
-      best_single_supplier: scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
+      best_single_supplier:
+        scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
       best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id),
       suppliers_best_solution: scrub_solution_for_supplier(suppliers_best_solution, supplier_id),
       winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id)
@@ -77,6 +79,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   defp scrub_solution_for_supplier(nil, _supplier_id), do: nil
   defp scrub_solution_for_supplier(%Solution{bids: []}, _auction), do: nil
+
   defp scrub_solution_for_supplier(solution = %Solution{bids: bids}, supplier_id) do
     %Solution{
       solution
@@ -86,12 +89,14 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   defp scrub_solution_for_buyer(nil, _auction), do: nil
   defp scrub_solution_for_buyer(%Solution{bids: []}, _auction), do: nil
+
   defp scrub_solution_for_buyer(solution = %Solution{bids: bids}, auction) do
     %Solution{solution | bids: Enum.map(bids, fn bid -> scrub_bid_for_buyer(bid, auction) end)}
   end
+
   defp scrub_solutions_for_buyer(solutions, auction) when is_list(solutions) do
     Enum.map(solutions, fn solution -> scrub_solution_for_buyer(solution, auction) end)
-    |> Enum.filter(&(&1))
+    |> Enum.filter(& &1)
   end
 
   # TODO: dedupe this across payloads

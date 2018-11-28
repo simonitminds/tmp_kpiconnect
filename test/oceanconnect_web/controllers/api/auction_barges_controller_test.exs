@@ -11,8 +11,10 @@ defmodule OceanconnectWeb.Api.AuctionBargesControllerTest do
     supplier2_company = insert(:company, is_supplier: true)
     supplier2 = insert(:user, company: supplier2_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
-    auction = insert(:auction, port: port, buyer: buyer_company, suppliers: [supplier_company])
-    |> Auctions.fully_loaded()
+
+    auction =
+      insert(:auction, port: port, buyer: buyer_company, suppliers: [supplier_company])
+      |> Auctions.fully_loaded()
 
     {:ok, _pid} =
       start_supervised(

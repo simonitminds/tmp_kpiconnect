@@ -105,7 +105,6 @@ defmodule OceanconnectWeb.Router do
     post("/send_email/upcoming", EmailController, :send_upcoming)
     post("/send_email/cancellation", EmailController, :send_cancellation)
     post("/send_email/completion", EmailController, :send_completion)
-
   end
 
   scope "/admin", OceanconnectWeb.Admin do

@@ -10,11 +10,12 @@ defmodule OceanconnectWeb.AuctionRsvpController do
          %AuctionSuppliers{supplier_id: ^company_id} <-
            Auctions.get_auction_supplier(auction_id, company_id),
          true <- response in ["yes", "no", "maybe"] do
-
       Auctions.update_participation_for_supplier(auction_id, company_id, response)
 
-      auction = Auctions.get_auction!(auction_id)
-      |> Auctions.fully_loaded()
+      auction =
+        Auctions.get_auction!(auction_id)
+        |> Auctions.fully_loaded()
+
       AuctionNotifier.notify_buyer_participants(auction)
 
       conn

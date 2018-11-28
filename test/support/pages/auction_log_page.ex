@@ -9,7 +9,9 @@ defmodule Oceanconnect.AuctionLogPage do
   def has_events?(events) do
     Enum.all?(events, fn event ->
       element = find_element(:class, "qa-event-#{event.id}")
-      (find_within_element(element, :class, "qa-event-type") |> inner_text) =~ AuctionView.convert_event_type(event.type)
+
+      find_within_element(element, :class, "qa-event-type") |> inner_text =~
+        AuctionView.convert_event_type(event.type)
     end)
   end
 
@@ -18,7 +20,8 @@ defmodule Oceanconnect.AuctionLogPage do
       events
       |> Enum.filter(fn event -> event.type == :bid_placed end)
       |> hd
-    (user_text(bid_event.id) =~ "#{supplier.first_name} #{supplier.last_name}")
+
+    user_text(bid_event.id) =~ "#{supplier.first_name} #{supplier.last_name}"
   end
 
   def event_user_displayed?(events) do
@@ -65,6 +68,7 @@ defmodule Oceanconnect.AuctionLogPage do
 
   def has_message_details?(message_id, details) do
     message_element = find_element(:class, "qa-message-#{message_id}")
+
     Enum.all?(details, fn {k, v} ->
       v =
         case v do
@@ -82,12 +86,11 @@ defmodule Oceanconnect.AuctionLogPage do
   end
 
   def has_vessel_fuel?(%{id: id, vessel: vessel, fuel: fuel, quantity: quantity}) do
-    deliverable_text = find_element(:css, ".qa-auction-deliverable-#{id}")
-    |> inner_text
+    deliverable_text =
+      find_element(:css, ".qa-auction-deliverable-#{id}")
+      |> inner_text
 
-    deliverable_text =~ vessel.name &&
-    deliverable_text =~ "#{vessel.imo}" &&
-    deliverable_text =~ "#{quantity}" &&
-    deliverable_text =~ fuel.name
+    deliverable_text =~ vessel.name && deliverable_text =~ "#{vessel.imo}" &&
+      deliverable_text =~ "#{quantity}" && deliverable_text =~ fuel.name
   end
 end

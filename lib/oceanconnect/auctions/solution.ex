@@ -38,15 +38,16 @@ defmodule Oceanconnect.Auctions.Solution do
   def sort_tuple(solution) do
     # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.
     valid_indicator = if solution.valid, do: 0, else: 1
+
     latest_original_time_entered =
       if solution.latest_original_time_entered do
         DateTime.to_unix(solution.latest_original_time_entered, :microsecond)
       else
         DateTime.utc_now()
       end
+
     {valid_indicator, solution.total_price, latest_original_time_entered}
   end
-
 
   defp is_valid?(bids, product_ids) do
     Enum.all?(product_ids, fn product_id ->
@@ -55,6 +56,7 @@ defmodule Oceanconnect.Auctions.Solution do
   end
 
   defp latest_time_entered([]), do: nil
+
   defp latest_time_entered(bids) do
     bids
     |> Enum.map(& &1.time_entered)
@@ -62,8 +64,8 @@ defmodule Oceanconnect.Auctions.Solution do
     |> hd()
   end
 
-
   defp latest_original_time_entered([]), do: nil
+
   defp latest_original_time_entered(bids) do
     bids
     |> Enum.map(& &1.original_time_entered)
@@ -73,10 +75,10 @@ defmodule Oceanconnect.Auctions.Solution do
 
   defp normalized_price(bids, product_quantities) do
     {total_price, total_quantity} =
-      Enum.reduce(bids, {0, 0}, fn(bid, acc = {total_price, total_quantity}) ->
+      Enum.reduce(bids, {0, 0}, fn bid, acc = {total_price, total_quantity} ->
         if quantity = Map.get(product_quantities, "#{bid.fuel_id}") do
           total_quantity = total_quantity + quantity
-          total_price = total_price + (bid.amount * quantity)
+          total_price = total_price + bid.amount * quantity
           {total_price, total_quantity}
         else
           acc
@@ -89,7 +91,7 @@ defmodule Oceanconnect.Auctions.Solution do
   defp total_price(bids, product_quantities) do
     Enum.reduce(bids, 0, fn bid, acc ->
       quantity = product_quantities["#{bid.fuel_id}"]
-      acc + (bid.amount * quantity)
+      acc + bid.amount * quantity
     end)
   end
 end

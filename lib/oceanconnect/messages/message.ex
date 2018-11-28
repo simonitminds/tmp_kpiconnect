@@ -4,7 +4,6 @@ defmodule Oceanconnect.Messages.Message do
   import Ecto.Query
   alias __MODULE__
 
-
   schema "messages" do
     field(:content, :string)
     field(:has_been_seen, :boolean, default: false)
@@ -20,13 +19,25 @@ defmodule Oceanconnect.Messages.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:author_id, :author_company_id, :auction_id, :content, :has_been_seen, :impersonator_id, :recipient_company_id])
+    |> cast(attrs, [
+      :author_id,
+      :author_company_id,
+      :auction_id,
+      :content,
+      :has_been_seen,
+      :impersonator_id,
+      :recipient_company_id
+    ])
     |> validate_required([:content, :has_been_seen])
   end
 
   def auction_messages_for_company(auction_id, company_id) do
     Message
-    |> where([m], m.auction_id == ^auction_id and (m.author_company_id == ^company_id or m.recipient_company_id == ^company_id))
+    |> where(
+      [m],
+      m.auction_id == ^auction_id and
+        (m.author_company_id == ^company_id or m.recipient_company_id == ^company_id)
+    )
     |> order_by(asc: :id)
   end
 end

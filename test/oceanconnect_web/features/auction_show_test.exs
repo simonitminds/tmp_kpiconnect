@@ -27,7 +27,8 @@ defmodule Oceanconnect.AuctionShowTest do
         suppliers: [supplier_company, supplier_company2, supplier_company3],
         auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
         is_traded_bid_allowed: true
-      ) |> Auctions.fully_loaded()
+      )
+      |> Auctions.fully_loaded()
 
     bid_params = %{
       amount: 1.25
@@ -106,8 +107,10 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "buyer can see the bid list", %{auction: auction, fuel_id: fuel_id} do
       [s1, s2, _s3] = auction.suppliers
+
       create_bid(1.75, nil, s1.id, fuel_id, auction, true)
       |> Auctions.place_bid(insert(:user, company: s1))
+
       create_bid(1.75, nil, s2.id, fuel_id, auction, false)
       |> Auctions.place_bid(insert(:user, company: s2))
 
@@ -125,7 +128,11 @@ defmodule Oceanconnect.AuctionShowTest do
 
           %{
             "id" => bid.id,
-            "data" => %{"amount" => "$#{bid.amount}", "supplier" => bid.supplier, "is_traded_bid" => is_traded_bid}
+            "data" => %{
+              "amount" => "$#{bid.amount}",
+              "supplier" => bid.supplier,
+              "is_traded_bid" => is_traded_bid
+            }
           }
         end)
 
@@ -236,7 +243,9 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 0.50})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid matches the best single-supplier offer, but was not the first"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid matches the best single-supplier offer, but was not the first"
     end
 
     test "supplier places minimum bid and maintains winning position", %{
@@ -300,10 +309,14 @@ defmodule Oceanconnect.AuctionShowTest do
   describe "decision period" do
     setup %{auction: auction, supplier: supplier, supplier2: supplier2, fuel_id: fuel_id} do
       Auctions.start_auction(auction)
-      bid = create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
-      |> Auctions.place_bid()
-      bid2 = create_bid(1.25, nil, supplier2.company_id, fuel_id, auction)
-      |> Auctions.place_bid()
+
+      bid =
+        create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
+        |> Auctions.place_bid()
+
+      bid2 =
+        create_bid(1.25, nil, supplier2.company_id, fuel_id, auction)
+        |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
       {:ok, %{bid: bid, bid2: bid2}}

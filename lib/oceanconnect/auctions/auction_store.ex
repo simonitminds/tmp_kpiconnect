@@ -230,17 +230,32 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         current_state = %{auction_id: auction_id}
       ) do
     new_state = revoke_supplier_bids(current_state, product, supplier_id)
-    AuctionEvent.emit(AuctionEvent.bids_revoked(auction_id, product, supplier_id, new_state, user), emit)
+
+    AuctionEvent.emit(
+      AuctionEvent.bids_revoked(auction_id, product, supplier_id, new_state, user),
+      emit
+    )
+
     {:noreply, new_state}
   end
 
   def handle_cast(
-        {:select_winning_solution, %{solution: solution = %Solution{}, auction: auction = %Auction{}, port_agent: port_agent, user: user}, emit},
+        {:select_winning_solution,
+         %{
+           solution: solution = %Solution{},
+           auction: auction = %Auction{},
+           port_agent: port_agent,
+           user: user
+         }, emit},
         current_state
       ) do
     new_state = select_winning_solution(solution, current_state)
 
-    AuctionEvent.emit(AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user), emit)
+    AuctionEvent.emit(
+      AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user),
+      emit
+    )
+
     AuctionEvent.emit(AuctionEvent.auction_closed(auction, new_state), emit)
 
     {:noreply, new_state}
@@ -360,7 +375,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state
   end
 
-  defp replay_event(%AuctionEvent{type: :auto_bid_placed, data: %{bid: event_bid}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :auto_bid_placed, data: %{bid: event_bid}},
+         previous_state
+       ) do
     bid = AuctionBid.from_event_bid(event_bid)
     {_product_state, _events, new_state} = process_bid(previous_state, bid)
     new_state
@@ -370,7 +388,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     previous_state
   end
 
-  defp replay_event(%AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}},
+         previous_state
+       ) do
     revoke_supplier_bids(previous_state, product, supplier_id)
   end
 
@@ -390,7 +411,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     cancel_auction(previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}}, previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}},
+         previous_state
+       ) do
     select_winning_solution(solution, previous_state)
   end
 
@@ -426,7 +450,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     expire_auction(previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state), do: state
+  defp replay_event(%AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state),
+    do: state
 
   defp replay_event(%AuctionEvent{type: :auction_state_rebuilt, data: _state}, _previous_state),
     do: nil
@@ -509,8 +534,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          current_state = %{auction_id: auction_id, product_bids: product_bids},
          product_id,
          supplier_id
-      ) do
-    product_state = product_bids["#{product_id}"] || ProductBidState.for_product(product_id, auction_id)
+       ) do
+    product_state =
+      product_bids["#{product_id}"] || ProductBidState.for_product(product_id, auction_id)
+
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)
 

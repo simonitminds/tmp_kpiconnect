@@ -41,7 +41,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         auction_id: auction_id,
         lowest_bids: [],
         minimum_bids: [],
-
         bids: []
       }
 
@@ -124,7 +123,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         lowest_bids: [prev_bid],
         active_bids: [prev_bid],
         minimum_bids: [],
-
         bids: [prev_bid]
       }
 
@@ -167,7 +165,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
         lowest_bids: [prev_bid],
         active_bids: [prev_bid],
         minimum_bids: [],
-
         bids: [prev_bid]
       }
 
@@ -271,13 +268,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       deactivated_supplier1_bid = %AuctionBid{supplier1_bid | active: false}
 
       assert %ProductBidState{
-                auction_id: ^auction_id,
-                active_bids: [^supplier2_bid],
-                bids: [^supplier2_bid, ^deactivated_supplier1_bid],
-                inactive_bids: [^deactivated_supplier1_bid],
-                lowest_bids: [^supplier2_bid],
-                minimum_bids: [],
-              } = AuctionBidCalculator.revoke_supplier_bids(current_state, supplier1)
+               auction_id: ^auction_id,
+               active_bids: [^supplier2_bid],
+               bids: [^supplier2_bid, ^deactivated_supplier1_bid],
+               inactive_bids: [^deactivated_supplier1_bid],
+               lowest_bids: [^supplier2_bid],
+               minimum_bids: []
+             } = AuctionBidCalculator.revoke_supplier_bids(current_state, supplier1)
     end
   end
 
@@ -608,12 +605,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert [{1.25, ^supplier1}, {2.50, ^supplier2} | _rest] = lowest_bids
     end
 
-    test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten", %{
-       auction: auction,
-       fuel_id: fuel_id,
-       supplier1: supplier1,
-       supplier2: supplier2
-    } do
+    test "after auction start with lower, beatable normal bid lowers all auto bids and is beaten",
+         %{
+           auction: auction,
+           fuel_id: fuel_id,
+           supplier1: supplier1,
+           supplier2: supplier2
+         } do
       auction_id = auction.id
 
       supplier1_bid1 = %AuctionBid{
@@ -906,12 +904,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert Enum.any?(state.bids, fn bid -> bid.supplier_id == supplier1 end)
     end
 
-    test "with no initial amount and existing lowest bid from same supplier maintains existing amount", %{
-      auction: auction,
-      fuel_id: fuel_id,
-      supplier1: supplier1,
-      supplier2: supplier2
-    } do
+    test "with no initial amount and existing lowest bid from same supplier maintains existing amount",
+         %{
+           auction: auction,
+           fuel_id: fuel_id,
+           supplier1: supplier1,
+           supplier2: supplier2
+         } do
       auction_id = auction.id
 
       supplier1_bid1 = %AuctionBid{
@@ -960,12 +959,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert [{1.50, ^supplier2}, {2.00, ^supplier1}] = lowest_bids
     end
 
-    test "with no initial amount and existing non-lowest bid from same supplier beats lowest existing amount", %{
-      auction: auction,
-      fuel_id: fuel_id,
-      supplier1: supplier1,
-      supplier2: supplier2
-    } do
+    test "with no initial amount and existing non-lowest bid from same supplier beats lowest existing amount",
+         %{
+           auction: auction,
+           fuel_id: fuel_id,
+           supplier1: supplier1,
+           supplier2: supplier2
+         } do
       auction_id = auction.id
 
       supplier1_bid1 = %AuctionBid{

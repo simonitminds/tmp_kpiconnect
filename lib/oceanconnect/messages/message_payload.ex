@@ -50,33 +50,49 @@ defmodule Oceanconnect.Messages.MessagePayload do
     |> build_message_payload_with_supplier_name(message_payload, company_id)
   end
 
-  defp get_correspondence_company_id(%{author_company_id: company_id, recipient_company_id: id}, company_id), do: id
+  defp get_correspondence_company_id(
+         %{author_company_id: company_id, recipient_company_id: id},
+         company_id
+       ),
+       do: id
+
   defp get_correspondence_company_id(%{author_company_id: id}, _company_id), do: id
 
-  defp maybe_add_companies_with_no_correspondence(messages_map, %{buyer_id: buyer_id, suppliers: suppliers}, buyer_id) do
-    empty_supplier_messages_map = Enum.reduce(suppliers, %{}, fn(%{id: id}, acc) -> Map.put(acc, id, []) end)
+  defp maybe_add_companies_with_no_correspondence(
+         messages_map,
+         %{buyer_id: buyer_id, suppliers: suppliers},
+         buyer_id
+       ) do
+    empty_supplier_messages_map =
+      Enum.reduce(suppliers, %{}, fn %{id: id}, acc -> Map.put(acc, id, []) end)
+
     Map.merge(empty_supplier_messages_map, messages_map)
   end
 
-  defp maybe_add_companies_with_no_correspondence(messages_map, %{buyer_id: buyer_id}, _company_id) do
+  defp maybe_add_companies_with_no_correspondence(
+         messages_map,
+         %{buyer_id: buyer_id},
+         _company_id
+       ) do
     Map.merge(%{buyer_id => []}, messages_map)
   end
 
   defp build_message_payload_with_supplier_name(messages_map, message_payload, company_id) do
     messages_map
-    |> Enum.reduce([], fn({k, v}, acc) ->
+    |> Enum.reduce([], fn {k, v}, acc ->
       company_message_payload = %{
         company_name: AuctionSuppliers.get_name_or_alias(k, message_payload),
         messages: sanitize_messages(v, company_id, message_payload),
         unseen_messages: count_unseen_messages(v, company_id)
       }
+
       [company_message_payload | acc]
     end)
     |> Enum.sort_by(& &1.company_name)
   end
 
   defp sanitize_messages(messages, company_id, %{anonymous_bidding: anon}) do
-    Enum.map(messages, fn(message) ->
+    Enum.map(messages, fn message ->
       message
       |> Map.take([:id, :content, :has_been_seen, :inserted_at])
       |> Map.put(:author_is_me, message.author_company_id == company_id)
@@ -84,9 +100,17 @@ defmodule Oceanconnect.Messages.MessagePayload do
     end)
   end
 
-  defp get_user_name_or_anon(%{author_id: author_id, author_company_id: company_id}, company_id, _anon), do: Accounts.get_user_name!(author_id)
+  defp get_user_name_or_anon(
+         %{author_id: author_id, author_company_id: company_id},
+         company_id,
+         _anon
+       ),
+       do: Accounts.get_user_name!(author_id)
+
   defp get_user_name_or_anon(_message, _company_id, true = _anon), do: "Anonymous"
-  defp get_user_name_or_anon(%{author_id: author_id}, _company_id, _anon), do: Accounts.get_user_name!(author_id)
+
+  defp get_user_name_or_anon(%{author_id: author_id}, _company_id, _anon),
+    do: Accounts.get_user_name!(author_id)
 
   defp count_unseen_messages(messages, company_id) do
     Enum.count(messages, &unseen_by_recipient?(&1, company_id))
@@ -96,7 +120,9 @@ defmodule Oceanconnect.Messages.MessagePayload do
   defp unseen_by_recipient?(%{has_been_seen: has_been_seen}, _company_id), do: !has_been_seen
 
   defp add_unseen_message_totals(%MessagePayload{conversations: conversations} = message_payload) do
-    unseen_messages = Enum.reduce(conversations, 0, fn(conversation, acc) -> acc + conversation.unseen_messages end)
+    unseen_messages =
+      Enum.reduce(conversations, 0, fn conversation, acc -> acc + conversation.unseen_messages end)
+
     Map.put(message_payload, :unseen_messages, unseen_messages)
   end
 end

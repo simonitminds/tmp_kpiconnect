@@ -270,6 +270,7 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
+
   def get_auction_supplier(auction_id, supplier_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
@@ -448,6 +449,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil
+
   def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
     Enum.map(suppliers, fn supplier ->
       alias_name =

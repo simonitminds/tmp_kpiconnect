@@ -17,20 +17,24 @@ defmodule OceanconnectWeb.AuctionController do
       |> Auctions.fully_loaded()
 
     auction_state = Auctions.get_auction_state!(auction)
+
     with %Auction{} <- auction,
          true <- current_company_id == auction.buyer_id or Auth.current_user_is_admin?(conn),
-         true <- auction_state.status not in [:draft, :pending, :open] or Auth.current_user_is_admin?(conn) do
-
+         true <-
+           auction_state.status not in [:draft, :pending, :open] or
+             Auth.current_user_is_admin?(conn) do
       render(
         conn,
         "log.html",
         auction_payload: AuctionPayload.get_auction_payload!(auction, auction.buyer_id),
         events: AuctionEventStore.event_list(auction.id),
         messages_by_company: Messages.messages_by_thread(auction),
-        solutions_payload: Payloads.SolutionsPayload.get_solutions_payload!(
-          auction_state,
-          [auction: auction, buyer: auction.buyer_id]
-        )
+        solutions_payload:
+          Payloads.SolutionsPayload.get_solutions_payload!(
+            auction_state,
+            auction: auction,
+            buyer: auction.buyer_id
+          )
       )
     else
       _ -> redirect(conn, to: auction_path(conn, :index))
@@ -158,16 +162,16 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
-    auction_vessel_fuels =
-      vessel_fuels_from_params(auction_params)
+    auction_vessel_fuels = vessel_fuels_from_params(auction_params)
 
     user = Auth.current_user(conn)
 
     with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
-      updated_params = Auction.from_params(auction_params)
-      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
+      updated_params =
+        Auction.from_params(auction_params)
+        |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
       case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->
@@ -234,33 +238,40 @@ defmodule OceanconnectWeb.AuctionController do
     [auction, json_auction, suppliers]
   end
 
-  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_map(auction_vessel_fuels) do
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels})
+       when is_map(auction_vessel_fuels) do
     Enum.flat_map(auction_vessel_fuels, fn {fuel_id, vessel_quantities} ->
       Enum.map(vessel_quantities, fn {vessel_id, quantity} ->
         %{"fuel_id" => fuel_id, "vessel_id" => vessel_id, "quantity" => quantity}
       end)
     end)
   end
-  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels}) when is_list(auction_vessel_fuels) do
+
+  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels})
+       when is_list(auction_vessel_fuels) do
     auction_vessel_fuels
   end
+
   # For draft auctions, there might only be vessels or fuels provided. Even
   # though these are invalid for _scheduled_ auctions, they are still allowed
   # for draft auctions as the values for fuels and quantities may not be known.
-  defp vessel_fuels_from_params(%{"vessels" => vessels, "fuels" => fuels}) when is_list(vessels) and is_list(fuels) do
-    Enum.map(fuels, fn(fuel_id) ->
-      Enum.flat_map(vessels, fn(vessel_id) ->
+  defp vessel_fuels_from_params(%{"vessels" => vessels, "fuels" => fuels})
+       when is_list(vessels) and is_list(fuels) do
+    Enum.map(fuels, fn fuel_id ->
+      Enum.flat_map(vessels, fn vessel_id ->
         %{"vessel_id" => vessel_id, "fuel_id" => fuel_id}
       end)
     end)
   end
+
   defp vessel_fuels_from_params(%{"vessels" => vessels}) when is_list(vessels) do
-    Enum.map(vessels, fn(vessel_id) ->
+    Enum.map(vessels, fn vessel_id ->
       %{"vessel_id" => vessel_id}
     end)
   end
+
   defp vessel_fuels_from_params(%{"fuels" => fuels}) when is_list(fuels) do
-    Enum.map(fuels, fn(fuel_id) ->
+    Enum.map(fuels, fn fuel_id ->
       %{"fuel_id" => fuel_id}
     end)
   end

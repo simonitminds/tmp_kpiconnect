@@ -39,7 +39,8 @@ defmodule Oceanconnect.Accounts.User do
     from(
       q in query,
       where: q.is_admin == false,
-      join: c in Company, where: c.id == q.company_id,
+      join: c in Company,
+      where: c.id == q.company_id,
       order_by: [asc: c.name, asc: q.first_name, asc: q.last_name],
       preload: [:company]
     )

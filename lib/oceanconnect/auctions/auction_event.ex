@@ -16,11 +16,12 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   def emit(%AuctionEvent{}, false), do: nil
 
   def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data, user: _user}, _emit) do
-    :ok = Phoenix.PubSub.broadcast(
-      :auction_pubsub,
-      "auction:#{id}",
-      Map.put(event, :id, UUID.uuid4(:hex))
-    )
+    :ok =
+      Phoenix.PubSub.broadcast(
+        :auction_pubsub,
+        "auction:#{id}",
+        Map.put(event, :id, UUID.uuid4(:hex))
+      )
 
     {:ok, event}
   end
@@ -142,10 +143,10 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auto_bid_placed(
-    bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
-    new_state = %ProductBidState{},
-    nil
-  ) do
+        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
+        new_state = %ProductBidState{},
+        nil
+      ) do
     %AuctionEvent{
       type: :auto_bid_placed,
       auction_id: auction_id,

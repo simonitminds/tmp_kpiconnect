@@ -49,15 +49,30 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, %{auction: auction, fuel_id: fuel_id}}
   end
 
-  test "rebuild auction state from event storage", %{auction: auction = %Auction{id: auction_id}, fuel_id: fuel_id} do
+  test "rebuild auction state from event storage", %{
+    auction: auction = %Auction{id: auction_id},
+    fuel_id: fuel_id
+  } do
     Auctions.start_auction(auction)
-    bid = create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
-    |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
+
+    bid =
+      create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+      |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
+
     create_bid(1.50, nil, hd(auction.suppliers).id, fuel_id, auction)
     |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
+
     Auctions.end_auction(auction)
     state = Auctions.get_auction_state!(auction)
-    Auctions.select_winning_solution([bid], state.product_bids, auction, "Winner Winner Chicken Dinner.", "Agent 9")
+
+    Auctions.select_winning_solution(
+      [bid],
+      state.product_bids,
+      auction,
+      "Winner Winner Chicken Dinner.",
+      "Agent 9"
+    )
+
     :timer.sleep(200)
 
     current_cache = AuctionCache.read(auction_id)
@@ -84,8 +99,10 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   } do
     :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     Auctions.start_auction(auction)
+
     create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
     |> Auctions.place_bid(insert(:user, company: hd(auction.suppliers)))
+
     Auctions.end_auction(auction)
     :timer.sleep(200)
     # # Crash AuctionStore / AuctionSupervisor and let restart

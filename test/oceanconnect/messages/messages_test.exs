@@ -68,29 +68,66 @@ defmodule Oceanconnect.MessagesTest do
     test "returns all messages where the given company is either an author or the recipient" do
       company = insert(:company)
       auction = insert(:auction, suppliers: [company])
-      insert_list(4, :message, auction: auction, author_company: auction.buyer, recipient_company: company)
 
-      assert length((Messages.list_auction_messages_for_company(auction.id, company.id))) == 4
-      assert Enum.all?(Messages.list_auction_messages_for_company(auction.id, company.id), &(&1.recipient_company_id == company.id))
+      insert_list(4, :message,
+        auction: auction,
+        author_company: auction.buyer,
+        recipient_company: company
+      )
+
+      assert length(Messages.list_auction_messages_for_company(auction.id, company.id)) == 4
+
+      assert Enum.all?(
+               Messages.list_auction_messages_for_company(auction.id, company.id),
+               &(&1.recipient_company_id == company.id)
+             )
     end
 
     test "does not return messages that don't belong to the given company" do
       supplier_company = insert(:company)
       supplier_company2 = insert(:company)
       auction = insert(:auction, suppliers: [supplier_company, supplier_company2])
-      insert_list(4, :message, auction: auction, author_company: auction.buyer, recipient_company: supplier_company)
-      insert_list(3, :message, auction: auction, author_company: auction.buyer, recipient_company: supplier_company2)
 
-      refute Enum.all?(Messages.list_auction_messages_for_company(auction.id, supplier_company.id), &(&1.recipient_company_id == supplier_company2.id))
+      insert_list(4, :message,
+        auction: auction,
+        author_company: auction.buyer,
+        recipient_company: supplier_company
+      )
+
+      insert_list(3, :message,
+        auction: auction,
+        author_company: auction.buyer,
+        recipient_company: supplier_company2
+      )
+
+      refute Enum.all?(
+               Messages.list_auction_messages_for_company(auction.id, supplier_company.id),
+               &(&1.recipient_company_id == supplier_company2.id)
+             )
     end
 
     test "messages sorted oldest to newest" do
       supplier_company = insert(:company)
       auction = insert(:auction, suppliers: [supplier_company])
-      %{id: id1} = insert(:message, auction: auction, author_company: auction.buyer, recipient_company: supplier_company)
-      %{id: id2} = insert(:message, auction: auction, author_company: auction.buyer, recipient_company: supplier_company)
 
-      assert Enum.map(Messages.list_auction_messages_for_company(auction.id, supplier_company.id), & &1.id) == [id1, id2]
+      %{id: id1} =
+        insert(:message,
+          auction: auction,
+          author_company: auction.buyer,
+          recipient_company: supplier_company
+        )
+
+      %{id: id2} =
+        insert(:message,
+          auction: auction,
+          author_company: auction.buyer,
+          recipient_company: supplier_company
+        )
+
+      assert Enum.map(
+               Messages.list_auction_messages_for_company(auction.id, supplier_company.id),
+               & &1.id
+             ) == [id1, id2]
     end
   end
 end

@@ -10,7 +10,14 @@ defmodule Oceanconnect.AuctionEditTest do
     login_user(buyer)
     [vessel1, _vessel2] = insert_list(2, :vessel, company: buyer_company)
     login_user(buyer)
-    auction = insert(:auction, buyer: buyer_company, auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel1)], is_traded_bid_allowed: true)
+
+    auction =
+      insert(:auction,
+        buyer: buyer_company,
+        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel1)],
+        is_traded_bid_allowed: true
+      )
+
     {:ok, %{auction: auction}}
   end
 
@@ -18,20 +25,20 @@ defmodule Oceanconnect.AuctionEditTest do
     AuctionEditPage.visit(auction.id)
 
     assert AuctionEditPage.has_fields?([
-      "additional_information",
-      "anonymous_bidding",
-      "credit_margin_amount",
-      "decision_duration",
-      "duration",
-      "eta",
-      "etd",
-      "is_traded_bid_allowed",
-      "po",
-      "port_id",
-      "scheduled_start",
-      "select-fuel",
-      "select-port",
-      "select-vessel"
-    ])
+             "additional_information",
+             "anonymous_bidding",
+             "credit_margin_amount",
+             "decision_duration",
+             "duration",
+             "eta",
+             "etd",
+             "is_traded_bid_allowed",
+             "po",
+             "port_id",
+             "scheduled_start",
+             "select-fuel",
+             "select-port",
+             "select-vessel"
+           ])
   end
 end

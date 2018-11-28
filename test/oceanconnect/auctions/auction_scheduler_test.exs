@@ -48,6 +48,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
     now = DateTime.utc_now()
     Auctions.update_auction(auction, %{scheduled_start: now}, nil)
+
     receive do
       %AuctionEvent{
         type: :auction_started,
@@ -99,6 +100,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
       5000 ->
         assert false, "Expected message received nothing."
     end
+
     :timer.sleep(500)
     assert %{status: :open} = Auctions.get_auction_state!(draft_auction)
   end

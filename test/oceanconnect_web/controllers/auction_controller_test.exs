@@ -17,7 +17,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     supplier = insert(:user, company: supplier_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
 
-    auction_vessel_fuels = [build(:vessel_fuel, vessel: selected_vessel, fuel: selected_fuel, quantity: 1500), build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: List.last(fuels), quantity: 1500)]
+    auction_vessel_fuels = [
+      build(:vessel_fuel, vessel: selected_vessel, fuel: selected_fuel, quantity: 1500),
+      build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: List.last(fuels), quantity: 1500)
+    ]
+
     auction_params =
       string_params_for(
         :auction,
@@ -38,7 +42,8 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         auction_vessel_fuels: auction_vessel_fuels,
         suppliers: [supplier_company],
         is_traded_bid_allowed: true
-      ) |> Auctions.fully_loaded()
+      )
+      |> Auctions.fully_loaded()
 
     {:ok,
      conn: authed_conn,
@@ -326,6 +331,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
     test "the log includes messages", %{auction: auction, conn: authed_conn} do
       insert_list(4, :message, auction: auction, author_company: auction.buyer)
+
       auction
       |> Auctions.start_auction()
       |> Auctions.end_auction()

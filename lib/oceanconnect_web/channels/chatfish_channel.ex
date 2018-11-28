@@ -26,14 +26,19 @@ defmodule OceanconnectWeb.ChatfishChannel do
 
   def handle_info({:messages_update, company_id}, socket) do
     message_payloads = MessagePayload.get_message_payloads_for_company(company_id)
-    OceanconnectWeb.Endpoint.broadcast("user_messages:#{company_id}", "messages_update", %{message_payloads: message_payloads})
+
+    OceanconnectWeb.Endpoint.broadcast("user_messages:#{company_id}", "messages_update", %{
+      message_payloads: message_payloads
+    })
+
     {:noreply, socket}
   end
 
   def handle_in("seen", %{"ids" => message_ids}, socket) do
     current_company_id = Guardian.Phoenix.Socket.current_resource(socket).company_id
+
     message_ids
-    |> Enum.map(fn(message_id) ->
+    |> Enum.map(fn message_id ->
       message_id
       |> Messages.get_message!()
       |> maybe_update_message(current_company_id)
@@ -41,30 +46,43 @@ defmodule OceanconnectWeb.ChatfishChannel do
     end)
     |> Enum.uniq()
     |> Enum.each(&send(self(), {:messages_update, &1}))
+
     {:noreply, socket}
   end
 
-  def handle_in("send", %{"auctionId" => auction_id, "recipient" => recipient_company_name, "content" => content}, socket) do
+  def handle_in(
+        "send",
+        %{"auctionId" => auction_id, "recipient" => recipient_company_name, "content" => content},
+        socket
+      ) do
     recipient_company_id =
       auction_id
       |> Auctions.get_participant_name_and_ids_for_auction()
-      |> Enum.filter(& &1.name == recipient_company_name)
+      |> Enum.filter(&(&1.name == recipient_company_name))
       |> List.first()
       |> case do
         nil -> nil
         map -> Map.get(map, :id)
       end
+
     current_user = Guardian.Phoenix.Socket.current_resource(socket)
-    {:ok, _message} = Messages.create_message(%{
-      auction_id: auction_id,
-      author_company_id: current_user.company_id,
-      author_id: current_user.id,
-      content: content,
-      has_been_seen: false,
-      impersonator_id: current_user.impersonated_by,
-      recipient_company_id: recipient_company_id
-    })
-    Enum.each([current_user.company_id, recipient_company_id], &send(self(), {:messages_update, &1}))
+
+    {:ok, _message} =
+      Messages.create_message(%{
+        auction_id: auction_id,
+        author_company_id: current_user.company_id,
+        author_id: current_user.id,
+        content: content,
+        has_been_seen: false,
+        impersonator_id: current_user.impersonated_by,
+        recipient_company_id: recipient_company_id
+      })
+
+    Enum.each(
+      [current_user.company_id, recipient_company_id],
+      &send(self(), {:messages_update, &1})
+    )
+
     {:noreply, socket}
   end
 
@@ -95,7 +113,10 @@ defmodule OceanconnectWeb.ChatfishChannel do
     end
   end
 
-  defp maybe_update_message(%Message{recipient_company_id: current_company_id} = message, current_company_id) do
+  defp maybe_update_message(
+         %Message{recipient_company_id: current_company_id} = message,
+         current_company_id
+       ) do
     {:ok, message} = Messages.update_message(message, %{has_been_seen: true})
     message
   end

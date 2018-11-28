@@ -430,13 +430,13 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       @endpoint.subscribe(channel)
 
-
       create_bid(1.25, nil, supplier_id, fuel_id, auction, false)
       |> Auctions.place_bid()
 
       buyer_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
+
       buyer_payload = buyer_auction_payload.product_bids[fuel_id]
 
       receive do
@@ -473,6 +473,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       decision_buyer_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
+
       decision_buyer_payload = decision_buyer_auction_payload.product_bids[fuel_id]
 
       receive do
@@ -515,6 +516,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       supplier_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
+
       supplier_payload = supplier_auction_payload.product_bids[fuel_id]
 
       # NOTE: There seems to be an extra event that gets sent when bids are
@@ -535,7 +537,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             product_bids: %{
               ^fuel_id => %{
                 lowest_bids: lowest_bids,
-                bid_history: bid_history,
+                bid_history: bid_history
               }
             },
             time_remaining: time_remaining
@@ -552,7 +554,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-
       create_bid(1.25, nil, supplier3.id, fuel_id, auction, false)
       |> Auctions.place_bid()
 
@@ -568,6 +569,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       decision_supplier_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
+
       decision_supplier_payload = decision_supplier_auction_payload.product_bids[fuel_id]
 
       receive do
@@ -579,7 +581,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             product_bids: %{
               ^fuel_id => %{
                 lowest_bids: lowest_bids,
-                bid_history: bid_history,
+                bid_history: bid_history
               }
             },
             time_remaining: time_remaining

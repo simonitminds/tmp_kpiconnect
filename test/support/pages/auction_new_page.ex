@@ -14,6 +14,7 @@ defmodule Oceanconnect.AuctionNewPage do
 
   def buyer_vessels_in_vessel_list?(vessels) do
     element = find_element(:css, ".qa-auction-select-vessel")
+
     Enum.all?(vessels, fn vessel ->
       find_within_element(element, :id, "#{vessel.id}")
     end)

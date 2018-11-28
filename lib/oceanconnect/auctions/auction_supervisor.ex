@@ -56,9 +56,10 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
         all_children
       end
 
-    children_included = children
-    |> Enum.reject(fn {k, _v} -> k in exclusions end)
-    |> Enum.map(fn {_, v} -> v end)
+    children_included =
+      children
+      |> Enum.reject(fn {k, _v} -> k in exclusions end)
+      |> Enum.map(fn {_, v} -> v end)
 
     children_included
   end

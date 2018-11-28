@@ -27,13 +27,14 @@ defmodule Oceanconnect.Messages do
     |> Repo.all()
   end
 
-  def preload_messages(messages), do: Repo.preload(messages, [:author, :author_company, :impersonator, :recipient_company])
+  def preload_messages(messages),
+    do: Repo.preload(messages, [:author, :author_company, :impersonator, :recipient_company])
 
   def messages_by_thread(%{id: auction_id, buyer_id: buyer_id}) do
     auction_id
     |> list_auction_messages_for_company(buyer_id)
     |> preload_messages()
-    |> Enum.group_by(fn(message) ->
+    |> Enum.group_by(fn message ->
       cond do
         buyer_id == message.author_company_id -> message.recipient_company
         buyer_id == message.recipient_company_id -> message.author_company
@@ -41,7 +42,6 @@ defmodule Oceanconnect.Messages do
       end
     end)
   end
-
 
   @doc """
   Gets a single message.
