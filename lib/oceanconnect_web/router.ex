@@ -95,6 +95,7 @@ defmodule OceanconnectWeb.Router do
     get("/auctions/:id/log", AuctionController, :log)
     get("/auctions/:id/start", AuctionController, :start)
     get("/auctions/:id/cancel", AuctionController, :cancel)
+    get("/auctions/:id/rsvp", AuctionRsvpController, :update, as: :auction_rsvp)
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
@@ -104,6 +105,7 @@ defmodule OceanconnectWeb.Router do
     post("/send_email/upcoming", EmailController, :send_upcoming)
     post("/send_email/cancellation", EmailController, :send_cancellation)
     post("/send_email/completion", EmailController, :send_completion)
+
   end
 
   scope "/admin", OceanconnectWeb.Admin do

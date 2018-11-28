@@ -1,95 +1,76 @@
+
 import React from 'react';
 import _ from 'lodash';
 
-const AuctionInvitation = ({auction}) => {
+const AuctionInvitation = ({auctionPayload, supplierId}) => {
+  const {auction, participations} = auctionPayload
+  const suppliersParticipationStatus = participations[supplierId]
+
+  const supplierParticipationModifier = () => {
+    switch (suppliersParticipationStatus) {
+      case "yes": { return "auction-invitation__status--accepted"}
+      case "no": { return "auction-invitation__status--declined"}
+      case "maybe": { return "auction-invitation__status--maybe"}
+      default: { return "auction-invitation__status--unanswered"}
+    }
+  }
+
+  const styleStatusContainer = () => {
+    switch (suppliersParticipationStatus) {
+      case "yes": { return (
+        <span className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-check-circle"></i>
+        </span>
+      )}
+      case "no": { return (
+        <span className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-times-circle"></i>
+        </span>
+      )}
+      case "maybe": { return (
+        <span className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-adjust"></i>
+        </span>
+      )}
+      default: {return(
+        <span className="auction-invitation__status__marker">
+          <i className="fas fa-lg fa-question-circle"></i>
+        </span>
+      )}
+    }
+  };
+
   return(
     <div className="auction-invitation auction-invitation--large qa-auction-invitation-controls">
-      <div className="auction-invitation__status box box--bordered-left">
-        <h3 className="auction-invitation__status__copy">Do you intend to participate in the auction?</h3>
-        <div className="field has-addons has-margin-right-md">
-          <p className="control">
-            <a className="button is-success">
-              <span>Accept</span>
-            </a>
-          </p>
-          <p className="control">
-            <a className="button is-danger">
-              <span>Decline</span>
-            </a>
-          </p>
-          <p className="control">
-            <a className="button is-gray-3">
-              <span>Maybe</span>
-            </a>
-          </p>
-        </div>
-      </div>
-      {/* <div className = "auction-invitation__status auction-invitation__status--accepted box" >
-        <div className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-check-circle"></i>
-        </div>
-        <h3 className="auction-invitation__status__copy">
-          You are participating in this auction
-        </h3>
-        <span className="auction-invitation__status__edit icon">
-          <i className="fas fa-lg fa-pencil-alt"></i>
-        </span>
-      </div>
-      <div className = "auction-invitation__status auction-invitation__status--decline box" >
-        <div className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-times-circle"></i>
-        </div>
-        <h3 className="auction-invitation__status__copy">
-          You are not participating in this auction
-        </h3>
-        <span className="auction-invitation__status__edit icon">
-          <i className="fas fa-lg fa-pencil-alt"></i>
-        </span>
-      </div>
-      <div className = "auction-invitation__status auction-invitation__status--maybe box" >
-        <div className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-adjust"></i>
-        </div>
-        <h3 className="auction-invitation__status__copy">
-          You might participate in this auction
-        </h3>
-        <span className="auction-invitation__status__edit icon">
-          <i className="fas fa-lg fa-pencil-alt"></i>
-        </span>
-      </div>
-      <div className = "auction-invitation__status auction-invitation__status--unanswered box" >
-        <div className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-question-circle"></i>
-        </div>
-        <h3 className="auction-invitation__status__copy">
-          You have not RSVPed to this auction
-        </h3>
-      </div>
-      <div className = "auction-invitation__status auction-invitation__status--unanswered box" >
-        <div className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-question-circle"></i>
-        </div>
-        <h3 className="auction-invitation__status__copy has-margin-top-xs">Change RSVP</h3>
-        <div className="auction-invitation__status__button field has-addons has-margin-right-md">
-          <div className="control">
-            <div className="select">
-              <select>
-                <option disabled="disabled" value="">
-                  Change Status
-                </option>
-                <option>Participating</option>
-                <option>May Participate</option>
-                <option>Not Participating</option>
-              </select>
-            </div>
+      <div className={`auction-invitation__status box ${supplierParticipationModifier()}`}>
+        {styleStatusContainer()}
+        <div className="auction-invitation__status__form">
+          <h3 className="auction-invitation__status__copy">
+            {styleStatusContainer()}
+            {suppliersParticipationStatus == "yes" && "You are participating in this auction"}
+            {suppliersParticipationStatus == "no" && "You are not participating in this auction"}
+            {suppliersParticipationStatus == "maybe" && "You might participate in this auction"}
+            {!suppliersParticipationStatus && "Do you intend to participate in this auction?"}
+          </h3>
+          <div className="field has-addons has-margin-right-md">
+            <p className="control">
+                <a className={`button is-success qa-auction-${auction.id}-rsvp-response qa-auction-${auction.id}-rsvp-response-yes`} data-selected={suppliersParticipationStatus == "yes"} href={`/auctions/${auction.id}/rsvp?response=yes`}>
+                <span>Accept</span>
+              </a>
+            </p>
+            <p className="control">
+                <a className={`button is-danger qa-auction-${auction.id}-rsvp-response qa-auction-${auction.id}-rsvp-response-no`} data-selected={suppliersParticipationStatus == "no"} href={`/auctions/${auction.id}/rsvp?response=no`}>
+                <span>Decline</span>
+              </a>
+            </p>
+            <p className="control">
+                <a className={`button is-gray-3 qa-auction-${auction.id}-rsvp-response qa-auction-${auction.id}-rsvp-response-maybe`} data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
+                <span>Maybe</span>
+              </a>
+            </p>
           </div>
-          <p className="control">
-            <a className="button is-primary">
-              <i className="fas fa-md fa-check"></i>
-            </a>
-          </p>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

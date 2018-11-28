@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionTimer}
+  alias Oceanconnect.Auctions.{Auction, AuctionTimer, AuctionSuppliers}
   alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
@@ -9,6 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             current_server_time: nil,
             auction: nil,
             status: :pending,
+            participations: %{},
             bid_history: [],
             product_bids: %{},
             solutions: %{},
@@ -31,12 +32,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         auction_state = %AuctionState{}
       ) do
-    # auction = Auctions.fully_loaded(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
   def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %AuctionState{}) do
-    # auction = Auctions.fully_loaded(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
@@ -45,7 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
     |> List.flatten()
-    |> Enum.sort_by(& DateTime.to_unix(&1.time_entered, :microsecond))
+    |> Enum.sort_by(&DateTime.to_unix(&1.time_entered, :microsecond))
     |> Enum.reverse()
   end
 
@@ -54,13 +53,16 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         supplier_id,
         state = %AuctionState{
           product_bids: product_bids,
-          status: status,
+          status: status
         }
       ) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
       auction: scrub_auction(auction, supplier_id),
+      participations: %{
+        supplier_id => get_supplier_participation(auction.auction_suppliers, supplier_id)
+      },
       status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
@@ -86,7 +88,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         state = %AuctionState{
           product_bids: product_bids,
-          status: status,
+          status: status
         }
       ) do
     %AuctionPayload{
@@ -97,6 +99,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
       bid_history: [],
+      participations: get_participations(auction),
       product_bids:
         Enum.reduce(product_bids, %{}, fn {fuel_id, product_state}, acc ->
           Map.put(
@@ -110,6 +113,23 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         end),
       submitted_barges: BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id)
     }
+  end
+
+  defp get_supplier_participation(auction_suppliers, supplier_id) do
+    with %AuctionSuppliers{participation: participation} <- Enum.find(auction_suppliers, fn supplier -> supplier.supplier_id == supplier_id end) do
+      participation
+    else
+      nil -> nil
+    end
+  end
+
+  defp get_participations(%Auction{anonymous_bidding: true}), do: %{}
+
+  defp get_participations(%Auction{auction_suppliers: auction_suppliers}) do
+    auction_suppliers
+    |> Enum.reduce(%{}, fn auction_supplier, acc ->
+      Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation)
+    end)
   end
 
   defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :open}) do
@@ -135,6 +155,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         bid_history: bid_history,
         status: status,
         product_bids: product_bids,
+        participations: participations,
         solutions: solutions,
         submitted_barges: submitted_barges
       }) do
@@ -145,6 +166,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: bid_history,
       status: status,
       product_bids: product_bids,
+      participations: participations,
       solutions: solutions,
       submitted_barges: submitted_barges
     }

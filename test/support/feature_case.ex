@@ -21,6 +21,11 @@ defmodule Oceanconnect.FeatureCase do
         NewSessionPage.submit()
       end
 
+      def logout_user do
+        alias Oceanconnect.NewSessionPage
+        NewSessionPage.logout()
+      end
+
       def convert_to_millisecs(time_remaining) do
         time = String.slice(time_remaining, 0..4)
 

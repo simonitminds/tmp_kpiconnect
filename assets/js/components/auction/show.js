@@ -237,14 +237,11 @@ export default class AuctionShow extends React.Component {
                           <Tab>
                             <h2 className="title is-size-5">Auction Details</h2>
                           </Tab>
-                          {/* <Tab>
-                            <h2 className="title is-size-5">Messages</h2>
-                          </Tab> */}
                         </TabList>
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
+                        { currentUser.isBuyer ? "" : <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/> }
                         { currentUser.isBuyer ?
                           <InvitedSuppliers
                             auctionPayload={auctionPayload}
@@ -337,7 +334,7 @@ export default class AuctionShow extends React.Component {
                   </TabPanel>
                   <TabPanel>
                     { auctionLogLinkDisplay() }
-                    {/* { currentUser.isBuyer ? "" : <AuctionInvitation auction={auction} /> } */}
+                    { currentUser.isBuyer ? "" : <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/> }
                     { currentUser.isBuyer ?
                       <InvitedSuppliers
                         auctionPayload={auctionPayload}

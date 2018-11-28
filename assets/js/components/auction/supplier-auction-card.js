@@ -4,6 +4,7 @@ import moment from 'moment';
 import { formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 import AuctionTimeRemaining from './auction-time-remaining';
+import AuctionInvitation from './auction-invitation';
 
 const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
   const auction = _.get(auctionPayload, 'auction');
@@ -29,6 +30,8 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
           </div>
         </div>
       );
+    } else if (auctionStatus == 'pending') {
+      return <AuctionInvitation auctionPayload={auctionPayload} supplierId={currentUserCompanyId}/>;
     } else {
       return "";
     }
