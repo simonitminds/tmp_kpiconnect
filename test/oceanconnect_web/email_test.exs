@@ -211,8 +211,8 @@ defmodule OceanconnectWeb.EmailTest do
                end)
 
         assert Enum.any?(buyer_emails, fn buyer_email ->
-          buyer_email.html_body =~ "Physical Supplier"
-        end)
+                 buyer_email.html_body =~ "Physical Supplier"
+               end)
       end
     end
 

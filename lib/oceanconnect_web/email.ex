@@ -150,6 +150,7 @@ defmodule OceanconnectWeb.Email do
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
         is_traded_bid = bid.is_traded_bid
+
         Enum.map(buyers, fn buyer ->
           supplier_company = Accounts.get_company!(bid.supplier_id)
 

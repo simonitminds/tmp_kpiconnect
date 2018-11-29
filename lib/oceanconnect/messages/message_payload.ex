@@ -65,7 +65,9 @@ defmodule Oceanconnect.Messages.MessagePayload do
        ) do
     empty_supplier_messages_map =
       Enum.reduce(suppliers, %{}, fn %{id: id}, acc -> Map.put(acc, id, []) end)
-      |> Map.put(buyer_id, []) # You can have a conversation with others in your company
+      # You can have a conversation with others in your company
+      |> Map.put(buyer_id, [])
+
     Map.merge(empty_supplier_messages_map, messages_map)
   end
 

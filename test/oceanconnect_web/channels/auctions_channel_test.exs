@@ -30,7 +30,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
-         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler, :auction_email_notification_handler]}}}
+         {auction,
+          %{
+            exclude_children: [
+              :auction_reminder_timer,
+              :auction_scheduler,
+              :auction_email_notification_handler
+            ]
+          }}}
       )
 
     expected_payload = %{
