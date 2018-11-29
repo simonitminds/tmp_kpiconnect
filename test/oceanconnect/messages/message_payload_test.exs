@@ -220,7 +220,8 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         Enum.map(buyer_message_payload_for_auction.conversations, & &1.company_name)
 
       assert supplier_name in conversation_companies
-      assert buyer_company.name in conversation_companies # Buyers can have a conversation between themselves
+      # Buyers can have a conversation between themselves
+      assert buyer_company.name in conversation_companies
     end
 
     test "buyer's with no correspondence are in their own conversation list" do

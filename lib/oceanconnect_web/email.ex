@@ -128,6 +128,7 @@ defmodule OceanconnectWeb.Email do
       Enum.flat_map(bids, fn bid ->
         supplier_company = Accounts.get_company!(bid.supplier_id)
         suppliers = Accounts.users_for_companies([supplier_company])
+        is_traded_bid = bid.is_traded_bid
 
         Enum.map(suppliers, fn supplier ->
           base_email(supplier)
@@ -136,6 +137,7 @@ defmodule OceanconnectWeb.Email do
             "auction_completion.html",
             user: supplier,
             winning_supplier_company: supplier_company,
+            is_traded_bid: is_traded_bid,
             auction: auction,
             buyer_company: buyer_company_for_bid(bid),
             deliverables: deliverables_for_bid(deliverables, bid),
@@ -147,6 +149,8 @@ defmodule OceanconnectWeb.Email do
 
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
+        is_traded_bid = bid.is_traded_bid
+
         Enum.map(buyers, fn buyer ->
           supplier_company = Accounts.get_company!(bid.supplier_id)
 
@@ -156,6 +160,8 @@ defmodule OceanconnectWeb.Email do
             "auction_completion.html",
             user: buyer,
             winning_supplier_company: supplier_company_for_bid(bid),
+            physical_supplier: supplier_company,
+            is_traded_bid: is_traded_bid,
             auction: auction,
             buyer_company: buyer_company,
             deliverables: deliverables_for_bid(deliverables, bid),

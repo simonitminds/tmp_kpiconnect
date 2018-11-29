@@ -171,7 +171,7 @@ defmodule OceanconnectWeb.ChatChannelTest do
       } ->
         assert message_payload.auction_id == auction_id
 
-        [_ , conversation | _]  = message_payload.conversations
+        [_, conversation | _] = message_payload.conversations
         assert conversation.company_name == supplier.company.name
 
         [%{content: content} | _tail] = Enum.reverse(conversation.messages)
