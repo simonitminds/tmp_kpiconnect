@@ -95,7 +95,7 @@ defmodule Oceanconnect.AuctionLogTest do
       "buyer-name" => auction.buyer.name,
       "auction_started" => AuctionView.convert_date?(auction.scheduled_start),
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
-      "actual-duration" => AuctionView.actual_duration(auction_events),
+      "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
       "winning-solution-entry" => "$1.25/unit for #{fuel.name} from #{supplier.company.name}"
     }

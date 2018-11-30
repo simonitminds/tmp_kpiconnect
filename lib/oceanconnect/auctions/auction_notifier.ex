@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(%AuctionState{auction_id: auction_id}) do
     auction = Auctions.AuctionCache.read(auction_id)
+    |> Auctions.fully_loaded()
     notify_participants(auction)
   end
 

@@ -58,7 +58,7 @@ export default class AuctionShow extends React.Component {
   render() {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
-    const auction = auctionPayload.auction;
+    const {auction, status} = auctionPayload;
 
     const bidStatusDisplay = () => {
       if (auctionPayload.message) {
@@ -241,7 +241,9 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        { currentUser.isBuyer ? "" : <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/> }
+                        { !currentUser.isBuyer && (status == 'pending' || status == 'open') &&
+                          <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/>
+                        }
                         { currentUser.isBuyer ?
                           <InvitedSuppliers
                             auctionPayload={auctionPayload}
