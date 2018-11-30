@@ -320,7 +320,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
       assert %ProductBidState{
                auction_id: ^auction_id,
                lowest_bids: [],
-               bids: [],
+               bids: [^supplier2_bid, ^supplier1_bid],
                minimum_bids: [^supplier2_bid, ^supplier1_bid],
                inactive_bids: []
              } = current_state
