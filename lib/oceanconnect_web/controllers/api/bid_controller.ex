@@ -20,7 +20,7 @@ defmodule OceanconnectWeb.Api.BidController do
          {:ok, _bids} <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
 
         Auctions.update_participation_for_supplier(auction_id, supplier_id, "yes")
-        AuctionNotifier.notify_buyer_participants(auction)
+        AuctionNotifier.notify_participants(auction)
       render(conn, "show.json", %{success: true, message: "Bids successfully placed"})
     else
       {:error, :late_bid} ->
