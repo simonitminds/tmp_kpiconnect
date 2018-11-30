@@ -3,18 +3,29 @@ import _ from 'lodash';
 import CollapsingBargeList from './collapsing-barge-list';
 import CollapsingBarge from './collapsing-barge';
 
+function rsvpSortingRank(response) {
+  switch(response) {
+    case "yes": return 0;
+    case "maybe": return 1;
+    default: return 2;
+    case "no": return 3;
+  }
+}
+
 const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) => {
-  const suppliers = _.get(auctionPayload, 'auction.suppliers');
   const participations = _.get(auctionPayload, 'participations');
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
+  const rsvpSortingOrder = ["yes", "maybe", null, "no"];
+  const suppliers = _.chain(auctionPayload)
+    .get('auction.suppliers')
+    .sortBy((supplier) => rsvpSortingRank(participations[supplier.id]))
+    .value();
 
   const auctionBargesBySupplier = auctionBarges.reduce((acc, barge) => {
     acc[barge.supplier_id] = acc[barge.supplier_id] || [];
     acc[barge.supplier_id].push(barge);
     return acc;
   }, {});
-
-  // const supplierBargeCount = auctionBargesBySupplier[supplier.id].length;
 
   const bargesForSupplier = (supplier) => {
     const auctionBarges = auctionBargesBySupplier[supplier.id] || [];
@@ -49,10 +60,10 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
   const renderSupplierParticipation = (status, supplier) => {
     if (status == "yes") {
       return <span className={`icon has-text-success has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-check-circle"></i></span>;
+    } else if (status == "maybe"){
+        return <span className={`icon has-text-warning has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-adjust"></i></span>;
     } else if (status == "no") {
       return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-times-circle"></i></span>;
-    } else if (status == "maybe"){
-        return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-adjust-circle"></i></span>;
     } else {
       return <span className={`icon has-text-gray-3 has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-question-circle"></i></span>;
     }

@@ -32,7 +32,7 @@
           </tr>
           <tr>
             <th>Actual Duration</th>
-            <td class="qa-auction-detail-actual-duration"><%= actual_duration(@events) %></td>
+            <td class="qa-auction-detail-actual-duration"><%= actual_duration(@auction_payload.auction) %></td>
           </tr>
           <tr>
           <tr>

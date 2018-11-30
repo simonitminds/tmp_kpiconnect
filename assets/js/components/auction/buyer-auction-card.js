@@ -14,6 +14,9 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
+  const participations = _.get(auctionPayload, 'participations');
+  const participationCounts = _.countBy(participations, _.identity);
+  const {"yes": rsvpYesCount, "no": rsvpNoCount, "maybe": rsvpMaybeCount, null: rsvpNoResponseCount} = participationCounts;
 
   const confirmCancellation = () => { return confirm('Are you sure you want to cancel this auction?') ? window.open(`/auctions/${auction.id}/cancel`) : false; };
 
@@ -188,19 +191,17 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }
 
         <div>
-          {auctionStatus == 'pending' || auctionStatus == 'open' ?
-            // <div className="card-content__auction-status has-margin-top-md">
-            //   <div>Suppliers Participating</div>
-            //   <div className="card-content__rsvp qa-auction-suppliers">
-            //     <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{auction.suppliers.length}&nbsp;
-            //     <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
-            //     <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
-            //     <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
-            //   </div>
-            // </div>
-            <div className="is-none"></div>
-            :
-            <div className="is-none"></div>
+          { auctionStatus == 'pending' || auctionStatus == 'open'
+            ? <div className="card-content__auction-status">
+                <div>Suppliers Participating</div>
+                <div className="card-content__rsvp qa-auction-suppliers">
+                  <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{rsvpYesCount || "0"}&nbsp;
+                  <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>{rsvpMaybeCount || "0"}&nbsp;
+                  <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>{rsvpNoCount || "0"}&nbsp;
+                  <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>{rsvpNoResponseCount || "0"}&nbsp;
+                </div>
+              </div>
+            : <div className="is-none"></div>
           }
         </div>
         { bidStatusDisplay() }
