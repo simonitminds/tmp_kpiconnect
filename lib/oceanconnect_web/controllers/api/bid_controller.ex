@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction}
+  alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
 
   def create(conn, params = %{"auction_id" => auction_id, "bids" => bids_params}) do
     time_entered = DateTime.utc_now()
@@ -17,8 +17,10 @@ defmodule OceanconnectWeb.Api.BidController do
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- validate_traded_bids(is_traded, auction),
-         {:ok, _bids} <-
-           Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
+         {:ok, _bids} <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
+
+        Auctions.update_participation_for_supplier(auction_id, supplier_id, "yes")
+        AuctionNotifier.notify_buyer_participants(auction)
       render(conn, "show.json", %{success: true, message: "Bids successfully placed"})
     else
       {:error, :late_bid} ->

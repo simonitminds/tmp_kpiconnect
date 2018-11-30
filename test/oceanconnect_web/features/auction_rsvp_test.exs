@@ -123,4 +123,40 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
 
     assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Decline"
   end
+
+  test "placing a bid changes a suppliers response to yes",
+       %{
+         auction: auction = %Auction{id: auction_id},
+         supplier: supplier,
+         buyer: buyer,
+         supplier_company: %Company{id: supplier_company_id}
+       } do
+
+
+    login_user(supplier)
+    AuctionRsvpPage.respond_no(auction)
+    logout_user()
+
+    :timer.sleep(200)
+    login_user(buyer)
+    AuctionShowPage.visit(auction_id)
+
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Decline"
+
+    logout_user()
+    :timer.sleep(200)
+
+    login_user(supplier)
+
+    AuctionShowPage.visit(auction.id)
+    AuctionShowPage.enter_bid(%{amount: 1.25})
+    AuctionShowPage.submit_bid()
+    :timer.sleep(200)
+    logout_user()
+
+    login_user(buyer)
+    AuctionShowPage.visit(auction_id)
+
+    assert AuctionRsvpPage.supplier_response_as_buyer(supplier_company_id) == "Accept"
+  end
 end

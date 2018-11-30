@@ -23,6 +23,8 @@ header {
 main {
   transition: all 0.2s ease-out;
   overflow-y: scroll;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -124,7 +126,6 @@ section {
 
 .auction-page { // For container-agnostic classes
   padding: 0 1rem;
-  padding-bottom: 2.5rem;
 
   @media (max-width: 768px) {
     padding: 0 0.5rem;
@@ -198,6 +199,8 @@ section {
 }
 
 .auction-app__body {
+  padding-bottom: 2.5rem;
+
   @media (max-width: 768px) {
     border-top: 2px solid $gray-1;
     flex-shrink: 1;
