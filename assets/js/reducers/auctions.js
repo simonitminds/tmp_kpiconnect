@@ -45,7 +45,7 @@ export default function(state, action) {
       } else {
         newAuctionPayloadList = _.concat(state.auctionPayloads, action.auctionPayload);
       }
-      console.log(state)
+
       return {
         ...state,
         auctionPayloads: newAuctionPayloadList,

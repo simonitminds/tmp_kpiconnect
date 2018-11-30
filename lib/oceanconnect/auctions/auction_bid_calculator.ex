@@ -28,6 +28,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         status
       )
       when is_number(min_amount) do
+
     enter_auto_bid(current_state, bid)
     |> process(status)
   end
@@ -297,6 +298,25 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp enter_bid(
+    current_state = %ProductBidState{
+      auction_id: auction_id
+    },
+    bid = %AuctionBid{
+      auction_id: auction_id,
+      amount: amount,
+      min_amount: nil
+    },
+    :pending
+  )
+  do
+    current_state
+    |> invalidate_previous_auto_bids(bid)
+    |> invalidate_previous_bids(bid)
+    |> add_bid(bid)
+  end
+
+
+  defp enter_bid(
          current_state = %ProductBidState{
            auction_id: auction_id
          },
@@ -346,8 +366,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
          bid = %AuctionBid{
            auction_id: auction_id
          },
-         :open
-       ) do
+         status
+       ) when status in [:pending, :open] do
     current_state
     |> invalidate_previous_auto_bids(bid)
     |> invalidate_previous_bids(bid)
@@ -362,10 +382,10 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp add_auto_bid(
-         state = %ProductBidState{bids: _bids, minimum_bids: min_bids},
+         state = %ProductBidState{bids: bids, minimum_bids: min_bids},
          bid = %AuctionBid{}
        ) do
-    %ProductBidState{state | minimum_bids: [bid | min_bids]}
+    %ProductBidState{state | bids: [ bid | bids], minimum_bids: [bid | min_bids]}
   end
 
   defp sort_lowest_bids(state = %ProductBidState{active_bids: active_bids}) do
