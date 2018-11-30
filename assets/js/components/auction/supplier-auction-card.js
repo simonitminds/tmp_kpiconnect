@@ -126,29 +126,6 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
           }
           { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
         </div>
-
-        {/* <div>
-          <div className="card-content__auction-status has-margin-top-md">
-            <div>Respond to Invitation</div>
-            <div className="field has-addons qa-auction-invitation-controls">
-              <div className="control">
-                <a className="button is-small is-success">
-                  <span>Accept</span>
-                </a>
-              </div>
-              <div className="control">
-                <a className="button is-small is-danger">
-                  <span>Decline</span>
-                </a>
-              </div>
-              <div className="control">
-                <a className="button is-small is-gray-3">
-                  <span>Maybe</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div> */}
         { bidStatusDisplay() }
       </div>
     </div>

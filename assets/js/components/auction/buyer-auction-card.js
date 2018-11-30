@@ -192,7 +192,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
 
         <div>
           { auctionStatus == 'pending' || auctionStatus == 'open'
-            ? <div className="card-content__auction-status has-margin-top-md">
+            ? <div className="card-content__auction-status">
                 <div>Suppliers Participating</div>
                 <div className="card-content__rsvp qa-auction-suppliers">
                   <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{rsvpYesCount || "0"}&nbsp;
