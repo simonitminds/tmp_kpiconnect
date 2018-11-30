@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction}
+  alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
 
   def create(conn, params = %{"auction_id" => auction_id, "bids" => bids_params}) do
     time_entered = DateTime.utc_now()
