@@ -49,7 +49,7 @@ class BiddingForm extends React.Component {
     });
     const hasNecessaryAmounts = _.every(bidsByProduct, (bid) => {
       const {amount, min_amount, existing_bid} = bid;
-      console.log(amount, min_amount, bid)
+
       return existing_bid ? true : (min_amount ? amount : true);
     });
 

@@ -28,7 +28,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         status
       )
       when is_number(min_amount) do
-    enter_auto_bid(current_state, bid)
+
+    enter_auto_bid(current_state, bid, status)
     |> process(status)
   end
 
@@ -110,7 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp enter_opening_bids(state = %ProductBidState{minimum_bids: [min_bid = %AuctionBid{}]}) do
-    enter_auto_bid(state, min_bid)
+    enter_auto_bid(state, min_bid, :open)
   end
 
   defp enter_opening_bids(state = %ProductBidState{minimum_bids: min_bids}) do
@@ -264,8 +265,23 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp enter_auto_bid(
+    current_state = %ProductBidState{lowest_bids: _lowest_bids},
+    bid = %AuctionBid{amount: amount, min_amount: min_amount},
+    :pending
+  )
+  when is_number(min_amount) and is_number(amount) do
+    current_state
+    |> invalidate_previous_auto_bids(bid)
+    |> invalidate_previous_bids(bid)
+    |> add_auto_bid(bid)
+    |> add_bid(bid)
+  end
+
+
+  defp enter_auto_bid(
          current_state = %ProductBidState{lowest_bids: _lowest_bids},
-         bid = %AuctionBid{min_amount: min_amount}
+         bid = %AuctionBid{min_amount: min_amount},
+         :open
        )
        when is_number(min_amount) do
     bid = ensure_initial_auto_bid_amount(current_state, bid)
@@ -295,6 +311,25 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
       %AuctionBid{amount: amount} -> %AuctionBid{bid | amount: amount}
     end
   end
+
+  defp enter_bid(
+    current_state = %ProductBidState{
+      auction_id: auction_id
+    },
+    bid = %AuctionBid{
+      auction_id: auction_id,
+      amount: amount,
+      min_amount: nil
+    },
+    :pending
+  )
+  do
+    current_state
+    |> invalidate_previous_auto_bids(bid)
+    |> invalidate_previous_bids(bid)
+    |> add_bid(bid)
+  end
+
 
   defp enter_bid(
          current_state = %ProductBidState{
@@ -346,8 +381,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
          bid = %AuctionBid{
            auction_id: auction_id
          },
-         :open
-       ) do
+         status
+       ) when status in [:pending, :open] do
     current_state
     |> invalidate_previous_auto_bids(bid)
     |> invalidate_previous_bids(bid)

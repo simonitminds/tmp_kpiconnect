@@ -14,7 +14,6 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
                    .get('product_bids');
 
   const bidList = _.get(auctionPayload, 'bid_history', []);
-
     if (bidList.length > 0 ) {
       return(
         <div className="qa-supplier-bid-history box has-margin-top-md">

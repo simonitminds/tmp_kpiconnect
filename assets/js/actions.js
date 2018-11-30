@@ -315,7 +315,7 @@ export function updateInformation(property, value) {
 }
 
 export function updateInformationFromCheckbox(property, value) {
-  console.log(_.get(value, 'target.checked', value));
+
   return {type: UPDATE_INFORMATION,
           data: {
             property,
