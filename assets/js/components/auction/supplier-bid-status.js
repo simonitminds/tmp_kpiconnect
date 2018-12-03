@@ -7,6 +7,8 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const bidList = _.get(auctionPayload, 'bid_history', []);
   const hasActiveBid = (_.filter(bidList, 'active').length > 0);
 
+  const auctionFuels = _.get(auctionPayload, 'auction.fuels');
+
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
 
@@ -16,6 +18,14 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const bestOverallSolution = _.get(auctionPayload, 'solutions.best_overall');
   const bestOverallSolutionBids = _.get(bestOverallSolution, 'bids');
+  const bidProductsForSupplier = _.chain(bestOverallSolutionBids)
+        .filter({'supplier_id': supplierIdInt})
+        .map((bid) => {
+          const fuel = _.find(auctionFuels, (fuel) => fuel.id == bid.fuel_id);
+          return fuel.name;
+        })
+        .value();
+
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
   const isInBestSolution = _.includes(bestSolutionSupplierIds, supplierIdInt);
   const isBestOverallSolution = !_.some(bestSolutionSupplierIds, (id) => id != supplierIdInt);
@@ -28,14 +38,31 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
   const auctionStatus = _.get(auctionPayload, 'status');
 
+  const renderProductsForMessage = (productNames) => {
+    if (productNames.length == auctionFuels.length && auctionFuels.length != 1) {
+      return "all products";
+    }
+    return _.join(productNames, ", ");
+  }
+
   const messageDisplay = (message) => {
-    return (
-      <h3 className="has-text-weight-bold has-margin-bottom-none">
-        <span className="auction-notification__copy qa-supplier-bid-status-message">
-          {message}
-        </span>
-      </h3>
-    );
+    if (bidProductsForSupplier) {
+      return (
+        <h3 className="has-text-weight-bold has-margin-bottom-none">
+          <span className="auction-notification__copy qa-supplier-bid-status-message">
+            {message + " for " + renderProductsForMessage(bidProductsForSupplier)}
+          </span>
+        </h3>
+      );
+    } else {
+      return (
+        <h3 className="has-text-weight-bold has-margin-bottom-none">
+          <span className="auction-notification__copy qa-supplier-bid-status-message">
+            {message}
+          </span>
+        </h3>
+      );
+    }
   }
 
   if(auctionStatus == "pending") {
@@ -89,7 +116,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best overall offer.")}
+          {messageDisplay("Your bid is the best overall offer")}
         </div>
         <div className="auction-notification__card-message">
           {messageDisplay("Your bid is the best overall offer")}
@@ -111,7 +138,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best single-supplier offer.")}
+          {messageDisplay("Your bid is the best single-supplier offer")}
         </div>
         <div className="auction-notification__card-message">
           {messageDisplay("Your bid is the best single-supplier offer")}
