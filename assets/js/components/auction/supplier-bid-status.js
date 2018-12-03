@@ -39,8 +39,10 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
 
   const renderProductsForMessage = (productNames) => {
-    if (productNames.length == auctionFuels.length) {
-      return " for all products.";
+    if (productNames.length == auctionFuels.length && auctionFuels.length == 1) {
+      return " for " + productNames[0];
+    } else if(productNames.length == auctionFuels.length) {
+      return " for all products";
     } else if(productNames.length > 2) {
       const lastProduct = _.takeRight(productNames)[0];
       const firstProducts = _.dropRight(productNames);
@@ -56,7 +58,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   }
 
   const messageDisplay = (message) => {
-    if (!bidProductsForSupplier) {
+    if (bidProductsForSupplier) {
     return (
       <h3 className="has-text-weight-bold has-margin-bottom-none">
         <span className="auction-notification__copy qa-supplier-bid-status-message">
