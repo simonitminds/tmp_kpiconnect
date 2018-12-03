@@ -59,20 +59,20 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const messageDisplay = (message) => {
     if (bidProductsForSupplier) {
-    return (
-      <h3 className="has-text-weight-bold has-margin-bottom-none">
-        <span className="auction-notification__copy qa-supplier-bid-status-message">
-          {message + renderProductsForMessage(bidProductsForSupplier)}
-        </span>
-      </h3>
-    );
+      return (
+        <h3 className="has-text-weight-bold has-margin-bottom-none">
+          <span className="auction-notification__copy qa-supplier-bid-status-message">
+            {message + renderProductsForMessage(bidProductsForSupplier)}
+          </span>
+        </h3>
+      );
     } else {
       return (
-          <h3 className="has-text-weight-bold has-margin-bottom-none">
+        <h3 className="has-text-weight-bold has-margin-bottom-none">
           <span className="auction-notification__copy qa-supplier-bid-status-message">
-          {message}
-        </span>
-          </h3>
+            {message}
+          </span>
+        </h3>
       );
     }
   }
