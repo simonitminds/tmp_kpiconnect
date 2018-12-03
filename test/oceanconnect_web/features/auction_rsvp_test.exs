@@ -131,8 +131,6 @@ defmodule Oceanconnect.AuctionRsvpFeatureTest do
          buyer: buyer,
          supplier_company: %Company{id: supplier_company_id}
        } do
-
-
     login_user(supplier)
     AuctionRsvpPage.respond_no(auction)
     logout_user()
