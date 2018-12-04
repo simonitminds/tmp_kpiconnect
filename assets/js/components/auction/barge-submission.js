@@ -28,6 +28,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           supplierId={supplierId}
           bargeStatus={null}
           isBuyer={isBuyer}
+          auctionState={auctionState}
         >
         </CollapsingBarge>
       </div>
@@ -54,6 +55,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
           barge={auctionBarge.barge}
           bargeStatus={auctionBarge.approval_status}
           isBuyer={isBuyer}
+          auctionState={auctionState}
         >
         </CollapsingBarge>
       </div>

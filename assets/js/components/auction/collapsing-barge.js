@@ -177,6 +177,7 @@ class CollapsingBarge extends Component {
     const unsubmitBargeForm = this.props.unsubmitBargeForm;
     const auction = this.props.auction;
     const bargeStatus = (this.props.bargeStatus || 'available').toLowerCase();
+    const auctionState = this.props.auctionState;
 
     const approvalStatusIcon = () => {
       if (bargeStatus == 'pending') { return `fas fa-question-circle` }
@@ -233,8 +234,8 @@ class CollapsingBarge extends Component {
               <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-right has-padding-right-nudge` : `fa-angle-down`}`}></i></span>
               <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
-            </h2>
-            {bargeAction()}
+           </h2>
+           { (auctionState == 'expired' || auctionState == 'closed' || auctionState == 'canceled') ? "" : bargeAction() }
           </div>
         </div>
 
