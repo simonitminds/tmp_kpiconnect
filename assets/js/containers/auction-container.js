@@ -44,7 +44,12 @@ const mapDispatchToProps = (dispatch) => ({
       acc[e.dataset.product] = acc[e.dataset.product] || {};
       switch(e.type) {
         case 'checkbox':
-          acc[e.dataset.product][e.name] = e.checked;
+          if(e.dataset.vessel) {
+            acc[e.dataset.product]["vessels"] = acc[e.dataset.product]["vessels"] || {};
+            acc[e.dataset.product]["vessels"][e.dataset.vessel] = e.checked;
+          } else {
+            acc[e.dataset.product][e.name] = e.checked;
+          }
           break;
 
         default:

@@ -99,74 +99,100 @@ class BiddingForm extends React.Component {
       };
 
       return(
-        <div className="auction-bidding__product-group columns is-desktop" key={productId}>
-          <div className="column is-one-quarter-desktop">
-            <strong>{name}</strong><br/>
-            <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
-            { existingBid
-              ? <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-success"><i className="fas fa-check"></i></div>
-                  <div className="tag revoke-bid__status is-white">Bid Active</div>
-                  <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
-                  <input type="hidden" name="existing_bid" value="true" data-product={productId} />
-                </div>
-              : <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
-                  <div className="tag is-white revoke-bid__status">No Active Bid</div>
-                </div>
-            }
-          </div>
-          <div className="column">
-            <div className="columns is-desktop">
-              <div className="column">
-                <div className="field">
-                  <label className="label" htmlFor="bid">Bid Amount</label>
-                  <div className="control auction-bidding__input has-icons-left">
-                    <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
-                    <input
-                      type="number"
-                      step="0.25"
-                      min="0"
-                      className="input qa-auction-bid-amount"
-                      id="bid"
-                      name="amount"
-                      onChange={this.updateSubmittability.bind(this)}
-                      data-product={productId}
-                    />
+        <div className="auction-bidding__product-group has-margin-bottom-md" key={productId}>
+          <div className="columns is-desktop has-margin-bottom-xs">
+            <div className="column is-one-quarter-desktop">
+              <strong>{name}</strong><br/>
+              <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
+              { existingBid
+                ? <div className="tags has-addons has-margin-top-xs">
+                    <div className="tag is-success"><i className="fas fa-check"></i></div>
+                    <div className="tag revoke-bid__status is-white">Bid Active</div>
+                    <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
+                    <input type="hidden" name="existing_bid" value="true" data-product={productId} />
                   </div>
-                  <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
-                </div>
-              </div>
-              <div className="column">
-                <div className="field">
-                  <label className="label" htmlFor="bid">Minimum Bid</label>
-                  <div className="control auction-bidding__input has-icons-left">
-                    <input
-                      type="number"
-                      step="0.25"
-                      min="0"
-                      className="input qa-auction-bid-min_amount"
-                      id="minimumBid"
-                      name="min_amount"
-                      onChange={this.updateSubmittability.bind(this)}
-                      data-product={productId}
-                    />
-                    <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                : <div className="tags has-addons has-margin-top-xs">
+                    <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
+                    <div className="tag is-white revoke-bid__status">No Active Bid</div>
                   </div>
-                  <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
+              }
+            </div>
+            <div className="column">
+              <div className="columns is-desktop">
+                <div className="column">
+                  <div className="field">
+                    <label className="label" htmlFor="bid">Bid Amount</label>
+                    <div className="control auction-bidding__input has-icons-left">
+                      <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                      <input
+                        type="number"
+                        step="0.25"
+                        min="0"
+                        className="input qa-auction-bid-amount"
+                        id="bid"
+                        name="amount"
+                        onChange={this.updateSubmittability.bind(this)}
+                        data-product={productId}
+                      />
+                    </div>
+                    <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
+                  </div>
+                </div>
+                <div className="column">
+                  <div className="field">
+                    <label className="label" htmlFor="bid">Minimum Bid</label>
+                    <div className="control auction-bidding__input has-icons-left">
+                      <input
+                        type="number"
+                        step="0.25"
+                        min="0"
+                        className="input qa-auction-bid-min_amount"
+                        id="minimumBid"
+                        name="min_amount"
+                        onChange={this.updateSubmittability.bind(this)}
+                        data-product={productId}
+                      />
+                      <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                    </div>
+                    <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
+                  </div>
                 </div>
               </div>
             </div>
+            { fuels && fuels.length > 1
+              ? <div className="column is-narrow">
+                  <label className="checkbox">
+                    <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
+                    <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
+                  </label>
+                </div>
+              : <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
+            }
           </div>
-          { fuels && fuels.length > 1 ?
-          <div className="column is-narrow">
-            <label className="checkbox">
-              <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
-              <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
-            </label>
-          </div>  :
-            <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
-          }
+          <div>
+            <span className="has-text-weight-bold has-margin-left-lg">Vessels:</span>
+            { _.map(vesselFuels, (vesselFuel) => {
+                const vessel = vesselFuel.vessel;
+                const quantity = vesselFuel.quantity;
+                return (
+                  <label htmlFor={`auction-bid_vessel-${vessel.id}`} className='label is-capitalized is-inline-block has-margin-left-lg' key={vessel.name}>
+                    <input
+                      className={`checkbox qa-auction-bid-fuel-${productId}-vessel-${vessel.id} has-margin-right-sm`}
+                      id={`auction-bid_vessel-${vessel.id}`}
+                      name={`auction-bid_vessel-${vessel.id}`}
+                      type="checkbox"
+                      defaultChecked={true}
+                      onChange={this.updateSubmittability.bind(this)}
+                      data-product={productId}
+                      data-vessel={vessel.id}
+                    />
+                    {vessel.name}
+                    <span className="has-text-gray-3 has-text-weight-normal"> &times; {quantity} MT</span>
+                  </label>
+                );
+              })
+            }
+          </div>
         </div>
       );
     };

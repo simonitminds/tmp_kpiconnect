@@ -1,17 +1,19 @@
 defmodule Oceanconnect.Auctions.AuctionBid do
-  @enforce_keys [:auction_id, :amount, :supplier_id, :fuel_id]
+  @enforce_keys [:auction_id, :amount, :supplier_id, :fuel_id, :vessel_ids]
   defstruct id: nil,
             auction_id: nil,
             supplier_id: nil,
             fuel_id: nil,
-            active: true,
-            comment: nil,
+            vessel_ids: [],
             amount: nil,
             min_amount: nil,
-            allow_split: true,
-            is_traded_bid: false,
             time_entered: DateTime.utc_now(),
             original_time_entered: DateTime.utc_now(),
+            allow_split: true,
+            is_traded_bid: false,
+            active: true,
+            # Unused
+            comment: nil,
             credit_terms: nil,
             expiration: nil,
             total_price: nil
@@ -22,21 +24,23 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered
+          "time_entered" => time_entered,
+          "vessels" => vessel_ids,
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do
     %__MODULE__{
       id: UUID.uuid4(:hex),
       auction_id: auction.id,
-      amount: amount,
-      is_traded_bid: Map.get(params, "is_traded_bid", false),
-      allow_split: Map.get(params, "allow_split", true),
-      fuel_id: fuel_id,
-      min_amount: min_amount,
       supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      vessel_ids: vessel_ids,
+      amount: amount,
+      min_amount: min_amount,
       time_entered: time_entered,
-      original_time_entered: time_entered
+      original_time_entered: time_entered,
+      allow_split: Map.get(params, "allow_split", true),
+      is_traded_bid: Map.get(params, "is_traded_bid", false)
     }
   end
 
@@ -49,7 +53,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       auction_id: nil,
       amount: nil,
       supplier_id: nil,
-      fuel_id: nil
+      fuel_id: nil,
+      vessel_ids: []
     }
     |> Map.merge(bid)
   end

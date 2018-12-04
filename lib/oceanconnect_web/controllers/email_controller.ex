@@ -53,6 +53,7 @@ defmodule OceanconnectWeb.EmailController do
     auction = Oceanconnect.Auctions.get_auction!(3) |> Oceanconnect.Auctions.fully_loaded()
     winning_supplier_company2 = List.last(auction.suppliers)
     fuels = auction.fuels
+    vessel_ids = Enum.map(auction.vessels, &(&1.id))
 
     approved_barges =
       Auctions.list_auction_barges(auction)
@@ -68,6 +69,7 @@ defmodule OceanconnectWeb.EmailController do
             auction_id: auction.id,
             amount: 200.00,
             fuel_id: fuel.id,
+            vessel_ids: vessel_ids,
             supplier_id: winning_supplier_company2.id,
             is_traded_bid: false
           }

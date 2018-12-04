@@ -43,6 +43,7 @@ export default class SolutionDisplay extends React.Component {
     const auctionStatus = auctionPayload.status;
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
     const fuels = _.get(auctionPayload, 'auction.fuels');
+    const vessels = _.get(auctionPayload, 'auction.vessels');
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const bidIds = _.map(bids, 'id');
     const fuelBids = _.map(bids, (bid) => {
@@ -103,12 +104,13 @@ export default class SolutionDisplay extends React.Component {
     const isTradedBid = (bid) => {
       return(
         <span>
-          { bid.is_traded_bid ?
-            <span className="auction__traded-bid-tag">
-              <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
-              <span className="has-padding-left-sm">Traded Bid</span>
-            </span>
-          : "" }
+          { bid.is_traded_bid
+            ? <span className="auction__traded-bid-tag">
+                <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+                <span className="has-padding-left-sm">Traded Bid</span>
+              </span>
+            : ""
+          }
 
         </span>
       );
@@ -116,20 +118,23 @@ export default class SolutionDisplay extends React.Component {
     const isNonsplittableBid = (bid) => {
       return(
         <span>
-          { bid.allow_split == false ?
-            <span className="auction__nonsplittable-bid-tag">
-              <i action-label="Can't Be Split" className="fas fa-ban auction__nonsplittable-bid-marker"></i>
-              <span className="has-padding-left-sm">Unsplittable</span>
-            </span>
-          : "" }
+          { bid.allow_split == false
+            ? <span className="auction__nonsplittable-bid-tag">
+                <i action-label="Can't Be Split" className="fas fa-ban auction__nonsplittable-bid-marker"></i>
+                <span className="has-padding-left-sm">Unsplittable</span>
+              </span>
+            : ""
+          }
 
         </span>
       );
     }
 
-    const supplierName = (bid) => {
+    const supplierName = (bid, selfText) => {
+      const supplierText = selfText || "Your Bid";
+
       if(supplierId) {
-        return bid.supplier_id == supplierId ? "Your Bid" : "";
+        return bid.supplier_id == supplierId ? supplierText : "";
       } else {
         return bid.supplier;
       }
@@ -159,13 +164,24 @@ export default class SolutionDisplay extends React.Component {
           </div>
         );
       }
-
     }
 
     const renderBid = (bid, fuel) => {
       return (
         <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
-          <td>{fuel.name}</td>
+          <td>
+            {fuel.name}
+            <br/>
+            { _.map(bid.vessel_ids, (vessel_id) => {
+                const vessel = _.find(vessels, (vessel) => vessel.id == vessel_id);
+                return (
+                  <div key={vessel.name}>
+                    <span className="has-text-weight-bold">{vessel.name}:</span> {supplierName(bid, "Your Company")}
+                  </div>
+                );
+              })
+            }
+          </td>
 
           <td>
             { bid
@@ -187,9 +203,9 @@ export default class SolutionDisplay extends React.Component {
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-            {isExpanded ?
-              <i className="fas fa-minus has-padding-right-md"></i>:
-              <i className="fas fa-plus has-padding-right-md"></i>
+            {isExpanded
+              ? <i className="fas fa-minus has-padding-right-md"></i>
+              : <i className="fas fa-plus has-padding-right-md"></i>
             }
             <span className="is-inline-block">
               <span className="auction-solution__title__category">{title}</span>
@@ -226,13 +242,13 @@ export default class SolutionDisplay extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                { bids.length > 0  ?
-                    fuelBids.map(({fuel, bid}) => renderBid(bid, fuel))
-                    : <tr>
-                        <td>
-                          <i>No bids have been placed on this auction</i>
-                        </td>
-                      </tr>
+                { bids.length > 0
+                  ? fuelBids.map(({fuel, bid}) => renderBid(bid, fuel))
+                  : <tr>
+                      <td>
+                        <i>No bids have been placed on this auction</i>
+                      </td>
+                    </tr>
                 }
               </tbody>
             </table>

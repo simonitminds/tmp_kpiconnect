@@ -12,11 +12,13 @@ defmodule OceanconnectWeb.Api.BidController do
     bids_params =
       bids_params
       |> add_flags_to_bids(is_traded)
+      |> convert_vessel_maps_to_lists()
       |> filter_placeable_bids()
 
     with auction = %Auction{} <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- validate_traded_bids(is_traded, auction),
+         true <- Enum.count(bids_params) > 0,
          {:ok, _bids} <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
 
         Auctions.update_participation_for_supplier(auction_id, supplier_id, "yes")
@@ -139,10 +141,25 @@ defmodule OceanconnectWeb.Api.BidController do
     end)
   end
 
-  defp bid_is_placeable(%{"amount" => amount, "min_amount" => min_amount}) do
+  defp bid_is_placeable(%{"amount" => amount, "min_amount" => min_amount, "vessels" => vessels}) do
     amount_is_empty = amount == "" || amount == nil
     min_amount_is_empty = min_amount == "" || min_amount == nil
+    has_vessels = !Enum.empty?(vessels)
 
-    !(amount_is_empty && min_amount_is_empty)
+    has_vessels && !(amount_is_empty && min_amount_is_empty)
+  end
+
+  defp convert_vessel_maps_to_lists(bids_params) do
+    Enum.reduce(bids_params, %{}, fn({product_id, bid_params}, acc) ->
+      selected_vessel_list = selected_vessels_from_params(bid_params)
+      bid_params = %{bid_params | "vessels" => selected_vessel_list}
+      Map.put(acc, product_id, bid_params)
+    end)
+  end
+
+  defp selected_vessels_from_params(_bid_params = %{"vessels" => vessels}) do
+    Enum.reduce(vessels, [], fn({vessel_id, value}, acc) ->
+      if value, do: [vessel_id | acc], else: acc
+    end)
   end
 end

@@ -350,10 +350,10 @@ export function deselectAllSuppliers() {
 }
 
 function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= 200 && response.status < 300 || response.status == 422) {
     return response;
   } else {
-    throw response.statusText;
+    throw response;
   }
 }
 
