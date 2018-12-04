@@ -13,6 +13,7 @@ function rsvpSortingRank(response) {
 }
 
 const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) => {
+  const auctionState = _.get(auctionPayload, 'status');
   const participations = _.get(auctionPayload, 'participations');
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const rsvpSortingOrder = ["yes", "maybe", null, "no"];
@@ -47,6 +48,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
                 supplierId={auctionBarge.supplier_id}
                 bargeStatus={auctionBarge.approval_status}
                 isBuyer={true}
+                auctionState={auctionState}
                 key={barge.id}
               >
               </CollapsingBarge>
