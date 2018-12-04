@@ -456,9 +456,10 @@ defmodule Oceanconnect.AuctionShowTest do
   describe "barges" do
     test "supplier cannot submit a barge for approval once an auction has expired", %{
       auction: auction,
-      supplier: supplier,
+      supplier: supplier
     } do
       barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+
       inactive_barge =
         insert(:barge, companies: [supplier.company], imo_number: "1234568", is_active: false)
 
@@ -470,13 +471,14 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
       assert AuctionShowPage.auction_status() == "EXPIRED"
 
-
       Hound.Helpers.Screenshot.take_screenshot()
       assert AuctionShowPage.has_available_barge?(barge)
       refute AuctionShowPage.has_available_barge?(inactive_barge)
+
       assert_raise Hound.NoSuchElementError, fn ->
         AuctionShowPage.submit_barge(barge)
       end
+
       assert_raise Hound.NoSuchElementError, fn ->
         AuctionShowPage.has_submitted_barge?(barge)
       end
