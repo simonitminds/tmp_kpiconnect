@@ -195,12 +195,14 @@ export default class AuctionShow extends React.Component {
             <strong className="is-inline">{fuel.name}</strong>
             <div className="qa-auction_vessel_fuels-quantities">
             { _.map(vessels, (vessel) => {
-                let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
-                return(
-                  <div key={vessel.id}>
-                    { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
-                  </div>
-                );
+                let vesselFuel = _.find(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                if(vesselFuel) {
+                  return(
+                    <div key={vessel.id}>
+                      { vesselFuel.quantity } MT to <span className="is-inline">{vessel.name}</span>
+                    </div>
+                  );
+                }
               })
             }
             </div>

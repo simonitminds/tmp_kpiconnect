@@ -245,11 +245,13 @@ defmodule OceanconnectWeb.AuctionController do
         %{"fuel_id" => fuel_id, "vessel_id" => vessel_id, "quantity" => quantity}
       end)
     end)
+    |> Enum.reject(fn(vf) -> vf["quantity"] == "0" end)
   end
 
   defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels})
        when is_list(auction_vessel_fuels) do
     auction_vessel_fuels
+    |> Enum.reject(fn(vf) -> vf["quantity"] == "0" end)
   end
 
   # For draft auctions, there might only be vessels or fuels provided. Even
