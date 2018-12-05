@@ -169,29 +169,36 @@ class BiddingForm extends React.Component {
               : <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
             }
           </div>
-          <div>
-            <span className="has-text-weight-bold has-margin-left-lg">Vessels:</span>
-            { _.map(vesselFuels, (vesselFuel) => {
-                const vessel = vesselFuel.vessel;
-                const quantity = vesselFuel.quantity;
-                return (
-                  <label htmlFor={`auction-bid_vessel-${vessel.id}`} className='label is-capitalized is-inline-block has-margin-left-lg' key={vessel.name}>
-                    <input
-                      className={`checkbox qa-auction-bid-fuel-${productId}-vessel-${vessel.id} has-margin-right-sm`}
-                      id={`auction-bid_vessel-${vessel.id}`}
-                      name={`auction-bid_vessel-${vessel.id}`}
-                      type="checkbox"
-                      defaultChecked={true}
-                      onChange={this.updateSubmittability.bind(this)}
-                      data-product={productId}
-                      data-vessel={vessel.id}
-                    />
-                    {vessel.name}
-                    <span className="has-text-gray-3 has-text-weight-normal"> &times; {quantity} MT</span>
-                  </label>
-                );
-              })
-            }
+          <div className="auction-bidding__vessels columns">
+            <div className="column is-narrow">
+              <span className="has-text-weight-bold">Vessels:</span>
+            </div>
+            <div className="column columns">
+
+              { _.map(vesselFuels, (vesselFuel) => {
+                  const vessel = vesselFuel.vessel;
+                  const quantity = vesselFuel.quantity;
+                  return (
+                    <div className="column is-narrow">
+                      <label htmlFor={`auction-bid_vessel-${vessel.id}`} className='auction-bidding__vessel-selection label' key={vessel.name}>
+                        <input
+                          className={`checkbox qa-auction-bid-fuel-${productId}-vessel-${vessel.id} has-margin-right-sm`}
+                          id={`auction-bid_vessel-${vessel.id}`}
+                          name={`auction-bid_vessel-${vessel.id}`}
+                          type="checkbox"
+                          defaultChecked={true}
+                          onChange={this.updateSubmittability.bind(this)}
+                          data-product={productId}
+                          data-vessel={vessel.id}
+                        />
+                        {vessel.name}
+                        <span className="is-inline-block has-text-gray-3 has-text-weight-normal has-margin-left-xs"> &times; {quantity} MT</span>
+                      </label>
+                    </div>
+                  );
+                })
+              }
+            </div>
           </div>
         </div>
       );

@@ -186,14 +186,19 @@
 }
 
 .auction-bidding__product-group {
+  border-bottom: 1px solid $gray-2;
+  margin: 0 -1.3rem;
+  padding: 0 1.3rem 1rem 1.3rem;
+
   @media (max-width: 1024px) {
-    border-top: 1px solid $gray-2;
     padding: 0.5rem 0.75rem 0 0.75rem;
     margin: 0 -1.25rem;
     width: calc(100% + 2.5rem);
   }
   @media (max-width: 768px) {
     width: 100%;
+    margin: 0 -0.25rem;
+    padding-bottom: 1rem;
   }
 }
 
@@ -252,4 +257,31 @@
   min-width: 1rem;
   margin-right: 0.5rem;
   text-align: center;
+}
+
+.auction-bidding__vessels {
+  background-color: $gray-2;
+  margin: 0 !important;
+  border-radius: 3px;
+
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem !important;
+  }
+}
+
+.auction-bidding__vessel-selection {
+  display: inline-block;
+  background-color: $gray-0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 3px;
+  text-transform: capitalize;
+
+  &:hover, &:focus {
+    background-color: $white;
+  }
 }
