@@ -56,15 +56,15 @@ export default class SolutionDisplay extends React.Component {
     const acceptable = !!acceptSolution;
     const isExpanded = this.state.expanded;
 
-    const fuelBids = _.map(bids, (bid) => {
-      const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);
-      return {fuel, bid};
-    });
-
-    const vesselFuelBids = _.chain(vesselFuels)
-      .reduce((acc, vf) => {
-        acc[vf] = _.find(bids, (bid) => bid.fuel_id == vf.fuel_id && _.includes(bid.vessel_ids, vf.vessel_id);
-          return acc;
+    const bidsByFuel = _.chain(fuels)
+      .reduce((acc, fuel) => {
+        const vfIds = _.chain(vesselFuels)
+          .filter((vf) => vf.fuel_id == fuel.id)
+          .map((vf) => `${vf.id}`)
+          .value();
+        const fuelBids = _.filter(bids, (bid) => _.includes(vfIds, bid.vessel_fuel_id));
+        acc[fuel.name] = fuelBids;
+        return acc;
       }, {})
       .value();
 
@@ -119,7 +119,13 @@ export default class SolutionDisplay extends React.Component {
               <SolutionDisplayBarges suppliers={suppliers} bids={bids} auctionBarges={auctionBarges} />
             </div>
           }
-          { _.map(vesselFuelBids, (vesselFuel, bids) => <SolutionDisplayVesselSection vessel={vessel} bids={bids} supplierId={supplierId} />) }
+          { _.map(bidsByFuel, (bids, fuelName) => {
+              const fuel = _.find(fuels, {name: fuelName});
+              return (
+                <SolutionDisplayVesselSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} />
+              );
+            })
+          }
         </div>
         { acceptable && this.state.selected &&
           <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />

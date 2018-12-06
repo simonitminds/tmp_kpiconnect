@@ -22,6 +22,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
     return(
       <div className="box qa-buyer-bid-history">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
+        {/* TODO: LATER
         { _.map(products, (fuel_id) => {
             const lowestBids = productBids[fuel_id].lowest_bids;
 
@@ -59,7 +60,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
               </table>
             );
           })
-        }
+        }*/}
       </div>
     );
   }

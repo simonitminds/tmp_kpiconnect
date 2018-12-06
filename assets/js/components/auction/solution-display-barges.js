@@ -35,8 +35,7 @@ const SolutionDisplayBarges = ({suppliers, bids, auctionBarges}) => {
         }
       </div>
     );
-  }
-  else {
+  } else {
     return (
       <div className="auction-solution__barge-list">
         <i>None</i>

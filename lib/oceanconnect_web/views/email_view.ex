@@ -44,10 +44,10 @@ defmodule OceanconnectWeb.EmailView do
     end
   end
 
-  def price_for_vessel_fuel(winning_solution_bids, fuel_id) do
-    case winning_solution_bids[fuel_id] do
+  def price_for_vessel_fuel(winning_solution_bids, vessel_fuel_id) do
+    case winning_solution_bids[vessel_fuel_id] do
       nil -> nil
-      _ -> Enum.map(winning_solution_bids[fuel_id], & &1.amount)
+      _ -> Enum.map(winning_solution_bids[vessel_fuel_id], & &1.amount)
     end
   end
 

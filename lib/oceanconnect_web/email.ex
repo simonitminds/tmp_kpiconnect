@@ -120,7 +120,7 @@ defmodule OceanconnectWeb.Email do
     deliverables =
       vessel_fuels
       |> Enum.map(fn vessel_fuel ->
-        bid_for_vessel_fuel = Enum.find(bids, &(&1.fuel_id == "#{vessel_fuel.fuel_id}"))
+        bid_for_vessel_fuel = Enum.find(bids, &(&1.vessel_fuel_id == "#{vessel_fuel.id}"))
         Map.put(vessel_fuel, :bid, bid_for_vessel_fuel)
       end)
 

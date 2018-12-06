@@ -133,10 +133,10 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    th, td {
+    td {
       &:nth-child(2) { // Amount
         margin-left: auto;
-        flex: 0 0 13rem;
+        flex: 0 0 15rem;
       }
       &:nth-child(3) { // Supplier
         flex: 0 0 13rem;

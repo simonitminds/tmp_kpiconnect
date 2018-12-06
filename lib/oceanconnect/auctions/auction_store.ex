@@ -14,7 +14,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionScheduler,
     AuctionTimer,
     Command,
-    Fuel,
     SolutionCalculator,
     Solution
   }
@@ -26,17 +25,17 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     alias __MODULE__
 
     defstruct auction_id: nil,
-              fuel_id: nil,
+              vessel_fuel_id: nil,
               lowest_bids: [],
               minimum_bids: [],
               bids: [],
               active_bids: [],
               inactive_bids: []
 
-    def for_product(fuel_id, auction_id) do
+    def for_product(vessel_fuel_id, auction_id) do
       %__MODULE__{
         auction_id: auction_id,
-        fuel_id: fuel_id
+        vessel_fuel_id: vessel_fuel_id
       }
     end
   end
@@ -58,10 +57,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }
     end
 
-    def from_auction(%Auction{id: auction_id, fuels: fuels}) do
+    def from_auction(%Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
       product_bids =
-        Enum.reduce(fuels, %{}, fn %Fuel{id: fuel_id}, acc ->
-          Map.put(acc, "#{fuel_id}", ProductBidState.for_product(fuel_id, auction_id))
+        Enum.reduce(vessel_fuels, %{}, fn %{id: vf_id}, acc ->
+          Map.put(acc, "#{vf_id}", ProductBidState.for_product(vf_id, auction_id))
         end)
 
       %AuctionState{
@@ -333,9 +332,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp is_lowest_bid?(
          %AuctionState{product_bids: product_bids},
-         bid = %AuctionBid{fuel_id: fuel_id}
+         bid = %AuctionBid{vessel_fuel_id: vessel_fuel_id}
        ) do
-    product_bids = product_bids[fuel_id]
+    product_bids = product_bids[vessel_fuel_id]
 
     length(product_bids.lowest_bids) == 0 ||
       hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
@@ -518,11 +517,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp process_bid(
          current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
-         bid = %{fuel_id: fuel_id}
+         bid = %{vessel_fuel_id: vessel_fuel_id}
        ) do
-    product_state = product_bids[fuel_id] || ProductBidState.for_product(fuel_id, auction_id)
+    product_state = product_bids[vessel_fuel_id] || ProductBidState.for_product(vessel_fuel_id, auction_id)
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
-    new_state = AuctionState.update_product_bids(current_state, fuel_id, new_product_state)
+    new_state = AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
     # TODO: Not this
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()

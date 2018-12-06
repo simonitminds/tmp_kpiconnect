@@ -18,7 +18,7 @@ defmodule Oceanconnect.Auctions.Solution do
       |> Enum.reduce(%{}, fn {product_id, _bids}, acc ->
         total_quantity =
           vessel_fuels
-          |> Enum.filter(fn vf -> "#{vf.fuel_id}" == product_id end)
+          |> Enum.filter(fn vf -> "#{vf.id}" == product_id end)
           |> Enum.reduce(0, fn vf, acc -> acc + vf.quantity end)
 
         Map.put(acc, product_id, total_quantity)
@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.Solution do
 
     %__MODULE__{
       auction_id: auction_id,
-      bids: Enum.sort_by(bids, & &1.fuel_id),
+      bids: bids,
       valid: is_valid?(bids, product_ids),
       normalized_price: normalized_price(bids, product_quantities),
       total_price: total_price(bids, product_quantities),
@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions.Solution do
 
   defp is_valid?(bids, product_ids) do
     Enum.all?(product_ids, fn product_id ->
-      Enum.any?(bids, fn bid -> "#{bid.fuel_id}" == product_id end)
+      Enum.any?(bids, fn bid -> "#{bid.vessel_fuel_id}" == product_id end)
     end)
   end
 
@@ -76,7 +76,7 @@ defmodule Oceanconnect.Auctions.Solution do
   defp normalized_price(bids, product_quantities) do
     {total_price, total_quantity} =
       Enum.reduce(bids, {0, 0}, fn bid, acc = {total_price, total_quantity} ->
-        if quantity = Map.get(product_quantities, "#{bid.fuel_id}") do
+        if quantity = Map.get(product_quantities, "#{bid.vessel_fuel_id}") do
           total_quantity = total_quantity + quantity
           total_price = total_price + bid.amount * quantity
           {total_price, total_quantity}
@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions.Solution do
 
   defp total_price(bids, product_quantities) do
     Enum.reduce(bids, 0, fn bid, acc ->
-      quantity = product_quantities["#{bid.fuel_id}"]
+      quantity = product_quantities["#{bid.vessel_fuel_id}"]
       acc + bid.amount * quantity
     end)
   end

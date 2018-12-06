@@ -196,9 +196,9 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def product_name_for_event(%AuctionEvent{
-        data: %{bid: %AuctionBid{fuel_id: fuel_id}}
+        data: %{bid: %AuctionBid{vessel_fuel_id: vessel_fuel_id}}
       }) do
-    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, fuel_id) do
+    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, vessel_fuel_id) do
       name
     else
       _ -> ""
@@ -206,9 +206,9 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def product_name_for_event(%AuctionEvent{
-        data: %{product: fuel_id}
+        data: %{product: vessel_fuel_id}
       }) do
-    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, fuel_id) do
+    with %Fuel{name: name} <- Oceanconnect.Repo.get(Fuel, vessel_fuel_id) do
       name
     else
       _ -> ""

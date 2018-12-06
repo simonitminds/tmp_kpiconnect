@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const SolutionDisplayVesselSection = ({bids, vessel, supplierId, auctionPayload}) => {
+const SolutionDisplayVesselSection = ({bids, fuel, vesselFuels, supplierId, auctionPayload}) => {
   const supplierName = (bid, selfText) => {
     const supplierText = selfText || "Your Bid";
 
@@ -46,15 +46,18 @@ const SolutionDisplayVesselSection = ({bids, vessel, supplierId, auctionPayload}
     <table className="auction-solution__product-table table is-striped">
       <thead>
         <tr>
-          <th colSpan="3">{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></th>
+          <th colSpan="4">{fuel.name}</th>
         </tr>
       </thead>
       <tbody>
         { bids.length > 0
           ? _.map(bids, (bid) => {
+              const vesselFuel = _.find(vesselFuels, ({id}) => `${id}` == bid.vessel_fuel_id);
+              const vessel = vesselFuel.vessel;
+
               return (
                 <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                  <td>{vessel.name}</td>
+                  <td>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></td>
 
                   <td>
                     { bid

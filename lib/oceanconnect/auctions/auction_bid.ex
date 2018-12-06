@@ -1,10 +1,9 @@
 defmodule Oceanconnect.Auctions.AuctionBid do
-  @enforce_keys [:auction_id, :amount, :supplier_id, :fuel_id, :vessel_ids]
+  @enforce_keys [:auction_id, :amount, :supplier_id, :vessel_fuel_id]
   defstruct id: nil,
             auction_id: nil,
             supplier_id: nil,
-            fuel_id: nil,
-            vessel_ids: [],
+            vessel_fuel_id: nil,
             amount: nil,
             min_amount: nil,
             time_entered: DateTime.utc_now(),
@@ -22,10 +21,9 @@ defmodule Oceanconnect.Auctions.AuctionBid do
         params = %{
           "amount" => amount,
           "min_amount" => min_amount,
-          "fuel_id" => fuel_id,
+          "vessel_fuel_id" => vessel_fuel_id,
           "supplier_id" => supplier_id,
           "time_entered" => time_entered,
-          "vessels" => vessel_ids,
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do
@@ -33,8 +31,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       id: UUID.uuid4(:hex),
       auction_id: auction.id,
       supplier_id: supplier_id,
-      fuel_id: fuel_id,
-      vessel_ids: vessel_ids,
+      vessel_fuel_id: vessel_fuel_id,
       amount: amount,
       min_amount: min_amount,
       time_entered: time_entered,
@@ -53,8 +50,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       auction_id: nil,
       amount: nil,
       supplier_id: nil,
-      fuel_id: nil,
-      vessel_ids: []
+      vessel_fuel_id: nil
     }
     |> Map.merge(bid)
   end

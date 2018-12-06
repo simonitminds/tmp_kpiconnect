@@ -80,7 +80,7 @@ defmodule Oceanconnect.Auctions do
         bid_params
         |> Map.put("supplier_id", supplier_id)
         |> Map.put("time_entered", time_entered)
-        |> Map.put("fuel_id", product_id)
+        |> Map.put("vessel_fuel_id", product_id)
         |> AuctionBid.from_params_to_auction_bid(auction)
 
       case bid do

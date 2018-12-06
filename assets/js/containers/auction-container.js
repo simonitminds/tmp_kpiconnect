@@ -39,22 +39,27 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
   formSubmit(auctionId, ev) {
-    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.product);
-    const bidsByProduct = _.reduce(bidElements, (acc, e) => {
-      acc[e.dataset.product] = acc[e.dataset.product] || {};
+    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.fuelInput);
+    const vesselFuelBoxes = _.reject(ev.target.elements, (e) => !e.dataset.vesselFuel);
+
+    const fuelBids = _.reduce(bidElements, (acc, e) => {
+      acc[e.dataset.fuel] = acc[e.dataset.fuel] || {};
       switch(e.type) {
         case 'checkbox':
-          if(e.dataset.vessel) {
-            acc[e.dataset.product]["vessels"] = acc[e.dataset.product]["vessels"] || {};
-            acc[e.dataset.product]["vessels"][e.dataset.vessel] = e.checked;
-          } else {
-            acc[e.dataset.product][e.name] = e.checked;
-          }
+          acc[e.dataset.fuel][e.name] = e.checked;
           break;
 
         default:
-          acc[e.dataset.product][e.name] = e.value;
+          acc[e.dataset.fuel][e.name] = e.value;
           break;
+      }
+      return acc;
+    }, {});
+
+    const bidsByProduct = _.reduce(vesselFuelBoxes, (acc, vfBox) => {
+      const {vesselFuel, fuel} = vfBox.dataset;
+      if(vfBox.checked) {
+        acc[vesselFuel] = { ...fuelBids[fuel] };
       }
       return acc;
     }, {});
