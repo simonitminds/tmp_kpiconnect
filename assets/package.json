@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
+    "bowser": "^2.0.0-beta.3",
     "dot-prop-immutable": "^1.4.0",
     "es6-promise": "^4.2.2",
     "isomorphic-fetch": "^2.2.1",
@@ -27,6 +28,7 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "serverdate": "^3.1.0",
+    "webfontloader": "^1.6.28",
     "yarn": "^1.12.1"
   },
   "devDependencies": {
