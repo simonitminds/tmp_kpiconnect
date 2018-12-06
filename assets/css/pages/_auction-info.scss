@@ -101,7 +101,7 @@
 
     &> div {
       display: inline-flex;
-      width: 1.675rem;
+
       border-radius: 50%;
 
       &.is-danger > i {
@@ -119,6 +119,19 @@
           text-shadow: -1px -1px 0 $red, 1px -1px 0 $red, -1px 1px 0 $red, 1px 1px 0 $red;
         }
       }
+
+      // Connection Button on Auction List
+
+      .auction-list__time-box & {
+        width: 1.7rem;
+      }
+
+      // Connection Button on Auction Show
+
+      .auction-header__timer & {
+        width: 1.675rem;
+      }
+
     }
   }
 
