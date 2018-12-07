@@ -105,7 +105,7 @@ defmodule OceanconnectWeb.AuctionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
         [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
-
+        IO.inspect(changeset, label: "HERE")
         render(
           conn,
           "new.html",
@@ -157,7 +157,8 @@ defmodule OceanconnectWeb.AuctionController do
         credit_margin_amount: credit_margin_amount
       )
     else
-      _ -> redirect(conn, to: auction_path(conn, :index))
+      _ ->
+        redirect(conn, to: auction_path(conn, :index))
     end
   end
 
@@ -183,7 +184,6 @@ defmodule OceanconnectWeb.AuctionController do
           [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
           [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
           credit_margin_amount = user.company.credit_margin_amount
-
           render(
             conn,
             "edit.html",
@@ -198,7 +198,8 @@ defmodule OceanconnectWeb.AuctionController do
           )
       end
     else
-      _ -> redirect(conn, to: auction_path(conn, :index))
+      _ ->
+        redirect(conn, to: auction_path(conn, :index))
     end
   end
 
