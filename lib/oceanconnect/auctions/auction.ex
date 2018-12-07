@@ -239,7 +239,7 @@ defmodule Oceanconnect.Auctions.Auction do
   defp validate_scheduled_start(changeset, _attrs), do: changeset
 
   defp compare_start_time(changeset, start_time) do
-    case DateTime.compare(scheduled_start, DateTime.utc_now()) do
+    case DateTime.compare(start_time, DateTime.utc_now()) do
       :lt ->
         add_error(changeset, :scheduled_start, "Auction cannot be scheduled in the past")
 
@@ -250,6 +250,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
     {_, scheduled_start, _} = DateTime.from_iso8601(scheduled_start)
+    scheduled_start
   end
 
   defp maybe_convert_start_time(scheduled_start) do
