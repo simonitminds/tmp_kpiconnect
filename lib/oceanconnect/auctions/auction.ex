@@ -239,8 +239,10 @@ defmodule Oceanconnect.Auctions.Auction do
   defp validate_scheduled_start(changeset, _attrs), do: changeset
 
   defp compare_start_time(changeset, nil), do: changeset
+
   defp compare_start_time(changeset, start_time) do
-    now = DateTime.utc_now |> DateTime.truncate(:second)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
     case DateTime.compare(start_time, now) do
       :lt ->
         add_error(changeset, :scheduled_start, "Auction cannot be scheduled in the past")
