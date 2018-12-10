@@ -105,7 +105,6 @@ defmodule OceanconnectWeb.AuctionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
         [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
-        IO.inspect(changeset, label: "HERE")
         render(
           conn,
           "new.html",

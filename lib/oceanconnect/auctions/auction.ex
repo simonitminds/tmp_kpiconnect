@@ -211,8 +211,8 @@ defmodule Oceanconnect.Auctions.Auction do
   def parse_date(epoch) do
     epoch
     |> String.to_integer()
-    |> DateTime.from_unix!(:milliseconds)
-    |> DateTime.to_string()
+    |> DateTime.from_unix!()
+    |> DateTime.to_iso8601()
   end
 
   def select_upcoming(query \\ Auction, time_frame) do
