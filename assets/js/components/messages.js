@@ -75,7 +75,7 @@ class Messages extends React.Component {
             : <div className="qa-auction-messages-auctions overflow--auto">
                 { panelIsExpanded &&
                   <ul className="messaging__top-context">
-                    <li className="messaging__top-context__selector">Select an Auction</li>
+                    <li className="messaging__top-context__selector"><span>Select an Auction</span></li>
                     {
                       _.map(sortedMessagePayloads, (payload) => {
                         return (

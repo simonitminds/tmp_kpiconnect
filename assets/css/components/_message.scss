@@ -13,6 +13,7 @@
   box-shadow: $box-shadow;
   transition: all 0.5s ease;
   border-top-left-radius: 5px;
+  z-index: 5;
 
   &.open {
     top: 3.25rem;
@@ -208,7 +209,6 @@
   padding: 1rem;
   background-color: $gray-2;
   margin: 0 -1rem 0 -1rem;
-
   .field .control > * {
     border: 1px solid lighten($gray-3, 25%);
   }
@@ -352,7 +352,7 @@
 }
 
 .messaging__top-context__selector, .messaging__context-list__selector { // Help Text
-  flex: 0 0 auto;
+  flex-direction: row !important;
   background-color: $gray-1 !important;
   border-left: none !important;
   font-weight: bold;
@@ -415,5 +415,15 @@
 
   .messaging__message-container__header > & {
     margin: -0.25rem -0.5rem -0.25rem 0.5rem;
+  }
+}
+
+
+.messaging {
+
+// Auction Status
+
+  .auction-status {
+    flex-shrink: 0;
   }
 }

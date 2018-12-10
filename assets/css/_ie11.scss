@@ -1,0 +1,9 @@
+// Get reaaaaaally particular with that conditional CSS to target IE11.
+
+@media all and (-ms-high-contrast:none){
+
+.messaging__context-list__container > .messaging__back-indicator {
+  right: 2.5rem;
+}
+
+}
