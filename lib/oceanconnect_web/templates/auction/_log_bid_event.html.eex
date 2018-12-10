@@ -2,7 +2,7 @@
   <div><%= convert_event_date_time?(@event.time_entered) %></div>
   <div>
     <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
-    <span class="qa-event-type-extras"><%= convert_event_type_extras(@event.type, @event) %></span>
+    <span class="qa-event-type-extras"><%= vessel_fuel_name_for_event(@event, @auction_payload.auction) %></span>
     <br>
     <%= if event_bid_has_amount?(@event) do %>
       <span class="qa-event-bid-amount has-text-weight-bold has-padding-right-xs"><%= event_bid_amount(@event) %></span>

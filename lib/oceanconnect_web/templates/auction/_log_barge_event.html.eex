@@ -2,7 +2,7 @@
   <div><%= convert_event_date_time?(@event.time_entered) %></div>
   <div>
     <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
-    <span class="qa-event-type-extras"><%= convert_event_type_extras(@event.type, @event) %></span>
+    <span class="qa-event-type-extras"><%= barge_name_for_event(@event) %></span>
     <br>
     <span class="qa-event-company has-padding-right-xs"><%= event_company(@event) %></span>
     <span class="qa-event-user">(<%= event_user(@event) %>)</span>
