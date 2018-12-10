@@ -152,7 +152,7 @@ const AuctionForm = (props) => {
      <VesselFuelForm auction={auction}
                      vessels={vessels}
                      fuels={fuels}
-                     vessel_fuels={auction.vessel_fuels} />
+                     vesselFuels={auction.vessel_fuels} />
 
       <section className="auction-info is-gray-1"> {/* Add'l info */}
         <div className="container">
