@@ -352,7 +352,7 @@
 }
 
 .messaging__top-context__selector, .messaging__context-list__selector { // Help Text
-  flex: 0 0 auto;
+  flex-direction: row !important;
   background-color: $gray-1 !important;
   border-left: none !important;
   font-weight: bold;
@@ -415,5 +415,15 @@
 
   .messaging__message-container__header > & {
     margin: -0.25rem -0.5rem -0.25rem 0.5rem;
+  }
+}
+
+
+.messaging {
+
+// Auction Status
+
+  .auction-status {
+    flex-shrink: 0;
   }
 }
