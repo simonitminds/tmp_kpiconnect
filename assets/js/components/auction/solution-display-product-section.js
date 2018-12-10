@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const SolutionDisplayVesselSection = ({bids, fuel, vesselFuels, supplierId, auctionPayload}) => {
+const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auctionPayload}) => {
   const supplierName = (bid, selfText) => {
     const supplierText = selfText || "Your Bid";
 
@@ -75,9 +75,10 @@ const SolutionDisplayVesselSection = ({bids, fuel, vesselFuels, supplierId, auct
               );
             })
           : <tr>
-              <td>
-                <i>No bids have been placed on this auction</i>
+              <td colSpan="3">
+                <i>No bids have been placed for this product</i>
               </td>
+              <td></td>
             </tr>
         }
       </tbody>
@@ -87,4 +88,4 @@ const SolutionDisplayVesselSection = ({bids, fuel, vesselFuels, supplierId, auct
 };
 
 
-export default SolutionDisplayVesselSection;
+export default SolutionDisplayProductSection;

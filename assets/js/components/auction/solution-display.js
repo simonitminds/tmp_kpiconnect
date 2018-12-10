@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
-import SolutionDisplayVesselSection from './solution-display-vessel-section';
+import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
 
 export default class SolutionDisplay extends React.Component {
@@ -122,7 +122,7 @@ export default class SolutionDisplay extends React.Component {
           { _.map(bidsByFuel, (bids, fuelName) => {
               const fuel = _.find(fuels, {name: fuelName});
               return (
-                <SolutionDisplayVesselSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} />
+                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} />
               );
             })
           }
