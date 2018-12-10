@@ -13,6 +13,7 @@
   box-shadow: $box-shadow;
   transition: all 0.5s ease;
   border-top-left-radius: 5px;
+  z-index: 5;
 
   &.open {
     top: 3.25rem;
@@ -208,7 +209,6 @@
   padding: 1rem;
   background-color: $gray-2;
   margin: 0 -1rem 0 -1rem;
-
   .field .control > * {
     border: 1px solid lighten($gray-3, 25%);
   }
