@@ -22,7 +22,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
   const bidList = _.chain(productBids)
     .map('lowest_bids')
     .flatten()
-    .orderBy(['amount', 'time_entered'], ['asc', 'asc'])
+    .orderBy(['amount', 'time_entered'], ['asc', 'desc'])
     .value();
 
   if(bidList.length > 0) {
