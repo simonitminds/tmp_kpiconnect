@@ -157,7 +157,8 @@ defmodule OceanconnectWeb.AuctionController do
         credit_margin_amount: credit_margin_amount
       )
     else
-      _ -> redirect(conn, to: auction_path(conn, :index))
+      _ ->
+        redirect(conn, to: auction_path(conn, :index))
     end
   end
 
@@ -198,7 +199,8 @@ defmodule OceanconnectWeb.AuctionController do
           )
       end
     else
-      _ -> redirect(conn, to: auction_path(conn, :index))
+      _ ->
+        redirect(conn, to: auction_path(conn, :index))
     end
   end
 

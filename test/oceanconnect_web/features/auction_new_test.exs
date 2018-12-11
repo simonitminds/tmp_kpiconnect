@@ -21,6 +21,12 @@ defmodule Oceanconnect.AuctionNewTest do
     selected_company1 = Enum.at(supplier_companies, 0)
     selected_company2 = Enum.at(supplier_companies, 2)
 
+    valid_start_time =
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> Kernel.+(100_000)
+      |> DateTime.from_unix!()
+
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
@@ -33,8 +39,8 @@ defmodule Oceanconnect.AuctionNewTest do
       etd_date: date_time,
       etd_time: date_time,
       is_traded_bid_allowed: true,
-      scheduled_start_date: date_time,
-      scheduled_start_time: date_time,
+      scheduled_start_date: valid_start_time,
+      scheduled_start_time: valid_start_time,
       suppliers: [
         %{
           id: selected_company1.id
@@ -128,7 +134,6 @@ defmodule Oceanconnect.AuctionNewTest do
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
     AuctionNewPage.submit()
-
     assert current_path() =~ ~r/auctions\/\d/
 
     assert AuctionShowPage.has_values_from_params?(

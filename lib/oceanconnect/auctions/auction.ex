@@ -89,6 +89,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> validate_required(@required_fields)
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
+    |> validate_scheduled_start(attrs)
     |> maybe_add_vessel_fuels(attrs)
     |> maybe_add_suppliers(attrs)
   end
@@ -99,6 +100,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> validate_required(@required_fields ++ [:scheduled_start])
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
+    |> validate_scheduled_start(attrs)
     |> validate_vessel_fuels(attrs)
     |> maybe_add_vessel_fuels(attrs)
     |> maybe_add_suppliers(attrs)
@@ -209,8 +211,8 @@ defmodule Oceanconnect.Auctions.Auction do
   def parse_date(epoch) do
     epoch
     |> String.to_integer()
-    |> DateTime.from_unix!(:milliseconds)
-    |> DateTime.to_string()
+    |> DateTime.from_unix!(:millisecond)
+    |> DateTime.to_iso8601()
   end
 
   def select_upcoming(query \\ Auction, time_frame) do
@@ -222,6 +224,41 @@ defmodule Oceanconnect.Auctions.Auction do
         fragment("? - ?", q.scheduled_start, ^current_time) >= 0 and
           fragment("? - ?", q.sheduled_start, ^current_time) <= ^time_frame
     )
+  end
+
+  defp validate_scheduled_start(changeset, %{scheduled_start: scheduled_start}) do
+    scheduled_start = maybe_convert_start_time(scheduled_start)
+    compare_start_time(changeset, scheduled_start)
+  end
+
+  defp validate_scheduled_start(changeset, %{"scheduled_start" => scheduled_start}) do
+    scheduled_start = maybe_convert_start_time(scheduled_start)
+    compare_start_time(changeset, scheduled_start)
+  end
+
+  defp validate_scheduled_start(changeset, _attrs), do: changeset
+
+  defp compare_start_time(changeset, nil), do: changeset
+
+  defp compare_start_time(changeset, start_time) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    case DateTime.compare(start_time, now) do
+      :lt ->
+        add_error(changeset, :scheduled_start, "Auction cannot be scheduled in the past")
+
+      _ ->
+        changeset
+    end
+  end
+
+  defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
+    {_, scheduled_start, _} = DateTime.from_iso8601(scheduled_start)
+    scheduled_start
+  end
+
+  defp maybe_convert_start_time(scheduled_start) do
+    scheduled_start
   end
 
   def validate_vessel_fuels(changeset, %{auction_vessel_fuels: vessel_fuels}) do
