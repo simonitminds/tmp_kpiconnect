@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions do
     AuctionBid,
     AuctionCache,
     AuctionEvent,
-    AuctionEventStorage,
+    AuctionEventStore,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
@@ -213,7 +213,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def upcoming_notification_sent?(%Auction{id: auction_id}) do
-    Enum.any?(AuctionEventStorage.events_by_auction(auction_id), fn event ->
+    Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
       event.type == :auction_upcoming_notified
     end)
   end
@@ -446,6 +446,10 @@ defmodule Oceanconnect.Auctions do
   def with_participants(%Auction{} = auction) do
     auction
     |> Repo.preload([:buyer, :suppliers])
+  end
+
+  def active_participants(auction_id) do
+    AuctionEventStore.participants_from_events(auction_id)
   end
 
   def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil

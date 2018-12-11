@@ -23,7 +23,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   defp get_event_store_name(auction_id) do
     {:via, Registry, {@registry_name, auction_id}}
   end
-
   def event_list(auction_id) do
     case find_pid(auction_id) do
       {:ok, pid} ->
@@ -32,6 +31,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
       {:error, "Auction Event Store Not Started"} ->
         @event_storage.events_by_auction(auction_id)
     end
+  end
+
+  def participants_from_events(auction_id) do
+    event_list(auction_id)
+    |> Enum.map(&(&1.user))
+    |> Enum.reject(&(is_nil(&1)))
   end
 
   # Server

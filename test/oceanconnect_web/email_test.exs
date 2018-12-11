@@ -17,6 +17,9 @@ defmodule OceanconnectWeb.EmailTest do
       insert(:company, is_supplier: true)
     ]
 
+    non_participating_suppliers = for company <- supplier_companies, do: insert(:user, company: company)
+    non_participating_buyers = insert_list(2, :user, company: buyer_company)
+
     Enum.each(supplier_companies, fn supplier_company ->
       insert(:user, company: supplier_company)
     end)
@@ -79,6 +82,8 @@ defmodule OceanconnectWeb.EmailTest do
 
     {:ok,
      %{
+       non_participating_suppliers: non_participating_suppliers,
+       non_participating_buyers: non_participating_buyers,
        suppliers: suppliers,
        credit_company: credit_company,
        buyer_company: buyer_company,
@@ -174,23 +179,35 @@ defmodule OceanconnectWeb.EmailTest do
       end
     end
 
-    test "auction completion email builds for winning suppliers and buyer", %{
+    test "auction completion email builds for winning suppliers and buyer who participated in the auction", %{
       buyers: buyers,
       auction: auction,
       winning_solution: winning_solution,
-      approved_barges: approved_barges
+      approved_barges: approved_barges,
+      suppliers: suppliers,
+      non_participating_suppliers: non_participating_suppliers,
+      non_participating_buyers: non_participating_buyers
     } do
+      non_participating_suppliers_emails = non_participating_suppliers |> Enum.map(&(&1.email))
+      non_participating_buyers_emails = non_participating_buyers |> Enum.map(&(&1.email))
       vessel_name_list =
         auction.vessels
         |> Enum.map(& &1.name)
         |> Enum.join(", ")
-
+      active_users = buyers ++ suppliers
       %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
         Email.auction_closed(
           winning_solution.bids,
           approved_barges,
-          auction
+          auction,
+          active_users
         )
+
+      sent_supplier_emails = Enum.map(winning_supplier_emails, &(&1.to))
+      sent_buyer_emails = Enum.map(buyer_emails, &(&1.to))
+
+      refute Enum.any?(non_participating_suppliers_emails, &(&1 in sent_supplier_emails))
+      refute Enum.any?(non_participating_buyers_emails, &(&1 in sent_buyer_emails))
 
       for supplier_email <- winning_supplier_emails do
         assert supplier_email.subject ==
