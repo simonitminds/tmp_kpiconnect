@@ -255,7 +255,15 @@
     width: calc(100vw + 2px);
     background-color: $gray-1;
   }
+
+  // Position/Nest Based on Previous Sibling
+
+  .auction-lowest-bid + .auction-bidding {
+    margin-top: -2rem;
+  }
+
 }
+
 
 .auction-bidding__form-body {
   @media(max-width: 768px) {
@@ -282,7 +290,7 @@
 }
 
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
-  box-shadow: none;
+  // box-shadow: none;
   border: 1px solid $gray-2;
 }
 

@@ -94,7 +94,7 @@
 }
 
 .auction-solution__barge-section {
-  margin: 0.5rem -1rem;
+  margin: 0.5rem -1rem 0 -1rem;
   padding: 0.5rem 1rem;
   background-color: $gray-1;
 }
@@ -212,11 +212,6 @@
     width: calc(100% + 2.5rem);
     padding: 0.75rem 1rem;
     margin: 0 -1.25rem;
-}
-
-.box--nested-base--base {
-    margin-top: calc(-1.5rem - 2px);
-    margin-bottom: 1rem;
 }
 
 .auction-solution--split {

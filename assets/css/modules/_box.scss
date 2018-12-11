@@ -69,6 +69,7 @@
   }
 
   &--base { // Get last .box__subsection flush with the base of the box.
+    margin-top: -1.75rem;
     margin-bottom: -1.25rem;
   }
 

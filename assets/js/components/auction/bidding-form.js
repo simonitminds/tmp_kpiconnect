@@ -81,7 +81,7 @@ class BiddingForm extends React.Component {
     const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed');
 
     return(
-      <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
+      <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base`}>
         <MediaQuery query="(min-width: 769px)">
           <form onSubmit={this.submitForm.bind(this)}>
             <h3 className="auction-bidding__title title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>

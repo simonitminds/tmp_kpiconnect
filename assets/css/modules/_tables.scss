@@ -114,10 +114,10 @@
 
 .auction-solution__product-table {
   width: calc(100% + 2rem);
-  margin: 0 -1rem !important;
+  margin: 0.5rem -1rem 0 -1rem !important;
+  padding-top: 0.5rem;
 
   &:not(:last-child) {
-    margin-bottom: 0.5rem;
     border-bottom: 1px solid $gray-1;
   }
   thead tr {
