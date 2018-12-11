@@ -211,7 +211,7 @@ defmodule Oceanconnect.Auctions.Auction do
   def parse_date(epoch) do
     epoch
     |> String.to_integer()
-    |> DateTime.from_unix!()
+    |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_iso8601()
   end
 

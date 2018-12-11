@@ -36,7 +36,7 @@ defmodule Oceanconnect.AuctionsTest do
       %{"scheduled_start" => parsed_date} =
         Auction.maybe_parse_date_field(params, "scheduled_start")
 
-      assert parsed_date == expected_date |> DateTime.to_string()
+      assert parsed_date == expected_date |> DateTime.to_iso8601()
     end
 
     test "#maybe_convert_duration" do

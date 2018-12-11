@@ -96,6 +96,7 @@ defmodule OceanconnectWeb.AuctionController do
       |> Map.put("buyer_id", user.company.id)
       |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
+
     case Auctions.create_auction(updated_params, user) do
       {:ok, auction} ->
         conn

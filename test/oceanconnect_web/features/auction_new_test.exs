@@ -128,7 +128,6 @@ defmodule Oceanconnect.AuctionNewTest do
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
     AuctionNewPage.submit()
-
     assert current_path() =~ ~r/auctions\/\d/
 
     assert AuctionShowPage.has_values_from_params?(
