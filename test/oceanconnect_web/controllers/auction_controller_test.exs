@@ -24,7 +24,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
     valid_start_time =
       DateTime.utc_now()
-      |> DateTime.to_unix()
+      |> DateTime.to_unix(:millisecond)
       |> Kernel.+(100_000)
       |> Integer.to_string()
 
