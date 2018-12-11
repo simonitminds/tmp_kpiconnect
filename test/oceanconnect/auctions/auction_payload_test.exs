@@ -12,14 +12,14 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       supplier_user = insert(:user, company: supplier)
       supplier_user2 = insert(:user, company: supplier_2)
 
-      fuel = insert(:fuel)
-      fuel_id = "#{fuel.id}"
+      vessel_fuel = insert(:vessel_fuel)
+      vessel_fuel_id = "#{vessel_fuel.id}"
 
       auction =
         insert(:auction,
           buyer: buyer_company,
           suppliers: [supplier, supplier_2],
-          auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]
+          auction_vessel_fuels: [vessel_fuel]
         )
         |> Auctions.fully_loaded()
 
@@ -39,23 +39,23 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
          supplier_2: supplier_2,
          supplier_user: supplier_user,
          supplier_user2: supplier_user2,
-         fuel_id: fuel_id
+         vessel_fuel_id: vessel_fuel_id
        }}
     end
 
     test "returns state payload for a buyer with supplier names in the bid_list", %{
       auction: auction,
       supplier: supplier,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
 
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert supplier.name in Enum.map(payload.bid_history, & &1.supplier)
       assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
@@ -66,19 +66,19 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      create_bid(1.50, nil, supplier_2.id, fuel_id, auction)
+      create_bid(1.50, nil, supplier_2.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert auction_payload.status == :open
       assert [%{amount: 1.25}, %{amount: 1.5}] = payload.lowest_bids
@@ -95,22 +95,22 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
-      create_bid(1.50, nil, supplier_2.id, fuel_id, auction, false)
+      create_bid(1.50, nil, supplier_2.id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
       supplier1_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
-      supplier1_product_payload = supplier1_payload.product_bids[fuel_id]
+      supplier1_product_payload = supplier1_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.25, is_traded_bid: true}, %{amount: 1.5, is_traded_bid: false}] =
                supplier1_product_payload.lowest_bids
 
       supplier2_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
-      supplier2_product_payload = supplier2_payload.product_bids[fuel_id]
+      supplier2_product_payload = supplier2_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.25, is_traded_bid: false}, %{amount: 1.5, is_traded_bid: false}] =
                supplier2_product_payload.lowest_bids
@@ -119,13 +119,13 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "contains is_traded_bid information in supplier's bid_history", %{
       auction: auction,
       supplier: supplier,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
       auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.25, is_traded_bid: true}] = payload.bid_history
     end
@@ -134,28 +134,28 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.50, nil, supplier_2.id, fuel_id, auction, true)
+      create_bid(1.50, nil, supplier_2.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
       auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.5}] = payload.lowest_bids
       assert length(payload.bid_history) == 0
 
-      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
       updated_auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      updated_payload = updated_auction_payload.product_bids[fuel_id]
+      updated_payload = updated_auction_payload.product_bids[vessel_fuel_id]
 
       assert updated_auction_payload.status == :open
       assert [%{amount: 1.25}, %{amount: 1.5}] = updated_payload.lowest_bids
@@ -165,19 +165,19 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier_2.id, fuel_id, auction, true)
+      create_bid(1.25, nil, supplier_2.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
-      create_bid(1.25, nil, supplier.id, fuel_id, auction, true)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
       auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(supplier.id)
 
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.25}, %{amount: 1.25}] = payload.lowest_bids
 
@@ -185,7 +185,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
 
-      buyer_payload = buyer_auction_payload.product_bids[fuel_id]
+      buyer_payload = buyer_auction_payload.product_bids[vessel_fuel_id]
 
       assert supplier.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       assert supplier_2.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
@@ -197,12 +197,12 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
-      create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier_2.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
@@ -211,7 +211,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
         auction
         |> AuctionPayload.get_auction_payload!(supplier_2.id)
 
-      payload = auction_payload.product_bids[fuel_id]
+      payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert [%{amount: 1.25}, %{amount: 1.25}] = payload.lowest_bids
     end
@@ -220,7 +220,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction,
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       auction =
         Oceanconnect.Repo.update!(Ecto.Changeset.change(auction, %{anonymous_bidding: true}))
@@ -229,17 +229,17 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.update_cache(auction)
 
-      create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier_2.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      create_bid(1.25, nil, supplier.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       buyer_auction_payload =
         auction
         |> AuctionPayload.get_auction_payload!(auction.buyer_id)
 
-      buyer_payload = buyer_auction_payload.product_bids[fuel_id]
+      buyer_payload = buyer_auction_payload.product_bids[vessel_fuel_id]
 
       refute supplier.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
       refute supplier_2.name in Enum.map(buyer_payload.bid_history, & &1.supplier)
@@ -265,14 +265,14 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       auction: auction = %Auction{id: auction_id},
       supplier: supplier,
       supplier_2: supplier_2,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       _bid1 =
-        create_bid(1.25, nil, supplier_2.id, fuel_id, auction)
+        create_bid(1.25, nil, supplier_2.id, vessel_fuel_id, auction)
         |> Auctions.place_bid()
 
       bid2 =
-        create_bid(1.25, nil, supplier.id, fuel_id, auction)
+        create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
         |> Auctions.place_bid()
 
       bid2_id = bid2.id
@@ -295,7 +295,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert %Solution{
                auction_id: ^auction_id,
                bids: [
-                 %{id: ^bid2_id, amount: 1.25, fuel_id: ^fuel_id}
+                 %{id: ^bid2_id, amount: 1.25, vessel_fuel_id: ^vessel_fuel_id}
                ],
                comment: "you're winner"
              } = auction_payload.solutions.winning_solution

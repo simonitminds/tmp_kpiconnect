@@ -58,7 +58,7 @@ defmodule OceanconnectWeb.EmailTest do
         200.00,
         nil,
         hd(supplier_companies).id,
-        hd(auction.auction_vessel_fuels).fuel.id,
+        hd(auction.auction_vessel_fuels).id,
         auction,
         true
       ),
@@ -66,7 +66,7 @@ defmodule OceanconnectWeb.EmailTest do
         220.00,
         nil,
         List.last(supplier_companies).id,
-        List.last(auction.auction_vessel_fuels).fuel.id,
+        List.last(auction.auction_vessel_fuels).id,
         auction,
         false
       )

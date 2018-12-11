@@ -14,15 +14,15 @@ defmodule Oceanconnect.AuctionLogTest do
     supplier = insert(:user, company: supplier_company)
     insert(:company, name: "Ocean Connect Marine")
 
-    fuel = insert(:fuel)
-    fuel_id = "#{fuel.id}"
+    vessel_fuel = insert(:vessel_fuel)
+    vessel_fuel_id = "#{vessel_fuel.id}"
 
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2],
-        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
+        auction_vessel_fuels: [vessel_fuel],
         duration: 600_000
       )
       |> Auctions.fully_loaded()
@@ -50,7 +50,7 @@ defmodule Oceanconnect.AuctionLogTest do
     Auctions.start_auction(auction)
 
     bid =
-      create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier_company.id, vessel_fuel_id, auction)
       |> Auctions.place_bid(supplier)
 
     Auctions.end_auction(auction)
@@ -74,7 +74,7 @@ defmodule Oceanconnect.AuctionLogTest do
        auction: updated_auction,
        buyer_id: buyer_company.id,
        supplier: supplier,
-       fuel: fuel,
+       vessel_fuel: vessel_fuel,
        auction_events: auction_events,
        messages: [message | messages]
      }}
@@ -86,7 +86,7 @@ defmodule Oceanconnect.AuctionLogTest do
 
   test "page has auction details", %{
     auction: auction,
-    fuel: fuel,
+    vessel_fuel: vessel_fuel,
     supplier: supplier,
     auction_events: auction_events
   } do
@@ -97,7 +97,7 @@ defmodule Oceanconnect.AuctionLogTest do
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
-      "winning-solution-entry" => "$1.25/unit for #{fuel.name} from #{supplier.company.name}"
+      "winning-solution-entry" => "$1.25/unit for #{vessel_fuel.fuel.name} from #{supplier.company.name} to #{vessel_fuel.vessel.name}"
     }
 
     assert AuctionLogPage.has_details?(expected_details)

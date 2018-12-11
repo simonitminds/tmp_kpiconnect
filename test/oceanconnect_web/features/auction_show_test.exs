@@ -17,15 +17,15 @@ defmodule Oceanconnect.AuctionShowTest do
     supplier3 = insert(:user, company: supplier_company3)
     insert(:company, name: "Ocean Connect Marine")
 
-    fuel = insert(:fuel)
-    fuel_id = "#{fuel.id}"
+    vessel_fuel = insert(:vessel_fuel)
+    vessel_fuel_id = "#{vessel_fuel.id}"
 
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2, supplier_company3],
-        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
+        auction_vessel_fuels: [vessel_fuel],
         is_traded_bid_allowed: true
       )
       |> Auctions.fully_loaded()
@@ -49,7 +49,7 @@ defmodule Oceanconnect.AuctionShowTest do
        supplier2: supplier2,
        supplier3: supplier3,
        buyer_company: buyer_company,
-       fuel_id: fuel_id
+       vessel_fuel_id: vessel_fuel_id
      }}
   end
 
@@ -105,13 +105,13 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_values_from_params?(buyer_params)
     end
 
-    test "buyer can see the bid list", %{auction: auction, fuel_id: fuel_id} do
+    test "buyer can see the bid list", %{auction: auction, vessel_fuel_id: vessel_fuel_id} do
       [s1, s2, _s3] = auction.suppliers
 
-      create_bid(1.75, nil, s1.id, fuel_id, auction, true)
+      create_bid(1.75, nil, s1.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid(insert(:user, company: s1))
 
-      create_bid(1.75, nil, s2.id, fuel_id, auction, false)
+      create_bid(1.75, nil, s2.id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid(insert(:user, company: s2))
 
       auction_state =
@@ -119,7 +119,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[fuel_id].bids
+        auction_state.product_bids[vessel_fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -158,7 +158,7 @@ defmodule Oceanconnect.AuctionShowTest do
     test "supplier can enter a bid", %{
       auction: auction,
       bid_params: bid_params,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
@@ -170,7 +170,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[fuel_id].bids
+        auction_state.product_bids[vessel_fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
@@ -186,7 +186,7 @@ defmodule Oceanconnect.AuctionShowTest do
       auction: auction,
       bid_params: bid_params,
       buyer_company: buyer_company,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.mark_as_traded_bid()
@@ -203,7 +203,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[fuel_id].bids
+        auction_state.product_bids[vessel_fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -275,14 +275,14 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier can revoke their bid for a product", %{
       auction: auction,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
 
-      AuctionShowPage.revoke_bid_for_product(fuel_id)
+      AuctionShowPage.revoke_bid_for_product(vessel_fuel_id)
       :timer.sleep(200)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
@@ -290,7 +290,7 @@ defmodule Oceanconnect.AuctionShowTest do
         auction
         |> Auctions.get_auction_state!()
 
-      stored_bid_list = auction_state.product_bids[fuel_id].bids
+      stored_bid_list = auction_state.product_bids[vessel_fuel_id].bids
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
@@ -307,15 +307,15 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "decision period" do
-    setup %{auction: auction, supplier: supplier, supplier2: supplier2, fuel_id: fuel_id} do
+    setup %{auction: auction, supplier: supplier, supplier2: supplier2, vessel_fuel_id: vessel_fuel_id} do
       Auctions.start_auction(auction)
 
       bid =
-        create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
+        create_bid(1.25, nil, supplier.company_id, vessel_fuel_id, auction)
         |> Auctions.place_bid()
 
       bid2 =
-        create_bid(1.25, nil, supplier2.company_id, fuel_id, auction)
+        create_bid(1.25, nil, supplier2.company_id, vessel_fuel_id, auction)
         |> Auctions.place_bid()
 
       Auctions.end_auction(auction)

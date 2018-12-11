@@ -52,7 +52,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
         200.00,
         nil,
         hd(supplier_companies).id,
-        hd(auction.auction_vessel_fuels).fuel.id,
+        hd(auction.auction_vessel_fuels).id,
         auction,
         true
       ),
@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
         200.00,
         nil,
         List.last(supplier_companies).id,
-        hd(auction.auction_vessel_fuels).fuel.id,
+        hd(auction.auction_vessel_fuels).id,
         auction,
         false
       )

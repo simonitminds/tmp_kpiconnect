@@ -128,8 +128,6 @@ defmodule Oceanconnect.Auctions.Auction do
         vessel_fuel_changeset_proc.(existing, avf)
       end)
 
-    IO.inspect(Enum.map(list_of_changesets, &(&1.data)))
-
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
 
