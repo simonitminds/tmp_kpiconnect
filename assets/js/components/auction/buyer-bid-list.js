@@ -12,31 +12,37 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
     .value();
 
   const productBids = _.get(auctionPayload, 'product_bids');
-  const products = _.keys(productBids);
+  const products = _.chain(productBids)
+    .keys()
+    .sortBy([
+      (vfId) => vesselFuels[vfId].fuel_id,
+      (vfId) => vesselFuels[vfId].vessel_id
+    ])
+    .value();
   const bidList = _.chain(productBids)
-                   .map('lowest_bids')
-                   .flatten()
-                   .orderBy(['amount', 'time_entered'],['asc', 'asc'])
-                   .value();
+    .map('lowest_bids')
+    .flatten()
+    .orderBy(['amount', 'time_entered'], ['asc', 'asc'])
+    .value();
 
-  if (bidList.length > 0) {
+  if(bidList.length > 0) {
     return(
       <div className="box qa-buyer-bid-history">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         { _.map(products, (vfId) => {
             const lowestBids = productBids[vfId].lowest_bids;
 
-            return (
+            return(
               <table key={vfId} className="table table--grade-display is-fullwidth is-striped is-marginless">
                 <thead>
                   <tr>
-                    <th>{vesselFuels[vfId].fuel.name}</th>
+                    <th>{vesselFuels[vfId].fuel.name} for {vesselFuels[vfId].vessel.name}</th>
                     <th>Price</th>
                     <th>Time</th>
                   </tr>
                 </thead>
-                <tbody>
 
+                <tbody>
                   { _.map(lowestBids, ({id, amount, vfId, is_traded_bid, time_entered, supplier}) => {
                       return (
                         <tr key={id} className={`qa-auction-bid-${id}`}>
@@ -63,9 +69,7 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
         }
       </div>
     );
-  }
-
-  else {
+  } else {
     return(
       <div className="box">
         <h3 className="box__header box__header--bordered">Grade Display</h3>

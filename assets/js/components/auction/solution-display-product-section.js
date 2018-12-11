@@ -3,6 +3,9 @@ import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
 const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auctionPayload}) => {
+  const sortedBids = _.sortBy(bids, [
+      ({vessel_fuel_id}) => _.find(vesselFuels, (vf) => vf.id == vessel_fuel_id).vessel_id
+    ]);
   const supplierName = (bid, selfText) => {
     const supplierText = selfText || "Your Bid";
 
@@ -50,8 +53,8 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auc
         </tr>
       </thead>
       <tbody>
-        { bids.length > 0
-          ? _.map(bids, (bid) => {
+        { sortedBids.length > 0
+          ? _.map(sortedBids, (bid) => {
               const vesselFuel = _.find(vesselFuels, ({id}) => `${id}` == bid.vessel_fuel_id);
               const vessel = vesselFuel.vessel;
 
