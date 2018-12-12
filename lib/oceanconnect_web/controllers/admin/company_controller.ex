@@ -42,7 +42,6 @@ defmodule OceanconnectWeb.Admin.CompanyController do
 
   def edit(conn, %{"id" => id}) do
     brokers = Accounts.list_broker_entities()
-    |> IO.inspect()
     company = Accounts.get_company!(id)
     changeset = Accounts.change_company(company)
     render(conn, "edit.html", company: company, changeset: changeset, brokers: brokers)
