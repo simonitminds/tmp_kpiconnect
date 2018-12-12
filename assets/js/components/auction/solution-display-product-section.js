@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auctionPayload}) => {
+const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, revokable, revokeBid, auctionPayload}) => {
   const sortedBids = _.sortBy(bids, [
       ({vessel_fuel_id}) => _.find(vesselFuels, (vf) => vf.id == vessel_fuel_id).vessel_id
     ]);
@@ -15,6 +15,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auc
       return bid.supplier;
     }
   }
+
 
   const isTradedBid = (bid) => {
     return(
@@ -73,7 +74,14 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, auc
                     }
                   </td>
                   <td><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
-                  <td><span className="qa-auction-bid-supplier">({ formatTime(bid.time_entered) })</span></td>
+                  <td><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
+                  { revokable &&
+                    <td>
+                      <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={revokeBid} data-product-id={vesselFuel.id}>
+                        <i className="fas fa-minus"></i>
+                      </span>
+                    </td>
+                  }
                 </tr>
               );
             })

@@ -25,15 +25,21 @@ export default class SolutionDisplay extends React.Component {
     const selectionWindow = document.querySelector(`.${this.props.className} > .auction-solution__confirmation`);
     selectionWindow.classList.add("clear");
     setTimeout(() => this.setState({selected: false}), 750);
-    return(false);
+    return false;
   }
 
-  onConfirm(event) {
-    event.preventDefault();
+  onConfirm(e) {
+    e.preventDefault();
     const bidIds = _.map(this.props.solution.bids, 'id');
     const auctionId = this.props.auctionPayload.auction.id;
-    this.props.acceptSolution(auctionId, bidIds, event);
-    return(false)
+    this.props.acceptSolution(auctionId, bidIds, e);
+    return false;
+  }
+
+  onRevoke(e) {
+    e.preventDefault();
+    const productId = e.currentTarget.dataset.productId;
+    this.props.revokeBid(auctionId, productId);
   }
 
   toggleExpanded(e) {
@@ -42,7 +48,7 @@ export default class SolutionDisplay extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
+    const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, best, children, className} = this.props;
     const isSupplier = !!supplierId;
     const auctionStatus = auctionPayload.status;
     const auctionBarges = _.get(auctionPayload, 'submitted_barges');
@@ -54,6 +60,7 @@ export default class SolutionDisplay extends React.Component {
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
     const acceptable = !!acceptSolution;
+    const revokable = isSupplier && revokeBid;
     const isExpanded = this.state.expanded;
 
     const bidsByFuel = _.chain(fuels)
@@ -122,7 +129,7 @@ export default class SolutionDisplay extends React.Component {
           { _.map(bidsByFuel, (bids, fuelName) => {
               const fuel = _.find(fuels, {name: fuelName});
               return (
-                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} />
+                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} revokable={revokable} revokeBid={this.onRevoke.bind(this)}/>
               );
             })
           }

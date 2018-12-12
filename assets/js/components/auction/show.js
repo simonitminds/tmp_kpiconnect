@@ -145,7 +145,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
+            <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} revokeBid={this.props.revokeSupplierBid} supplierId={this.props.currentUserCompanyId} />
             <BiddingForm formSubmit={this.props.formSubmit} revokeBid={this.props.revokeSupplierBid} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -175,7 +175,7 @@ export default class AuctionShow extends React.Component {
               </h3>
             </div>
             <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
-            <BiddingForm formSubmit={this.props.formSubmit} revokeBid={this.props.revokeSupplierBid} auctionPayload={auctionPayload} />
+            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )

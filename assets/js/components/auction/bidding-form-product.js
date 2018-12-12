@@ -35,18 +35,6 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
-          { existingBid
-            ? <div className="tags has-addons has-margin-top-xs">
-                <div className="tag is-success"><i className="fas fa-check"></i></div>
-                <div className="tag revoke-bid__status is-white">Bid Active</div>
-                <span className={`tag revoke-bid__button qa-auction-product-${fuelId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
-                <input type="hidden" name="existing_bid" value="true" data-fuel-input data-fuel={fuelId} />
-              </div>
-            : <div className="tags has-addons has-margin-top-xs">
-                <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
-                <div className="tag is-white revoke-bid__status">No Active Bid</div>
-              </div>
-          }
         </div>
         <div className="column">
           <div className="columns is-desktop">
