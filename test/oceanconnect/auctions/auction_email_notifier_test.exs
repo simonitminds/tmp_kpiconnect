@@ -7,8 +7,8 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
   alias Oceanconnect.Auctions.{AuctionEmailNotifier}
 
   setup do
-    buyer_company = insert(:company, is_supplier: false)
-    _ocm = insert(:company, name: "Ocean Connect Marine", is_ocm: true)
+    ocm = insert(:company, name: "Ocean Connect Marine", is_ocm: true, is_broker: true)
+    buyer_company = insert(:company, is_supplier: false, broker_entity: ocm)
     buyers = insert_list(2, :user, company: buyer_company)
 
     [barge1, barge2] = insert_list(2, :barge)

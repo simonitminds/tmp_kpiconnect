@@ -136,7 +136,6 @@ defmodule OceanconnectWeb.Email do
         |> Enum.filter(&(&1.email in active_user_emails))
 
         is_traded_bid = bid.is_traded_bid
-
         Enum.map(suppliers, fn supplier ->
           base_email(supplier)
           |> subject("You have won Auction #{auction.id} for #{vessel_name} at #{port_name}!")
