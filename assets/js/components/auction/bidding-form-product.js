@@ -14,13 +14,20 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
     .value();
   const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
 
+  const lowestFuelBid = _.chain(vesselFuels)
+    .map((vf) => _.get(auctionPayload, `product_bids["${vf.id}"].lowest_bids[0]`))
+    .filter()
+    .minBy('amount')
+    .value();
+
 
   return(
     <div className="auction-bidding__product-group has-margin-bottom-md">
       <div className="columns is-desktop has-margin-bottom-xs">
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
-          <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
+          <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
+          <span className="has-text-gray-3">Bid to Beat: ${formatPrice(lowestFuelBid.amount)}</span>
         </div>
         <div className="column">
           <div className="columns is-desktop">
@@ -41,7 +48,6 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     data-fuel={fuelId}
                   />
                 </div>
-                {/*<p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>*/}
               </div>
             </div>
             <div className="column">
@@ -61,7 +67,6 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                   />
                   <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
                 </div>
-                {/*<p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>*/}
               </div>
             </div>
           </div>
@@ -81,7 +86,6 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
           <span className="has-text-weight-bold">Vessels:</span>
         </div>
         <div className="column columns">
-
           { _.map(vesselFuels, (vesselFuel) => {
               const vessel = vesselFuel.vessel;
               const quantity = vesselFuel.quantity;
@@ -111,9 +115,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     <span className="is-inline-block has-text-gray-3 has-text-weight-normal has-margin-left-xs"> &times; {quantity} MT</span>
                     <br/>
                     { existingBid
-                      ? <span>
-                          <span className="is-inline-block has-text-gray-3 has-text-weight-normal qa-auction-bid-amount">{`$` + formatPrice(currentBidAmount)}</span>
-                          <span className="is-inline-block has-text-gray-3 has-text-weight-normal qa-auction-bid-min_amount"> {minimumBidAmount ? `(min $${formatPrice(minimumBidAmount)})` : ""}</span>
+                      ? <span className="is-inline-block has-text-gray-3 has-text-weight-normal">
+                          <span className="qa-auction-bid-amount">{`$` + formatPrice(currentBidAmount)}</span> <span className="qa-auction-bid-min_amount"> {minimumBidAmount ? `(Min $${formatPrice(minimumBidAmount)})` : ""}</span>
                         </span>
                       : <span className="is-inline-block has-text-gray-3 has-text-weight-normal is-italic qa-auction-bid-no_existing">
                           No active bid
