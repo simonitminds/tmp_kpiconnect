@@ -45,6 +45,15 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
     );
   }
 
+  const confirmBidRevoke = (ev) => {
+    ev.preventDefault();
+    const productId = ev.currentTarget.dataset.productId;
+    const auctionId = auctionPayload.auction.id;
+    const vesselFuel = _.find(vesselFuels, ({id}) => `${id}` == productId);
+
+    return confirm(`Are you sure you want to cancel your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId) : false;
+  };
+
 
   return (
     <table className="auction-solution__product-table table is-striped">
@@ -77,7 +86,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
                   <td><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
                   { revokable &&
                     <td>
-                      <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={revokeBid} data-product-id={vesselFuel.id}>
+                      <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
                         <i className="fas fa-minus"></i>
                       </span>
                     </td>

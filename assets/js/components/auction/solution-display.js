@@ -36,12 +36,6 @@ export default class SolutionDisplay extends React.Component {
     return false;
   }
 
-  onRevoke(e) {
-    e.preventDefault();
-    const productId = e.currentTarget.dataset.productId;
-    this.props.revokeBid(auctionId, productId);
-  }
-
   toggleExpanded(e) {
     e.preventDefault();
     this.setState({expanded: !this.state.expanded});
@@ -129,7 +123,7 @@ export default class SolutionDisplay extends React.Component {
           { _.map(bidsByFuel, (bids, fuelName) => {
               const fuel = _.find(fuels, {name: fuelName});
               return (
-                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} revokable={revokable} revokeBid={this.onRevoke.bind(this)}/>
+                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} revokable={revokable} revokeBid={revokeBid} auctionPayload={auctionPayload} />
               );
             })
           }

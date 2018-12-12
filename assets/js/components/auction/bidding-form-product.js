@@ -8,25 +8,11 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
   const isMultiProduct = _.get(auctionPayload, 'auction.fuels', []).length > 1;
 
   const {id: fuelId, name} = fuel;
-  const existingBid = _.chain(auctionPayload)
-    .get(`bid_history`)
-    .filter('active')
-    .find({fuel_id: fuelId})
-    .value();
-  const currentBidAmount = _.get(existingBid, `amount`);
-  const minimumBidAmount = _.get(existingBid, `min_amount`);
-  const allowSplit = _.get(existingBid, 'allow_split', true);
-
   const vesselFuels = _.chain(auctionPayload)
     .get('auction.auction_vessel_fuels')
     .filter((avf) => avf.fuel_id == fuelId)
     .value();
   const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
-
-  const confirmBidCancellation = (ev) => {
-    ev.preventDefault();
-    return confirm('Are you sure you want to cancel your bid for this product?') ? onRevoke(auction.id, fuelId) : false;
-  };
 
 
   return(
@@ -55,7 +41,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     data-fuel={fuelId}
                   />
                 </div>
-                <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
+                {/*<p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>*/}
               </div>
             </div>
             <div className="column">
@@ -75,7 +61,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                   />
                   <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
                 </div>
-                <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
+                {/*<p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>*/}
               </div>
             </div>
           </div>
@@ -83,7 +69,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
         { isMultiProduct
           ? <div className="column is-narrow">
               <label className="checkbox">
-                <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-fuel-input data-fuel={fuelId}/> Split?
+                <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={true} data-fuel-input data-fuel={fuelId}/> Split?
                 <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
               </label>
             </div>
@@ -99,6 +85,14 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
           { _.map(vesselFuels, (vesselFuel) => {
               const vessel = vesselFuel.vessel;
               const quantity = vesselFuel.quantity;
+              const existingBid = _.chain(auctionPayload)
+                .get(`bid_history`)
+                .filter('active')
+                .find({vessel_fuel_id: `${vesselFuel.id}`})
+                .value();
+              const currentBidAmount = _.get(existingBid, `amount`);
+              const minimumBidAmount = _.get(existingBid, `min_amount`);
+
               return (
                 <div className="column is-narrow" key={vesselFuel.id}>
                   <label htmlFor={`auction-bid_vessel_fuel-${vesselFuel.id}`} className='auction-bidding__vessel-selection label' key={vessel.name}>
@@ -115,6 +109,16 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     />
                     {vessel.name}
                     <span className="is-inline-block has-text-gray-3 has-text-weight-normal has-margin-left-xs"> &times; {quantity} MT</span>
+                    <br/>
+                    { existingBid
+                      ? <span>
+                          <span className="is-inline-block has-text-gray-3 has-text-weight-normal qa-auction-bid-amount">{`$` + formatPrice(currentBidAmount)}</span>
+                          <span className="is-inline-block has-text-gray-3 has-text-weight-normal qa-auction-bid-min_amount"> {minimumBidAmount ? `(min $${formatPrice(minimumBidAmount)})` : ""}</span>
+                        </span>
+                      : <span className="is-inline-block has-text-gray-3 has-text-weight-normal is-italic qa-auction-bid-no_existing">
+                          No active bid
+                        </span>
+                    }
                   </label>
                 </div>
               );
