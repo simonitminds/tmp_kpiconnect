@@ -43,24 +43,29 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
                 </thead>
 
                 <tbody>
-                  { _.map(lowestBids, ({id, amount, vfId, is_traded_bid, time_entered, supplier}) => {
-                      return (
-                        <tr key={id} className={`qa-auction-bid-${id}`}>
-                          <td className="qa-auction-bid-supplier">{supplier}</td>
-                          <td className="qa-auction-bid-amount"><span className="auction__bid-amount">${formatPrice(amount)}</span>
-                            <span className="qa-auction-bid-is_traded_bid">
-                              {is_traded_bid &&
-                                <span className="auction__traded-bid-tag">
-                                  <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
-                                  <span className="has-padding-left-sm">Traded Bid</span>
-                                </span>
-                              }
-                            </span>
-                          </td>
-                          <td>({formatTime(time_entered)})</td>
-                        </tr>
-                      );
-                    })
+                  { lowestBids.length > 0
+                    ? _.map(lowestBids, ({id, amount, vfId, is_traded_bid, time_entered, supplier}) => {
+                        return (
+                          <tr key={id} className={`qa-auction-bid-${id}`}>
+                            <td className="qa-auction-bid-supplier">{supplier}</td>
+                            <td className="qa-auction-bid-amount"><span className="auction__bid-amount">${formatPrice(amount)}</span>
+                              <span className="qa-auction-bid-is_traded_bid">
+                                {is_traded_bid &&
+                                  <span className="auction__traded-bid-tag">
+                                    <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+                                    <span className="has-padding-left-sm">Traded Bid</span>
+                                  </span>
+                                }
+                              </span>
+                            </td>
+                            <td>({formatTime(time_entered)})</td>
+                          </tr>
+                        );
+                      })
+                    : <tr>
+                        <td colSpan="3"><i>No bids have been placed on this product</i></td>
+                        <td></td>
+                      </tr>
                   }
                 </tbody>
               </table>
