@@ -180,6 +180,16 @@ defmodule Oceanconnect.Auctions do
     [auction.buyer_id | auction_supplier_ids(auction)]
   end
 
+  def auction_admin_ids do
+    query = from(user in Accounts.User,
+      where: user.is_admin == true,
+      select: user.id
+    )
+
+    query
+    |> Repo.all()
+  end
+
   def auction_supplier_ids(auction = %Auction{}) do
     auction_with_participants = with_participants(auction)
     Enum.map(auction_with_participants.suppliers, & &1.id)
