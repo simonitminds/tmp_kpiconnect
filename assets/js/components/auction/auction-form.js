@@ -207,15 +207,6 @@ const AuctionForm = (props) => {
                 </div>
               </div>
               <div className="field is-horizontal">
-                <div className="field-label"></div>
-                <div className="field-body">
-                  <div className="control">
-                    <i className="is-caption">Port Local Time: {portLocalTime(auction.scheduled_start, port_id, ports)}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_duration" className="label">
                     Duration

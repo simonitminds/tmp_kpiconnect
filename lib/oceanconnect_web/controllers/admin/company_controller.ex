@@ -7,10 +7,14 @@ defmodule OceanconnectWeb.Admin.CompanyController do
   def index(conn, params) do
     page = Accounts.list_companies(params)
 
+    alphabetized_companies =
+      page.entries
+      |> Enum.sort_by(&String.first(&1.name))
+
     render(
       conn,
       "index.html",
-      companies: page.entries,
+      companies: alphabetized_companies,
       page_number: page.page_number,
       page_size: page.page_size,
       total_pages: page.total_pages,
@@ -19,11 +23,14 @@ defmodule OceanconnectWeb.Admin.CompanyController do
   end
 
   def new(conn, _params) do
+    brokers = Accounts.list_broker_entities()
     changeset = Accounts.change_company(%Company{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, brokers: brokers)
   end
 
   def create(conn, %{"company" => company_params}) do
+    brokers = Accounts.list_broker_entities()
+
     case Accounts.create_company(company_params) do
       {:ok, _company} ->
         conn
@@ -31,18 +38,20 @@ defmodule OceanconnectWeb.Admin.CompanyController do
         |> redirect(to: admin_company_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, brokers: brokers)
     end
   end
 
   def edit(conn, %{"id" => id}) do
+    brokers = Accounts.list_broker_entities()
     company = Accounts.get_company!(id)
     changeset = Accounts.change_company(company)
-    render(conn, "edit.html", company: company, changeset: changeset)
+    render(conn, "edit.html", company: company, changeset: changeset, brokers: brokers)
   end
 
   def update(conn, %{"id" => id, "company" => company_params}) do
     company = Accounts.get_company!(id)
+    brokers = Accounts.list_broker_entities()
 
     case Accounts.update_company(company, company_params) do
       {:ok, _company} ->
@@ -51,7 +60,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
         |> redirect(to: admin_company_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", company: company, changeset: changeset)
+        render(conn, "edit.html", company: company, changeset: changeset, brokers: brokers)
     end
   end
 

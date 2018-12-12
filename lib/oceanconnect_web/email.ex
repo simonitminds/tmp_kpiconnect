@@ -108,12 +108,15 @@ defmodule OceanconnectWeb.Email do
       port: port
     } = auction
 
-    active_user_emails = active_participants
-    |> Enum.map(&(&1.email))
+    active_user_emails =
+      active_participants
+      |> Enum.map(& &1.email)
 
     buyer_company = Accounts.get_company!(buyer_id)
-    buyers = Accounts.users_for_companies([buyer_company])
-    |> Enum.filter(&(&1.email in active_user_emails))
+
+    buyers =
+      Accounts.users_for_companies([buyer_company])
+      |> Enum.filter(&(&1.email in active_user_emails))
 
     vessel_name =
       vessels
@@ -132,8 +135,10 @@ defmodule OceanconnectWeb.Email do
     supplier_emails =
       Enum.flat_map(bids, fn bid ->
         supplier_company = Accounts.get_company!(bid.supplier_id)
-        suppliers = Accounts.users_for_companies([supplier_company])
-        |> Enum.filter(&(&1.email in active_user_emails))
+
+        suppliers =
+          Accounts.users_for_companies([supplier_company])
+          |> Enum.filter(&(&1.email in active_user_emails))
 
         is_traded_bid = bid.is_traded_bid
 
@@ -146,7 +151,7 @@ defmodule OceanconnectWeb.Email do
             winning_supplier_company: supplier_company,
             is_traded_bid: is_traded_bid,
             auction: auction,
-            buyer_company: buyer_company_for_bid(bid),
+            buyer_company: buyer_company_for_bid(bid, buyer_company),
             deliverables: deliverables_for_bid(deliverables, bid),
             approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: false
@@ -157,6 +162,7 @@ defmodule OceanconnectWeb.Email do
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
         is_traded_bid = bid.is_traded_bid
+
         Enum.map(buyers, fn buyer ->
           supplier_company = Accounts.get_company!(bid.supplier_id)
 
@@ -165,7 +171,7 @@ defmodule OceanconnectWeb.Email do
           |> render(
             "auction_completion.html",
             user: buyer,
-            winning_supplier_company: supplier_company_for_bid(bid),
+            winning_supplier_company: supplier_company_for_bid(bid, buyer_company),
             physical_supplier: supplier_company,
             is_traded_bid: is_traded_bid,
             auction: auction,
@@ -240,20 +246,24 @@ defmodule OceanconnectWeb.Email do
     |> Enum.uniq()
   end
 
-  defp buyer_company_for_bid(%AuctionBid{is_traded_bid: true}) do
-    Accounts.get_ocm_company()
+  defp buyer_company_for_bid(%AuctionBid{is_traded_bid: true}, %Accounts.Company{
+         broker_entity_id: broker_id
+       }) do
+    Accounts.get_company!(broker_id)
   end
 
-  defp buyer_company_for_bid(%AuctionBid{auction_id: auction_id}) do
+  defp buyer_company_for_bid(%AuctionBid{auction_id: auction_id}, _) do
     %{buyer_id: buyer_id} = Auctions.get_auction!(auction_id)
     Accounts.get_company!(buyer_id)
   end
 
-  defp supplier_company_for_bid(%AuctionBid{is_traded_bid: true}) do
-    Accounts.get_ocm_company()
+  defp supplier_company_for_bid(%AuctionBid{is_traded_bid: true}, %Accounts.Company{
+         broker_entity_id: broker_id
+       }) do
+    Accounts.get_company!(broker_id)
   end
 
-  defp supplier_company_for_bid(%AuctionBid{supplier_id: supplier_id}) do
+  defp supplier_company_for_bid(%AuctionBid{supplier_id: supplier_id}, _) do
     Accounts.get_company!(supplier_id)
   end
 
