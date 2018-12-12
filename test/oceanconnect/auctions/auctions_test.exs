@@ -36,7 +36,7 @@ defmodule Oceanconnect.AuctionsTest do
       %{"scheduled_start" => parsed_date} =
         Auction.maybe_parse_date_field(params, "scheduled_start")
 
-      assert parsed_date == expected_date |> DateTime.to_string()
+      assert parsed_date == expected_date |> DateTime.to_iso8601()
     end
 
     test "#maybe_convert_duration" do
@@ -276,6 +276,30 @@ defmodule Oceanconnect.AuctionsTest do
         })
 
       assert auction_supplier.alias_name == "Supplier 1"
+    end
+
+    test "create_auction/1 with a scheduled_start time ion the past returns error changeset", %{
+      auction: auction
+    } do
+      invalid_start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix()
+        |> Kernel.-(60_000)
+        |> DateTime.from_unix!()
+
+      auction_with_participants =
+        Auctions.with_participants(auction)
+        |> Auctions.fully_loaded()
+        |> Map.put(:scheduled_start, invalid_start_time)
+
+      auction_attrs =
+        auction_with_participants
+        |> Map.take(
+          [:scheduled_start, :eta, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
+            Map.keys(@valid_attrs)
+        )
+
+      assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(auction_attrs)
     end
 
     test "create_auction/1 with invalid data returns error changeset" do

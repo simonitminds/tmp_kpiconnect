@@ -1,5 +1,5 @@
 <div class="form auction-app__body">
-<%= form_for @changeset, @action, [class: "control"], fn _f -> %>
+<%= form_for @changeset, @action, [class: "control", onsubmit: "debouncedSubmit()"], fn _f -> %>
 
   <%= if @changeset.action do %>
     <div class="container is-fullhd">
@@ -34,3 +34,14 @@
   </section>
 <% end %>
 </div>
+<script>
+  function debouncedSubmit(e) {
+    e.preventDefault();
+    var timeout;
+    clearTimeout(timeout);
+    if (!timeout) {
+      e.target.submit();
+    }
+    timeout = setTimeout(function () {}, 1000);
+  }
+</script>

@@ -22,6 +22,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: List.last(fuels), quantity: 1500)
     ]
 
+    valid_start_time =
+      DateTime.utc_now()
+      |> DateTime.to_unix(:millisecond)
+      |> Kernel.+(100_000)
+      |> Integer.to_string()
+
     auction_params =
       string_params_for(
         :auction,
@@ -31,6 +37,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       )
       |> Oceanconnect.Utilities.maybe_convert_date_times()
       |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
+      |> Map.put("scheduled_start", valid_start_time)
 
     authed_conn = login_user(build_conn(), buyer)
 

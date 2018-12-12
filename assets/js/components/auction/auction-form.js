@@ -194,12 +194,15 @@ const AuctionForm = (props) => {
                 <div className="field-label">
                   <label className="label">Auction Start</label>
                 </div>
-                <div className="field-body">
+                <div className="field-body field-body--distribute-middle">
                   <div className="control">
                     <DateInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_date')} />
                   </div>
                   <div className="control">
                     <TimeInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_time')} />
+                  </div>
+                  <div className="control has-text-gray-3">
+                    (GMT)
                   </div>
                 </div>
               </div>

@@ -27,19 +27,20 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
     {:ok, cancellation_emails}
   end
 
-  def notify_auction_completed(winning_solution_bids, submitted_barges, auction_id) do
+  def notify_auction_completed(winning_solution_bids, submitted_barges, auction_id, active_participants) do
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
     approved_barges = Enum.filter(submitted_barges, &(&1.approval_status == "APPROVED"))
-
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       OceanconnectWeb.Email.auction_closed(
         winning_solution_bids,
         approved_barges,
-        auction
+        auction,
+        active_participants
       )
+    completion_emails = [supplier_emails | buyer_emails]
+    |> List.flatten()
+    |> deliver_emails()
 
-    completion_emails = List.flatten([supplier_emails | buyer_emails])
-    deliver_emails(completion_emails)
     {:ok, completion_emails}
   end
 

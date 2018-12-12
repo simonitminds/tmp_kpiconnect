@@ -27,7 +27,6 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         status
       )
       when is_number(min_amount) do
-
     enter_auto_bid(current_state, bid, status)
     |> process(status)
   end
@@ -264,18 +263,17 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp enter_auto_bid(
-    current_state = %ProductBidState{lowest_bids: _lowest_bids},
-    bid = %AuctionBid{amount: amount, min_amount: min_amount},
-    :pending
-  )
-  when is_number(min_amount) and is_number(amount) do
+         current_state = %ProductBidState{lowest_bids: _lowest_bids},
+         bid = %AuctionBid{amount: amount, min_amount: min_amount},
+         :pending
+       )
+       when is_number(min_amount) and is_number(amount) do
     current_state
     |> invalidate_previous_auto_bids(bid)
     |> invalidate_previous_bids(bid)
     |> add_auto_bid(bid)
     |> add_bid(bid)
   end
-
 
   defp enter_auto_bid(
          current_state = %ProductBidState{lowest_bids: _lowest_bids},
@@ -312,23 +310,21 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   end
 
   defp enter_bid(
-    current_state = %ProductBidState{
-      auction_id: auction_id
-    },
-    bid = %AuctionBid{
-      auction_id: auction_id,
-      amount: amount,
-      min_amount: nil
-    },
-    :pending
-  )
-  do
+         current_state = %ProductBidState{
+           auction_id: auction_id
+         },
+         bid = %AuctionBid{
+           auction_id: auction_id,
+           amount: amount,
+           min_amount: nil
+         },
+         :pending
+       ) do
     current_state
     |> invalidate_previous_auto_bids(bid)
     |> invalidate_previous_bids(bid)
     |> add_bid(bid)
   end
-
 
   defp enter_bid(
          current_state = %ProductBidState{
@@ -381,7 +377,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
            auction_id: auction_id
          },
          status
-       ) when status in [:pending, :open] do
+       )
+       when status in [:pending, :open] do
     current_state
     |> invalidate_previous_auto_bids(bid)
     |> invalidate_previous_bids(bid)

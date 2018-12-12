@@ -9,18 +9,22 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
   setup do
     buyer_company = insert(:company, is_supplier: false)
     _ocm = insert(:company, name: "Ocean Connect Marine", is_ocm: true)
-    [insert(:user, company: buyer_company), insert(:user, company: buyer_company)]
+    buyers = insert_list(2, :user, company: buyer_company)
 
-    barge1 = insert(:barge)
-    barge2 = insert(:barge)
+    [barge1, barge2] = insert_list(2, :barge)
 
     supplier_companies = [
       insert(:company, is_supplier: true),
       insert(:company, is_supplier: true)
     ]
+    suppliers = Enum.map(supplier_companies, &(insert(:user, %{company: &1})))
+    auction_users = buyers ++ suppliers
 
     vessel = insert(:vessel)
     fuel = insert(:fuel)
+
+    non_participating_suppliers = for company <- supplier_companies, do: insert(:user, company: company)
+    non_participating_buyers = insert_list(2, :user, company: buyer_company)
 
     auction =
       insert(:auction,
@@ -40,10 +44,6 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
         supplier: List.last(supplier_companies)
       )
     ]
-
-    Enum.each(auction.suppliers, fn supplier_company ->
-      insert(:user, %{company: supplier_company})
-    end)
 
     winning_supplier_company = Enum.at(Enum.take_random(auction.suppliers, 1), 0)
 
@@ -74,6 +74,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
     {:ok,
      %{
        auction: auction,
+       auction_users: auction_users,
        winning_supplier_company: winning_supplier_company,
        winning_solution: winning_solution,
        approved_barges: approved_barges
@@ -106,7 +107,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
     #       :timer.sleep(500)
     #       assert length(emails) > 0
 
-    #       for email <- emails o
+    #       for email <- emails do
     #         assert_delivered_email(email)
     #       end
     #     end
@@ -114,16 +115,21 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
     test "auction notifier sends completion emails to winning supplier and buyer", %{
       winning_solution: winning_solution,
       approved_barges: approved_barges,
-      auction: auction
+      auction: auction,
+      auction_users: auction_users
     } do
+      active_participants = Enum.drop(auction_users, 2)
+
       assert {:ok, emails} =
                AuctionEmailNotifier.notify_auction_completed(
                  winning_solution.bids,
                  approved_barges,
-                 auction.id
+                 auction.id,
+                 active_participants
                )
 
       :timer.sleep(500)
+      assert length(emails) == length(active_participants)
       assert length(emails) > 0
 
       for email <- emails do

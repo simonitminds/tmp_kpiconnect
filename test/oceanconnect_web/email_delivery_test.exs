@@ -84,13 +84,16 @@ defmodule OceanconnectWeb.EmailDeliveryTest do
       end
     end
 
-    test "sends auction completion emails to winning supplier and buyer", %{
+   test "sends auction completion emails to winning supplier and buyer", %{
       auction: auction,
       approved_barges: approved_barges,
-      winning_solution: winning_solution
+      winning_solution: winning_solution,
+      winning_supplier_company: winning_supplier_company
     } do
+      buyers = auction.buyer.users
+      suppliers = winning_supplier_company.users
       %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
-        Email.auction_closed(winning_solution.bids, approved_barges, auction)
+        Email.auction_closed(winning_solution.bids, approved_barges, auction, buyers ++ suppliers)
 
       for supplier_email <- supplier_emails do
         Mailer.deliver_now(supplier_email)

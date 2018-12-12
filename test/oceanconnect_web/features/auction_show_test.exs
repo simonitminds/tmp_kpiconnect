@@ -49,6 +49,7 @@ defmodule Oceanconnect.AuctionShowTest do
        supplier2: supplier2,
        supplier3: supplier3,
        buyer_company: buyer_company,
+       fuel: vessel_fuel.fuel,
        vessel_fuel_id: vessel_fuel_id
      }}
   end
@@ -220,12 +221,18 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
-    test "index displays bid status to suppliers", %{supplier2: supplier2, auction: auction} do
+    test "index displays bid status to suppliers", %{
+      supplier2: supplier2,
+      auction: auction,
+      fuel: fuel
+    } do
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
       AuctionShowPage.enter_bid(%{amount: 1.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid is the best overall offer for #{fuel.name}"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -234,7 +241,9 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.enter_bid(%{amount: 0.50})
         AuctionShowPage.submit_bid()
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "Your bid is the best overall offer for #{fuel.name}"
       end)
 
       change_session_to(:default)
@@ -250,12 +259,15 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier places minimum bid and maintains winning position", %{
       supplier2: supplier2,
-      auction: auction
+      auction: auction,
+      fuel: fuel
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid is the best overall offer for #{fuel.name}"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -268,9 +280,14 @@ defmodule Oceanconnect.AuctionShowTest do
       end)
 
       change_session_to(:default)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid is the best overall offer for #{fuel.name}"
+
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid is the best overall offer for #{fuel.name}"
     end
 
     test "supplier can revoke their bid for a product", %{
@@ -280,7 +297,9 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "Your bid is the best overall offer for #{fuel.name}"
 
       AuctionShowPage.revoke_bid_for_product(vessel_fuel_id)
       :timer.sleep(200)
@@ -434,6 +453,36 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "barges" do
+    test "supplier cannot submit a barge for approval once an auction has expired", %{
+      auction: auction,
+      supplier: supplier
+    } do
+      barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+
+      inactive_barge =
+        insert(:barge, companies: [supplier.company], imo_number: "1234568", is_active: false)
+
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      Auctions.end_auction(auction)
+      Auctions.expire_auction(auction)
+      :timer.sleep(500)
+      assert AuctionShowPage.auction_status() == "EXPIRED"
+
+      Hound.Helpers.Screenshot.take_screenshot()
+      assert AuctionShowPage.has_available_barge?(barge)
+      refute AuctionShowPage.has_available_barge?(inactive_barge)
+
+      assert_raise Hound.NoSuchElementError, fn ->
+        AuctionShowPage.submit_barge(barge)
+      end
+
+      assert_raise Hound.NoSuchElementError, fn ->
+        AuctionShowPage.has_submitted_barge?(barge)
+      end
+    end
+
     test "supplier views a list of their barges", %{
       auction: auction,
       supplier: supplier

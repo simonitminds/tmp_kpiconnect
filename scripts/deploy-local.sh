@@ -25,3 +25,20 @@ sudo /bin/systemctl restart "$APP_NAME"
 
 # Save a version file to track what's currently deployed.
 git rev-parse --short HEAD > .deployed-version
+
+
+
+
+# DISCORD WEBHOOK
+url='https://discordapp.com/api/webhooks/522067576713510958/z4jmyFVYLke1E_c0q_COb6wEZj7Th_Iilq-GTAc4XmZJpPbWqzlnhVrt-N7V3CjoRqb9'
+
+curl -H "Content-Type: application/json" -X POST $url -d @- <<-END
+  {
+    "embeds": [
+      {
+        "title": "Deployment happened!",
+        "description": "Deployment performed on $(hostname)"
+      }
+    ]
+  }
+END

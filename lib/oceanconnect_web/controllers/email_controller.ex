@@ -78,7 +78,8 @@ defmodule OceanconnectWeb.EmailController do
       Email.auction_closed(
         winning_solution.bids,
         approved_barges,
-        auction
+        auction,
+        Auctions.active_participants(auction.id)
       )
 
     emails = List.flatten([supplier_emails | buyer_emails])

@@ -61,7 +61,11 @@ defmodule OceanconnectWeb.AuctionView do
     |> Poison.encode!()
   end
 
-  def actual_duration(%Auction{auction_started: started, auction_ended: ended, auction_closed_time: closed}) do
+  def actual_duration(%Auction{
+        auction_started: started,
+        auction_ended: ended,
+        auction_closed_time: closed
+      }) do
     cond do
       started && ended -> "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
       started && closed -> "#{trunc(DateTime.diff(closed, started) / 60)} minutes"

@@ -46,10 +46,12 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
         },
         state
       ) do
+    active_participants = Auctions.active_participants(auction_id)
     AuctionEmailNotifier.notify_auction_completed(
       winning_solution_bids,
       submitted_barges,
-      auction_id
+      auction_id,
+      active_participants
     )
 
     {:noreply, state}

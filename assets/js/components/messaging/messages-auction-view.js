@@ -37,7 +37,7 @@ const MessagesAuctionView = ({ messagePayloads, selectedAuction, auctionState, a
               actions={actions}
             />
         : <ul className="messaging__context-list qa-conversations">
-            <li className="messaging__context-list__selector">Select a Conversation</li>
+            <li className="messaging__context-list__selector"><span>Select a Conversation</span></li>
             {
               _.map(auctionPayload.conversations, (conversation) => {
                 return (

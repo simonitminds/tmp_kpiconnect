@@ -96,7 +96,8 @@ defmodule OceanconnectWeb.Email do
   def auction_closed(
         bids,
         approved_barges,
-        auction = %Auction{}
+        auction = %Auction{},
+        active_participants
       ) do
     auction = Auctions.fully_loaded(auction)
 
@@ -107,8 +108,12 @@ defmodule OceanconnectWeb.Email do
       port: port
     } = auction
 
+    active_user_emails = active_participants
+    |> Enum.map(&(&1.email))
+
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
+    |> Enum.filter(&(&1.email in active_user_emails))
 
     vessel_name =
       vessels
@@ -128,6 +133,8 @@ defmodule OceanconnectWeb.Email do
       Enum.flat_map(bids, fn bid ->
         supplier_company = Accounts.get_company!(bid.supplier_id)
         suppliers = Accounts.users_for_companies([supplier_company])
+        |> Enum.filter(&(&1.email in active_user_emails))
+
         is_traded_bid = bid.is_traded_bid
 
         Enum.map(suppliers, fn supplier ->
@@ -150,7 +157,6 @@ defmodule OceanconnectWeb.Email do
     buyer_emails =
       Enum.flat_map(bids, fn bid ->
         is_traded_bid = bid.is_traded_bid
-
         Enum.map(buyers, fn buyer ->
           supplier_company = Accounts.get_company!(bid.supplier_id)
 

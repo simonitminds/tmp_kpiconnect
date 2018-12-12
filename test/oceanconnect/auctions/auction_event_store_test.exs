@@ -112,7 +112,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     :timer.sleep(200)
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
-    :timer.sleep(200)
+    :timer.sleep(500)
 
     assert_received %AuctionEvent{type: :auction_state_rebuilt, auction_id: ^auction_id}
 
