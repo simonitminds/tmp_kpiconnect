@@ -43,4 +43,15 @@ defmodule Oceanconnect.Admin.Company.EditPage do
   defp fill_form_element(_key, element, _type, value) do
     fill_field(element, value)
   end
+
+  def add_broker_entity(broker_company) do
+    find_element(:css, ".qa-admin-company-broker_entity")
+    |> find_within_element(:css, ".qa-admin-company-broker_entity-#{broker_company.id}")
+    |> click
+  end
+
+  def broker_entity_selected?(broker_company) do
+    find_element(:css, ".qa-admin-company-broker_entity")
+    |> find_within_element(:css, ".qa-admin-company-broker_entity-#{broker_company.id}")
+  end
 end

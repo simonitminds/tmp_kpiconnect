@@ -3,7 +3,7 @@ defmodule Oceanconnect.Accounts.Company do
   import Ecto.{Changeset, Query}
   alias Oceanconnect.Accounts.Company
 
-  @derive {Poison.Encoder, except: [:__meta__, :barges, :users, :vessels, :ports]}
+  @derive {Poison.Encoder, except: [:__meta__, :barges, :users, :vessels, :ports, :broker_entity]}
 
   schema "companies" do
     field(:address1, :string)
@@ -14,12 +14,14 @@ defmodule Oceanconnect.Accounts.Company do
     field(:credit_margin_amount, :float)
     field(:email, :string)
     field(:is_active, :boolean, default: true)
+    field(:is_broker, :boolean, default: false)
     field(:is_supplier, :boolean, default: false)
     field(:is_ocm, :boolean, default: false)
     field(:main_phone, :string)
     field(:mobile_phone, :string)
     field(:name, :string)
     field(:postal_code, :string)
+    belongs_to(:broker_entity, Company)
 
     many_to_many(
       :barges,
@@ -50,12 +52,14 @@ defmodule Oceanconnect.Accounts.Company do
   @optional_fields [
     :address1,
     :address2,
+    :broker_entity_id,
     :city,
     :contact_name,
     :country,
     :credit_margin_amount,
     :email,
     :is_active,
+    :is_broker,
     :is_supplier,
     :is_ocm,
     :main_phone,
@@ -75,6 +79,13 @@ defmodule Oceanconnect.Accounts.Company do
     from(
       q in query,
       where: q.is_active == true
+    )
+  end
+
+  def select_brokers(query \\ Company) do
+    from(
+      q in query,
+      where: q.is_broker == true
     )
   end
 

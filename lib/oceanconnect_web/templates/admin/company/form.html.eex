@@ -95,6 +95,16 @@
         <%end%>
       </div>
 
+      <div class="field is-horizontal">
+        <div class="control is-inline-block">
+          <%= checkbox f, :is_broker, class: "checkbox qa-admin-company-is_broker" %>
+          <%= error_tag f, :is_broker %>
+        </div>
+        <%= label f, :is_broker, class: "label has-margin-left-md is-inline-block" do %>
+          Is Broker
+        <%end%>
+      </div>
+
       <div class="field">
         <%= label f, :credit_margin_amount, class: "label" do %>
           Credit Margin
@@ -104,6 +114,18 @@
           <%= error_tag f, :credit_margin_amount %>
         </div>
       </div>
+
+			<div class="field">
+				<%= label f, :broker_entity_id, class: "label" do %>
+					Broker Entity
+				<% end %>
+				<div class="control">
+					<div class="select">
+						<%= select f, :broker_entity_id, [{nil, nil}] ++ Enum.map(@brokers, &{&1.name, &1.id}), class: "qa-admin-company-broker_entity_id" %>
+						<%= error_tag f, :broker_entity_id %>
+					</div>
+				</div>
+			</div>
     </div>
   </div>
   <div class="columns">

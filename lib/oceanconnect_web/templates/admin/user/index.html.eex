@@ -24,7 +24,7 @@
 					<tbody>
 						<%= for user <- @users do %>
 							<tr class="qa-admin-user-<%= user.id %>">
-								<td class="qa-admin-user-full_name"><%= OceanconnectWeb.Admin.UserView.full_name(user) %></td>
+								<td class="qa-admin-user-full_name"><%= user.first_name %> <strong><%= user.last_name %></strong></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_user_path(@conn, :edit, user), class: "button is-small is-primary is-inline-block" %>
 									<%= if user.is_active do %>

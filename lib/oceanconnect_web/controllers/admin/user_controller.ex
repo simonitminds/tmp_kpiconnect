@@ -7,10 +7,14 @@ defmodule OceanconnectWeb.Admin.UserController do
   def index(conn, params) do
     page = Accounts.list_users(params)
 
+    alphabetized_users =
+      page.entries
+      |> Enum.sort_by(&String.first(&1.last_name))
+
     render(
       conn,
       "index.html",
-      users: page.entries,
+      users: alphabetized_users,
       page_number: page.page_number,
       page_size: page.page_size,
       total_pages: page.total_pages,
