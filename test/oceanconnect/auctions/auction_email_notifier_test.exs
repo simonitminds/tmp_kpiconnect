@@ -17,13 +17,16 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
       insert(:company, is_supplier: true),
       insert(:company, is_supplier: true)
     ]
-    suppliers = Enum.map(supplier_companies, &(insert(:user, %{company: &1})))
+
+    suppliers = Enum.map(supplier_companies, &insert(:user, %{company: &1}))
     auction_users = buyers ++ suppliers
 
     vessel = insert(:vessel)
     fuel = insert(:fuel)
 
-    non_participating_suppliers = for company <- supplier_companies, do: insert(:user, company: company)
+    non_participating_suppliers =
+      for company <- supplier_companies, do: insert(:user, company: company)
+
     non_participating_buyers = insert_list(2, :user, company: buyer_company)
 
     auction =

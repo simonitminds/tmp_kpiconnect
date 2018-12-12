@@ -19,7 +19,7 @@ defmodule Oceanconnect.AccountsTest do
        %{
          user: Accounts.get_user!(user.id),
          inactive_user: Accounts.get_user!(inactive_user.id),
-         company: company,
+         company: company
        }}
     end
 
@@ -151,8 +151,8 @@ defmodule Oceanconnect.AccountsTest do
       inactive_company: inactive_company
     } do
       assert Enum.map(Accounts.list_companies(), fn f -> f.id end) == [
-        company.id,
-        broker_company.id,
+               company.id,
+               broker_company.id,
                inactive_company.id
              ]
     end
@@ -171,8 +171,8 @@ defmodule Oceanconnect.AccountsTest do
       broker_company: broker_company
     } do
       assert Enum.map(Accounts.list_broker_entities(), fn f -> f.id end) == [
-        broker_company.id
-      ]
+               broker_company.id
+             ]
 
       refute Enum.any?(Accounts.list_broker_entities(), fn f -> f.id == company.id end)
     end
@@ -182,7 +182,10 @@ defmodule Oceanconnect.AccountsTest do
       broker_company: broker_company,
       inactive_company: inactive_company
     } do
-      assert Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [company.id, broker_company.id]
+      assert Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [
+               company.id,
+               broker_company.id
+             ]
 
       refute Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [
                company.id,

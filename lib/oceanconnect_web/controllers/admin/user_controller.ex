@@ -6,9 +6,10 @@ defmodule OceanconnectWeb.Admin.UserController do
 
   def index(conn, params) do
     page = Accounts.list_users(params)
+
     alphabetized_users =
       page.entries
-      |> Enum.sort_by(&(String.first(&1.last_name)))
+      |> Enum.sort_by(&String.first(&1.last_name))
 
     render(
       conn,

@@ -6,9 +6,10 @@ defmodule OceanconnectWeb.Admin.CompanyController do
 
   def index(conn, params) do
     page = Accounts.list_companies(params)
+
     alphabetized_companies =
       page.entries
-      |> Enum.sort_by(&(String.first(&1.name)))
+      |> Enum.sort_by(&String.first(&1.name))
 
     render(
       conn,
@@ -29,6 +30,7 @@ defmodule OceanconnectWeb.Admin.CompanyController do
 
   def create(conn, %{"company" => company_params}) do
     brokers = Accounts.list_broker_entities()
+
     case Accounts.create_company(company_params) do
       {:ok, _company} ->
         conn
