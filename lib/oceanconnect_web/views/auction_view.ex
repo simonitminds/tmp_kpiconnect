@@ -300,6 +300,7 @@ defmodule OceanconnectWeb.AuctionView do
       event.type in @events_from_system -> "_log_system_event.html"
       event.type in @events_with_solution_data -> "_log_solution_event.html"
       event.type in @events_with_bid_data -> "_log_bid_event.html"
+      event.type in @events_with_product_data -> "_log_product_event.html"
       event.type in @events_for_barges -> "_log_barge_event.html"
       true -> "_log_normal_event.html"
     end
