@@ -98,14 +98,18 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         }, {})
         .value();
 
-    const solutionBidsByFuel = _.chain(solution)
-      .get('bids', [])
-      .reduce((acc, bid) => {
-        acc[bid.fuel_id] = bid;
+    const fuelForVesselFuels = _.chain(vesselFuels)
+      .reduce((acc, vf) => {
+        acc[vf.id] = vf.fuel_id;
         return acc;
       }, {})
       .value();
 
+    const solutionBidsByFuel =  _.chain(solution)
+      .get('bids', [])
+      .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
+      .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())
+      .value();
 
     return _.map(uniqueFuels, (fuel) => {
       const fuelBid = solutionBidsByFuel[fuel.id];
