@@ -28,7 +28,7 @@ defmodule Oceanconnect.Admin.Company.NewTest do
                "is_supplier",
                "is_broker",
                "credit_margin_amount",
-               "broker_entity"
+               "broker_entity_id"
              ])
     end
 
