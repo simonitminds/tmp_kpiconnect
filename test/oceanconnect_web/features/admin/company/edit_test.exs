@@ -27,7 +27,9 @@ defmodule Oceanconnect.Admin.Company.EditTest do
                "main_phone",
                "mobile_phone",
                "is_supplier",
-               "credit_margin_amount"
+               "is_broker",
+               "credit_margin_amount",
+               "broker_entity_id"
              ])
     end
 

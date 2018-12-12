@@ -3,23 +3,21 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
 
   alias Oceanconnect.Accounts
 
-  @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{name: nil}
 
-  def fixture(:company) do
-    {:ok, company} = Accounts.create_company(@create_attrs)
-    company
-  end
-
   setup do
     user = insert(:user, password: "password", is_admin: "true")
+
+    company =
+      insert(:company)
+      |> Oceanconnect.Repo.preload(:broker_entity)
 
     conn =
       build_conn()
       |> login_user(user)
 
-    {:ok, %{conn: conn}}
+    {:ok, %{conn: conn, company: company}}
   end
 
   describe "index" do
@@ -38,8 +36,9 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "create company" do
-    test "redirects to index when data is valid", %{conn: conn} do
-      conn = post(conn, admin_company_path(conn, :create), company: @create_attrs)
+    test "redirects to index when data is valid", %{conn: conn, company: company} do
+      company_params = string_params_for(:company, broker_entity_id: company.broker_entity_id)
+      conn = post(conn, admin_company_path(conn, :create), company: company_params)
 
       assert redirected_to(conn) == admin_company_path(conn, :index)
 
@@ -54,8 +53,6 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "edit company" do
-    setup [:create_company]
-
     test "renders form for editing chosen company", %{conn: conn, company: company} do
       conn = get(conn, admin_company_path(conn, :edit, company))
       assert html_response(conn, 200) =~ "Edit Company"
@@ -63,8 +60,6 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "update company" do
-    setup [:create_company]
-
     test "redirects to index when data is valid", %{conn: conn, company: company} do
       conn = put(conn, admin_company_path(conn, :update, company), company: @update_attrs)
       assert redirected_to(conn) == admin_company_path(conn, :index)
@@ -80,8 +75,6 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "delete company" do
-    setup [:create_company]
-
     test "deletes chosen company", %{conn: conn, company: company} do
       conn = delete(conn, admin_company_path(conn, :delete, company))
       assert redirected_to(conn) == admin_company_path(conn, :index)
@@ -93,8 +86,6 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "deactivate company" do
-    setup [:create_company]
-
     test "deactivates chosen company", %{conn: conn, company: company} do
       conn = post(conn, admin_company_path(conn, :deactivate, company))
       assert redirected_to(conn) == admin_company_path(conn, :index)
@@ -104,18 +95,11 @@ defmodule OceanconnectWeb.Admin.CompanyControllerTest do
   end
 
   describe "activate company" do
-    setup [:create_company]
-
     test "activates chosen company", %{conn: conn, company: company} do
       conn = post(conn, admin_company_path(conn, :activate, company))
       assert redirected_to(conn) == admin_company_path(conn, :index)
       company = Accounts.get_company!(company.id)
       assert company.is_active == true
     end
-  end
-
-  defp create_company(_) do
-    company = fixture(:company)
-    {:ok, company: company}
   end
 end

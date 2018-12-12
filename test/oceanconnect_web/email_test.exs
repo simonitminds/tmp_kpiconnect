@@ -6,8 +6,8 @@ defmodule OceanconnectWeb.EmailTest do
   alias Oceanconnect.Auctions
 
   setup do
-    credit_company = insert(:company, name: "Ocean Connect Marine", is_ocm: true)
-    buyer_company = insert(:company, is_supplier: false)
+    credit_company = insert(:company, name: "Ocean Connect Marine", is_broker: true)
+    buyer_company = insert(:company, is_supplier: false, broker_entity: credit_company)
     buyers = [insert(:user, %{company: buyer_company}), insert(:user, %{company: buyer_company})]
     barge1 = insert(:barge)
     barge2 = insert(:barge)

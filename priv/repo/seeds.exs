@@ -149,6 +149,7 @@ companies =
       address2: "",
       city: "London",
       is_supplier: true,
+      is_broker: true,
       country: "Britain",
       contact_name: "Neal Bolton",
       email: "nbolton@oceanconnectmarine.com",

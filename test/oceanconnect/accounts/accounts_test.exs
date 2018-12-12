@@ -19,7 +19,7 @@ defmodule Oceanconnect.AccountsTest do
        %{
          user: Accounts.get_user!(user.id),
          inactive_user: Accounts.get_user!(inactive_user.id),
-         company: company
+         company: company,
        }}
     end
 
@@ -134,50 +134,70 @@ defmodule Oceanconnect.AccountsTest do
 
     setup do
       company = insert(:company, Map.merge(@valid_attrs, %{is_active: true}))
+      broker_company = insert(:company, Map.merge(@valid_attrs, %{is_broker: true}))
       inactive_company = insert(:company, Map.merge(@valid_attrs, %{is_active: false}))
 
       {:ok,
        %{
          company: Accounts.get_company!(company.id),
+         broker_company: Accounts.get_company!(broker_company.id),
          inactive_company: Accounts.get_company!(inactive_company.id)
        }}
     end
 
     test "list_companies/0 returns all companies", %{
       company: company,
+      broker_company: broker_company,
       inactive_company: inactive_company
     } do
       assert Enum.map(Accounts.list_companies(), fn f -> f.id end) == [
-               company.id,
+        company.id,
+        broker_company.id,
                inactive_company.id
              ]
     end
 
     test "list_companies/1 returns a paginated list all companies", %{
       company: company,
+      broker_company: broker_company,
       inactive_company: inactive_company
     } do
       page = Accounts.list_companies(%{})
-      assert page.entries == [company, inactive_company]
+      assert page.entries == [company, broker_company, inactive_company]
+    end
+
+    test "list_broker_entities/0 returns all companies that are brokers", %{
+      company: company,
+      broker_company: broker_company
+    } do
+      assert Enum.map(Accounts.list_broker_entities(), fn f -> f.id end) == [
+        broker_company.id
+      ]
+
+      refute Enum.any?(Accounts.list_broker_entities(), fn f -> f.id == company.id end)
     end
 
     test "list_active_companies/0 returns all companys marked as active", %{
       company: company,
+      broker_company: broker_company,
       inactive_company: inactive_company
     } do
-      assert Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [company.id]
+      assert Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [company.id, broker_company.id]
 
       refute Enum.map(Accounts.list_active_companies(), fn f -> f.id end) == [
                company.id,
+               broker_company.id,
                inactive_company.id
              ]
     end
 
     test "get_company!/1 returns the company with given id", %{
       company: company,
+      broker_company: broker_company,
       inactive_company: inactive_company
     } do
       assert Accounts.get_company!(company.id) == company
+      assert Accounts.get_company!(broker_company.id) == broker_company
       assert Accounts.get_company!(inactive_company.id) == inactive_company
     end
 
