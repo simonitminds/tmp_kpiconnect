@@ -53,8 +53,16 @@ export default class AuctionsIndex extends React.Component {
         });
     }
 
+    const chronologicalAuctionPayloads = (auctionPayloads, status) => {
+      if (status === 'pending') {
+        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.scheduled_start], ['asc']);
+      } else {
+        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.auction_started], ['asc']);
+      }
+    }
+
     const filteredAuctionsDisplay = (status) => {
-      const filteredPayloads = filteredAuctionPayloads(status);
+      const filteredPayloads = chronologicalAuctionPayloads(filteredAuctionPayloads(status), status);
       if(_.isEmpty(filteredPayloads)) {
         return(
           <div className="empty-list">
