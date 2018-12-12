@@ -75,6 +75,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         | product_bids: Map.put(state.product_bids, "#{product_key}", new_product_state)
       }
     end
+
+    def get_state_for_product(state, product_key) do
+      Map.get(state.product_bids, "#{product_key}")
+    end
   end
 
   def find_pid(auction_id) do
@@ -331,10 +335,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp is_lowest_bid?(
-         %AuctionState{product_bids: product_bids},
+         state = %AuctionState{},
          bid = %AuctionBid{vessel_fuel_id: vessel_fuel_id}
        ) do
-    product_bids = product_bids[vessel_fuel_id]
+    product_bids = AuctionState.get_state_for_product(state, vessel_fuel_id)
 
     length(product_bids.lowest_bids) == 0 ||
       hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
@@ -516,10 +520,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp process_bid(
-         current_state = %{auction_id: auction_id, status: status, product_bids: product_bids},
+         current_state = %{auction_id: auction_id, status: status},
          bid = %{vessel_fuel_id: vessel_fuel_id}
        ) do
-    product_state = product_bids[vessel_fuel_id] || ProductBidState.for_product(vessel_fuel_id, auction_id)
+    product_state = AuctionState.get_state_for_product(current_state, vessel_fuel_id) || ProductBidState.for_product(vessel_fuel_id, auction_id)
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
     new_state = AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
@@ -530,12 +534,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp revoke_supplier_bids(
-         current_state = %{auction_id: auction_id, product_bids: product_bids},
+         current_state = %{auction_id: auction_id},
          product_id,
          supplier_id
        ) do
     product_state =
-      product_bids["#{product_id}"] || ProductBidState.for_product(product_id, auction_id)
+      AuctionState.get_state_for_product(current_state, product_id) || ProductBidState.for_product(product_id, auction_id)
 
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)

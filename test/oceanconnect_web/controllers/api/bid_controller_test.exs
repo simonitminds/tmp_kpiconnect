@@ -15,21 +15,21 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     vessel1 = insert(:vessel)
     vessel2 = insert(:vessel)
 
-    [vessel_fuel1, vessel_fuel2, vessel_fuel3, vessel_fuel4] = vessel_fuels = [
-      build(:vessel_fuel, vessel: vessel1, fuel: fuel1),
-      build(:vessel_fuel, vessel: vessel1, fuel: fuel2),
-      build(:vessel_fuel, vessel: vessel2, fuel: fuel1),
-      build(:vessel_fuel, vessel: vessel2, fuel: fuel2)
-    ]
-
     auction =
       insert(
         :auction,
         buyer: buyer.company,
         suppliers: [supplier_company, supplier2_company],
-        auction_vessel_fuels: vessel_fuels
+        auction_vessel_fuels: [
+          build(:vessel_fuel, vessel: vessel1, fuel: fuel1),
+          build(:vessel_fuel, vessel: vessel1, fuel: fuel2),
+          build(:vessel_fuel, vessel: vessel2, fuel: fuel1),
+          build(:vessel_fuel, vessel: vessel2, fuel: fuel2)
+        ]
       )
       |> Auctions.fully_loaded()
+
+    [vessel_fuel1, vessel_fuel2, vessel_fuel3, vessel_fuel4] = auction.auction_vessel_fuels
 
     {:ok, _pid} =
       start_supervised(
@@ -341,32 +341,39 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       auction: auction,
       buyer: buyer,
       supplier_company: supplier_company,
-      vessel_fuel1: vessel_fuel1
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       Auctions.start_auction(auction)
 
-      bid =
-        create_bid(1.25, nil, supplier_company.id, vessel_fuel1.id, auction)
-        |> Auctions.place_bid(nil)
+      bids = [
+        create_bid(1.25, nil, supplier_company.id, vessel_fuel1.id, auction),
+        create_bid(1.25, nil, supplier_company.id, vessel_fuel2.id, auction)
+      ]
+      Enum.each(bids, fn(bid) -> Auctions.place_bid(bid, nil) end)
+
+      Auctions.end_auction(auction)
 
       authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
-      Auctions.end_auction(auction)
-      {:ok, %{conn: authed_conn, bid: bid}}
+      {:ok, %{conn: authed_conn, bids: bids}}
     end
 
-    test "buyer selects winning bid", %{auction: auction, conn: conn, bid: bid} do
+
+    test "buyer selects winning bid", %{auction: auction, conn: conn, bids: bids} do
+      bid_ids = Enum.map(bids, &(&1.id))
+
       new_conn =
         post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{
           comment: "test",
           port_agent: "",
-          bid_ids: [bid.id]
+          bid_ids: bid_ids
         })
 
       assert json_response(new_conn, 200)
 
       auction_state = Auctions.get_auction_state!(auction)
 
-      assert bid in auction_state.winning_solution.bids
+      assert Enum.all?(bids, fn(bid) -> bid in auction_state.winning_solution.bids end)
       assert auction_state.winning_solution.comment == "test"
       assert auction_state.status == :closed
     end
