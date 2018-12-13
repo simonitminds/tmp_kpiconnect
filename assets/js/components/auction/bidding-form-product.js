@@ -27,7 +27,10 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
-          <span className="has-text-gray-3">Bid to Beat: ${formatPrice(lowestFuelBid.amount)}</span>
+          <span className="has-text-gray-3">Bid to Beat: {lowestFuelBid == true ?
+            '$' + formatPrice(lowestFuelBid.amount):
+            <i>None</i>}
+          </span>
         </div>
         <div className="column">
           <div className="columns is-desktop">
