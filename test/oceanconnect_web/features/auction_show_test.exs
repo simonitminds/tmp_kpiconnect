@@ -292,6 +292,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier can revoke their bid for a product", %{
       auction: auction,
+      fuel: fuel,
       vessel_fuel_id: vessel_fuel_id
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
