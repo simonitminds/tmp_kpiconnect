@@ -42,8 +42,9 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def start(conn, %{"id" => id}) do
-    admin = Auth.current_user_is_admin?(conn)
-    if admin do
+    admin? = Auth.current_user_is_admin?(conn)
+    if admin? do
+      admin = Auth.current_admin(conn)
       id
       |> Auctions.get_auction!()
       |> Auctions.fully_loaded()
