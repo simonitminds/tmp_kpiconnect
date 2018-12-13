@@ -144,13 +144,17 @@ section {
 
 // ==== STICKY MOBILE LAYOUT ==== //
 
-#auction-app {
-  // overflow-y: scroll;
+#auctions-app {
+  @media (max-width: 768px) {
+    position: sticky;
+    bottom: 0;
+    top: 0;
+    height: calc(100vh - 3.5rem);
+    overflow-y: scroll;
+  }
 }
 
 .auction-app { // Not to be confused with the ID... probably going to rename in a bit.
-  // overflow-y: scroll;
-  // height: auto;
 
   .alert:not(:empty) + main & { // Adjust the height when there's a notification in the header...
     height: calc(100vh - 89px);
@@ -196,6 +200,10 @@ section {
 
     .auction-page {
       padding-top: 2rem;
+
+      @media (max-width: 768px) {
+        padding-top: 0.5rem;
+      }
     }
   }
 }
