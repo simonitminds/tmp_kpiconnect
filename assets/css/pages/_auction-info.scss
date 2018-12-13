@@ -253,7 +253,7 @@
 // Auction Bid box
 
 .auction-bidding {
-  @media (min-width: 768px) and (max-width: 1024px) {
+  @media (max-width: 768px) {
     max-height: 93vh;
 
     .body--admin & {
@@ -405,7 +405,18 @@
       font-size: 0.75rem;
     }
   }
+
+  @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+    padding-top: 3px;
+
+    &:hover, &:focus {
+      &:after {
+        right: -7px;
+      }
+    }
+  }
 }
+
 
 .auction__nonsplittable-bid-tag {
   display: inline-block;

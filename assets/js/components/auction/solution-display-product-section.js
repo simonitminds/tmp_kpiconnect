@@ -70,9 +70,14 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
 
               return (
                 <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                  <td>{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></td>
-
-                  <td>
+                  <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
+                  { revokable &&
+                      <span className={`tag auction-solution__product-table__revoke revoke-bid__button has-margin-left-auto qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
+                        <i className="fas fa-times"></i>
+                      </span>
+                  }
+                  </td>
+                  <td className="auction-solution__product-table__bid">
                     { bid
                       ? <span>
                           <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {vesselFuel.quantity} MT </span>
@@ -82,10 +87,10 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
                       : <i>No bid</i>
                     }
                   </td>
-                  <td><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
-                  <td><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
+                  <td className="auction-solution__product-table__supplier"><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
+                  <td className="auction-solution__product-table__bid-time"><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
                   { revokable &&
-                    <td>
+                    <td className="auction-solution__product-table__revoke">
                       <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
                         <i className="fas fa-times"></i>
                       </span>
