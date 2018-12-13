@@ -45,7 +45,8 @@ export default class AuctionsIndex extends React.Component {
   render() {
     const connection = this.props.connection;
     const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm");};
-    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || window.isAdmin); };
+    const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
+    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.props.auctionPayloads, (auctionPayload) => {
