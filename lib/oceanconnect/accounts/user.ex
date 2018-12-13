@@ -65,6 +65,13 @@ defmodule Oceanconnect.Accounts.User do
     )
   end
 
+  def select_admins(query \\ User) do
+    from(
+      q in query,
+      where: q.is_admin == true
+    )
+  end
+
   def for_companies(company_ids) when is_list(company_ids) do
     from(
       u in User,

@@ -1,5 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions.{Auction, AuctionPayload, AuctionStore.AuctionState}
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
@@ -23,30 +24,14 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
       send_notification_to_participants("user_auctions", payload, [user_id])
     end)
 
-    admin_payloads =
-      Auctions.auction_admin_ids()
-      |> Enum.map(fn admin_id ->
-        admin_payload =
-          auction
-          |> AuctionPayload.get_admin_auction_payload!()
-
-        send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-      end)
+    notify_admin(auction)
   end
 
   def notify_buyer_participants(auction = %Auction{buyer_id: buyer_id}) do
     payload = AuctionPayload.get_auction_payload!(auction, buyer_id)
     send_notification_to_participants("user_auctions", payload, [buyer_id])
 
-    admin_payloads =
-      Auctions.auction_admin_ids()
-      |> Enum.map(fn admin_id ->
-      admin_payload =
-        auction
-        |> AuctionPayload.get_admin_auction_payload!()
-
-      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-    end)
+    notify_admin(auction)
   end
 
   def send_notification_to_participants(channel, payload, participants) do
@@ -60,15 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def notify_updated_bid(auction, _bid, _supplier_id) do
-    admin_payloads =
-      Auctions.auction_admin_ids()
-      |> Enum.map(fn admin_id ->
-      admin_payload =
-        auction
-        |> AuctionPayload.get_admin_auction_payload!()
-
-      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-    end)
+    notify_admin(auction)
 
     buyer_payload =
       auction
@@ -83,5 +60,17 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
       send_notification_to_participants("user_auctions", supplier_payload, [supplier_id])
     end)
+  end
+
+  defp notify_admin(auction = %Auction{}) do
+    admin_ids =
+      Enum.map(Accounts.list_admin_users(), & &1.id)
+      |> Enum.map(fn admin_id ->
+        admin_payload =
+          auction
+          |> AuctionPayload.get_admin_auction_payload!()
+
+        send_notification_to_participants("user_auctions", admin_payload, [admin_id])
+      end)
   end
 end
