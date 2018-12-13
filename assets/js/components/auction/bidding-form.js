@@ -170,7 +170,7 @@ class BiddingForm extends React.Component {
               <div className="field is-horizontal is-expanded">
                 <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
                   <div className="control">
-                    <button type="submit" className="button is-primary qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
+                    <button type="submit" className="button is-primary has-margin-top-sm qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
                   </div>
                 </div>
               </div>
