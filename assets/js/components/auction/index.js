@@ -36,7 +36,7 @@ export default class AuctionsIndex extends React.Component {
     this.setState({
       timeRemaining: _.reduce(this.props.auctionPayloads, (acc, auctionPayload) => {
         acc[_.get(auctionPayload, 'auction.id', 'temp')] = timeRemainingCountdown(auctionPayload, time);
-          return acc
+          return acc;
         }, {}),
       serverTime: time
     });
@@ -44,14 +44,15 @@ export default class AuctionsIndex extends React.Component {
 
   render() {
     const connection = this.props.connection;
-    const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm")};
-    const currentUserIsBuyer = (auction) => { return(parseInt(this.props.currentUserCompanyId) === auction.buyer.id); };
+    const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm");};
+    const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
+    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.props.auctionPayloads, (auctionPayload) => {
-          return(auctionPayload.status === status)
+          return(auctionPayload.status === status);
         });
-    }
+    };
 
     const chronologicalAuctionPayloads = (auctionPayloads, status) => {
       if (status === 'pending') {
@@ -59,7 +60,7 @@ export default class AuctionsIndex extends React.Component {
       } else {
         return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.auction_started], ['asc']);
       }
-    }
+    };
 
     const filteredAuctionsDisplay = (status) => {
       const filteredPayloads = chronologicalAuctionPayloads(filteredAuctionPayloads(status), status);
@@ -93,7 +94,7 @@ export default class AuctionsIndex extends React.Component {
     };
     const filteredAuctionsCount = (status) => {
       return filteredAuctionPayloads(status).length;
-    }
+    };
 
     return (
       <div className="auction-app">

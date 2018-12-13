@@ -12,38 +12,63 @@ defmodule Oceanconnect.AccountsTest do
 
     setup do
       company = insert(:company)
+      admin_user = insert(:user, Map.merge(@valid_attrs, %{is_admin: true}))
       user = insert(:user, Map.merge(@valid_attrs, %{is_active: true, company: company}))
       inactive_user = insert(:user, Map.merge(@valid_attrs, %{is_active: false}))
 
       {:ok,
        %{
+         admin_user: Accounts.get_user!(admin_user.id),
          user: Accounts.get_user!(user.id),
          inactive_user: Accounts.get_user!(inactive_user.id),
          company: company
        }}
     end
 
-    test "list_users/0 returns all users", %{user: user, inactive_user: inactive_user} do
-      assert Enum.map(Accounts.list_users(), fn f -> f.id end) == [user.id, inactive_user.id]
+    test "list_users/0 returns all users", %{
+      admin_user: admin_user,
+      user: user,
+      inactive_user: inactive_user
+    } do
+      assert Enum.map(Accounts.list_users(), fn f -> f.id end) == [
+               admin_user.id,
+               user.id,
+               inactive_user.id
+             ]
     end
 
     test "list_users/1 returns a paginated list of users", %{
+      admin_user: admin_user,
       user: user,
       inactive_user: inactive_user
     } do
       page = Accounts.list_users(%{})
-      assert page.entries == [user, inactive_user]
+      assert page.entries == [admin_user, user, inactive_user]
     end
 
     test "list_active_users/0 returns all users marked as active", %{
+      admin_user: admin_user,
       user: user,
       inactive_user: inactive_user
     } do
-      assert Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [user.id]
+      assert Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [admin_user.id, user.id]
 
       refute Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [
+               admin_user.id,
                user.id,
                inactive_user.id
+             ]
+    end
+
+    test "list_admin_users/0 returns all admin users", %{
+      admin_user: admin_user,
+      user: user
+    } do
+      assert Enum.map(Accounts.list_admin_users(), fn f -> f.id end) == [admin_user.id]
+
+      refute Enum.map(Accounts.list_admin_users(), fn f -> f.id end) == [
+               admin_user.id,
+               user.id
              ]
     end
 

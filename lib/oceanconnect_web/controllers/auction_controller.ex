@@ -42,9 +42,11 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def start(conn, %{"id" => id}) do
-    admin = Auth.current_admin(conn)
+    admin? = Auth.current_user_is_admin?(conn)
 
-    if admin do
+    if admin? do
+      admin = Auth.current_admin(conn)
+
       id
       |> Auctions.get_auction!()
       |> Auctions.fully_loaded()
@@ -125,8 +127,9 @@ defmodule OceanconnectWeb.AuctionController do
     auction = Auctions.get_auction!(id)
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
+    is_admin = OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn)
 
-    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) do
+    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) || is_admin do
       render(conn, "show.html", auction: auction, credit_margin_amount: credit_margin_amount)
     else
       redirect(conn, to: auction_path(conn, :index))

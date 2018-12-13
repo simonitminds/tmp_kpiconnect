@@ -68,7 +68,7 @@ export default class AuctionShow extends React.Component {
 
     const currentUser = {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id,
-      isAdmin: parseInt(this.props.currentUserCompanyId) === auction.buyer_id && window.isAdmin
+      isAdmin: window.isAdmin && !window.isImpersonating
     };
     const fuels = _.get(auction, 'fuels');
     const vessels = _.get(auction, 'vessels');
@@ -116,8 +116,17 @@ export default class AuctionShow extends React.Component {
       } else if (auctionPayload.status == 'decision') {
         return (
           <div>
-            <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={this.props.acceptSolution} />
-            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
+            {currentUser.isAdmin ?
+             <div>
+              <BuyerBestSolution auctionPayload={auctionPayload} />
+              <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
+             </div>
+            :
+             <div>
+               <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={this.props.acceptSolution} />
+               <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
+             </div>
+            }
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -125,7 +134,11 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             <WinningSolution auctionPayload={auctionPayload} />
+            {currentUser.isAdmin ?
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
+            :
             <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={this.props.acceptSolution} />
+            }
             <BuyerBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -229,7 +242,7 @@ export default class AuctionShow extends React.Component {
                           </li>
                         </ul>
                       </div>
-                      { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
+                    { (currentUser.isBuyer || currentUser.isAdmin) ? buyerBidComponents() : supplierBidComponents() }
                     </div>
                     <Tabs className="column is-one-third">
                       <div className="tabs is-fullwidth is-medium">
@@ -241,7 +254,7 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { auctionLogLinkDisplay() }
-                        { !currentUser.isBuyer && (status == 'pending' || status == 'open') &&
+                        { (!currentUser.isBuyer && !currentUser.isAdmin) && (status == 'pending' || status == 'open') &&
                           <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/>
                         }
                         { currentUser.isBuyer ?
@@ -262,7 +275,7 @@ export default class AuctionShow extends React.Component {
                           <div className="box__subsection">
                             <h3 className="box__header">Buyer Information
                               <div className="field is-inline-block is-pulled-right">
-                                { currentUser.isBuyer && auctionPayload.status != 'open' && auctionPayload.status != 'decision' ?
+                              { (currentUser.isBuyer || currentUser.isAdmin) && auctionPayload.status != 'open' && auctionPayload.status != 'decision' ?
                                   <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
                                   :
                                   <div> </div>
@@ -332,12 +345,12 @@ export default class AuctionShow extends React.Component {
                     </TabList>
                   </div>
                   <TabPanel>
-                    { currentUser.isBuyer ? buyerBidComponents() : supplierBidComponents() }
+                    { (currentUser.isBuyer || currentUser.isAdmin) ? buyerBidComponents() : supplierBidComponents() }
                   </TabPanel>
                   <TabPanel>
                     { auctionLogLinkDisplay() }
-                    { currentUser.isBuyer ? "" : <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/> }
-                    { currentUser.isBuyer ?
+                    { (currentUser.isBuyer || currentUser.isAdmin) ? "" : <AuctionInvitation auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId}/> }
+                    { (currentUser.isBuyer || currentUser.isAdmin) ?
                       <InvitedSuppliers
                         auctionPayload={auctionPayload}
                         approveBargeForm={this.props.approveBargeForm}
@@ -355,7 +368,7 @@ export default class AuctionShow extends React.Component {
                       <div className="box__subsection">
                         <h3 className="box__header">Buyer Information
                           <div className="field is-inline-block is-pulled-right">
-                            { currentUser.isBuyer ?
+                            { (currentUser.isBuyer || currentUser.isAdmin) ?
                               <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
                               :
                               <div> </div>

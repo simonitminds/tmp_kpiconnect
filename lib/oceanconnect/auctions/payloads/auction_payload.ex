@@ -15,6 +15,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             solutions: %{},
             submitted_barges: []
 
+  def get_admin_auction_payload!(auction = %Auction{buyer_id: buyer_id}) do
+    get_auction_payload!(auction, buyer_id)
+  end
+
   def get_auction_payload!(auction = %Auction{buyer_id: buyer_id}, buyer_id) do
     # auction = Auctions.fully_loaded(auction)
     auction_state = Auctions.get_auction_state!(auction)
