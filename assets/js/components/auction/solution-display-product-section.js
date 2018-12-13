@@ -87,7 +87,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
                   { revokable &&
                     <td>
                       <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
-                        <i className="fas fa-minus"></i>
+                        <i className="fas fa-times"></i>
                       </span>
                     </td>
                   }

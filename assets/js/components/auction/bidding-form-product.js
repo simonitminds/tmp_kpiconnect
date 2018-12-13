@@ -27,12 +27,16 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
-          <span className="has-text-gray-3">
-            Bid to Beat: { lowestFuelBid
-              ? '$' + formatPrice(lowestFuelBid.amount)
-              : <i>None</i>
-            }
-          </span>
+          <div className="control has-margin-top-sm">
+            <div className="tags has-addons">
+              <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized">Bid to Beat:</span>
+              { lowestFuelBid
+                ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">${formatPrice(lowestFuelBid.amount)}</span>
+                : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized"><i>None</i></span>
+              }
+
+            </div>
+          </div>
         </div>
         <div className="column">
           <div className="columns is-desktop">
@@ -120,12 +124,12 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     <span className="is-inline-block has-text-gray-3 has-text-weight-normal has-margin-left-xs"> &times; {quantity} MT</span>
                     <br/>
                     { existingBid
-                      ? <span className="is-inline-block has-text-gray-3 has-text-weight-normal">
-                          <span className="qa-auction-bid-amount">{`$` + formatPrice(currentBidAmount)}</span> <span className="qa-auction-bid-min_amount"> {minimumBidAmount ? `(Min $${formatPrice(minimumBidAmount)})` : ""}</span>
-                        </span>
-                      : <span className="is-inline-block has-text-gray-3 has-text-weight-normal is-italic qa-auction-bid-no_existing">
-                          No active bid
-                        </span>
+                      ? <div className="control has-margin-top-sm has-margin-bottom-xs">
+                          <span className="tag is-gray-2 is-capitalized has-family-copy"><span className="qa-auction-bid-amount">{`$` + formatPrice(currentBidAmount)}</span> <span className="qa-auction-bid-min_amount has-margin-left-xs"> {minimumBidAmount ? `(Min $${formatPrice(minimumBidAmount)})` : ""}</span></span>
+                        </div>
+                      : <div className="control has-margin-top-sm has-margin-bottom-xs">
+                            <span className="tag is-gray-2 has-family-copy has-text-weight-normal is-italic is-capitalized qa-auction-bid-no_existing ">No active bid</span>
+                        </div>
                     }
                   </label>
                 </div>
