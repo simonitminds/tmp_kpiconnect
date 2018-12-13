@@ -9,7 +9,8 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   def process_all(auction_state = %AuctionState{product_bids: product_bids}, status) do
     {new_auction_state, events} =
       product_bids
-      |> Enum.reduce({auction_state, []}, fn({product_key, product_bid_state}, {auction_state, events}) ->
+      |> Enum.reduce({auction_state, []}, fn {product_key, product_bid_state},
+                                             {auction_state, events} ->
         {new_product_bid_state, new_events} = process(product_bid_state, status)
 
         new_auction_state =

@@ -109,6 +109,7 @@ defmodule OceanconnectWeb.AuctionView do
       _ -> "—"
     end
   end
+
   def auction_log_vessel_from_vessel_fuel_id(%{auction_vessel_fuels: vessel_fuels}, vf_id) do
     vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == vf_id))
 
@@ -195,27 +196,34 @@ defmodule OceanconnectWeb.AuctionView do
     ""
   end
 
-
-  def vessel_fuel_name_for_event(%AuctionEvent{
-        data: %{bid: %AuctionBid{vessel_fuel_id: vessel_fuel_id}}
-      }, _auction = %Auction{auction_vessel_fuels: vessel_fuels}) do
+  def vessel_fuel_name_for_event(
+        %AuctionEvent{
+          data: %{bid: %AuctionBid{vessel_fuel_id: vessel_fuel_id}}
+        },
+        _auction = %Auction{auction_vessel_fuels: vessel_fuels}
+      ) do
     vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == vessel_fuel_id))
-    with  true <- !!vessel_fuel,
-          fuel_name <- vessel_fuel.fuel.name,
-          vessel_name <- vessel_fuel.vessel.name do
+
+    with true <- !!vessel_fuel,
+         fuel_name <- vessel_fuel.fuel.name,
+         vessel_name <- vessel_fuel.vessel.name do
       "#{fuel_name} to #{vessel_name}"
     else
       _ -> ""
     end
   end
 
-  def vessel_fuel_name_for_event(%AuctionEvent{
-        data: %{product: vessel_fuel_id}
-      }, _auction = %Auction{auction_vessel_fuels: vessel_fuels}) do
+  def vessel_fuel_name_for_event(
+        %AuctionEvent{
+          data: %{product: vessel_fuel_id}
+        },
+        _auction = %Auction{auction_vessel_fuels: vessel_fuels}
+      ) do
     vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == vessel_fuel_id))
-    with  true <- !!vessel_fuel,
-          fuel_name <- vessel_fuel.fuel.name,
-          vessel_name <- vessel_fuel.vessel.name do
+
+    with true <- !!vessel_fuel,
+         fuel_name <- vessel_fuel.fuel.name,
+         vessel_name <- vessel_fuel.vessel.name do
       "#{fuel_name} to #{vessel_name}"
     else
       _ -> ""

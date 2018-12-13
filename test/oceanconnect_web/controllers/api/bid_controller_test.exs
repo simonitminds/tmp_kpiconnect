@@ -47,7 +47,9 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
 
     bid_params = %{
-      "bids" => %{vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}}
+      "bids" => %{
+        vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}
+      }
     }
 
     {:ok,
@@ -179,8 +181,16 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       conn =
         create_post(conn, auction, %{
           "bids" => %{
-            vessel_fuel1.id => %{"amount" => "10.50", "min_amount" => "9.00", "allow_split" => true},
-            vessel_fuel2.id => %{"amount" => "10.50", "min_amount" => "9.00", "allow_split" => true}
+            vessel_fuel1.id => %{
+              "amount" => "10.50",
+              "min_amount" => "9.00",
+              "allow_split" => true
+            },
+            vessel_fuel2.id => %{
+              "amount" => "10.50",
+              "min_amount" => "9.00",
+              "allow_split" => true
+            }
           }
         })
 
@@ -289,7 +299,14 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
   end
 
   describe "revoking bids" do
-    setup %{auction: auction, conn: conn, vessel_fuel1: vessel_fuel1, vessel_fuel2: vessel_fuel2, vessel_fuel3: vessel_fuel3, vessel_fuel4: vessel_fuel4,} do
+    setup %{
+      auction: auction,
+      conn: conn,
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2,
+      vessel_fuel3: vessel_fuel3,
+      vessel_fuel4: vessel_fuel4
+    } do
       Auctions.start_auction(auction)
 
       bid_params = %{
@@ -350,7 +367,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
         create_bid(1.25, nil, supplier_company.id, vessel_fuel1.id, auction),
         create_bid(1.25, nil, supplier_company.id, vessel_fuel2.id, auction)
       ]
-      Enum.each(bids, fn(bid) -> Auctions.place_bid(bid, nil) end)
+
+      Enum.each(bids, fn bid -> Auctions.place_bid(bid, nil) end)
 
       Auctions.end_auction(auction)
 
@@ -358,9 +376,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       {:ok, %{conn: authed_conn, bids: bids}}
     end
 
-
     test "buyer selects winning bid", %{auction: auction, conn: conn, bids: bids} do
-      bid_ids = Enum.map(bids, &(&1.id))
+      bid_ids = Enum.map(bids, & &1.id)
 
       new_conn =
         post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{
@@ -373,7 +390,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
       auction_state = Auctions.get_auction_state!(auction)
 
-      assert Enum.all?(bids, fn(bid) -> bid in auction_state.winning_solution.bids end)
+      assert Enum.all?(bids, fn bid -> bid in auction_state.winning_solution.bids end)
       assert auction_state.winning_solution.comment == "test"
       assert auction_state.status == :closed
     end

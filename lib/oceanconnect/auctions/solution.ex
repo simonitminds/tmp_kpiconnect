@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.Solution do
 
     %__MODULE__{
       auction_id: auction_id,
-      bids: Enum.sort_by(bids, &(&1.vessel_fuel_id)),
+      bids: Enum.sort_by(bids, & &1.vessel_fuel_id),
       valid: is_valid?(bids, product_ids),
       normalized_price: normalized_price(bids, product_quantities),
       total_price: total_price(bids, product_quantities),

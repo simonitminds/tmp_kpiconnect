@@ -141,7 +141,12 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   describe "lowest bid list" do
-    setup %{auction: auction, supplier_company: supplier_company, vessel_fuel: vessel_fuel, supplier: supplier} do
+    setup %{
+      auction: auction,
+      supplier_company: supplier_company,
+      vessel_fuel: vessel_fuel,
+      supplier: supplier
+    } do
       Auctions.start_auction(auction)
       vessel_fuel_id = "#{vessel_fuel.id}"
 
@@ -309,7 +314,11 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
-    test "winning solution can be selected", %{auction: auction, bid: bid, vessel_fuel: vessel_fuel} do
+    test "winning solution can be selected", %{
+      auction: auction,
+      bid: bid,
+      vessel_fuel: vessel_fuel
+    } do
       auction_id = auction.id
       vessel_fuel_id = "#{vessel_fuel.id}"
       bid_id = bid.id

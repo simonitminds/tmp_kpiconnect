@@ -12,7 +12,6 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
     auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel), build(:vessel_fuel)])
     [vessel_fuel1, vessel_fuel2] = auction.auction_vessel_fuels
 
-
     {:ok,
      %{
        auction: auction,

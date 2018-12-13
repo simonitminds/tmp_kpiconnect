@@ -537,7 +537,13 @@ defmodule Oceanconnect.AuctionsTest do
         end
       end)
 
-      {:ok, %{auction: auction, vessel_fuel: vessel_fuel, vessel_fuel_id: vessel_fuel_id, supplier_company: supplier_company}}
+      {:ok,
+       %{
+         auction: auction,
+         vessel_fuel: vessel_fuel,
+         vessel_fuel_id: vessel_fuel_id,
+         supplier_company: supplier_company
+       }}
     end
 
     test "place_bid/2 enters bid in bid_list and runs lowest_bid logic", %{
@@ -607,7 +613,9 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.end_auction(auction)
       :timer.sleep(50)
 
-      result = Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
+      result =
+        Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
+
       assert {:error, :late_bid} = result
     end
   end

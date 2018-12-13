@@ -327,7 +327,12 @@ defmodule Oceanconnect.AuctionShowTest do
   end
 
   describe "decision period" do
-    setup %{auction: auction, supplier: supplier, supplier2: supplier2, vessel_fuel_id: vessel_fuel_id} do
+    setup %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2,
+      vessel_fuel_id: vessel_fuel_id
+    } do
       Auctions.start_auction(auction)
 
       bid =

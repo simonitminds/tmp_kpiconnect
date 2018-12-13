@@ -18,8 +18,8 @@ defmodule OceanconnectWeb.Api.BidController do
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- validate_traded_bids(is_traded, auction),
          true <- Enum.count(bids_params) > 0,
-         {:ok, _bids} <- Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
-
+         {:ok, _bids} <-
+           Auctions.place_bids(auction, bids_params, supplier_id, time_entered, user) do
       Auctions.update_participation_for_supplier(auction_id, supplier_id, "yes")
       AuctionNotifier.notify_participants(auction)
       render(conn, "show.json", %{success: true, message: "Bids successfully placed"})

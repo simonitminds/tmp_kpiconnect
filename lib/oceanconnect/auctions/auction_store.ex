@@ -523,7 +523,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          current_state = %{auction_id: auction_id, status: status},
          bid = %{vessel_fuel_id: vessel_fuel_id}
        ) do
-    product_state = AuctionState.get_state_for_product(current_state, vessel_fuel_id) || ProductBidState.for_product(vessel_fuel_id, auction_id)
+    product_state =
+      AuctionState.get_state_for_product(current_state, vessel_fuel_id) ||
+        ProductBidState.for_product(vessel_fuel_id, auction_id)
+
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
     new_state = AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
@@ -539,7 +542,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          supplier_id
        ) do
     product_state =
-      AuctionState.get_state_for_product(current_state, product_id) || ProductBidState.for_product(product_id, auction_id)
+      AuctionState.get_state_for_product(current_state, product_id) ||
+        ProductBidState.for_product(product_id, auction_id)
 
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)

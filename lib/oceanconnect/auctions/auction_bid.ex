@@ -23,7 +23,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "vessel_fuel_id" => vessel_fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered,
+          "time_entered" => time_entered
         },
         auction = %Oceanconnect.Auctions.Auction{}
       ) do

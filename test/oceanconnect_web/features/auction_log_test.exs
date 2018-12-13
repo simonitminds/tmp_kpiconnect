@@ -97,7 +97,10 @@ defmodule Oceanconnect.AuctionLogTest do
       "auction_ended" => AuctionView.convert_date?(auction.auction_ended),
       "actual-duration" => AuctionView.actual_duration(auction),
       "duration" => AuctionView.convert_duration(auction.duration),
-      "winning-solution-entry" => "$1.25/unit for #{vessel_fuel.fuel.name} from #{supplier.company.name} to #{vessel_fuel.vessel.name}"
+      "winning-solution-entry" =>
+        "$1.25/unit for #{vessel_fuel.fuel.name} from #{supplier.company.name} to #{
+          vessel_fuel.vessel.name
+        }"
     }
 
     assert AuctionLogPage.has_details?(expected_details)

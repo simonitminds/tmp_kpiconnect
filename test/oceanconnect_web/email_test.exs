@@ -8,7 +8,7 @@ defmodule OceanconnectWeb.EmailTest do
   setup do
     credit_company = insert(:company, name: "Ocean Connect Marine", is_broker: true)
     buyer_company = insert(:company, is_supplier: false, broker_entity: credit_company)
-    buyers = [insert(:user, %{company: buyer_company}), insert(:user, %{company: buyer_company})]
+    buyers = insert_list(2, :user, %{company: buyer_company, is_active: true})
     barge1 = insert(:barge)
     barge2 = insert(:barge)
 
@@ -23,14 +23,15 @@ defmodule OceanconnectWeb.EmailTest do
     non_participating_buyers = insert_list(2, :user, company: buyer_company)
 
     Enum.each(supplier_companies, fn supplier_company ->
-      insert(:user, company: supplier_company)
+      insert(:user, %{company: supplier_company, is_active: true})
     end)
 
     winning_supplier_company = Enum.at(Enum.take_random(supplier_companies, 1), 0)
 
-    vessel = insert(:vessel)
-    fuel = insert(:fuel)
-    fuel2 = insert(:fuel)
+    vessels = insert_list(2, :vessel)
+    [vessel, vessel2] = vessels
+    fuels = insert_list(2, :fuel)
+    [fuel, fuel2] = fuels
 
     auction =
       insert(
@@ -39,7 +40,7 @@ defmodule OceanconnectWeb.EmailTest do
         suppliers: supplier_companies,
         auction_vessel_fuels: [
           build(:vessel_fuel, vessel: vessel, fuel: fuel, quantity: 200),
-          build(:vessel_fuel, vessel: vessel, fuel: fuel2, quantity: 200)
+          build(:vessel_fuel, vessel: vessel2, fuel: fuel2, quantity: 200)
         ]
       )
       |> Auctions.fully_loaded()
@@ -63,7 +64,7 @@ defmodule OceanconnectWeb.EmailTest do
         200.00,
         nil,
         hd(supplier_companies).id,
-        hd(auction.auction_vessel_fuels).id,
+        "#{hd(auction.auction_vessel_fuels).id}",
         auction,
         true
       ),
@@ -71,7 +72,7 @@ defmodule OceanconnectWeb.EmailTest do
         220.00,
         nil,
         List.last(supplier_companies).id,
-        List.last(auction.auction_vessel_fuels).id,
+        "#{hd(auction.auction_vessel_fuels).id}",
         auction,
         false
       )
@@ -189,19 +190,16 @@ defmodule OceanconnectWeb.EmailTest do
            approved_barges: approved_barges,
            suppliers: suppliers,
            non_participating_suppliers: non_participating_suppliers,
-           non_participating_buyers: non_participating_buyers
+           non_participating_buyers: non_participating_buyers,
+           vessel_fuels: vessel_fuels,
+           vessel: vessel
          } do
       non_participating_suppliers_emails = non_participating_suppliers |> Enum.map(& &1.email)
       non_participating_buyers_emails = non_participating_buyers |> Enum.map(& &1.email)
 
-      vessel_name_list =
-        auction.vessels
-        |> Enum.map(& &1.name)
-        |> Enum.join(", ")
-
       active_users = buyers ++ suppliers
 
-      %{supplier_emails: winning_supplier_emails, buyer_emails: buyer_emails} =
+      emails =
         Email.auction_closed(
           winning_solution.bids,
           approved_barges,
@@ -209,21 +207,18 @@ defmodule OceanconnectWeb.EmailTest do
           active_users
         )
 
-      sent_supplier_emails = Enum.map(winning_supplier_emails, & &1.to)
-      sent_buyer_emails = Enum.map(buyer_emails, & &1.to)
+      sent_emails = Enum.map(emails, & &1.to)
 
-      refute Enum.any?(non_participating_suppliers_emails, &(&1 in sent_supplier_emails))
-      refute Enum.any?(non_participating_buyers_emails, &(&1 in sent_buyer_emails))
+      refute Enum.any?(non_participating_suppliers_emails, &(&1 in sent_emails))
+      refute Enum.any?(non_participating_buyers_emails, &(&1 in sent_emails))
 
-      for supplier_email <- winning_supplier_emails do
+      {supplier_emails, buyer_emails} = Enum.split_with(emails, &(&1.assigns.is_buyer == false))
+
+      for supplier_email <- supplier_emails do
         assert supplier_email.subject ==
-                 "You have won Auction #{auction.id} for #{vessel_name_list} at #{
-                   auction.port.name
-                 }!"
+                 "You have won Auction #{auction.id} for #{vessel.name} at #{auction.port.name}!"
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
-        assert supplier_email.html_body =~ vessel_name_list
-        assert supplier_email.html_body =~ vessel_name_list
       end
 
       for buyer <- buyers do
