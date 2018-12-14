@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 
 // NOTE: Sourced from glennflanagan's react-collapsible component (https://github.com/glennflanagan/react-collapsible/blob/develop/src/Collapsible.js)
@@ -172,6 +173,7 @@ class CollapsingBarge extends Component {
     const supplierId = this.props.supplierId;
     const isBuyer = this.props.isBuyer;
     const isAdmin = window.isAdmin;
+    const isImpersonating = window.isImpersonating;
     const approveBargeForm = this.props.approveBargeForm;
     const rejectBargeForm = this.props.rejectBargeForm;
     const submitBargeForm = this.props.submitBargeForm;
@@ -181,11 +183,12 @@ class CollapsingBarge extends Component {
     const auctionState = this.props.auctionState;
 
     const approvalStatusIcon = () => {
-      if (bargeStatus == 'pending') { return `fas fa-question-circle` }
-      else if (bargeStatus == 'approved') { return `fas fa-check-circle` }
-      else if (bargeStatus == 'rejected') {return `fas fa-times-circle`}
-      else {return `fas fa-ban`}
+      if (bargeStatus == 'pending') { return `question-circle` }
+      else if (bargeStatus == 'approved') { return `check-circle` }
+      else if (bargeStatus == 'rejected') {return `times-circle`}
+      else {return `ban`}
     };
+
     const bargeAction = () => {
       if(isBuyer) {
         switch(bargeStatus) {
@@ -217,7 +220,7 @@ class CollapsingBarge extends Component {
           default:
             return (
               <div className="collapsing-barge__barge__button collapsing-barge__barge__button--unsubmit">
-                <a onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `qa-auction-barge-unsubmit-${barge.id}` }><i className="fas fa-times"></i></a>
+                <a onClick={ unsubmitBargeForm.bind(this, auction.id, barge.id) } className={ `qa-auction-barge-unsubmit-${barge.id}` }><FontAwesomeIcon icon="times" /></a>
               </div>)
         }
       }
@@ -232,11 +235,11 @@ class CollapsingBarge extends Component {
               onClick={this.handleTriggerClick}
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
-              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-right has-padding-right-nudge` : `fa-angle-down`}`}></i></span>
-              <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
+              <span className="collapsible-section__toggle-icon"><FontAwesomeIcon icon={this.state.isClosed ? "angle-right" : "angle-down"} /></span>
+              <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><FontAwesomeIcon icon={approvalStatusIcon()} /></span>
               <span className="collapsible-section__title">{trigger}</span>
            </h2>
-           { (auctionState == 'expired' || auctionState == 'closed' || auctionState == 'canceled' || isAdmin) ? "" : bargeAction() }
+           { (auctionState == 'expired' || auctionState == 'closed' || auctionState == 'canceled' || (isAdmin && !isImpersonating)) ? "" : bargeAction() }
           </div>
         </div>
 

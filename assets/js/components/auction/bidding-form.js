@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import k from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
@@ -105,13 +106,13 @@ class BiddingForm extends React.Component {
             <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
             { existingBid
               ? <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-success"><i className="fas fa-check"></i></div>
+                  <div className="tag is-success"><FontAwesomeIcon icon="check" /></div>
                   <div className="tag revoke-bid__status is-white">Bid Active</div>
-                  <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><i className="fas fa-minus"></i></span>
+                  <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><FontAwesomeIcon icon="minus" /></span>
                   <input type="hidden" name="existing_bid" value="true" data-product={productId} />
                 </div>
               : <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-gray-3"><i className="fas fa-times"></i></div>
+                  <div className="tag is-gray-3"><FontAwesomeIcon icon="times" /></div>
                   <div className="tag is-white revoke-bid__status">No Active Bid</div>
                 </div>
             }
@@ -122,7 +123,7 @@ class BiddingForm extends React.Component {
                 <div className="field">
                   <label className="label" htmlFor="bid">Bid Amount</label>
                   <div className="control auction-bidding__input has-icons-left">
-                    <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                    <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                     <input
                       type="number"
                       step="0.25"
@@ -151,7 +152,7 @@ class BiddingForm extends React.Component {
                       onChange={this.updateSubmittability.bind(this)}
                       data-product={productId}
                     />
-                    <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                    <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                   </div>
                   <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
                 </div>
@@ -162,7 +163,7 @@ class BiddingForm extends React.Component {
           <div className="column is-narrow">
             <label className="checkbox">
               <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
-              <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
+              <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers" />
             </label>
           </div>  :
             <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
@@ -195,7 +196,7 @@ class BiddingForm extends React.Component {
               }
               { this.state.tradedBidChecked &&
                 <div className="traded-bid-help-text notification is-turquoise">
-                  <i className="fas fa-info-circle is-inline-block has-margin-right-sm"></i> Add the above credit margin to your baseline price when placing your bid
+                  <FontAwesomeIcon icon="info-circle" className="is-inline-block has-margin-right-sm" /> Add the above credit margin to your baseline price when placing your bid
                 </div>
               }
               { products.map((product) => renderProduct(product, auctionPayload)) }

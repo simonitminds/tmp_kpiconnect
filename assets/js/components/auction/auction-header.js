@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   convertToMinutes,
   formatUTCDateTime,
@@ -35,7 +36,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                   </div>
                   <MediaQuery query="(max-width: 768px)">
                       <div className="auction-list__timer auction-list__timer--show">
-                        <i className="far fa-clock has-margin-right-xs"></i>
+                        <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
                         <span className="auction-list__timer__clock" id="gmt-time" >
                           {serverTime.format("DD MMM YYYY, k:mm:ss")}
                         </span>&nbsp;GMT
@@ -60,7 +61,10 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                           );
                         })
                       }
-                      {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 auction__traded-bid-accepted-marker"></i></span>}
+                      { auction.is_traded_bid_allowed &&
+                        <span> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3 auction__traded-bid-accepted-marker" action-label="Traded Bids Accepted" />
+                        </span>
+                      }
                       <span className="auction-header__company">{auction.buyer.name}</span>
                     </h1>
                   </div>
@@ -72,7 +76,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
                   <MediaQuery query="(min-width: 769px)">
                     <div className="auction-list__timer">
-                      <i className="far fa-clock has-margin-right-xs"></i>
+                      <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
                       <span className="auction-list__timer__clock" id="gmt-time" >
                         {serverTime.format("DD MMM YYYY, k:mm:ss")}
                       </span>&nbsp;GMT

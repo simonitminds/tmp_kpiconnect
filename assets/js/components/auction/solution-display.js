@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionAcceptDisplay from './solution-accept-display';
 import MediaQuery from 'react-responsive';
@@ -105,7 +106,7 @@ export default class SolutionDisplay extends React.Component {
         <span>
           { bid.is_traded_bid ?
             <span className="auction__traded-bid-tag">
-              <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+              <FontAwesomeIcon icon="exchange-alt" className="auction__traded-bid-marker" action-label="Traded Bid" />
               <span className="has-padding-left-sm">Traded Bid</span>
             </span>
           : "" }
@@ -118,7 +119,7 @@ export default class SolutionDisplay extends React.Component {
         <span>
           { bid.allow_split == false ?
             <span className="auction__nonsplittable-bid-tag">
-              <i action-label="Can't Be Split" className="fas fa-ban auction__nonsplittable-bid-marker"></i>
+              <FontAwesomeIcon icon="ban" className="auction__nonsplittable-bid-marker" action-label="Can't Be Split" />
               <span className="has-padding-left-sm">Unsplittable</span>
             </span>
           : "" }
@@ -187,9 +188,9 @@ export default class SolutionDisplay extends React.Component {
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-            {isExpanded ?
-              <i className="fas fa-minus has-padding-right-md"></i>:
-              <i className="fas fa-plus has-padding-right-md"></i>
+            { isExpanded
+              ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
+              : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
             }
             <span className="is-inline-block">
               <span className="auction-solution__title__category">{title}</span>

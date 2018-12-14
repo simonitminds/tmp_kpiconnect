@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 
 
@@ -44,7 +45,10 @@ const SupplierList = (props) => {
                             checked={!!isSelected(supplier.id)}
                             onChange={onToggleSupplier.bind(this, supplier.id)}
                           />
-                          <span className="invite-selector__facade"><i className={`fas ${isSelected(supplier.id) ? `fa-check` : `fa-plus`} default-only`}></i><i className="fas fa-minus hover-only"></i></span>
+                          <span className="invite-selector__facade">
+                            <FontAwesomeIcon icon={isSelected(supplier.id) ? "check" : "plus"} className="default-only" />
+                            <FontAwesomeIcon icon="minus" className="hover-only" />
+                          </span>
                           <span className="invite-selector__label">{supplier.name}</span>
                         </label>
                       </div>
@@ -56,7 +60,7 @@ const SupplierList = (props) => {
                 <div className="control">
                   <a id="selectAllSellers" className="button" onClick={onSelectAllSuppliers}>
                     <span className="icon is-small">
-                      <i className="fas fa-plus"></i>
+                      <FontAwesomeIcon icon="plus" />
                     </span>
                     <span className="is-inline-block has-margin-left-xs">Select All</span>
                   </a>
@@ -64,7 +68,7 @@ const SupplierList = (props) => {
                 <div className="control">
                   <a id="deselectAllSellers" className="button" onClick={onDeSelectAllSuppliers}>
                     <span className="icon is-small">
-                      <i className="fas fa-minus"></i>
+                      <FontAwesomeIcon icon="minus" />
                     </span>
                     <span className="is-inline-block has-margin-left-xs">Deselect All</span>
                   </a>
