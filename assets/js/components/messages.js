@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from './auction/collapsible-section';
 import MessagesAuctionView from './messaging/messages-auction-view';
 import MessagesAuctionHeader from './messaging/messages-auction-header';
@@ -58,7 +59,7 @@ class Messages extends React.Component {
             <h1 className="messaging__menu-bar__title">Messages</h1>
 
             <div className={`messaging__notifications messaging__notifications--menu-bar ${hasUnseen ? 'messaging__notifications--has-unseen' : ''}`}>
-              <i className="fas fa-envelope has-margin-right-sm"></i>
+              <FontAwesomeIcon icon="envelope" className="has-margin-right-sm" />
               { hasUnseen &&
                 <span>{unseenMessageCount}</span>
               }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import InputField from '../input-field';
 
@@ -67,7 +68,7 @@ export default class VesselFuelForm extends React.Component {
               this.removeVessel(vessel.id);
               ev.preventDefault();
             }}>
-            <i className="fas fa-times"></i>
+            <FontAwesomeIcon icon="times" />
           </span>
           <input type="hidden" name="auction[vessels][]" value={vessel.id} />
         </div>
@@ -82,7 +83,7 @@ export default class VesselFuelForm extends React.Component {
               this.removeFuel(fuel.id);
               ev.preventDefault();
             }}>
-            <i className="fas fa-times"></i>
+            <FontAwesomeIcon icon="times" />
           </span>
           <br/>
           <div className="selected-list__sublist">
@@ -141,7 +142,7 @@ export default class VesselFuelForm extends React.Component {
                           ))}
                       </select>
                       <div className="icon is-small is-left">
-                        <i className="fas fa-plus"></i>
+                        <FontAwesomeIcon icon="plus" />
                       </div>
                       </div>
                     </div>
@@ -187,7 +188,7 @@ export default class VesselFuelForm extends React.Component {
                           ))}
                         </select>
                         <div className="icon is-small is-left">
-                          <i className="fas fa-plus"></i>
+                          <FontAwesomeIcon icon="plus" />
                         </div>
                       </div>
                     </div>
