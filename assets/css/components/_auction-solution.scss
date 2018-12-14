@@ -28,8 +28,17 @@
   }
   .auction-solution__title {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     font-weight: 700;
+    flex: 2 1 auto;
+
+    &> svg {
+      flex: 0 0 1.5rem;
+      padding-right: 0.5rem !important;
+    }
+  }
+  .auction-solution__content {
+    flex: 0 0 auto;
   }
   .auction-solution__title__category {
     &:not(:empty) {

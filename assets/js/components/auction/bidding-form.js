@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import k from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
@@ -104,7 +105,7 @@ class BiddingForm extends React.Component {
               }
               { this.state.tradedBidChecked &&
                 <div className="traded-bid-help-text notification is-turquoise">
-                  <i className="fas fa-info-circle is-inline-block has-margin-right-sm"></i> Add the above credit margin to your baseline price when placing your bid
+                  <FontAwesomeIcon icon="info-circle" className="is-inline-block has-margin-right-sm" /> Add the above credit margin to your baseline price when placing your bid
                 </div>
               }
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 
 // NOTE: Sourced from glennflanagan's react-collapsible component (https://github.com/glennflanagan/react-collapsible/blob/develop/src/Collapsible.js)
@@ -178,7 +179,7 @@ class CollapsibleSection extends Component {
             >
               <span>{trigger}</span>
               <span className="collapsible-section__counter tag is-medium is-primary">{this.props.contentChildCount}</span>
-              <span className="collapsible-section__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
+              <span className="collapsible-section__toggle-icon"><FontAwesomeIcon icon={this.state.isClosed ? "angle-down" : "angle-up"} /></span>
             </h2>
           </div>
         </div>

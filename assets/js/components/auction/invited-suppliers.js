@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import CollapsingBargeList from './collapsing-barge-list';
 import CollapsingBarge from './collapsing-barge';
@@ -61,13 +62,13 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
 
   const renderSupplierParticipation = (status, supplier) => {
     if (status == "yes") {
-      return <span className={`icon has-text-success has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-check-circle"></i></span>;
+      return <span className={`icon has-text-success has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><FontAwesomeIcon icon="check-circle" /></span>;
     } else if (status == "maybe"){
-        return <span className={`icon has-text-warning has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-adjust"></i></span>;
+        return <span className={`icon has-text-warning has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><FontAwesomeIcon icon="adjust" /></span>;
     } else if (status == "no") {
-      return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-times-circle"></i></span>;
+      return <span className={`icon has-text-danger has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><FontAwesomeIcon icon="times-circle" /></span>;
     } else {
-      return <span className={`icon has-text-gray-3 has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><i className="fas fa-question-circle"></i></span>;
+      return <span className={`icon has-text-gray-3 has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><FontAwesomeIcon icon="question-circle" /></span>;
     }
   }
 

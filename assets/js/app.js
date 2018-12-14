@@ -13,19 +13,7 @@
 // to also remove its path from 'config.paths.watched'.
 import "@babel/polyfill";
 import 'phoenix_html';
-import WebFont from 'webfontloader';
-import bowser from 'bowser';
-
-const browser = bowser.getParser(window.navigator.userAgent);
-if (browser.getBrowserName() === "Internet Explorer") {
-  WebFont.load({
-	  custom: {
-		  families: ['FontAwesome'],
-		  urls: ['https://use.fontawesome.com/releases/v5.0.4/css/all.css']
-	  }
-  });
-}
-
+import './fontawesome-library';
 
 // Import local files
 //

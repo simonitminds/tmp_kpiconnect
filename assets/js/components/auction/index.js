@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
@@ -105,7 +106,7 @@ export default class AuctionsIndex extends React.Component {
                 <div className="auction-list__time-box">
                   <ChannelConnectionStatus connection={connection} />
                   <div className="auction-list__timer">
-                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
                     <span className="auction-list__timer__clock" id="gmt-time" >
                       {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
                     </span>&nbsp;GMT
@@ -125,7 +126,7 @@ export default class AuctionsIndex extends React.Component {
                 <div className="auction-list__time-box">
                   <ChannelConnectionStatus connection={connection} />
                   <div className="auction-list__timer">
-                    <i className="far fa-clock has-margin-right-xs"></i>
+                    <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
                     <span className="auction-list__timer__clock" id="gmt-time" >
                       {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
                     </span>&nbsp;GMT

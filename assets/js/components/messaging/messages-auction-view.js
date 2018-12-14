@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MessagesAuctionHeader from './messages-auction-header';
 import MessagesConversationHeader from './messages-conversation-header';
 import MessagesConversationView from './messages-conversation-view';
@@ -20,7 +21,7 @@ const MessagesAuctionView = ({ messagePayloads, selectedAuction, auctionState, a
   return (
     <div className="messaging__context-list__container">
       <div className="messaging__back-indicator" onClick={() => collapseMessagesAuction(selectedAuction)}>
-        <i className="fas fa-angle-left has-margin-right-sm"></i> Select
+        <FontAwesomeIcon icon="angle-left" className="has-margin-right-sm" /> Select
       </div>
 
       <ul>

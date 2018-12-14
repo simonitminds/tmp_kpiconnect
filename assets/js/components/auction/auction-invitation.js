@@ -1,6 +1,6 @@
-
 import React from 'react';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const AuctionInvitation = ({auctionPayload, supplierId}) => {
   const {auction, participations} = auctionPayload
@@ -19,22 +19,22 @@ const AuctionInvitation = ({auctionPayload, supplierId}) => {
     switch (suppliersParticipationStatus) {
       case "yes": { return (
         <span className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-check-circle"></i>
+          <FontAwesomeIcon icon="check-circle" size="lg" />
         </span>
       )}
       case "no": { return (
         <span className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-times-circle"></i>
+          <FontAwesomeIcon icon="times-circle" size="lg" />
         </span>
       )}
       case "maybe": { return (
         <span className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-adjust"></i>
+          <FontAwesomeIcon icon="adjust" size="lg" />
         </span>
       )}
       default: {return(
         <span className="auction-invitation__status__marker">
-          <i className="fas fa-lg fa-question-circle"></i>
+          <FontAwesomeIcon icon="question-circle" size="lg" />
         </span>
       )}
     }

@@ -59,6 +59,7 @@ export default class AuctionShow extends React.Component {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
     const {auction, status} = auctionPayload;
+    const isAdmin = window.isAdmin;
 
     const bidStatusDisplay = () => {
       if (auctionPayload.message) {
@@ -82,7 +83,7 @@ export default class AuctionShow extends React.Component {
     }
 
     const auctionLogLinkDisplay = () => {
-      if (currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open' || currentUser.isAdmin) {
+      if ((currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open') || isAdmin) {
         return <AuctionLogLink auction={auction} />;
       } else {
         return false;

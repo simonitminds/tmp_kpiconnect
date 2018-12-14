@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import { formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
@@ -113,7 +114,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
             </div>
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction */}
-              <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+              <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><FontAwesomeIcon icon="angle-right" size="2x" /></span></a>
             {/* End Link to Auction */}
           </div>
         </div>
@@ -121,7 +122,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
           <span className="has-text-gray-3 is-inline-block has-padding-right-sm">{auction.id}</span>
             {vesselNameDisplay(vesselFuels)}
-            {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
+            {auction.is_traded_bid_allowed && <span> <FontAwesomeIcon icon="exchange-alt" action-label="Traded Bids Accepted" className="has-text-gray-3 card__traded-bid-marker" /> </span>}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>

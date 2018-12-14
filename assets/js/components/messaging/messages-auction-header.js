@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const MessagesAuctionHeader = ({payload, onSelect}) => {
   return (
@@ -7,7 +8,7 @@ const MessagesAuctionHeader = ({payload, onSelect}) => {
         className={`qa-auction-${payload.auction_id}-message-payloads ${payload.unseen_messages ? "with-unseen" : ""}`}
         onClick={() => onSelect && onSelect(payload.auction_id)}>
       { onSelect &&
-        <i className="fas fa-angle-right has-padding-right-nudge"></i>
+        <FontAwesomeIcon icon="angle-right" className="has-padding-right-nudge" />
       }
 
       <div className={`auction-status auction-status--${payload.status}`}>
@@ -21,7 +22,7 @@ const MessagesAuctionHeader = ({payload, onSelect}) => {
         })
       }
       { payload.unseen_messages > 0 &&
-        <span className="messaging__notifications qa-messages-unseen-count"><i className="fas fa-envelope has-margin-right-xs"></i> {payload.unseen_messages}</span>
+        <span className="messaging__notifications qa-messages-unseen-count"><FontAwesomeIcon icon="envelope" className="has-margin-right-xs" /> {payload.unseen_messages}</span>
       }
     </div>
   );

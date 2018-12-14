@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status';
 import AuctionTimeRemaining from './auction-time-remaining';
@@ -148,21 +149,21 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
               { (auctionStatus == 'draft' || auctionStatus == 'pending') &&
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">
-                    <i className="fas fa-lg fa-edit"></i>
+                    <FontAwesomeIcon icon="edit" size="lg" />
                   </span>
                 </a>
               }
               { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
                 ? <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
                     <span className="icon is-medium has-text-right">
-                      <i className="fas fa-lg fa-times"></i>
+                      <FontAwesomeIcon icon="times" size="lg" />
                     </span>
                   </a>
                 : <span></span>
               }
               {/* End Link to Auction Edit/Delete */}
               {/* Start Link to Auction */}
-                <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><i className="fas fa-2x fa-angle-right"></i></span></a>
+                <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><FontAwesomeIcon icon="angle-right" size="2x" /></span></a>
               {/* End Link to Auction */}
             </div>
           </div>
@@ -171,7 +172,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
           <span className="has-text-gray-3 is-inline-block has-padding-right-sm">{auction.id}</span>
             { vesselNameDisplay(vesselFuels) }
-            {auction.is_traded_bid_allowed && <span> <i action-label="Traded Bids Accepted" className="fas fa-exchange-alt has-text-gray-3 card__traded-bid-marker"></i> </span>}
+            {auction.is_traded_bid_allowed && <span> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3 card__traded-bid-marker" action-label="Traded Bids Accepted" /> </span>}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
@@ -185,8 +186,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         { auctionStatus == 'pending' ?
           <div className="card-content__products">
           { window.isAdmin &&
-            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start has-margin-left-sm">
-              <span className="icon"><i className="fas fa-play"></i></span> Start Auction
+            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
+              <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
             </a>
           }
           </div>
@@ -199,10 +200,10 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             ? <div className="card-content__auction-status">
                 <div>Suppliers Participating</div>
                 <div className="card-content__rsvp qa-auction-suppliers">
-                  <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>{rsvpYesCount || "0"}&nbsp;
-                  <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>{rsvpMaybeCount || "0"}&nbsp;
-                  <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>{rsvpNoCount || "0"}&nbsp;
-                  <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>{rsvpNoResponseCount || "0"}&nbsp;
+                  <span className="icon has-text-success has-margin-right-xs"><FontAwesomeIcon icon="check-circle" /></span>{rsvpYesCount || "0"}&nbsp;
+                  <span className="icon has-text-warning has-margin-right-xs"><FontAwesomeIcon icon="adjust" /></span>{rsvpMaybeCount || "0"}&nbsp;
+                  <span className="icon has-text-danger has-margin-right-xs"><FontAwesomeIcon icon="times-circle" /></span>{rsvpNoCount || "0"}&nbsp;
+                  <span className="icon has-text-dark has-margin-right-xs"><FontAwesomeIcon icon="question-circle" /></span>{rsvpNoResponseCount || "0"}&nbsp;
                 </div>
               </div>
             : <div className="is-none"></div>
@@ -217,7 +218,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         <div className="card-content__bid">
           <div className="card-content__bid__title has-padding-right-xs">
             <div>Place Bid</div>
-            <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+            <span className="icon is-inline-block has-text-dark has-margin-left-md"><FontAwesomeIcon icon="plus" /></span>
           </div>
         </div>
         <div className="card-content__bid">
@@ -225,12 +226,12 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             <div>Change RSVP</div>
             <div className="card-content__change-rsvp">
               <div className="card-content__rsvp">
-                <span className="icon has-text-success has-margin-right-xs"><i className="fas fa-check-circle"></i></span>0&nbsp;
-                <span className="icon has-text-warning has-margin-right-xs"><i className="fas fa-adjust"></i></span>0&nbsp;
-                <span className="icon has-text-danger has-margin-right-xs"><i className="fas fa-times-circle"></i></span>0&nbsp;
-                <span className="icon has-text-dark has-margin-right-xs"><i className="fas fa-question-circle"></i></span>0&nbsp;
+                <span className="icon has-text-success has-margin-right-xs"><FontAwesomeIcon icon="check-circle" /></span>0&nbsp;
+                <span className="icon has-text-warning has-margin-right-xs"><FontAwesomeIcon icon="adjust" /></span>0&nbsp;
+                <span className="icon has-text-danger has-margin-right-xs"><FontAwesomeIcon icon="times-circle" /></span>0&nbsp;
+                <span className="icon has-text-dark has-margin-right-xs"><FontAwesomeIcon icon="question-circle" /></span>0&nbsp;
               </div>
-              <span className="icon is-inline-block has-text-dark has-margin-left-md"><i className="fas fa-plus"></i></span>
+              <span className="icon is-inline-block has-text-dark has-margin-left-md"><FontAwesomeIcon icon="plus" /></span>
             </div>
           </div>
         </div> */}

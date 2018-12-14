@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -182,8 +183,8 @@ class CollapsingBargeList extends Component {
               onClick={this.handleTriggerClick}
               style={this.props.triggerStyle && this.props.triggerStyle}
             >
-              <span className="collapsible-barge-list__toggle-icon"><i className={`fas ${this.state.isClosed ? `fa-angle-down` : `fa-angle-up`}`}></i></span>
-              <span className={`collapsible-barge-list__category-icon collapsible-section__category-icon ${!pendingBargeFlag && 'is-hidden'}`}><i className="fas fa-exclamation-circle"></i></span>
+              <span className="collapsible-barge-list__toggle-icon"><FontAwesomeIcon icon={this.state.isClosed ? "angle-down" : "angle-up"} /></span>
+              <span className={`collapsible-barge-list__category-icon collapsible-section__category-icon ${!pendingBargeFlag && 'is-hidden'}`}><FontAwesomeIcon icon="exclamation-circle" /></span>
               <span className="collapsible-barge-list__title">{trigger} ({this.props.contentChildCount})</span>
             </h2>
           </div>

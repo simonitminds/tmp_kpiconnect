@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class MessagePanel extends React.Component {
   constructor(props) {
@@ -73,7 +74,7 @@ export default class MessagePanel extends React.Component {
         <div className="messaging__message-container__header">
           <h1>{company_name}</h1>
           <div className="messaging__back-indicator" onClick={() => collapseMessagesConversation(auctionId, company_name)}>
-            <i className="fas fa-angle-left has-margin-right-sm"></i> Select
+            <FontAwesomeIcon icon="angle-left" className="has-margin-right-sm" /> Select
           </div>
         </div>
         <div className='messaging__message-container__list'>
