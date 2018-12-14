@@ -3,16 +3,6 @@
   <div>
     <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
     <span class="qa-event-type-extras"><%= vessel_fuel_name_for_event(@event, @auction_payload.auction) %></span>
-    <br>
-    <%= if event_bid_has_amount?(@event) do %>
-      <span class="qa-event-bid-amount has-text-weight-bold has-padding-right-xs"><%= event_bid_amount(@event) %></span>
-    <% else %>
-      <i class="qa-event-bid-amount has-text-gray-3">No initial amount</i>
-    <% end %>
-    <%= if event_bid_is_traded?(@event) do %>
-      &nbsp;
-      <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
-    <% end %>
     <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
       <%= if event_bid_has_minimum?(@event) do %>
         <span class="has-text-gray-3">Min: <span class="qa-event-bid-min-amount"><%= event_bid_min_amount(@event) %></span></span>

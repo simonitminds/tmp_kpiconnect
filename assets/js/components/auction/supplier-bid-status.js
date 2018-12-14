@@ -8,6 +8,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const hasActiveBid = (_.filter(bidList, 'active').length > 0);
 
   const auctionFuels = _.get(auctionPayload, 'auction.fuels');
+  const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
 
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
@@ -21,9 +22,10 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const bidProductsForSupplier = _.chain(bestOverallSolutionBids)
         .filter({'supplier_id': supplierIdInt})
         .map((bid) => {
-          const fuel = _.find(auctionFuels, (fuel) => fuel.id == bid.fuel_id);
-          return fuel.name;
+          const vesselFuel = _.find(vesselFuels, (vf) =>  `${vf.id}` == bid.vessel_fuel_id);
+          return vesselFuel.fuel.name;
         })
+        .uniq()
         .value();
 
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
@@ -39,10 +41,13 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
 
   const renderProductsForMessage = (productNames) => {
-    if (productNames.length == auctionFuels.length && auctionFuels.length != 1) {
-      return "all products";
+    if(productNames.length == auctionFuels.length && auctionFuels.length != 1) {
+      return " for all products";
+    } else if(productNames.length == 0) {
+      return "";
     }
-    return _.join(productNames, ", ");
+
+    return " for " + _.join(productNames, ", ");
   }
 
   const messageDisplay = (message) => {
@@ -50,7 +55,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
       return (
         <h3 className="has-text-weight-bold has-margin-bottom-none">
           <span className="auction-notification__copy qa-supplier-bid-status-message">
-            {message + " for " + renderProductsForMessage(bidProductsForSupplier)}
+            {message + renderProductsForMessage(bidProductsForSupplier)}
           </span>
         </h3>
       );

@@ -10,6 +10,10 @@
   font-family: $family-header;
   font-weight: 700;
 
+  @media (max-width: 768px) {
+    margin-top: 3.25rem;
+  }
+
   // LEFT COLUMN
 
   &> .columns > .column:first-child { // Tweak spacing from top for mobile.
@@ -250,7 +254,7 @@
 // Auction Bid box
 
 .auction-bidding {
-  @media (min-width: 768px) and (max-width: 1024px) {
+  @media (max-width: 768px) {
     max-height: 93vh;
 
     .body--admin & {
@@ -268,12 +272,23 @@
     padding: 1.25rem 1.25rem 1.5rem;
     width: calc(100vw + 2px);
     background-color: $gray-1;
+    max-height: calc(100% -3.5rem);
+
+    .body--admin & {
+      max-height: calc(100% - 6.75rem);
+    }
   }
+
+  // Position/Nest Based on Previous Sibling
+
+  .auction-lowest-bid + .auction-bidding {
+    margin-top: -2rem;
+  }
+
 }
 
-.auction-bidding__form-body {
-  padding-bottom: 1.5rem;
 
+.auction-bidding__form-body {
   @media(max-width: 768px) {
     max-height: 70vh;
     overflow-y: scroll;
@@ -298,7 +313,7 @@
 }
 
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
-  box-shadow: none;
+  // box-shadow: none;
   border: 1px solid $gray-2;
 }
 
@@ -391,7 +406,18 @@
       font-size: 0.75rem;
     }
   }
+
+  @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+    padding-top: 3px;
+
+    &:hover, &:focus {
+      &:after {
+        right: -7px;
+      }
+    }
+  }
 }
+
 
 .auction__nonsplittable-bid-tag {
   display: inline-block;

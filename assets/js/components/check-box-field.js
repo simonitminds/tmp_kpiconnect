@@ -4,6 +4,7 @@ import _ from 'lodash';
 const CheckBoxField = ({model, field, labelText, defaultChecked, onChange, opts = {}}) => {
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
+
   return (
     <div className="field has-margin-bottom-none">
       <div className="control">

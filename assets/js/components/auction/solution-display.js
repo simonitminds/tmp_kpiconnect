@@ -3,6 +3,8 @@ import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionAcceptDisplay from './solution-accept-display';
+import SolutionDisplayBarges from './solution-display-barges';
+import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
 
 export default class SolutionDisplay extends React.Component {
@@ -15,75 +17,57 @@ export default class SolutionDisplay extends React.Component {
     }
   }
 
+  selectSolution() {
+    this.setState({selected: true})
+  }
+
   cancelSelection(e) {
     e.preventDefault();
     const selectionWindow = document.querySelector(`.${this.props.className} > .auction-solution__confirmation`);
     selectionWindow.classList.add("clear");
-    setTimeout(function(){this.setState({selected: false})}.bind(this), 750);
-    return(false);
+    setTimeout(() => this.setState({selected: false}), 750);
+    return false;
   }
-  selectSolution() {
-    this.setState({selected: true})
-  }
-  onConfirm(event) {
-    event.preventDefault();
+
+  onConfirm(e) {
+    e.preventDefault();
     const bidIds = _.map(this.props.solution.bids, 'id');
     const auctionId = this.props.auctionPayload.auction.id;
-    this.props.acceptSolution(auctionId, bidIds, event);
-    return(false)
+    this.props.acceptSolution(auctionId, bidIds, e);
+    return false;
   }
+
   toggleExpanded(e) {
     e.preventDefault();
     this.setState({expanded: !this.state.expanded});
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
+    const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, best, children, className} = this.props;
     const isSupplier = !!supplierId;
-    const auctionId = auctionPayload.auction.id;
     const auctionStatus = auctionPayload.status;
+    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
     const fuels = _.get(auctionPayload, 'auction.fuels');
-    const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
-    const bidIds = _.map(bids, 'id');
-    const fuelBids = _.map(bids, (bid) => {
-      const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);
-      return {fuel, bid};
-    });
-    const solutionSuppliers = _.chain(bids)
-      .map((bid) => bid.supplier)
-      .uniq()
-      .value();
-    const isSingleSupplier = (solutionSuppliers.length == 1);
-
-
+    const vessels = _.get(auctionPayload, 'auction.vessels');
     const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
-    const fuelQuantities = _.chain(fuels)
-        .reduce((acc, fuel) => {
-          acc[fuel.id] = _.chain(vesselFuels).filter((vf) => vf.fuel_id == fuel.id).sumBy((vf) => vf.quantity).value();
-          return acc;
-        }, {})
-        .value();
-    const totalQuantity = _.sum(Object.values(fuelQuantities));
+    const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
+    const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
+    const isSingleSupplier = (solutionSuppliers.length == 1);
     const acceptable = !!acceptSolution;
+    const revokable = isSupplier && revokeBid;
     const isExpanded = this.state.expanded;
 
-
-    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
-    const bidSupplierIDs = _.chain(bids)
-      .map((bid) => {
-        if(bid.supplier_id) {
-          return bid.supplier_id;
-        } else {
-          const supplier = _.find(suppliers, {name: bid.supplier});
-          return supplier && supplier.id;
-        }
-      })
-      .uniq()
-      .value();
-    const approvedAuctionBargesForSolution = _.chain(auctionBarges)
-      .filter((auctionBarge) => _.includes(bidSupplierIDs, auctionBarge.supplier_id))
-      .filter({approval_status: "APPROVED"})
+    const bidsByFuel = _.chain(fuels)
+      .reduce((acc, fuel) => {
+        const vfIds = _.chain(vesselFuels)
+          .filter((vf) => vf.fuel_id == fuel.id)
+          .map((vf) => `${vf.id}`)
+          .value();
+        const fuelBids = _.filter(bids, (bid) => _.includes(vfIds, bid.vessel_fuel_id));
+        acc[fuel.name] = fuelBids;
+        return acc;
+      }, {})
       .value();
 
 
@@ -101,88 +85,6 @@ export default class SolutionDisplay extends React.Component {
         );
       }
     };
-    const isTradedBid = (bid) => {
-      return(
-        <span>
-          { bid.is_traded_bid ?
-            <span className="auction__traded-bid-tag">
-              <FontAwesomeIcon icon="exchange-alt" className="auction__traded-bid-marker" action-label="Traded Bid" />
-              <span className="has-padding-left-sm">Traded Bid</span>
-            </span>
-          : "" }
-
-        </span>
-      );
-    }
-    const isNonsplittableBid = (bid) => {
-      return(
-        <span>
-          { bid.allow_split == false ?
-            <span className="auction__nonsplittable-bid-tag">
-              <FontAwesomeIcon icon="ban" className="auction__nonsplittable-bid-marker" action-label="Can't Be Split" />
-              <span className="has-padding-left-sm">Unsplittable</span>
-            </span>
-          : "" }
-
-        </span>
-      );
-    }
-
-    const supplierName = (bid) => {
-      if(supplierId) {
-        return bid.supplier_id == supplierId ? "Your Bid" : "";
-      } else {
-        return bid.supplier;
-      }
-    }
-
-    const renderBarges = (auctionBarges) => {
-      if(auctionBarges.length > 0) {
-        return (
-          <div className="auction-solution__barge-list">
-            {
-              auctionBarges.map((auctionBarge) => {
-                const barge = auctionBarge.barge;
-                return (
-                  <span key={auctionBarge.id} className="auction-solution__barge">
-                    { barge.name } ({barge.imo_number})
-                  </span>
-                );
-              })
-            }
-          </div>
-        );
-      }
-      else {
-        return (
-          <div className="auction-solution__barge-list">
-            <i>None</i>
-          </div>
-        );
-      }
-
-    }
-
-    const renderBid = (bid, fuel) => {
-      return (
-        <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
-          <td>{fuel.name}</td>
-
-          <td>
-            { bid
-              ? <span>
-                  <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
-                  <span className="auction__traded-bid-tag__container qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
-                  <span className="auction__nonsplittable-bid-tag__container qa-auction-bid-is_nonsplittable_bid">{isNonsplittableBid(bid)}</span>
-                </span>
-              : <i>No bid</i>
-            }
-          </td>
-          <td><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
-          <td><span className="qa-auction-bid-supplier">({ formatTime(bid.time_entered) })</span></td>
-        </tr>
-      );
-    }
 
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
@@ -210,34 +112,22 @@ export default class SolutionDisplay extends React.Component {
                 <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
               }
             </MediaQuery>
-
           </div>
         </div>
         <div className="auction-solution__body">
           { !isSupplier &&
             <div className="auction-solution__barge-section">
-              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
+              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong>
+              <SolutionDisplayBarges suppliers={suppliers} bids={bids} auctionBarges={auctionBarges} />
             </div>
           }
-          <div>
-            <table className="auction-solution__product-table table is-striped">
-              <thead>
-                <tr>
-                  <th colSpan="3">Fuels</th>
-                </tr>
-              </thead>
-              <tbody>
-                { bids.length > 0  ?
-                    fuelBids.map(({fuel, bid}) => renderBid(bid, fuel))
-                    : <tr>
-                        <td>
-                          <i>No bids have been placed on this auction</i>
-                        </td>
-                      </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          { _.map(bidsByFuel, (bids, fuelName) => {
+              const fuel = _.find(fuels, {name: fuelName});
+              return (
+                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} revokable={revokable} revokeBid={revokeBid} auctionPayload={auctionPayload} />
+              );
+            })
+          }
         </div>
         { acceptable && this.state.selected &&
           <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />

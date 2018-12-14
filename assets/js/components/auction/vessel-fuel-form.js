@@ -7,7 +7,7 @@ export default class VesselFuelForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const vesselFuels = this.props.vessel_fuels;
+    const vesselFuels = this.props.vesselFuels;
     const selectedVessels = _.chain(vesselFuels).map('vessel_id').uniq().filter().value();
     const selectedFuels = _.chain(vesselFuels).map('fuel_id').uniq().filter().value();
     this.state = {
@@ -47,9 +47,9 @@ export default class VesselFuelForm extends React.Component {
   }
 
   render() {
-    const { auction, vessels, fuels, vessel_fuels } = this.props;
+    const { auction, vessels, fuels, vesselFuels } = this.props;
     const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
-      const vesselFuel = _.find(vessel_fuels, {vessel_id: vessel_id, fuel_id: fuel_id});
+      const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
       return vesselFuel && vesselFuel.quantity;
     };
     const availableVessels = _.reject(vessels, (v) => {

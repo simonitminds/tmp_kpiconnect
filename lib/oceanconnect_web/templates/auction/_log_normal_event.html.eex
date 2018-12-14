@@ -2,7 +2,7 @@
   <div><%= convert_event_date_time?(@event.time_entered) %></div>
   <div>
     <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
-    <span class="qa-event-type-extras"><%= convert_event_type_extras(@event.type, @event) %></span>
+    <span class="qa-event-type-extras"></span>
     <br>
     <%= if event_has_bid_data?(@event) do %>
       <%= if event_bid_has_amount?(@event) do %>

@@ -44,7 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_bid_history(supplier_id, %AuctionState{product_bids: product_bids}) do
-    Enum.map(product_bids, fn {_fuel_id, product_state} ->
+    Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
     |> List.flatten()
@@ -72,10 +72,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
       bid_history: get_bid_history(supplier_id, state),
       product_bids:
-        Enum.reduce(product_bids, %{}, fn {fuel_id, product_state}, acc ->
+        Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
           Map.put(
             acc,
-            fuel_id,
+            vessel_fuel_id,
             ProductBidsPayload.get_product_bids_payload!(product_state,
               auction: auction,
               supplier: supplier_id
@@ -105,10 +105,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       bid_history: [],
       participations: get_participations(auction),
       product_bids:
-        Enum.reduce(product_bids, %{}, fn {fuel_id, product_state}, acc ->
+        Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
           Map.put(
             acc,
-            fuel_id,
+            vessel_fuel_id,
             ProductBidsPayload.get_product_bids_payload!(product_state,
               auction: auction,
               buyer: buyer_id

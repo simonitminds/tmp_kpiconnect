@@ -498,14 +498,14 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       supplier_company = insert(:company, is_supplier: true)
       buyer_company = insert(:company, is_supplier: false)
-      fuel = insert(:fuel)
-      fuel_id = "#{fuel.id}"
+      vessel_fuel = insert(:vessel_fuel)
+      vessel_fuel_id = "#{vessel_fuel.id}"
 
       auction =
         insert(:auction,
           suppliers: [supplier_company],
           buyer: buyer_company,
-          auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]
+          auction_vessel_fuels: [vessel_fuel]
         )
         |> Auctions.fully_loaded()
 
@@ -537,12 +537,18 @@ defmodule Oceanconnect.AuctionsTest do
         end
       end)
 
-      {:ok, %{auction: auction, fuel: fuel, fuel_id: fuel_id, supplier_company: supplier_company}}
+      {:ok,
+       %{
+         auction: auction,
+         vessel_fuel: vessel_fuel,
+         vessel_fuel_id: vessel_fuel_id,
+         supplier_company: supplier_company
+       }}
     end
 
     test "place_bid/2 enters bid in bid_list and runs lowest_bid logic", %{
       auction: auction,
-      fuel_id: fuel_id,
+      vessel_fuel_id: vessel_fuel_id,
       supplier_company: supplier_company
     } do
       amount = 1.25
@@ -550,14 +556,14 @@ defmodule Oceanconnect.AuctionsTest do
       expected_result = %{
         amount: amount,
         auction_id: auction.id,
-        fuel_id: fuel_id,
+        vessel_fuel_id: vessel_fuel_id,
         supplier_id: supplier_company.id,
         time_entered: DateTime.utc_now()
       }
 
       assert bid =
                %AuctionBid{} =
-               create_bid(amount, nil, supplier_company.id, fuel_id, auction)
+               create_bid(amount, nil, supplier_company.id, vessel_fuel_id, auction)
                |> Auctions.place_bid()
 
       assert Enum.all?(expected_result, fn {k, v} ->
@@ -569,7 +575,7 @@ defmodule Oceanconnect.AuctionsTest do
              end)
 
       auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
-      product_payload = auction_payload.product_bids["#{fuel_id}"]
+      product_payload = auction_payload.product_bids["#{vessel_fuel_id}"]
 
       assert hd(product_payload.bid_history).id == bid.id
       assert hd(product_payload.lowest_bids).id == bid.id
@@ -577,18 +583,18 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "revoke_supplier_bids_for_product/4 enters bid in bid_list and runs lowest_bid logic", %{
       auction: auction,
-      fuel_id: fuel_id,
+      vessel_fuel_id: vessel_fuel_id,
       supplier_company: supplier_company
     } do
-      create_bid(1.50, nil, supplier_company.id, fuel_id, auction)
+      create_bid(1.50, nil, supplier_company.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       :timer.sleep(100)
 
-      Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+      Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
 
       auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_company.id)
-      product_payload = auction_payload.product_bids["#{fuel_id}"]
+      product_payload = auction_payload.product_bids["#{vessel_fuel_id}"]
 
       # `bid_history` still contains the bid for auditing, but it is not in
       # `lowest_bids` because it is inactive.
@@ -598,16 +604,18 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "revoke_supplier_bids_for_product/4 fails when auction is in decision", %{
       auction: auction,
-      fuel_id: fuel_id,
+      vessel_fuel_id: vessel_fuel_id,
       supplier_company: supplier_company
     } do
-      create_bid(1.25, nil, supplier_company.id, fuel_id, auction)
+      create_bid(1.25, nil, supplier_company.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
       :timer.sleep(50)
 
-      result = Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_company.id)
+      result =
+        Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
+
       assert {:error, :late_bid} = result
     end
   end

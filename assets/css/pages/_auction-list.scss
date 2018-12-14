@@ -12,6 +12,10 @@
     flex-direction: row;
     float: right;
 
+    @media (max-width: 768px) {
+      margin-top: 1rem;
+    }
+
     @media (max-width: 599px) {
       margin-bottom: 1rem;
     }

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import k from 'react-responsive';
 import CollapsibleSection from './collapsible-section';
 import { formatPrice } from '../../utilities';
+import BiddingFormProduct from './bidding-form-product';
 import CheckBoxField from '../check-box-field';
 import MediaQuery from 'react-responsive';
 
@@ -15,7 +16,7 @@ class BiddingForm extends React.Component {
                            .get('bid_history')
                            .filter('active')
                            .some('is_traded_bid')
-                           .value()
+                           .value();
     this.state = {
       tradedBidChecked: is_traded_bid,
       isSubmittable: false
@@ -30,16 +31,16 @@ class BiddingForm extends React.Component {
 
   updateSubmittability(ev) {
     const form = ev.target.form;
-    const bidElements = _.reject(form.elements, (e) => !e.dataset.product);
+    const bidElements = _.reject(form.elements, (e) => !e.dataset.fuel);
     const bidsByProduct = _.reduce(bidElements, (acc, e) => {
-      acc[e.dataset.product] = acc[e.dataset.product] || {};
+      acc[e.dataset.fuel] = acc[e.dataset.fuel] || {};
       switch(e.type) {
         case 'checkbox':
-          acc[e.dataset.product][e.name] = e.checked;
+          acc[e.dataset.fuel][e.name] = e.checked;
           break;
 
         default:
-          acc[e.dataset.product][e.name] = e.value;
+          acc[e.dataset.fuel][e.name] = e.value;
           break;
       }
       return acc;
@@ -67,113 +68,21 @@ class BiddingForm extends React.Component {
     const {auction} = auctionPayload;
     if(this.state.isSubmittable) {
       formSubmit(auction.id, ev);
+      this.setState({ isSubmittable: false });
     }
   }
 
   render(){
     const {auctionPayload, revokeBid, barges} = this.props;
     const {isSubmittable} = this.state;
+    const fuels = _.get(auctionPayload, 'auction.fuels');
     const auction = auctionPayload.auction;
     const auctionState = auctionPayload.status;
-    const products = _.sortBy(auction.fuels, 'id');
     const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'));
     const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed');
-    const fuels = _.get(auctionPayload, 'auction.fuels');
-
-    const renderProduct = ({id: productId, name}, auctionPayload) => {
-      const existingBid = _.chain(auctionPayload)
-        .get(`product_bids[${productId}].bid_history`)
-        .filter('active')
-        .first()
-        .value();
-      const currentBidAmount = _.get(existingBid, `amount`);
-      const minimumBidAmount = _.get(existingBid, `min_amount`);
-      const allowSplit = _.get(existingBid, 'allow_split', true);
-      const vesselFuels = _.chain(auctionPayload)
-        .get('auction.auction_vessel_fuels')
-        .filter((avf) => avf.fuel_id == productId)
-        .value();
-      const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
-      const confirmBidCancellation = (ev) => {
-        ev.preventDefault();
-        return confirm('Are you sure you want to cancel your bid for this product?') ? revokeBid(auction.id, productId) : false;
-      };
-
-      return(
-        <div className="auction-bidding__product-group columns is-desktop" key={productId}>
-          <div className="column is-one-quarter-desktop">
-            <strong>{name}</strong><br/>
-            <span className="has-text-gray-3">&times; {totalQuantity} MT </span>
-            { existingBid
-              ? <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-success"><FontAwesomeIcon icon="check" /></div>
-                  <div className="tag revoke-bid__status is-white">Bid Active</div>
-                  <span className={`tag revoke-bid__button qa-auction-product-${productId}-revoke`} onClick={confirmBidCancellation} tabIndex="-1"><FontAwesomeIcon icon="minus" /></span>
-                  <input type="hidden" name="existing_bid" value="true" data-product={productId} />
-                </div>
-              : <div className="tags has-addons has-margin-top-xs">
-                  <div className="tag is-gray-3"><FontAwesomeIcon icon="times" /></div>
-                  <div className="tag is-white revoke-bid__status">No Active Bid</div>
-                </div>
-            }
-          </div>
-          <div className="column">
-            <div className="columns is-desktop">
-              <div className="column">
-                <div className="field">
-                  <label className="label" htmlFor="bid">Bid Amount</label>
-                  <div className="control auction-bidding__input has-icons-left">
-                    <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
-                    <input
-                      type="number"
-                      step="0.25"
-                      min="0"
-                      className="input qa-auction-bid-amount"
-                      id="bid"
-                      name="amount"
-                      onChange={this.updateSubmittability.bind(this)}
-                      data-product={productId}
-                    />
-                  </div>
-                  <p className="help auction-bidding__label-addendum">Current: {currentBidAmount ? `$` + formatPrice(currentBidAmount) : '—'}</p>
-                </div>
-              </div>
-              <div className="column">
-                <div className="field">
-                  <label className="label" htmlFor="bid">Minimum Bid</label>
-                  <div className="control auction-bidding__input has-icons-left">
-                    <input
-                      type="number"
-                      step="0.25"
-                      min="0"
-                      className="input qa-auction-bid-min_amount"
-                      id="minimumBid"
-                      name="min_amount"
-                      onChange={this.updateSubmittability.bind(this)}
-                      data-product={productId}
-                    />
-                    <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
-                  </div>
-                  <p className="help auction-bidding__label-addendum">Current: {minimumBidAmount ? `$` + formatPrice(minimumBidAmount) : '—'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          { fuels && fuels.length > 1 ?
-          <div className="column is-narrow">
-            <label className="checkbox">
-              <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={allowSplit} data-product={productId}/> Split?
-              <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers" />
-            </label>
-          </div>  :
-            <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />
-          }
-        </div>
-      );
-    };
 
     return(
-      <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base box--nested-base--base`}>
+      <div className={`auction-bidding ${auctionState == 'pending' ? 'auction-bidding--pending':''} box box--nested-base`}>
         <MediaQuery query="(min-width: 769px)">
           <form onSubmit={this.submitForm.bind(this)}>
             <h3 className="auction-bidding__title title is-size-6 is-uppercase has-margin-top-sm">Place Bid</h3>
@@ -199,7 +108,17 @@ class BiddingForm extends React.Component {
                   <FontAwesomeIcon icon="info-circle" className="is-inline-block has-margin-right-sm" /> Add the above credit margin to your baseline price when placing your bid
                 </div>
               }
-              { products.map((product) => renderProduct(product, auctionPayload)) }
+
+              { fuels.map((fuel) =>
+                  <BiddingFormProduct
+                    key={fuel.id}
+                    fuel={fuel}
+                    auctionPayload={auctionPayload}
+                    onRevoke={revokeBid}
+                    onUpdate={this.updateSubmittability.bind(this)}
+                  />
+                )
+              }
             </div>
 
             <div className="field is-horizontal is-expanded">
@@ -237,13 +156,22 @@ class BiddingForm extends React.Component {
                   </div>
                 }
 
-                { products.map((product) => renderProduct(product, auctionPayload)) }
+                { fuels.map((fuel) =>
+                    <BiddingFormProduct
+                      key={fuel.id}
+                      fuel={fuel}
+                      auctionPayload={auctionPayload}
+                      onRevoke={revokeBid}
+                      onUpdate={this.updateSubmittability.bind(this)}
+                    />
+                  )
+                }
               </div>
 
               <div className="field is-horizontal is-expanded">
                 <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
                   <div className="control">
-                    <button type="submit" className="button is-primary qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
+                    <button type="submit" className="button is-primary has-margin-top-sm qa-auction-bid-submit" disabled={!isSubmittable}>Place Bid</button>
                   </div>
                 </div>
               </div>

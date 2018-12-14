@@ -59,6 +59,7 @@ export default class AuctionShow extends React.Component {
     const auctionPayload = this.props.auctionPayload;
     const companyProfile = this.props.companyProfile;
     const {auction, status} = auctionPayload;
+    const isAdmin = window.isAdmin;
 
     const bidStatusDisplay = () => {
       if (auctionPayload.message) {
@@ -82,7 +83,7 @@ export default class AuctionShow extends React.Component {
     }
 
     const auctionLogLinkDisplay = () => {
-      if (currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open' || currentUser.isAdmin) {
+      if ((currentUser.isBuyer && auctionPayload.status != 'pending' && auctionPayload.status != 'open') || isAdmin) {
         return <AuctionLogLink auction={auction} />;
       } else {
         return false;
@@ -158,7 +159,7 @@ export default class AuctionShow extends React.Component {
         return (
           <div>
             {bidStatusDisplay()}
-            <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
+            <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} revokeBid={this.props.revokeSupplierBid} supplierId={this.props.currentUserCompanyId} />
             <BiddingForm formSubmit={this.props.formSubmit} revokeBid={this.props.revokeSupplierBid} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
@@ -188,7 +189,7 @@ export default class AuctionShow extends React.Component {
               </h3>
             </div>
             <SupplierBestSolution auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
-            <BiddingForm formSubmit={this.props.formSubmit} revokeBid={this.props.revokeSupplierBid} auctionPayload={auctionPayload} />
+            <BiddingForm formSubmit={this.props.formSubmit} auctionPayload={auctionPayload} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
@@ -208,12 +209,14 @@ export default class AuctionShow extends React.Component {
             <strong className="is-inline">{fuel.name}</strong>
             <div className="qa-auction_vessel_fuels-quantities">
             { _.map(vessels, (vessel) => {
-                let filteredAuctionVesselFuels = _.filter(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
-                return(
-                  <div key={vessel.id}>
-                    { filteredAuctionVesselFuels[0].quantity } MT to <span className="is-inline">{vessel.name}</span>
-                  </div>
-                );
+                let vesselFuel = _.find(auction.auction_vessel_fuels, {'fuel_id': fuel.id, 'vessel_id': vessel.id});
+                if(vesselFuel) {
+                  return(
+                    <div key={vessel.id}>
+                      { vesselFuel.quantity } MT to <span className="is-inline">{vessel.name}</span>
+                    </div>
+                  );
+                }
               })
             }
             </div>
@@ -414,13 +417,6 @@ export default class AuctionShow extends React.Component {
                       </div>
                     </div>
                   </TabPanel>
-                  {/* <TabPanel>
-                    <div className="auction-notification box is-gray-0" >
-                      <h3 className="has-text-weight-bold is-flex">
-                      <span className="is-inline-block qa-supplier-bid-status-message">Messages is coming soon!</span>
-                      </h3>
-                    </div>
-                  </TabPanel> */}
                 </Tabs>
               </div>
             </section>

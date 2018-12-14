@@ -90,7 +90,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> validate_scheduled_start(attrs)
-    |> maybe_add_vessel_fuels(attrs)
+    |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end
 
@@ -102,7 +102,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:port)
     |> validate_scheduled_start(attrs)
     |> validate_vessel_fuels(attrs)
-    |> maybe_add_vessel_fuels(attrs)
+    |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end
 
@@ -116,7 +116,12 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_add_suppliers(changeset, _attrs), do: changeset
 
-  def maybe_add_vessel_fuels(changeset, %{"auction_vessel_fuels" => auction_vessel_fuels}) do
+  def maybe_add_vessel_fuels(
+        changeset,
+        auction = %Auction{auction_vessel_fuels: existing_vessel_fuels},
+        %{"auction_vessel_fuels" => auction_vessel_fuels}
+      )
+      when is_list(existing_vessel_fuels) do
     vessel_fuel_changeset_proc =
       case get_field(changeset, :scheduled_start) do
         nil -> &AuctionVesselFuel.changeset_for_draft/2
@@ -125,16 +130,53 @@ defmodule Oceanconnect.Auctions.Auction do
 
     list_of_changesets =
       auction_vessel_fuels
-      |> Enum.map(fn avf -> vessel_fuel_changeset_proc.(%AuctionVesselFuel{}, avf) end)
+      |> Enum.map(fn avf ->
+        existing = find_existing_or_new_vessel_fuel(existing_vessel_fuels, avf)
+        vessel_fuel_changeset_proc.(existing, avf)
+      end)
 
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
 
-  def maybe_add_vessel_fuels(changeset, %{auction_vessel_fuels: auction_vessel_fuels}) do
+  def maybe_add_vessel_fuels(changeset, auction = %Auction{}, %{
+        "auction_vessel_fuels" => auction_vessel_fuels
+      }) do
+    vessel_fuel_changeset_proc =
+      case get_field(changeset, :scheduled_start) do
+        nil -> &AuctionVesselFuel.changeset_for_draft/2
+        _ -> &AuctionVesselFuel.changeset_for_new/2
+      end
+
+    list_of_changesets =
+      auction_vessel_fuels
+      |> Enum.map(fn avf ->
+        vessel_fuel_changeset_proc.(%AuctionVesselFuel{}, avf)
+      end)
+
+    put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
+  end
+
+  def maybe_add_vessel_fuels(changeset, _auction = %{}, %{
+        auction_vessel_fuels: auction_vessel_fuels
+      }) do
     put_assoc(changeset, :auction_vessel_fuels, auction_vessel_fuels)
   end
 
-  def maybe_add_vessel_fuels(changeset, _attrs), do: changeset
+  def maybe_add_vessel_fuels(changeset, _auction, _attrs), do: changeset
+
+  defp find_existing_or_new_vessel_fuel(vessel_fuels, %{
+         "fuel_id" => fuel_id,
+         "vessel_id" => vessel_id
+       }) do
+    Enum.find(vessel_fuels, %AuctionVesselFuel{}, fn %AuctionVesselFuel{
+                                                       fuel_id: vf_fuel_id,
+                                                       vessel_id: vf_vessel_id
+                                                     } ->
+      "#{vf_fuel_id}" == fuel_id && "#{vf_vessel_id}" == vessel_id
+    end)
+  end
+
+  defp find_existing_or_new_vessel_fuel(_vessel_fuels, _vf), do: %AuctionVesselFuel{}
 
   def from_params(params) do
     params

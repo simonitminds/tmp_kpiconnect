@@ -435,3 +435,19 @@
     flex-shrink: 0;
   }
 }
+
+// Tune up responsivity for open/closed messaging pane.
+
+.messaging.closed {
+  @media(max-width: 720px) {
+    width: 50vw;
+    left: calc(100vw - 50%);
+  }
+}
+
+.messaging.open {
+  @media(max-width: 720px) {
+    left: 0;
+    width: 100vw;
+  }
+}

@@ -114,10 +114,10 @@
 
 .auction-solution__product-table {
   width: calc(100% + 2rem);
-  margin: 0 -1rem !important;
+  margin: 0.5rem -1rem 0 -1rem !important;
+  padding-top: 0.5rem;
 
   &:not(:last-child) {
-    margin-bottom: 0.5rem;
     border-bottom: 1px solid $gray-1;
   }
   thead tr {
@@ -133,23 +133,35 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    th, td {
-      &:nth-child(2) { // Amount
+    td {
+      &.auction-solution__product-table__vessel { // Amount
+        flex: 0 0 12rem;
+      }
+      &.auction-solution__product-table__bid { // Amount
         margin-left: auto;
-        flex: 0 0 13rem;
+        flex: 0 0 15rem;
       }
-      &:nth-child(3) { // Supplier
-        flex: 0 0 13rem;
+      &.auction-solution__product-table__supplier { // Supplier
+        flex: 0 0 12rem;
       }
-      &:last-child { // Time
+      &.auction-solution__product-table__bid-time { // Time
         flex: 0 0 6rem;
+      }
+      &.auction-solution__product-table__revoke { // Revoke Bid
+        display: table-cell;
+      }
+      &.auction-solution__product-table__vessel .auction-solution__product-table__revoke { // Nested Revoke Bid
+        display: none;
       }
     }
   }
   @media (min-width: 768px) and (max-width: 1400px) {
     thead tr, tbody tr {
       th, td {
-        &:nth-child(2) { // Amount
+        &.auction-solution__product-table__vessel { // Amount
+          flex: 0 0 auto;
+        }
+        &.auction-solution__product-table__bid { // Amount
           margin-left: auto;
           flex: 0 0 9rem;
         }
@@ -159,11 +171,20 @@
   @media (max-width: 768px) and (min-width: 480px) {
     thead tr, tbody tr {
       th, td {
-        &:nth-child(2) { // Amount
+        &.auction-solution__product-table__vessel { // Amount
+          flex: 0 0 10rem;
+        }
+        &.auction-solution__product-table__bid { // Amount
           flex: 0 0 9rem;
         }
-        &:nth-child(3) { // Supplier
-          flex: 0 0 13rem;
+        &.auction-solution__product-table__supplier { // Supplier
+          flex: 0 0 12rem;
+        }
+        &.auction-solution__product-table__revoke { // Revoke Bid
+          display: table-cell;
+        }
+        &.auction-solution__product-table__vessel .auction-solution__product-table__revoke { // Nested Revoke Bid
+          display: none;
         }
       }
     }
@@ -174,85 +195,31 @@
       padding: 0.5rem 1rem;
       th, td {
         padding: 0;
-        &:first-child {
+        &.auction-solution__product-table__vessel {
+          display: flex;
+          flex: 0 0 auto;
           padding-left: 0rem !important;
           font-weight: bold;
         }
-        &:nth-child(2) { // Amount
+        &.auction-solution__product-table__bid  { // Amount
           margin-top: 0.5rem;
           margin-left: 0;
           flex: 0 0 auto;
         }
-        &:nth-child(3) { // Supplier
+        &.auction-solution__product-table__supplier { // Supplier
           flex: 0 0 auto;
         }
-        &:last-child { // Time
+        &.auction-solution__product-table__bid-time { // Time
           flex: 0 0 auto;
         }
-      }
-      th:not(:first-child) { // Hide non-lead headers in mobile
-        display: none;
-      }
-    }
-  }
-}
-
-.auction-solution__vessel-table {
-  width: calc(100% + 2rem);
-  margin: 0 -1rem !important;
-  &:not(:last-child) {
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid $gray-1;
-  }
-  thead tr {
-    border-bottom: 2px solid $gray-3;
-  }
-  thead tr th {
-    font-weight: bold;
-  }
-  thead tr, tbody tr {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    th, td {
-      &:nth-child(2) { // Amount
-        margin-left: auto;
-        flex: 0 0 13rem;
-      }
-      &:last-child { // Time
-        flex: 0 0 6rem;
-      }
-    }
-  }
-  @media (max-width: 768px) and (min-width: 480px) {
-    thead tr, tbody tr {
-      th, td {
-        &:nth-child(2) { // Amount
-          flex: 0 0 8rem;
+        &.auction-solution__product-table__revoke { // Revoke Bid
+          display: none;
+        }
+        &.auction-solution__product-table__vessel .auction-solution__product-table__revoke { // Nested Revoke Bid
+          display: inline !important;
         }
       }
-    }
-  }
-  @media (max-width: 480px) {
-    thead tr, tbody tr {
-      flex-direction: column;
-      padding: 0.5rem 1rem;
-      th, td {
-        padding: 0;
-        &:first-child {
-          padding-left: 0rem !important;
-          font-weight: bold;
-        }
-        &:nth-child(2) { // Amount
-          margin-top: 0.5rem;
-          margin-left: 0;
-          flex: 0 0 auto;
-        }
-        &:last-child { // Time
-          flex: 0 0 auto;
-        }
-      }
-      th:not(:first-child) { // Hide non-lead headers in mobile
+      th:not(.auction-solution__product-table__vessel) { // Hide non-lead headers in mobile
         display: none;
       }
     }

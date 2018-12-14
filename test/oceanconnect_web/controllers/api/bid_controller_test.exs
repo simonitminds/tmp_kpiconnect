@@ -12,6 +12,8 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     fuel2 = insert(:fuel)
     fuel1_id = "#{fuel1.id}"
     fuel2_id = "#{fuel2.id}"
+    vessel1 = insert(:vessel)
+    vessel2 = insert(:vessel)
 
     auction =
       insert(
@@ -19,11 +21,15 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
         buyer: buyer.company,
         suppliers: [supplier_company, supplier2_company],
         auction_vessel_fuels: [
-          build(:vessel_fuel, fuel: fuel1),
-          build(:vessel_fuel, fuel: fuel2)
+          build(:vessel_fuel, vessel: vessel1, fuel: fuel1),
+          build(:vessel_fuel, vessel: vessel1, fuel: fuel2),
+          build(:vessel_fuel, vessel: vessel2, fuel: fuel1),
+          build(:vessel_fuel, vessel: vessel2, fuel: fuel2)
         ]
       )
       |> Auctions.fully_loaded()
+
+    [vessel_fuel1, vessel_fuel2, vessel_fuel3, vessel_fuel4] = auction.auction_vessel_fuels
 
     {:ok, _pid} =
       start_supervised(
@@ -41,7 +47,9 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
 
     bid_params = %{
-      "bids" => %{fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}}
+      "bids" => %{
+        vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}
+      }
     }
 
     {:ok,
@@ -52,8 +60,10 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
        bid_params: bid_params,
        supplier_company: supplier_company,
        supplier2_company: supplier2_company,
-       fuel1_id: fuel1_id,
-       fuel2_id: fuel2_id
+       vessel_fuel1: vessel_fuel1,
+       vessel_fuel2: vessel_fuel2,
+       vessel_fuel3: vessel_fuel3,
+       vessel_fuel4: vessel_fuel4
      }}
   end
 
@@ -115,11 +125,13 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       conn: conn,
       auction: auction,
       bid_params: params,
-      fuel1_id: fuel1_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       updated_params =
         Map.put(params, "bids", %{
-          fuel1_id => %{"amount" => "2.95", "min_amount" => "", "allow_split" => "true"}
+          vessel_fuel1.id => %{"amount" => "2.95", "min_amount" => "", "allow_split" => true},
+          vessel_fuel2.id => %{"amount" => "2.95", "min_amount" => "", "allow_split" => true}
         })
 
       conn = create_post(conn, auction, updated_params)
@@ -138,13 +150,17 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "creating multiple bids in a single request", %{
       auction: auction,
       conn: conn,
-      fuel1_id: fuel1_id,
-      fuel2_id: fuel2_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2,
+      vessel_fuel3: vessel_fuel3,
+      vessel_fuel4: vessel_fuel4
     } do
       bid_params = %{
         "bids" => %{
-          fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "true"},
-          fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "true"}
+          vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel2.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel3.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel4.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => true}
         }
       }
 
@@ -159,12 +175,22 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "creating a minimum bid with no bid for an auction", %{
       auction: auction,
       conn: conn,
-      fuel1_id: fuel1_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       conn =
         create_post(conn, auction, %{
           "bids" => %{
-            fuel1_id => %{"amount" => "", "min_amount" => "9.00", "allow_split" => "true"}
+            vessel_fuel1.id => %{
+              "amount" => "10.50",
+              "min_amount" => "9.00",
+              "allow_split" => true
+            },
+            vessel_fuel2.id => %{
+              "amount" => "10.50",
+              "min_amount" => "9.00",
+              "allow_split" => true
+            }
           }
         })
 
@@ -214,13 +240,38 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "creating a non-splittable bid", %{
       auction: auction,
       conn: conn,
-      fuel1_id: fuel1_id,
-      fuel2_id: fuel2_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2,
+      vessel_fuel3: vessel_fuel3,
+      vessel_fuel4: vessel_fuel4
     } do
       params = %{
         "bids" => %{
-          fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "false"},
-          fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "false"}
+          vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => false},
+          vessel_fuel2.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => false},
+          vessel_fuel3.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => false},
+          vessel_fuel4.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => false}
+        }
+      }
+
+      conn = create_post(conn, auction, params)
+
+      assert json_response(conn, 200) == %{
+               "success" => true,
+               "message" => "Bids successfully placed"
+             }
+    end
+
+    test "creating a bid for a subset of vessels", %{
+      auction: auction,
+      conn: conn,
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
+    } do
+      params = %{
+        "bids" => %{
+          vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => false},
+          vessel_fuel2.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => false}
         }
       }
 
@@ -248,13 +299,22 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
   end
 
   describe "revoking bids" do
-    setup %{auction: auction, conn: conn, fuel1_id: fuel1_id, fuel2_id: fuel2_id} do
+    setup %{
+      auction: auction,
+      conn: conn,
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2,
+      vessel_fuel3: vessel_fuel3,
+      vessel_fuel4: vessel_fuel4
+    } do
       Auctions.start_auction(auction)
 
       bid_params = %{
         "bids" => %{
-          fuel1_id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => "true"},
-          fuel2_id => %{"amount" => "2.50", "min_amount" => "1.00", "allow_split" => "true"}
+          vessel_fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel2.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel3.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => true},
+          vessel_fuel4.id => %{"amount" => "2.50", "min_amount" => "", "allow_split" => true}
         }
       }
 
@@ -266,9 +326,9 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "revoking a bid for a product from a supplier", %{
       auction: auction,
       conn: conn,
-      fuel1_id: fuel1_id
+      vessel_fuel1: vessel_fuel1
     } do
-      conn = revoke_post(conn, auction, %{"product" => fuel1_id})
+      conn = revoke_post(conn, auction, %{"product" => vessel_fuel1.id})
 
       assert json_response(conn, 200) == %{
                "success" => true,
@@ -279,12 +339,12 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
     test "revoking a bid for an auction in decision", %{
       auction: auction,
       conn: conn,
-      fuel1_id: fuel1_id
+      vessel_fuel1: vessel_fuel1
     } do
       Auctions.end_auction(auction)
       :timer.sleep(100)
 
-      conn = revoke_post(conn, auction, %{"product" => fuel1_id})
+      conn = revoke_post(conn, auction, %{"product" => vessel_fuel1.id})
 
       assert json_response(conn, 409) == %{
                "success" => false,
@@ -298,32 +358,39 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       auction: auction,
       buyer: buyer,
       supplier_company: supplier_company,
-      fuel1_id: fuel1_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       Auctions.start_auction(auction)
 
-      bid =
-        create_bid(1.25, nil, supplier_company.id, fuel1_id, auction)
-        |> Auctions.place_bid(nil)
+      bids = [
+        create_bid(1.25, nil, supplier_company.id, vessel_fuel1.id, auction),
+        create_bid(1.25, nil, supplier_company.id, vessel_fuel2.id, auction)
+      ]
+
+      Enum.each(bids, fn bid -> Auctions.place_bid(bid, nil) end)
+
+      Auctions.end_auction(auction)
 
       authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), buyer)
-      Auctions.end_auction(auction)
-      {:ok, %{conn: authed_conn, bid: bid}}
+      {:ok, %{conn: authed_conn, bids: bids}}
     end
 
-    test "buyer selects winning bid", %{auction: auction, conn: conn, bid: bid} do
+    test "buyer selects winning bid", %{auction: auction, conn: conn, bids: bids} do
+      bid_ids = Enum.map(bids, & &1.id)
+
       new_conn =
         post(conn, auction_bid_api_path(conn, :select_solution, auction.id), %{
           comment: "test",
           port_agent: "",
-          bid_ids: [bid.id]
+          bid_ids: bid_ids
         })
 
       assert json_response(new_conn, 200)
 
       auction_state = Auctions.get_auction_state!(auction)
 
-      assert bid in auction_state.winning_solution.bids
+      assert Enum.all?(bids, fn bid -> bid in auction_state.winning_solution.bids end)
       assert auction_state.winning_solution.comment == "test"
       assert auction_state.status == :closed
     end
