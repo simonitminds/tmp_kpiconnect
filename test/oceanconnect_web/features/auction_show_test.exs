@@ -89,6 +89,59 @@ defmodule Oceanconnect.AuctionShowTest do
     assert AuctionShowPage.auction_status() == "OPEN"
   end
 
+  describe "admin login" do
+    setup %{auction: auction, buyer: buyer} do
+      Auctions.start_auction(auction)
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      :ok
+    end
+
+    test "admin can see buyer view of the auction card", %{auction: auction} do
+      buyer_params = %{
+        suppliers: auction.suppliers
+      }
+
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.has_values_from_params?(buyer_params)
+    end
+
+    test "admin can see the bid list", %{auction: auction, vessel_fuel_id: vessel_fuel_id} do
+      [s1, s2, _s3] = auction.suppliers
+
+      create_bid(1.75, nil, s1.id, vessel_fuel_id, auction, true)
+      |> Auctions.place_bid(insert(:user, company: s1))
+
+      create_bid(1.75, nil, s2.id, vessel_fuel_id, auction, false)
+      |> Auctions.place_bid(insert(:user, company: s2))
+
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!()
+
+      stored_bid_list =
+        auction_state.product_bids[vessel_fuel_id].bids
+        |> AuctionShowPage.convert_to_supplier_names(auction)
+
+      bid_list_card_expectations =
+        Enum.map(stored_bid_list, fn bid ->
+          is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
+
+          %{
+            "id" => bid.id,
+            "data" => %{
+              "amount" => "$#{bid.amount}",
+              "supplier" => bid.supplier,
+              "is_traded_bid" => is_traded_bid
+            }
+          }
+        end)
+
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_card_expectations)
+    end
+  end
+
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
       Auctions.start_auction(auction)
@@ -303,7 +356,6 @@ defmodule Oceanconnect.AuctionShowTest do
                "Your bid is the best overall offer for #{fuel.name}"
 
       AuctionShowPage.revoke_bid_for_product(vessel_fuel_id)
-      :timer.sleep(200)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
       auction_state =
@@ -476,7 +528,6 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
       assert AuctionShowPage.auction_status() == "EXPIRED"
 
-      Hound.Helpers.Screenshot.take_screenshot()
       assert AuctionShowPage.has_available_barge?(barge)
       refute AuctionShowPage.has_available_barge?(inactive_barge)
 
