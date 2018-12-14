@@ -168,6 +168,7 @@ defmodule OceanconnectWeb.Email do
                 "auction_completion.html",
                 user: supplier,
                 winning_supplier_company: supplier_company,
+                physical_buyer: buyer_company,
                 is_traded_bid: is_traded_bid,
                 auction: auction,
                 vessel: vessel,
