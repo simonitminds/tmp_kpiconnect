@@ -32,6 +32,11 @@ defmodule Oceanconnect.Accounts do
     |> Repo.all()
   end
 
+  def list_admin_users do
+    User.select_admins()
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single user.
 

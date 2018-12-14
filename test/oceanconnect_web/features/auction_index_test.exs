@@ -84,6 +84,16 @@ defmodule Oceanconnect.AuctionIndexTest do
       {:ok, %{auction: auction, buyer: buyer}}
     end
 
+    test "renders the default auction index page", %{auctions: auctions} do
+      assert AuctionIndexPage.is_current_path?()
+      assert AuctionIndexPage.has_auctions?(auctions)
+    end
+
+    test "admin can see the buyer auction card", %{auction: auction} do
+      # Temporarily removed parameter "suppliers"
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
+    end
+
     test "can start auction manually with start auction button when impersonating a buyer", %{
       auction: auction,
       buyer: buyer

@@ -6,13 +6,23 @@ defmodule OceanconnectWeb.Api.AuctionController do
     user_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
 
     auction_payloads =
-      user_id
-      |> Auctions.list_participating_auctions()
-      |> Enum.map(fn auction ->
-        auction
-        |> Auctions.fully_loaded()
-        |> Auctions.AuctionPayload.get_auction_payload!(user_id)
-      end)
+      case OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn) do
+        true ->
+          Auctions.list_auctions()
+          |> Enum.map(fn auction ->
+            auction
+            |> Auctions.fully_loaded()
+            |> Auctions.AuctionPayload.get_admin_auction_payload!()
+          end)
+
+        false ->
+          Auctions.list_participating_auctions(user_id)
+          |> Enum.map(fn auction ->
+            auction
+            |> Auctions.fully_loaded()
+            |> Auctions.AuctionPayload.get_auction_payload!(user_id)
+          end)
+      end
 
     render(conn, "index.json", data: auction_payloads)
   end

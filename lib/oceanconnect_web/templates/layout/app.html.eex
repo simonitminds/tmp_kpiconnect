@@ -45,7 +45,10 @@
                     <button class="<%= "navbar-dropdown__admin__toggles qa-admin-act-as-agent " <> "#{ if OceanconnectWeb.SessionView.is_impersonating?(@conn),  do:  "active",  else:  "inactive"}" %>">Agent</button>
                   </div>
                 </div>
-                <script> window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %></script>
+                <script>
+                  window.isAdmin = <%= OceanconnectWeb.SessionView.current_user_is_admin?(@conn) %>
+                  window.isImpersonating = <%= OceanconnectWeb.SessionView.is_impersonating?(@conn)  %>
+                </script>
               <% end %>
             </div>
             <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>

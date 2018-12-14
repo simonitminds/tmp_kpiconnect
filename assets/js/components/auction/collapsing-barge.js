@@ -171,6 +171,7 @@ class CollapsingBarge extends Component {
     const barge = this.props.barge;
     const supplierId = this.props.supplierId;
     const isBuyer = this.props.isBuyer;
+    const isAdmin = window.isAdmin;
     const approveBargeForm = this.props.approveBargeForm;
     const rejectBargeForm = this.props.rejectBargeForm;
     const submitBargeForm = this.props.submitBargeForm;
@@ -235,7 +236,7 @@ class CollapsingBarge extends Component {
               <span className={`collapsible-section__category-icon collapsible-section__category-icon--${bargeStatus}`}><i className={approvalStatusIcon()}></i></span>
               <span className="collapsible-section__title">{trigger}</span>
            </h2>
-           { (auctionState == 'expired' || auctionState == 'closed' || auctionState == 'canceled') ? "" : bargeAction() }
+           { (auctionState == 'expired' || auctionState == 'closed' || auctionState == 'canceled' || isAdmin) ? "" : bargeAction() }
           </div>
         </div>
 
