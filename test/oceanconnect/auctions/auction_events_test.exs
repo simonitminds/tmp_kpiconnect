@@ -29,8 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
           %{
             exclude_children: [
               :auction_reminder_timer,
-              :auction_event_handler,
-              :auction_scheduler
+              :auction_event_handler
             ]
           }}}
       )
@@ -97,6 +96,23 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       cached_auction = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
+    end
+
+    test "update_auction/2 with a new start time adds an auction_rescheduled event to the event store",
+         %{
+           auction: auction = %Auction{id: auction_id}
+         } do
+      new_start_time =
+        auction.scheduled_start
+        |> DateTime.to_unix()
+        |> Kernel.+(1_000_000)
+        |> DateTime.from_unix!()
+
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      Auctions.update_auction(auction, %{scheduled_start: new_start_time}, nil)
+      :timer.sleep(200)
+      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert_received %AuctionEvent{type: :auction_rescheduled, auction_id: ^auction_id}
     end
 
     test "starting an auction adds an auction_started event to the event store", %{

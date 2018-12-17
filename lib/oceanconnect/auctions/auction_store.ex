@@ -166,7 +166,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast({:update_auction, %{auction: auction, user: user}, emit}, current_state) do
-    state = update_auction(auction, current_state)
+    state = update_auction(auction, current_state, emit)
 
     AuctionEvent.emit(AuctionEvent.auction_updated(auction, user), emit)
 
@@ -369,7 +369,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
-    update_auction(auction, previous_state)
+    update_auction(auction, previous_state, false)
   end
 
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do
@@ -472,7 +472,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     auction
     |> Command.cancel_scheduled_start()
-    |> AuctionScheduler.process_command()
+    |> AuctionScheduler.process_command(nil)
 
     {next_state, _} =
       %AuctionState{current_state | status: :open}
@@ -485,26 +485,27 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp update_auction(
          auction = %Auction{scheduled_start: start},
-         current_state = %{status: :draft}
+         current_state = %{status: :draft},
+         emit
        )
        when start != nil do
-    update_auction_side_effects(auction)
+    update_auction_side_effects(auction, emit)
     Map.put(current_state, :status, :pending)
   end
 
-  defp update_auction(auction, current_state) do
-    update_auction_side_effects(auction)
+  defp update_auction(auction, current_state, emit) do
+    update_auction_side_effects(auction, emit)
     current_state
   end
 
-  defp update_auction_side_effects(auction) do
+  defp update_auction_side_effects(auction, emit) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
 
     auction
     |> Command.update_scheduled_start()
-    |> AuctionScheduler.process_command()
+    |> AuctionScheduler.process_command(emit)
   end
 
   defp end_auction(current_state, auction = %Auction{}) do

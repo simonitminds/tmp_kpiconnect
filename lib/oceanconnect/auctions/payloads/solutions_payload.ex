@@ -71,8 +71,8 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
     supplier_solutions = Map.values(best_by_supplier)
 
     [best_overall, best_single_supplier | supplier_solutions]
-    |> Enum.reject(fn(solution) -> solution == nil end)
-    |> Enum.reject(fn(%{bids: bids}) -> bids == winning_bids end)
+    |> Enum.reject(fn solution -> solution == nil end)
+    |> Enum.reject(fn %{bids: bids} -> bids == winning_bids end)
     |> Enum.uniq()
     |> Enum.sort_by(&Solution.sort_tuple/1)
   end

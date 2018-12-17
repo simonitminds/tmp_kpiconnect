@@ -66,6 +66,14 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
     {:noreply, state}
   end
 
+  def hand_info(
+        %AuctionEvent{type: :auction_rescheduled, data: auction = %Auction{}},
+        state
+      ) do
+    AuctionEmailNotifier.notify_auction_rescheduled(auction)
+    {:noreply, state}
+  end
+
   def handle_info(
         %AuctionEvent{type: :upcoming_auction_notified, data: auction = %Auction{}},
         state
