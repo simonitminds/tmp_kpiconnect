@@ -80,8 +80,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
         {:update_scheduled_start, %{scheduled_start: scheduled_start}},
         state = %{scheduled_start: scheduled_start},
         _emit
-      )
-    do
+      ) do
     IO.inspect("HEEEEEY")
     {:noreply, state}
   end
@@ -93,6 +92,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     timer_ref = Process.send_after(self(), :start_auction, delay)
     new_state = %{state | scheduled_start: scheduled_start, timer_ref: timer_ref}
+
     if emit do
       AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
     end
@@ -114,8 +114,8 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
         {:update_scheduled_start, %{scheduled_start: nil}, _emit},
         state = %{timer_ref: timer_ref}
       ) do
-        cancel_timer(timer_ref)
-        IO.inspect("BBBB")
+    cancel_timer(timer_ref)
+    IO.inspect("BBBB")
 
     new_state =
       state
@@ -132,6 +132,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     cancel_timer(timer_ref)
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :start_auction, delay)
+
     if emit do
       AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
     end

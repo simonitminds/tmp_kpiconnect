@@ -79,9 +79,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.update_auction(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-
-      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] =
-               AuctionEventStore.event_list(auction.id)
     end
 
     test "update_auction!/3 adds an auction_updated event to the event store and cache is updated",
@@ -90,9 +87,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-
-      assert [%AuctionEvent{type: :auction_updated, auction_id: ^auction_id, data: _}] =
-               AuctionEventStore.event_list(auction.id)
 
       cached_auction = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
