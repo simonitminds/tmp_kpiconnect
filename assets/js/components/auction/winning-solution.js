@@ -4,7 +4,7 @@ import { formatTime, formatPrice } from '../../utilities';
 import SolutionComment from './solution-comment';
 import SolutionDisplay from './solution-display';
 
-const WinningSolution = ({auctionPayload}) => {
+const WinningSolution = ({auctionPayload, supplierId}) => {
   const solution = _.get(auctionPayload, 'solutions.winning_solution');
 
   return(
@@ -14,7 +14,7 @@ const WinningSolution = ({auctionPayload}) => {
           <h3 className="box__header box__header--bordered">Winning Solution</h3>
           {
             solution ?
-              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title={"Winning Solution"} isExpanded={true} best={true} className="qa-auction-winning-solution" />
+              <SolutionDisplay auctionPayload={auctionPayload} solution={solution} title={"Winning Solution"} supplierId={supplierId} isExpanded={true} best={true} className="qa-auction-winning-solution" />
               : <div className="auction-table-placeholder">
                 <i>A winning bid was not selected before the decision time expired</i>
               </div>

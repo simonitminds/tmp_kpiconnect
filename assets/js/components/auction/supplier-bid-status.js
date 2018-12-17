@@ -40,53 +40,45 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
   const auctionStatus = _.get(auctionPayload, 'status');
 
-  const renderProductsForMessage = (productNames) => {
-    if(productNames.length == auctionFuels.length && auctionFuels.length != 1) {
-      return " for all products";
-    } else if(productNames.length == 0) {
-      return "";
+  const productPortionString = (products) => {
+    if(products.length == vesselFuels.length && vesselFuels.length != 1) {
+      return "every product";
+    } else if(products.length == 1) {
+      return "one product";
+    } else if(products.length > 0) {
+      return `${products.length} of ${vesselFuels.length} products`;
+    } else {
+      return "no products";
     }
-
-    return " for " + _.join(productNames, ", ");
-  }
+  };
 
   const messageDisplay = (message) => {
-    if (bidProductsForSupplier) {
-      return (
-        <h3 className="has-text-weight-bold has-margin-bottom-none">
-          <span className="auction-notification__copy qa-supplier-bid-status-message">
-            {message + renderProductsForMessage(bidProductsForSupplier)}
-          </span>
-        </h3>
-      );
-    } else {
-      return (
-        <h3 className="has-text-weight-bold has-margin-bottom-none">
-          <span className="auction-notification__copy qa-supplier-bid-status-message">
-            {message}
-          </span>
-        </h3>
-      );
-    }
+    return (
+      <h3 className="has-text-weight-bold has-margin-bottom-none">
+        <span className="auction-notification__copy qa-supplier-bid-status-message">
+          {message}
+        </span>
+      </h3>
+    );
   }
 
   if(auctionStatus == "pending") {
     return <i>The auction has not started</i>;
   } else if (auctionStatus == "expired") {
     return (
-      <div className="auction-notification box is-gray-3" >
+      <div className="auction-notification box is-gray-3">
         {messageDisplay("No offer was selected")}
       </div>
     );
   } else if (auctionStatus == "closed" && isInWinningSolution) {
     return (
-      <div className="auction-notification box is-success" >
-        {messageDisplay("You won the auction")}
+      <div className="auction-notification box is-success">
+        {messageDisplay(`You won ${productPortionString(bidProductsForSupplier)} in this auction`)}
       </div>
     );
   } else if (auctionStatus == "closed" && !isInWinningSolution) {
     return (
-      <div className="auction-notification box is-danger" >
+      <div className="auction-notification box is-danger">
         <div className="auction-notification__show-message">
           {messageDisplay("Regretfully, you were unsuccessful in this auction. Thank you for quoting")}
         </div>
@@ -97,7 +89,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (auctionStatus == "open" && !connection) {
     return (
-      <div className="auction-notification box is-gray-2" >
+      <div className="auction-notification box is-gray-2">
         <div className="auction-notification__show-message">
           {messageDisplay("Your connection to the server has been lost")}
         </div>
@@ -163,7 +155,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (isInBestSolution) {
     return (
-      <div className="auction-notification box is-warning" >
+      <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
           {messageDisplay("Your bid is part of the best overall offer")}
         </div>
@@ -174,7 +166,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (isBestSingleSolution) {
     return(
-      <div className="auction-notification box is-warning">
+      <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
           {messageDisplay("Your bid is the best single supplier solution")}
         </div>
@@ -185,7 +177,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else {
     return (
-      <div className="auction-notification box is-danger" >
+      <div className="auction-notification box is-danger">
         <div className="auction-notification__show-message">
           {messageDisplay("Your bid is not the best offer")}
         </div>

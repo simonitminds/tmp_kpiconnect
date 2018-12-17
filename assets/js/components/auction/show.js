@@ -176,7 +176,7 @@ export default class AuctionShow extends React.Component {
           <div>
             {bidStatusDisplay()}
             <SupplierBidStatus auctionPayload={auctionPayload} connection={this.props.connection} supplierId={this.props.currentUserCompanyId} />
-            <WinningSolution auctionPayload={auctionPayload} />
+            <WinningSolution auctionPayload={auctionPayload} supplierId={this.props.currentUserCompanyId} />
             <SupplierBidList auctionPayload={auctionPayload} />
           </div>
         )
