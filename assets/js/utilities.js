@@ -54,6 +54,8 @@ export const portLocalTime = (gmtTime, portId, ports) => {
       .value();
     const localTime = moment(gmtTime).utc().add(_.get(port, 'gmt_offset', 0), 'hours');
     return formatDateTime(localTime);
+  } else if(portId == "") {
+    return "No port selected";
   }
 }
 

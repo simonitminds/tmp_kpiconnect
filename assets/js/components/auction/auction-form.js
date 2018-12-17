@@ -52,6 +52,7 @@ const AuctionForm = (props) => {
       />;
     }
   };
+
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
@@ -152,7 +153,9 @@ const AuctionForm = (props) => {
      <VesselFuelForm auction={auction}
                      vessels={vessels}
                      fuels={fuels}
-                     vesselFuels={auction.vessel_fuels} />
+                     vesselFuels={auction.vessel_fuels}
+                     portId={port_id}
+                     ports={ports} />
 
       <section className="auction-info is-gray-1"> {/* Add'l info */}
         <div className="container">

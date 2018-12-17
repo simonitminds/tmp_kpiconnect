@@ -91,10 +91,10 @@
   &> div {
 
     &.selected-list--vessels {
-      max-width: 300px;
+      max-width: 400px;
       flex-grow: 0;
       &+ .control {
-        max-width: 300px;
+        max-width: 400px;
         margin-top: 0 !important;
       }
     }
