@@ -14,7 +14,7 @@ defmodule Oceanconnect.User.EditTest do
   describe "editing users" do
     test "visiting the edit user page", %{user: user} do
       EditPage.visit(user.id)
-      assert EditPage.has_fields?(["email", "first_name", "last_name"])
+      assert EditPage.has_fields?(["email", "first_name", "last_name", "office_phone", "mnbile_phone"])
     end
 
     test "user can edit their information and submit the changes", %{user: user} do
@@ -23,7 +23,9 @@ defmodule Oceanconnect.User.EditTest do
       EditPage.fill_form(%{
         email: user.email,
         first_name: "new",
-        last_name: "name"
+        last_name: "name",
+        office_phone: "1234567",
+        mobile_phone: "1234567"
                          })
 
       EditPage.submit()

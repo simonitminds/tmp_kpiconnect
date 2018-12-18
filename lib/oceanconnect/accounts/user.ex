@@ -7,6 +7,8 @@ defmodule Oceanconnect.Accounts.User do
 
   schema "users" do
     field(:email, :string)
+    field(:office_phone, :string)
+    field(:mobile_phone, :string)
     field(:first_name, :string)
     field(:last_name, :string)
     field(:password_hash, :string)
@@ -22,7 +24,8 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone])
+    |> validate_required([:email])
     |> upcase_email()
     |> unique_constraint(:email)
   end
@@ -30,7 +33,7 @@ defmodule Oceanconnect.Accounts.User do
   def admin_changeset(%User{} = user, attrs) do
     user
     |> cast(attrs, [:is_active, :password, :company_id, :is_admin])
-    |> validate_required([:email, :password, :company_id])
+    |> validate_required([:password, :company_id])
     |> foreign_key_constraint(:company_id)
     |> put_pass_hash()
   end

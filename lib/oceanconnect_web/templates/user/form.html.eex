@@ -34,6 +34,23 @@
     		</div>
       </div>
 
+      <div class="field is-grouped">
+        <%= label f, :office_phone, class: "label" do %>
+          Office Phone
+        <% end %>
+        <div class="control">
+          <%= text_input f, :office_phone, class: "input qa-user-office_phone" %>
+          <%= error_tag f, :office_phone %>
+        </div>
+
+        <%= label f, :mobile_phone, class: "label" do %>
+          Mobile Phone
+        <% end %>
+        <div class="control">
+          <%= text_input f, :mobile_phone, class: "input qa-user-mobile_phone" %>
+          <%= error_tag f, :mobile_phone %>
+        </div>
+      </div>
     </div>
   </div>
   <div class="columns">
