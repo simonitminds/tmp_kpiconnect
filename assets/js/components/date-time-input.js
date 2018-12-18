@@ -10,7 +10,7 @@ class DateTimeInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTime: moment(props.value).utc()
+      selectedTime: props.value ? moment(props.value).utc() : null
     };
   }
 
@@ -24,7 +24,7 @@ class DateTimeInput extends React.Component {
 
     return(
       <React.Fragment>
-        <input type="hidden" name={`${fieldName}`} value={selectedTime} />
+        <input type="hidden" name={`${fieldName}`} value={selectedTime || ""} />
         <div className="field is-horizontal">
           <div className="field-label">
             <label className="label">{label}</label>

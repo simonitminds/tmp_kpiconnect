@@ -94,6 +94,8 @@ defmodule OceanconnectWeb.AuctionController do
 
     updated_params =
       auction_params
+      |> Map.put("eta", get_eta_from_vessel_fuels(auction_vessel_fuels))
+      |> Map.put("etd", get_etd_from_vessel_fuels(auction_vessel_fuels))
       |> Auction.from_params()
       |> Map.put("buyer_id", user.company.id)
       |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
@@ -174,7 +176,10 @@ defmodule OceanconnectWeb.AuctionController do
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params =
-        Auction.from_params(auction_params)
+        auction_params
+        |> Map.put("eta", get_eta_from_vessel_fuels(auction_vessel_fuels))
+        |> Map.put("etd", get_etd_from_vessel_fuels(auction_vessel_fuels))
+        |> Auction.from_params()
         |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
 
       case Auctions.update_auction(auction, updated_params, user) do
@@ -285,4 +290,22 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   defp vessel_fuels_from_params(_), do: []
+
+  defp get_eta_from_vessel_fuels([]), do: nil
+  defp get_eta_from_vessel_fuels(vessel_fuels) when is_list(vessel_fuels) do
+    vessel_fuels
+    |> Enum.map(fn(vf) -> Map.get(vf, "eta") end)
+    |> Enum.filter(&(&1))
+    |> Enum.min(nil)
+  end
+  defp get_eta_from_vessel_fuels(_vessel_fuels), do: nil
+
+  defp get_etd_from_vessel_fuels([]), do: nil
+  defp get_etd_from_vessel_fuels(vessel_fuels) when is_list(vessel_fuels) do
+    vessel_fuels
+    |> Enum.map(fn(vf) -> Map.get(vf, "etd") end)
+    |> Enum.filter(&(&1))
+    |> Enum.max(nil)
+  end
+  defp get_etd_from_vessel_fuels(_vessel_fuels), do: nil
 end

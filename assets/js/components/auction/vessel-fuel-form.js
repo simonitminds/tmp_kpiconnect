@@ -18,7 +18,7 @@ export default class VesselFuelForm extends React.Component {
   }
 
   addVessel(ev) {
-    const selectedElement = ev.target
+    const selectedElement = ev.target;
     const vessel_id = selectedElement.value;
     this.setState((previousState) => ({
       selectedVessels: _.uniq([...previousState.selectedVessels, vessel_id])
@@ -58,14 +58,14 @@ export default class VesselFuelForm extends React.Component {
 
     const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
       const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
-      return vesselFuel && vesselFuel.quantity;
+      return vesselFuel ? vesselFuel.quantity : 0;
     };
 
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       const initialVesselFuels = _.filter(vesselFuels, {vessel_id: vessel_id});
-      const initialETA = _.chain(initialVesselFuels).map('eta').min().value();
-      const initialETD = _.chain(initialVesselFuels).map('etd').min().value();
+      const initialETA = _.chain(initialVesselFuels).map('eta').min().value() || auction.eta;
+      const initialETD = _.chain(initialVesselFuels).map('etd').min().value() || auction.etd;
 
       return (
         <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>

@@ -75,8 +75,8 @@ defmodule Oceanconnect.Auctions.Auction do
     :buyer_id,
     :decision_duration,
     :duration,
-    :etd,
     :is_traded_bid_allowed,
+    :etd,
     :po,
     :port_agent,
     :scheduled_start
@@ -181,10 +181,10 @@ defmodule Oceanconnect.Auctions.Auction do
   def from_params(params) do
     params
     |> maybe_parse_date_field("scheduled_start")
-    |> maybe_convert_checkbox("is_traded_bid_allowed")
-    |> maybe_convert_checkbox("anonymous_bidding")
     |> maybe_parse_date_field("eta")
     |> maybe_parse_date_field("etd")
+    |> maybe_convert_checkbox("is_traded_bid_allowed")
+    |> maybe_convert_checkbox("anonymous_bidding")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
     |> maybe_load_suppliers("suppliers")
@@ -293,6 +293,8 @@ defmodule Oceanconnect.Auctions.Auction do
         changeset
     end
   end
+
+  defp maybe_convert_start_time(""), do: nil
 
   defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
     {_, scheduled_start, _} = DateTime.from_iso8601(scheduled_start)
