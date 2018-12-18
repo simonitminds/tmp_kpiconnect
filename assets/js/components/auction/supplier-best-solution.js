@@ -21,10 +21,10 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
           <div className="box__subsection">
             <h3 className="box__header box__header--bordered">{auctionStatus == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
             { bestSolution &&
-              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} title="Best Overall Offer" />
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" />
             }
             { bestSingleSupplier && fuels && fuels.length > 1 &&
-              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} title={`Best Single Supplier Offer`}/>
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`}/>
             }
             { !bestSolution &&
               <div className="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>

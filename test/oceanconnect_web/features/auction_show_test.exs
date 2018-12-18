@@ -17,15 +17,15 @@ defmodule Oceanconnect.AuctionShowTest do
     supplier3 = insert(:user, company: supplier_company3)
     insert(:company, name: "Ocean Connect Marine")
 
-    vessel_fuel = insert(:vessel_fuel)
-    vessel_fuel_id = "#{vessel_fuel.id}"
+    fuel = insert(:fuel)
+    [vessel_fuel1, vessel_fuel2] = insert_list(2, :vessel_fuel, fuel: fuel)
 
     auction =
       insert(
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company, supplier_company2, supplier_company3],
-        auction_vessel_fuels: [vessel_fuel],
+        auction_vessel_fuels: [vessel_fuel1, vessel_fuel2],
         is_traded_bid_allowed: true
       )
       |> Auctions.fully_loaded()
@@ -49,8 +49,9 @@ defmodule Oceanconnect.AuctionShowTest do
        supplier2: supplier2,
        supplier3: supplier3,
        buyer_company: buyer_company,
-       fuel: vessel_fuel.fuel,
-       vessel_fuel_id: vessel_fuel_id
+       fuel: fuel,
+       vessel_fuel1: "#{vessel_fuel1.id}",
+       vessel_fuel2: "#{vessel_fuel2.id}"
      }}
   end
 
@@ -106,13 +107,13 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_values_from_params?(buyer_params)
     end
 
-    test "admin can see the bid list", %{auction: auction, vessel_fuel_id: vessel_fuel_id} do
+    test "admin can see the bid list", %{auction: auction, vessel_fuel1: vessel_fuel1} do
       [s1, s2, _s3] = auction.suppliers
 
-      create_bid(1.75, nil, s1.id, vessel_fuel_id, auction, true)
+      create_bid(1.75, nil, s1.id, vessel_fuel1, auction, true)
       |> Auctions.place_bid(insert(:user, company: s1))
 
-      create_bid(1.75, nil, s2.id, vessel_fuel_id, auction, false)
+      create_bid(1.75, nil, s2.id, vessel_fuel1, auction, false)
       |> Auctions.place_bid(insert(:user, company: s2))
 
       auction_state =
@@ -120,7 +121,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[vessel_fuel_id].bids
+        auction_state.product_bids[vessel_fuel1].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -159,13 +160,13 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.has_values_from_params?(buyer_params)
     end
 
-    test "buyer can see the bid list", %{auction: auction, vessel_fuel_id: vessel_fuel_id} do
+    test "buyer can see the bid list", %{auction: auction, vessel_fuel1: vessel_fuel1} do
       [s1, s2, _s3] = auction.suppliers
 
-      create_bid(1.75, nil, s1.id, vessel_fuel_id, auction, true)
+      create_bid(1.75, nil, s1.id, vessel_fuel1, auction, true)
       |> Auctions.place_bid(insert(:user, company: s1))
 
-      create_bid(1.75, nil, s2.id, vessel_fuel_id, auction, false)
+      create_bid(1.75, nil, s2.id, vessel_fuel1, auction, false)
       |> Auctions.place_bid(insert(:user, company: s2))
 
       auction_state =
@@ -173,7 +174,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[vessel_fuel_id].bids
+        auction_state.product_bids[vessel_fuel1].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -212,7 +213,7 @@ defmodule Oceanconnect.AuctionShowTest do
     test "supplier can enter a bid", %{
       auction: auction,
       bid_params: bid_params,
-      vessel_fuel_id: vessel_fuel_id
+      vessel_fuel1: vessel_fuel1
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
@@ -224,7 +225,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[vessel_fuel_id].bids
+        auction_state.product_bids[vessel_fuel1].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =
@@ -240,7 +241,7 @@ defmodule Oceanconnect.AuctionShowTest do
       auction: auction,
       bid_params: bid_params,
       buyer_company: buyer_company,
-      vessel_fuel_id: vessel_fuel_id
+      vessel_fuel2: vessel_fuel2
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.mark_as_traded_bid()
@@ -257,7 +258,7 @@ defmodule Oceanconnect.AuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[vessel_fuel_id].bids
+        auction_state.product_bids[vessel_fuel2].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_card_expectations =
@@ -276,8 +277,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "index displays bid status to suppliers", %{
       supplier2: supplier2,
-      auction: auction,
-      fuel: fuel
+      auction: auction
     } do
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
       AuctionShowPage.enter_bid(%{amount: 1.00})
@@ -285,7 +285,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
 
       assert AuctionShowPage.auction_bid_status() =~
-               "Your bid is the best overall offer for #{fuel.name}"
+               "You have the best overall offer for this auction"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -296,7 +296,7 @@ defmodule Oceanconnect.AuctionShowTest do
         :timer.sleep(500)
 
         assert AuctionShowPage.auction_bid_status() =~
-                 "Your bid is the best overall offer for #{fuel.name}"
+                 "You have the best overall offer for this auction"
       end)
 
       change_session_to(:default)
@@ -312,15 +312,14 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "supplier places minimum bid and maintains winning position", %{
       supplier2: supplier2,
-      auction: auction,
-      fuel: fuel
+      auction: auction
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
 
       assert AuctionShowPage.auction_bid_status() =~
-               "Your bid is the best overall offer for #{fuel.name}"
+               "You have the best overall offer for this auction"
 
       in_browser_session(:second_supplier, fn ->
         login_user(supplier2)
@@ -335,34 +334,35 @@ defmodule Oceanconnect.AuctionShowTest do
       change_session_to(:default)
 
       assert AuctionShowPage.auction_bid_status() =~
-               "Your bid is the best overall offer for #{fuel.name}"
+               "You have the best overall offer for this auction"
 
       AuctionShowPage.visit(auction.id)
 
       assert AuctionShowPage.auction_bid_status() =~
-               "Your bid is the best overall offer for #{fuel.name}"
+               "You have the best overall offer for this auction"
     end
 
     test "supplier can revoke their bid for a product", %{
       auction: auction,
-      fuel: fuel,
-      vessel_fuel_id: vessel_fuel_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(500)
 
       assert AuctionShowPage.auction_bid_status() =~
-               "Your bid is the best overall offer for #{fuel.name}"
+               "You have the best overall offer for this auction"
 
-      AuctionShowPage.revoke_bid_for_product(vessel_fuel_id)
+      AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
+      AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
       auction_state =
         auction
         |> Auctions.get_auction_state!()
 
-      stored_bid_list = auction_state.product_bids[vessel_fuel_id].bids
+      stored_bid_list = auction_state.product_bids[vessel_fuel1].bids
 
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
@@ -383,17 +383,22 @@ defmodule Oceanconnect.AuctionShowTest do
       auction: auction,
       supplier: supplier,
       supplier2: supplier2,
-      vessel_fuel_id: vessel_fuel_id
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
     } do
       Auctions.start_auction(auction)
 
       bid =
-        create_bid(1.25, nil, supplier.company_id, vessel_fuel_id, auction)
+        create_bid(1.25, nil, supplier.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
+      create_bid(1.25, nil, supplier.company_id, vessel_fuel2, auction)
+      |> Auctions.place_bid()
 
       bid2 =
-        create_bid(1.25, nil, supplier2.company_id, vessel_fuel_id, auction)
+        create_bid(1.50, nil, supplier2.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
+      create_bid(1.50, nil, supplier2.company_id, vessel_fuel2, auction)
+      |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
       {:ok, %{bid: bid, bid2: bid2}}
@@ -403,7 +408,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is the best overall offer"
+      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
     end
 
     test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
@@ -442,7 +447,7 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier, fn ->
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
+        assert AuctionShowPage.auction_bid_status() =~ "You won the entire auction"
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
     end
@@ -482,7 +487,7 @@ defmodule Oceanconnect.AuctionShowTest do
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
         :timer.sleep(500)
-        assert AuctionShowPage.auction_bid_status() =~ "You won the auction"
+        assert AuctionShowPage.auction_bid_status() =~ "You won the entire auction"
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 

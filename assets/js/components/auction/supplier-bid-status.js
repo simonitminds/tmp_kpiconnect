@@ -23,9 +23,8 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         .filter({'supplier_id': supplierIdInt})
         .map((bid) => {
           const vesselFuel = _.find(vesselFuels, (vf) =>  `${vf.id}` == bid.vessel_fuel_id);
-          return vesselFuel.fuel.name;
+          return vesselFuel;
         })
-        .uniq()
         .value();
 
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
@@ -35,6 +34,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const winningSolutionBids = _.get(auctionPayload, "solutions.winning_solution.bids");
   const winningSolutionSupplierIds = _.map(winningSolutionBids, 'supplier_id');
   const isInWinningSolution = _.includes(winningSolutionSupplierIds, supplierIdInt);
+  const isWinningSolution = !_.some(winningSolutionSupplierIds, (id) => id != supplierIdInt);
 
   const singleSolutionIsTied = suppliersBestSolution && bestSingleSolution &&
     !isBestSingleSolution && (bestSingleSolution.normalized_price == suppliersBestSolution.normalized_price);
@@ -42,15 +42,29 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const productPortionString = (products) => {
     if(products.length == vesselFuels.length && vesselFuels.length != 1) {
-      return "every product";
+      return "every deliverable";
     } else if(products.length == 1) {
-      return "one product";
+      return "one deliverable";
     } else if(products.length > 0) {
-      return `${products.length} of ${vesselFuels.length} products`;
+      return `${products.length} of ${vesselFuels.length} deliverables`;
     } else {
-      return "no products";
+      return "no deliverables";
     }
-  };
+  }
+
+  const productNameString = (products) => {
+    const fuelNames = _.chain(products)
+      .map('fuel.name')
+      .uniq()
+      .value();
+
+    const fuelCount = fuelNames.length;
+
+    return _.reduce(fuelNames, (acc, fuel, index) => {
+        const delim = (fuelCount <= 2) ? " and " : ((index == fuelCount - 1) ? ", and " : ", ");
+        return acc + delim + fuel;
+      });
+  }
 
   const messageDisplay = (message) => {
     return (
@@ -70,10 +84,26 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         {messageDisplay("No offer was selected")}
       </div>
     );
+  } else if (auctionStatus == "closed" && isWinningSolution) {
+    return (
+      <div className="auction-notification box is-success">
+        <div className="auction-notification__show-message">
+          {messageDisplay(`You won the entire auction`)}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay(`You won the auction`)}
+        </div>
+      </div>
+    );
   } else if (auctionStatus == "closed" && isInWinningSolution) {
     return (
       <div className="auction-notification box is-success">
-        {messageDisplay(`You won ${productPortionString(bidProductsForSupplier)} in this auction`)}
+        <div className="auction-notification__show-message">
+          {messageDisplay(`You won bids for ${productNameString(bidProductsForSupplier)} in this auction`)}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay(`You won ${productPortionString(bidProductsForSupplier)} in this auction`)}
+        </div>
       </div>
     );
   } else if (auctionStatus == "closed" && !isInWinningSolution) {
@@ -113,10 +143,21 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best overall offer")}
+          {messageDisplay("You have the best overall offer for this auction")}
         </div>
         <div className="auction-notification__card-message">
-          {messageDisplay("Your bid is the best overall offer")}
+          {messageDisplay("You have the best overall offer")}
+        </div>
+      </div>
+    );
+  } else if (isInBestSolution) {
+    return (
+      <div className="auction-notification box is-success">
+        <div className="auction-notification__show-message">
+          {messageDisplay(`You have the best overall offer for ${productNameString(bidProductsForSupplier)}`)}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay(`You have the best offer for ${productPortionString(bidProductsForSupplier)}`)}
         </div>
       </div>
     );
@@ -124,21 +165,10 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-warning">
         <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best single-supplier offer. Other suppliers have matched this offer")}
+          {messageDisplay("You have the best single-supplier offer. Other suppliers have matched this offer")}
         </div>
         <div className="auction-notification__card-message">
-          {messageDisplay("Your bid is the best single-supplier offer")}
-        </div>
-      </div>
-    );
-  } else if (isBestSingleSolution) {
-    return (
-      <div className="auction-notification box is-success">
-        <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best single-supplier offer")}
-        </div>
-        <div className="auction-notification__card-message">
-          {messageDisplay("Your bid is the best single-supplier offer")}
+          {messageDisplay("You have the best single-supplier offer")}
         </div>
       </div>
     );
@@ -153,25 +183,14 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
       </div>
     );
-  } else if (isInBestSolution) {
-    return (
-      <div className="auction-notification box is-success">
-        <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is part of the best overall offer")}
-        </div>
-        <div className="auction-notification__card-message">
-          {messageDisplay("Your bid is part of the best offer")}
-        </div>
-      </div>
-    );
   } else if (isBestSingleSolution) {
     return(
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay("Your bid is the best single supplier solution")}
+          {messageDisplay("You have the best single supplier solution")}
         </div>
         <div className="auction-notification__card-message">
-          {messageDisplay("Your bid is the best single supplier solution")}
+          {messageDisplay("You have the best single supplier solution")}
         </div>
       </div>
     );
