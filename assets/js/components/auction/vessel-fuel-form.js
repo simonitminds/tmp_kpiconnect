@@ -49,10 +49,6 @@ export default class VesselFuelForm extends React.Component {
 
   render() {
     const { auction, vessels, fuels, vesselFuels, portId, ports } = this.props;
-    const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
-      const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
-      return vesselFuel && vesselFuel.quantity;
-    };
     const availableVessels = _.reject(vessels, (v) => {
       return _.some(this.state.selectedVessels, (sv) => v.id == sv);
     });
@@ -60,8 +56,17 @@ export default class VesselFuelForm extends React.Component {
       return _.some(this.state.selectedFuels, (sf) => f.id == sf);
     });
 
+    const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
+      const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
+      return vesselFuel && vesselFuel.quantity;
+    };
+
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
+      const initialVesselFuels = _.filter(vesselFuels, {vessel_id: vessel_id});
+      const initialETA = _.chain(initialVesselFuels).map('eta').min().value();
+      const initialETD = _.chain(initialVesselFuels).map('etd').min().value();
+
       return (
         <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>
           {vessel.name}, {vessel.imo}
@@ -72,8 +77,8 @@ export default class VesselFuelForm extends React.Component {
             <FontAwesomeIcon icon="times" />
           </span>
           <input type="hidden" name={`auction[vessels][${vessel.id}][selected]`} value={true} />
-          <DateTimeInput label="ETA" portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} />
-          <DateTimeInput label="ETD" portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} />
+          <DateTimeInput label="ETA" value={initialETA} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} />
+          <DateTimeInput label="ETD" value={initialETD} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} />
         </div>
       );
     }
