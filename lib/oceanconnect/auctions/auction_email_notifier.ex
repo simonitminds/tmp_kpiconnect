@@ -9,6 +9,13 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
     {:ok, invitation_emails}
   end
 
+  def notify_auction_rescheduled(auction = %Auction{}) do
+    auction = auction |> Auctions.fully_loaded()
+    updated_emails = OceanconnectWeb.Email.auction_rescheduled(auction)
+    updated_emails = deliver_emails(updated_emails)
+    {:ok, updated_emails}
+  end
+
   def notify_upcoming_auction(auction = %Auction{}) do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       OceanconnectWeb.Email.auction_starting_soon(auction)

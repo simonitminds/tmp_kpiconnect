@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionScheduler do
   use GenServer
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionCache, Command}
+  alias Oceanconnect.Auctions.{Auction, AuctionCache, Command, AuctionEvent}
 
   @registry_name :auction_scheduler_registry
 
@@ -33,18 +33,24 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     )
   end
 
-  def process_command(%Command{
-        command: :update_scheduled_start,
-        data: auction = %Auction{id: auction_id}
-      }) do
+  def process_command(
+        %Command{
+          command: :update_scheduled_start,
+          data: auction = %Auction{id: auction_id}
+        },
+        emit
+      ) do
     with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.cast(pid, {:update_scheduled_start, auction})
+         do: GenServer.cast(pid, {:update_scheduled_start, auction, emit})
   end
 
-  def process_command(%Command{
-        command: :cancel_scheduled_start,
-        data: auction = %Auction{id: auction_id}
-      }) do
+  def process_command(
+        %Command{
+          command: :cancel_scheduled_start,
+          data: auction = %Auction{id: auction_id}
+        },
+        _emit
+      ) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:cancel_scheduled_start, auction})
   end
@@ -72,24 +78,31 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   def handle_cast(
         {:update_scheduled_start, %{scheduled_start: scheduled_start}},
-        state = %{scheduled_start: scheduled_start}
-      ),
-      do: {:noreply, state}
+        state = %{scheduled_start: scheduled_start},
+        _emit
+      ) do
+    IO.inspect("HEEEEEY")
+    {:noreply, state}
+  end
 
   def handle_cast(
-        {:update_scheduled_start, %{scheduled_start: scheduled_start}},
+        {:update_scheduled_start, auction = %Auction{scheduled_start: scheduled_start}, emit},
         state = %{timer_ref: nil}
       ) do
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     timer_ref = Process.send_after(self(), :start_auction, delay)
     new_state = %{state | scheduled_start: scheduled_start, timer_ref: timer_ref}
 
+    if emit do
+      AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
+    end
+
     {:noreply, new_state}
   end
 
   def handle_cast(
         {:update_scheduled_start,
-         %{scheduled_start: scheduled_start, auction_started: auction_started}},
+         %{scheduled_start: scheduled_start, auction_started: auction_started}, _emit},
         state
       )
       when auction_started != nil do
@@ -98,10 +111,11 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, %{scheduled_start: nil}},
+        {:update_scheduled_start, %{scheduled_start: nil}, _emit},
         state = %{timer_ref: timer_ref}
       ) do
     cancel_timer(timer_ref)
+    IO.inspect("BBBB")
 
     new_state =
       state
@@ -112,12 +126,16 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, %{scheduled_start: scheduled_start}},
+        {:update_scheduled_start, auction = %Auction{scheduled_start: scheduled_start}, emit},
         state = %{timer_ref: timer_ref}
       ) do
     cancel_timer(timer_ref)
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :start_auction, delay)
+
+    if emit do
+      AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
+    end
 
     new_state =
       state

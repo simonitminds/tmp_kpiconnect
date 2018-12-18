@@ -4,6 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
   use Bamboo.Test
 
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions.{AuctionEmailNotifier}
 
   setup do
@@ -24,10 +25,10 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
     vessel = insert(:vessel)
     fuel = insert(:fuel)
 
-    non_participating_suppliers =
+    _non_participating_suppliers =
       for company <- supplier_companies, do: insert(:user, company: company)
 
-    non_participating_buyers = insert_list(2, :user, company: buyer_company)
+    _non_participating_buyers = insert_list(2, :user, company: buyer_company)
 
     auction =
       insert(:auction,
@@ -115,6 +116,20 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
     #       end
     #     end
 
+    test "auction notifier sends auction updated emails to all suppliers", %{
+      auction: auction
+    } do
+      suppliers = Accounts.users_for_companies(auction.suppliers)
+      assert {:ok, emails} = AuctionEmailNotifier.notify_auction_rescheduled(auction)
+
+      :timer.sleep(500)
+      assert length(emails) == length(suppliers)
+
+      for email <- emails do
+        assert_delivered_email(email)
+      end
+    end
+
     test "auction notifier sends completion emails to winning supplier and buyer", %{
       winning_solution: winning_solution,
       approved_barges: approved_barges,
@@ -133,7 +148,6 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
 
       :timer.sleep(500)
       assert length(emails) == length(active_participants)
-      assert length(emails) > 0
 
       for email <- emails do
         assert_delivered_email(email)

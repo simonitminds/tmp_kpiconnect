@@ -11,8 +11,8 @@ defmodule Oceanconnect.Auctions.SolutionsPayloadTest do
     supplier3 = insert(:company, name: "BooCompany")
     supplier4 = insert(:company, name: "FazCompany")
 
-    [vessel1, vessel2]  = insert_list(2, :vessel)
-    [fuel1, fuel2]      = insert_list(2, :fuel)
+    [vessel1, vessel2] = insert_list(2, :vessel)
+    [fuel1, fuel2] = insert_list(2, :fuel)
 
     auction =
       insert(:auction,
@@ -49,32 +49,46 @@ defmodule Oceanconnect.Auctions.SolutionsPayloadTest do
   end
 
   describe "other_solutions" do
-    test "prioritizes valid solutions over all others", %{auction: auction, buyer: buyer, supplier: supplier1, supplier2: supplier2, supplier3: supplier3, supplier4: supplier4, vessel_fuels: vessel_fuels} do
+    test "prioritizes valid solutions over all others", %{
+      auction: auction,
+      buyer: buyer,
+      supplier: supplier1,
+      supplier2: supplier2,
+      supplier3: supplier3,
+      supplier4: supplier4,
+      vessel_fuels: vessel_fuels
+    } do
       [vf1, vf2, vf3, vf4 | _] = vessel_fuels
 
       create_bid(10.00, nil, supplier1.id, vf1.id, auction)
       |> Auctions.place_bid()
+
       create_bid(10.00, nil, supplier1.id, vf2.id, auction)
       |> Auctions.place_bid()
+
       create_bid(20.00, nil, supplier1.id, vf3.id, auction)
       |> Auctions.place_bid()
+
       create_bid(20.00, nil, supplier1.id, vf4.id, auction)
       |> Auctions.place_bid()
 
       create_bid(5.00, nil, supplier2.id, vf1.id, auction)
       |> Auctions.place_bid()
+
       create_bid(5.00, nil, supplier2.id, vf2.id, auction)
       |> Auctions.place_bid()
 
       create_bid(20.00, nil, supplier3.id, vf1.id, auction)
       |> Auctions.place_bid()
+
       create_bid(20.00, nil, supplier3.id, vf2.id, auction)
       |> Auctions.place_bid()
+
       create_bid(30.00, nil, supplier3.id, vf3.id, auction)
       |> Auctions.place_bid()
+
       create_bid(30.00, nil, supplier3.id, vf4.id, auction)
       |> Auctions.place_bid()
-
 
       auction_payload =
         auction
@@ -84,7 +98,7 @@ defmodule Oceanconnect.Auctions.SolutionsPayloadTest do
         other_solutions: other_solutions
       } = auction_payload.solutions
 
-      assert [true, false] = Enum.map(other_solutions, &(&1.valid))
+      assert [true, false] = Enum.map(other_solutions, & &1.valid)
     end
   end
 end

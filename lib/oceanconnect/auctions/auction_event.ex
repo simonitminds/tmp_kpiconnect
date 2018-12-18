@@ -79,6 +79,16 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
+  def auction_rescheduled(auction = %Auction{id: auction_id}, user) do
+    %AuctionEvent{
+      type: :auction_rescheduled,
+      auction_id: auction_id,
+      data: auction,
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
   def auction_ended(
         auction = %Auction{id: auction_id, auction_ended: ended_at},
         new_state = %AuctionState{}

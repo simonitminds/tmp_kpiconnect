@@ -124,7 +124,11 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def revoke_bid_for_product(product_id) do
-    execute_script("document.getElementsByClassName('qa-auction-product-#{product_id}-revoke')[0].click();", [])
+    execute_script(
+      "document.getElementsByClassName('qa-auction-product-#{product_id}-revoke')[0].click();",
+      []
+    )
+
     Hound.Helpers.Dialog.accept_dialog()
   end
 

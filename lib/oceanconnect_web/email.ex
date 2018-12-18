@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.Email do
 
     suppliers = Accounts.users_for_companies(supplier_companies)
 
-    vessel_name =
+    vessel_name_list =
       vessels
       |> Enum.map(& &1.name)
       |> Enum.join(", ")
@@ -28,10 +28,43 @@ defmodule OceanconnectWeb.Email do
     Enum.map(suppliers, fn supplier ->
       base_email(supplier)
       |> subject(
-        "You have been invited to Auction #{auction.id} for #{vessel_name} at #{port_name}"
+        "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{port_name}"
       )
       |> render(
         "auction_invitation.html",
+        supplier: supplier,
+        auction: auction,
+        buyer_company: buyer
+      )
+    end)
+  end
+
+  def auction_rescheduled(auction = %Auction{}) do
+    auction = Auctions.fully_loaded(auction)
+
+    %Auction{
+      buyer: buyer,
+      port: port,
+      suppliers: supplier_companies,
+      vessels: vessels
+    } = auction
+
+    suppliers = Accounts.users_for_companies(supplier_companies)
+
+    vessel_name_list =
+      vessels
+      |> Enum.map(& &1.name)
+      |> Enum.join(", ")
+
+    port_name = port.name
+
+    Enum.map(suppliers, fn supplier ->
+      base_email(supplier)
+      |> subject(
+        "The start time for Auction #{auction.id} for #{vessel_name_list} at #{port_name} has been changed"
+      )
+      |> render(
+        "auction_updated.html",
         supplier: supplier,
         auction: auction,
         buyer_company: buyer
@@ -118,6 +151,7 @@ defmodule OceanconnectWeb.Email do
       |> Enum.filter(&(&1.email in active_user_emails))
 
     port_name = port.name
+
     bids_by_vessel =
       Enum.reduce(bids, %{}, fn bid, acc ->
         vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))

@@ -140,6 +140,47 @@ defmodule OceanconnectWeb.EmailTest do
       for buyer <- buyers, do: refute(Enum.any?(emails, fn email -> email.to.id == buyer.id end))
     end
 
+    test "auction rescheduled email builds for suppliers", %{
+      suppliers: suppliers,
+      auction: auction,
+      buyer_company: buyer_company
+    } do
+      vessel_name_list =
+        auction.vessels
+        |> Enum.map(& &1.name)
+        |> Enum.join(", ")
+
+      supplier_emails = Email.auction_rescheduled(auction)
+
+      for supplier <- suppliers do
+        assert Enum.any?(supplier_emails, fn supplier_email ->
+                 supplier_email.to.id == supplier.id
+               end)
+
+        assert Enum.any?(supplier_emails, fn supplier_email ->
+                 supplier_email.html_body =~ Accounts.User.full_name(supplier)
+               end)
+      end
+
+      for supplier_email <- supplier_emails do
+        assert supplier_email.subject ==
+                 "The start time for Auction #{auction.id} for #{vessel_name_list} at #{
+                   auction.port.name
+                 } has been changed"
+
+        assert supplier_email.html_body =~ buyer_company.name
+        assert supplier_email.html_body =~ Integer.to_string(auction.id)
+      end
+    end
+
+    test "auction rescheduled email does not build for buyers", %{
+      buyers: buyers,
+      auction: auction
+    } do
+      emails = Email.auction_rescheduled(auction)
+      for buyer <- buyers, do: refute(Enum.any?(emails, fn email -> email.to.id == buyer.id end))
+    end
+
     test "auction starting soon email builds for all participants", %{
       suppliers: suppliers,
       buyers: buyers,
@@ -191,7 +232,6 @@ defmodule OceanconnectWeb.EmailTest do
            suppliers: suppliers,
            non_participating_suppliers: non_participating_suppliers,
            non_participating_buyers: non_participating_buyers,
-           vessel_fuels: vessel_fuels,
            vessel: vessel
          } do
       non_participating_suppliers_emails = non_participating_suppliers |> Enum.map(& &1.email)
