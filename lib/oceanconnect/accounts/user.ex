@@ -22,17 +22,17 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
-    |> validate_required([:email, :password, :company_id])
-    |> foreign_key_constraint(:company_id)
+    |> cast(attrs, [:email, :first_name, :last_name])
     |> upcase_email()
     |> unique_constraint(:email)
-    |> put_pass_hash()
   end
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:is_active])
+    |> cast(attrs, [:is_active, :password, :company_id, :is_admin])
+    |> validate_required([:email, :password, :company_id])
+    |> foreign_key_constraint(:company_id)
+    |> put_pass_hash()
   end
 
   def impersonable_users(query \\ User) do
@@ -77,6 +77,10 @@ defmodule Oceanconnect.Accounts.User do
       u in User,
       where: u.company_id in ^company_ids
     )
+  end
+
+  def with_company(user = %User{}) do
+    Oceanconnect.Repo.preload(user, :company)
   end
 
   def full_name(%User{first_name: first_name, last_name: last_name}) do

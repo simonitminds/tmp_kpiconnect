@@ -1,0 +1,17 @@
+<aside class="admin-panel__nav column is-one-quarter menu">
+	<label class="admin-panel__nav__toggle__label" for="admin-panel-menu-toggle"><i class="fas fa-bars is-inline-block has-margin-left-sm has-margin-right-md"></i><strong>Menu</strong></label>
+	<input class="admin-panel__nav__toggle__checkbox" type="checkbox" id="admin-panel-menu-toggle">
+	<div class="admin-panel__nav__content">
+		<p class="menu-label">
+			Manage Account
+		</p>
+		<ul class="menu-list">
+			<li><%= link "Account Information", to: user_path(@conn, :edit, @user) %></li>
+		</ul>
+		<p class="menu-label">
+			Manage Company
+		</p>
+		<ul class="menu-list">
+		</ul>
+	</div>
+</aside>
