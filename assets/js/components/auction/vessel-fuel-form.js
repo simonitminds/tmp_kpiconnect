@@ -77,8 +77,8 @@ export default class VesselFuelForm extends React.Component {
             <FontAwesomeIcon icon="times" />
           </span>
           <input type="hidden" name={`auction[vessels][${vessel.id}][selected]`} value={true} />
-          <DateTimeInput label="ETA" value={initialETA} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} />
-          <DateTimeInput label="ETD" value={initialETD} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} />
+          <DateTimeInput label="ETA" value={initialETA} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} model="vessel" field="eta" />
+          <DateTimeInput label="ETD" value={initialETD} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} model="vessel" field="etd" />
         </div>
       );
     }

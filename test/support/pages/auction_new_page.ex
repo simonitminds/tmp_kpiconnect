@@ -69,6 +69,26 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
+  def add_vessel_timestamps(vessels, eta, etd) do
+    Enum.each(vessels, fn(vessel) ->
+      container = find_element(:css, ".qa-auction-vessel-#{vessel.id}")
+
+      container
+      |> find_within_element(:css, ".qa-vessel-eta_date")
+      |> fill_form_element("datetime", eta)
+      container
+      |> find_within_element(:css, ".qa-vessel-eta_time")
+      |> fill_form_element("datetime", eta)
+
+      container
+      |> find_within_element(:css, ".qa-vessel-etd_date")
+      |> fill_form_element("datetime", etd)
+      container
+      |> find_within_element(:css, ".qa-vessel-etd_time")
+      |> fill_form_element("datetime", etd)
+    end)
+  end
+
   def add_fuel(fuel_id) do
     find_element(:css, ".qa-auction-select-fuel")
     |> fill_form_element("select", fuel_id)

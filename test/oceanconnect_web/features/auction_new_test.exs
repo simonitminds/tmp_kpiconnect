@@ -34,10 +34,6 @@ defmodule Oceanconnect.AuctionNewTest do
       anonymous_bidding: false,
       decision_duration: 15,
       duration: 10,
-      eta_date: date_time,
-      eta_time: date_time,
-      etd_date: date_time,
-      etd_time: date_time,
       is_traded_bid_allowed: true,
       scheduled_start_date: valid_start_time,
       scheduled_start_time: valid_start_time,
@@ -68,7 +64,8 @@ defmodule Oceanconnect.AuctionNewTest do
        suppliers: suppliers,
        port: port,
        fuels: fuels,
-       selected_vessel: selected_vessel
+       selected_vessel: selected_vessel,
+       date_time: date_time
      }}
   end
 
@@ -81,8 +78,6 @@ defmodule Oceanconnect.AuctionNewTest do
              "scheduled_start",
              "duration",
              "decision_duration",
-             "eta",
-             "etd",
              "is_traded_bid_allowed",
              "po",
              "port_id",
@@ -121,12 +116,14 @@ defmodule Oceanconnect.AuctionNewTest do
     port: port,
     fuels: [selected_fuel | _rest],
     buyer_company: buyer_company,
-    buyer_vessels: [selected_vessel | _reset]
+    buyer_vessels: [selected_vessel | _reset],
+    date_time: date_time
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels([selected_vessel])
+    AuctionNewPage.add_vessel_timestamps([selected_vessel], date_time, date_time)
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, [selected_vessel], 1500)
 
@@ -146,6 +143,7 @@ defmodule Oceanconnect.AuctionNewTest do
     show_params: show_params,
     port: port,
     fuels: [selected_fuel | _rest],
+    date_time: date_time,
     buyer_company: buyer_company,
     buyer_vessels: buyer_vessels
   } do
@@ -153,6 +151,7 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_vessel_timestamps(buyer_vessels, date_time, date_time)
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_vessels_fuel_quantity(selected_fuel.id, buyer_vessels, 1500)
 
@@ -170,12 +169,14 @@ defmodule Oceanconnect.AuctionNewTest do
     show_params: show_params,
     port: port,
     buyer_vessels: buyer_vessels,
+    date_time: date_time,
     fuels: fuels
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_vessel_timestamps(buyer_vessels, date_time, date_time)
 
     Enum.each(fuels, fn fuel ->
       AuctionNewPage.add_fuel(fuel.id)
@@ -193,12 +194,14 @@ defmodule Oceanconnect.AuctionNewTest do
     show_params: show_params,
     port: port,
     buyer_vessels: buyer_vessels,
+    date_time: date_time,
     fuels: fuels
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_vessel_timestamps(buyer_vessels, date_time, date_time)
 
     Enum.each(fuels, fn fuel ->
       AuctionNewPage.add_fuel(fuel.id)

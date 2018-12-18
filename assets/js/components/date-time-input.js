@@ -19,7 +19,7 @@ class DateTimeInput extends React.Component {
   }
 
   render() {
-    const { label, fieldName, portId, ports } = this.props;
+    const { model, field, label, fieldName, portId, ports } = this.props;
     const { selectedTime } = this.state;
 
     return(
@@ -31,10 +31,10 @@ class DateTimeInput extends React.Component {
           </div>
           <div className="field-body">
             <div className="control">
-              <DateInput value={selectedTime} name={false} onChange={this.updateTime.bind(this)} />
+              <DateInput value={selectedTime} model={model} field={field} onChange={this.updateTime.bind(this)} />
             </div>
             <div className="control">
-              <TimeInput value={selectedTime} name={false} onChange={this.updateTime.bind(this)} />
+              <TimeInput value={selectedTime} model={model} field={field} onChange={this.updateTime.bind(this)} />
             </div>
             <i className="help">Port Local Time: {portLocalTime(selectedTime, portId, ports)}</i>
           </div>
