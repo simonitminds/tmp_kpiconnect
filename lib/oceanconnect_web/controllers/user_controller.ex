@@ -9,10 +9,12 @@ defmodule OceanconnectWeb.UserController do
     current_user = Guardian.Plug.current_resource(conn)
     user = Accounts.get_user!(id)
     user_id = user.id
+
     case current_user.id do
       ^user_id ->
         changeset = Accounts.change_user(user)
         render(conn, "edit.html", user: user, changeset: changeset)
+
       _ ->
         conn
         |> put_flash(:warning, "Page not found")
@@ -23,6 +25,7 @@ defmodule OceanconnectWeb.UserController do
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
+
     case Accounts.update_user(user, user_params) do
       {:ok, user} ->
         conn
