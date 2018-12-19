@@ -89,29 +89,47 @@ export default class SolutionDisplay extends React.Component {
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-            { isExpanded
-              ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
-              : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
-            }
-            <span className="is-inline-block">
-              <span className="auction-solution__title__category">{title}</span>
-              <span className="auction-solution__title__description">{solutionTitle()}</span>
-            </span>
-            <MediaQuery query="(max-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+          <div className="auction-solution__header__row">
+            <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
+              { isExpanded
+                ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
+                : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
               }
-            </MediaQuery>
-          </h3>
-          <div className="auction-solution__content">
-            <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
-            ({formatTime(latest_time_entered)})
-            <MediaQuery query="(min-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-              }
-            </MediaQuery>
+              <span className="is-inline-block">
+                <span className="auction-solution__title__category">{title}</span>
+                <span className="auction-solution__title__description">{solutionTitle()}</span>
+              </span>
+              <MediaQuery query="(max-width: 480px)">
+                { acceptable && auctionStatus == 'decision' &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </h3>
+            <div className="auction-solution__content">
+              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
+              ({formatTime(latest_time_entered)})
+              <MediaQuery query="(min-width: 480px)">
+                { acceptable && auctionStatus == 'decision' &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </div>
+          </div>
+          <div className="auction-solution__header__row auction-solution__header__row--preview">
+            <h4 className="has-text-weight-bold">Product Prices</h4>
+            <div className="control">
+              <div className="tags has-addons">
+                <span className="tag is-gray-3 has-text-gold has-padding-right-none"><FontAwesomeIcon icon="crown" /></span>
+                <span className="tag tag--clippable-text is-gray-3 has-family-copy has-text-weight-bold is-capitalized"><span>RMG 380 (2015 Spec)</span></span>
+                <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">$700.00</span>
+              </div>
+            </div>
+            <div className="control">
+              <div className="tags has-addons">
+                <span className="tag tag--clippable-text is-gray-3 has-family-copy has-text-weight-bold is-capitalized"><span>MGO (DMA)</span></span>
+                <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">$500.00</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="auction-solution__body">

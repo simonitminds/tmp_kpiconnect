@@ -2,11 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
-const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, revokable, revokeBid, highlightOwn, auctionPayload}) => {
+const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, revokable, revokeBid, auctionPayload}) => {
   const sortedBids = _.sortBy(bids, [
       ({vessel_fuel_id}) => _.find(vesselFuels, (vf) => vf.id == vessel_fuel_id).vessel_id
     ]);
-
   const supplierName = (bid, selfText) => {
     const supplierText = selfText || "Your Bid";
 
@@ -15,10 +14,6 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
     } else {
       return bid.supplier;
     }
-  }
-
-  const isSupplierBid = (bid) => {
-    return supplierId && bid.supplier_id == supplierId;
   }
 
 
@@ -56,7 +51,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
     const auctionId = auctionPayload.auction.id;
     const vesselFuel = _.find(vesselFuels, ({id}) => `${id}` == productId);
 
-    return confirm(`Are you sure you want to revoke your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId) : false;
+    return confirm(`Are you sure you want to cancel your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId) : false;
   };
 
 
@@ -74,7 +69,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
               const vessel = vesselFuel.vessel;
 
               return (
-                <tr key={bid.id} className={`qa-auction-bid-${bid.id} ${(isSupplierBid(bid) && highlightOwn) ? 'is-yellow' : ''}`}>
+                <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
                   <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
                   { revokable &&
                       <span className={`tag auction-solution__product-table__revoke revoke-bid__button has-margin-left-auto qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
