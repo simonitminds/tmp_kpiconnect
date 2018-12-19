@@ -61,7 +61,7 @@ const AuctionForm = (props) => {
         <div className="container">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Arrival/Departure</legend>
+              <legend className="subtitle is-4" >Port</legend>
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_port_id" className="label">

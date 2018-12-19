@@ -224,6 +224,11 @@ fieldset {
   }
 }
 
+.selected-list__item-title {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
 .selected-list__item-delete {
   margin-left: auto;
   padding-left: 0.75rem;
@@ -251,4 +256,8 @@ fieldset {
 }
 .is-flex-column {
   flex-direction: column;
+}
+
+.is-full-width {
+  width: 100%;
 }

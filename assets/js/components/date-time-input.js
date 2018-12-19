@@ -25,7 +25,7 @@ class DateTimeInput extends React.Component {
     return(
       <React.Fragment>
         <input type="hidden" name={`${fieldName}`} value={selectedTime || ""} />
-        <div className="field is-horizontal">
+        <div className="field is-horizontal has-margin-bottom-xs">
           <div className="field-label">
             <label className="label">{label}</label>
           </div>
@@ -36,6 +36,11 @@ class DateTimeInput extends React.Component {
             <div className="control">
               <TimeInput value={selectedTime} model={model} field={field} onChange={this.updateTime.bind(this)} />
             </div>
+          </div>
+        </div>
+        <div className="field is-horizontal is-full-width">
+          <div className="field-label has-margin-right-md"></div>
+          <div className="field-body">
             <i className="help">Port Local Time: {portLocalTime(selectedTime, portId, ports)}</i>
           </div>
         </div>

@@ -69,7 +69,7 @@ export default class VesselFuelForm extends React.Component {
 
       return (
         <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>
-          {vessel.name}, {vessel.imo}
+          <span className="selected-list__item-title">{vessel.name}, {vessel.imo}</span>
           <span className="selected-list__item-delete" onClick={(ev) => {
               this.removeVessel(vessel.id);
               ev.preventDefault();
