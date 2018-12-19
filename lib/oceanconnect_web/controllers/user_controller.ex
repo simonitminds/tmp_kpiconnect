@@ -2,8 +2,6 @@ defmodule OceanconnectWeb.UserController do
   use OceanconnectWeb, :controller
 
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.User
-  alias OceanconenctWeb.Plugs.Auth
 
   def edit(conn, %{"id" => id}) do
     current_user = Guardian.Plug.current_resource(conn)

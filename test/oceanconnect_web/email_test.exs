@@ -101,7 +101,7 @@ defmodule OceanconnectWeb.EmailTest do
      }}
   end
 
-  describe "emails" do
+  describe "auction notification emails" do
     test "auction invitation email builds for suppliers", %{
       suppliers: suppliers,
       auction: auction,
@@ -322,6 +322,22 @@ defmodule OceanconnectWeb.EmailTest do
         assert buyer_email.html_body =~ Integer.to_string(auction.id)
         assert buyer_email.html_body =~ buyer_company.name
       end
+    end
+  end
+
+  describe "password reset emails" do
+    setup do
+      user = insert(:user)
+
+      {:ok, %{user: user}}
+    end
+
+    test "password reset email builds for the inputted email", %{user: user} do
+      {:ok, token, _claims} = Oceanconnect.Guardian.encode_and_sign(user, %{email: true})
+      password_reset_email = Email.password_reset(user, token)
+
+      assert password_reset_email.to.id == user.id
+      assert password_reset_email.assigns.token == token
     end
   end
 end

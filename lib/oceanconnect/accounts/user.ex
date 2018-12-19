@@ -13,6 +13,7 @@ defmodule Oceanconnect.Accounts.User do
     field(:last_name, :string)
     field(:password_hash, :string)
     field(:password, :string, virtual: true)
+    field(:password_confirmation, :string, virtual: true)
     field(:is_admin, :boolean, default: false)
     field(:is_active, :boolean, default: true)
     field(:impersonated_by, :integer, virtual: true)
@@ -32,9 +33,17 @@ defmodule Oceanconnect.Accounts.User do
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:is_active, :password, :company_id, :is_admin])
-    |> validate_required([:password, :company_id])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :password, :company_id, :is_admin])
+    |> validate_required([:email, :password, :company_id])
     |> foreign_key_constraint(:company_id)
+    |> put_pass_hash()
+  end
+
+  def password_reset_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:password])
+    |> validate_required([:password, :password_confirmation])
+    |> validate_confirmation(:password, message: "Passwords do not match")
     |> put_pass_hash()
   end
 
@@ -88,6 +97,13 @@ defmodule Oceanconnect.Accounts.User do
 
   def full_name(%User{first_name: first_name, last_name: last_name}) do
     "#{first_name} #{last_name}"
+  end
+
+  def email_exists?(email) do
+    case Oceanconnect.Repo.get_by(User, email: String.upcase(email)) do
+      nil -> false
+      %User{} -> true
+    end
   end
 
   defimpl Bamboo.Formatter, for: User do

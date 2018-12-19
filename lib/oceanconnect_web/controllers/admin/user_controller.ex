@@ -31,7 +31,7 @@ defmodule OceanconnectWeb.Admin.UserController do
   def create(conn, %{"user" => user_params}) do
     companies = Accounts.list_active_companies()
 
-    case Accounts.create_user(user_params) do
+    case Accounts.admin_create_user(user_params) do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "User created successfully.")
@@ -53,7 +53,7 @@ defmodule OceanconnectWeb.Admin.UserController do
     user = Accounts.get_user!(id)
     companies = Accounts.list_active_companies()
 
-    case Accounts.update_user(user, user_params) do
+    case Accounts.admin_update_user(user, user_params) do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "User updated successfully.")

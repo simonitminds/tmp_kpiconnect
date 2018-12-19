@@ -1,10 +1,14 @@
-defmodule Oceanconnect.NewSessionPage do
+defmodule Oceanconnect.Session.NewPage do
   @page_path "/sessions/new"
 
   use Oceanconnect.Page
 
   def visit do
     navigate_to(@page_path)
+  end
+
+  def is_current_path? do
+    current_path() == @page_path
   end
 
   def enter_credentials(email, password) do
@@ -21,6 +25,11 @@ defmodule Oceanconnect.NewSessionPage do
     |> click()
 
     find_element(:css, ".qa-logout")
+    |> click()
+  end
+
+  def forgot_password do
+    find_element(:css, ".qa-forgot_password")
     |> click()
   end
 end
