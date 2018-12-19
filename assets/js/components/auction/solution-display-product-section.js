@@ -1,5 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { formatTime, formatPrice } from '../../utilities';
 
 const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, revokable, revokeBid, auctionPayload}) => {
@@ -87,7 +89,14 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, rev
                       : <i>No bid</i>
                     }
                   </td>
-                  <td className="auction-solution__product-table__supplier"><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
+                  <td className="auction-solution__product-table__supplier"><span className="qa-auction-bid-supplier">
+                    { supplierName(bid) == "Your Bid" ?
+                      <span className="tag auction-solution__your-bid-tag">
+                        { supplierName(bid) }
+                      </span>:
+                      supplierName(bid)
+                    }
+                    </span></td>
                   <td className="auction-solution__product-table__bid-time"><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
                   { revokable &&
                     <td className="auction-solution__product-table__revoke">

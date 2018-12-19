@@ -28,11 +28,11 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
           <div className="control has-margin-top-sm">
-            <div className="tags has-addons">
-              <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized">Bid to Beat:</span>
+            <div className="tags auction-bidding__best-price has-addons">
+              <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">Bid to Beat:</span>
               { lowestFuelBid
-                ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">${formatPrice(lowestFuelBid.amount)}</span>
-                : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized"><i>None</i></span>
+                ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">${formatPrice(lowestFuelBid.amount)}</span>
+                : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
               }
 
             </div>
