@@ -183,16 +183,15 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           }
           { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
         </div>
-        { auctionStatus == 'pending' ?
-          <div className="card-content__products">
-          { window.isAdmin &&
-            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
-              <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
-            </a>
-          }
-          </div>
-          :
-          <div className="is-none"></div>
+        { auctionStatus == 'pending'
+          ? <div className="card-content__products">
+              { window.isAdmin &&
+                <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
+                  <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
+                </a>
+              }
+            </div>
+          : <div className="is-none"></div>
         }
 
         <div>

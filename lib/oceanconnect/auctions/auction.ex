@@ -34,8 +34,6 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     field(:po, :string)
     field(:port_agent, :string)
-    field(:eta, :utc_datetime_usec)
-    field(:etd, :utc_datetime_usec)
     field(:scheduled_start, :utc_datetime_usec)
     field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
@@ -63,7 +61,6 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   @required_fields [
-    :eta,
     :port_id
   ]
 
@@ -76,7 +73,6 @@ defmodule Oceanconnect.Auctions.Auction do
     :decision_duration,
     :duration,
     :is_traded_bid_allowed,
-    :etd,
     :po,
     :port_agent,
     :scheduled_start
@@ -181,8 +177,6 @@ defmodule Oceanconnect.Auctions.Auction do
   def from_params(params) do
     params
     |> maybe_parse_date_field("scheduled_start")
-    |> maybe_parse_date_field("eta")
-    |> maybe_parse_date_field("etd")
     |> maybe_convert_checkbox("is_traded_bid_allowed")
     |> maybe_convert_checkbox("anonymous_bidding")
     |> maybe_convert_duration("duration")
@@ -249,6 +243,7 @@ defmodule Oceanconnect.Auctions.Auction do
   defp parse_duration(duration) when is_integer(duration), do: duration
 
   def parse_date(""), do: ""
+  def parse_date(nil), do: ""
 
   def parse_date(epoch) do
     epoch

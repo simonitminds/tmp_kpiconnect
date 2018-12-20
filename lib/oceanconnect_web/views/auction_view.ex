@@ -42,8 +42,6 @@ defmodule OceanconnectWeb.AuctionView do
     %{
       po: auction_map.po,
       port_agent: auction_map.port_agent,
-      eta: auction_map.eta,
-      etd: auction_map.etd,
       scheduled_start: auction_map.scheduled_start,
       auction_started: auction_map.auction_started,
       auction_ended: auction_map.auction_ended,

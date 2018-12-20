@@ -56,7 +56,6 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         auction
         |> Map.take([
           :scheduled_start,
-          :eta,
           :fuel_id,
           :port_id,
           :auction_vessel_fuels,

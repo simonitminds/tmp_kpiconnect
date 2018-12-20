@@ -26,7 +26,15 @@ export const formatUTCDateTime = (dateTime) => {
   if (dateTime) {
     return `${formatDateTime(moment(dateTime).utc())} GMT`;
   } else {
-    return "Not Scheduled"
+    return "Not Scheduled";
+  }
+}
+
+export const formatUTCDate = (date) => {
+  if (date) {
+    return `${formatDateTime(moment(date).utc())} GMT`;
+  } else {
+    return "Not Scheduled";
   }
 }
 
@@ -34,7 +42,15 @@ export const formatDateTime = (dateTime) => {
   if (dateTime) {
     return moment(dateTime).format("DD/MM/YYYY HH:mm");
   } else {
-    return ""
+    return "";
+  }
+}
+
+export const formatDate = (date) => {
+  if (date) {
+    return moment(date).format("DD/MM/YYYY");
+  } else {
+    return "";
   }
 }
 
@@ -42,7 +58,7 @@ export const formatTime = (dateTime) => {
   if (dateTime) {
     return moment(dateTime).utc().format("HH:mm:ss");
   } else {
-    return ""
+    return "";
   }
 }
 

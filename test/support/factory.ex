@@ -26,7 +26,6 @@ defmodule Oceanconnect.Factory do
 
   def draft_auction_factory() do
     %Oceanconnect.Auctions.Auction{
-      eta: DateTime.utc_now(),
       port: build(:port)
     }
   end
@@ -55,7 +54,9 @@ defmodule Oceanconnect.Factory do
     %Oceanconnect.Auctions.AuctionVesselFuel{
       vessel: build(:vessel),
       fuel: build(:fuel),
-      quantity: 1500
+      quantity: 1500,
+      eta: DateTime.utc_now(),
+      etd: DateTime.utc_now()
     }
   end
 

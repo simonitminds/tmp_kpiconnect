@@ -57,7 +57,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   test "draft status of draft auction" do
     auction_attrs =
       insert(:auction)
-      |> Map.take([:eta, :port_id, :vessel_id])
+      |> Map.take([:port_id, :vessel_id])
 
     {:ok, auction} = Auctions.create_auction(auction_attrs)
     # create_action has the side effect of starting the AuctionsSupervisor, thus the sleep
