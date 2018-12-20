@@ -24,7 +24,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" />
             }
             { bestSingleSupplier && fuels && fuels.length > 1 &&
-              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={true} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`}/>
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={false} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`}/>
             }
             { !bestSolution &&
               <div className="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
@@ -36,7 +36,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">Your {auctionStatus == 'pending' ? 'Opening Offer' : 'Best Offer'}</h3>
           { suppliersBestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} supplierId={supplierId} revokeBid={revokeBid} title="Your Best Offer" />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={false} supplierId={supplierId} revokeBid={revokeBid} title="Your Best Offer" />
           }
           { !suppliersBestSolution &&
             <div className="auction-table-placeholder"><i>You have not bid on this auction</i></div>

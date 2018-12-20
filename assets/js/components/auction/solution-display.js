@@ -6,6 +6,7 @@ import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
 import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
+import BidTag from './bid-tag';
 
 export default class SolutionDisplay extends React.Component {
   constructor(props) {
@@ -70,6 +71,12 @@ export default class SolutionDisplay extends React.Component {
       }, {})
       .value();
 
+    const lowestFuelBids = _.chain(bidsByFuel)
+      .reduce((acc, bids, fuel) => {
+        acc[fuel] = _.minBy(bids,'amount');
+        return acc;
+      }, {})
+      .value();
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -117,19 +124,15 @@ export default class SolutionDisplay extends React.Component {
           </div>
           <div className="auction-solution__header__row auction-solution__header__row--preview">
             <h4 className="has-text-weight-bold">Product Prices</h4>
-            <div className="control">
-              <div className="tags has-addons">
-                <span className="tag is-gray-3 has-text-gold has-padding-right-none"><FontAwesomeIcon icon="crown" /></span>
-                <span className="tag tag--clippable-text is-gray-3 has-family-copy has-text-weight-bold is-capitalized"><span>RMG 380 (2015 Spec)</span></span>
-                <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">$700.00</span>
-              </div>
-            </div>
-            <div className="control">
-              <div className="tags has-addons">
-                <span className="tag tag--clippable-text is-gray-3 has-family-copy has-text-weight-bold is-capitalized"><span>MGO (DMA)</span></span>
-                <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">$500.00</span>
-              </div>
-            </div>
+            { _.map(lowestFuelBids, (bid, fuel) => {
+                const highlight = bid.supplier_id == supplierId;
+                return(
+                  <div className="control" key={fuel}>
+                    <BidTag title={fuel} highlightOwn={highlight} bid={bid}/>
+                  </div>
+                )
+              })
+            }
           </div>
         </div>
         <div className="auction-solution__body">

@@ -3,8 +3,10 @@ import _ from 'lodash';
 import { formatPrice } from '../../utilities';
 import CheckBoxField from '../check-box-field';
 import MediaQuery from 'react-responsive';
+import BidTag from './bid-tag';
 
-const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
+
+const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierId}) => {
   const isMultiProduct = _.get(auctionPayload, 'auction.fuels', []).length > 1;
 
   const {id: fuelId, name} = fuel;
@@ -28,14 +30,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
           <div className="control has-margin-top-sm">
-            <div className="tags auction-bidding__best-price has-addons">
-              <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">Bid to Beat:</span>
-              { lowestFuelBid
-                ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">${formatPrice(lowestFuelBid.amount)}</span>
-                : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
-              }
-
-            </div>
+            <BidTag bid={lowestFuelBid} title="Bid to Beat" highlightOwn={lowestFuelBid.supplier_id == supplierId} />
           </div>
         </div>
         <div className="column">
