@@ -22,6 +22,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
     .minBy('amount')
     .value();
 
+  const hasLowestBid = lowestFuelBid && (lowestFuelBid.supplier_id == supplierId)
+
 
   return(
     <div className="auction-bidding__product-group has-margin-bottom-md">
@@ -30,7 +32,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
           <div className="control has-margin-top-sm">
-            <BidTag bid={lowestFuelBid} title="Bid to Beat" highlightOwn={lowestFuelBid.supplier_id == supplierId} />
+            <BidTag bid={lowestFuelBid} title="Bid to Beat" highlightOwn={hasLowestBid} />
           </div>
         </div>
         <div className="column">
