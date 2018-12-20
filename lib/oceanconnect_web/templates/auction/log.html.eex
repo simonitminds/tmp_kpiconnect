@@ -44,8 +44,16 @@
             <td><%= @auction_payload.auction.port_agent || "—" %></td>
           </tr>
           <tr>
-            <th>ETA</th>
-            <td><%= @auction_payload.auction.eta %></td>
+            <th>ETA/ETD</th>
+            <td>
+              <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction_payload.auction) do %>
+                <p class="qa-auction-etas-<%= vessel.id %> has-margin-bottom-sm">
+                  <span class="qa-auction-etas-<%= vessel.id %>-vessel"><%= vessel.name %></span>
+                  (<span class="qa-auction-etas-<%= vessel.id %>-eta"><%= convert_date?(eta, "Not Specified") %></span>
+                  &ndash;
+                  <span class="qa-auction-etas-<%= vessel.id %>-etd"><%= convert_date?(etd, "Not Specified") %></span>)
+                </p>
+              <% end %>
           </tr>
           <tr>
             <th>Deliverables</th>

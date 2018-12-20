@@ -596,7 +596,6 @@ auctions_params = [
       %AuctionVesselFuel{vessel_id: vessel1.id, fuel_id: fuel1.id, quantity: 1500, eta: date_time}
     ],
     port_id: port1.id,
-    eta: date_time,
     scheduled_start: date_time,
     po: "1234567",
     buyer_id: nigeria.id,
@@ -608,7 +607,6 @@ auctions_params = [
       %AuctionVesselFuel{vessel_id: hd(vessels).id, fuel_id: fuel1.id, quantity: 1500, eta: date_time}
     ],
     port_id: fujairah.id,
-    eta: date_time,
     scheduled_start: date_time,
     po: "2345678",
     buyer_id: chevron.id,
@@ -626,7 +624,6 @@ auctions_params = [
       %AuctionVesselFuel{vessel_id: List.last(vessels).id, fuel_id: hd(fuels).id, quantity: 1000, eta: date_time}
     ],
     port_id: port1.id,
-    eta: date_time,
     scheduled_start: date_time,
     po: "3456789",
     buyer_id: qatargas.id,

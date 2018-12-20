@@ -15,7 +15,12 @@
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel:</b> <%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port:</b> <%= @auction.port.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port Agent:</b> <%= @auction.port_agent %></p>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>ETA/ETD:</b> <%= convert_date?(@auction.eta) %> / <%= convert_date?(@auction.etd) %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessels (ETA/ETD):</b>
+      <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction) do %>
+        <p style="margin-top: 0.25rem;">
+          <%= vessel.name %> (<%= convert_date?(eta, "Not Specified") %> &ndash; <%= convert_date?(etd, "Not Specified") %>)
+        </p>
+      <% end %>
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Approved Barges</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>

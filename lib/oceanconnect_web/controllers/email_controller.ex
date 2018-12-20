@@ -5,8 +5,10 @@ defmodule OceanconnectWeb.EmailController do
   alias Oceanconnect.{Auctions}
   alias Oceanconnect.Auctions.AuctionBid
 
+  @test_auction_id 1
+
   def send_invitation(conn, _) do
-    auction = Oceanconnect.Auctions.get_auction(1) |> Oceanconnect.Auctions.fully_loaded()
+    auction = Oceanconnect.Auctions.get_auction!(@test_auction_id) |> Oceanconnect.Auctions.fully_loaded()
     supplier_emails = Email.auction_invitation(auction)
 
     for email <- supplier_emails do
@@ -18,7 +20,7 @@ defmodule OceanconnectWeb.EmailController do
   end
 
   def send_upcoming(conn, _) do
-    auction = Oceanconnect.Auctions.get_auction(1) |> Oceanconnect.Auctions.fully_loaded()
+    auction = Oceanconnect.Auctions.get_auction!(@test_auction_id) |> Oceanconnect.Auctions.fully_loaded()
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       Email.auction_starting_soon(auction)
@@ -34,7 +36,7 @@ defmodule OceanconnectWeb.EmailController do
   end
 
   def send_cancellation(conn, _) do
-    auction = Oceanconnect.Auctions.get_auction!(1) |> Oceanconnect.Auctions.fully_loaded()
+    auction = Oceanconnect.Auctions.get_auction!(@test_auction_id) |> Oceanconnect.Auctions.fully_loaded()
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       Email.auction_canceled(auction)
@@ -50,7 +52,7 @@ defmodule OceanconnectWeb.EmailController do
   end
 
   def send_completion(conn, _) do
-    auction = Oceanconnect.Auctions.get_auction!(3) |> Oceanconnect.Auctions.fully_loaded()
+    auction = Oceanconnect.Auctions.get_auction!(@test_auction_id) |> Oceanconnect.Auctions.fully_loaded()
     winning_supplier_company2 = List.last(auction.suppliers)
     vessel_fuels = auction.auction_vessel_fuels
 
@@ -74,15 +76,13 @@ defmodule OceanconnectWeb.EmailController do
         end)
     }
 
-    %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
+    emails =
       Email.auction_closed(
         winning_solution.bids,
         approved_barges,
         auction,
         Auctions.active_participants(auction.id)
       )
-
-    emails = List.flatten([supplier_emails | buyer_emails])
 
     for email <- emails do
       Mailer.deliver_now(email)
