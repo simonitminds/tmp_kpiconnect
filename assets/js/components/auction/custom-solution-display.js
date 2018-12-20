@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SolutionAcceptDisplay from './solution-accept-display';
 import MediaQuery from 'react-responsive';
 
@@ -98,7 +99,9 @@ export default class CustomSolutionDisplay extends React.Component {
         <span>
           { bid.is_traded_bid ?
             <span className="auction__traded-bid-tag">
-              <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+              <span action-label="Traded Bid" className="auction__traded-bid-marker">
+                <FontAwesomeIcon icon="exchange-alt" />
+              </span>
               <span className="has-padding-left-sm">Traded Bid</span>
             </span>
           : "" }
@@ -167,8 +170,8 @@ export default class CustomSolutionDisplay extends React.Component {
         <div className="auction-solution__header auction-solution__header--bordered">
           <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
             {isExpanded ?
-              <i className="fas fa-minus has-padding-right-md"></i>:
-              <i className="fas fa-plus has-padding-right-md"></i>
+              <FontAwesomeIcon icon="minus" className="has-padding-right-md" />:
+              <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
             }
             <span className="is-inline-block">
               <span className="auction-solution__title__category">{title}</span>

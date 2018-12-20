@@ -36,7 +36,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">Your {auctionStatus == 'pending' ? 'Opening Offer' : 'Best Offer'}</h3>
           { suppliersBestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={false} supplierId={supplierId} revokeBid={revokeBid} title="Your Best Offer" />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} supplierId={supplierId} revokeBid={revokeBid} title="Your Best Offer" / >
           }
           { !suppliersBestSolution &&
             <div className="auction-table-placeholder"><i>You have not bid on this auction</i></div>

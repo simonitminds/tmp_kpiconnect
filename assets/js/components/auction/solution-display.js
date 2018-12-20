@@ -127,7 +127,7 @@ export default class SolutionDisplay extends React.Component {
             { _.map(lowestFuelBids, (bid, fuel) => {
                 const highlight = highlightOwn && supplierId && (bid.supplier_id == supplierId);
                 return(
-                  <div className="control" key={fuel}>
+                  <div className="control has-margin-bottom-none" key={fuel}>
                     <BidTag title={fuel} highlightOwn={highlight} bid={bid}/>
                   </div>
                 )

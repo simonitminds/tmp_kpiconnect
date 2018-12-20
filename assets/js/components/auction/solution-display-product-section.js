@@ -24,7 +24,9 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
       <span>
         { bid.is_traded_bid
           ? <span className="auction__traded-bid-tag">
-              <i action-label="Traded Bid" className="fas fa-exchange-alt auction__traded-bid-marker"></i>
+              <span action-label="Traded Bid" className="auction__traded-bid-marker">
+                <FontAwesomeIcon icon="exchange-alt" />
+              </span>
               <span className="has-padding-left-sm">Traded Bid</span>
             </span>
           : ""
@@ -38,7 +40,9 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
       <span>
         { bid.allow_split == false
           ? <span className="auction__nonsplittable-bid-tag">
-              <i action-label="Can't Be Split" className="fas fa-ban auction__nonsplittable-bid-marker"></i>
+              <span action-label="Can't Be Split" className="auction__nonsplittable-bid-marker">
+                <FontAwesomeIcon icon="ban" />
+              </span>
               <span className="has-padding-left-sm">Unsplittable</span>
             </span>
           : ""
@@ -75,7 +79,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
                   <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
                   { revokable &&
                       <span className={`tag auction-solution__product-table__revoke revoke-bid__button has-margin-left-auto qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
-                        <i className="fas fa-times"></i>
+                        <FontAwesomeIcon icon="times" />
                       </span>
                   }
                   </td>
@@ -101,7 +105,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
                   { revokable &&
                     <td className="auction-solution__product-table__revoke">
                       <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
-                        <i className="fas fa-times"></i>
+                        <FontAwesomeIcon icon="times" />
                       </span>
                     </td>
                   }
