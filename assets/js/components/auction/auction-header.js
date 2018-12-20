@@ -62,7 +62,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                         })
                       }
                       { auction.is_traded_bid_allowed &&
-                        <span> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3 auction__traded-bid-accepted-marker" action-label="Traded Bids Accepted" />
+                        <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
                         </span>
                       }
                       <span className="auction-header__company">{auction.buyer.name}</span>

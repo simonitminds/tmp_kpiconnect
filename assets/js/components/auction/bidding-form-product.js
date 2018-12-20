@@ -3,8 +3,11 @@ import _ from 'lodash';
 import { formatPrice } from '../../utilities';
 import CheckBoxField from '../check-box-field';
 import MediaQuery from 'react-responsive';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import BidTag from './bid-tag';
 
-const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
+
+const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierId}) => {
   const isMultiProduct = _.get(auctionPayload, 'auction.fuels', []).length > 1;
 
   const {id: fuelId, name} = fuel;
@@ -20,6 +23,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
     .minBy('amount')
     .value();
 
+  const hasLowestBid = lowestFuelBid && (lowestFuelBid.supplier_id == supplierId)
+
 
   return(
     <div className="auction-bidding__product-group has-margin-bottom-md">
@@ -27,15 +32,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {totalQuantity} MT </span><br/>
-          <div className="control has-margin-top-sm">
-            <div className="tags has-addons">
-              <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized">Bid to Beat:</span>
-              { lowestFuelBid
-                ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized">${formatPrice(lowestFuelBid.amount)}</span>
-                : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized"><i>None</i></span>
-              }
-
-            </div>
+          <div className="control control--flex-limit has-margin-top-sm">
+            <BidTag bid={lowestFuelBid} title="Bid to Beat" highlightOwn={hasLowestBid} />
           </div>
         </div>
         <div className="column">
@@ -44,7 +42,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
               <div className="field">
                 <label className="label" htmlFor="bid">Bid Amount</label>
                 <div className="control auction-bidding__input has-icons-left">
-                  <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                  <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                   <input
                     type="number"
                     step="0.25"
@@ -74,7 +72,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
                     data-fuel-input
                     data-fuel={fuelId}
                   />
-                  <span className="icon is-small is-left"><i className="fas fa-dollar-sign"></i></span>
+                  <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                 </div>
               </div>
             </div>
@@ -84,7 +82,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate}) => {
           ? <div className="column is-narrow">
               <label className="checkbox">
                 <input type="checkbox" className="qa-auction-bid-allow_split" name="allow_split" defaultChecked={true} data-fuel-input data-fuel={fuelId}/> Split?
-                <i className="auction__split-bid-help fas fa-question-circle has-text-gray-3 has-margin-left-sm" action-label="Allow Split with Other Supplier Offers"></i>
+                <span action-label="Allow Split with Other Supplier Offers" className="auction__split-bid-help"><FontAwesomeIcon icon="question-circle" className="has-text-gray-3 has-margin-left-sm"  /></span>
               </label>
             </div>
           : <input type="hidden" className="qa-auction-bid-allow_split" name="allow_split" value="true" />

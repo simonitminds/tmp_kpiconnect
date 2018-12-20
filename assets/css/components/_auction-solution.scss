@@ -21,11 +21,54 @@
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
+    flex-direction: column;
 
     @media (max-width: 480px) {
       flex-direction: column;
     }
   }
+
+  .auction-solution__header__row {
+    display: flex;
+    width: 100%;
+  }
+
+  .auction-solution__header__row--preview {
+    margin: 0.5rem -1rem -0.75rem -1rem;
+    width: calc(100% + 2rem);
+    padding: 0.75rem 1rem 0.25rem 1rem;
+    background-color: $gray-2;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &> * {
+      margin-bottom: 0.5rem;
+    }
+
+    &> *:not(:last-child) {
+      margin-right: 1rem;
+    }
+
+    &> .control {
+      max-width: 100%;
+    }
+
+    .tags {
+      flex-wrap: nowrap;
+    }
+
+    .tag--clippable-text {
+      flex: 1;
+      min-width: 0;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
   .auction-solution__title {
     display: flex;
     align-items: center;
@@ -134,7 +177,7 @@
   width: calc(100% + 2rem);
   margin-left: -1rem;
   margin-right: -1rem;
-  padding: 0.25rem 1rem 0.5rem 1rem;
+  padding: 0.25rem 1rem 0.75rem 1rem;
   border-bottom: 4px solid $teal;
   transition: border-bottom 0.4s ease, padding-bottom 0.4s ease;
 }
@@ -263,6 +306,13 @@
   text-align: center;
 }
 
+.auction-solution__your-bid-tag {
+  margin-left: -0.5rem;
+  background-color: $yellow !important;
+  font-family: $family-sans-serif !important;
+  text-transform: capitalize !important;
+}
+
 .auction-bidding__vessels {
   background-color: $gray-2;
   margin: 0 !important;
@@ -275,6 +325,52 @@
 
   @media (max-width: 768px) {
     margin-bottom: 1rem !important;
+  }
+}
+
+.control--flex-limit > .auction-bidding__best-price {
+  .tag:first-child { // Label
+    max-width: 115px;
+  }
+}
+
+.auction-bidding__best-price {
+  margin-bottom: 0.5rem !important;
+
+  .tag:first-child { // Label
+    min-width: 0;
+    flex: 1;
+
+    span.truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .tag:last-child { // Price
+    border-radius: 0 !important;
+    border-bottom-left-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+  }
+
+  @media(max-width: 1280px) and (min-width: 1088px) {
+    flex-direction: column;
+    align-items: flex-start !important;
+
+    .tag {
+      width: 100px;
+    }
+
+    .tag:first-child { // Label
+      border-radius: 0 !important;
+      border-top-left-radius: 3px !important;
+      border-top-right-radius: 3px !important;
+    }
+    .tag:last-child { // Price
+      border-radius: 0 !important;
+      border-bottom-left-radius: 3px !important;
+      border-bottom-right-radius: 3px !important;
+    }
   }
 }
 

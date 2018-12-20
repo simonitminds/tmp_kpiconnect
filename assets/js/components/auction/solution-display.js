@@ -6,6 +6,7 @@ import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
 import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
+import BidTag from './bid-tag';
 
 export default class SolutionDisplay extends React.Component {
   constructor(props) {
@@ -43,7 +44,7 @@ export default class SolutionDisplay extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, best, children, className} = this.props;
+    const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, children, className} = this.props;
     const isSupplier = !!supplierId;
     const auctionStatus = auctionPayload.status;
     const auctionBarges = _.get(auctionPayload, 'submitted_barges');
@@ -70,6 +71,12 @@ export default class SolutionDisplay extends React.Component {
       }, {})
       .value();
 
+    const lowestFuelBids = _.chain(bidsByFuel)
+      .reduce((acc, bids, fuel) => {
+        acc[fuel] = _.minBy(bids,'amount');
+        return acc;
+      }, {})
+      .value();
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -89,29 +96,43 @@ export default class SolutionDisplay extends React.Component {
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
         <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-            { isExpanded
-              ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
-              : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
+          <div className="auction-solution__header__row">
+            <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
+              { isExpanded
+                ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
+                : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
+              }
+              <span className="is-inline-block">
+                <span className="auction-solution__title__category">{title}</span>
+                <span className="auction-solution__title__description">{solutionTitle()}</span>
+              </span>
+              <MediaQuery query="(max-width: 480px)">
+                { acceptable && auctionStatus == 'decision' &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </h3>
+            <div className="auction-solution__content">
+              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
+              ({formatTime(latest_time_entered)})
+              <MediaQuery query="(min-width: 480px)">
+                { acceptable && auctionStatus == 'decision' &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </div>
+          </div>
+          <div className="auction-solution__header__row auction-solution__header__row--preview">
+            <h4 className="has-text-weight-bold">Product Prices</h4>
+            { _.map(lowestFuelBids, (bid, fuel) => {
+                const highlight = highlightOwn && supplierId && (bid.supplier_id == supplierId);
+                return(
+                  <div className="control has-margin-bottom-none" key={fuel}>
+                    <BidTag title={fuel} highlightOwn={highlight} bid={bid}/>
+                  </div>
+                )
+              })
             }
-            <span className="is-inline-block">
-              <span className="auction-solution__title__category">{title}</span>
-              <span className="auction-solution__title__description">{solutionTitle()}</span>
-            </span>
-            <MediaQuery query="(max-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-              }
-            </MediaQuery>
-          </h3>
-          <div className="auction-solution__content">
-            <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
-            ({formatTime(latest_time_entered)})
-            <MediaQuery query="(min-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-              }
-            </MediaQuery>
           </div>
         </div>
         <div className="auction-solution__body">
@@ -124,7 +145,17 @@ export default class SolutionDisplay extends React.Component {
           { _.map(bidsByFuel, (bids, fuelName) => {
               const fuel = _.find(fuels, {name: fuelName});
               return (
-                <SolutionDisplayProductSection key={fuelName} fuel={fuel} bids={bids} vesselFuels={vesselFuels} supplierId={supplierId} revokable={revokable} revokeBid={revokeBid} auctionPayload={auctionPayload} />
+                <SolutionDisplayProductSection
+                  key={fuelName}
+                  fuel={fuel}
+                  bids={bids}
+                  vesselFuels={vesselFuels}
+                  supplierId={supplierId}
+                  revokable={revokable}
+                  revokeBid={revokeBid}
+                  highlightOwn={highlightOwn}
+                  auctionPayload={auctionPayload}
+                />
               );
             })
           }

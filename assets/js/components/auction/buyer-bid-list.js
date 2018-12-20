@@ -53,7 +53,9 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
                               <span className="qa-auction-bid-is_traded_bid">
                                 {is_traded_bid &&
                                   <span className="auction__traded-bid-tag">
-                                    <FontAwesomeIcon icon="exchange-alt" className="auction__traded-bid-marker" action-label="Traded Bid" />
+                                    <span action-label="Traded Bid" className="auction__traded-bid-marker">
+                                      <FontAwesomeIcon icon="exchange-alt" />
+                                    </span>
                                     <span className="has-padding-left-sm">Traded Bid</span>
                                   </span>
                                 }

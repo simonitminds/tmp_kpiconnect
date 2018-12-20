@@ -73,7 +73,7 @@ class BiddingForm extends React.Component {
   }
 
   render(){
-    const {auctionPayload, revokeBid, barges} = this.props;
+    const {auctionPayload, revokeBid, barges, supplierId} = this.props;
     const {isSubmittable} = this.state;
     const fuels = _.get(auctionPayload, 'auction.fuels');
     const auction = auctionPayload.auction;
@@ -114,6 +114,7 @@ class BiddingForm extends React.Component {
                     key={fuel.id}
                     fuel={fuel}
                     auctionPayload={auctionPayload}
+                    supplierId={supplierId}
                     onRevoke={revokeBid}
                     onUpdate={this.updateSubmittability.bind(this)}
                   />
