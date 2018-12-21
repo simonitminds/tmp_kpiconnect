@@ -74,10 +74,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil}
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -91,10 +90,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id}
+          %{"vessel_id" => vessel.id, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -108,10 +106,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"fuel_id" => fuel.id}
+          %{"fuel_id" => fuel.id, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -126,10 +123,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil}
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -143,10 +139,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => nil, "fuel_id" => fuel.id, "quantity" => 1500}
+          %{"vessel_id" => nil, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -160,10 +155,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => nil, "quantity" => 1500}
+          %{"vessel_id" => vessel.id, "fuel_id" => nil, "quantity" => 1500, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -178,10 +172,9 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       params = %{
         "port_id" => port.id,
-        "eta" => DateTime.utc_now(),
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => 1500}
+          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
         ]
       }
 
@@ -257,7 +250,7 @@ defmodule Oceanconnect.AuctionsTest do
       auction_attrs =
         auction_with_participants
         |> Map.take(
-          [:scheduled_start, :eta, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
+          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
             Map.keys(@valid_attrs)
         )
 
@@ -295,7 +288,7 @@ defmodule Oceanconnect.AuctionsTest do
       auction_attrs =
         auction_with_participants
         |> Map.take(
-          [:scheduled_start, :eta, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
+          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
             Map.keys(@valid_attrs)
         )
 

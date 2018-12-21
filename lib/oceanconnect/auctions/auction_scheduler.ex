@@ -81,7 +81,6 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
         state = %{scheduled_start: scheduled_start},
         _emit
       ) do
-    IO.inspect("HEEEEEY")
     {:noreply, state}
   end
 
@@ -115,7 +114,6 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
         state = %{timer_ref: timer_ref}
       ) do
     cancel_timer(timer_ref)
-    IO.inspect("BBBB")
 
     new_state =
       state

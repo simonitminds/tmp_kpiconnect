@@ -34,8 +34,6 @@ defmodule Oceanconnect.Auctions.Auction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     field(:po, :string)
     field(:port_agent, :string)
-    field(:eta, :utc_datetime_usec)
-    field(:etd, :utc_datetime_usec)
     field(:scheduled_start, :utc_datetime_usec)
     field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
@@ -63,7 +61,6 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   @required_fields [
-    :eta,
     :port_id
   ]
 
@@ -75,7 +72,6 @@ defmodule Oceanconnect.Auctions.Auction do
     :buyer_id,
     :decision_duration,
     :duration,
-    :etd,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
@@ -183,8 +179,6 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_parse_date_field("scheduled_start")
     |> maybe_convert_checkbox("is_traded_bid_allowed")
     |> maybe_convert_checkbox("anonymous_bidding")
-    |> maybe_parse_date_field("eta")
-    |> maybe_parse_date_field("etd")
     |> maybe_convert_duration("duration")
     |> maybe_convert_duration("decision_duration")
     |> maybe_load_suppliers("suppliers")
@@ -249,6 +243,7 @@ defmodule Oceanconnect.Auctions.Auction do
   defp parse_duration(duration) when is_integer(duration), do: duration
 
   def parse_date(""), do: ""
+  def parse_date(nil), do: ""
 
   def parse_date(epoch) do
     epoch
@@ -293,6 +288,8 @@ defmodule Oceanconnect.Auctions.Auction do
         changeset
     end
   end
+
+  defp maybe_convert_start_time(""), do: nil
 
   defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
     {_, scheduled_start, _} = DateTime.from_iso8601(scheduled_start)

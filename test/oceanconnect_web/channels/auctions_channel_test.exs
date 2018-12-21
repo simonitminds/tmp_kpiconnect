@@ -70,7 +70,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
 
       @endpoint.subscribe(channel)
 
-      auction_attrs = auction |> Map.take([:eta, :port_id, :vessel_id, :suppliers])
+      auction_attrs = auction |> Map.take([:port_id, :vessel_id, :suppliers])
       Auctions.create_auction(auction_attrs)
 
       receive do
@@ -94,7 +94,6 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         auction
         |> Map.take([
           :scheduled_start,
-          :eta,
           :fuel_id,
           :fuel_quantity,
           :port_id,

@@ -23,8 +23,10 @@ export default class DateInput extends React.Component {
 
   render(){
     const {
-      model, field, labelText, value, onChange
+      model, field, labelText, value, name, onChange
     } = this.props;
+
+    const fieldName = name === false ? "" : name || `${model}_${field}_date`;
 
     return(
       <div>
@@ -33,7 +35,7 @@ export default class DateInput extends React.Component {
         </label> */}
         <div className={`control qa-${model}-${field}_date`}>
           <SingleDatePicker
-            id={`${model}_${field}_date`}
+            id={fieldName}
             date={this.state.date}
             onDateChange={date => {
                 if (date) {

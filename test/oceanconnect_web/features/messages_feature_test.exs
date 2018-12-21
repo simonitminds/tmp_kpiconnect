@@ -7,16 +7,13 @@ defmodule Oceanconnect.MessagesFeatureTest do
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
-    vessel = insert(:vessel)
-    fuel = insert(:fuel)
 
     auction =
       :auction
       |> insert(
         buyer: buyer_company,
         suppliers: [supplier_company],
-        vessels: [vessel],
-        auction_vessel_fuels: [build(:vessel_fuel, vessel: vessel, fuel: fuel)]
+        auction_vessel_fuels: [build(:vessel_fuel)]
       )
       |> Auctions.fully_loaded()
 
@@ -39,7 +36,7 @@ defmodule Oceanconnect.MessagesFeatureTest do
 
       login_user(buyer)
       AuctionIndexPage.visit()
-      {:ok, %{auction: auction}}
+      {:ok, %{auction: auction, buyer: buyer}}
     end
 
     test "buyer can see a list of all participating auctions in the chat window", %{
@@ -50,7 +47,7 @@ defmodule Oceanconnect.MessagesFeatureTest do
       assert MessagesPage.has_participating_auctions?([auction])
     end
 
-    test "buyer can see chat window on show page with all auctions", %{auction: auction} do
+    test "buyer can see chat window on show page with all auctions", %{auction: auction, buyer: buyer} do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.is_current_path?(auction.id)
       MessagesPage.open_message_window()
@@ -84,20 +81,6 @@ defmodule Oceanconnect.MessagesFeatureTest do
       assert AuctionShowPage.is_current_path?(auction.id)
       MessagesPage.open_message_window()
       assert MessagesPage.has_participating_auctions?([auction])
-    end
-
-    test "unseen messages are marked as seen when recipient expands conversation", %{
-      auction: _auction,
-      messages: _messages
-    } do
-      # AuctionShowPage.visit(auction.id)
-      # assert AuctionShowPage.is_current_path?(auction.id)
-      # MessagesPage.open_message_window()
-      # MessagesPage.open_auction_message_payload(auction.id)
-      # assert MessagesPage.auction_conversation_unseen_count(auction.id, auction.buyer.name) == "3"
-      # MessagesPage.open_auction_conversation(auction.id, auction.buyer.name)
-      # assert Enum.all?(messages, &MessagesPage.message_is_unseen?(&1))
-      IO.inspect("Pending...")
     end
   end
 end

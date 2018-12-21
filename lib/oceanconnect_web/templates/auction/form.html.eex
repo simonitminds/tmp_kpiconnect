@@ -5,7 +5,7 @@
     <div class="container is-fullhd">
       <div class="content has-margin-top-lg">
         <div class="alert alert-danger">
-          <p class="help is-danger">To save a future requirement auction, be sure a <strong>Port</strong> and <strong>ETA</strong> are specified. To schedule an auction, <strong>Auction Start</strong>, <strong>Fuel</strong> and <strong>Fuel Quantity</strong> also need to be specified.</p>
+          <p class="help is-danger">To save a future requirement auction, specify a <strong>Port</strong>, at least one <strong>Vessel</strong> with an ETA, and at least one <strong>Fuel</strong> with a Quantity. To schedule an auction, <strong>Auction Start</strong> also needs to be specified.</p>
         </div>
       </div>
     </div>
@@ -36,7 +36,9 @@
 </div>
 <script>
   function debouncedSubmit(e) {
+    if(!e) return;
     e.preventDefault();
+
     var timeout;
     clearTimeout(timeout);
     if (!timeout) {

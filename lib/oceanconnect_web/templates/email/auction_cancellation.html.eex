@@ -13,17 +13,24 @@
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <p style="margin-top: 0.25rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
     <p style="margin-top: 0.25rem;"><b>Port:</b> <%= @auction.port.name %></p>
-    <p style="margin-top: 0.25rem;"><b>ETA/ETD:</b> <%= convert_date?(@auction.eta) %> / <%= convert_date?(@auction.etd) %></p>
+    <p style="margin-top: 0.25rem;"><b>Vessels (ETA/ETD):</b>
+      <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction) do %>
+        <p style="margin-top: 0.25rem;">
+          <%= vessel.name %> (<%= convert_date?(eta, "Not Specified") %> &ndash; <%= convert_date?(etd, "Not Specified") %>)
+        </p>
+      <% end %>
     <br>
     <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
-      <p style="margin-top: 0.25rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
-      <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
-      <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
+    <%= for deliverable <- @auction.auction_vessel_fuels do %>
+      <p style="margin-top: 0.75rem;"><b>Vessel:</b> <%= deliverable.vessel.name %> (<%= deliverable.vessel.imo %>)</p>
+      <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
+      <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>
     <% end %>
-    <br>
-    <p style="margin-top: 0.25rem;"><b>Additional Information:</b> <%= @auction.additional_information %></p>
+    <%= if @auction.additional_information do %>
+      <br>
+      <p style="margin-top: 0.25rem;"><b>Additional Information:</b> <%= @auction.additional_information %></p>
+    <% end %>
     </td>
   </tr>
 </table>

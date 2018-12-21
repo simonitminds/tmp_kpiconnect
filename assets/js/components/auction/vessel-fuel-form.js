@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import InputField from '../input-field';
+import DateTimeInput from '../date-time-input';
 
 export default class VesselFuelForm extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ export default class VesselFuelForm extends React.Component {
   }
 
   addVessel(ev) {
-    const selectedElement = ev.target
+    const selectedElement = ev.target;
     const vessel_id = selectedElement.value;
     this.setState((previousState) => ({
       selectedVessels: _.uniq([...previousState.selectedVessels, vessel_id])
@@ -47,11 +48,7 @@ export default class VesselFuelForm extends React.Component {
   }
 
   render() {
-    const { auction, vessels, fuels, vesselFuels } = this.props;
-    const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
-      const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
-      return vesselFuel && vesselFuel.quantity;
-    };
+    const { auction, vessels, fuels, vesselFuels, portId, ports } = this.props;
     const availableVessels = _.reject(vessels, (v) => {
       return _.some(this.state.selectedVessels, (sv) => v.id == sv);
     });
@@ -59,25 +56,36 @@ export default class VesselFuelForm extends React.Component {
       return _.some(this.state.selectedFuels, (sf) => f.id == sf);
     });
 
+    const initialQuantityForVesselFuel = (vessel_id, fuel_id) => {
+      const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
+      return vesselFuel ? vesselFuel.quantity : 0;
+    };
+
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
+      const initialVesselFuels = _.filter(vesselFuels, {vessel_id: vessel_id});
+      const initialETA = _.chain(initialVesselFuels).map('eta').min().value() || auction.eta;
+      const initialETD = _.chain(initialVesselFuels).map('etd').min().value() || auction.etd;
+
       return (
-        <div className={`is-flex qa-auction-vessel-${vessel.id}`} key={vessel.id}>
-          {vessel.name}, {vessel.imo}
+        <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>
+          <span className="selected-list__item-title">{vessel.name}, {vessel.imo}</span>
           <span className="selected-list__item-delete" onClick={(ev) => {
               this.removeVessel(vessel.id);
               ev.preventDefault();
             }}>
             <FontAwesomeIcon icon="times" />
           </span>
-          <input type="hidden" name="auction[vessels][]" value={vessel.id} />
+          <input type="hidden" name={`auction[vessels][${vessel.id}][selected]`} value={true} />
+          <DateTimeInput label="ETA" value={initialETA} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} model="vessel" field="eta" />
+          <DateTimeInput label="ETD" value={initialETD} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} model="vessel" field="etd" />
         </div>
       );
     }
     const renderFuel = (fuel_id) => {
       const fuel = _.find(fuels, (f) => f.id == fuel_id);
       return(
-        <div className={`is-flex is-flex-wrapped qa-auction-vessel-${fuel.id}`} key={fuel.id}>
+        <div className={`is-flex is-flex-wrapped qa-auction-fuel-${fuel.id}`} key={fuel.id}>
           {fuel.name}
           <span className="selected-list__item-delete" onClick={(ev) => {
               this.removeFuel(fuel.id);
@@ -97,14 +105,14 @@ export default class VesselFuelForm extends React.Component {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       const initialQuantity = initialQuantityForVesselFuel(vessel.id, fuel_id);
       return(
-          <InputField
-            key={`${fuel_id}-${vessel_id}`}
-            model={'auction'}
-            field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
-            value={initialQuantity}
-            isHorizontal={true}
-            opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
-            />
+        <InputField
+          key={`${fuel_id}-${vessel_id}`}
+          model={'auction'}
+          field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
+          value={initialQuantity}
+          isHorizontal={true}
+          opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
+        />
       )
     }
 

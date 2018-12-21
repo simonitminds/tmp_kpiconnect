@@ -52,17 +52,16 @@ const AuctionForm = (props) => {
       />;
     }
   };
+
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
-      <input type="hidden" name="auction[eta]" className="qa-auction-eta" value={auction.eta ? moment(auction.eta).utc() : ""} />
-      <input type="hidden" name="auction[etd]" className="qa-auction-etd" value={auction.etd ? moment(auction.etd).utc() : ""} />
 
       <section className="auction-info is-gray-1"> {/* Port info */}
         <div className="container">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Arrival/Departure</legend>
+              <legend className="subtitle is-4" >Port</legend>
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_port_id" className="label">
@@ -93,49 +92,6 @@ const AuctionForm = (props) => {
                 </div>
               </div>
 
-              <div className="field is-horizontal">
-
-                <div className="field-label">
-                  <label className="label">ETA</label>
-                </div>
-                <div className="field-body">
-                  <div className="control">
-                    <DateInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_date')} />
-                  </div>
-                  <div className="control">
-                    <TimeInput value={auction.eta} model={'auction'} field={'eta'} labelText={'ETA'} onChange={updateDate.bind(this, 'eta_time')} />
-                  </div>
-                </div>
-              </div>
-              <div className="field is-horizontal">
-                <div className="field-label"></div>
-                <div className="field-body">
-                  <div className="control">
-                    <i className="is-caption">Port Local Time: {portLocalTime(auction.eta, port_id, ports)}</i>
-                  </div>
-                </div>
-              </div>
-              <div className="field is-horizontal">
-                <div className="field-label">
-                  <label className="label">ETD</label>
-                </div>
-                <div className="field-body">
-                  <div className="control">
-                    <DateInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_date')} />
-                  </div>
-                  <div className="control">
-                    <TimeInput value={auction.etd} model={'auction'} field={'etd'} labelText={'ETD'} onChange={updateDate.bind(this, 'etd_time')} />
-                  </div>
-                </div>
-              </div>
-              <div className="field is-horizontal">
-                <div className="field-label"></div>
-                <div className="field-body">
-                  <div className="control">
-                    <i className="is-caption">Port Local Time: {portLocalTime(auction.etd, port_id, ports)}</i>
-                  </div>
-                </div>
-              </div>
               {portAgentDisplay()}
             </fieldset>
           </div>
@@ -152,7 +108,9 @@ const AuctionForm = (props) => {
      <VesselFuelForm auction={auction}
                      vessels={vessels}
                      fuels={fuels}
-                     vesselFuels={auction.vessel_fuels} />
+                     vesselFuels={auction.vessel_fuels}
+                     portId={port_id}
+                     ports={ports} />
 
       <section className="auction-info is-gray-1"> {/* Add'l info */}
         <div className="container">

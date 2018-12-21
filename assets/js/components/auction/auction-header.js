@@ -4,17 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   convertToMinutes,
   formatUTCDateTime,
-  formatTimeRemaining,
-  formatTimeRemainingMobile,
-  formatTimeRemainingColor
 } from '../../utilities';
-import ChannelConnectionStatus from './channel-connection-status';
 import MediaQuery from 'react-responsive';
+import AuctionHeaderTimers from './auction-header-timers';
+
 
 const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
-
   const auctionStatus = _.get(auctionPayload, 'status');
+
   const displayAuctionStartTime = () => {
     if (auctionStatus == 'pending') {
       return formatUTCDateTime(auction.scheduled_start);
@@ -35,21 +33,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                     {auctionStatus}
                   </div>
                   <MediaQuery query="(max-width: 768px)">
-                      <div className="auction-list__timer auction-list__timer--show">
-                        <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
-                        <span className="auction-list__timer__clock" id="gmt-time" >
-                          {serverTime.format("DD MMM YYYY, k:mm:ss")}
-                        </span>&nbsp;GMT
-                      </div>
-
-                      <div className={`auction-header__timer auction-header__timer--mobile ${auctionStatus == "pending" ? "auction-header__timer--mobile--pending" : ""} has-text-left-mobile`}>
-                        <ChannelConnectionStatus connection={connection} />
-                        <div className={`auction-timer auction-timer--mobile auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
-                          <span className="qa-auction-time_remaining" id="time-remaining">
-                            {formatTimeRemainingMobile(auctionStatus, timeRemaining, "show")}
-                          </span>
-                        </div>
-                      </div>
+                    <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={true} />
                   </MediaQuery>
                   <div className="qa-auction-vessels">
                     <h1 className="auction-header__vessel title has-text-weight-bold">
@@ -75,20 +59,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                 </div>
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
                   <MediaQuery query="(min-width: 769px)">
-                    <div className="auction-list__timer">
-                      <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
-                      <span className="auction-list__timer__clock" id="gmt-time" >
-                        {serverTime.format("DD MMM YYYY, k:mm:ss")}
-                      </span>&nbsp;GMT
-                    </div>
-                    <div className="auction-header__timer has-text-left-mobile">
-                      <ChannelConnectionStatus connection={connection} />
-                      <div className={`auction-timer auction-timer--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
-                        <span className="qa-auction-time_remaining" id="time-remaining">
-                          {formatTimeRemaining(auctionStatus, timeRemaining, "show")}
-                        </span>
-                      </div>
-                    </div>
+                    <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={false} />
                   </MediaQuery>
 
                   <div className={`auction-header__start-time has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>

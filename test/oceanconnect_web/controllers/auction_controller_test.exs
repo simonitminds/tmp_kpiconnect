@@ -19,7 +19,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
     auction_vessel_fuels = [
       build(:vessel_fuel, vessel: selected_vessel, fuel: selected_fuel, quantity: 1500),
-      build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: List.last(fuels), quantity: 1500)
+      build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: selected_fuel, quantity: 1500)
     ]
 
     valid_start_time =
@@ -38,6 +38,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       |> Oceanconnect.Utilities.maybe_convert_date_times()
       |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
       |> Map.put("scheduled_start", valid_start_time)
+      |> Map.put("vessels", Enum.reduce(buyer_vessels, %{}, fn(vessel, acc) ->
+        Map.put(acc, "#{vessel.id}", %{ "eta" => valid_start_time })
+      end))
+      |> Map.put("auction_vessel_fuels", %{
+        "#{selected_fuel.id}" => %{"#{selected_vessel.id}" => 1500, "#{List.last(buyer_vessels).id}" => 1500}
+      })
 
     authed_conn = login_user(build_conn(), buyer)
 

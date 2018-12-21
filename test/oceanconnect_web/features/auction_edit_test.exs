@@ -30,8 +30,6 @@ defmodule Oceanconnect.AuctionEditTest do
              "credit_margin_amount",
              "decision_duration",
              "duration",
-             "eta",
-             "etd",
              "is_traded_bid_allowed",
              "po",
              "port_id",

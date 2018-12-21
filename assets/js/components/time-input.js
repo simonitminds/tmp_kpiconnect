@@ -21,8 +21,10 @@ export default class TimeInput extends React.Component {
 
   render(){
     const {
-      model, field, labelText, onChange
+      model, field, name, labelText, onChange
     } = this.props;
+
+    const fieldName = name === false ? "" : name || `${model}_${field}_time`;
 
     const {time} = this.state;
 

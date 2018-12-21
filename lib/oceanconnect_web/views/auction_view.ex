@@ -42,8 +42,6 @@ defmodule OceanconnectWeb.AuctionView do
     %{
       po: auction_map.po,
       port_agent: auction_map.port_agent,
-      eta: auction_map.eta,
-      etd: auction_map.etd,
       scheduled_start: auction_map.scheduled_start,
       auction_started: auction_map.auction_started,
       auction_ended: auction_map.auction_ended,
@@ -87,6 +85,23 @@ defmodule OceanconnectWeb.AuctionView do
   end
 
   def auction_log_suppliers(_), do: "—"
+
+  def auction_log_vessel_etas(%Auction{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
+    Enum.map(vessels, fn(vessel) ->
+      eta =
+        vessel_fuels
+        |> Enum.map(fn(vessel_fuel) -> vessel_fuel.eta end)
+        |> Enum.filter(&(&1))
+        |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
+      etd =
+        vessel_fuels
+        |> Enum.map(fn(vessel_fuel) -> vessel_fuel.etd end)
+        |> Enum.filter(&(&1))
+        |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
+
+      {vessel, eta, etd}
+    end)
+  end
 
   def auction_log_vessel_fuels_by_fuel(%{auction_vessel_fuels: auction_vessel_fuels}) do
     Enum.group_by(auction_vessel_fuels, & &1.fuel)
@@ -139,13 +154,14 @@ defmodule OceanconnectWeb.AuctionView do
     "#{trunc(duration / 60_000)} minutes"
   end
 
-  def convert_date?(date_time = %{}) do
+  def convert_date?(_, default \\ "—")
+  def convert_date?(date_time = %{}, _default) do
     time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}"
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
 
-  def convert_date?(_), do: "—"
+  def convert_date?(_, default), do: default
 
   def convert_date_time?(date_time = %{}) do
     time =

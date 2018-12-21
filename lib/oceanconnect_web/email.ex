@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.Email do
 
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionBid}
+  alias Oceanconnect.Auctions.{Auction}
 
   def auction_invitation(auction = %Auction{}) do
     auction = Auctions.fully_loaded(auction)
@@ -155,90 +155,92 @@ defmodule OceanconnectWeb.Email do
     bids_by_vessel =
       Enum.reduce(bids, %{}, fn bid, acc ->
         vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+        if vessel_fuel do
+          case acc[vessel_fuel.vessel] do
+            nil ->
+              Map.put(acc, vessel_fuel.vessel, [bid])
 
-        case acc[vessel_fuel.vessel] do
-          nil ->
-            Map.put(acc, vessel_fuel.vessel, [bid])
-
-          existing_value ->
-            Map.put(acc, vessel_fuel.vessel, [bid | existing_value])
+            existing_value ->
+              Map.put(acc, vessel_fuel.vessel, [bid | existing_value])
+          end
+        else
+          acc
         end
       end)
 
-    emails =
-      Enum.flat_map(bids_by_vessel, fn {vessel, bids} ->
-        bids_by_supplier =
-          Enum.reduce(bids, %{}, fn bid, acc ->
-            case acc[bid.supplier_id] do
-              nil ->
-                Map.put(acc, bid.supplier_id, [bid])
+    Enum.flat_map(bids_by_vessel, fn {vessel, bids} ->
+      bids_by_supplier =
+        Enum.reduce(bids, %{}, fn bid, acc ->
+          case acc[bid.supplier_id] do
+            nil ->
+              Map.put(acc, bid.supplier_id, [bid])
 
-              existing_value ->
-                Map.put(acc, bid.supplier_id, [bid | existing_value])
-            end
+            existing_value ->
+              Map.put(acc, bid.supplier_id, [bid | existing_value])
+          end
+        end)
+
+      Enum.map(bids_by_supplier, fn {supplier_id, bids} ->
+        supplier_company = Accounts.get_company!(supplier_id)
+
+        suppliers =
+          Accounts.users_for_companies([supplier_company])
+          |> Enum.filter(&(&1.email in active_user_emails))
+
+        is_traded_bid = Enum.any?(bids, &(&1.is_traded_bid == true))
+
+        deliverables =
+          bids
+          |> Enum.map(fn bid ->
+            Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+            |> Map.put(:bid, bid)
           end)
 
-        Enum.map(bids_by_supplier, fn {supplier_id, bids} ->
-          supplier_company = Accounts.get_company!(supplier_id)
+        supplier_emails =
+          Enum.map(suppliers, fn supplier ->
+            base_email(supplier)
+            |> subject("You have won Auction #{auction.id} for #{vessel.name} at #{port_name}!")
+            |> render(
+              "auction_completion.html",
+              user: supplier,
+              winning_supplier_company: supplier_company,
+              physical_buyer: buyer_company,
+              is_traded_bid: is_traded_bid,
+              auction: auction,
+              vessel: vessel,
+              buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
+              deliverables: deliverables,
+              approved_barges:
+                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              is_buyer: false
+            )
+          end)
 
-          suppliers =
-            Accounts.users_for_companies([supplier_company])
-            |> Enum.filter(&(&1.email in active_user_emails))
+        buyer_emails =
+          Enum.map(buyers, fn buyer ->
+            base_email(buyer)
+            |> subject("Auction #{auction.id} for #{vessel.name} at #{port_name} has closed.")
+            |> render(
+              "auction_completion.html",
+              user: buyer,
+              winning_supplier_company:
+                supplier_company_for_email(is_traded_bid, buyer_company, supplier_company),
+              physical_supplier: supplier_company,
+              is_traded_bid: is_traded_bid,
+              auction: auction,
+              vessel: vessel,
+              buyer_company: buyer_company,
+              deliverables: deliverables,
+              approved_barges:
+                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              is_buyer: true
+            )
+          end)
 
-          is_traded_bid = Enum.any?(bids, &(&1.is_traded_bid == true))
-
-          deliverables =
-            bids
-            |> Enum.map(fn bid ->
-              Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
-              |> Map.put(:bid, bid)
-            end)
-
-          supplier_emails =
-            Enum.map(suppliers, fn supplier ->
-              base_email(supplier)
-              |> subject("You have won Auction #{auction.id} for #{vessel.name} at #{port_name}!")
-              |> render(
-                "auction_completion.html",
-                user: supplier,
-                winning_supplier_company: supplier_company,
-                physical_buyer: buyer_company,
-                is_traded_bid: is_traded_bid,
-                auction: auction,
-                vessel: vessel,
-                buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
-                deliverables: deliverables,
-                approved_barges:
-                  approved_barges_for_supplier(approved_barges, supplier_company.id),
-                is_buyer: false
-              )
-            end)
-
-          buyer_emails =
-            Enum.map(buyers, fn buyer ->
-              base_email(buyer)
-              |> subject("Auction #{auction.id} for #{vessel.name} at #{port_name} has closed.")
-              |> render(
-                "auction_completion.html",
-                user: buyer,
-                winning_supplier_company:
-                  supplier_company_for_email(is_traded_bid, buyer_company, supplier_company),
-                physical_supplier: supplier_company,
-                is_traded_bid: is_traded_bid,
-                auction: auction,
-                vessel: vessel,
-                buyer_company: buyer_company,
-                deliverables: deliverables,
-                approved_barges:
-                  approved_barges_for_supplier(approved_barges, supplier_company.id),
-                is_buyer: true
-              )
-            end)
-
-          List.flatten([supplier_emails, buyer_emails])
-        end)
+        List.flatten([supplier_emails, buyer_emails])
       end)
-      |> List.flatten()
+    end)
+    |> List.flatten()
   end
 
   def auction_canceled(auction = %Auction{}) do
@@ -289,11 +291,6 @@ defmodule OceanconnectWeb.Email do
       end)
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
-  end
-
-  defp deliverables_for_bid(deliverables, bid) do
-    deliverables
-    |> Enum.filter(&(&1.bid == bid))
   end
 
   defp approved_barges_for_supplier(approved_barges, supplier_id) do
