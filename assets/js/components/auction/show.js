@@ -17,21 +17,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 export default class AuctionShow extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      timeRemaining: timeRemainingCountdown(props.auctionPayload, moment().utc()),
-      serverTime: moment().utc()
-    }
-  }
-
-  componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),
-      500
-    );
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
   }
 
   componentDidUpdate() {
@@ -40,15 +25,8 @@ export default class AuctionShow extends React.Component {
     updateAuctionBodySize();
   }
 
-  tick() {
-    let time = moment(ServerDate.now()).utc();
-    this.setState({
-      timeRemaining: timeRemainingCountdown(this.props.auctionPayload, time),
-      serverTime: time
-    });
-  }
-
   render() {
+    console.log("rerendered")
     const {
       auctionPayload,
       companyProfile,
@@ -76,7 +54,7 @@ export default class AuctionShow extends React.Component {
         <MediaQuery query="(min-width: 769px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
-        <AuctionHeader auctionPayload={auctionPayload} timeRemaining={this.state.timeRemaining} connection={connection} serverTime={this.state.serverTime} />
+        <AuctionHeader auctionPayload={auctionPayload} connection={connection} />
         <MediaQuery query="(min-width: 769px)">
           <div className="auction-app__body">
             <section className="auction-page"> {/* Auction details */}

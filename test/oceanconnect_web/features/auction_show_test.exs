@@ -349,7 +349,7 @@ defmodule Oceanconnect.AuctionShowTest do
     } do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
-      :timer.sleep(500)
+      :timer.sleep(700)
 
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"

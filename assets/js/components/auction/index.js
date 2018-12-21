@@ -20,12 +20,12 @@ export default class AuctionsIndex extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),
-      500
-    );
-  }
+  // componentDidMount() {
+  //   this.timerID = setInterval(
+  //     () => this.tick(),
+  //     500
+  //   );
+  // }
 
   componentWillUnmount() {
     clearInterval(this.timerID);
