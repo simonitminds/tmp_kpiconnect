@@ -26,7 +26,6 @@ export default class AuctionShow extends React.Component {
   }
 
   render() {
-    console.log("rerendered")
     const {
       auctionPayload,
       companyProfile,

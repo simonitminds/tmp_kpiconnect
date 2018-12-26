@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../utilities';
 import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
+import SolutionDisplayProductPrices from './solution-display-product-prices';
 import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
 import BidTag from './bid-tag';
@@ -12,6 +13,8 @@ export default class SolutionDisplay extends React.Component {
   constructor(props) {
     super(props);
     const isExpanded = this.props.isExpanded;
+
+    this.container = React.createRef();
     this.state = {
       selected: false,
       expanded: isExpanded
@@ -24,7 +27,7 @@ export default class SolutionDisplay extends React.Component {
 
   cancelSelection(e) {
     e.preventDefault();
-    const selectionWindow = document.querySelector(`.${this.props.className} > .auction-solution__confirmation`);
+    const selectionWindow = this.container.current.querySelector(".auction-solution__confirmation");
     selectionWindow.classList.add("clear");
     setTimeout(() => this.setState({selected: false}), 750);
     return false;
@@ -55,7 +58,7 @@ export default class SolutionDisplay extends React.Component {
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
-    const acceptable = !!acceptSolution;
+    const acceptable = !!acceptSolution && auctionStatus == 'decision';
     const revokable = isSupplier && revokeBid;
     const isExpanded = this.state.expanded;
 
@@ -94,7 +97,7 @@ export default class SolutionDisplay extends React.Component {
     };
 
     return (
-      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`} ref={this.container}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
@@ -107,7 +110,7 @@ export default class SolutionDisplay extends React.Component {
                 <span className="auction-solution__title__description">{solutionTitle()}</span>
               </span>
               <MediaQuery query="(max-width: 480px)">
-                { acceptable && auctionStatus == 'decision' &&
+                { acceptable &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
@@ -116,25 +119,15 @@ export default class SolutionDisplay extends React.Component {
               <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
               ({formatTime(latest_time_entered)})
               <MediaQuery query="(min-width: 480px)">
-                { acceptable && auctionStatus == 'decision' &&
+                { acceptable &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
             </div>
           </div>
-          <div className="auction-solution__header__row auction-solution__header__row--preview">
-            <h4 className="has-text-weight-bold">Product Prices</h4>
-            { _.map(lowestFuelBids, (bid, fuel) => {
-                const highlight = highlightOwn && supplierId && (bid.supplier_id == supplierId);
-                return(
-                  <div className="control has-margin-bottom-none" key={fuel}>
-                    <BidTag title={fuel} highlightOwn={highlight} bid={bid}/>
-                  </div>
-                )
-              })
-            }
-          </div>
+          <SolutionDisplayProductPrices lowestFuelBids={lowestFuelBids} supplierId={supplierId} highlightOwn={highlightOwn} />
         </div>
+
         <div className="auction-solution__body">
           { !isSupplier &&
             <div className="auction-solution__barge-section">

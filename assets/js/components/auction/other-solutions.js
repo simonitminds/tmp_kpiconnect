@@ -1,11 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
+import CustomSolutionDisplay from './custom-solution-display';
 import SolutionComment from './solution-comment';
 import SolutionDisplay from './solution-display';
 import InputField from '../input-field';
 
-const OtherSolutions = ({auctionPayload, solutions, acceptSolution}) => {
+const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution}) => {
   if (solutions.length > 0) {
     return(
       <div className="auction-solution__container qa-auction-other-solutions">
@@ -17,6 +18,9 @@ const OtherSolutions = ({auctionPayload, solutions, acceptSolution}) => {
                   <SolutionDisplay key={index} auctionPayload={auctionPayload} solution={solution} acceptSolution={acceptSolution} best={false} className="qa-auction-other-solution" />
                 );
               })
+            }
+            { showCustom &&
+              <CustomSolutionDisplay auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
             }
           </div>
         </div>

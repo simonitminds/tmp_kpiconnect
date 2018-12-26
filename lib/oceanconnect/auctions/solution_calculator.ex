@@ -8,16 +8,8 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
 
   def process(current_state = %AuctionState{product_bids: product_bids}, auction = %Auction{}) do
     best_by_supplier = best_solutions_by_supplier(product_bids, auction)
-
-    best_single_supplier =
-      calculate_solution(product_bids, auction, :best_single_supplier,
-        supplier_solutions: best_by_supplier
-      )
-
-    best_overall =
-      calculate_solution(product_bids, auction, :best_overall,
-        best_single_supplier: best_single_supplier
-      )
+    best_single_supplier = calculate_solution(product_bids, auction, :best_single_supplier, supplier_solutions: best_by_supplier)
+    best_overall = calculate_solution(product_bids, auction, :best_overall, best_single_supplier: best_single_supplier)
 
     solution_state = %__MODULE__{
       best_by_supplier: best_by_supplier,

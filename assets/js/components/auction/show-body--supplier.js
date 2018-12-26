@@ -34,14 +34,14 @@ const SupplierAuctionShowBody = (props) => {
         <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status == 'decision') {
     return (
       <div>
         <SupplierBestSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status != 'pending') {
     return (
       <div>
@@ -50,7 +50,7 @@ const SupplierAuctionShowBody = (props) => {
         <WinningSolution auctionPayload={auctionPayload} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else {
     return (
       <div>
@@ -63,7 +63,7 @@ const SupplierAuctionShowBody = (props) => {
         <BiddingForm formSubmit={formSubmit} auctionPayload={auctionPayload} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   }
 };
 
