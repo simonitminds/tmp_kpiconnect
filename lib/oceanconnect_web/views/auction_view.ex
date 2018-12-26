@@ -129,7 +129,7 @@ defmodule OceanconnectWeb.AuctionView do
     vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == vf_id))
 
     case vessel_fuel do
-      %{vessel: %{name: name, imo: imo}} -> name
+      %{vessel: %{name: name, imo: _imo}} -> name
       _ -> "—"
     end
   end

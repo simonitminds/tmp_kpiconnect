@@ -36,24 +36,23 @@ defmodule EventMigrator do
 
   def migrate_event(
         storage = %AuctionEventStorage{
-          auction: auction = %Auction{},
+          auction: %Auction{},
           event: event
         }
       ) do
-    updated_event =
+    final_event =
       event
       |> AuctionEventStorage.hydrate_event()
       |> migrate_event()
 
-    final_event = case updated_event do
-      [event] -> event
+    final_event = case final_event do
       %AuctionEvent{} = event -> event
-      events ->
-        IO.inspect(length(events), label: "HOW MANY EVENTS?")
-        events
+      [event] -> event
+      events -> events
     end
     if is_list(final_event) && length(final_event) > 1 do
-      Enum.map(final_event, fn(event) ->
+      events = final_event |> List.flatten
+      Enum.map(events, fn(event) ->
         changeset =
         AuctionEventStorage.changeset(%AuctionEventStorage{}, %{event: :erlang.term_to_binary(event)})
         Ecto.Multi.new()
@@ -94,20 +93,57 @@ defmodule EventMigrator do
       end)
   end
 
+  def migrate_event(event = %AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{solution: _solution, state: %{
+    product_bids: product_bids,
+    solutions: _solutions,
+    winning_solution: _winning_solution
+  }}}) do
+    fuel_ids =
+    Map.keys(product_bids)
+    |> Enum.sort()
+
+  fuel_to_vessel_fuel_lookup =
+    from(avf in AuctionVesselFuel,
+      where: avf.fuel_id in ^fuel_ids and avf.auction_id == ^auction_id
+    )
+    |> Repo.all()
+    |> Enum.group_by(fn avf -> "#{avf.fuel_id}" end, fn %{id: avf_id} -> "#{avf_id}" end)
+
+  product_bid_state_map =
+    Enum.reduce(product_bids, %{}, fn {fuel_id, product_bid_state}, acc ->
+        fuel_to_vessel_fuel_lookup[fuel_id]
+        |> Enum.reduce(acc, fn vfid, acc ->
+          updated_product_bid_state = update_product_bid_state(product_bid_state, vfid)
+          Map.put(acc, vfid, updated_product_bid_state)
+        end)
+    end)
+
+  %AuctionEvent{
+    event
+    | data: %{
+        event.data
+        | state: %{
+            event.data.state
+            | product_bids: product_bid_state_map,
+              solutions:
+                update_solutions(event.data.state.solutions, fuel_to_vessel_fuel_lookup),
+              winning_solution:
+                update_solution(event.data.state.winning_solution, fuel_to_vessel_fuel_lookup)
+          },
+          solution: update_solution(event.data.solution, fuel_to_vessel_fuel_lookup)
+      }
+  }
+  end
   def migrate_event(
         event = %AuctionEvent{
-          type: type,
+          type: _type,
           auction_id: auction_id,
           data: %{
             state:
               state = %{
                 product_bids: product_bids,
-                solutions: %SolutionCalculator{
-                  best_single_supplier: best_single,
-                  best_overall: best_overall,
-                  best_by_supplier: best_by_supplier
-                },
-                winning_solution: winning_solution
+                solutions: %SolutionCalculator{},
+                winning_solution: _winning_solution
               }
           }
         }
@@ -125,7 +161,6 @@ defmodule EventMigrator do
 
     product_bid_state_map =
       Enum.reduce(product_bids, %{}, fn {fuel_id, product_bid_state}, acc ->
-        correct_ids =
           fuel_to_vessel_fuel_lookup[fuel_id]
           |> Enum.reduce(acc, fn vfid, acc ->
             updated_product_bid_state = update_product_bid_state(product_bid_state, vfid)
@@ -133,7 +168,7 @@ defmodule EventMigrator do
           end)
       end)
 
-    solution_state = %AuctionEvent{
+    %AuctionEvent{
       event
       | data: %{
           event.data
@@ -154,13 +189,14 @@ defmodule EventMigrator do
   end
 
   def update_bid_list(bids, fuel_to_vessel_fuel_lookup) do
-    Enum.flat_map(bids, fn bid ->
-      correct_ids =
-        fuel_to_vessel_fuel_lookup[bid.fuel_id]
+    Enum.map(bids, fn bid ->
+      fuel_to_vessel_fuel_lookup[bid.fuel_id]
         |> Enum.map(fn vessel_fuel_id ->
           Map.put(bid, :vessel_fuel_id, vessel_fuel_id)
+          |> Map.drop([:fuel_id])
         end)
     end)
+    |> List.flatten
   end
 
   def update_solutions(solution = %SolutionCalculator{}, fuel_to_vessel_fuel_lookup) do
@@ -177,7 +213,9 @@ defmodule EventMigrator do
   end
 
   def update_solution(nil, _fuel_to_vessel_fuel_lookup), do: nil
-
+  def update_solution(solution = %Solution{bids: []}, _fuel_to_vessel_fuel_lookup) do
+    solution
+  end
   def update_solution(solution = %Solution{bids: bids}, fuel_to_vessel_fuel_lookup) do
     updated_bids = update_bid_list(bids, fuel_to_vessel_fuel_lookup)
     %Solution{solution | bids: updated_bids}
@@ -189,7 +227,7 @@ defmodule EventMigrator do
       |> Map.put(:vessel_fuel_id, vessel_fuel_id)
       |> Map.drop([:fuel_id])
 
-    final_product_bid_state = %{
+  %{
       updated_state
       | vessel_fuel_id: vessel_fuel_id,
         lowest_bids:
@@ -206,7 +244,7 @@ defmodule EventMigrator do
 
   def convert_product_bid(auction_bid, vessel_fuel_id) do
     bid = AuctionBid.from_event_bid(auction_bid)
-    %{bid | vessel_fuel_id: vessel_fuel_id}
+    %{bid | vessel_fuel_id: vessel_fuel_id} |> Map.drop([:fuel_id])
   end
 end
 
@@ -216,5 +254,6 @@ defmodule Mix.Tasks.MigrateEventsToMultiVessel do
   @shortdoc "Migrates Events prior to Multi-Vessel to the new Multi-Vessel format."
   def run(_args) do
     EventMigrator.migrate()
+    nil
   end
 end
