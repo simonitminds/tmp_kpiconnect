@@ -34,13 +34,39 @@ defmodule EventMigrator do
     |> List.flatten()
   end
 
-  def migrate_event(%AuctionEventStorage{
-        auction: auction = %Auction{},
-        event: event
-      }) do
-    event
-    |> AuctionEventStorage.hydrate_event()
-    |> migrate_event()
+  def migrate_event(
+        storage = %AuctionEventStorage{
+          auction: auction = %Auction{},
+          event: event
+        }
+      ) do
+    updated_event =
+      event
+      |> AuctionEventStorage.hydrate_event()
+      |> migrate_event()
+
+    final_event = case updated_event do
+      [event] -> event
+      %AuctionEvent{} = event -> event
+      events ->
+        IO.inspect(length(events), label: "HOW MANY EVENTS?")
+        events
+    end
+    if is_list(final_event) && length(final_event) > 1 do
+      Enum.map(final_event, fn(event) ->
+        changeset =
+        AuctionEventStorage.changeset(%AuctionEventStorage{}, %{event: :erlang.term_to_binary(event)})
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert_or_update(:insert_or_update, changeset)
+        |> Repo.transaction()
+      end)
+    else
+    changeset =
+      AuctionEventStorage.changeset(storage, %{event: :erlang.term_to_binary(final_event)})
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert_or_update(:insert_or_update, changeset)
+      |> Repo.transaction()
+    end
   end
 
   # switch fuel_id in auction_state with vessel fuel
@@ -128,10 +154,10 @@ defmodule EventMigrator do
   end
 
   def update_bid_list(bids, fuel_to_vessel_fuel_lookup) do
-    Enum.flat_map(bids, fn(bid) ->
+    Enum.flat_map(bids, fn bid ->
       correct_ids =
         fuel_to_vessel_fuel_lookup[bid.fuel_id]
-        |> Enum.map(fn(vessel_fuel_id) ->
+        |> Enum.map(fn vessel_fuel_id ->
           Map.put(bid, :vessel_fuel_id, vessel_fuel_id)
         end)
     end)
@@ -140,9 +166,13 @@ defmodule EventMigrator do
   def update_solutions(solution = %SolutionCalculator{}, fuel_to_vessel_fuel_lookup) do
     %SolutionCalculator{
       solution
-      | best_single_supplier: update_solution(solution.best_single_supplier, fuel_to_vessel_fuel_lookup),
-      best_overall: update_solution(solution.best_overall, fuel_to_vessel_fuel_lookup),
-      best_by_supplier: Enum.reduce(solution.best_by_supplier, %{}, fn({supplier_id, solution}, acc) -> Map.put(acc, supplier_id, update_solution(solution, fuel_to_vessel_fuel_lookup)) end)
+      | best_single_supplier:
+          update_solution(solution.best_single_supplier, fuel_to_vessel_fuel_lookup),
+        best_overall: update_solution(solution.best_overall, fuel_to_vessel_fuel_lookup),
+        best_by_supplier:
+          Enum.reduce(solution.best_by_supplier, %{}, fn {supplier_id, solution}, acc ->
+            Map.put(acc, supplier_id, update_solution(solution, fuel_to_vessel_fuel_lookup))
+          end)
     }
   end
 

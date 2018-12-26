@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventStorage do
   use Ecto.Schema
   import Ecto.Query
+  import Ecto.Changeset
   alias __MODULE__
 
   schema "auction_events" do
@@ -8,6 +9,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     field(:event, :binary)
 
     timestamps()
+  end
+
+  def changeset(%AuctionEventStorage{} = storage, attrs) do
+    storage
+    |> cast(attrs, [:auction_id, :event])
   end
 
   def persist(event_storage = %AuctionEventStorage{event: event}) do
