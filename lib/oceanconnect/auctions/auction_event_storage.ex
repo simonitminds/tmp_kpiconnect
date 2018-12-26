@@ -30,9 +30,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     |> Enum.map(fn event -> hydrate_event(event) end)
   end
 
-  defp hydrate_event(nil), do: nil
-
-  defp hydrate_event(event) do
+  def hydrate_event(nil), do: nil
+  def hydrate_event(event) do
     :erlang.binary_to_term(event)
   end
 end
