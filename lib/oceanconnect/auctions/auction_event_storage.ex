@@ -7,13 +7,14 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   schema "auction_events" do
     belongs_to(:auction, Oceanconnect.Auctions.Auction)
     field(:event, :binary)
+    field(:version, :integer, default: 2)
 
     timestamps()
   end
 
   def changeset(%AuctionEventStorage{} = storage, attrs) do
     storage
-    |> cast(attrs, [:auction_id, :event])
+    |> cast(attrs, [:auction_id, :event, :version])
   end
 
   def persist(event_storage = %AuctionEventStorage{event: event}) do
@@ -26,9 +27,9 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     query =
       from(
         storage in __MODULE__,
-        where: storage.auction_id == ^auction_id,
+        where: storage.auction_id == ^auction_id and storage.version == 2,
         select: storage.event,
-        order_by: [desc: :id]
+        order_by: [desc: :inserted_at]
       )
 
     query

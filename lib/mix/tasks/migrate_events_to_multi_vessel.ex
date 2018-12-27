@@ -18,7 +18,12 @@ defmodule EventMigrator do
   def migrate do
     Application.ensure_started(Repo, [])
 
-    Repo.all(AuctionEventStorage)
+    query = from auction_event in AuctionEventStorage,
+            where: is_nil(auction_event.version),
+            order_by: [desc: :inserted_at]
+
+    query
+    |> Repo.all()
     |> Repo.preload(
       auction: [
         :port,
@@ -30,13 +35,14 @@ defmodule EventMigrator do
         [suppliers: :users]
       ]
     )
+    |> Enum.reverse
     |> Enum.map(&migrate_event/1)
     |> List.flatten()
   end
 
   def migrate_event(
         storage = %AuctionEventStorage{
-          auction: %Auction{},
+          auction: auction = %Auction{},
           event: event
         }
       ) do
@@ -53,29 +59,23 @@ defmodule EventMigrator do
     if is_list(final_event) && length(final_event) > 1 do
       events = final_event |> List.flatten
       Enum.map(events, fn(event) ->
-        changeset =
-        AuctionEventStorage.changeset(%AuctionEventStorage{}, %{event: :erlang.term_to_binary(event)})
-        Ecto.Multi.new()
-        |> Ecto.Multi.insert_or_update(:insert_or_update, changeset)
-        |> Repo.transaction()
+        %AuctionEventStorage{auction_id: auction.id, event: event}
+        |> AuctionEventStorage.persist
       end)
     else
-    changeset =
-      AuctionEventStorage.changeset(storage, %{event: :erlang.term_to_binary(final_event)})
-      Ecto.Multi.new()
-      |> Ecto.Multi.insert_or_update(:insert_or_update, changeset)
-      |> Repo.transaction()
+      %AuctionEventStorage{auction_id: auction.id, event: final_event}
+      |> AuctionEventStorage.persist
     end
   end
 
   # switch fuel_id in auction_state with vessel fuel
   def migrate_event(
         event = %AuctionEvent{
-          type: :bid_placed,
           auction_id: auction_id,
           data: %{bid: bid = %{fuel_id: fuel_id}, state: state}
         }
       ) do
+
     vessel_fuels =
       from(avf in AuctionVesselFuel,
         where: avf.fuel_id == ^fuel_id and avf.auction_id == ^auction_id
@@ -88,8 +88,7 @@ defmodule EventMigrator do
           |> Map.put(:vessel_fuel_id, "#{vf.id}")
           |> Map.drop([:fuel_id])
           |> AuctionBid.from_event_bid()
-
-        %AuctionEvent{event | data: %{event.data | bid: bid}}
+          %AuctionEvent{event | data: %{event.data | state: update_product_bid_state(event.data.state, "#{vf.id}"), bid: bid}}
       end)
   end
 
@@ -147,7 +146,7 @@ defmodule EventMigrator do
               }
           }
         }
-      ) do
+      ) when not is_nil(product_bids) do
     fuel_ids =
       Map.keys(product_bids)
       |> Enum.sort()
