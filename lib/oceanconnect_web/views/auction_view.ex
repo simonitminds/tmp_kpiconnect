@@ -90,11 +90,13 @@ defmodule OceanconnectWeb.AuctionView do
     Enum.map(vessels, fn(vessel) ->
       eta =
         vessel_fuels
+        |> Enum.filter(&(&1.vessel_id == vessel.id))
         |> Enum.map(fn(vessel_fuel) -> vessel_fuel.eta end)
         |> Enum.filter(&(&1))
         |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
       etd =
         vessel_fuels
+        |> Enum.filter(&(&1.vessel_id == vessel.id))
         |> Enum.map(fn(vessel_fuel) -> vessel_fuel.etd end)
         |> Enum.filter(&(&1))
         |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)

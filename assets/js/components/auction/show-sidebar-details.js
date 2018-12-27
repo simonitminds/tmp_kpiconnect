@@ -13,11 +13,13 @@ const AuctionShowSidebarDetails = (props) => {
   const vessels = _.get(auction, 'vessels');
 
   const vesselsWithETAs = _.map(vessels, (vessel) => {
-    const eta = _.chain(vesselFuels)
+    const vesselFuelsForVessel = _.filter(vesselFuels, {vessel_id: vessel.id});
+    const eta = _.chain(vesselFuelsForVessel)
       .map('eta')
       .min()
       .value();
-    const etd = _.chain(vesselFuels)
+    const etd = _.chain(vesselFuelsForVessel)
+      .filter({vessel_id: vessel.id})
       .map('etd')
       .min()
       .value();
