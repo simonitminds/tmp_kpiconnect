@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
         storage in __MODULE__,
         where: storage.auction_id == ^auction_id and storage.version == 2,
         select: storage.event,
-        order_by: [desc: :inserted_at]
+        order_by: [desc: :id]
       )
 
     query

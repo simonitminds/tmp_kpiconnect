@@ -191,7 +191,7 @@ defmodule EventMigrator do
     Enum.map(bids, fn bid ->
       fuel_to_vessel_fuel_lookup[bid.fuel_id]
         |> Enum.map(fn vessel_fuel_id ->
-          Map.put(bid, :vessel_fuel_id, vessel_fuel_id)
+        Map.put(bid, :vessel_fuel_id, "#{vessel_fuel_id}")
           |> Map.drop([:fuel_id])
         end)
     end)
@@ -223,27 +223,27 @@ defmodule EventMigrator do
   def update_product_bid_state(product_bid_state, vessel_fuel_id) do
     updated_state =
       Map.merge(%AuctionStore.ProductBidState{}, product_bid_state)
-      |> Map.put(:vessel_fuel_id, vessel_fuel_id)
+      |> Map.put(:vessel_fuel_id, "#{vessel_fuel_id}")
       |> Map.drop([:fuel_id])
 
   %{
       updated_state
-      | vessel_fuel_id: vessel_fuel_id,
+      | vessel_fuel_id: "#{vessel_fuel_id}",
         lowest_bids:
-          Enum.map(updated_state.lowest_bids, &convert_product_bid(&1, vessel_fuel_id)),
+        Enum.map(updated_state.lowest_bids, &convert_product_bid(&1, "#{vessel_fuel_id}")),
         minimum_bids:
-          Enum.map(updated_state.minimum_bids, &convert_product_bid(&1, vessel_fuel_id)),
-        bids: Enum.map(updated_state.bids, &convert_product_bid(&1, vessel_fuel_id)),
+        Enum.map(updated_state.minimum_bids, &convert_product_bid(&1, "#{vessel_fuel_id}")),
+        bids: Enum.map(updated_state.bids, &convert_product_bid(&1, "#{vessel_fuel_id}")),
         active_bids:
-          Enum.map(updated_state.active_bids, &convert_product_bid(&1, vessel_fuel_id)),
+          Enum.map(updated_state.active_bids, &convert_product_bid(&1, "#{vessel_fuel_id}")),
         inactive_bids:
-          Enum.map(updated_state.inactive_bids, &convert_product_bid(&1, vessel_fuel_id))
+        Enum.map(updated_state.inactive_bids, &convert_product_bid(&1, "#{vessel_fuel_id}"))
     }
   end
 
   def convert_product_bid(auction_bid, vessel_fuel_id) do
     bid = AuctionBid.from_event_bid(auction_bid)
-    %{bid | vessel_fuel_id: vessel_fuel_id} |> Map.drop([:fuel_id])
+    %{bid | vessel_fuel_id: "#{vessel_fuel_id}"} |> Map.drop([:fuel_id])
   end
 end
 
