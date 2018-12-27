@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Downshift from 'downshift';
-import { formatTime, formatPrice } from '../../utilities';
+import { formatPrice } from '../../utilities';
 
 const CustomSolutionBidSelector = (props) => {
   const {
@@ -76,20 +76,20 @@ const CustomSolutionBidSelector = (props) => {
   return (
     <Downshift onChange={onChange} itemToString={bid => bid ? bid.id : ""}>
       {({
-        getInputProps,
         getItemProps,
-        getLabelProps,
         getToggleButtonProps,
         isOpen,
-        inputValue,
         highlightedIndex,
         selectedItem,
+        clearSelection
       }) => (
         <div style={{position: "relative", zIndex: 10}}>
-          <label {...getLabelProps()}></label>
           <div className="select" {...getToggleButtonProps()}>
             { renderBid({bid: selectedItem, getItemProps}) }
           </div>
+          { selectedItem &&
+            <button onClick={clearSelection}><FontAwesomeIcon icon="times" /></button>
+          }
           { isOpen &&
             <div style={{position: "absolute", top: "100%", backgroundColor: "white"}}>
               { _.map(bids, (bid) => renderBid({bid, getItemProps})) }
