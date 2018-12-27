@@ -1,13 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import MediaQuery from 'react-responsive';
 import { formatTime, formatPrice } from '../../utilities';
+import BidTag from './bid-tag';
 import CustomSolutionBidSelector from './custom-solution-bid-selector';
 import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
 import SolutionDisplayProductPrices from './solution-display-product-prices';
-import MediaQuery from 'react-responsive';
-import BidTag from './bid-tag';
 
 export default class CustomSolutionDisplay extends React.Component {
   constructor(props) {
@@ -87,6 +87,16 @@ export default class CustomSolutionDisplay extends React.Component {
       }, {})
       .value();
 
+    const totalAmounts = _.reduce(selectedBids, ({quantity, price}, bid) => {
+      const vf = _.find(vesselFuels, (vf) => vf.id == bid.vessel_fuel_id);
+      return {
+        quantity: quantity + vf.quantity,
+        price: price + (bid.amount * vf.quantity)
+      }
+    }, {quantity: 0, price: 0});
+
+    const normalizedPrice = totalAmounts.price / totalAmounts.quantity;
+
 
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`} ref={this.container}>
@@ -108,6 +118,9 @@ export default class CustomSolutionDisplay extends React.Component {
               </MediaQuery>
             </h3>
             <div className="auction-solution__content">
+              { selectedBids.length > 0 &&
+                <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalizedPrice)}</span>
+              }
               <MediaQuery query="(min-width: 480px)">
                 { acceptable &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
