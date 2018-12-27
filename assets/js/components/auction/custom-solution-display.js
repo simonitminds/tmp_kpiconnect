@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../utilities';
+import CustomSolutionBidSelector from './custom-solution-bid-selector';
 import SolutionAcceptDisplay from './solution-accept-display';
 import SolutionDisplayBarges from './solution-display-barges';
 import SolutionDisplayProductPrices from './solution-display-product-prices';
-import SolutionDisplayProductSection from './solution-display-product-section';
 import MediaQuery from 'react-responsive';
 import BidTag from './bid-tag';
 
@@ -47,10 +47,7 @@ export default class CustomSolutionDisplay extends React.Component {
     this.setState({isExpanded: !this.state.isExpanded});
   }
 
-  toggleBidSelected(vesselFuelId, ev) {
-    ev.preventDefault();
-    const bidId = ev.target.value;
-    const bid = _.find(this.props.auctionPayload.product_bids[vesselFuelId].lowest_bids, {id: bidId});
+  bidSelected(vesselFuelId, bid) {
     const remainingOldBids = _.reject(this.state.selectedBids, {vessel_fuel_id: `${vesselFuelId}`});
     const newSelectedBids = bid ? [...remainingOldBids, bid] : remainingOldBids;
 
@@ -149,19 +146,7 @@ export default class CustomSolutionDisplay extends React.Component {
                             <tr key={vesselFuel.id} className={`qa-custom-solution-vessel-${vessel.id}`}>
                               <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
                               <td className="auction-solution__product-table__bid">
-                                <div className="select">
-                                  <select defaultValue="" onChange={this.toggleBidSelected.bind(this, vesselFuel.id)}>
-                                    <option value="">No bid selected</option>
-                                    { _.map(bids, (bid) => {
-                                        return (
-                                          <option value={bid.id} key={bid.id}>
-                                            ${formatPrice(bid.amount)} - {bid.supplier}
-                                          </option>
-                                        );
-                                      })
-                                    }
-                                  </select>
-                                </div>
+                                <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} />
                               </td>
                               <td className="auction-solution__product-table__supplier">{bids.length == 1 ? "1 bid" : `${bids.length} bids` } available</td>
                               <td className="auction-solution__product-table__bid-time"></td>
