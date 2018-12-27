@@ -4,25 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Downshift from 'downshift';
 import { formatPrice } from '../../utilities';
 
+// The `bids` object passed to this component can supply additional information
+// on each bid indicating if it should be disabled, and if so, a message of why
+// the bid has been disabled (e.g., an unsplittable bid for another product was
+// selected). The props are `disabled` and `disabledReason` respectively.
 const CustomSolutionBidSelector = (props) => {
   const {
     bids,
     onChange
   } = props;
-
-  // <div className="select">
-  //   <select defaultValue="" onChange={}>
-  //     <option value="">No bid selected</option>
-  //     { _.map(bids, (bid) => {
-  //         return (
-  //           <option value={bid.id} key={bid.id}>
-  //             ${formatPrice(bid.amount)} - {bid.supplier}
-  //           </option>
-  //         );
-  //       })
-  //     }
-  //   </select>
-  // </div>
 
   const isTradedBid = (bid) => {
     return(
@@ -58,10 +48,13 @@ const CustomSolutionBidSelector = (props) => {
 
   const renderBid = ({bid, getItemProps}) => {
     if(bid) {
+      const { id, amount, supplier, disabled, disabledReason} = bid;
+
       return (
-        <div {...getItemProps({ item: bid, key: bid.id })}>
-          <strong>${formatPrice(bid.amount)}</strong> - {bid.supplier}
+        <div {...getItemProps({ item: bid, key: id })} style={{padding: "6px 10px"}}>
+          <strong>${formatPrice(amount)}</strong> - {supplier}
           { isTradedBid(bid) }
+          { isNonsplittableBid(bid) }
         </div>
       );
     } else {
@@ -83,7 +76,7 @@ const CustomSolutionBidSelector = (props) => {
         selectedItem,
         clearSelection
       }) => (
-        <div style={{position: "relative", zIndex: 10}}>
+        <div style={{position: "relative", display: "flex"}}>
           <div className="select" {...getToggleButtonProps()}>
             { renderBid({bid: selectedItem, getItemProps}) }
           </div>
@@ -91,7 +84,7 @@ const CustomSolutionBidSelector = (props) => {
             <button onClick={clearSelection}><FontAwesomeIcon icon="times" /></button>
           }
           { isOpen &&
-            <div style={{position: "absolute", top: "100%", backgroundColor: "white"}}>
+            <div style={{position: "absolute", top: "100%", zIndex: 10, backgroundColor: "white"}}>
               { _.map(bids, (bid) => renderBid({bid, getItemProps})) }
             </div>
           }

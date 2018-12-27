@@ -23,7 +23,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
     .minBy('amount')
     .value();
 
-  const hasLowestBid = lowestFuelBid && (lowestFuelBid.supplier_id == supplierId)
+  const hasLowestBid = lowestFuelBid && supplierId && (lowestFuelBid.supplier_id == supplierId);
 
 
   return(

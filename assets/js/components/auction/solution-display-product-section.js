@@ -96,8 +96,8 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
                   <td className="auction-solution__product-table__supplier"><span className="qa-auction-bid-supplier">
                     { supplierName(bid) == "Your Bid" && highlightOwn
                       ? <span className="tag auction-solution__your-bid-tag">
-                        { supplierName(bid) }
-                      </span>
+                          { supplierName(bid) }
+                        </span>
                       : supplierName(bid)
                     }
                     </span></td>
