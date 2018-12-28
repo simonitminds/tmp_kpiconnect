@@ -9,7 +9,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
             data: nil,
             auction_id: nil,
             time_entered: nil,
-            user: nil
+            user: nil,
+            version: 2
 
   alias __MODULE__
 

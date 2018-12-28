@@ -153,7 +153,10 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
         {:start_decision_duration_timer, %Auction{decision_duration: decision_duration}, pid},
         current_state = %{duration_timer: duration_timer}
       ) do
-    Process.cancel_timer(duration_timer)
+
+    if duration_timer do
+      Process.cancel_timer(duration_timer)
+    end
     new_timer = create_timer(pid, decision_duration, :decision_duration)
 
     new_state =
