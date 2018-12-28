@@ -175,6 +175,23 @@ defmodule Oceanconnect.AuctionShowPage do
     |> click()
   end
 
+  def select_custom_solution_bids(bids, container \\ ".qa-auction-solution-custom") do
+    container = find_element(:css, container)
+
+    Enum.each(bids, fn(%{vessel_fuel_id: vfid, id: bid_id}) ->
+      selector =
+        container
+        |> find_within_element(:css, ".qa-custom-bid-selector-#{vfid} .select")
+
+      selector
+      |> click()
+
+      container
+      |> find_within_element(:css, ".qa-bid-#{bid_id}")
+      |> click()
+    end)
+  end
+
   def solution_has_bids?(solution, bids) when is_atom(solution) do
     element = find_element(:css, ".qa-auction-solution-best_overall")
 

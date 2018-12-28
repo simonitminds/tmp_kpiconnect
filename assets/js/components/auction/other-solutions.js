@@ -20,7 +20,7 @@ const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution})
               })
             }
             { showCustom &&
-              <CustomSolutionDisplay auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
+              <CustomSolutionDisplay auctionPayload={auctionPayload} acceptSolution={acceptSolution} className="qa-auction-solution-custom" />
             }
           </div>
         </div>

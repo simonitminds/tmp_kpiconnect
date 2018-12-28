@@ -11,6 +11,7 @@ import { formatPrice } from '../../utilities';
 const CustomSolutionBidSelector = (props) => {
   const {
     bids,
+    className,
     onChange
   } = props;
 
@@ -51,7 +52,7 @@ const CustomSolutionBidSelector = (props) => {
       const { id, amount, supplier, disabled, disabledReason} = bid;
 
       return (
-        <div {...getItemProps({ item: bid, key: id })} style={{padding: "6px 10px"}}>
+        <div className={`qa-bid-${bid.id}`} {...getItemProps({ item: bid, key: id })} style={{padding: "6px 10px"}}>
           <strong>${formatPrice(amount)}</strong> - {supplier}
           { isTradedBid(bid) }
           { isNonsplittableBid(bid) }
@@ -76,7 +77,7 @@ const CustomSolutionBidSelector = (props) => {
         selectedItem,
         clearSelection
       }) => (
-        <div style={{position: "relative", display: "flex"}}>
+        <div style={{position: "relative", display: "flex"}} className={className}>
           <div className="select" {...getToggleButtonProps()}>
             { renderBid({bid: selectedItem, getItemProps}) }
           </div>

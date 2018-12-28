@@ -19,7 +19,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const bestOverallSolution = _.get(auctionPayload, 'solutions.best_overall');
   const bestOverallSolutionBids = _.get(bestOverallSolution, 'bids');
-  const bidProductsForSupplier = _.chain(bestOverallSolutionBids)
+  const bestOverallProductsForSupplier = _.chain(bestOverallSolutionBids)
         .filter({'supplier_id': supplierIdInt})
         .map((bid) => {
           const vesselFuel = _.find(vesselFuels, (vf) =>  `${vf.id}` == bid.vessel_fuel_id);
@@ -33,6 +33,13 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const winningSolutionBids = _.get(auctionPayload, "solutions.winning_solution.bids");
   const winningSolutionSupplierIds = _.map(winningSolutionBids, 'supplier_id');
+  const winningSolutionProductsForSupplier = _.chain(winningSolutionBids)
+        .filter({'supplier_id': supplierIdInt})
+        .map((bid) => {
+          const vesselFuel = _.find(vesselFuels, (vf) =>  `${vf.id}` == bid.vessel_fuel_id);
+          return vesselFuel;
+        })
+        .value();
   const isInWinningSolution = _.includes(winningSolutionSupplierIds, supplierIdInt);
   const isWinningSolution = !_.some(winningSolutionSupplierIds, (id) => id != supplierIdInt);
 
@@ -60,10 +67,14 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
     const fuelCount = fuelNames.length;
 
-    return _.reduce(fuelNames, (acc, fuel, index) => {
-        const delim = (fuelCount <= 2) ? " and " : ((index == fuelCount - 1) ? ", and " : ", ");
-        return acc + delim + fuel;
-      });
+    if(fuelNames.length == 1) {
+      return fuelNames[0];
+    } else {
+      return _.reduce(fuelNames, (acc, fuel, index) => {
+          const delim = (fuelCount <= 2) ? " and " : ((index == fuelCount - 1) ? ", and " : ", ");
+          return acc + delim + fuel;
+        });
+    }
   }
 
   const messageDisplay = (message) => {
@@ -99,10 +110,10 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay(`You won bids for ${productNameString(bidProductsForSupplier)} in this auction`)}
+          {messageDisplay(`You won bids for ${productNameString(winningSolutionProductsForSupplier)} in this auction`)}
         </div>
         <div className="auction-notification__card-message">
-          {messageDisplay(`You won ${productPortionString(bidProductsForSupplier)} in this auction`)}
+          {messageDisplay(`You won ${productPortionString(winningSolutionProductsForSupplier)} in this auction`)}
         </div>
       </div>
     );
@@ -154,10 +165,10 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return (
       <div className="auction-notification box is-success">
         <div className="auction-notification__show-message">
-          {messageDisplay(`You have the best overall offer for ${productNameString(bidProductsForSupplier)}`)}
+          {messageDisplay(`You have the best overall offer for ${productNameString(bestOverallProductsForSupplier)}`)}
         </div>
         <div className="auction-notification__card-message">
-          {messageDisplay(`You have the best offer for ${productPortionString(bidProductsForSupplier)}`)}
+          {messageDisplay(`You have the best offer for ${productPortionString(bestOverallProductsForSupplier)}`)}
         </div>
       </div>
     );

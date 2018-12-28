@@ -388,20 +388,27 @@ defmodule Oceanconnect.AuctionShowTest do
     } do
       Auctions.start_auction(auction)
 
-      bid =
+      supplier1_bid1 =
         create_bid(1.25, nil, supplier.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
-      create_bid(1.25, nil, supplier.company_id, vessel_fuel2, auction)
-      |> Auctions.place_bid()
+      supplier1_bid2 =
+        create_bid(1.25, nil, supplier.company_id, vessel_fuel2, auction)
+        |> Auctions.place_bid()
 
-      bid2 =
+      supplier2_bid1 =
         create_bid(1.50, nil, supplier2.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
-      create_bid(1.50, nil, supplier2.company_id, vessel_fuel2, auction)
-      |> Auctions.place_bid()
+      supplier2_bid2 =
+        create_bid(1.50, nil, supplier2.company_id, vessel_fuel2, auction)
+        |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
-      {:ok, %{bid: bid, bid2: bid2}}
+      {:ok, %{
+        supplier1_bid1: supplier1_bid1,
+        supplier1_bid2: supplier1_bid2,
+        supplier2_bid1: supplier2_bid1,
+        supplier2_bid2: supplier2_bid2
+      }}
     end
 
     test "supplier view of decision period", %{auction: auction, supplier: supplier} do
@@ -411,16 +418,16 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
     end
 
-    test "buyer view of decision period", %{auction: auction, bid: bid, bid2: bid2, buyer: buyer} do
+    test "buyer view of decision period", %{auction: auction, supplier1_bid1: supplier1_bid1, supplier2_bid1: supplier2_bid1, buyer: buyer} do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.solution_has_bids?(:best_overall, [bid])
-      assert AuctionShowPage.solution_has_bids?(0, [bid2])
+      assert AuctionShowPage.solution_has_bids?(:best_overall, [supplier1_bid1])
+      assert AuctionShowPage.solution_has_bids?(0, [supplier2_bid1])
     end
 
     test "buyer selects best solution", %{
       auction: auction,
-      bid: bid,
+      supplier1_bid1: supplier1_bid1,
       buyer: buyer,
       supplier: supplier,
       supplier2: supplier2
@@ -432,7 +439,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
       assert AuctionShowPage.auction_status() == "CLOSED"
-      assert AuctionShowPage.winning_solution_has_bids?([bid])
+      assert AuctionShowPage.winning_solution_has_bids?([supplier1_bid1])
 
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
@@ -454,7 +461,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
     test "buyer selects other solution and provides comment", %{
       auction: auction,
-      bid2: bid2,
+      supplier2_bid1: supplier2_bid1,
       buyer: buyer,
       supplier: supplier,
       supplier2: supplier2,
@@ -471,7 +478,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
 
       assert AuctionShowPage.auction_status() == "CLOSED"
-      assert AuctionShowPage.winning_solution_has_bids?([bid2])
+      assert AuctionShowPage.winning_solution_has_bids?([supplier2_bid1])
 
       in_browser_session(:supplier, fn ->
         login_user(supplier)
@@ -512,6 +519,54 @@ defmodule Oceanconnect.AuctionShowTest do
 
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.port_agent() == "Test Agent"
+    end
+
+    test "buyer selects custom solution and provides comment", %{
+      auction: auction,
+      supplier1_bid2: supplier1_bid2,
+      supplier2_bid1: supplier2_bid1,
+      fuel: fuel,
+      buyer: buyer,
+      supplier: supplier,
+      supplier2: supplier2,
+      supplier3: supplier3
+    } do
+      login_user(buyer)
+      :timer.sleep(200)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.expand_solution(:custom)
+      AuctionShowPage.select_custom_solution_bids([supplier2_bid1, supplier1_bid2])
+      AuctionShowPage.select_solution(:custom)
+      :timer.sleep(100)
+      AuctionShowPage.enter_solution_comment("Screw you!")
+      AuctionShowPage.accept_bid()
+      :timer.sleep(500)
+
+      assert AuctionShowPage.auction_status() == "CLOSED"
+      assert AuctionShowPage.winning_solution_has_bids?([supplier2_bid1, supplier1_bid2])
+
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "You won bids for #{fuel.name} in this auction"
+
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+
+      in_browser_session(:supplier2, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You won bids for #{fuel.name} in this auction"
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+
+      in_browser_session(:supplier3, fn ->
+        login_user(supplier3)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
     end
   end
 
