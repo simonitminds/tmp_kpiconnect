@@ -158,9 +158,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:start_auction, %{auction: auction = %Auction{}, user: user}, emit},
         current_state
       ) do
-    new_state = start_auction(current_state, auction)
-
-    AuctionEvent.emit(AuctionEvent.auction_started(auction, new_state, user), emit)
+    new_state = start_auction(current_state, auction, user, emit)
 
     {:noreply, new_state}
   end
@@ -365,7 +363,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          %AuctionEvent{type: :auction_started, data: %{state: state, auction: auction}},
          _previous_state
        ) do
-    start_auction(state, auction)
+    start_auction(state, auction, nil, false)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
@@ -461,7 +459,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(_event, _previous_state), do: nil
 
-  defp start_auction(current_state, auction = %Auction{}) do
+  defp start_auction(%AuctionState{status: status} = current_state, auction = %Auction{}, user, emit) when status in [:pending, :open] do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
@@ -469,6 +467,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction
     |> Command.start_duration_timer()
     |> AuctionTimer.process_command()
+
 
     auction
     |> Command.cancel_scheduled_start()
@@ -480,7 +479,23 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
     next_state = SolutionCalculator.process(next_state, auction)
 
+    AuctionEvent.emit(AuctionEvent.auction_started(auction, next_state, user), emit)
     next_state
+  end
+
+  defp start_auction(%AuctionState{status: :decision} = current_state, auction = %Auction{}, _user, _emit) do
+    auction
+    |> Command.start_decision_duration_timer()
+    |> AuctionTimer.process_command()
+
+    auction
+    |> Command.cancel_scheduled_start()
+    |> AuctionScheduler.process_command(nil)
+
+    current_state
+  end
+  defp start_auction(%AuctionState{} = current_state, auction = %Auction{}, _user, _emit) do
+    current_state
   end
 
   defp update_auction(
