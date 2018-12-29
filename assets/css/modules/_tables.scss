@@ -137,9 +137,14 @@
       &.auction-solution__product-table__vessel { // Amount
         flex: 0 0 12rem;
       }
-      &.auction-solution__product-table__bid { // Amount
+      &.auction-solution__product-table__bid { // Bid
         margin-left: auto;
         flex: 0 0 15rem;
+      }
+      &.auction-solution__product-table__bid--custom { // Custom Bid
+        margin-left: auto;
+        flex: 0 0 25rem;
+        position: relative;
       }
       &.auction-solution__product-table__supplier { // Supplier
         flex: 0 0 12rem;
@@ -222,6 +227,17 @@
       th:not(.auction-solution__product-table__vessel) { // Hide non-lead headers in mobile
         display: none;
       }
+    }
+  }
+}
+
+.auction-solution__product-table--custom { // Adaptations for the custom solution table.
+  tbody tr td.auction-solution__product-table__bid-time {
+    display: none;
+  }
+  tbody tr td.auction-solution__product-table__bid--custom {
+    @media (max-width: 768px) and (min-width: 480px) {
+      flex: 0 1 30rem;
     }
   }
 }

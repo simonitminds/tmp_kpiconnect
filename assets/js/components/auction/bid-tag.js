@@ -12,7 +12,7 @@ const BidTag = ({bid, title, highlightOwn}) => {
       </span>
       { bid
         ? <span className="tag is-yellow has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">${formatPrice(bid.amount)}</span>
-        : <span className="tag is-gray-2 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
+        : <span className="tag auction-bidding__best-price--price has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
       }
     </div>
   );

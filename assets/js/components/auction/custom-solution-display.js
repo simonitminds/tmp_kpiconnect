@@ -144,7 +144,7 @@ export default class CustomSolutionDisplay extends React.Component {
                   .value();
 
                 return (
-                  <table className="auction-solution__product-table table is-striped" key={fuel.id}>
+                  <table className="auction-solution__product-table auction-solution__product-table--custom table is-striped" key={fuel.id}>
                     <thead>
                       <tr>
                         <th colSpan="4">{fuel.name}</th>
@@ -158,7 +158,7 @@ export default class CustomSolutionDisplay extends React.Component {
                           return (
                             <tr key={vesselFuel.id} className={`qa-custom-solution-vessel-${vessel.id}`}>
                               <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
-                              <td className="auction-solution__product-table__bid">
+                              <td className="auction-solution__product-table__bid auction-solution__product-table__bid--custom">
                                 <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
                               </td>
                               <td className="auction-solution__product-table__supplier">{bids.length == 1 ? "1 bid" : `${bids.length} bids` } available</td>

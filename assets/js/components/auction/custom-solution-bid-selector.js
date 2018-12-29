@@ -53,7 +53,7 @@ const CustomSolutionBidSelector = (props) => {
 
       return (
         <div className={`qa-bid-${bid.id}`} {...getItemProps({ item: bid, key: id })} style={{padding: "6px 10px"}}>
-          <strong>${formatPrice(amount)}</strong> - {supplier}
+          <strong>${formatPrice(amount)}</strong> - <span className="has-margin-right-sm">{supplier}</span>
           { isTradedBid(bid) }
           { isNonsplittableBid(bid) }
         </div>
@@ -77,15 +77,15 @@ const CustomSolutionBidSelector = (props) => {
         selectedItem,
         clearSelection
       }) => (
-        <div style={{position: "relative", display: "flex"}} className={className}>
-          <div className="select" {...getToggleButtonProps()}>
+        <div style={{position: "relative", width: "100%", display: "flex"}} className={className}>
+          <div className="select select--custom-bid" {...getToggleButtonProps()}>
             { renderBid({bid: selectedItem, getItemProps}) }
           </div>
           { selectedItem &&
             <button onClick={clearSelection}><FontAwesomeIcon icon="times" /></button>
           }
           { isOpen &&
-            <div style={{position: "absolute", top: "100%", zIndex: 10, backgroundColor: "white"}}>
+            <div className="select__custom-dropdown">
               { _.map(bids, (bid) => renderBid({bid, getItemProps})) }
             </div>
           }

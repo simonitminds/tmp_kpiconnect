@@ -134,6 +134,46 @@ fieldset {
   padding: 0.25rem 0.5rem;
 }
 
+.select--custom-bid {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid $gray-2;
+  border-radius: 3px;
+  background-color: $white;
+  overflow: hidden;
+
+  position: relative;
+
+  &> div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    span { padding-right: 1.5rem; }
+  }
+}
+
+.select__custom-dropdown {
+  position: absolute;
+  top: 100%;
+  z-index: 11;
+  background-color: $white;
+  border: 1px solid $gray-2;
+  border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  & > div { // Target actual items in dropdown.
+    &:not(:first-child) {
+      border-top: 1px solid $gray-1;
+    }
+    &:hover, &:focus {
+      background-color: $gray-0;
+    }
+  }
+}
+
 .select--transparent { // Transparent background select for use on colored backgrounds
   select {
     background-color: transparent;
