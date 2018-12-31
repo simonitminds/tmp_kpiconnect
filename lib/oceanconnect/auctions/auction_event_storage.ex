@@ -37,7 +37,33 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     |> Enum.map(fn event -> hydrate_event(event) end)
   end
 
+  def most_recent_state(auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+    events = events_by_auction(auction_id)
+    state_for_type(auction, events)
+  end
+
+  defp state_for_type(auction, []) do
+    Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+  end
+
+  defp state_for_type(auction, events) do
+    last_event = hd(events)
+    if last_event.type in [
+         :auction_updated,
+         :auction_rescheduled,
+         :upcoming_auction_notified,
+         :auction_created,
+         :duration_extended
+       ] do
+      [_last | rest] = events
+      state_for_type(auction, rest)
+    else
+      last_event.data.state
+    end
+  end
+
   def hydrate_event(nil), do: nil
+
   def hydrate_event(event) do
     :erlang.binary_to_term(event)
   end
