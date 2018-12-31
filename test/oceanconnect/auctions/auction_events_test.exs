@@ -7,8 +7,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
     buyer_company = insert(:company, is_supplier: false)
-    fuel = insert(:fuel)
-    fuel_id = "#{fuel.id}"
+    vessel_fuel = insert(:vessel_fuel)
+    vessel_fuel_id = "#{vessel_fuel.id}"
 
     auction =
       insert(
@@ -16,7 +16,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         duration: 1_000,
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier2_company],
-        auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)],
+        auction_vessel_fuels: [],
         buyer: buyer_company,
         is_traded_bid_allowed: true
       )
@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
           }}}
       )
 
-    {:ok, %{auction: auction, fuel: fuel, fuel_id: fuel_id, supplier: supplier_company}}
+    {:ok, %{auction: auction, vessel_fuel_id: vessel_fuel_id, supplier: supplier_company}}
   end
 
   test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
@@ -56,7 +56,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         auction
         |> Map.take([
           :scheduled_start,
-          :fuel_id,
+          :vessel_fuel_id,
           :port_id,
           :auction_vessel_fuels,
           :suppliers,
@@ -123,12 +123,12 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "placing a bid adds a bid_placed event to the event store", %{
       auction: auction = %Auction{id: auction_id},
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
-      create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+      create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       :timer.sleep(200)
@@ -143,12 +143,12 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "placing a traded bid adds a bid_placed event to the event store", %{
       auction: auction = %Auction{id: auction_id},
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
-      create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction, true)
+      create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
       :timer.sleep(200)
@@ -167,18 +167,18 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "revoking a supplier's bids adds a bids_revoked event to the event store", %{
       auction: auction = %Auction{id: auction_id},
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       supplier_id = hd(auction.suppliers).id
 
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
-      create_bid(1.25, nil, supplier_id, fuel_id, auction)
+      create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       :timer.sleep(100)
-      Auctions.revoke_supplier_bids_for_product(auction, fuel_id, supplier_id)
+      Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_id)
 
       :timer.sleep(200)
       assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
@@ -209,14 +209,14 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "selecting the winning solution", %{
       auction: auction = %Auction{id: auction_id},
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
 
       bid =
-        create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction, true)
+        create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction, true)
         |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
@@ -246,16 +246,16 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "ensure events are in proper order", %{
       auction: auction = %Auction{id: auction_id},
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
 
-      create_bid(1.25, nil, hd(auction.suppliers).id, fuel_id, auction)
+      create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      create_bid(1.50, nil, hd(auction.suppliers).id, fuel_id, auction)
+      create_bid(1.50, nil, hd(auction.suppliers).id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
