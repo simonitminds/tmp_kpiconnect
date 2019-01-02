@@ -8,6 +8,7 @@ defmodule Oceanconnect.Auctions do
     AuctionCache,
     AuctionEvent,
     AuctionEventStore,
+    AuctionEventStorage,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
@@ -261,8 +262,7 @@ defmodule Oceanconnect.Auctions do
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
-        AuctionStore.AuctionState.from_auction(auction)
-
+        AuctionEventStorage.most_recent_state(auction)
       state ->
         state
     end
