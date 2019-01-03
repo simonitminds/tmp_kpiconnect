@@ -31,6 +31,12 @@
   .auction-solution__header__row {
     display: flex;
     width: 100%;
+
+    &:first-child { // Target title row of auction solution
+      @media (max-width: 480px) {
+        flex-direction: column;
+      }
+    }
   }
 
   .auction-solution__header__row--preview {
@@ -78,6 +84,14 @@
     &> svg {
       flex: 0 0 1.5rem;
       padding-right: 0.5rem !important;
+    }
+
+    @media (max-width: 480px) {
+      align-items: flex-start;
+      
+      &> svg {
+        margin-top: 0.375rem;
+      }
     }
   }
   .auction-solution__content {

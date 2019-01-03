@@ -108,6 +108,9 @@
         display: none;
       }
     }
+    thead tr {
+      border-bottom: 3px solid $gray-3;
+    }
   }
 }
 
@@ -139,7 +142,7 @@
       }
       &.auction-solution__product-table__bid { // Bid
         margin-left: auto;
-        flex: 0 0 15rem;
+        flex: 1 0 15rem;
       }
       &.auction-solution__product-table__bid--custom { // Custom Bid
         margin-left: auto;
@@ -147,7 +150,7 @@
         position: relative;
       }
       &.auction-solution__product-table__supplier { // Supplier
-        flex: 0 0 12rem;
+        flex: 1 0 12rem;
       }
       &.auction-solution__product-table__bid-time { // Time
         flex: 0 0 6rem;
@@ -177,13 +180,13 @@
     thead tr, tbody tr {
       th, td {
         &.auction-solution__product-table__vessel { // Amount
-          flex: 0 0 10rem;
+          flex: 0 1 10rem;
         }
         &.auction-solution__product-table__bid { // Amount
           flex: 0 0 9rem;
         }
         &.auction-solution__product-table__supplier { // Supplier
-          flex: 0 0 12rem;
+          flex: 1 0 9rem;
         }
         &.auction-solution__product-table__revoke { // Revoke Bid
           display: table-cell;
