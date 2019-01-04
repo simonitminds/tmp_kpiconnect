@@ -210,7 +210,7 @@ fieldset {
 .select__custom-dropdown {
   position: absolute;
   top: 100%;
-  width: 100%;
+  width: calc(100% - 2.25rem);
   z-index: 11;
   background-color: $white;
   border: 1px solid $gray-2;
@@ -231,11 +231,12 @@ fieldset {
 }
 
 .select--custom-bid__count {
+  display: inline-block;
   margin-left: 0.5rem;
-  flex: 1 0 7rem;
+  flex: 1 1 7rem;
 
   @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
   }
 }
 

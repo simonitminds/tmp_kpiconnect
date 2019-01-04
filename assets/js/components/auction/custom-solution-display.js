@@ -144,10 +144,10 @@ export default class CustomSolutionDisplay extends React.Component {
                   .value();
 
                 return (
-                  <table className="auction-solution__product-table auction-solution__product-table--custom table is-striped" key={fuel.id}>
+                  <table className="auction-solution__custom-product-table table is-striped" key={fuel.id}>
                     <thead>
                       <tr>
-                        <th colSpan="4">{fuel.name}</th>
+                        <th>{fuel.name}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -157,11 +157,38 @@ export default class CustomSolutionDisplay extends React.Component {
 
                           return (
                             <tr key={vesselFuel.id} className={`qa-custom-solution-vessel-${vessel.id}`}>
-                              <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
-                              <td className="auction-solution__product-table__bid auction-solution__product-table__bid--custom">
+                            <MediaQuery minWidth={940}>
+                              <td className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
+                              <td className="auction-solution__custom-product-table__bid">
                                 <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
                                 <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
                               </td>
+                            </MediaQuery>
+                              <MediaQuery minWidth={480} maxWidth={768}>
+                                <td className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
+                                <td className="auction-solution__custom-product-table__bid">
+                                  <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                  <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                </td>
+                              </MediaQuery>
+                              <MediaQuery maxWidth={480}>
+                                <td className="auction-solution__custom-product-table__vessel">
+                                  <div className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></div>
+                                  <div className="auction-solution__custom-product-table__bid">
+                                    <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                    <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                  </div>
+                                </td>
+                              </MediaQuery>
+                              <MediaQuery minWidth={768} maxWidth={940}>
+                                <td className="auction-solution__custom-product-table__vessel">
+                                  <div className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></div>
+                                  <div className="auction-solution__custom-product-table__bid">
+                                    <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                    <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                  </div>
+                                </td>
+                              </MediaQuery>
                             </tr>
                           );
                         })

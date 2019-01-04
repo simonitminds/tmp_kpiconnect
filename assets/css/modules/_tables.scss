@@ -244,54 +244,118 @@
   }
 }
 
-.auction-solution__product-table--custom { // Adaptations for the custom solution table.
+// .auction-solution__product-table--custom { // Adaptations for the custom solution table.
+//   table-layout: fixed;
+//
+//   thead tr {
+//     display: table-row;
+//   }
+//
+//   tbody tr {
+//     display: table-row;
+//
+//     @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+//       align-items: flex-start;
+//     }
+//   }
+//   tbody tr td.auction-solution__product-table__vessel {
+//     flex: none;
+//
+//     @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+//       flex: none;
+//     }
+//   }
+//   tbody tr td.auction-solution__product-table__bid {
+//     flex: none;
+//   }
+//   tbody tr td.auction-solution__product-table__bid-time {
+//     display: none;
+//   }
+//   tbody tr td.auction-solution__product-table__bid--custom {
+//
+//     @media (max-width: 1400px) and (min-width: 768px) {
+//     }
+//
+//     @media (max-width: 768px) and (min-width: 480px) {
+//       flex: none;
+//     }
+//     @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+//       // flex-direction: column;
+//       // align-items: flex-start;
+//     }
+//
+//     .custom-bid__dropdown__head {
+//       // display: flex;
+//       position: relative;
+//
+//       @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+//         flex: none;
+//       }
+//
+//       // Children Sizing
+//
+//       .select--custom-bid {
+//         flex: none;
+//       }
+//
+//       .button.button-icon {
+//         flex: none;
+//       }
+//     }
+//     .custom-bid__dropdown__list {
+//       padding: 6px 10px;
+//     }
+//   }
+//   tbody tr td.auction-solution__product-table__bid--custom > div {
+//     flex: none;
+//   }
+// }
+
+.auction-solution__custom-product-table {
+  width: calc(100% + 2rem);
+  margin: 0 -1rem;
   table-layout: fixed;
+  border-collapse:collapse;
 
-  tbody tr {
-    align-items: center;
-
-    @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
-      align-items: flex-start;
-    }
-  }
-  tbody tr td.auction-solution__product-table__vessel {
-    flex: 0 0 9rem;
+  thead tr th {
+    width: 9rem;
+    white-space: nowrap;
 
     @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
-      flex: 0 1 auto;
+      width: 100%;
     }
   }
-  tbody tr td.auction-solution__product-table__bid-time {
-    display: none;
+
+  tbody {
+    border-top: 5px solid #888888;
   }
-  tbody tr td.auction-solution__product-table__bid--custom {
 
-    @media (max-width: 1400px) and (min-width: 768px) {
-      // flex: 0 1 calc(100% - 10rem);
-    }
+  .auction-solution__custom-product-table__vessel {
+    width: 9rem;
 
-    @media (max-width: 768px) and (min-width: 480px) {
-      flex: 0 1 auto;
-    }
     @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
+      width: 100%;
+    }
+  }
+  .auction-solution__custom-product-table__bid {
+    width: calc(100% - 9rem);
+
+    @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+      position: relative;
+      width: 100%;
     }
 
     .custom-bid__dropdown__head {
-      display: flex;
       position: relative;
-      // width: calc(100vw - 38rem);
+      display: flex;
 
-      @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
-        // width: calc(100vw - 2rem);
+      .select--custom-bid {
+        width: calc(100% - 2rem);
       }
     }
     .custom-bid__dropdown__list {
-      padding: 6px 10px;
+      padding: 0.5rem 0.75rem;
     }
-  }
-  tbody tr td.auction-solution__product-table__bid--custom > div {
-    // flex: 1 0 calc(100% - 7rem);
+
   }
 }
