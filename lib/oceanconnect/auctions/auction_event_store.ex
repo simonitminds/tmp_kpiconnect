@@ -40,6 +40,15 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     |> Enum.reject(&is_nil(&1))
   end
 
+  def create_auction_snapshot(event = %AuctionEvent{type: :auction_snapshotted, auction_id: auction_id}) do
+    case find_pid(auction_id) do
+      {:ok, pid} ->
+        GenServer.call(pid, {:persist_auction_snapshot, event})
+
+      {:error, "Auction Event Store Not Started"} ->
+        {:error, "Auction Event Store Not Started"}
+    end
+  end
   # Server
   def init({auction_id, nil}) do
     Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
@@ -61,5 +70,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
     events = [persisted_event | current_events]
     {:noreply, events}
+  end
+
+  def handle_call({:persist_auction_snapshot, event = %AuctionEvent{auction_id: auction_id, type: :auction_state_snapshotted}}, _from, current_events) do
+    {:ok, %AuctionEventStorage{event: persisted_event}} =
+      @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
+    events = [persisted_event | current_events]
+    {:reply, {:ok, event}, events}
   end
 end

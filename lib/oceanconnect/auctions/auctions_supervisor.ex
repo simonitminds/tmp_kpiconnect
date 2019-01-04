@@ -32,4 +32,13 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
         raise("Could Not Start AuctionStore for auction #{auction.id}")
     end
   end
+
+  def stop_child(auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+    with {:ok, pid} <- Oceanconnect.Auctions.AuctionSupervisor.find_pid(auction_id),
+         :ok <- DynamicSupervisor.terminate_child(__MODULE__, pid) do
+      {:ok, "Auction Services Stopped"}
+    else
+      {:error, msg} -> {:error, msg}
+    end
+  end
 end

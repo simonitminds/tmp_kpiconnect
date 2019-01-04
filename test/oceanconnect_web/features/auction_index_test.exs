@@ -20,7 +20,10 @@ defmodule Oceanconnect.AuctionIndexTest do
     AuctionIndexPage.visit()
     :timer.sleep(500)
     AuctionIndexPage.cancel_auction(auction)
-    :timer.sleep(300)
+    :timer.sleep(500)
+
+    AuctionIndexPage.visit()
+
     assert AuctionIndexPage.auction_is_status?(auction, "canceled")
   end
 

@@ -18,7 +18,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
     results =
       Auctions.list_auctions()
       |> Enum.filter(fn(auction) ->
-        %{status: status} = Auctions.AuctionEventStorage.most_recent_state(auction)
+        %{status: status} = Oceanconnect.Auctions.AuctionEventStorage.most_recent_state(auction)
         status in [:draft, :pending, :open, :decision]
       end)
       |> Enum.map(fn auction ->

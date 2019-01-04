@@ -124,6 +124,10 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     |> Auctions.update_auction_without_event_storage!(%{auction_closed_time: time_entered})
 
     AuctionNotifier.notify_participants(auction_state)
+    AuctionEvent.auction_state_snapshotted(auction, auction_state)
+    |> AuctionEvent.emit(true)
+
+    Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}
   end
 
