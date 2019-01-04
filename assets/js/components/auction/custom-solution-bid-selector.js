@@ -16,35 +16,31 @@ const CustomSolutionBidSelector = (props) => {
   } = props;
 
   const isTradedBid = (bid) => {
-    return(
-      <span>
-        { bid.is_traded_bid
-          ? <span className="auction__traded-bid-tag">
-              <span action-label="Traded Bid" className="auction__traded-bid-marker">
-                <FontAwesomeIcon icon="exchange-alt" />
-              </span>
-              <span className="has-padding-left-sm">Traded Bid</span>
-            </span>
-          : ""
-        }
-      </span>
-    );
+    if(bid.is_traded_bid) {
+      return(
+        <span className="auction__traded-bid-tag">
+          <span action-label="Traded Bid" className="auction__traded-bid-marker">
+            <FontAwesomeIcon icon="exchange-alt" />
+          </span>
+          <span className="has-padding-left-sm">Traded Bid</span>
+        </span>
+      );
+    };
+    return;
   }
 
   const isNonsplittableBid = (bid) => {
-    return(
-      <span>
-        { bid.allow_split == false
-          ? <span className="auction__nonsplittable-bid-tag">
-              <span action-label="Can't Be Split" className="auction__nonsplittable-bid-marker">
-                <FontAwesomeIcon icon="ban" />
-              </span>
-              <span className="has-padding-left-sm">Unsplittable</span>
-            </span>
-          : ""
-        }
-      </span>
-    );
+    if(bid.allow_split == false) {
+      return(
+        <span className="auction__nonsplittable-bid-tag">
+          <span action-label="Can't Be Split" className="auction__nonsplittable-bid-marker">
+            <FontAwesomeIcon icon="ban" />
+          </span>
+          <span className="has-padding-left-sm">Unsplittable</span>
+        </span>
+      );
+    };
+    return;
   }
 
   const renderBid = ({bid, getItemProps}) => {
@@ -52,15 +48,15 @@ const CustomSolutionBidSelector = (props) => {
       const { id, amount, supplier, disabled, disabledReason} = bid;
 
       return (
-        <div className={`qa-bid-${bid.id}`} {...getItemProps({ item: bid, key: id })} style={{padding: "6px 10px"}}>
-          <strong>${formatPrice(amount)}</strong> - <span className="has-margin-right-sm">{supplier}</span>
+        <div className={`custom-bid__dropdown__list qa-bid-${bid.id}`} {...getItemProps({ item: bid, key: id })}>
+          <span className="custom-bid__supplier"><strong className="has-margin-right-xs">${formatPrice(amount)}</strong> - {supplier}</span>
           { isTradedBid(bid) }
           { isNonsplittableBid(bid) }
         </div>
       );
     } else {
       return (
-        <div {...getItemProps({item: bid, key: ""})}>
+        <div {...getItemProps({item: bid, key: ""})} style={{padding: "6px 10px"}}>
           <span className="is-italic">No bid selected</span>
         </div>
       );
@@ -77,12 +73,12 @@ const CustomSolutionBidSelector = (props) => {
         selectedItem,
         clearSelection
       }) => (
-        <div style={{position: "relative", width: "100%", display: "flex"}} className={className}>
+        <div className={`${className} custom-bid__dropdown__head`}>
           <div className="select select--custom-bid" {...getToggleButtonProps()}>
             { renderBid({bid: selectedItem, getItemProps}) }
           </div>
           { selectedItem &&
-            <button onClick={clearSelection}><FontAwesomeIcon icon="times" /></button>
+            <button className="button button--icon" onClick={clearSelection}><FontAwesomeIcon icon="times" /></button>
           }
           { isOpen &&
             <div className="select__custom-dropdown">

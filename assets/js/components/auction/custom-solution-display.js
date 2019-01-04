@@ -160,9 +160,8 @@ export default class CustomSolutionDisplay extends React.Component {
                               <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
                               <td className="auction-solution__product-table__bid auction-solution__product-table__bid--custom">
                                 <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
                               </td>
-                              <td className="auction-solution__product-table__supplier">{bids.length == 1 ? "1 bid" : `${bids.length} bids` } available</td>
-                              <td className="auction-solution__product-table__bid-time"></td>
                             </tr>
                           );
                         })

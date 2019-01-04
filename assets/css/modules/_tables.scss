@@ -145,9 +145,12 @@
         flex: 1 0 15rem;
       }
       &.auction-solution__product-table__bid--custom { // Custom Bid
+        display: flex;
+        align-items: center;
         margin-left: auto;
-        flex: 0 0 25rem;
+        flex: 1 1 auto;
         position: relative;
+        flex-wrap: wrap;
       }
       &.auction-solution__product-table__supplier { // Supplier
         flex: 1 0 12rem;
@@ -172,6 +175,10 @@
         &.auction-solution__product-table__bid { // Amount
           margin-left: auto;
           flex: 0 0 9rem;
+        }
+        &.auction-solution__product-table__bid--custom { // Custom Bid
+          margin-left: auto;
+          flex: 1 1 auto;
         }
       }
     }
@@ -217,6 +224,9 @@
         &.auction-solution__product-table__supplier { // Supplier
           flex: 0 0 auto;
         }
+        &.auction-solution__product-table__supplier { // Supplier
+          flex: 0 0 auto;
+        }
         &.auction-solution__product-table__bid-time { // Time
           flex: 0 0 auto;
         }
@@ -235,12 +245,53 @@
 }
 
 .auction-solution__product-table--custom { // Adaptations for the custom solution table.
+  table-layout: fixed;
+
+  tbody tr {
+    align-items: center;
+
+    @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+      align-items: flex-start;
+    }
+  }
+  tbody tr td.auction-solution__product-table__vessel {
+    flex: 0 0 9rem;
+
+    @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+      flex: 0 1 auto;
+    }
+  }
   tbody tr td.auction-solution__product-table__bid-time {
     display: none;
   }
   tbody tr td.auction-solution__product-table__bid--custom {
-    @media (max-width: 768px) and (min-width: 480px) {
-      flex: 0 1 30rem;
+
+    @media (max-width: 1400px) and (min-width: 768px) {
+      // flex: 0 1 calc(100% - 10rem);
     }
+
+    @media (max-width: 768px) and (min-width: 480px) {
+      flex: 0 1 auto;
+    }
+    @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .custom-bid__dropdown__head {
+      display: flex;
+      position: relative;
+      // width: calc(100vw - 38rem);
+
+      @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+        // width: calc(100vw - 2rem);
+      }
+    }
+    .custom-bid__dropdown__list {
+      padding: 6px 10px;
+    }
+  }
+  tbody tr td.auction-solution__product-table__bid--custom > div {
+    // flex: 1 0 calc(100% - 7rem);
   }
 }
