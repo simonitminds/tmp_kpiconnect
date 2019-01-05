@@ -17,7 +17,8 @@ export default class SolutionDisplay extends React.Component {
     this.container = React.createRef();
     this.state = {
       selected: false,
-      expanded: isExpanded
+      expanded: isExpanded,
+      hasOverflow: false
     }
   }
 
@@ -44,6 +45,12 @@ export default class SolutionDisplay extends React.Component {
   toggleExpanded(e) {
     e.preventDefault();
     this.setState({expanded: !this.state.expanded});
+  }
+
+  toggleOverflow(e) {
+    e.preventDefault();
+    this.setState({hasOverflow: true});
+    setTimeout(() => this.setState({hasOverflow: false}), 750);
   }
 
   render() {
@@ -97,7 +104,7 @@ export default class SolutionDisplay extends React.Component {
     };
 
     return (
-      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`} ref={this.container}>
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
