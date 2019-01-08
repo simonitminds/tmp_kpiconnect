@@ -19,8 +19,13 @@ export default class CustomSolutionDisplay extends React.Component {
       selected: false,
       isExpanded: isExpanded,
       hasOverflow: false,
+      overflowTimer: null,
       selectedBids: []
     }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.state.overflowTimer);
   }
 
   selectSolution() {
@@ -49,9 +54,10 @@ export default class CustomSolutionDisplay extends React.Component {
   }
 
   toggleOverflow(e) {
-    e.preventDefault();
     this.setState({hasOverflow: true});
-    setTimeout(() => this.setState({hasOverflow: false}), 750);
+    let timer = setTimeout(() => {this.setState({hasOverflow: false})}, 750);
+    this.setState({overflowTimer: timer})
+    return false;
   }
 
   bidSelected(vesselFuelId, bid) {
@@ -106,7 +112,7 @@ export default class CustomSolutionDisplay extends React.Component {
 
 
     return (
-      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container}>
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
