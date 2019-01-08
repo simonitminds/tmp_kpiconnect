@@ -40,7 +40,7 @@ main {
 main {
   width: 100vw;
   overflow-y: scroll;
-  
+
   @media (max-width: 768px) {
     overflow-y: hidden;
     height: calc(100vh - 3.25rem);
@@ -155,6 +155,8 @@ section {
 }
 
 .auction-app { // Not to be confused with the ID... probably going to rename in a bit.
+  display: flex;
+  flex-direction: column;
 
   .alert:not(:empty) + main & { // Adjust the height when there's a notification in the header...
     height: calc(100vh - 89px);

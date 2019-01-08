@@ -1,229 +1,215 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatTime, formatPrice } from '../../utilities';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SolutionAcceptDisplay from './solution-accept-display';
 import MediaQuery from 'react-responsive';
+import { formatTime, formatPrice } from '../../utilities';
+import BidTag from './bid-tag';
+import CustomSolutionBidSelector from './custom-solution-bid-selector';
+import SolutionAcceptDisplay from './solution-accept-display';
+import SolutionDisplayBarges from './solution-display-barges';
+import SolutionDisplayProductPrices from './solution-display-product-prices';
 
 export default class CustomSolutionDisplay extends React.Component {
   constructor(props) {
     super(props);
     const isExpanded = this.props.isExpanded;
+
+    this.container = React.createRef();
     this.state = {
       selected: false,
-      expanded: isExpanded
+      isExpanded: isExpanded,
+      hasOverflow: false,
       selectedBids: []
-    };
+    }
+  }
+
+  selectSolution() {
+    this.setState({selected: true})
   }
 
   cancelSelection(e) {
     e.preventDefault();
-    const selectionWindow = document.querySelector(`.${this.props.className} > .auction-solution__confirmation`);
+    const selectionWindow = this.container.current.querySelector(".auction-solution__confirmation");
     selectionWindow.classList.add("clear");
-    setTimeout(function(){this.setState({selected: false})}.bind(this), 750);
-    return(false);
+    setTimeout(() => this.setState({selected: false}), 750);
+    return false;
   }
-  selectSolution() {
-    this.setState({selected: true});
-  }
-  onConfirm(event) {
-    event.preventDefault();
-    const bidIds = _.map(this.props.solution.bids, 'id');
+
+  onConfirm(e) {
+    e.preventDefault();
+    const bidIds = _.map(this.state.selectedBids, 'id');
     const auctionId = this.props.auctionPayload.auction.id;
-    this.props.acceptSolution(auctionId, bidIds, event);
-    return(false);
+    this.props.acceptSolution(auctionId, bidIds, e);
+    return false;
   }
+
   toggleExpanded(e) {
     e.preventDefault();
-    this.setState({expanded: !this.state.expanded});
+    this.setState({isExpanded: !this.state.isExpanded});
   }
 
-  selectBid(bid) {
+  toggleOverflow(e) {
+    e.preventDefault();
+    this.setState({hasOverflow: true});
+    setTimeout(() => this.setState({hasOverflow: false}), 750);
+  }
+
+  bidSelected(vesselFuelId, bid) {
+    const remainingOldBids = _.reject(this.state.selectedBids, {vessel_fuel_id: `${vesselFuelId}`});
+    const newSelectedBids = bid ? [...remainingOldBids, bid] : remainingOldBids;
+
     this.setState({
-      selectedBids: [...this.state.selectedBids, bid]
+      selectedBids: newSelectedBids
     });
   }
+
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, supplierId, best, children, className} = this.props;
-    const isSupplier = !!supplierId;
-    const auctionId = auctionPayload.auction.id;
+    const {auctionPayload, acceptSolution, className} = this.props;
+    const {isExpanded, selected, selectedBids} = this.state;
     const auctionStatus = auctionPayload.status;
+    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
     const suppliers = _.get(auctionPayload, 'auction.suppliers');
     const fuels = _.get(auctionPayload, 'auction.fuels');
-    const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
-    const bidIds = _.map(bids, 'id');
-    const productBids = _.get(auctionPayload, 'productBids')
-    const fuelBids = _.map(bids, (bid) => {
-      const fuel = _.find(fuels, (fuel) => fuel.id == bid.fuel_id);
-      return {fuel, bid};
-    });
-    const solutionSuppliers = _.chain(bids)
-      .map((bid) => bid.supplier)
-      .uniq()
-      .value();
-    const isSingleSupplier = (solutionSuppliers.length <= 1);
-
-
+    const vessels = _.get(auctionPayload, 'auction.vessels');
     const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
-    const fuelQuantities = _.chain(fuels)
-        .reduce((acc, fuel) => {
-          acc[fuel.id] = _.chain(vesselFuels).filter((vf) => vf.fuel_id == fuel.id).sumBy((vf) => vf.quantity).value();
-          return acc;
-        }, {})
-        .value();
-    const totalQuantity = _.sum(Object.values(fuelQuantities));
-    const acceptable = !!acceptSolution;
-    const isExpanded = this.state.expanded;
+    const acceptable = !!acceptSolution && auctionStatus == 'decision';
 
-
-    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
-    const bidSupplierIDs = _.chain(bids)
-      .map((bid) => {
-        if(bid.supplier_id) {
-          return bid.supplier_id;
-        } else {
-          const supplier = _.find(suppliers, {name: bid.supplier});
-          return supplier && supplier.id;
-        }
-      })
-      .uniq()
-      .value();
-    const approvedAuctionBargesForSolution = _.chain(auctionBarges)
-      .filter((auctionBarge) => _.includes(bidSupplierIDs, auctionBarge.supplier_id))
-      .filter({approval_status: "APPROVED"})
+    const bidsByFuel = _.chain(fuels)
+      .reduce((acc, fuel) => {
+        const vfIds = _.chain(vesselFuels)
+          .filter((vf) => vf.fuel_id == fuel.id)
+          .map((vf) => `${vf.id}`)
+          .value();
+        const fuelBids = _.filter(selectedBids, (bid) => _.includes(vfIds, bid.vessel_fuel_id));
+        acc[fuel.name] = fuelBids;
+        return acc;
+      }, {})
       .value();
 
-    const isTradedBid = (bid) => {
-      return(
-        <span>
-          { bid.is_traded_bid ?
-            <span className="auction__traded-bid-tag">
-              <span action-label="Traded Bid" className="auction__traded-bid-marker">
-                <FontAwesomeIcon icon="exchange-alt" />
-              </span>
-              <span className="has-padding-left-sm">Traded Bid</span>
-            </span>
-          : "" }
+    const lowestFuelBids = _.chain(bidsByFuel)
+      .reduce((acc, bids, fuel) => {
+        acc[fuel] = _.minBy(bids, 'amount');
+        return acc;
+      }, {})
+      .value();
 
-        </span>
-      );
-    }
-
-    const supplierName = (bid) => {
-      if(supplierId) {
-        return bid.supplier_id == supplierId ? "Your Bid" : "";
-      } else {
-        return bid.supplier;
+    const totalAmounts = _.reduce(selectedBids, ({quantity, price}, bid) => {
+      const vf = _.find(vesselFuels, (vf) => vf.id == bid.vessel_fuel_id);
+      return {
+        quantity: quantity + vf.quantity,
+        price: price + (bid.amount * vf.quantity)
       }
-    }
+    }, {quantity: 0, price: 0});
 
-    const renderBarges = (auctionBarges) => {
-      if(auctionBarges.length > 0) {
-        return (
-          <div className="auction-solution__barge-list">
-            {
-              auctionBarges.map((auctionBarge) => {
-                const barge = auctionBarge.barge;
+    const normalizedPrice = totalAmounts.price / totalAmounts.quantity;
+
+
+    return (
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container}>
+        <div className="auction-solution__header auction-solution__header--bordered">
+          <div className="auction-solution__header__row">
+            <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
+              { isExpanded
+                ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
+                : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
+              }
+              <span className="is-inline-block">
+                <span className="auction-solution__title__category">Custom Split Solution</span>
+                <span className="auction-solution__title__description has-text-gray-3">Assemble offer based on all valid product offerings</span>
+              </span>
+              <MediaQuery query="(max-width: 480px)">
+                { acceptable &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </h3>
+            <div className="auction-solution__content">
+              { selectedBids.length > 0 &&
+                <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalizedPrice)}</span>
+              }
+              <MediaQuery query="(min-width: 480px)">
+                { acceptable &&
+                  <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
+                }
+              </MediaQuery>
+            </div>
+          </div>
+          <SolutionDisplayProductPrices lowestFuelBids={lowestFuelBids} highlightOwn={false} />
+        </div>
+
+        <div className="auction-solution__body">
+          <div className="auction-solution__barge-section">
+            <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong>
+            <SolutionDisplayBarges suppliers={suppliers} bids={selectedBids} auctionBarges={auctionBarges} />
+          </div>
+
+          <div>
+            { _.map(fuels, (fuel) => {
+                const vesselFuelsForFuel = _.chain(vesselFuels)
+                  .filter({fuel_id: fuel.id})
+                  .value();
+
                 return (
-                  <span key={auctionBarge.id} className="auction-solution__barge">
-                    { barge.name } ({barge.imo_number})
-                  </span>
+                  <table className="auction-solution__custom-product-table table is-striped" key={fuel.id}>
+                    <thead>
+                      <tr>
+                        <th>{fuel.name}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      { _.map(vesselFuelsForFuel, (vesselFuel) => {
+                          const {vessel} = vesselFuel;
+                          const bids = _.get(auctionPayload, `product_bids[${vesselFuel.id}].lowest_bids`);
+
+                          return (
+                            <tr key={vesselFuel.id} className={`qa-custom-solution-vessel-${vessel.id}`}>
+                            <MediaQuery minWidth={940}>
+                              <td className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
+                              <td className="auction-solution__custom-product-table__bid">
+                                <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                              </td>
+                            </MediaQuery>
+                              <MediaQuery minWidth={480} maxWidth={768}>
+                                <td className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></td>
+                                <td className="auction-solution__custom-product-table__bid">
+                                  <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                  <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                </td>
+                              </MediaQuery>
+                              <MediaQuery maxWidth={480}>
+                                <td className="auction-solution__custom-product-table__vessel">
+                                  <div className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></div>
+                                  <div className="auction-solution__custom-product-table__bid">
+                                    <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                    <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                  </div>
+                                </td>
+                              </MediaQuery>
+                              <MediaQuery minWidth={768} maxWidth={940}>
+                                <td className="auction-solution__custom-product-table__vessel">
+                                  <div className="auction-solution__custom-product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span></div>
+                                  <div className="auction-solution__custom-product-table__bid">
+                                    <CustomSolutionBidSelector bids={bids} onChange={this.bidSelected.bind(this, vesselFuel.id)} className={`qa-custom-bid-selector-${vesselFuel.id}`} />
+                                    <span className="select--custom-bid__count">({bids.length == 1 ? "1 bid" : `${bids.length} bids` } available)</span>
+                                  </div>
+                                </td>
+                              </MediaQuery>
+                            </tr>
+                          );
+                        })
+                      }
+                    </tbody>
+                  </table>
                 );
               })
             }
           </div>
-        );
-      }
-      else {
-        return (
-          <div className="auction-solution__barge-list">
-            <i>None</i>
-          </div>
-        );
-      }
-
-    }
-
-    const renderSlot = (bid) => {
-      return (
-        <tr key={fuel.id} className={`qa-auction-bid-${bid.id}`}>
-          <td>{fuel.name}</td>
-
-          <td>
-            { bid
-              ? <span>
-                  <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {fuelQuantities[fuel.id]} MT </span>
-                  <span className="qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
-                </span>
-              : <i>No bid</i>
-            }
-          </td>
-          <td><span className="qa-auction-bid-supplier">{ supplierName(bid) }</span></td>
-          <td><span className="qa-auction-bid-supplier">({ formatTime(bid.time_entered) })</span></td>
-        </tr>
-      );
-    }
-
-    return (
-      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}`}>
-        <div className="auction-solution__header auction-solution__header--bordered">
-          <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-            {isExpanded ?
-              <FontAwesomeIcon icon="minus" className="has-padding-right-md" />:
-              <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
-            }
-            <span className="is-inline-block">
-              <span className="auction-solution__title__category">{title}</span>
-              <span className="auction-solution__title__description">{solutionTitle()}</span>
-            </span>
-            <MediaQuery query="(max-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-              }
-            </MediaQuery>
-          </h3>
-          <div className="auction-solution__content">
-            <span className="has-text-weight-bold has-padding-right-xs">{normalized_price && `$${formatPrice(normalized_price)}`}</span>
-            {latest_time_entered && `(${formatTime(latest_time_entered)})`}
-            <MediaQuery query="(min-width: 480px)">
-              { acceptable && auctionStatus == 'decision' &&
-                <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
-              }
-            </MediaQuery>
-
-          </div>
         </div>
-        <div className="auction-solution__body">
-          { !isSupplier &&
-            <div className="auction-solution__barge-section">
-              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong> {renderBarges(approvedAuctionBargesForSolution)}
-            </div>
-          }
-          <div>
-            <table className="auction-solution__product-table table is-striped">
-              <thead>
-                <tr>
-                  <th colSpan="3">Fuels</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                { bids.length > 0  ?
-                  productBids.map(({product, bid}) => renderSolution(bid))
-                    : <tr>
-                        <td>
-                          <i>No bids have been placed on this auction</i>
-                        </td>
-                        <td></td>
-                      </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-        { acceptable && this.state.selected &&
-          <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
+
+        { acceptable && selected &&
+          <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={false} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
         }
       </div>
     );

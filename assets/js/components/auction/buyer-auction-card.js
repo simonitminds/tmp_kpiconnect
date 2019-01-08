@@ -47,7 +47,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
       const suppliers = _.chain(bestSolution.bids).map("supplier").uniq().value();
       return (
         <div className="card-content__best-bidder">
-          <div className="card-content__best-bidder__name">Best Solution: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
+          <div className="card-content__best-bidder__name">Best Solution: {suppliers[0]}</div>{suppliers.length > 1 && <div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>}
         </div>
       )
     } else {
@@ -186,7 +186,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         { auctionStatus == 'pending'
           ? <div className="card-content__products">
               { window.isAdmin &&
-                <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small qa-auction-start">
+                <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small has-margin-left-sm qa-auction-start">
                   <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
                 </a>
               }

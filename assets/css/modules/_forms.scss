@@ -134,6 +134,112 @@ fieldset {
   padding: 0.25rem 0.5rem;
 }
 
+.select--custom-bid {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border: 1px solid $gray-2;
+  border-radius: 3px;
+  background-color: $white;
+  overflow: hidden;
+
+  &[aria-label="close menu"] {
+    border-bottom: 0px solid transparent;
+  }
+
+  position: relative;
+
+  &> div {
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+
+    &> span:last-child {
+      margin-right: 1rem;
+    }
+
+    .custom-bid__supplier {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex: 0 1 100%;
+
+
+
+      @media (min-width: 768px) and (max-width: 1400px) {
+        flex: 0 1 100%;
+      }
+      @media (max-width: 768px) and (min-width: 480px) {
+        flex: 0 1 100%;;
+      }
+      @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+        // flex: 0 1 calc(100% - 13rem);
+      }
+    }
+  }
+
+  // @media (min-width: 768px) and (max-width: 1400px) {
+  //   max-width: calc(100%);
+  // }
+  // @media (max-width: 768px) and (min-width: 480px) {
+  //   max-width: calc(100%);
+  // }
+  // @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+  //   max-width: calc(100%);
+  // }
+
+  .auction__traded-bid-tag {
+    margin-left: 0.5rem;
+  }
+  .auction__nonsplittable-bid-tag {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+    flex: 0 1 calc(100vw - 8rem);
+  }
+}
+
+.select.select--custom-bid:not(.is-multiple):not(.is-loading):hover::after, .select.select--custom-bid:not(.is-multiple):not(.is-loading):focus::after {
+  border-color: darken($turquoise, 15%);
+}
+
+.select__custom-dropdown {
+  position: absolute;
+  top: 100%;
+  width: calc(100% - 2.25rem);
+  z-index: 11;
+  background-color: $white;
+  border: 1px solid $gray-2;
+  border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  & > div { // Target actual items in dropdown.
+    border-top: 1px solid $gray-2;
+    &:hover, &:focus {
+      background-color: $gray-0;
+    }
+  }
+
+  .auction__traded-bid-tag {
+    margin-left: 0.5rem;
+  }
+}
+
+.select--custom-bid__count {
+  display: inline-block;
+  margin-left: 0.5rem;
+  flex: 1 1 7rem;
+
+  @media (max-width: 480px), (max-width: 940px) and (min-width: 768px) {
+    flex: 1 1 auto;
+  }
+}
+
 .select--transparent { // Transparent background select for use on colored backgrounds
   select {
     background-color: transparent;
@@ -260,4 +366,13 @@ fieldset {
 
 .is-full-width {
   width: 100%;
+}
+
+.button--icon {
+  background-color: transparent;
+  border: none;
+
+  &:hover, &:focus {
+    color: darken(#363636, 15%);
+  }
 }

@@ -24,39 +24,37 @@ const BuyerAuctionShowBody = (props) => {
     return (
       <div>
         <BuyerBestSolution auctionPayload={auctionPayload} />
-        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
+        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
         <BuyerBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status == 'decision') {
     return (
       <div>
-        {currentUser.isAdmin ?
-         <div>
-          <BuyerBestSolution auctionPayload={auctionPayload} />
-          <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
-         </div>
-        :
-         <div>
-           <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
-           <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} />
-         </div>
+        { currentUser.isAdmin
+          ? <div>
+              <BuyerBestSolution auctionPayload={auctionPayload} />
+              <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
+            </div>
+          : <div>
+              <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
+              <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
+            </div>
         }
         <BuyerBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status != 'pending') {
     return (
       <div>
         <WinningSolution auctionPayload={auctionPayload} />
-        {currentUser.isAdmin ?
-        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} />
-        :
-        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} />
+        { currentUser.isAdmin
+          ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
+          : <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={false} />
         }
         <BuyerBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else {
     return (
       <div className="auction-notification box is-gray-0" >
@@ -64,7 +62,7 @@ const BuyerAuctionShowBody = (props) => {
         <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
         </h3>
       </div>
-    )
+    );
   }
 };
 

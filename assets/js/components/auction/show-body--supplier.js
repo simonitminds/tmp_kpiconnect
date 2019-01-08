@@ -31,17 +31,17 @@ const SupplierAuctionShowBody = (props) => {
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
-        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} />
+        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status == 'decision') {
     return (
       <div>
         <SupplierBestSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else if (status != 'pending') {
     return (
       <div>
@@ -50,7 +50,7 @@ const SupplierAuctionShowBody = (props) => {
         <WinningSolution auctionPayload={auctionPayload} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   } else {
     return (
       <div>
@@ -60,10 +60,10 @@ const SupplierAuctionShowBody = (props) => {
           </h3>
         </div>
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
-        <BiddingForm formSubmit={formSubmit} auctionPayload={auctionPayload} />
+        <BiddingForm formSubmit={formSubmit} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} />
       </div>
-    )
+    );
   }
 };
 

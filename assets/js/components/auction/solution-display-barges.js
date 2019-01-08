@@ -20,11 +20,11 @@ const SolutionDisplayBarges = ({suppliers, bids, auctionBarges}) => {
     .value();
 
 
-  if(auctionBarges.length > 0) {
+  if(approvedAuctionBargesForSolution.length > 0) {
     return (
       <div className="auction-solution__barge-list">
         {
-          auctionBarges.map((auctionBarge) => {
+          approvedAuctionBargesForSolution.map((auctionBarge) => {
             const barge = auctionBarge.barge;
             return (
               <span key={auctionBarge.id} className="auction-solution__barge">
