@@ -18,10 +18,13 @@ export default class SolutionDisplay extends React.Component {
     this.state = {
       selected: false,
       expanded: isExpanded,
-      hasOverflow: false
+      hasOverflow: false,
+      overflowTimer: null,
     }
   }
-
+  componentWillUnmount() {
+    clearTimeout(this.state.overflowTimer);
+  }
   selectSolution() {
     this.setState({selected: true})
   }
@@ -48,9 +51,10 @@ export default class SolutionDisplay extends React.Component {
   }
 
   toggleOverflow(e) {
-    e.preventDefault();
-    this.setState({hasOverflow: true});
-    setTimeout(() => this.setState({hasOverflow: false}), 750);
+      this.setState({hasOverflow: true});
+      let timer = setTimeout(() => {this.setState({hasOverflow: false})}, 750);
+      this.setState({overflowTimer: timer})
+    return false;
   }
 
   render() {
