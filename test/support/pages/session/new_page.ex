@@ -11,6 +11,10 @@ defmodule Oceanconnect.Session.NewPage do
     current_path() == @page_path
   end
 
+  def visible_text do
+    visible_page_text()
+  end
+
   def enter_credentials(email, password) do
     fill_field({:class, "qa-session-email"}, email)
     fill_field({:class, "qa-session-password"}, password)

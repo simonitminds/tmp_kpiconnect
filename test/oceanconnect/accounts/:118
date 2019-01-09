@@ -4,16 +4,16 @@ defmodule Oceanconnect.AccountsTest do
   alias Oceanconnect.Accounts
 
   describe "users" do
-    alias Oceanconnect.Accounts.User
+    alias Oceanconnect.Accounts.{User, Registration, Credential}
 
-    @valid_attrs %{email: "SOME EMAIL"}
-    @update_attrs %{email: "SOME UPDATED EMAIL", password: "some updated password"}
+    @valid_attrs %{password: "some password"}
+    @update_attrs %{email: "SOME EMAIL", password: "some updated password"}
     @invalid_attrs %{email: nil}
 
     setup do
       company = insert(:company)
 
-      user = insert(:user, %{is_active: true, company: company})
+      user = insert(:user, %{is_active: true})
       admin_user = insert(:user, %{is_admin: true})
       inactive_user = insert(:user, %{is_active: false})
 
@@ -75,14 +75,14 @@ defmodule Oceanconnect.AccountsTest do
     end
 
     test "get_user!/1 returns the user with given id", %{user: user} do
-      assert Accounts.get_user!(user.id).id == user.id
+      assert Accounts.get_user!(user.id) == user
     end
 
     test "get_active_user!/1 returns the active user with given id", %{
       user: user,
       inactive_user: inactive_user
     } do
-      assert Accounts.get_active_user!(user.id).id == user.id
+      assert Accounts.get_active_user!(user.id) == user
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_active_user!(inactive_user.id) end
     end
 
@@ -90,11 +90,13 @@ defmodule Oceanconnect.AccountsTest do
       assert Accounts.get_user_name!(user.id) == "#{user.first_name} #{user.last_name}"
     end
 
-    test "create_user/1 with valid data creates a user" do
+    test "create_user/1 with valid data creates a user", %{company: company} do
       assert {:ok, %User{} = user} =
-               Accounts.create_user(@valid_attrs)
+               Accounts.create_user(
+                 Map.merge(@valid_attrs, %{company_id: company.id})
+               )
 
-      assert user.email == "SOME EMAIL"
+      assert user.company_id == company.id
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -104,17 +106,12 @@ defmodule Oceanconnect.AccountsTest do
     test "update_user/2 with valid data updates the user", %{user: user} do
       assert {:ok, user} = Accounts.update_user(user, @update_attrs)
       assert %User{} = user
-      assert user.email == "SOME UPDATED EMAIL"
+      assert user.email == "SOME EMAIL"
     end
 
     test "update_user/2 with invalid data returns error changeset", %{user: user} do
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user.id == Accounts.get_user!(user.id).id
-    end
-
-    test "reset_password/2 with valid data updates the user's password", %{user: user} do
-      assert {:ok, %User{} = user} = Accounts.reset_password(user, %{"password" => "password"})
-      assert {:ok, user} = Accounts.verify_login(%{"email" => user.email, "password" => "password"})
+      assert user == Accounts.get_user!(user.id)
     end
 
     test "delete_user/1 deletes the user", %{user: user} do

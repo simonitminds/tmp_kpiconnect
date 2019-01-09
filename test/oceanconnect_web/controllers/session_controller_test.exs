@@ -72,11 +72,11 @@ defmodule Oceanconnectweb.SessionControllerTest do
 
   test "submitting forgotten password with a valid email address", %{conn: conn, user: user} do
     response = post(conn, "/forgot_password", %{email: user.email})
-    assert html_response(response, 200) =~ "/sessions/new"
+    assert html_response(response, 302) =~ "/sessions/new"
   end
 
   test "submitting forgotten password with an invalid email address", %{conn: conn} do
     response = post(conn, "/forgot_password", %{email: "invalid-email@example.com"})
-    assert html_response(response, 401) =~ "That email address does not exist in the system"
+    assert html_response(response, 302) =~ "/sessions/new"
   end
 end

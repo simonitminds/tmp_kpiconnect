@@ -13,7 +13,6 @@ defmodule Oceanconnect.Accounts.User do
     field(:last_name, :string)
     field(:password_hash, :string)
     field(:password, :string, virtual: true)
-    field(:password_confirmation, :string, virtual: true)
     field(:is_admin, :boolean, default: false)
     field(:is_active, :boolean, default: true)
     field(:impersonated_by, :integer, virtual: true)
@@ -33,17 +32,28 @@ defmodule Oceanconnect.Accounts.User do
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :password, :company_id, :is_admin])
-    |> validate_required([:email, :password, :company_id])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin])
+    |> validate_required([:email, :company_id])
     |> foreign_key_constraint(:company_id)
+    |> upcase_email()
+    |> unique_constraint(:email)
+  end
+
+  def seed_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :password])
+    |> foreign_key_constraint(:company_id)
+    |> upcase_email()
+    |> unique_constraint(:email)
     |> put_pass_hash()
   end
 
   def password_reset_changeset(%User{} = user, attrs) do
     user
     |> cast(attrs, [:password])
-    |> validate_required([:password, :password_confirmation])
+    |> validate_required([:password])
     |> validate_confirmation(:password, message: "Passwords do not match")
+    |> validate_length(:password, min: 6)
     |> put_pass_hash()
   end
 

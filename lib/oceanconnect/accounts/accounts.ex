@@ -82,9 +82,21 @@ defmodule Oceanconnect.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  def create_user(attrs \\ %{}) do
+    %User{}
+    |> User.changeset(attrs)
+    |> Repo.insert()
+  end
+
   def admin_create_user(attrs \\ %{}) do
     %User{}
     |> User.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def seed_user(attrs \\ %{}) do
+    %User{}
+    |> User.seed_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -140,7 +152,7 @@ defmodule Oceanconnect.Accounts do
     |> Repo.update()
   end
 
-  def reset_passwor(%User{} = user, attrs) do
+  def reset_password(%User{} = user, attrs) do
     user
     |> User.password_reset_changeset(attrs)
     |> Repo.update()

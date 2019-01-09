@@ -20,7 +20,7 @@ defmodule Oceanconnect.User.EditTest do
                "first_name",
                "last_name",
                "office_phone",
-               "mnbile_phone"
+               "mobile_phone"
              ])
     end
 
@@ -39,7 +39,7 @@ defmodule Oceanconnect.User.EditTest do
       assert EditPage.is_current_path?(user.id)
     end
 
-    test "a user cannot visit another user's edit page", %{user: user, another_user: another_user} do
+    test "a user cannot visit another user's edit page", %{another_user: another_user} do
       EditPage.visit(another_user.id)
       refute EditPage.is_current_path?(another_user.id)
     end

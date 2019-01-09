@@ -15,7 +15,7 @@ defmodule OceanconnectWeb.Session.ForgotPasswordTest do
     ForgotPasswordPage.submit()
 
     assert NewPage.is_current_path?()
-    assert NewPage.inner_html =~ "An email has been sent with instructions to reset your password"
+    assert NewPage.visible_text() =~ "An email has been sent with instructions to reset your password"
   end
 
   test "submitting an invalid email address" do
@@ -23,7 +23,6 @@ defmodule OceanconnectWeb.Session.ForgotPasswordTest do
     ForgotPasswordPage.enter_email("invalid-email@example.com")
     ForgotPasswordPage.submit()
 
-    assert ForgotPasswordPage.is_current_path?()
-    assert ForgotPasswordPage.inner_html() =~ "That email address does not exist in the system"
+    assert NewPage.is_current_path?()
   end
 end

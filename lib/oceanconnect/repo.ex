@@ -33,10 +33,11 @@ defmodule Oceanconnect.Repo do
       first_name: first_name,
       last_name: last_name,
       password: "ocmtest",
+      password_confirmation: "ocmtest",
       company_id: company.id
     }
 
-    {:ok, user} = Oceanconnect.Accounts.create_user(user_params)
+    {:ok, user} = Oceanconnect.Accounts.seed_user(user_params)
     user
   end
 

@@ -65,70 +65,63 @@ defmodule OceanconnectWeb.SessionController do
   end
 
   def forgot_password(conn, %{"email" => email}) do
-    case Accounts.get_user_by_email(String.upcase(email)) |> IO.inspect do
+    case Accounts.get_user_by_email(String.upcase(email)) do
+      nil ->
+        conn
+        |> put_status(302)
+        |> redirect(to: session_path(conn, :new))
       user ->
-        {:ok, token, claims} =
-          Guardian.encode_and_sign(user, %{email: true}, ttl: {1, :hours})
+        {:ok, token, _claims} =
+          Guardian.encode_and_sign(user, %{user_id: user.id, email: true}, ttl: {1, :hours})
 
         OceanconnectWeb.Email.password_reset(user, token)
         |> OceanconnectWeb.Mailer.deliver_later()
 
         conn
         |> put_flash(:info, "An email has been sent with instructions to reset your password")
+        |> put_status(302)
         |> redirect(to: session_path(conn, :new))
-      nil ->
-        conn
-        |> put_status(403)
-        |> render("forgot_password.html")
     end
-
-
-    # cond do
-    #   User.email_exists?(email) ->
-    #     OceanconnectWeb.Email.password_reset(email)
-    #     |> OceanconnectWeb.Mailer.deliver_later()
-
-    #     conn
-    #     |> put_flash(:info, "An email has been sent with instructions to reset your password")
-    #     |> redirect(to: session_path(conn, :new))
-    #   true ->
-    #     conn
-    #     |> put_flash(:error, "That email address does not exist in the system")
-    #     |> put_status(401)
-    #     |> render("forgot_password.html")
-    # end
   end
 
   def forgot_password(conn, _) do
     render(conn, "forgot_password.html")
   end
 
-  def reset_password(conn, %{"id" => id, "new_password" => new_password, "token" => token}) do
-    user = Accounts.get_user!(id)
+  def reset_password(conn, %{"password" => password, "password_confirmation" => password_confirmation, "token" => token}) do
+    %{claims: %{"user_id" => user_id}} = Guardian.peek(token)
+    user = Accounts.get_user!(user_id)
 
-    case Accounts.reset_passwor(user, %{password: new_password}) do
+    case Accounts.reset_password(user, %{"password" => password, "password_confirmation" => password_confirmation}) do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "Password updated successfully")
+        |> put_status(302)
         |> redirect(to: session_path(conn, :new))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_flash(:error, "Something went wrong!")
         |> put_status(401)
-        |> render("reset_password.html", changeset: changeset, action: session_path(conn, :reset_password, %{user: user, token: token}))
+        |> render("reset_password.html", changeset: changeset, token: token, user: user, action: session_path(conn, :reset_password))
     end
   end
 
-  def reset_password(conn, %{"user_id" => user_id, "token" => token}) do
+  def reset_password(conn, %{"token" => token}) do
+    %{claims: %{"user_id" => user_id}} = Guardian.peek(token)
+
     user = Accounts.get_user!(user_id)
 
-    case Guardian.decode_and_verify(token, %{email: true}) do
+    case Guardian.decode_and_verify(token, %{user_id: user.id, email: true}) do
       {:ok, _claims} ->
         changeset = Accounts.change_user_password(user)
 
-        render(conn, "reset_password.html", changeset: changeset, action: session_path(conn, :reset_password))
+        render(conn, "reset_password.html", changeset: changeset, token: token, user: user, action: session_path(conn, :reset_password))
       {:error, _} ->
+        conn
+        |> put_flash(:error, "Please try resetting your password again")
+        |> put_status(302)
+        |> redirect(to: session_path(conn, :new))
     end
   end
 
