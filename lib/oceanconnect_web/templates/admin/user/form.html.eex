@@ -52,16 +52,6 @@
         </div>
       </div>
 
-      <div class="field" >
-        <%= label f, :password, class: "label" do %>
-          Password
-        <%end%>
-        <div class="control">
-          <%= password_input f, :password, class: "input qa-admin-user-password" %>
-          <%= error_tag f, :password %>
-        </div>
-      </div>
-
 			<div class="field">
 				<%= label f, :company_id, class: "label" do %>
 					Company
