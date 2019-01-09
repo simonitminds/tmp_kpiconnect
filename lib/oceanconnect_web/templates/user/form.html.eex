@@ -4,8 +4,6 @@
     <p>Oops, something went wrong! Please check the errors below.</p>
   </div>
 <% end %>
-  <div class="columns is-variable is-4">
-    <div class="column is-one-third">
       <div class="field" >
         <%= label f, :email, class: "label" do %>
           Email
@@ -51,15 +49,9 @@
           <%= error_tag f, :mobile_phone %>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="columns">
-    <div class="column">
       <div class="field is-margin-top-lg">
         <div class="control">
           <%= submit "Submit", class: "button is-primary qa-submit" %>
         </div>
       </div>
-    </div>
-  </div>
 <% end %>
