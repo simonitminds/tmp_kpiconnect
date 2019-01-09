@@ -4,7 +4,6 @@ defmodule OceanconnectWeb.SessionController do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.User
   alias OceanconnectWeb.Plugs.Auth
-  # TODO: break this out eventually and put guardian shit in auth ^^
   alias Oceanconnect.Guardian
 
   def new(conn, _) do

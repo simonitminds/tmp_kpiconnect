@@ -3,6 +3,7 @@ defmodule OceanconnectWeb.Admin.UserController do
 
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.User
+  alias Oceanconnect.Guardian
 
   def index(conn, params) do
     page = Accounts.list_users(params)
@@ -89,5 +90,22 @@ defmodule OceanconnectWeb.Admin.UserController do
     conn
     |> put_flash(:info, "User activated successfully.")
     |> redirect(to: admin_user_path(conn, :index))
+  end
+
+  def reset_password(conn, %{"user_id" => user_id}) do
+    user = Accounts.get_user!(user_id)
+    companies = Accounts.list_active_companies()
+    changeset = Accounts.change_user(user)
+
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{user_id: user.id, email: true}, ttl: {1, :hours})
+
+    OceanconnectWeb.Email.password_reset(user, token)
+    |> OceanconnectWeb.Mailer.deliver_later()
+
+    conn
+    |> put_flash(:info, "An email has been sent to the user with instructions to reset their password")
+    |> put_status(200)
+    |> render("edit.html", user: user, changeset: changeset, companies: companies)
   end
 end

@@ -135,6 +135,7 @@ defmodule OceanconnectWeb.Router do
     resources("/users", UserController, as: :admin_user)
     post("/users/:user_id/deactivate", UserController, :deactivate, as: :admin_user)
     post("/users/:user_id/activate", UserController, :activate, as: :admin_user)
+    post("/users/:user_id/reset_password", UserController, :reset_password, as: :admin_user)
 
     resources("/companies", CompanyController, as: :admin_company)
     post("/companies/:company_id/deactivate", CompanyController, :deactivate, as: :admin_company)

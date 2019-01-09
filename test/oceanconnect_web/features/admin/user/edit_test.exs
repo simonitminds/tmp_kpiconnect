@@ -20,7 +20,6 @@ defmodule Oceanconnect.Admin.User.EditTest do
                "email",
                "first_name",
                "last_name",
-               "password",
                "is_admin"
              ])
     end
@@ -38,7 +37,6 @@ defmodule Oceanconnect.Admin.User.EditTest do
         email: user.email,
         first_name: "new",
         last_name: "name",
-        password: user.password,
         company_id: company.id
       })
 
@@ -52,6 +50,13 @@ defmodule Oceanconnect.Admin.User.EditTest do
       EditPage.delete()
       assert IndexPage.is_current_path?()
       refute IndexPage.has_user?(user.id)
+    end
+
+    test "admin can send a password reset email to a user", %{user: user} do
+      EditPage.visit(user.id)
+      assert EditPage.is_current_path?(user.id)
+      EditPage.send_password_reset_email()
+      assert EditPage.has_content?("An email has been sent to the user with instructions to reset their password")
     end
   end
 end

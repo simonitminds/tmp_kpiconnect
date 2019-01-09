@@ -44,4 +44,8 @@ defmodule Oceanconnect.Admin.User.EditPage do
   def fill_form_element(_key, element, _type, value) do
     fill_field(element, value)
   end
+
+  def send_password_reset_email do
+    click({:css, ".qa-admin-user-password_reset"})
+  end
 end

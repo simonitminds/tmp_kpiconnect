@@ -17,6 +17,9 @@
           </div>
 				</h2>
 				<%= render "form.html", changeset: @changeset, action: admin_user_path(@conn, :update, @user), companies: @companies %>
+
+        <%= link "Send password reset email", to: admin_user_path(@conn, :reset_password, @user), method: :post, class: "button is-info qa-admin-user-password_reset" %>
+
 			</section>
 		</div>
 	</div>
