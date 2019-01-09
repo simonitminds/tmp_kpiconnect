@@ -105,7 +105,9 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+
     resources("/users", UserController)
+    post("/users/:user_id/reset_password", UserController, :reset_password)
 
     # TODO: remove this after emails are designed
     post("/send_email/invitation", EmailController, :send_invitation)

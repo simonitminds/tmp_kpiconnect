@@ -8,10 +8,5 @@
 		<ul class="menu-list">
 			<li><%= link "Account Information", to: user_path(@conn, :edit, @user) %></li>
 		</ul>
-		<p class="menu-label">
-			Manage Company
-		</p>
-		<ul class="menu-list">
-		</ul>
 	</div>
 </aside>
