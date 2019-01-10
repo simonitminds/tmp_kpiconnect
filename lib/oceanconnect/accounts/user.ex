@@ -7,6 +7,8 @@ defmodule Oceanconnect.Accounts.User do
 
   schema "users" do
     field(:email, :string)
+    field(:office_phone, :string)
+    field(:mobile_phone, :string)
     field(:first_name, :string)
     field(:last_name, :string)
     field(:password_hash, :string)
@@ -22,17 +24,37 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :company_id, :is_admin])
-    |> validate_required([:email, :password, :company_id])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone])
+    |> validate_required([:email])
+    |> upcase_email()
+    |> unique_constraint(:email)
+  end
+
+  def admin_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin])
+    |> validate_required([:email, :company_id])
+    |> foreign_key_constraint(:company_id)
+    |> upcase_email()
+    |> unique_constraint(:email)
+  end
+
+  def seed_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :password])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()
     |> unique_constraint(:email)
     |> put_pass_hash()
   end
 
-  def admin_changeset(%User{} = user, attrs) do
+  def password_reset_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:is_active])
+    |> cast(attrs, [:password])
+    |> validate_required([:password])
+    |> validate_confirmation(:password, message: "Passwords do not match")
+    |> validate_length(:password, min: 6)
+    |> put_pass_hash()
   end
 
   def impersonable_users(query \\ User) do
@@ -79,8 +101,19 @@ defmodule Oceanconnect.Accounts.User do
     )
   end
 
+  def with_company(user = %User{}) do
+    Oceanconnect.Repo.preload(user, :company)
+  end
+
   def full_name(%User{first_name: first_name, last_name: last_name}) do
     "#{first_name} #{last_name}"
+  end
+
+  def email_exists?(email) do
+    case Oceanconnect.Repo.get_by(User, email: String.upcase(email)) do
+      nil -> false
+      %User{} -> true
+    end
   end
 
   defimpl Bamboo.Formatter, for: User do

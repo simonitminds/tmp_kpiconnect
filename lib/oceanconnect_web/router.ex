@@ -80,6 +80,12 @@ defmodule OceanconnectWeb.Router do
     get("/", SessionController, :new)
     post("/sessions", SessionController, :create)
 
+    get("/forgot_password", SessionController, :forgot_password)
+    post("/forgot_password", SessionController, :forgot_password)
+
+    get("/reset_password", SessionController, :reset_password)
+    post("/reset_password", SessionController, :reset_password)
+
     # Routes requiring authentication
     pipe_through(:authenticated)
 
@@ -99,6 +105,9 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+
+    resources("/users", UserController)
+    post("/users/:user_id/reset_password", UserController, :reset_password)
 
     # TODO: remove this after emails are designed
     post("/send_email/invitation", EmailController, :send_invitation)
@@ -128,6 +137,7 @@ defmodule OceanconnectWeb.Router do
     resources("/users", UserController, as: :admin_user)
     post("/users/:user_id/deactivate", UserController, :deactivate, as: :admin_user)
     post("/users/:user_id/activate", UserController, :activate, as: :admin_user)
+    post("/users/:user_id/reset_password", UserController, :reset_password, as: :admin_user)
 
     resources("/companies", CompanyController, as: :admin_company)
     post("/companies/:company_id/deactivate", CompanyController, :deactivate, as: :admin_company)

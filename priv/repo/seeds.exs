@@ -174,7 +174,7 @@ Enum.map(companies, fn c ->
 end)
 
 Repo.get_by(User, %{email: String.upcase(ocm.email)})
-|> User.changeset(%{is_admin: true, password: "ocmtest"})
+|> User.seed_changeset(%{is_admin: true, password: "ocmtest"})
 |> Repo.update()
 
 # Create Admin User

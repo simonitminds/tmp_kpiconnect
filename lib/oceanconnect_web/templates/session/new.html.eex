@@ -37,6 +37,7 @@
             </div>
           </div>
         <% end %>
+        <%= link "Forgot password?", to: session_path(@conn, :forgot_password), class: "link--forgot-password qa-forgot_password" %>
       </div>
     </div>
   </div>

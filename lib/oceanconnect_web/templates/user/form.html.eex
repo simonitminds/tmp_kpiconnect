@@ -9,7 +9,7 @@
           Email
         <%end%>
         <div class="control">
-          <%= text_input f, :email, class: "input qa-admin-user-email" %>
+          <%= text_input f, :email, class: "input qa-user-email" %>
           <%= error_tag f, :email %>
         </div>
       </div>
@@ -19,7 +19,7 @@
           First Name
         <%end%>
     		<div class="control">
-    			<%= text_input f, :first_name, class: "input qa-admin-user-first_name" %>
+    			<%= text_input f, :first_name, class: "input qa-user-first_name" %>
     			<%= error_tag f, :first_name %>
     		</div>
 
@@ -27,7 +27,7 @@
           Last Name
         <%end%>
     		<div class="control">
-    			<%= text_input f, :last_name, class: "input qa-admin-user-last_name" %>
+    			<%= text_input f, :last_name, class: "input qa-user-last_name" %>
     			<%= error_tag f, :last_name %>
     		</div>
       </div>
@@ -49,31 +49,9 @@
           <%= error_tag f, :mobile_phone %>
         </div>
       </div>
-
-			<div class="field">
-				<%= label f, :company_id, class: "label" do %>
-					Company
-				<% end %>
-				<div class="control">
-					<div class="select">
-						<%= select f, :company_id, Enum.map(@companies, &{&1.name, &1.id}), class: "qa-admin-user-company_id" %>
-						<%= error_tag f, :company_id %>
-					</div>
-				</div>
-			</div>
-
-      <div class="field is-horizontal">
-        <div class="control is-inline-block">
-          <%= checkbox f, :is_admin, class: "checkbox qa-admin-user-is_admin" %>
-          <%= error_tag f, :is_admin %>
-        </div>
-        <%= label f, :is_admin, class: "label has-margin-left-md is-inline-block" do %>
-          Is Admin
-        <%end%>
-      </div>
       <div class="field is-margin-top-lg">
         <div class="control">
-          <%= submit "Submit", class: "button is-primary qa-admin-submit" %>
+          <%= submit "Submit", class: "button is-primary qa-submit" %>
         </div>
       </div>
 <% end %>

@@ -119,6 +119,12 @@
 
 // Additions
 
+.field--reset-password {
+  .field-body {
+    flex-grow: 3;
+  }
+}
+
 fieldset {
   max-width: 750px;
   border: none;

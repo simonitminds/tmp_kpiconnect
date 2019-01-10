@@ -65,6 +65,7 @@
                   <a href="#" class="navbar-item">Invoices</a>
                   <a href="#" class="navbar-item">Messages</a>
                   <a href="#" class="navbar-item">Account Settings</a> -->
+                  <%= link "Account Settings", to: "/users/#{OceanconnectWeb.Plugs.Auth.current_user(@conn).id}/edit", class: "navbar-item" %>
                   <%= OceanconnectWeb.SessionView.log_in_logout_link(@conn) %>
                 </div>
               </div>

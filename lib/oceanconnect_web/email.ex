@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.Email do
 
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction}
+  alias Oceanconnect.Auctions.Auction
 
   def auction_invitation(auction = %Auction{}) do
     auction = Auctions.fully_loaded(auction)
@@ -291,6 +291,16 @@ defmodule OceanconnectWeb.Email do
       end)
 
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
+  end
+
+  def password_reset(%Accounts.User{} = user, token) do
+    base_email(user)
+    |> subject("Reset your password")
+    |> render(
+      "password_reset.html",
+      user: user,
+      token: token
+    )
   end
 
   defp approved_barges_for_supplier(approved_barges, supplier_id) do
