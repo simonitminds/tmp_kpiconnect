@@ -80,11 +80,11 @@ defmodule OceanconnectWeb.Router do
     get("/", SessionController, :new)
     post("/sessions", SessionController, :create)
 
-    get("/forgot_password", SessionController, :forgot_password)
-    post("/forgot_password", SessionController, :forgot_password)
+    get("/forgot_password", ForgotPasswordController, :new)
+    post("/forgot_password", ForgotPasswordController, :create)
 
-    get("/reset_password", SessionController, :reset_password)
-    post("/reset_password", SessionController, :reset_password)
+    get("/reset_password", ForgotPasswordController, :edit)
+    post("/reset_password", ForgotPasswordController, :update)
 
     # Routes requiring authentication
     pipe_through(:authenticated)

@@ -63,20 +63,4 @@ defmodule Oceanconnectweb.SessionControllerTest do
     assert redirected_to(response, 302) =~ "/sessions/new"
     assert response.private.phoenix_flash["error"] == "Authentication Required"
   end
-
-  test "visiting the forgot password page", %{conn: conn} do
-    response = get(conn, "/forgot_password")
-
-    assert html_response(response, 200) =~ "/forgot_password"
-  end
-
-  test "submitting forgotten password with a valid email address", %{conn: conn, user: user} do
-    response = post(conn, "/forgot_password", %{email: user.email})
-    assert html_response(response, 302) =~ "/sessions/new"
-  end
-
-  test "submitting forgotten password with an invalid email address", %{conn: conn} do
-    response = post(conn, "/forgot_password", %{email: "invalid-email@example.com"})
-    assert html_response(response, 302) =~ "/sessions/new"
-  end
 end
