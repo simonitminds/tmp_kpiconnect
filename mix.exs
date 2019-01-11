@@ -64,7 +64,8 @@ defmodule Oceanconnect.Mixfile do
       {:guardian, "~> 1.1"},
       {:gettext, "~> 0.16"},
       {:scrivener_ecto, "~> 2.0"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:pot, "~> 0.9.6"}
     ]
   end
 
