@@ -19,7 +19,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const participationCounts = _.countBy(participations, _.identity);
   const {"yes": rsvpYesCount, "no": rsvpNoCount, "maybe": rsvpMaybeCount, null: rsvpNoResponseCount} = participationCounts;
 
-  const confirmCancellation = () => { return confirm('Are you sure you want to cancel this auction?') ? window.open(`/auctions/${auction.id}/cancel`) : false; };
+  const confirmCancellation = (e) => { event.preventDefault();
+                                       return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
 
   const lowestBidMessage = () => {
     if (winningSolution) {
@@ -154,7 +155,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
                 </a>
               }
               { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
-                ? <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
+                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={() => confirmCancellation()} action-label="Cancel Auction" className={`auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel-${auction.id}`}>
                     <span className="icon is-medium has-text-right">
                       <FontAwesomeIcon icon="times" size="lg" />
                     </span>

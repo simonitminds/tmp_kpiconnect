@@ -40,7 +40,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     |> Enum.reject(&is_nil(&1))
   end
 
-  def create_auction_snapshot(event = %AuctionEvent{type: :auction_snapshotted, auction_id: auction_id}) do
+  def create_auction_snapshot(event = %AuctionEvent{type: :auction_state_snapshotted, auction_id: auction_id}) do
     case find_pid(auction_id) do
       {:ok, pid} ->
         GenServer.call(pid, {:persist_auction_snapshot, event})
