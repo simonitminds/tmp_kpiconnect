@@ -155,7 +155,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
                 </a>
               }
               { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
-                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={() => confirmCancellation()} action-label="Cancel Auction" className={`auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel-${auction.id}`}>
+                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
                     <span className="icon is-medium has-text-right">
                       <FontAwesomeIcon icon="times" size="lg" />
                     </span>

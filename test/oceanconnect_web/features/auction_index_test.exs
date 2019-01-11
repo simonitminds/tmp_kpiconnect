@@ -13,19 +13,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
   end
 
-  test "canceling an auction", %{auctions: [auction | _rest], buyer: buyer} do
-    auction = auction |> Oceanconnect.Auctions.fully_loaded()
-    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
-    login_user(buyer)
-    AuctionIndexPage.visit()
-    :timer.sleep(500)
-    AuctionIndexPage.cancel_auction(auction)
-    :timer.sleep(500)
-
-    AuctionIndexPage.visit()
-
-    assert AuctionIndexPage.auction_is_status?(auction, "canceled")
-  end
 
   describe "buyer login" do
     setup %{auctions: auctions, buyer: buyer} do
@@ -39,6 +26,13 @@ defmodule Oceanconnect.AuctionIndexTest do
       login_user(buyer)
       AuctionIndexPage.visit()
       {:ok, %{auction: auction}}
+    end
+
+    test "canceling an auction", %{auction: auction} do
+      AuctionIndexPage.visit()
+      AuctionIndexPage.cancel_auction(auction)
+
+      assert AuctionIndexPage.auction_is_status?(auction, "canceled")
     end
 
     test "renders the default auction index page", %{auctions: auctions} do
