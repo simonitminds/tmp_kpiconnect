@@ -56,7 +56,7 @@
           <%= error_tag f, :has_2fa %>
         </div>
         <%= label f, :has_2fa, class: "label has-margin-left-md is-inline-block" do %>
-          Enable two-factor authentification
+          Enable two-factor authentication
         <%end%>
       </div>
 

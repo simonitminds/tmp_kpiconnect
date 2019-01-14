@@ -305,7 +305,7 @@ defmodule OceanconnectWeb.Email do
 
   def two_factor_auth(%Accounts.User{has_2fa: true} = user, one_time_pass) do
     base_email(user)
-    |> subject("Two factor authentification")
+    |> subject("Two factor authentication")
     |> render(
       "two_factor_auth.html",
       user: user,
