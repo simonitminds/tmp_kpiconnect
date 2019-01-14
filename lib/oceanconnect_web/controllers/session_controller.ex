@@ -13,12 +13,22 @@ defmodule OceanconnectWeb.SessionController do
   def create(conn, %{"session" => session}) do
     case Accounts.verify_login(session) do
       {:ok, user} ->
-        updated_conn =
-          conn
-          |> Auth.build_session(user)
+        case user.has_2fa do
+          true ->
+            {token, _one_time_pass, _email} = Auth.generate_one_time_pass(user)
 
-        updated_conn
-        |> redirect(to: auction_path(updated_conn, :index))
+            conn
+            |> put_flash(:info, "An email has been sent code to log in")
+            |> put_status(302)
+            |> redirect(to: two_factor_auth_path(conn, :new, %{user_id: user.id, token: token}))
+          false ->
+            updated_conn =
+              conn
+              |> Auth.build_session(user)
+
+            updated_conn
+            |> redirect(to: auction_path(updated_conn, :index))
+        end
 
       {:error, _} ->
         conn

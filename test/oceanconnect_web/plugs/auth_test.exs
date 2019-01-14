@@ -1,10 +1,13 @@
 defmodule OceanconnectWeb.Plugs.AuthTest do
   use OceanconnectWeb.ConnCase
+  use Bamboo.Test
+
   alias Oceanconnect.Accounts.{User}
   alias OceanconnectWeb.Plugs.Auth
 
   setup do
     user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
+    user_with_2fa = insert(:user, %{has_2fa: true})
     other_user = insert(:user, %{email: "BAR@EXAMPLE.COM", password: "password"})
     admin = insert(:user, %{email: "ADMIN@EXAMPLE.COM", password: "password", is_admin: true})
 
@@ -13,6 +16,7 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
 
     %{
       user: user,
+      user_with_2fa: user_with_2fa,
       admin: admin,
       other_admin: other_admin,
       other_user: other_user,
@@ -68,5 +72,11 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
       |> Auth.current_user()
 
     assert %User{impersonated_by: nil} = current_user
+  end
+
+  test "generating a one time password", %{user_with_2fa: user_with_2fa} do
+    {_token, _one_time_pass, email} = Auth.generate_one_time_pass(user_with_2fa)
+
+    assert_delivered_email(email)
   end
 end

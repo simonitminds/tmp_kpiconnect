@@ -303,6 +303,16 @@ defmodule OceanconnectWeb.Email do
     )
   end
 
+  def two_factor_auth(%Accounts.User{has_2fa: true} = user, one_time_pass) do
+    base_email(user)
+    |> subject("Two factor authentification")
+    |> render(
+      "two_factor_auth.html",
+      user: user,
+      one_time_pass: one_time_pass
+    )
+  end
+
   defp approved_barges_for_supplier(approved_barges, supplier_id) do
     Enum.filter(approved_barges, &(&1.supplier_id == supplier_id))
     |> Enum.uniq()

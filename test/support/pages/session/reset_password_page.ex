@@ -9,7 +9,7 @@ defmodule Oceanconnect.Session.ResetPasswordPage do
     current_path() =~ "/reset_password"
   end
 
-  def enter_credentials(password, password_confirmation, token) do
+  def enter_credentials(password, password_confirmation) do
     fill_field({:css, ".qa-reset-password"}, password)
     fill_field({:css, ".qa-reset-password_confirmation"}, password_confirmation)
   end

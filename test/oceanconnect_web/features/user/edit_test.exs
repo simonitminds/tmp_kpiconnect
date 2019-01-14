@@ -20,7 +20,8 @@ defmodule Oceanconnect.User.EditTest do
                "first_name",
                "last_name",
                "office_phone",
-               "mobile_phone"
+               "mobile_phone",
+               "has_2fa"
              ])
     end
 

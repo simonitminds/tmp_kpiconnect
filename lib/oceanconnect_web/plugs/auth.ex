@@ -118,4 +118,18 @@ defmodule OceanconnectWeb.Plugs.Auth do
       conn
     end
   end
+
+  def generate_one_time_pass(user = %User{has_2fa: true}) do
+    token =
+      :crypto.strong_rand_bytes(8)
+      |> Base.encode32()
+    one_time_pass = :pot.hotp(token, _num_of_trials = 1)
+
+    two_factor_auth_email =
+      OceanconnectWeb.Email.two_factor_auth(user, one_time_pass)
+
+    OceanconnectWeb.Mailer.deliver_later(two_factor_auth_email)
+
+    {token, one_time_pass, two_factor_auth_email}
+  end
 end

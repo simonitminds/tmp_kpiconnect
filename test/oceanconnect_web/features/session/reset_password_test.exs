@@ -16,7 +16,7 @@ defmodule OceanconnectWeb.Session.ResetPasswordTest do
   test "user can reset there password and log in with new credentials", %{user: user, token: token} do
     ResetPasswordPage.visit(token)
     assert ResetPasswordPage.is_current_path?()
-    ResetPasswordPage.enter_credentials("newpass", "newpass", token)
+    ResetPasswordPage.enter_credentials("newpass", "newpass")
     ResetPasswordPage.submit()
 
     assert NewPage.is_current_path?()
