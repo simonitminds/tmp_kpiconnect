@@ -33,7 +33,7 @@ defmodule Oceanconnect.Accounts.User do
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :has_2fa])
     |> validate_required([:email, :company_id])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()
