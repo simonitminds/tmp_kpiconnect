@@ -20,7 +20,7 @@ defmodule OceanconnectWeb.SessionController do
 
             conn
             |> Auth.assign_otp_data_to_session(token, user.id)
-            |> put_flash(:info, "An email has been sent code to log in")
+            |> put_flash(:info, "A two-factor authentication code has been sent to your email")
             |> put_status(302)
             |> redirect(to: two_factor_auth_path(conn, :new))
           false ->
