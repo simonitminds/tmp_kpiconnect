@@ -34,4 +34,14 @@ defmodule OceanconnectWeb.Session.NewTest do
 
     assert TwoFactorAuthPage.is_current_path?()
   end
+
+  test "a user can resend the 2fa email", %{user_2fa: user_2fa} do
+    NewPage.visit()
+    NewPage.enter_credentials(user_2fa.email, "password")
+    NewPage.submit()
+
+    assert TwoFactorAuthPage.is_current_path?()
+    TwoFactorAuthPage.resend_2fa_email()
+    assert TwoFactorAuthPage.has_content?("A new two-factor authentication code has been sent to your email")
+  end
 end

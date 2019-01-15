@@ -12,16 +12,14 @@
               </div>
             </div>
           </div>
-
-          <%= hidden_input f, :token, value: @token, class: "qa-token" %>
-          <%= hidden_input f, :user_id, value: @user_id %>
-
           <div class="field is-pulled-right has-margin-top-sm">
             <div class="control">
               <%= submit "Submit", class: "button is-primary qa-submit" %>
             </div>
           </div>
         <% end %>
+
+        <%= link "Resend two-factor authetication code", to: two_factor_auth_path(@conn, :resend_email), method: :post, class: "qa-resend_2fa_email" %>
       </div>
     </div>
   </div>

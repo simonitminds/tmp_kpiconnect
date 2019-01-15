@@ -74,9 +74,47 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
     assert %User{impersonated_by: nil} = current_user
   end
 
-  test "generating a one time password", %{user_with_2fa: user_with_2fa} do
-    {_token, _one_time_pass, email} = Auth.generate_one_time_pass(user_with_2fa)
+  describe "one time password" do
+    test "generating and validating a one time password", %{user_with_2fa: user_with_2fa} do
+      {token, one_time_pass} = Auth.generate_one_time_pass(user_with_2fa)
+      assert Auth.valid_otp?(token, one_time_pass)
+    end
 
-    assert_delivered_email(email)
+    test "assigning and fetching otp data to and from session's private storage", %{user_with_2fa: user_with_2fa} do
+      {token, _one_time_pass} = Auth.generate_one_time_pass(user_with_2fa)
+      user_id = user_with_2fa.id
+
+      conn =
+        build_conn()
+        |> put_private(:plug_session, %{})
+
+      updated_conn =
+        conn
+        |> Auth.assign_otp_data_to_session(token, user_id)
+
+      assert %{"otp_token" => token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(updated_conn)
+    end
+
+    test "invalidating one time password", %{user_with_2fa: user_with_2fa} do
+      {token, one_time_pass} = Auth.generate_one_time_pass(user_with_2fa)
+      user_id = user_with_2fa.id
+
+      conn =
+        build_conn()
+        |> put_private(:plug_session, %{})
+
+      updated_conn =
+        conn
+        |> Auth.assign_otp_data_to_session(token, user_id)
+
+      assert %{"otp_token" => token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(updated_conn)
+
+      invalid_conn =
+        updated_conn
+        |> Auth.invalidate_otp(user_id)
+
+      %{"otp_token" => invalid_token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(invalid_conn)
+      refute Auth.valid_otp?(invalid_token, one_time_pass)
+    end
   end
 end

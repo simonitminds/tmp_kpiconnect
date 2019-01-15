@@ -15,12 +15,14 @@ defmodule OceanconnectWeb.SessionController do
       {:ok, user} ->
         case user.has_2fa do
           true ->
-            {token, _one_time_pass, _email} = Auth.generate_one_time_pass(user)
+            {token, one_time_pass} = Auth.generate_one_time_pass(user)
+            OceanconnectWeb.Mailer.deliver_2fa_email(user, one_time_pass)
 
             conn
+            |> Auth.assign_otp_data_to_session(token, user.id)
             |> put_flash(:info, "An email has been sent code to log in")
             |> put_status(302)
-            |> redirect(to: two_factor_auth_path(conn, :new, %{user_id: user.id, token: token}))
+            |> redirect(to: two_factor_auth_path(conn, :new))
           false ->
             updated_conn =
               conn
