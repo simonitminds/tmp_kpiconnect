@@ -1,0 +1,26 @@
+<div class="container is-fullhd">
+  <div class="content">
+    <div class="columns is-centered">
+      <div class="column is-two-fifths has-padding-left-lg has-padding-right-lg">
+        <h1 class="title has-text-weight-bold has-margin-bottom-md has-margin-top-xl">Two Factor Authentification</h1>
+        <p class="has-text-gray-3 has-margin-bottom-lg">Enter the code that was sent to your email address.</p>
+        <%= form_for @conn, two_factor_auth_path(@conn, :create), fn f -> %>
+          <div class="field is-horizontal is-expanded">
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :one_time_pass, class: "input qa-one_time_password" %>
+              </div>
+            </div>
+          </div>
+          <div class="field is-pulled-right has-margin-top-sm">
+            <div class="control">
+              <%= submit "Submit", class: "button is-primary qa-submit" %>
+            </div>
+          </div>
+        <% end %>
+
+        <%= link "Resend two-factor authetication code", to: two_factor_auth_path(@conn, :resend_email), method: :post, class: "link--resend-auth qa-resend_2fa_email" %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -118,4 +118,46 @@ defmodule OceanconnectWeb.Plugs.Auth do
       conn
     end
   end
+
+  def generate_one_time_pass(user = %User{has_2fa: true}) do
+    token =
+      :crypto.strong_rand_bytes(8)
+      |> Base.encode32()
+    one_time_pass = :pot.hotp(token, _num_of_trials = 1)
+
+    {token, one_time_pass}
+  end
+
+  def assign_otp_data_to_session(conn, token, user_id) do
+    plug_session =
+      conn.private[:plug_session]
+      |> Map.put_new("user_data", %{"otp_token" => token, "user_id" => user_id})
+
+    conn
+    |> put_private(:plug_session, plug_session)
+  end
+
+  def fetch_otp_data_from_session(conn) do
+    Kernel.get_in(conn.private, [:plug_session, "user_data"])
+  end
+
+  def valid_otp?(token, one_time_pass) do
+    case token do
+      nil -> false
+      _ ->
+        case :pot.valid_hotp(one_time_pass, token, [{:last, 0}]) do
+          1 -> true
+          _ -> false
+        end
+    end
+  end
+
+  def invalidate_otp(conn, user_id) do
+    plug_session =
+      conn.private[:plug_session]
+      |> Map.put("user_data", %{"otp_token" => nil, "user_id" => user_id})
+
+    conn
+    |> put_private(:plug_session, plug_session)
+  end
 end

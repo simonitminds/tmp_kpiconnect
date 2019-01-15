@@ -1,13 +1,15 @@
 defmodule OceanconnectWeb.Session.NewTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
-  alias Oceanconnect.Session.{NewPage, ForgotPasswordPage}
+  alias Oceanconnect.Session.{NewPage, ForgotPasswordPage, TwoFactorAuthPage}
 
   hound_session()
 
   setup do
     user = insert(:user, password: "password")
-    {:ok, %{user: user}}
+    user_2fa = insert(:user, password: "password", has_2fa: true)
+
+    {:ok, %{user: user, user_2fa: user_2fa}}
   end
 
   test "logging in with valid user credentials", %{user: user} do
@@ -23,5 +25,23 @@ defmodule OceanconnectWeb.Session.NewTest do
     NewPage.forgot_password()
 
     assert ForgotPasswordPage.is_current_path?()
+  end
+
+  test "a user with 2fa enabled logs in and is redirected to the two factor auth page", %{user_2fa: user_2fa} do
+    NewPage.visit()
+    NewPage.enter_credentials(user_2fa.email, "password")
+    NewPage.submit()
+
+    assert TwoFactorAuthPage.is_current_path?()
+  end
+
+  test "a user can resend the 2fa email", %{user_2fa: user_2fa} do
+    NewPage.visit()
+    NewPage.enter_credentials(user_2fa.email, "password")
+    NewPage.submit()
+
+    assert TwoFactorAuthPage.is_current_path?()
+    TwoFactorAuthPage.resend_2fa_email()
+    assert TwoFactorAuthPage.has_content?("A new two-factor authentication code has been sent to your email")
   end
 end

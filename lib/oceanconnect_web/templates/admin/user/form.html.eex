@@ -64,6 +64,16 @@
 
       <div class="field is-horizontal">
         <div class="control is-inline-block">
+          <%= checkbox f, :has_2fa, class: "checkbox qa-admin-user-has_2fa" %>
+          <%= error_tag f, :has_2fa %>
+        </div>
+        <%= label f, :has_2fa, class: "label has-margin-left-md is-inline-block" do %>
+          Enable two-factor authentication
+        <%end%>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="control is-inline-block">
           <%= checkbox f, :is_admin, class: "checkbox qa-admin-user-is_admin" %>
           <%= error_tag f, :is_admin %>
         </div>

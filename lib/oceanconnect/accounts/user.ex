@@ -13,6 +13,7 @@ defmodule Oceanconnect.Accounts.User do
     field(:last_name, :string)
     field(:password_hash, :string)
     field(:password, :string, virtual: true)
+    field(:has_2fa, :boolean, default: false)
     field(:is_admin, :boolean, default: false)
     field(:is_active, :boolean, default: true)
     field(:impersonated_by, :integer, virtual: true)
@@ -24,7 +25,7 @@ defmodule Oceanconnect.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :has_2fa])
     |> validate_required([:email])
     |> upcase_email()
     |> unique_constraint(:email)
@@ -32,7 +33,7 @@ defmodule Oceanconnect.Accounts.User do
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin])
+    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :has_2fa])
     |> validate_required([:email, :company_id])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()

@@ -49,6 +49,17 @@
           <%= error_tag f, :mobile_phone %>
         </div>
       </div>
+
+      <div class="field is-horizontal has-margin-bottom-lg">
+        <div class="control is-inline-block">
+          <%= checkbox f, :has_2fa, class: "checkbox qa-user-has_2fa" %>
+          <%= error_tag f, :has_2fa %>
+        </div>
+        <%= label f, :has_2fa, class: "label has-margin-left-md is-inline-block" do %>
+        Two-Factor Authentication Enabled
+        <%end%>
+      </div>
+
       <div class="field is-margin-top-lg">
         <div class="control">
           <%= submit "Submit", class: "button is-primary qa-submit" %>

@@ -20,6 +20,7 @@ defmodule Oceanconnect.Admin.User.EditTest do
                "email",
                "first_name",
                "last_name",
+               "has_2fa",
                "is_admin"
              ])
     end
