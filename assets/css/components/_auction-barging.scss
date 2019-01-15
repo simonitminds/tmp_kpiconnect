@@ -220,6 +220,25 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
       }
     }
   }
+
+  .collapsing-barge__barge__button.buttons button { // Target button text for when window size is too narrow.
+    @media (min-width: 1280px) {
+      svg { display: none; }
+      span { display: inline; }
+    }
+    @media (max-width: 1280px) and (min-width: 768px) {
+      svg { display: block; }
+      span { display: none; }
+    }
+    @media (max-width: 768px) and (min-width: 480px) {
+      svg { display: none; }
+      span { display: inline; }
+    }
+    @media (max-width: 480px) {
+      svg { display: block; }
+      span { display: none; }
+    }
+  }
   .collapsing-barge__barge__button--toggle button {
     position: relative;
     width: calc(100% + 1.5rem);
