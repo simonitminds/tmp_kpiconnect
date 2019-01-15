@@ -17,7 +17,7 @@
             </div>
             <div class="column is-half">
               <h3 class="admin-panel__content__subhead">User Actions</h3>
-              <%= link "Send password reset email", to: user_path(@conn, :reset_password, @user), method: :post, class: "button is-info has-margin-top-sm qa-admin-user-password_reset" %>
+              <%= link "Send Password Reset Email", to: user_path(@conn, :reset_password, @user), method: :post, class: "button is-info has-margin-top-sm qa-admin-user-password_reset" %>
             </div>
           </div>
         </section>

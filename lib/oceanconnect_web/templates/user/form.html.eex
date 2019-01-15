@@ -50,13 +50,13 @@
         </div>
       </div>
 
-      <div class="field is-horizontal">
+      <div class="field is-horizontal has-margin-bottom-lg">
         <div class="control is-inline-block">
           <%= checkbox f, :has_2fa, class: "checkbox qa-user-has_2fa" %>
           <%= error_tag f, :has_2fa %>
         </div>
         <%= label f, :has_2fa, class: "label has-margin-left-md is-inline-block" do %>
-          Enable two-factor authentication
+        Two-Factor Authentication Enabled
         <%end%>
       </div>
 

@@ -19,7 +19,7 @@
           </div>
         <% end %>
 
-        <%= link "Resend two-factor authetication code", to: two_factor_auth_path(@conn, :resend_email), method: :post, class: "qa-resend_2fa_email" %>
+        <%= link "Resend two-factor authetication code", to: two_factor_auth_path(@conn, :resend_email), method: :post, class: "link--resend-auth qa-resend_2fa_email" %>
       </div>
     </div>
   </div>
