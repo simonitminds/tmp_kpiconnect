@@ -304,7 +304,7 @@ defmodule OceanconnectWeb.Email do
   end
 
   def two_factor_auth(%Accounts.User{has_2fa: true} = user, one_time_pass) do
-    base_email(user)
+    two_factor_email(user)
     |> subject("Two factor authentication")
     |> render(
       "two_factor_auth.html",
@@ -348,6 +348,13 @@ defmodule OceanconnectWeb.Email do
     new_email()
     |> cc("nbolton@oceanconnectmarine.com")
     |> bcc("lauren@gaslight.co")
+    |> from("bunkers@oceanconnectmarine.com")
+    |> to(user)
+    |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
+  end
+
+  defp two_factor_email(user) do
+    new_email()
     |> from("bunkers@oceanconnectmarine.com")
     |> to(user)
     |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
