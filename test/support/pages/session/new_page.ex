@@ -36,4 +36,8 @@ defmodule Oceanconnect.Session.NewPage do
     find_element(:css, ".qa-forgot_password")
     |> click()
   end
+
+  def register do
+    click({:css, ".qa-register"})
+  end
 end

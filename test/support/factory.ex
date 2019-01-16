@@ -18,6 +18,8 @@ defmodule Oceanconnect.Factory do
       email: sequence(:email, &"USER-#{&1}@EXAMPLE.COM"),
       first_name: sequence(:first_name, &"test-#{&1}"),
       last_name: sequence(:first_name, &"user-#{&1}"),
+      office_phone: "office phone",
+      mobile_phone: "mobile phone",
       password: "password",
       company: build(:company)
     }

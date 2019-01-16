@@ -1,0 +1,91 @@
+<div class="container is-fullhd">
+  <div class="content">
+    <div class="columns is-centered">
+      <div class="column is-two-fifths has-padding-left-lg has-padding-right-lg">
+        <h1 class="title has-text-weight-bold has-margin-bottom-md has-margin-top-xl">Contact Information</h1>
+        <p class="has-text-gray-3 has-margin-bottom-lg">Please enter the information below and submit it in order to receive inquiries from the site admin.</p>
+        <%= form_for @conn, registration_path(@conn, :create), fn f -> %>
+          <div class="field is-horizontal is-expanded">
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="email">Email</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :email, class: "input qa-email" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal is-expanded">
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="company_name">Company</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :company_name, class: "input qa-company_name" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped" >
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="first_name">First Name</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :first_name, class: "input qa-first_name" %>
+              </div>
+            </div>
+
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="last_name">Last Name</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :last_name, class: "input qa-last_name" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped">
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="office_phone">Office Phone</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :office_phone, class: "input qa-office_phone" %>
+              </div>
+            </div>
+
+            <div class="field-label">
+              <div class="control">
+                <label class="label" for="mobile_phone">Mobile Phone</label>
+              </div>
+            </div>
+            <div class="field-body">
+              <div class="control is-expanded">
+                <%= text_input f, :mobile_phone, class: "input qa-mobile_phone" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-pulled-right has-margin-top-sm">
+            <div class="control">
+              <%= submit "Submit", class: "button is-primary qa-submit" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
