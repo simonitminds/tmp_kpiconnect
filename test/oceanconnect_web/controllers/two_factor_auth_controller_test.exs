@@ -37,7 +37,7 @@ defmodule OceanconnectWeb.TwoFactorAuthControllerTest do
 
   test "submitting a session with an invalid one time password", %{conn: conn} do
     response = post(conn, "/sessions/new/two_factor_auth", %{one_time_pass: "not the one time password"})
-    assert html_response(response, 401) =~ "Two factor authentication code was invalid"
+    assert html_response(response, 401) =~ "The authentication code entered was invalid"
   end
 
   test "resending the 2fa email", %{conn: conn} do

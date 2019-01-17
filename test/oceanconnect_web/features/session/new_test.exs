@@ -54,6 +54,6 @@ defmodule OceanconnectWeb.Session.NewTest do
     RegistrationPage.submit()
 
     assert NewPage.is_current_path?()
-    assert NewPage.has_content?("Thank you for expressing interest in OceanConnect Marine. You will be contacted by a site administrator.")
+    assert NewPage.has_content?("Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator.")
   end
 end

@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.RegistrationController do
       _ ->
         OceanconnectWeb.Mailer.deliver_user_interest_email(new_user_information)
         conn
-        |> put_flash(:info, "Thank you for expressing interest in OceanConnect Marine. You will be contacted by a site administrator.")
+        |> put_flash(:info, "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator.")
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))
     end
