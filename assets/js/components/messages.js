@@ -65,7 +65,7 @@ class Messages extends React.Component {
               }
             </div>
           </div>
-          { auctionState
+          { auctionState && panelIsExpanded
             ? <MessagesAuctionView
                 messagePayloads={messagePayloads}
                 selectedAuction={selectedAuction}
