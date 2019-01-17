@@ -22,7 +22,7 @@ export default class MessagePanel extends React.Component {
   componentDidMount() {
     this.timerID = setInterval(
       () => this.tick(),
-      2000
+      1200
     );
   }
 
