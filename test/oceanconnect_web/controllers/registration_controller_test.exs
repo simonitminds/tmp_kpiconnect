@@ -12,8 +12,13 @@ defmodule OceanconnectWeb.RegistrationControllerTest do
     assert html_response(response, 200) =~ "/registration"
   end
 
-  test "submitting valid data to registration", %{conn: conn, user: user} do
-    response = post(conn, "/registration", %{email: user.email, company_name: user.company.name, first_name: user.first_name, last_name: user.last_name, office_phone: user.office_phone, mobile_phone: user.mobile_phone})
+  test "submitting valid data to registration redirects you to /session/new", %{conn: conn, user: user} do
+    response = post(conn, "/registration", %{email: user.email})
     assert html_response(response, 302) =~ "/sessions/new"
+  end
+
+  test "submitting invalid data to registration puts an error flash", %{conn: conn} do
+    response = post(conn, "/registration", %{email: nil})
+    assert html_response(response, 401) =~ "Please make sure to include your email address!"
   end
 end
