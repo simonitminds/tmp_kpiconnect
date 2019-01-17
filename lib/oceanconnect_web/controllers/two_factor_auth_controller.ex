@@ -6,8 +6,7 @@ defmodule OceanconnectWeb.TwoFactorAuthController do
   alias OceanconnectWeb.Plugs.Auth
 
   def new(conn, _) do
-    token =
-      Kernel.get_in(conn.private[:plug_session], ["user_data", "otp_token"])
+    %{"otp_token" => token, "user_id" => _user_id} = Auth.fetch_otp_data_from_session(conn)
 
     case token do
       nil ->
