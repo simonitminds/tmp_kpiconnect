@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.TwoFactorAuthControllerTest do
       conn
       |> put_private(:plug_session, plug_session)
 
-    {:ok, %{conn: conn, invalid_conn: build_conn(), one_time_pass: one_time_pass}}
+    {:ok, %{conn: conn, one_time_pass: one_time_pass, user: user}}
   end
 
   test "visiting the two factor auth page", %{conn: conn} do
@@ -25,7 +25,11 @@ defmodule OceanconnectWeb.TwoFactorAuthControllerTest do
     assert html_response(response, 200) =~ "/sessions/new/two_factor_auth"
   end
 
-  test "visiting the two factor auth page with no token", %{invalid_conn: invalid_conn} do
+  test "visiting the two factor auth page with no token", %{conn: conn, user: user} do
+    invalid_conn =
+      conn
+      |> Auth.invalidate_otp(user.id)
+
     response = get(invalid_conn, "/sessions/new/two_factor_auth")
     assert html_response(response, 302) =~ "/sessions/new"
   end

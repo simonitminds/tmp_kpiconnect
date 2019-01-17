@@ -131,7 +131,7 @@ defmodule OceanconnectWeb.Plugs.Auth do
   def assign_otp_data_to_session(conn, token, user_id) do
     plug_session =
       conn.private[:plug_session]
-      |> Map.put_new("user_data", %{"otp_token" => token, "user_id" => user_id})
+      |> Map.put("user_data", %{"otp_token" => token, "user_id" => user_id})
 
     conn
     |> put_private(:plug_session, plug_session)
