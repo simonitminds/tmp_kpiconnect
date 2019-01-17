@@ -76,6 +76,9 @@ defmodule OceanconnectWeb.Router do
     # Use the default browser stack
     pipe_through(:browser)
 
+    get("/registration", RegistrationController, :new)
+    post("/registration", RegistrationController, :create)
+
     get("/sessions/new", SessionController, :new)
     get("/", SessionController, :new)
     post("/sessions", SessionController, :create)

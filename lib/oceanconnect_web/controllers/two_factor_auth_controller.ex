@@ -35,7 +35,7 @@ defmodule OceanconnectWeb.TwoFactorAuthController do
 
       false ->
         conn
-        |> put_flash(:error, "Two factor authentication code was invalid")
+        |> put_flash(:error, "The authentication code entered was invalid")
         |> put_status(401)
         |> render("two_factor_auth.html", action: two_factor_auth_path(conn, :create))
     end
