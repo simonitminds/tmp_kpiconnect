@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { timeRemainingCountdown } from '../../utilities';
+import { cardDateFormat, timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
@@ -45,7 +45,6 @@ export default class AuctionsIndex extends React.Component {
 
   render() {
     const connection = this.props.connection;
-    const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm");};
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
     const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
 
