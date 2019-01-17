@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatTimeRemaining, formatTimeRemainingColor, timeRemainingCountdown } from '../../utilities';
+import { cardDateFormat, formatTimeRemaining, formatTimeRemainingColor, timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 
 class AuctionTimeRemaining extends React.Component {
@@ -42,7 +42,6 @@ class AuctionTimeRemaining extends React.Component {
     const auctionStartTime = _.get(auctionPayload, 'auction.scheduled_start');
     const auctionEndTime = _.get(auctionPayload, 'auction.auction_ended');
     const auctionClosedTime = _.get(auctionPayload, 'auction.auction_closed_time');
-    const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
 
     if (auctionStatus == "open" || auctionStatus == "decision") {
       return (
