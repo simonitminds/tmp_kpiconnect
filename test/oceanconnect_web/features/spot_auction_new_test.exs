@@ -1,4 +1,4 @@
-defmodule Oceanconnect.SpotAuctionNewTest do
+defmodule Oceanconnect.AuctionNewTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionNewPage, AuctionShowPage}
 
