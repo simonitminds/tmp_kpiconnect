@@ -2,6 +2,7 @@ defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
   alias Oceanconnect.AdminPage
+  alias Oceanconnect.AuctionLogPage
   alias Oceanconnect.Auctions
 
   setup do
@@ -34,6 +35,17 @@ defmodule Oceanconnect.AuctionIndexTest do
 
       assert AuctionIndexPage.auction_is_status?(auction, "canceled")
     end
+
+    test "canceling an auction creates a snapshop", %{auction: auction} do
+      AuctionIndexPage.visit()
+      AuctionIndexPage.cancel_auction(auction)
+
+      assert AuctionIndexPage.auction_is_status?(auction, "canceled")
+      AuctionLogPage.visit(auction.id)
+      Hound.Helpers.Screenshot.take_screenshot()
+      assert has_content?("Auction state snapshotted")
+    end
+
 
     test "renders the default auction index page", %{auctions: auctions} do
       assert AuctionIndexPage.is_current_path?()
