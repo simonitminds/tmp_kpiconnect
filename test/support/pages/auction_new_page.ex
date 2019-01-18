@@ -12,6 +12,11 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
+  def select_auction_type(type) do
+    find_element(:css, ".qa-auction-auction_type option[value='#{type}']")
+    |> click
+  end
+
   def buyer_vessels_in_vessel_list?(vessels) do
     element = find_element(:css, ".qa-auction-select-vessel")
 

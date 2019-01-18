@@ -9,12 +9,14 @@ import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_INFORMATION,
          RECEIVE_SUPPLIERS,
          SELECT_ALL_SUPPLIERS,
+         SELECT_AUCTION_TYPE,
          TOGGLE_SUPPLIER,
          DESELECT_ALL_SUPPLIERS,
  } from "../constants";
 
 const initialState = {
   auction: null,
+  type: null,
   eta_date: null,
   eta_time: null,
   etd_date: null,
@@ -50,6 +52,7 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
+          type: action.data.auction.type,
           credit_margin_amount: formatPrice(action.data.credit_margin_amount),
           is_traded_bid_allowed: _.get(action, 'data.auction.is_traded_bid_allowed'),
           eta_date: setUTCDateTime(action.data.auction.eta),

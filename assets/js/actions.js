@@ -332,6 +332,14 @@ export function updateDate(property, value) {
           }
         };
 }
+
+export function selectAuctionType(type) {
+  return {
+           type: SELECT_AUCTION_TYPE,
+           data: {type: type}
+         };
+}
+
 export function toggleSupplier(supplier_id) {
   return {
            type: TOGGLE_SUPPLIER,

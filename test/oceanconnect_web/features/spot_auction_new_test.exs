@@ -28,7 +28,7 @@ defmodule Oceanconnect.SpotAuctionNewTest do
       |> DateTime.from_unix!()
 
     date_time = DateTime.utc_now()
-    suppliers = [selected_company1, selected_company2]
+    suppliers = [selected_ompany1, selected_company2]
 
     auction_params = %{
       anonymous_bidding: false,
@@ -70,9 +70,8 @@ defmodule Oceanconnect.SpotAuctionNewTest do
   end
 
   test "visting the new auction page" do
-    AuctionNewPage.select_auction_type(:spot_auction)
-
     AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:spot_auction)
 
     assert AuctionNewPage.has_fields?([
              "auction_type",

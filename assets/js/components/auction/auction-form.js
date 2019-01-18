@@ -13,6 +13,7 @@ const AuctionForm = (props) => {
   const {
     auction,
     deselectAllSuppliers,
+    credit_margin_amount,
     eta_date,
     eta_time,
     etd_date,
@@ -30,9 +31,9 @@ const AuctionForm = (props) => {
     updateInformation,
     updateInformationFromCheckbox,
     vessels,
-    credit_margin_amount,
   } = props;
 
+  const auctionTypes = ["spot", "forward_fixed", "formula_related"];
   const port_id = auction.port_id ? auction.port_id : "";
   const selectedPort = _.chain(ports)
                         .filter(['id', auction.port_id])
@@ -56,6 +57,45 @@ const AuctionForm = (props) => {
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
+
+      <section className="auction-info is-gray-1"> {/* Auction type */}
+        <div className="container">
+          <div className="content">
+            <fieldset>
+              <legend className="subtitle is-4" >Auction Type</legend>
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_port_id" className="label">
+                    Auction Type
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select is-fullwidth">
+                      <select
+                        id="auction_type"
+                        name="auction[type]"
+                        className="qa-auction-type"
+                        value={auction.type}
+                        onChange={selectAuctionType.bind(this)}
+                      >
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        {_.map(auctionTypes, type => (
+                          <option key={type} value={type}>
+                            {_.startCase(type)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </section> {/* Auction type */}
 
       <section className="auction-info is-gray-1"> {/* Port info */}
         <div className="container">
