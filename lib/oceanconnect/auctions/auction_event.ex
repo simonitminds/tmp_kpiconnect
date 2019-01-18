@@ -37,6 +37,15 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     {:ok, updated_event}
   end
 
+  def auction_state_snapshotted(auction = %Auction{id: auction_id}, new_state = %AuctionState{}) do
+    %AuctionEvent{
+      type: :auction_state_snapshotted,
+      auction_id: auction_id,
+      data: %{state: new_state, auction: auction},
+      time_entered: DateTime.utc_now(),
+    }
+  end
+
   def auction_created(auction = %Auction{id: auction_id}, user) do
     %AuctionEvent{
       type: :auction_created,

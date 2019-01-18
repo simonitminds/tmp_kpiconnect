@@ -7,7 +7,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionBid,
     AuctionEvent,
     AuctionNotifier,
-    AuctionStore.AuctionState
+    AuctionStore.AuctionState,
+    AuctionEventStore
   }
 
   @registry_name :auction_event_handler_registry
@@ -124,6 +125,11 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     |> Auctions.update_auction_without_event_storage!(%{auction_closed_time: time_entered})
 
     AuctionNotifier.notify_participants(auction_state)
+
+    {:ok, _event} = AuctionEvent.auction_state_snapshotted(auction, auction_state)
+    |> AuctionEventStore.create_auction_snapshot()
+
+    Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}
   end
 
