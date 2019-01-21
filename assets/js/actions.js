@@ -14,6 +14,7 @@ import {
   RECEIVE_COMPANY_BARGES,
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
+  SELECT_AUCTION_TYPE,
   SELECT_PORT,
   EXPAND_MESSAGES_AUCTION,
   EXPAND_MESSAGES_CONVERSATION,
@@ -333,10 +334,11 @@ export function updateDate(property, value) {
         };
 }
 
-export function selectAuctionType(type) {
+export function selectAuctionType(event) {
+  const auctionType = event.target.value;
   return {
            type: SELECT_AUCTION_TYPE,
-           data: {type: type}
+           data: {type: auctionType}
          };
 }
 

@@ -62,7 +62,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
       AuctionNewPage.select_auction_type(:forward_fixed)
 
       assert AuctionNewPage.has_fields?([
-        "auction_type",
+        "type",
         "additional_information",
         "anonymous_bidding",
         "scheduled_start",
