@@ -1,14 +1,17 @@
 import React from 'react';
 import _ from 'lodash';
 import InputField from '../../input-field';
+import DateInput from '../../date-input';
 
 const PortSelectFormSection = (props) => {
   const {
     auction,
     port_id,
     ports,
+    hasDurationAndTerminal,
     selectPort,
-    updateInformation
+    updateInformation,
+    updateDate
   } = props;
 
   const portAgentDisplay = () => {
@@ -62,6 +65,33 @@ const PortSelectFormSection = (props) => {
             </div>
 
             {portAgentDisplay()}
+
+            { hasDurationAndTerminal &&
+              <div>
+                <InputField
+                  model={'auction'}
+                  field={'terminal'}
+                  labelText={'Terminal/Anchorage'}
+                  value={auction.terminal}
+                  isHorizontal={true}
+                  opts={{ labelClass: 'label is-uppercase' }}
+                  onChange={updateInformation.bind(this, 'auction.terminal')} />
+
+                <DateInput
+                  value={auction.term_start_month}
+                  model={'auction'}
+                  field={'term_start_month'}
+                  labelText={'Start Month'}
+                  onChange={updateDate.bind(this, 'term_start_month')} />
+
+                <DateInput
+                  value={auction.term_end_month}
+                  model={'auction'}
+                  field={'term_end_month'}
+                  labelText={'End Month'}
+                  onChange={updateDate.bind(this, 'term_end_month')} />
+              </div>
+            }
           </fieldset>
         </div>
       </div>

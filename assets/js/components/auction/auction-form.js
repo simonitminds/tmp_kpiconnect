@@ -9,6 +9,7 @@ import { portLocalTime } from '../../utilities';
 import SupplierList  from './supplier-list';
 import VesselFuelForm from './vessel-fuel-form';
 import SpotAuctionForm from './forms/spot-auction-form';
+import ForwardFixedAuctionForm from './forms/forward-fixed-auction-form';
 
 const AuctionForm = (props) => {
   const {
@@ -62,7 +63,7 @@ const AuctionForm = (props) => {
     case 'spot':
       return(<SpotAuctionForm {...props} />);
     case 'forward_fixed':
-      return(<div>Forward Fixed</div>);
+      return(<ForwardFixedAuctionForm {...props} />);
     case 'formula_related':
       return(<div>Formula Related</div>);
     }

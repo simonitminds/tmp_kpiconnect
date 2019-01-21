@@ -12,7 +12,7 @@ import PortSelectFormSection from './port-select-form-section';
 import AdditionalInfoFormSection from './additional-info-form-section';
 import AuctionDetailsFormSection from './auction-details-form-section';
 
-const SpotAuctionForm = (props) => {
+const ForwardFixedAuctionForm = (props) => {
   const {
     auction,
     type,
@@ -49,9 +49,10 @@ const SpotAuctionForm = (props) => {
       <PortSelectFormSection auction={auction}
                              port_id={port_id}
                              ports={ports}
+                             hasDurationAndTerminal={true}
                              selectPort={selectPort}
-                             updateInformation={updateInformation}
-                             hasDurationAndTerminal={false} />
+                             updateDate={updateDate}
+                             updateInformation={updateInformation} />
 
       <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
                     onSelectAllSuppliers={selectAllSuppliers}
@@ -79,4 +80,4 @@ const SpotAuctionForm = (props) => {
   );
 };
 
-export default SpotAuctionForm;
+export default ForwardFixedAuctionForm;
