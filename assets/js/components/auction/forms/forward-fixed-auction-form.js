@@ -7,7 +7,8 @@ import DateInput from '../../date-input';
 import TimeInput from '../../time-input';
 import { portLocalTime } from '../../../utilities';
 import SupplierList  from '../supplier-list';
-import VesselFuelForm from '../vessel-fuel-form';
+import TermVesselFormSection from './term-vessel-form-section';
+import TermFuelFormSection from './term-fuel-form-section';
 import PortSelectFormSection from './port-select-form-section';
 import AdditionalInfoFormSection from './additional-info-form-section';
 import AuctionDetailsFormSection from './auction-details-form-section';
@@ -61,17 +62,19 @@ const ForwardFixedAuctionForm = (props) => {
                     selectedSuppliers={selectedSuppliers}
                     suppliers={suppliers} />
 
-     <VesselFuelForm auction={auction}
-                     vessels={vessels}
-                     fuels={fuels}
-                     vesselFuels={auction.vessel_fuels}
-                     portId={port_id}
-                     ports={ports} />
 
-      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} />
+      <TermVesselFormSection auction={auction}
+                             vessels={vessels}
+                             portId={port_id}
+                             ports={ports} />
+
+      <TermFuelFormSection auction={auction} fuels={fuels} updateInformation={updateInformation} />
+
+      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} isTermAuction={true }/>
 
       <AuctionDetailsFormSection auction={auction}
                                  credit_margin_amount={credit_margin_amount}
+                                 isTermAuction={true}
                                  updateInformation={updateInformation}
                                  updateInformationFromCheckbox={updateInformationFromCheckbox}
                                  updateDate={updateDate} />

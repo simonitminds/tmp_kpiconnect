@@ -69,27 +69,45 @@ const PortSelectFormSection = (props) => {
             { hasDurationAndTerminal &&
               <div>
                 <InputField
+                  className={'qa-auction-terminal'}
                   model={'auction'}
                   field={'terminal'}
                   labelText={'Terminal/Anchorage'}
                   value={auction.terminal}
                   isHorizontal={true}
-                  opts={{ labelClass: 'label is-uppercase' }}
+                  opts={{ labelClass: 'label' }}
                   onChange={updateInformation.bind(this, 'auction.terminal')} />
 
-                <DateInput
-                  value={auction.term_start_month}
-                  model={'auction'}
-                  field={'term_start_month'}
-                  labelText={'Start Month'}
-                  onChange={updateDate.bind(this, 'term_start_month')} />
+                <div className="field is-horizontal">
+                  <div className="field-label">
+                    <label className="label">Start Month</label>
+                  </div>
+                  <div className="field-body">
+                    <DateInput
+                      className={'qa-auction-start_month'}
+                      value={auction.term_start_month}
+                      model={'auction'}
+                      field={'term_start'}
+                      labelText={'Start Month'}
+                      onChange={updateDate.bind(this, 'term_start_month')} />
+                  </div>
+                </div>
 
-                <DateInput
-                  value={auction.term_end_month}
-                  model={'auction'}
-                  field={'term_end_month'}
-                  labelText={'End Month'}
-                  onChange={updateDate.bind(this, 'term_end_month')} />
+
+                <div className="field is-horizontal">
+                  <div className="field-label">
+                    <label className="label">Start Month</label>
+                  </div>
+                  <div className="field-body">
+                    <DateInput
+                      className={'qa-auction-end_month'}
+                      value={auction.term_end_month}
+                      model={'auction'}
+                      field={'term_end'}
+                      labelText={'End Month'}
+                      onChange={updateDate.bind(this, 'term_end_month')} />
+                  </div>
+                </div>
               </div>
             }
           </fieldset>

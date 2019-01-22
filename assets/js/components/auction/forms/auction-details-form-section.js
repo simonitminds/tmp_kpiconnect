@@ -8,6 +8,7 @@ const AuctionDetailsFormSection = (props) => {
   const {
     auction,
     credit_margin_amount,
+    isTermAuction,
     updateInformation,
     updateInformationFromCheckbox,
     updateDate
@@ -69,27 +70,29 @@ const AuctionDetailsFormSection = (props) => {
               </div>
             </div>
 
-            <div className="field is-horizontal">
-              <div className="field-label">
-                <label htmlFor="auction_decision_duration" className="label">
-                  Decision Duration
-                </label>
-              </div>
-              <div className="field-body">
-                <div className="control">
-                  <div className="select">
-                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
-                      <option disabled value="">
-                        Please select
-                      </option>
-                      <option value="15">15</option>
-                      <option value="10">10</option>
-                    </select>
+            {!isTermAuction &&
+              <div className="field is-horizontal">
+                <div className="field-label">
+                  <label htmlFor="auction_decision_duration" className="label">
+                    Decision Duration
+                  </label>
+                </div>
+                <div className="field-body">
+                  <div className="control">
+                    <div className="select">
+                      <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
+                        <option disabled value="">
+                          Please select
+                        </option>
+                        <option value="15">15</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <span className="select__extra-label">minutes</span>
                   </div>
-                  <span className="select__extra-label">minutes</span>
                 </div>
               </div>
-            </div>
+            }
 
             <div className="field is-horizontal has-margin-bottom-md">
               <div className="field-label"></div>

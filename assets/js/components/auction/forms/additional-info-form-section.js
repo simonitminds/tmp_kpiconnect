@@ -3,6 +3,7 @@ import React from 'react';
 const AdditionalInfoFormSection = (props) => {
   const {
     auction,
+    isTermAuction,
     updateInformation
   } = props;
 
@@ -12,6 +13,9 @@ const AdditionalInfoFormSection = (props) => {
         <div className="content">
           <fieldset>
             <legend className="subtitle is-4" >Additional Information</legend>
+            {isTermAuction &&
+              <p class="is-italic has-text-gray-3 has-margin-bottom-lg">Specify desired timing of delivery, payment terms, duration of price validity, as well as any other additional delivery terms.</p>
+            }
             <div className="field is-horizontal">
               <textarea
                 name={'auction[additional_information]'}

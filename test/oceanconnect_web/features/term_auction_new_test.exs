@@ -63,18 +63,18 @@ defmodule Oceanconnect.TermAuctionNewTest do
 
       assert AuctionNewPage.has_fields?([
         "type",
+        "terminal",
         "additional_information",
         "anonymous_bidding",
         "scheduled_start",
-        "start_month",
-        "end_month",
+        "term_start_date",
+        "term_end_date",
         "is_traded_bid_allowed",
         "po",
         "port_id",
         "select-fuel",
         "select-port",
-        "select-vessel",
-        "terminal"
+        "select-vessel"
       ])
     end
   end

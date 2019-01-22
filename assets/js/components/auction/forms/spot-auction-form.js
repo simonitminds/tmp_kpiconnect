@@ -67,10 +67,11 @@ const SpotAuctionForm = (props) => {
                      portId={port_id}
                      ports={ports} />
 
-      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} />
+      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} isTermAuction={false}/>
 
       <AuctionDetailsFormSection auction={auction}
                                  credit_margin_amount={credit_margin_amount}
+                                 isTermAuction={false}
                                  updateInformation={updateInformation}
                                  updateInformationFromCheckbox={updateInformationFromCheckbox}
                                  updateDate={updateDate} />
