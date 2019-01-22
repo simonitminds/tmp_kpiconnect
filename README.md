@@ -89,7 +89,7 @@ We're using Ansible to manage server provisioning and deployments. For the most 
 4. Run any necessary migrations with `./scripts/db-migrate.sh`
 5. Deploy with `./scripts/deploy-local.sh`
 
-New users will need to add their account information to `ansible/inventory/group_vars/all/users/yml` before they will be able to access the servers.
+New users will need to add their account information to `ansible/inventory/group_vars/all/users.yml` and have the `manage-users` playbook run before they will be able to access the servers.
 
 
 ### Setting up `yarn`
@@ -97,6 +97,15 @@ New users will need to add their account information to `ansible/inventory/group
 This project now depends on `yarn` for managing dependencies and building assets with `parcel`. After all the ansible setup has been completed, you'll need to install `yarn` using the installation method suggested for the server's OS here: https://yarnpkg.com/en/docs/install#debian-stable.
 
 Without this, you'll get an error that `yarn` could not be found and `./scripts/build-release.sh` will fail.
+
+
+### Adding new servers
+
+The `ansible/inventory/hosts` file lists out the hostnames/ips of servers that will be managed by Ansible using an INI format. These servers are sorted into _groups_ that Ansible can reference.
+
+We currently have two primary groups set up: `staging`, and `production`. Additionally, `web-servers`, `build-servers`, and `db-servers` are also set up with both the staging and production servers for a semantic representation of our infrastructure.
+
+The only required groups are `[py3-hosts]` and `[py3-hosts:vars]`. Most modern OSs have Python 3 installed by default, but Ansible defaults to Python 2. These groups tell Ansible to use Python 3 on those servers. Other groupings are up to you.
 
 
 ### Provisioning new servers
@@ -115,6 +124,15 @@ ansible-playbook -u root -v -l <server-group> playbooks/config-build.yml -D
 Here, `<server-group>` is a host group defined in `./ansible/inventory/hosts`. You can also specify individual servers for more control/avoiding taking down other nodes.
 
 Alternatively, since we mainly run all components (web, build, and db) on a single server, you can make a new host group for your servers and provision them that way. For example, a `demo-servers` group could list the hosts for a demo instance of the app.
+
+One thing to note with this set of commands is that each server will be provisioned as the database, build server, _and_ application server all together. You can use different `hosts` file groups for each playbook to separate these components as needed. _Note: the `config` and `setup` steps for each type (web, build, db) must still be done on the same servers._
+
+
+### Using an external database
+
+If you have an external database setup to use, you can skip the `setup-db` playbook. This will avoid installing postgres and creating a database on the server.
+
+Then, after provisioning the server the rest of the way, edit the `config/prod.secret.exs` file under the build directory (`~deploy/build/oceanconnect`) with your database's connection information.
 
 
 ### Setting hostname
@@ -155,7 +173,7 @@ It is safe to run this while the server is running and will not restart the appl
 
 
 
-### Observing
+## Observing the Application
 
 Get the port numbers for the running erlang processes by SSHing into the server as the `deploy` user and running `epmd -names`. If `epmd` is not available, reshim with asdf.
 
