@@ -195,8 +195,8 @@ class CollapsingBarge extends Component {
           case 'pending':
             return (
               <div className="collapsing-barge__barge__button buttons has-addons has-margin-bottom-none">
-                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }>Approve</button>
-                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }>Reject</button>
+                <button onClick={ approveBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-success qa-auction-barge-approve-${barge.id}` }><FontAwesomeIcon icon="check" /><span>Approve</span></button>
+                <button onClick={ rejectBargeForm.bind(this, auction.id, barge.id, supplierId) } className={ `button is-small is-danger qa-auction-barge-reject-${barge.id}` }><FontAwesomeIcon icon="times" /><span>Reject</span></button>
               </div>)
           case 'approved':
             return (

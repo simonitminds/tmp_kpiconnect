@@ -76,9 +76,21 @@ defmodule OceanconnectWeb.Router do
     # Use the default browser stack
     pipe_through(:browser)
 
+    get("/registration", RegistrationController, :new)
+    post("/registration", RegistrationController, :create)
+
     get("/sessions/new", SessionController, :new)
     get("/", SessionController, :new)
     post("/sessions", SessionController, :create)
+    get("/sessions/new/two_factor_auth", TwoFactorAuthController, :new)
+    post("/sessions/new/two_factor_auth", TwoFactorAuthController, :create)
+    post("/sessions/new/two_factor_auth/resend_email", TwoFactorAuthController, :resend_email)
+
+    get("/forgot_password", ForgotPasswordController, :new)
+    post("/forgot_password", ForgotPasswordController, :create)
+
+    get("/reset_password", ForgotPasswordController, :edit)
+    post("/reset_password", ForgotPasswordController, :update)
 
     # Routes requiring authentication
     pipe_through(:authenticated)
@@ -99,6 +111,9 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+
+    resources("/users", UserController)
+    post("/users/:user_id/reset_password", UserController, :reset_password)
 
     # TODO: remove this after emails are designed
     post("/send_email/invitation", EmailController, :send_invitation)
@@ -128,6 +143,7 @@ defmodule OceanconnectWeb.Router do
     resources("/users", UserController, as: :admin_user)
     post("/users/:user_id/deactivate", UserController, :deactivate, as: :admin_user)
     post("/users/:user_id/activate", UserController, :activate, as: :admin_user)
+    post("/users/:user_id/reset_password", UserController, :reset_password, as: :admin_user)
 
     resources("/companies", CompanyController, as: :admin_company)
     post("/companies/:company_id/deactivate", CompanyController, :deactivate, as: :admin_company)

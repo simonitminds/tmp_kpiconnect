@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import { formatPrice } from '../../utilities';
+import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status'
 import AuctionTimeRemaining from './auction-time-remaining';
 import AuctionInvitation from './auction-invitation';
@@ -10,12 +10,12 @@ import AuctionInvitation from './auction-invitation';
 const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
-  const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const vessels = _.get(auction, 'vessels');
   const fuels = _.get(auction, 'fuels');
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
+  const { eta, etd } = etaAndEtdForAuction(auction);
 
 
   const bidStatusDisplay = () => {
@@ -125,7 +125,7 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
             {auction.is_traded_bid_allowed && <span action-label="Traded Bids Accepted" className="card__traded-bid-marker"> <FontAwesomeIcon icon="exchange-alt"  className="has-text-gray-3" /> </span>}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
-          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
+          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
         <div className="card-content__products">
           { auctionStatus != 'pending' &&

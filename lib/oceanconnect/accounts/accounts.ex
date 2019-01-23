@@ -58,6 +58,8 @@ defmodule Oceanconnect.Accounts do
     |> Repo.get!(id)
   end
 
+  def get_user_by_email(email), do: Repo.get_by(User, email: email)
+
   def get_user_name!(%User{} = user) do
     User.full_name(user)
   end
@@ -86,6 +88,18 @@ defmodule Oceanconnect.Accounts do
     |> Repo.insert()
   end
 
+  def admin_create_user(attrs \\ %{}) do
+    %User{}
+    |> User.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def seed_user(attrs \\ %{}) do
+    %User{}
+    |> User.seed_changeset(attrs)
+    |> Repo.insert()
+  end
+
   @doc """
   Updates a user.
 
@@ -101,6 +115,12 @@ defmodule Oceanconnect.Accounts do
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def admin_update_user(%User{} = user, attrs) do
+    user
+    |> User.admin_changeset(attrs)
     |> Repo.update()
   end
 
@@ -132,6 +152,12 @@ defmodule Oceanconnect.Accounts do
     |> Repo.update()
   end
 
+  def reset_password(%User{} = user, attrs) do
+    user
+    |> User.password_reset_changeset(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
@@ -143,6 +169,10 @@ defmodule Oceanconnect.Accounts do
   """
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+  def change_user_password(%User{} = user) do
+    User.password_reset_changeset(user, %{})
   end
 
   def verify_login(%{"email" => email, "password" => password}) do

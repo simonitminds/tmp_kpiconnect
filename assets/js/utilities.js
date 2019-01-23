@@ -156,6 +156,17 @@ export function formatTimeRemainingColor(auctionStatus, timeRemaining) {
   }
 }
 
+export function cardDateFormat(time, fallback) {
+  return time ? moment(time).format("DD MMM YYYY, k:mm") : (fallback || "Not Scheduled");
+}
+
+export function etaAndEtdForAuction(auction) {
+  const vesselFuels = _.get(auction, 'auction_vessel_fuels');
+  const eta = _.chain(vesselFuels).map('eta').min().value() || auction.eta;
+  const etd = _.chain(vesselFuels).map('etd').min().value() || auction.etd;
+  return { eta, etd };
+}
+
 export function leftpad (str, len, ch) {
   if (!ch) ch = ' ';
   let new_str = String(str);

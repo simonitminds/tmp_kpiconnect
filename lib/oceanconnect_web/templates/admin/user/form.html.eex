@@ -4,8 +4,6 @@
     <p>Oops, something went wrong! Please check the errors below.</p>
   </div>
 <% end %>
-  <div class="columns is-variable is-4">
-    <div class="column is-one-third">
       <div class="field" >
         <%= label f, :email, class: "label" do %>
           Email
@@ -34,13 +32,21 @@
     		</div>
       </div>
 
-      <div class="field" >
-        <%= label f, :password, class: "label" do %>
-          Password
-        <%end%>
+      <div class="field is-grouped">
+        <%= label f, :office_phone, class: "label" do %>
+          Office Phone
+        <% end %>
         <div class="control">
-          <%= password_input f, :password, class: "input qa-admin-user-password" %>
-          <%= error_tag f, :password %>
+          <%= text_input f, :office_phone, class: "input qa-user-office_phone" %>
+          <%= error_tag f, :office_phone %>
+        </div>
+
+        <%= label f, :mobile_phone, class: "label" do %>
+          Mobile Phone
+        <% end %>
+        <div class="control">
+          <%= text_input f, :mobile_phone, class: "input qa-user-mobile_phone" %>
+          <%= error_tag f, :mobile_phone %>
         </div>
       </div>
 
@@ -58,6 +64,16 @@
 
       <div class="field is-horizontal">
         <div class="control is-inline-block">
+          <%= checkbox f, :has_2fa, class: "checkbox qa-admin-user-has_2fa" %>
+          <%= error_tag f, :has_2fa %>
+        </div>
+        <%= label f, :has_2fa, class: "label has-margin-left-md is-inline-block" do %>
+          Enable two-factor authentication
+        <%end%>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="control is-inline-block">
           <%= checkbox f, :is_admin, class: "checkbox qa-admin-user-is_admin" %>
           <%= error_tag f, :is_admin %>
         </div>
@@ -65,15 +81,9 @@
           Is Admin
         <%end%>
       </div>
-    </div>
-  </div>
-  <div class="columns">
-    <div class="column">
       <div class="field is-margin-top-lg">
         <div class="control">
           <%= submit "Submit", class: "button is-primary qa-admin-submit" %>
         </div>
       </div>
-    </div>
-  </div>
 <% end %>

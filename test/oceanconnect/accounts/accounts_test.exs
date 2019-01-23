@@ -6,21 +6,22 @@ defmodule Oceanconnect.AccountsTest do
   describe "users" do
     alias Oceanconnect.Accounts.User
 
-    @valid_attrs %{password: "some password"}
-    @update_attrs %{email: "SOME EMAIL", password: "some updated password"}
-    @invalid_attrs %{password: nil}
+    @valid_attrs %{email: "SOME EMAIL"}
+    @update_attrs %{email: "SOME UPDATED EMAIL", password: "some updated password"}
+    @invalid_attrs %{email: nil}
 
     setup do
       company = insert(:company)
-      admin_user = insert(:user, Map.merge(@valid_attrs, %{is_admin: true}))
-      user = insert(:user, Map.merge(@valid_attrs, %{is_active: true, company: company}))
-      inactive_user = insert(:user, Map.merge(@valid_attrs, %{is_active: false}))
+
+      user = insert(:user, %{is_active: true, company: company})
+      admin_user = insert(:user, %{is_admin: true})
+      inactive_user = insert(:user, %{is_active: false})
 
       {:ok,
        %{
-         admin_user: Accounts.get_user!(admin_user.id),
-         user: Accounts.get_user!(user.id),
-         inactive_user: Accounts.get_user!(inactive_user.id),
+         admin_user: admin_user,
+         user: user,
+         inactive_user: inactive_user,
          company: company
        }}
     end
@@ -31,8 +32,8 @@ defmodule Oceanconnect.AccountsTest do
       inactive_user: inactive_user
     } do
       assert Enum.map(Accounts.list_users(), fn f -> f.id end) == [
-               admin_user.id,
                user.id,
+               admin_user.id,
                inactive_user.id
              ]
     end
@@ -43,7 +44,8 @@ defmodule Oceanconnect.AccountsTest do
       inactive_user: inactive_user
     } do
       page = Accounts.list_users(%{})
-      assert page.entries == [admin_user, user, inactive_user]
+      entries = Enum.map(page.entries, &(&1.id))
+      assert entries == [user.id, admin_user.id, inactive_user.id]
     end
 
     test "list_active_users/0 returns all users marked as active", %{
@@ -51,7 +53,7 @@ defmodule Oceanconnect.AccountsTest do
       user: user,
       inactive_user: inactive_user
     } do
-      assert Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [admin_user.id, user.id]
+      assert Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [user.id, admin_user.id]
 
       refute Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [
                admin_user.id,
@@ -73,14 +75,14 @@ defmodule Oceanconnect.AccountsTest do
     end
 
     test "get_user!/1 returns the user with given id", %{user: user} do
-      assert Accounts.get_user!(user.id) == user
+      assert Accounts.get_user!(user.id).id == user.id
     end
 
     test "get_active_user!/1 returns the active user with given id", %{
       user: user,
       inactive_user: inactive_user
     } do
-      assert Accounts.get_active_user!(user.id) == user
+      assert Accounts.get_active_user!(user.id).id == user.id
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_active_user!(inactive_user.id) end
     end
 
@@ -88,16 +90,11 @@ defmodule Oceanconnect.AccountsTest do
       assert Accounts.get_user_name!(user.id) == "#{user.first_name} #{user.last_name}"
     end
 
-    test "create_user/1 with valid data creates a user", %{company: company} do
+    test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} =
-               Accounts.create_user(
-                 Map.merge(@valid_attrs, %{email: "SOME EMAIL", company_id: company.id})
-               )
+               Accounts.create_user(@valid_attrs)
 
       assert user.email == "SOME EMAIL"
-
-      assert {:ok, %User{}} =
-               Accounts.verify_login(%{"email" => user.email, "password" => @valid_attrs.password})
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -107,18 +104,17 @@ defmodule Oceanconnect.AccountsTest do
     test "update_user/2 with valid data updates the user", %{user: user} do
       assert {:ok, user} = Accounts.update_user(user, @update_attrs)
       assert %User{} = user
-      assert user.email == "SOME EMAIL"
-
-      assert {:ok, %User{}} =
-               Accounts.verify_login(%{
-                 "email" => user.email,
-                 "password" => @update_attrs.password
-               })
+      assert user.email == "SOME UPDATED EMAIL"
     end
 
     test "update_user/2 with invalid data returns error changeset", %{user: user} do
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user == Accounts.get_user!(user.id)
+      assert user.id == Accounts.get_user!(user.id).id
+    end
+
+    test "reset_password/2 with valid data updates the user's password", %{user: user} do
+      assert {:ok, %User{} = user} = Accounts.reset_password(user, %{"password" => "password"})
+      assert {:ok, user} = Accounts.verify_login(%{"email" => user.email, "password" => "password"})
     end
 
     test "delete_user/1 deletes the user", %{user: user} do

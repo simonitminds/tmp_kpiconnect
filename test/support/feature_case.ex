@@ -15,15 +15,15 @@ defmodule Oceanconnect.FeatureCase do
       use Oceanconnect.Page
 
       def login_user(user) do
-        alias Oceanconnect.NewSessionPage
-        NewSessionPage.visit()
-        NewSessionPage.enter_credentials(user.email, user.password)
-        NewSessionPage.submit()
+        alias Oceanconnect.Session.NewPage
+        NewPage.visit()
+        NewPage.enter_credentials(user.email, user.password)
+        NewPage.submit()
       end
 
       def logout_user do
-        alias Oceanconnect.NewSessionPage
-        NewSessionPage.logout()
+        alias Oceanconnect.Session.NewPage
+        NewPage.logout()
       end
 
       def convert_to_millisecs(time_remaining) do

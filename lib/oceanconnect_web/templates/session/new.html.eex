@@ -37,6 +37,9 @@
             </div>
           </div>
         <% end %>
+        <%= link "Forgot password?", to: forgot_password_path(@conn, :new), class: "link--forgot-password qa-forgot_password has-margin-bottom-xl" %>
+
+        <%= link "Interested in signing up for OceanConnect Marine?", to: registration_path(@conn, :new), class: "link--notification qa-register" %>
       </div>
     </div>
   </div>

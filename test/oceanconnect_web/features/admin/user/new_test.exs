@@ -20,7 +20,6 @@ defmodule Oceanconnect.Admin.User.NewTest do
                "email",
                "first_name",
                "last_name",
-               "password",
                "is_admin",
                "company_id"
              ])
@@ -39,7 +38,6 @@ defmodule Oceanconnect.Admin.User.NewTest do
         email: "NEW@EMAIL.COM",
         first_name: "new",
         last_name: "name",
-        password: "password",
         company_id: company.id
       })
 

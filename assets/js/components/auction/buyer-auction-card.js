@@ -2,24 +2,25 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatPrice } from '../../utilities';
+import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status';
 import AuctionTimeRemaining from './auction-time-remaining';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const vessels = _.get(auction, 'vessels');
+  const { eta, etd } = etaAndEtdForAuction(auction);
   const fuels = _.get(auction, 'fuels');
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const auctionStatus = _.get(auctionPayload, 'status');
-  const cardDateFormat = (time) => { return moment(time).format("DD MMM YYYY, k:mm"); };
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
   const participations = _.get(auctionPayload, 'participations');
   const participationCounts = _.countBy(participations, _.identity);
   const {"yes": rsvpYesCount, "no": rsvpNoCount, "maybe": rsvpMaybeCount, null: rsvpNoResponseCount} = participationCounts;
 
-  const confirmCancellation = () => { return confirm('Are you sure you want to cancel this auction?') ? window.open(`/auctions/${auction.id}/cancel`) : false; };
+  const confirmCancellation = (e) => { event.preventDefault();
+                                       return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
 
   const lowestBidMessage = () => {
     if (winningSolution) {
@@ -154,7 +155,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
                 </a>
               }
               { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
-                ? <a id="cancel-auction" href="" onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
+                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
                     <span className="icon is-medium has-text-right">
                       <FontAwesomeIcon icon="times" size="lg" />
                     </span>
@@ -175,7 +176,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
             {auction.is_traded_bid_allowed && <span> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3 card__traded-bid-marker" action-label="Traded Bids Accepted" /> </span>}
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
-          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(auction.eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(auction.etd)}</span>)</p>
+          <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
         <div className="card-content__products">
           { auctionStatus != 'pending' &&

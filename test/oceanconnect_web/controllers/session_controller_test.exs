@@ -3,7 +3,8 @@ defmodule Oceanconnectweb.SessionControllerTest do
 
   setup do
     user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
-    %{user: user, conn: build_conn()}
+    user_with_2fa = insert(:user, %{password: "password", has_2fa: true})
+    %{user: user, user_with_2fa: user_with_2fa, conn: build_conn()}
   end
 
   test "confirm login page renders", %{conn: conn} do
@@ -23,6 +24,13 @@ defmodule Oceanconnectweb.SessionControllerTest do
       post(conn, "/sessions", %{session: %{email: "Foo@example.com", password: "password"}})
 
     assert redirected_to(response, 302) =~ "/auctions"
+  end
+
+  test "logging in with 2fa enabled", %{conn: conn, user_with_2fa: user_with_2fa} do
+    response =
+      post(conn, "/sessions", %{session: %{email: user_with_2fa.email, password: "password"}})
+
+    assert html_response(response, 302) =~ "/sessions/new/two_factor_auth"
   end
 
   test "invalid password", %{conn: conn} do

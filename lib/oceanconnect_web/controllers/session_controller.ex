@@ -2,7 +2,9 @@ defmodule OceanconnectWeb.SessionController do
   use OceanconnectWeb, :controller
   import Plug.Conn
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.User
   alias OceanconnectWeb.Plugs.Auth
+  alias Oceanconnect.Guardian
 
   def new(conn, _) do
     render(conn, "new.html")
@@ -11,12 +13,24 @@ defmodule OceanconnectWeb.SessionController do
   def create(conn, %{"session" => session}) do
     case Accounts.verify_login(session) do
       {:ok, user} ->
-        updated_conn =
-          conn
-          |> Auth.build_session(user)
+        case user.has_2fa do
+          true ->
+            {token, one_time_pass} = Auth.generate_one_time_pass(user)
+            OceanconnectWeb.Mailer.deliver_2fa_email(user, one_time_pass)
 
-        updated_conn
-        |> redirect(to: auction_path(updated_conn, :index))
+            conn
+            |> Auth.assign_otp_data_to_session(token, user.id)
+            |> put_flash(:info, "A two-factor authentication code has been sent to your email")
+            |> put_status(302)
+            |> redirect(to: two_factor_auth_path(conn, :new))
+          false ->
+            updated_conn =
+              conn
+              |> Auth.build_session(user)
+
+            updated_conn
+            |> redirect(to: auction_path(updated_conn, :index))
+        end
 
       {:error, _} ->
         conn

@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.Email do
 
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction}
+  alias Oceanconnect.Auctions.Auction
 
   def auction_invitation(auction = %Auction{}) do
     auction = Auctions.fully_loaded(auction)
@@ -293,6 +293,35 @@ defmodule OceanconnectWeb.Email do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
   end
 
+  def password_reset(%Accounts.User{} = user, token) do
+    base_email(user)
+    |> subject("Reset your password")
+    |> render(
+      "password_reset.html",
+      user: user,
+      token: token
+    )
+  end
+
+  def two_factor_auth(%Accounts.User{has_2fa: true} = user, one_time_pass) do
+    two_factor_email(user)
+    |> subject("Two factor authentication")
+    |> render(
+      "two_factor_auth.html",
+      user: user,
+      one_time_pass: one_time_pass
+    )
+  end
+
+  def user_interest(new_user_info) do
+    user_interest_email
+    |> subject("An unregistered user is requesting more information")
+    |> render(
+      "user_interest.html",
+      new_user_info: new_user_info
+    )
+  end
+
   defp approved_barges_for_supplier(approved_barges, supplier_id) do
     Enum.filter(approved_barges, &(&1.supplier_id == supplier_id))
     |> Enum.uniq()
@@ -330,6 +359,21 @@ defmodule OceanconnectWeb.Email do
     |> bcc("lauren@gaslight.co")
     |> from("bunkers@oceanconnectmarine.com")
     |> to(user)
+    |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
+  end
+
+  defp two_factor_email(user) do
+    new_email()
+    |> from("bunkers@oceanconnectmarine.com")
+    |> to(user)
+    |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
+  end
+
+  defp user_interest_email do
+    new_email()
+    |> bcc("lauren@gaslight.co")
+    |> from("bunkers@oceanconnectmarine.com")
+    |> to("nbolton@oceanconnectmarine.com")
     |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
   end
 end

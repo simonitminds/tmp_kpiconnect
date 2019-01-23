@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { timeRemainingCountdown } from '../../utilities';
+import { cardDateFormat, timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
@@ -45,7 +45,6 @@ export default class AuctionsIndex extends React.Component {
 
   render() {
     const connection = this.props.connection;
-    const cardDateFormat = function(time){return moment(time).format("DD MMM YYYY, k:mm");};
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
     const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
 
@@ -56,11 +55,30 @@ export default class AuctionsIndex extends React.Component {
     };
 
     const chronologicalAuctionPayloads = (auctionPayloads, status) => {
-      if (status === 'pending') {
-        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.scheduled_start], ['asc']);
-      } else {
-        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.auction_started], ['asc']);
+      let sortField = 'auction_started';
+      switch(status) {
+        case 'pending':
+          sortField = 'scheduled_start';
+          break;
+        case 'open':
+        case 'decision':
+          sortField = 'auction_started';
+          break;
+        case 'closed':
+        case 'cancelled':
+        case 'expired':
+          sortField = 'auction_closed_time';
+          break;
+        default:
+          sortField = 'id';
+          break;
       }
+      return _.orderBy(auctionPayloads, [
+          auctionPayload => _.get(auctionPayload.auction, sortField),
+          auctionPayload => auctionPayload.auction.id
+        ],
+        ['desc', 'desc']
+      );
     };
 
     const filteredAuctionsDisplay = (status) => {

@@ -15,6 +15,14 @@ defmodule Oceanconnect.AuctionLogPage do
     end)
   end
 
+  def event_of_type_logged?(event_type) when is_atom(event_type)  do
+    has_content?(Atom.to_string(event_type))
+  end
+  def event_of_type_logged?(event_type) when is_binary(event_type)  do
+    has_content?(event_type)
+  end
+
+
   def bid_has_supplier_as_user?(events, supplier) do
     bid_event =
       events

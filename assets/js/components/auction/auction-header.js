@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   convertToMinutes,
-  formatUTCDateTime,
+  etaAndEtdForAuction,
+  formatUTCDateTime
 } from '../../utilities';
 import MediaQuery from 'react-responsive';
 import AuctionHeaderTimers from './auction-header-timers';
@@ -12,6 +13,7 @@ import AuctionHeaderTimers from './auction-header-timers';
 const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
+  const { eta, etd } = etaAndEtdForAuction(auction);
 
   const displayAuctionStartTime = () => {
     if (auctionStatus == 'pending') {
@@ -54,7 +56,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                   </div>
                   <div className="auction-header__ports--mobile">
                     <span className="qa-auction-port has-text-weight-bold">{auction.port.name}</span>
-                    <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> (ETA {formatUTCDateTime(auction.eta)})</span>
+                    <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> (ETA {formatUTCDateTime(eta)})</span>
                   </div>
                 </div>
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
@@ -78,7 +80,7 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
         <div className="container">
           <div className="auction-header__ports has-text-weight-bold">
             <span className="qa-auction-port">{auction.port.name}</span>
-            <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> ETA {formatUTCDateTime(auction.eta)} &ndash; ETD {formatUTCDateTime(auction.etd)}</span>
+            <span className="has-text-weight-normal is-inline-block has-padding-left-sm"> ETA {formatUTCDateTime(eta)} &ndash; ETD {formatUTCDateTime(etd)}</span>
           </div>
         </div>
       </section>
