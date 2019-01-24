@@ -3,40 +3,44 @@ import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const AuctionInvitation = ({auctionPayload, supplierId}) => {
-  const {auction, participations} = auctionPayload
-  const suppliersParticipationStatus = participations[supplierId]
+  const {auction, participations} = auctionPayload;
+  const suppliersParticipationStatus = participations[supplierId];
 
   const supplierParticipationModifier = () => {
     switch (suppliersParticipationStatus) {
-      case "yes": { return "auction-invitation__status--accepted"}
-      case "no": { return "auction-invitation__status--declined"}
-      case "maybe": { return "auction-invitation__status--maybe"}
-      default: { return "auction-invitation__status--unanswered"}
+      case "yes":   return "auction-invitation__status--accepted";
+      case "no":    return "auction-invitation__status--declined";
+      case "maybe": return "auction-invitation__status--maybe";
+      default:      return "auction-invitation__status--unanswered";
     }
   }
 
   const styleStatusContainer = () => {
     switch (suppliersParticipationStatus) {
-      case "yes": { return (
-        <span className="auction-invitation__status__marker">
-          <FontAwesomeIcon icon="check-circle" size="lg" />
-        </span>
-      )}
-      case "no": { return (
-        <span className="auction-invitation__status__marker">
-          <FontAwesomeIcon icon="times-circle" size="lg" />
-        </span>
-      )}
-      case "maybe": { return (
-        <span className="auction-invitation__status__marker">
-          <FontAwesomeIcon icon="adjust" size="lg" />
-        </span>
-      )}
-      default: {return(
-        <span className="auction-invitation__status__marker">
-          <FontAwesomeIcon icon="question-circle" size="lg" />
-        </span>
-      )}
+      case "yes":
+        return (
+          <span className="auction-invitation__status__marker">
+            <FontAwesomeIcon icon="check-circle" size="lg" />
+          </span>
+        );
+      case "no":
+        return (
+          <span className="auction-invitation__status__marker">
+            <FontAwesomeIcon icon="times-circle" size="lg" />
+          </span>
+        );
+      case "maybe":
+        return (
+          <span className="auction-invitation__status__marker">
+            <FontAwesomeIcon icon="adjust" size="lg" />
+          </span>
+        );
+      default:
+        return(
+          <span className="auction-invitation__status__marker">
+            <FontAwesomeIcon icon="question-circle" size="lg" />
+          </span>
+        );
     }
   };
 

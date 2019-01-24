@@ -505,12 +505,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
        )
        when start != nil do
     update_auction_side_effects(auction, emit)
-    Map.put(current_state, :status, :pending)
+
+    current_state
+    |> Map.put(:status, :pending)
+    |> update_product_bid_state(auction)
   end
 
   defp update_auction(auction, current_state, emit) do
     update_auction_side_effects(auction, emit)
     current_state
+    |> update_product_bid_state(auction)
   end
 
   defp update_auction_side_effects(auction, emit) do
@@ -521,6 +525,22 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     auction
     |> Command.update_scheduled_start()
     |> AuctionScheduler.process_command(emit)
+  end
+
+  defp update_product_bid_state(state = %AuctionState{product_bids: product_bids}, auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
+    vessel_fuel_ids = Enum.map(vessel_fuels, &("#{&1.id}"))
+
+    updated_product_bids =
+      vessel_fuel_ids
+      |> Enum.reduce(%{}, fn(vfid, acc) ->
+        if vfid in Map.keys(product_bids) do
+          Map.put(acc, vfid, product_bids[vfid])
+        else
+          Map.put(acc, vfid, ProductBidState.for_product(vfid, auction_id))
+        end
+      end)
+
+    Map.put(state, :product_bids, updated_product_bids)
   end
 
   defp end_auction(current_state, auction = %Auction{}) do
