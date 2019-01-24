@@ -67,6 +67,7 @@ defmodule Oceanconnect.Auctions.Auction do
   @optional_fields [
     :additional_information,
     :anonymous_bidding,
+    :auction_started,
     :auction_ended,
     :auction_closed_time,
     :buyer_id,
