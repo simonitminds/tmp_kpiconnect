@@ -5,7 +5,7 @@ import SolutionDisplay from './solution-display';
 
 const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
-  const fuels = _.get(auctionPayload, 'auction.fuels');
+  const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
@@ -23,7 +23,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             { bestSolution &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" />
             }
-            { bestSingleSupplier && fuels && fuels.length > 1 &&
+            { bestSingleSupplier && vesselFuels && vesselFuels.length > 1 &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={false} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`}/>
             }
             { !bestSolution &&

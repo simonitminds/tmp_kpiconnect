@@ -32,14 +32,14 @@ const SupplierAuctionShowBody = (props) => {
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
         <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
-        <SupplierBidList auctionPayload={auctionPayload} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );
   } else if (status == 'decision') {
     return (
       <div>
         <SupplierBestSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
-        <SupplierBidList auctionPayload={auctionPayload} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );
   } else if (status != 'pending') {
@@ -47,8 +47,8 @@ const SupplierAuctionShowBody = (props) => {
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
-        <WinningSolution auctionPayload={auctionPayload} />
-        <SupplierBidList auctionPayload={auctionPayload} />
+        <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );
   } else {
@@ -61,7 +61,7 @@ const SupplierAuctionShowBody = (props) => {
         </div>
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
         <BiddingForm formSubmit={formSubmit} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
-        <SupplierBidList auctionPayload={auctionPayload} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );
   }

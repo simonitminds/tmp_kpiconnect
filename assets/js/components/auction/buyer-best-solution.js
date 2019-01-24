@@ -6,7 +6,7 @@ import SolutionDisplay from './solution-display';
 const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
-  const fuels = _.get(auctionPayload, 'auction.fuels');
+  const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
 
   return(
     <div className="auction-solution__container">
@@ -17,7 +17,7 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
             <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall" acceptSolution={acceptSolution} best={true} isExpanded={true} className="qa-auction-solution-best_overall" />
           }
 
-          { fuels && fuels.length > 1 && bestSingleSupplier &&
+          { vesselFuels && vesselFuels.length > 1 && bestSingleSupplier &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" acceptSolution={acceptSolution} isExpanded={true} className="qa-auction-solution-best_single_supplier" />
           }
           { !(bestSolution || bestSingleSupplier) &&
