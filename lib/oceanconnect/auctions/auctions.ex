@@ -9,10 +9,12 @@ defmodule Oceanconnect.Auctions do
     AuctionEvent,
     AuctionEventStore,
     AuctionEventStorage,
+    AuctionFixture,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
     AuctionTimer,
+    AuctionVesselFuel,
     Barge,
     Fuel,
     Port,
@@ -259,6 +261,12 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
+  def fixtures_for_auction(auction = %Auction{}) do
+    auction
+    |> AuctionFixture.from_auction
+    |> Repo.all
+  end
+
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
@@ -401,6 +409,7 @@ defmodule Oceanconnect.Auctions do
     |> auction_update_command(user)
   end
 
+  # this is kind of a lie because we emit an event....
   def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
     cleaned_attrs = clean_timestamps(attrs)
 
@@ -1198,5 +1207,10 @@ defmodule Oceanconnect.Auctions do
       |> Command.reject_barge(user)
       |> AuctionStore.process_command()
     end)
+  end
+
+  def fixture_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
+    AuctionFixture.from_auction_vessel_fuel(avf)
+    |> Repo.one()
   end
 end

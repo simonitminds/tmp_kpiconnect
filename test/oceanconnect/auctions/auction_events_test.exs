@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventsTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionSupervisor, AuctionFixture}
 
   setup do
     supplier_company = insert(:company)
@@ -16,7 +16,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         duration: 1_000,
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier2_company],
-        auction_vessel_fuels: [],
+        auction_vessel_fuels: [vessel_fuel],
         buyer: buyer_company,
         is_traded_bid_allowed: true
       )
@@ -36,6 +36,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     {:ok, %{auction: auction, vessel_fuel_id: vessel_fuel_id, supplier: supplier_company}}
   end
+
 
   test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")

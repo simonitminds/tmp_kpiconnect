@@ -1,4 +1,5 @@
 defmodule Oceanconnect.Auctions.AuctionEventHandler do
+
   use GenServer
   alias Oceanconnect.Auctions
 
@@ -128,6 +129,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
     {:ok, _event} = AuctionEvent.auction_state_snapshotted(auction, auction_state)
     |> AuctionEventStore.create_auction_snapshot()
+   {:ok, _fixtures} = Auctions.create_fixtures(auction_state)
 
     Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}

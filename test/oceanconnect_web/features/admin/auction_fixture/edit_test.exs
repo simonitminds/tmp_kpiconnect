@@ -1,6 +1,6 @@
-defmodule Oceanconnect.Admin.Auction.EditTest do
+defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.Admin.User.{IndexPage, EditPage}
+  alias Oceanconnect.Admin.AuctionFixture.{IndexPage, EditPage}
   alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Admin, as: Admin
 
@@ -12,17 +12,21 @@ defmodule Oceanconnect.Admin.Auction.EditTest do
     admin_user = insert(:user, is_admin: true)
     user = insert(:user, is_admin: false)
     company = insert(:company)
-    %{auction: auction} =  create_closed_auction
+    %{auction: auction, vessel_fuels: [vessel_fuel1, vessel_fuel2]} = create_closed_auction
 
-    {:ok, %{admin_user: admin_user, auction: auction}}
+    {:ok, %{admin_user: admin_user, auction: auction, vessel_fuel1: vessel_fuel1}}
   end
 
-  test "visiting the auctions index page shows a list of closed/canceled/expired auctions", %{admin_user: admin_user, auction: %{id: auction_id}} do
+  test "visiting the auction fixture index page shows a list fixtures for the auction", %{
+    admin_user: admin_user,
+    auction: %{id: auction_id},
+    vessel_fuel1: vessel_fuel1
+  } do
     login_user(admin_user)
-    Admin.Auction.IndexPage.visit()
-    assert Admin.Auction.IndexPage.has_fixture?(auction_id)
+    Admin.Fixture.IndexPage.visit(auction_id)
+    assert Admin.Fixture.IndexPage.is_current_path?(auction_id)
+    assert Admin.Fixture.IndexPage.has_fixture?(vessel_fuel1.id)
   end
-
 
   def create_closed_auction do
     buyer_company = insert(:company, credit_margin_amount: 5.00)
@@ -57,6 +61,7 @@ defmodule Oceanconnect.Admin.Auction.EditTest do
     supplier1_bid1 =
       create_bid(1.25, nil, supplier.company_id, "#{vessel_fuel1.id}", auction)
       |> Auctions.place_bid()
+
     supplier1_bid2 =
       create_bid(1.25, nil, supplier.company_id, "#{vessel_fuel2.id}", auction)
       |> Auctions.place_bid()
@@ -64,6 +69,7 @@ defmodule Oceanconnect.Admin.Auction.EditTest do
     supplier2_bid1 =
       create_bid(1.50, nil, supplier2.company_id, "#{vessel_fuel1.id}", auction)
       |> Auctions.place_bid()
+
     supplier2_bid2 =
       create_bid(1.50, nil, supplier2.company_id, "#{vessel_fuel2.id}", auction)
       |> Auctions.place_bid()
@@ -72,11 +78,10 @@ defmodule Oceanconnect.Admin.Auction.EditTest do
 
     login_user(buyer)
     AuctionShowPage.visit(auction.id)
-    Hound.Helpers.Screenshot.take_screenshot()
     AuctionShowPage.select_solution(:best_overall)
     :timer.sleep(100)
     AuctionShowPage.accept_bid()
 
-    %{auction: auction}
+    %{auction: auction, vessel_fuels: [vessel_fuel1, vessel_fuel2]}
   end
 end

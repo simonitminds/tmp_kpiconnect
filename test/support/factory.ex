@@ -120,6 +120,14 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def auction_fixture_factory() do
+    %Oceanconnect.Auctions.AuctionFixture{
+      auction: build(:auction),
+      auction_vessel_fuel: build(:vessel_fuel),
+      supplier: build(:company, is_supplier: true)
+    }
+  end
+
   def create_bid(amount, min_amount, supplier_id, vessel_fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,
@@ -133,4 +141,5 @@ defmodule Oceanconnect.Factory do
 
     Oceanconnect.Auctions.AuctionBid.from_params_to_auction_bid(bid_params, auction)
   end
+
 end

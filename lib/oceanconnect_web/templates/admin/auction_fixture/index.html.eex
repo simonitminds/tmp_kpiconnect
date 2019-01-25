@@ -1,0 +1,1 @@
+<h1> Auction <%= @auction.id %> Fixtures </h1>

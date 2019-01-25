@@ -42,7 +42,7 @@ defmodule Oceanconnect.AuctionIndexTest do
 
       assert AuctionIndexPage.auction_is_status?(auction, "canceled")
       AuctionLogPage.visit(auction.id)
-      Hound.Helpers.Screenshot.take_screenshot()
+
       assert has_content?("Auction state snapshotted")
     end
 

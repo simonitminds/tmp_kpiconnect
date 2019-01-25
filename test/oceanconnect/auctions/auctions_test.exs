@@ -1271,7 +1271,29 @@ defmodule Oceanconnect.AuctionsTest do
              ] = auction_state.submitted_barges
     end
   end
+  describe "auction_fixtures" do
+    alias Oceanconnect.Auctions.AuctionFixture
 
+    setup do
+      auction = insert(:auction)
+      fixtures = insert_list(2, :auction_fixture, auction: auction)
+      %{auction: auction, fixtures: fixtures}
+    end
+
+    test "fixtures_for_auction", %{auction: auction, fixtures: fixtures} do
+      assert fixtures = Auctions.fixtures_for_auction(auction)
+    end
+
+    test "creating fixtures for an auction_state" do
+      auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
+      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+      state = %{state | status: :closed}
+      event = AuctionEvent.auction_state_snapshotted(auction, state)
+      Oceanconnect.Auctions.create_fixtures_from_snapshot(event)
+
+      assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
+    end
+  end
   describe "barges" do
     alias Oceanconnect.Auctions.Barge
 
@@ -1434,5 +1456,6 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert barge.companies == companies
     end
+
   end
 end
