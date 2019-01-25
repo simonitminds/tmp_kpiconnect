@@ -246,7 +246,6 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def parse_date(""), do: ""
   def parse_date(nil), do: ""
-
   def parse_date(epoch) do
     epoch
     |> String.to_integer()

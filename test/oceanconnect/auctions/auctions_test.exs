@@ -13,15 +13,21 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction =
-        insert(:auction, @valid_attrs)
-        |> Auctions.fully_loaded()
-
-      term_auction = insert(:term_auction)
+      auction = insert(:auction, @valid_attrs) |> Auctions.fully_loaded()
+      term_auction = insert(:term_auction) |> Auctions.fully_loaded()
 
       port = insert(:port)
       vessel = insert(:vessel)
       fuel = insert(:fuel)
+
+      auction_attrs = string_params_for(:auction, port: port)
+      term_auction_attrs = string_params_for(:term_auction, port: port, fuel: fuel)
+
+      invalid_start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix()
+        |> Kernel.-(60_000)
+        |> DateTime.from_unix!()
 
       {:ok,
        %{
@@ -29,7 +35,10 @@ defmodule Oceanconnect.AuctionsTest do
          term_auction: term_auction,
          port: port,
          vessel: vessel,
-         fuel: fuel
+         fuel: fuel,
+         auction_attrs: auction_attrs,
+         term_auction_attrs: term_auction_attrs,
+         invalid_start_time: invalid_start_time
        }}
     end
 
@@ -49,6 +58,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert parsed_date == expected_date |> DateTime.to_iso8601()
     end
 
+
     test "#maybe_convert_duration" do
       params = %{"duration" => "10", "decision_duration" => "15"}
       %{"duration" => duration} = Auction.maybe_convert_duration(params, "duration")
@@ -60,6 +70,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert decision_duration == 15 * 60_000
     end
 
+
     test "#maybe_load_suppliers" do
       supplier = insert(:company, is_supplier: true)
       params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
@@ -67,6 +78,7 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert List.first(suppliers).id == supplier.id
     end
+
 
     test "#participation_for_supplier" do
       supplier = insert(:company, is_supplier: true)
@@ -76,6 +88,7 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.update_participation_for_supplier(auction.id, supplier.id, "yes")
       assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == "yes"
     end
+
 
     test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{
       port: port,
@@ -217,12 +230,14 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
+
     test "list_auctions/0 returns all auctions", %{auction: auction} do
       assert Auctions.list_auctions()
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
              |> MapSet.equal?(MapSet.new([auction.id]))
     end
+
 
     test "list_participating_auctions/1 returns all auctions a company is a participant in", %{
       auction: auction
@@ -273,6 +288,7 @@ defmodule Oceanconnect.AuctionsTest do
              ] == auctions
     end
 
+
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end
@@ -297,62 +313,37 @@ defmodule Oceanconnect.AuctionsTest do
       assert nil == Auctions.get_auction(term_auction.id, Auction)
     end
 
-    test "create_auction/1 with valid data creates a auction", %{auction: auction} do
-      auction_with_participants =
-        Auctions.with_participants(auction)
-        |> Auctions.fully_loaded()
 
-      auction_attrs =
-        auction_with_participants
-        |> Map.take(
-          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
-            Map.keys(@valid_attrs)
-        )
-
-      assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
-      # create_auction has a side effect of starting the AuctionsSupervisor, thus the sleep
-      :timer.sleep(200)
-
-      assert all_values_match?(Map.drop(auction_attrs, [:auction_vessel_fuels]), new_auction)
-
-      supplier = hd(auction_with_participants.suppliers)
-
-      auction_supplier =
-        Repo.get_by(Auctions.AuctionSuppliers, %{
-          auction_id: new_auction.id,
-          supplier_id: supplier.id
-        })
-
-      assert auction_supplier.alias_name == "Supplier 1"
+    test "create_auction/1 with valid data creates an auction", %{auction_attrs: auction_attrs} do
+      assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+      assert %Auction{} = Auctions.get_auction!(auction_id)
     end
 
-    test "create_auction/1 with a scheduled_start time ion the past returns error changeset", %{
-      auction: auction
+    test "create_auction/1 with valid term data creates a term auction", %{term_auction_attrs: term_auction_attrs} do
+      assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
+      assert %TermAuction{} = Auctions.get_auction!(auction_id, TermAuction)
+    end
+
+    test "create_auction/1 with a scheduled_start time in the past returns error changeset", %{
+      auction_attrs: auction_attrs,
+      invalid_start_time: invalid_start_time
     } do
-      invalid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.-(60_000)
-        |> DateTime.from_unix!()
-
-      auction_with_participants =
-        Auctions.with_participants(auction)
-        |> Auctions.fully_loaded()
-        |> Map.put(:scheduled_start, invalid_start_time)
-
-      auction_attrs =
-        auction_with_participants
-        |> Map.take(
-          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
-            Map.keys(@valid_attrs)
-        )
-
+      auction_attrs = Map.put(auction_attrs, "scheduled_start", invalid_start_time)
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(auction_attrs)
+    end
+
+    test "create_auction/1 with no scheduled_start time creates a draft auction", %{
+      auction_attrs: auction_attrs,
+    } do
+      auction_attrs = Map.drop(auction_attrs, [:scheduled_start])
+      assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+      assert %Auction{} = Auctions.get_auction!(auction_id, Auction)
     end
 
     test "create_auction/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
+
 
     test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
       auction: auction
@@ -363,6 +354,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction.po == "some updated po"
       assert auction == Auctions.get_auction(auction.id) |> Auctions.fully_loaded()
     end
+
 
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
       assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs, nil)
@@ -380,10 +372,12 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction == Auctions.get_auction!(auction.id)
     end
 
+
     test "delete_auction/1 deletes the auction", %{auction: auction} do
       assert {:ok, %Auction{}} = Auctions.delete_auction(auction)
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_auction!(auction.id) end
     end
+
 
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
