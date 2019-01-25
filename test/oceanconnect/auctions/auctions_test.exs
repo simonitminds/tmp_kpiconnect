@@ -17,10 +17,20 @@ defmodule Oceanconnect.AuctionsTest do
         insert(:auction, @valid_attrs)
         |> Auctions.fully_loaded()
 
+      term_auction = insert(:auction)
+
       port = insert(:port)
       vessel = insert(:vessel)
       fuel = insert(:fuel)
-      {:ok, %{auction: Auctions.get_auction!(auction.id), port: port, vessel: vessel, fuel: fuel}}
+
+      {:ok,
+       %{
+         auction: Auctions.get_auction!(auction.id),
+         term_auction: term_auction,
+         port: port,
+         vessel: vessel,
+         fuel: fuel
+       }}
     end
 
     test "#maybe_parse_date_field" do
@@ -76,7 +86,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => nil,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -125,7 +140,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => nil,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -141,7 +161,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => nil, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => nil,
+            "fuel_id" => fuel.id,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -157,7 +182,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => nil, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => nil,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -174,7 +204,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -240,6 +275,10 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
+    end
+
+    test "get_auction!/2 returns the auction with give id and type", %{term_auction: auction} do
+      assert Auctions.get_auction!(term_auction.id, TermAuction)
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do

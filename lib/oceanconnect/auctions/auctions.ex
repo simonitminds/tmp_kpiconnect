@@ -17,6 +17,7 @@ defmodule Oceanconnect.Auctions do
     Fuel,
     Port,
     Solution,
+    TermAuction,
     Vessel
   }
 
@@ -249,12 +250,12 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def get_auction(id) do
+  def get_auction(id, _) do
     Repo.get(Auction, id)
     |> fully_loaded
   end
 
-  def get_auction!(id) do
+  def get_auction!(id, type = TermAuction \\ nil)) do
     Repo.get!(Auction, id)
     |> fully_loaded
   end
@@ -263,6 +264,7 @@ defmodule Oceanconnect.Auctions do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
         AuctionEventStorage.most_recent_state(auction)
+
       state ->
         state
     end
@@ -327,6 +329,29 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
+
+  def create_auction(attrs = %{"scheduled_start" => start, "type" => type}, user)
+      when start != "" and type in ["forward_fixed", "formula_related"] do
+    with {:ok, auction} <-
+           %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
+  def create_auction(attrs = %{"type" => type}, user)
+      when type in ["forward_fixed", "formula_related"] do
+    with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
     with {:ok, auction} <-
@@ -464,6 +489,21 @@ defmodule Oceanconnect.Auctions do
 
       Map.put(supplier, :alias_name, alias_name)
     end)
+  end
+
+  def fully_loaded(term_auction = %TermAuction{}) do
+    fully_loaded_auction =
+      Repo.preload(term_auction, [
+        :port,
+        :vessels,
+        :fuel,
+        :auction_suppliers,
+        [buyer: :users],
+        [suppliers: :users]
+      ])
+
+    fully_loaded_auction
+    |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
 
   def fully_loaded(auction = %Auction{}) do

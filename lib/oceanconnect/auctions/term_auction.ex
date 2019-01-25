@@ -1,37 +1,34 @@
-defmodule Oceanconnect.Auctions.Auction do
+defmodule Oceanconnect.Auctions.TermAuction do
   import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{Auction, Port, AuctionVesselFuel}
+  alias Oceanconnect.Auctions.{TermAuction, Port, AuctionVesselFuel}
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
-  schema "auctions" do
+  schema "term_auctions" do
     field(:type, :string)
+    field(:start_date, :utc_datetime_usec, source: :term_start_date)
+    field(:end_date, :utc_datetime_usec, source: :term_end_date)
+    field(:terminal, :string, source: :term_terminal)
 
     belongs_to(:port, Port)
 
-    has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel,
-      on_replace: :delete,
-      on_delete: :delete_all
-    )
+    # has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel,
+    #   on_replace: :delete,
+    #   on_delete: :delete_all
+    # )
 
     many_to_many(
       :vessels,
       Oceanconnect.Auctions.Vessel,
-      join_through: Oceanconnect.Auctions.AuctionVesselFuel,
+      join_through: Oceanconnect.Auctions.TermAuctionVessel,
       join_keys: [auction_id: :id, vessel_id: :id],
       on_replace: :delete,
       on_delete: :delete_all
     )
 
-    many_to_many(
-      :fuels,
-      Oceanconnect.Auctions.Fuel,
-      join_through: Oceanconnect.Auctions.AuctionVesselFuel,
-      join_keys: [auction_id: :id, fuel_id: :id],
-      on_replace: :delete,
-      on_delete: :delete_all
-    )
+    belongs_to(:fuel, Oceanconnect.Auctions.Fuel)
+    field(:fuel_quantity, :integer)
 
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     field(:po, :string)
@@ -42,8 +39,6 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:auction_closed_time, :utc_datetime_usec)
     # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
-    # milliseconds
-    field(:decision_duration, :integer, default: 15 * 60_000)
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
     field(:additional_information, :string)
@@ -71,36 +66,41 @@ defmodule Oceanconnect.Auctions.Auction do
     :anonymous_bidding,
     :auction_ended,
     :auction_closed_time,
+    :auction_started,
     :buyer_id,
-    :decision_duration,
     :duration,
+    :end_date,
+    :fuel_id,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
-    :scheduled_start
+    :scheduled_start,
+    :start_date,
+    :vessels
   ]
 
   @doc false
-  def changeset(%Auction{} = auction, attrs) do
+  def changeset(%TermAuction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
+    |> cast_assoc(:vessels)
+    |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
-    |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end
 
-  def changeset_for_scheduled_auction(%Auction{} = auction, attrs) do
+  def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields ++ [:scheduled_start])
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
+    |> cast_assoc(:vessels)
+    |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
-    |> validate_vessel_fuels(attrs)
-    |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end
 
@@ -113,68 +113,6 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   def maybe_add_suppliers(changeset, _attrs), do: changeset
-
-  def maybe_add_vessel_fuels(
-        changeset,
-        auction = %Auction{auction_vessel_fuels: existing_vessel_fuels},
-        %{"auction_vessel_fuels" => auction_vessel_fuels}
-      )
-      when is_list(existing_vessel_fuels) do
-    vessel_fuel_changeset_proc =
-      case get_field(changeset, :scheduled_start) do
-        nil -> &AuctionVesselFuel.changeset_for_draft/2
-        _ -> &AuctionVesselFuel.changeset_for_new/2
-      end
-
-    list_of_changesets =
-      auction_vessel_fuels
-      |> Enum.map(fn avf ->
-        existing = find_existing_or_new_vessel_fuel(existing_vessel_fuels, avf)
-        vessel_fuel_changeset_proc.(existing, avf)
-      end)
-
-    put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
-  end
-
-  def maybe_add_vessel_fuels(changeset, auction = %Auction{}, %{
-        "auction_vessel_fuels" => auction_vessel_fuels
-      }) do
-    vessel_fuel_changeset_proc =
-      case get_field(changeset, :scheduled_start) do
-        nil -> &AuctionVesselFuel.changeset_for_draft/2
-        _ -> &AuctionVesselFuel.changeset_for_new/2
-      end
-
-    list_of_changesets =
-      auction_vessel_fuels
-      |> Enum.map(fn avf ->
-        vessel_fuel_changeset_proc.(%AuctionVesselFuel{}, avf)
-      end)
-
-    put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
-  end
-
-  def maybe_add_vessel_fuels(changeset, _auction = %{}, %{
-        auction_vessel_fuels: auction_vessel_fuels
-      }) do
-    put_assoc(changeset, :auction_vessel_fuels, auction_vessel_fuels)
-  end
-
-  def maybe_add_vessel_fuels(changeset, _auction, _attrs), do: changeset
-
-  defp find_existing_or_new_vessel_fuel(vessel_fuels, %{
-         "fuel_id" => fuel_id,
-         "vessel_id" => vessel_id
-       }) do
-    Enum.find(vessel_fuels, %AuctionVesselFuel{}, fn %AuctionVesselFuel{
-                                                       fuel_id: vf_fuel_id,
-                                                       vessel_id: vf_vessel_id
-                                                     } ->
-      "#{vf_fuel_id}" == fuel_id && "#{vf_vessel_id}" == vessel_id
-    end)
-  end
-
-  defp find_existing_or_new_vessel_fuel(_vessel_fuels, _vf), do: %AuctionVesselFuel{}
 
   def from_params(params) do
     params
@@ -300,29 +238,5 @@ defmodule Oceanconnect.Auctions.Auction do
 
   defp maybe_convert_start_time(scheduled_start) do
     scheduled_start
-  end
-
-  def validate_vessel_fuels(changeset, %{auction_vessel_fuels: vessel_fuels}) do
-    cond do
-      vessel_fuels == nil || length(vessel_fuels) < 1 ->
-        add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
-
-      true ->
-        changeset
-    end
-  end
-
-  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) do
-    cond do
-      vessel_fuels == nil || length(vessel_fuels) < 1 ->
-        add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
-
-      true ->
-        changeset
-    end
-  end
-
-  def validate_vessel_fuels(changeset, _attrs) do
-    add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
   end
 end
