@@ -2,7 +2,7 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEvent}
+  alias Oceanconnect.Auctions.{TermAuction, Auction, AuctionSupervisor, AuctionEvent}
   alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
 
   describe "auctions" do
@@ -17,7 +17,7 @@ defmodule Oceanconnect.AuctionsTest do
         insert(:auction, @valid_attrs)
         |> Auctions.fully_loaded()
 
-      term_auction = insert(:auction)
+      term_auction = insert(:term_auction)
 
       port = insert(:port)
       vessel = insert(:vessel)
@@ -277,8 +277,24 @@ defmodule Oceanconnect.AuctionsTest do
       assert Auctions.get_auction!(auction.id) == auction
     end
 
-    test "get_auction!/2 returns the auction with give id and type", %{term_auction: auction} do
-      assert Auctions.get_auction!(term_auction.id, TermAuction)
+    test "get_auction!/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
+      assert %Auction{} = Auctions.get_auction!(auction.id, Auction)
+      assert %TermAuction{} = Auctions.get_auction!(term_auction.id, TermAuction)
+
+      assert_raise Ecto.NoResultsError, fn-> Auctions.get_auction!(auction.id, TermAuction) end
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_auction!(term_auction.id, Auction) end
+    end
+
+    test "get_auction/1 returns the auction with given id", %{auction: auction} do
+      assert Auctions.get_auction(auction.id) == auction
+    end
+
+    test "get_auction/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
+      assert %Auction{} = Auctions.get_auction(auction.id, Auction)
+      assert %TermAuction{} = Auctions.get_auction(term_auction.id, TermAuction)
+
+      assert nil == Auctions.get_auction(auction.id, TermAuction)
+      assert nil == Auctions.get_auction(term_auction.id, Auction)
     end
 
     test "create_auction/1 with valid data creates a auction", %{auction: auction} do

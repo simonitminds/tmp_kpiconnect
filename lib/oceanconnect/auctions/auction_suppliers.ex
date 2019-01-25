@@ -9,8 +9,12 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   schema "auction_suppliers" do
     field(:participation, :string)
     field(:alias_name, :string)
-    belongs_to(:auction, Oceanconnect.Auctions.Auction)
     belongs_to(:supplier, Oceanconnect.Accounts.Company)
+
+    # Auctions and TermAuctions both reference this table. Each knows which
+    # column to use as the foreign_key_constraint.
+    belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:term_auction, Oceanconnect.Auctions.Auction)
 
     timestamps()
   end
@@ -21,6 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     |> cast(attrs, [:participation, :alias_name, :auction_id, :supplier_id])
     |> validate_required([:auction_id, :supplier_id])
     |> foreign_key_constraint(:auction_id)
+    |> foreign_key_constraint(:term_auction_id)
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:barge_id)
   end

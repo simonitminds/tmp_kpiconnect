@@ -2,60 +2,58 @@ defmodule Oceanconnect.Auctions.TermAuction do
   import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{TermAuction, Port, AuctionVesselFuel}
+  alias Oceanconnect.Auctions.{TermAuction, Fuel, Port, Vessel, TermAuctionVessel}
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "term_auctions" do
     field(:type, :string)
-    field(:start_date, :utc_datetime_usec, source: :term_start_date)
-    field(:end_date, :utc_datetime_usec, source: :term_end_date)
-    field(:terminal, :string, source: :term_terminal)
+    field(:start_date, :utc_datetime_usec, source: :start_date)
+    field(:end_date, :utc_datetime_usec, source: :end_date)
+    field(:terminal, :string, source: :terminal)
 
-    belongs_to(:port, Port)
-
-    # has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel,
-    #   on_replace: :delete,
-    #   on_delete: :delete_all
-    # )
-
-    many_to_many(
-      :vessels,
-      Oceanconnect.Auctions.Vessel,
-      join_through: Oceanconnect.Auctions.TermAuctionVessel,
-      join_keys: [auction_id: :id, vessel_id: :id],
-      on_replace: :delete,
-      on_delete: :delete_all
-    )
-
-    belongs_to(:fuel, Oceanconnect.Auctions.Fuel)
-    field(:fuel_quantity, :integer)
-
-    belongs_to(:buyer, Oceanconnect.Accounts.Company)
     field(:po, :string)
     field(:port_agent, :string)
     field(:scheduled_start, :utc_datetime_usec)
     field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
     field(:auction_closed_time, :utc_datetime_usec)
-    # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
     field(:additional_information, :string)
 
+    belongs_to(:port, Port)
+    belongs_to(:buyer, Oceanconnect.Accounts.Company)
+    belongs_to(:fuel, Fuel)
+    field(:fuel_quantity, :integer)
+
     many_to_many(
-      :suppliers,
-      Oceanconnect.Accounts.Company,
-      join_through: Oceanconnect.Auctions.AuctionSuppliers,
-      join_keys: [auction_id: :id, supplier_id: :id],
+      :vessels,
+      Vessel,
+      join_through: TermAuctionVessel,
+      join_keys: [auction_id: :id, vessel_id: :id],
       on_replace: :delete,
       on_delete: :delete_all
     )
 
-    has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
+    many_to_many(
+      :suppliers,
+      Oceanconnect.Accounts.Company,
+      join_through: Oceanconnect.Auctions.AuctionSuppliers,
+      join_keys: [term_auction_id: :id, supplier_id: :id],
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
+
+    has_many(
+      :auction_suppliers,
+      Oceanconnect.Auctions.AuctionSuppliers,
+      foreign_key: :term_auction_id
+    )
 
     timestamps()
   end
+
 
   @required_fields [
     :port_id

@@ -53,6 +53,12 @@ defmodule Oceanconnect.Factory do
     )
   end
 
+  def draft_term_auction_factory() do
+    %Oceanconnect.Auctions.TermAuction{
+      port: build(:port)
+    }
+  end
+
   def term_auction_factory() do
     start_time =
       DateTime.utc_now()
@@ -67,7 +73,7 @@ defmodule Oceanconnect.Factory do
       |> DateTime.from_naive!("Etc/UTC")
 
     struct!(
-      draft_auction_factory(),
+      draft_term_auction_factory(),
       %{
         type: "forward_fixed",
         scheduled_start: start_time,

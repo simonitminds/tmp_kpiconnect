@@ -8,9 +8,7 @@ defmodule OceanconnectWeb.AuctionView do
     AuctionBid,
     AuctionEvent,
     AuctionBarge,
-    AuctionVesselFuel,
     Barge,
-    Fuel,
     Solution
   }
 

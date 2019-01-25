@@ -314,7 +314,7 @@ defmodule OceanconnectWeb.Email do
   end
 
   def user_interest(new_user_info) do
-    user_interest_email
+    user_interest_email()
     |> subject("An unregistered user is requesting more information")
     |> render(
       "user_interest.html",

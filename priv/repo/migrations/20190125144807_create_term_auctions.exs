@@ -7,7 +7,6 @@ defmodule Oceanconnect.Repo.Migrations.CreateTermAuctions do
       add(:start_date, :utc_datetime_usec)
       add(:end_date, :utc_datetime_usec)
       add(:terminal, :string)
-      add(:fuel_quantity, :integer)
       add(:po, :string)
       add(:port_agent, :string)
       add(:scheduled_start, :utc_datetime_usec)
@@ -18,6 +17,12 @@ defmodule Oceanconnect.Repo.Migrations.CreateTermAuctions do
       add(:anonymous_bidding, :boolean)
       add(:is_traded_bid_allowed, :boolean)
       add(:additional_information, :string)
+
+      add(:fuel_id, references(:fuels))
+      add(:fuel_quantity, :integer)
+
+      add(:port_id, references(:ports))
+      add(:buyer_id, references(:companies))
 
       timestamps()
     end

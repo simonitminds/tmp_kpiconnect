@@ -250,13 +250,15 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def get_auction(id, _) do
-    Repo.get(Auction, id)
+  def get_auction(id, module \\ nil) do
+    module = module || Auction
+    Repo.get(module, id)
     |> fully_loaded
   end
 
-  def get_auction!(id, type = TermAuction \\ nil)) do
-    Repo.get!(Auction, id)
+  def get_auction!(id, module \\ nil) do
+    module = module || Auction
+    Repo.get!(module, id)
     |> fully_loaded
   end
 
@@ -477,9 +479,8 @@ defmodule Oceanconnect.Auctions do
     AuctionEventStore.participants_from_events(auction_id)
   end
 
-  def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil
-
-  def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
+  def suppliers_with_alias_names(auction = %{suppliers: nil}), do: nil
+  def suppliers_with_alias_names(auction = %{suppliers: suppliers}) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
         case get_auction_supplier(auction.id, supplier.id) do

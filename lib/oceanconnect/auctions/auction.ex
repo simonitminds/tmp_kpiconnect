@@ -116,7 +116,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_add_vessel_fuels(
         changeset,
-        auction = %Auction{auction_vessel_fuels: existing_vessel_fuels},
+        %Auction{auction_vessel_fuels: existing_vessel_fuels},
         %{"auction_vessel_fuels" => auction_vessel_fuels}
       )
       when is_list(existing_vessel_fuels) do
@@ -136,7 +136,7 @@ defmodule Oceanconnect.Auctions.Auction do
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
 
-  def maybe_add_vessel_fuels(changeset, auction = %Auction{}, %{
+  def maybe_add_vessel_fuels(changeset, %Auction{}, %{
         "auction_vessel_fuels" => auction_vessel_fuels
       }) do
     vessel_fuel_changeset_proc =
