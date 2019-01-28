@@ -343,6 +343,17 @@ defmodule Oceanconnect.Auctions do
       error -> error
     end
   end
+  def create_auction(attrs = %{scheduled_start: start, type: type}, user)
+      when start != "" and type in ["forward_fixed", "formula_related"] do
+    with {:ok, auction} <-
+           %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
 
   def create_auction(attrs = %{"type" => type}, user)
       when type in ["forward_fixed", "formula_related"] do
@@ -354,8 +365,28 @@ defmodule Oceanconnect.Auctions do
       error -> error
     end
   end
+  def create_auction(attrs = %{type: type}, user)
+      when type in ["forward_fixed", "formula_related"] do
+    with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
 
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
+    with {:ok, auction} <-
+           %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+  def create_auction(attrs = %{scheduled_start: start}, user) when start != "" do
     with {:ok, auction} <-
            %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
@@ -399,12 +430,26 @@ defmodule Oceanconnect.Auctions do
     |> AuctionCache.process_command()
   end
 
-  def create_supplier_aliases(auction = %{suppliers: suppliers}) do
+  def create_supplier_aliases(auction = %Auction{suppliers: suppliers}) do
     :random.seed()
 
     Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
       AuctionSuppliers
       |> Repo.get_by(%{auction_id: auction.id, supplier_id: supplier.id})
+      |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
+      |> Repo.update!()
+
+      acc + 1
+    end)
+
+    auction
+  end
+  def create_supplier_aliases(auction = %TermAuction{suppliers: suppliers}) do
+    :random.seed()
+
+    Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
+      AuctionSuppliers
+      |> Repo.get_by(%{term_auction_id: auction.id, supplier_id: supplier.id})
       |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
       |> Repo.update!()
 

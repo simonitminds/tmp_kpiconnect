@@ -17,5 +17,9 @@ defmodule Oceanconnect.Repo.Migrations.AddTermToAuctions do
       add(:auction_id, references(:auctions))
       add(:vessel_id, references(:vessels))
     end
+
+    alter table(:auction_suppliers) do
+      add(:term_auction_id, references(:auctions))
+    end
   end
 end

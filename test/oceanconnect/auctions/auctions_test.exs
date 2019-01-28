@@ -20,8 +20,8 @@ defmodule Oceanconnect.AuctionsTest do
       vessel = insert(:vessel)
       fuel = insert(:fuel)
 
-      auction_attrs = string_params_for(:auction, port: port)
-      term_auction_attrs = string_params_for(:term_auction, port: port, fuel: fuel)
+      auction_attrs = params_for(:auction, port: port)
+      term_auction_attrs = params_for(:term_auction, port: port, fuel: fuel)
 
       invalid_start_time =
         DateTime.utc_now()
@@ -231,11 +231,11 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
 
-    test "list_auctions/0 returns all auctions", %{auction: auction} do
+    test "list_auctions/0 returns all auctions", %{auction: auction, term_auction: term_auction} do
       assert Auctions.list_auctions()
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
-             |> MapSet.equal?(MapSet.new([auction.id]))
+             |> MapSet.equal?(MapSet.new([auction.id, term_auction.id]))
     end
 
 
@@ -296,9 +296,6 @@ defmodule Oceanconnect.AuctionsTest do
     test "get_auction!/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
       assert %Auction{} = Auctions.get_auction!(auction.id, Auction)
       assert %TermAuction{} = Auctions.get_auction!(term_auction.id, TermAuction)
-
-      assert_raise Ecto.NoResultsError, fn-> Auctions.get_auction!(auction.id, TermAuction) end
-      assert_raise Ecto.NoResultsError, fn -> Auctions.get_auction!(term_auction.id, Auction) end
     end
 
     test "get_auction/1 returns the auction with given id", %{auction: auction} do
@@ -308,9 +305,6 @@ defmodule Oceanconnect.AuctionsTest do
     test "get_auction/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
       assert %Auction{} = Auctions.get_auction(auction.id, Auction)
       assert %TermAuction{} = Auctions.get_auction(term_auction.id, TermAuction)
-
-      assert nil == Auctions.get_auction(auction.id, TermAuction)
-      assert nil == Auctions.get_auction(term_auction.id, Auction)
     end
 
 
@@ -328,7 +322,7 @@ defmodule Oceanconnect.AuctionsTest do
       auction_attrs: auction_attrs,
       invalid_start_time: invalid_start_time
     } do
-      auction_attrs = Map.put(auction_attrs, "scheduled_start", invalid_start_time)
+      auction_attrs = Map.put(auction_attrs, :scheduled_start, invalid_start_time)
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(auction_attrs)
     end
 

@@ -2,10 +2,10 @@ defmodule Oceanconnect.Auctions.TermAuction do
   import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{TermAuction, Fuel, Port, Vessel, AuctionVessel}
+  alias Oceanconnect.Auctions.{TermAuction, Fuel, Port, Vessel, TermAuctionVessel}
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
-  schema "term_auctions" do
+  schema "auctions" do
     field(:type, :string)
     field(:start_date, :utc_datetime_usec, source: :start_date)
     field(:end_date, :utc_datetime_usec, source: :end_date)
@@ -30,7 +30,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     many_to_many(
       :vessels,
       Vessel,
-      join_through: AuctionVessel,
+      join_through: TermAuctionVessel,
       join_keys: [auction_id: :id, vessel_id: :id],
       on_replace: :delete,
       on_delete: :delete_all
@@ -69,8 +69,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :po,
     :port_agent,
     :scheduled_start,
-    :start_date,
-    :vessels
+    :start_date
   ]
 
   @doc false

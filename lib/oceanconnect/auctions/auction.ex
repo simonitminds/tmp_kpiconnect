@@ -244,6 +244,7 @@ defmodule Oceanconnect.Auctions.Auction do
   defp parse_duration(duration) when is_binary(duration), do: String.to_integer(duration)
   defp parse_duration(duration) when is_integer(duration), do: duration
 
+  def parse_date(dt = %DateTime{}), do: dt
   def parse_date(""), do: ""
   def parse_date(nil), do: ""
   def parse_date(epoch) do
