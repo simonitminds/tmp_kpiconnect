@@ -6,7 +6,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
-    field(:type, :string)
+    field(:type, :string, default: "spot")
 
     belongs_to(:port, Port)
 

@@ -14,7 +14,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     # Auctions and TermAuctions both reference this table. Each knows which
     # column to use as the foreign_key_constraint.
     belongs_to(:auction, Oceanconnect.Auctions.Auction)
-    belongs_to(:term_auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:term_auction, Oceanconnect.Auctions.Auction, source: :auction_id)
 
     timestamps()
   end
