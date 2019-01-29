@@ -1,8 +1,17 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, AuctionEvent, Solution}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionBarge,
+    AuctionBid,
+    AuctionEvent,
+    Solution,
+    SpotAuctionState,
+    TermAuctionState,
+    ProductBidState
+  }
 
   defstruct id: nil,
             type: nil,
@@ -47,7 +56,17 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def upcoming_auction_notified(auction = %Auction{id: auction_id}) do
+  def auction_created(auction = %TermAuction{id: auction_id}, user) do
+    %AuctionEvent{
+      type: :auction_created,
+      auction_id: auction_id,
+      data: auction,
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def upcoming_auction_notified(auction = %{id: auction_id}) do
     %AuctionEvent{
       type: :upcoming_auction_notified,
       auction_id: auction_id,
@@ -58,7 +77,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def auction_started(
         auction = %Auction{id: auction_id, auction_started: auction_started},
-        new_state = %AuctionState{},
+        new_state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{
@@ -92,7 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def auction_ended(
         auction = %Auction{id: auction_id, auction_ended: ended_at},
-        new_state = %AuctionState{}
+        new_state = %SpotAuctionState{}
       ) do
     %AuctionEvent{
       type: :auction_ended,
@@ -102,7 +121,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_expired(auction = %Auction{id: auction_id}, new_state = %AuctionState{}) do
+  def auction_expired(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}) do
     %AuctionEvent{
       type: :auction_expired,
       auction_id: auction_id,
@@ -111,7 +130,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_canceled(auction = %Auction{id: auction_id}, new_state = %AuctionState{}, user) do
+  def auction_canceled(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}, user) do
     %AuctionEvent{
       type: :auction_canceled,
       auction_id: auction_id,
@@ -121,7 +140,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_closed(auction = %Auction{id: auction_id}, new_state = %AuctionState{}) do
+  def auction_closed(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}) do
     %AuctionEvent{
       type: :auction_closed,
       auction_id: auction_id,
@@ -130,7 +149,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_state_rebuilt(auction_id, state = %AuctionState{}, time_remaining) do
+  def auction_state_rebuilt(auction_id, state = %SpotAuctionState{}, time_remaining) do
     %AuctionEvent{
       type: :auction_state_rebuilt,
       data: %{state: state, time_remaining: time_remaining},
@@ -223,7 +242,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   def winning_solution_selected(
         solution = %Solution{auction_id: auction_id},
         port_agent,
-        state = %AuctionState{},
+        state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{
@@ -237,7 +256,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_submitted(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %AuctionState{},
+        state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{
@@ -251,7 +270,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_unsubmitted(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %AuctionState{},
+        state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{
@@ -265,7 +284,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_approved(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %AuctionState{},
+        state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{
@@ -279,7 +298,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_rejected(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %AuctionState{},
+        state = %SpotAuctionState{},
         user
       ) do
     %AuctionEvent{

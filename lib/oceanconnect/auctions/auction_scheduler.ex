@@ -1,5 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionScheduler do
   use GenServer
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionCache, Command, AuctionEvent}
 
@@ -25,7 +27,8 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
          do: GenServer.cast(pid, {:cancel_timer, timer_type})
   end
 
-  def start_link(%Auction{id: auction_id, scheduled_start: scheduled_start}) do
+  def start_link(%struct{id: auction_id, scheduled_start: scheduled_start})
+      when is_auction(struct) do
     GenServer.start_link(
       __MODULE__,
       {auction_id, scheduled_start},
@@ -36,10 +39,11 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   def process_command(
         %Command{
           command: :update_scheduled_start,
-          data: auction = %Auction{id: auction_id}
+          data: auction = %struct{id: auction_id}
         },
         emit
-      ) do
+      )
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:update_scheduled_start, auction, emit})
   end
@@ -47,10 +51,11 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   def process_command(
         %Command{
           command: :cancel_scheduled_start,
-          data: auction = %Auction{id: auction_id}
+          data: auction = %struct{id: auction_id}
         },
         _emit
-      ) do
+      )
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:cancel_scheduled_start, auction})
   end
@@ -124,9 +129,10 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, auction = %Auction{scheduled_start: scheduled_start}, emit},
+        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, emit},
         state = %{timer_ref: timer_ref}
-      ) do
+      )
+      when is_auction(struct) do
     cancel_timer(timer_ref)
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :start_auction, delay)

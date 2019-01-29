@@ -2,8 +2,15 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{TermAuction, Auction, AuctionSupervisor, AuctionEvent}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+
+  alias Oceanconnect.Auctions.{
+    TermAuction,
+    Auction,
+    AuctionSupervisor,
+    AuctionEvent,
+    SpotAuctionState,
+    TermAuctionState
+  }
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -58,7 +65,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert parsed_date == expected_date |> DateTime.to_iso8601()
     end
 
-
     test "#maybe_convert_duration" do
       params = %{"duration" => "10", "decision_duration" => "15"}
       %{"duration" => duration} = Auction.maybe_convert_duration(params, "duration")
@@ -70,7 +76,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert decision_duration == 15 * 60_000
     end
 
-
     test "#maybe_load_suppliers" do
       supplier = insert(:company, is_supplier: true)
       params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
@@ -78,7 +83,6 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert List.first(suppliers).id == supplier.id
     end
-
 
     test "#participation_for_supplier" do
       supplier = insert(:company, is_supplier: true)
@@ -88,7 +92,6 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.update_participation_for_supplier(auction.id, supplier.id, "yes")
       assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == "yes"
     end
-
 
     test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{
       port: port,
@@ -230,14 +233,12 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-
     test "list_auctions/0 returns all auctions", %{auction: auction, term_auction: term_auction} do
       assert Auctions.list_auctions()
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
              |> MapSet.equal?(MapSet.new([auction.id, term_auction.id]))
     end
-
 
     test "list_participating_auctions/1 returns all auctions a company is a participant in", %{
       auction: auction
@@ -288,12 +289,14 @@ defmodule Oceanconnect.AuctionsTest do
              ] == auctions
     end
 
-
     test "get_auction!/1 returns the auction with given id", %{auction: auction} do
       assert Auctions.get_auction!(auction.id) == auction
     end
 
-    test "get_auction!/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
+    test "get_auction!/2 returns the auction with give id and type", %{
+      auction: auction,
+      term_auction: term_auction
+    } do
       assert %Auction{} = Auctions.get_auction!(auction.id, Auction)
       assert %TermAuction{} = Auctions.get_auction!(term_auction.id, TermAuction)
     end
@@ -302,18 +305,22 @@ defmodule Oceanconnect.AuctionsTest do
       assert Auctions.get_auction(auction.id) == auction
     end
 
-    test "get_auction/2 returns the auction with give id and type", %{auction: auction, term_auction: term_auction} do
+    test "get_auction/2 returns the auction with give id and type", %{
+      auction: auction,
+      term_auction: term_auction
+    } do
       assert %Auction{} = Auctions.get_auction(auction.id, Auction)
       assert %TermAuction{} = Auctions.get_auction(term_auction.id, TermAuction)
     end
-
 
     test "create_auction/1 with valid data creates an auction", %{auction_attrs: auction_attrs} do
       assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
       assert %Auction{} = Auctions.get_auction!(auction_id)
     end
 
-    test "create_auction/1 with valid term data creates a term auction", %{term_auction_attrs: term_auction_attrs} do
+    test "create_auction/1 with valid term data creates a term auction", %{
+      term_auction_attrs: term_auction_attrs
+    } do
       assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
       assert %TermAuction{} = Auctions.get_auction!(auction_id, TermAuction)
     end
@@ -327,7 +334,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "create_auction/1 with no scheduled_start time creates a draft auction", %{
-      auction_attrs: auction_attrs,
+      auction_attrs: auction_attrs
     } do
       auction_attrs = Map.drop(auction_attrs, [:scheduled_start])
       assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
@@ -338,7 +345,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
 
-
     test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
       auction: auction
     } do
@@ -348,7 +354,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction.po == "some updated po"
       assert auction == Auctions.get_auction(auction.id) |> Auctions.fully_loaded()
     end
-
 
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
       assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs, nil)
@@ -366,12 +371,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction == Auctions.get_auction!(auction.id)
     end
 
-
     test "delete_auction/1 deletes the auction", %{auction: auction} do
       assert {:ok, %Auction{}} = Auctions.delete_auction(auction)
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_auction!(auction.id) end
     end
-
 
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
@@ -406,7 +409,7 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       auction = Auctions.start_auction(auction, admin)
       assert auction.auction_started != nil
-      assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
+      assert %SpotAuctionState{status: :open} = Auctions.get_auction_state!(auction)
     end
   end
 
@@ -472,7 +475,7 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.cancel_auction(auction, buyer)
       # TODO: Eventually shutdown the auction and commit the final state
       # assert {:error, "Auciton Suppervisor Not Started"} = Auctions.AuctionSupervisor.find_pid(auction.id)
-      assert %AuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
+      assert %SpotAuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
     end
   end
 

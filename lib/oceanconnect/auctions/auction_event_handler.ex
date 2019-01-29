@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionBid,
     AuctionEvent,
     AuctionNotifier,
-    AuctionStore.AuctionState
+    SpotAuctionState
   }
 
   @registry_name :auction_event_handler_registry
@@ -84,7 +84,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_started,
-          data: %{state: auction_state = %AuctionState{}, auction: auction},
+          data: %{state: auction_state = %SpotAuctionState{}, auction: auction},
           time_entered: time_entered
         },
         state
@@ -99,7 +99,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_ended,
-          data: %{state: auction_state = %AuctionState{}, auction: auction},
+          data: %{state: auction_state = %SpotAuctionState{}, auction: auction},
           time_entered: time_entered
         },
         state
@@ -114,7 +114,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: type,
-          data: %{state: auction_state = %AuctionState{}, auction: auction},
+          data: %{state: auction_state = %SpotAuctionState{}, auction: auction},
           time_entered: time_entered
         },
         state
@@ -133,13 +133,13 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:noreply, state}
   end
 
-  def handle_info(%AuctionEvent{type: _type, data: auction_state = %AuctionState{}}, state) do
+  def handle_info(%AuctionEvent{type: _type, data: auction_state = %SpotAuctionState{}}, state) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: _type, data: %{state: auction_state = %AuctionState{}}},
+        %AuctionEvent{type: _type, data: %{state: auction_state = %SpotAuctionState{}}},
         state
       ) do
     AuctionNotifier.notify_participants(auction_state)
@@ -147,7 +147,10 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :barge_submitted, data: %{state: auction_state = %AuctionState{}}},
+        %AuctionEvent{
+          type: :barge_submitted,
+          data: %{state: auction_state = %SpotAuctionState{}}
+        },
         state
       ) do
     AuctionNotifier.notify_participants(auction_state)
@@ -155,7 +158,10 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :barge_unsubmitted, data: %{state: auction_state = %AuctionState{}}},
+        %AuctionEvent{
+          type: :barge_unsubmitted,
+          data: %{state: auction_state = %SpotAuctionState{}}
+        },
         state
       ) do
     AuctionNotifier.notify_participants(auction_state)
@@ -163,7 +169,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %AuctionState{}}},
+        %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %SpotAuctionState{}}},
         state
       ) do
     AuctionNotifier.notify_participants(auction_state)

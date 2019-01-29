@@ -1,8 +1,15 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionTimer, AuctionSuppliers}
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionTimer,
+    AuctionSuppliers,
+    SpotAuctionState,
+    TermAuctionState
+  }
+
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
   defstruct time_remaining: nil,
@@ -34,16 +41,16 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   def get_auction_payload!(
         auction = %Auction{buyer_id: buyer_id},
         buyer_id,
-        auction_state = %AuctionState{}
+        auction_state = %SpotAuctionState{}
       ) do
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
-  def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %AuctionState{}) do
+  def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %SpotAuctionState{}) do
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
-  def get_bid_history(supplier_id, %AuctionState{product_bids: product_bids}) do
+  def get_bid_history(supplier_id, %SpotAuctionState{product_bids: product_bids}) do
     Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
@@ -55,7 +62,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   def get_supplier_auction_payload(
         auction = %Auction{},
         supplier_id,
-        state = %AuctionState{
+        state = %SpotAuctionState{
           product_bids: product_bids,
           status: status
         }
@@ -90,7 +97,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   def get_buyer_auction_payload(
         auction = %Auction{},
         buyer_id,
-        state = %AuctionState{
+        state = %SpotAuctionState{
           product_bids: product_bids,
           status: status
         }
@@ -137,15 +144,15 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     end)
   end
 
-  defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :open}) do
+  defp get_time_remaining(auction = %Auction{}, %SpotAuctionState{status: :open}) do
     AuctionTimer.read_timer(auction.id, :duration)
   end
 
-  defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :decision}) do
+  defp get_time_remaining(auction = %Auction{}, %SpotAuctionState{status: :decision}) do
     AuctionTimer.read_timer(auction.id, :decision_duration)
   end
 
-  defp get_time_remaining(_auction = %Auction{}, %AuctionState{}), do: 0
+  defp get_time_remaining(_auction = %Auction{}, %SpotAuctionState{}), do: 0
 
   defp scrub_auction(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
 

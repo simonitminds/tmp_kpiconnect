@@ -1,5 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionSupervisor do
   use Supervisor
+  import Oceanconnect.Auctions.Guards
   @registry_name :auction_supervisor_registry
   alias Oceanconnect.Auctions.{
     Auction,
@@ -12,7 +13,8 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     AuctionReminderTimer
   }
 
-  def start_link({auction = %Auction{id: auction_id}, config}) do
+  def start_link({auction = %struct{id: auction_id}, config})
+      when is_auction(struct) do
     Supervisor.start_link(
       __MODULE__,
       {auction, config},
@@ -20,7 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     )
   end
 
-  def init({auction = %Auction{id: auction_id}, options}) do
+  def init({auction = %struct{id: auction_id}, options})
+      when is_auction(struct) do
     all_children = %{
       auction_a_timer: {AuctionTimer, auction_id},
       auction_cache: {AuctionCache, auction},

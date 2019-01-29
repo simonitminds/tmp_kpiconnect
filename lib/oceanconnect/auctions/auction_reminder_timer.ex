@@ -1,8 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   use GenServer
+  import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions.{
-    Auction,
     AuctionEvent,
     AuctionEventStore
   }
@@ -18,22 +18,24 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
     end
   end
 
-  def start_link(auction = %Auction{id: auction_id}) do
+  def start_link(auction = %struct{id: auction_id}) when is_auction(struct) do
     GenServer.start_link(__MODULE__, auction, name: get_reminder_timer_name(auction_id))
   end
 
-  def init(%Auction{id: _auction_id, scheduled_start: nil}) do
+  def init(%struct{id: _auction_id, scheduled_start: nil}) when is_auction(struct) do
     terminate(:normal)
   end
 
-  def init(auction = %Auction{id: auction_id, scheduled_start: start_time}) do
+  def init(auction = %struct{id: auction_id, scheduled_start: start_time})
+      when is_auction(struct) do
     AuctionEventStore.event_list(auction_id)
+
     if Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
-          if(%AuctionEvent{} = event)do
-            event.type == :upcoming_auction_notified
-          else
-            :erlang.binary_to_term(event).type == :upcoming_auction_notified
-          end
+         if(%AuctionEvent{} = event) do
+           event.type == :upcoming_auction_notified
+         else
+           :erlang.binary_to_term(event).type == :upcoming_auction_notified
+         end
        end) do
       Process.send_after(self(), :shutdown_timer, 5_000)
       {:ok, start_time}
@@ -51,7 +53,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
     {:stop, :normal, state}
   end
 
-  def handle_info({:remind_participants, auction = %Auction{}}, state) do
+  def handle_info({:remind_participants, auction = %struct{}}, state) when is_auction(struct) do
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), true)
     {:stop, :normal, state}
   end

@@ -1,6 +1,5 @@
 defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers, Solution}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers, Solution, SpotAuctionState}
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -8,7 +7,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
             lead_is_tied: false
 
   def get_solutions_payload!(
-        _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
+        _state = %SpotAuctionState{solutions: solutions, winning_solution: winning_solution},
         auction: auction = %Auction{buyer_id: buyer_id},
         buyer: buyer_id
       ) do
@@ -29,7 +28,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   def get_solutions_payload!(
-        _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
+        _state = %SpotAuctionState{solutions: solutions, winning_solution: winning_solution},
         auction: _auction,
         supplier: supplier_id
       ) do

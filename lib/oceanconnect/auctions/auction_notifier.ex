@@ -1,11 +1,11 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Auctions.{Auction, AuctionPayload, AuctionStore.AuctionState}
+  alias Oceanconnect.Auctions.{Auction, AuctionPayload, SpotAuctionState}
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  def notify_participants(%AuctionState{auction_id: auction_id}) do
+  def notify_participants(%SpotAuctionState{auction_id: auction_id}) do
     auction =
       Auctions.AuctionCache.read(auction_id)
       |> Auctions.fully_loaded()
