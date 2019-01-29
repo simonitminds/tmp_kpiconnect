@@ -237,7 +237,6 @@
 .messaging__top-context {
   display: flex;
   width: 100%;
-  background-color: $white;
   flex-shrink: 0;
   flex-direction: column;
   overflow: hidden;
@@ -246,17 +245,11 @@
     display: flex;
     align-items: baseline;
     flex-direction: column;
-    background-color: $white;
-    padding: 1rem;
-    border-top: 1px solid $gray-2;
+    padding: 0.5rem 1rem;
     font-weight: bold;
 
-    &:hover, &:focus {
-      background-color: $gray-1;
-    }
-
-    &:last-child {
-      border-bottom: 1px solid $gray-2;
+    &> div:hover, &> div:focus {
+      background-color: lighten($gray-0, 2.5%);
     }
 
     &.open {
@@ -278,6 +271,9 @@
       align-items: center;
       width: 100%;
       flex: 0 0 auto;
+      background-color: $white;
+      padding: 0.75rem;
+      border-radius: 4px;
     }
 
     &> div > .messaging__notifications {
@@ -304,28 +300,31 @@
   flex: 2 1 auto;
   overflow: auto;
   border-top: 1px solid $gray-2;
+  background-color: $gray-1;
 
   li {
     display: flex;
-    flex-direction: column;
     align-items: baseline;
-    background-color: $white;
-    padding: 1rem;
-    border-left: 8px solid $gray-2;
-    border-bottom: 1px solid $gray-2;
+    flex-direction: column;
+    padding: 0.5rem 1rem;
     font-weight: bold;
-    flex: 0 0 auto;
 
-    &:hover, &:focus {
-      background-color: $gray-0;
+    &> div {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      flex: 0 0 auto;
+      background-color: #ffffff;
+      padding: 1.5rem 0.75rem !important;;
+      border-radius: 4px;
+    }
+
+    &> div:hover, &> div:focus {
+      background-color: lighten($gray-0, 2.5%);
     }
 
     &> svg {
       flex: 0 0 1rem;
-    }
-
-    &> div {
-      align-items: center;
     }
 
     .collapsible-section__toggle-icon {
@@ -338,12 +337,8 @@
       display: flex;
       flex-direction: row;
       flex: 0 0 21px;
-      width: calc(100% + 1rem);
     }
 
-    &:last-child {
-      border-bottom: 1px solid $gray-2;
-    }
   }
 
   .messaging__context-list__instruction {
@@ -363,6 +358,7 @@
 .messaging__context-list__container {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .messaging__context-list__auction {
@@ -382,7 +378,8 @@
   background-color: $gray-1 !important;
   border-left: none !important;
   font-weight: bold;
-  font-style: italic;
+  // font-style: italic;
+  padding: 1rem 1rem 0.5rem !important;
   border-top: none !important;
 }
 
@@ -446,7 +443,7 @@
   .messaging__context-list__container > & {
     position: absolute;
     right: 0;
-    margin: 0.75rem 0.5rem;
+    margin: 0.625rem 0.5rem;
   }
 
   .messaging__message-container__header > & {
@@ -503,4 +500,11 @@
   overflow: scroll;
   border: 1px solid #c8c8c8;
   padding: 0.625em;
+}
+
+// Fresh Styles (To Be Reorganized)
+
+.messaging__menu-list {
+  overflow: auto;
+  background-color: #efefef;
 }
