@@ -28,7 +28,7 @@ defmodule Oceanconnect.SpotAuctionNewTest do
       |> DateTime.from_unix!()
 
     date_time = DateTime.utc_now()
-    suppliers = [selected_ompany1, selected_company2]
+    suppliers = [selected_company1, selected_company2]
 
     auction_params = %{
       anonymous_bidding: false,
