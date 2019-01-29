@@ -3,6 +3,8 @@ import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+const MAX_MESSAGE_LENGTH = 1024;
+
 export default class MessagePanel extends React.Component {
   constructor(props) {
     super(props);
@@ -85,9 +87,9 @@ export default class MessagePanel extends React.Component {
 
     const newMessage = this.state.newMessage;
     const messageHasContent = !!newMessage;
-    const canSubmit = connection && messageHasContent;
     const contentLength = newMessage.length;
-    const contentMaxLength = 255;
+    const contentMaxLength = MAX_MESSAGE_LENGTH;
+    const canSubmit = connection && messageHasContent && contentLength <= contentMaxLength;
 
     return (
       <div className='messaging__message-container'>
@@ -143,7 +145,7 @@ export default class MessagePanel extends React.Component {
                 />
               </div>
             </div>
-            <p className={`messaging__input__char-count${contentLength > contentMaxLength ? ' has-text-red' : ''}`}>{contentLength}/{contentMaxLength} characters</p>
+            <p className={`messaging__input__char-count${contentLength > contentMaxLength ? ' has-text-red has-text-weight-bold' : ''}`}>{contentLength}/{contentMaxLength} characters</p>
           </div>
         </form>
       </div>
