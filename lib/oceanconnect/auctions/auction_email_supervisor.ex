@@ -43,6 +43,4 @@ defmodule Oceanconnect.Auctions.AuctionEmailSupervisor do
 
     children_included
   end
-
-  defp exclude_children(children, %{}), do: children |> Map.values()
 end

@@ -4,6 +4,7 @@ defmodule OceanconnectWeb.EmailTest do
   alias OceanconnectWeb.Email
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{SpotAuctionState}
 
   setup do
     credit_company = insert(:company, name: "Ocean Connect Marine", is_broker: true)
@@ -78,8 +79,8 @@ defmodule OceanconnectWeb.EmailTest do
       )
     ]
 
-    %Auctions.AuctionStore.AuctionState{product_bids: product_bids} =
-      Auctions.AuctionStore.AuctionState.from_auction(auction)
+    %SpotAuctionState{product_bids: product_bids} =
+      SpotAuctionState.from_auction(auction)
 
     winning_solution = Auctions.Solution.from_bids(solution_bids, product_bids, auction)
 

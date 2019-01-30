@@ -1,9 +1,9 @@
 defmodule Oceanconnect.Auctions.AuctionSupervisor do
   use Supervisor
+
   import Oceanconnect.Auctions.Guards
-  @registry_name :auction_supervisor_registry
+
   alias Oceanconnect.Auctions.{
-    Auction,
     AuctionCache,
     AuctionEventHandler,
     AuctionEventStore,
@@ -12,6 +12,8 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     AuctionTimer,
     AuctionReminderTimer
   }
+
+  @registry_name :auction_supervisor_registry
 
   def start_link({auction = %struct{id: auction_id}, config})
       when is_auction(struct) do

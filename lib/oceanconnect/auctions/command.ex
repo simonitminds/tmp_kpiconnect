@@ -1,46 +1,48 @@
 defmodule Oceanconnect.Auctions.Command do
-  alias Oceanconnect.Auctions.{Auction, AuctionBarge, AuctionBid, Solution}
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{AuctionBarge, AuctionBid, Solution}
   alias __MODULE__
 
   defstruct command: :get_current_state, data: nil
 
-  def update_auction(auction = %Auction{}, user) when not is_integer(user) do
+  def update_auction(auction = %struct{}, user) when is_auction(struct) and not is_integer(user) do
     %Command{command: :update_auction, data: %{auction: auction, user: user}}
   end
 
-  def update_cache(auction = %Auction{}) do
+  def update_cache(auction = %struct{}) when is_auction(struct) do
     %Command{command: :update_cache, data: auction}
   end
 
-  def update_scheduled_start(auction = %Auction{}) do
+  def update_scheduled_start(auction = %struct{}) when is_auction(struct) do
     %Command{command: :update_scheduled_start, data: auction}
   end
 
-  def cancel_scheduled_start(auction = %Auction{}) do
+  def cancel_scheduled_start(auction = %struct{}) when is_auction(struct) do
     %Command{command: :cancel_scheduled_start, data: auction}
   end
 
-  def start_auction(auction = %Auction{}, user) when not is_integer(user) do
+  def start_auction(auction = %struct{}, user) when is_auction(struct) and not is_integer(user) do
     %Command{command: :start_auction, data: %{auction: auction, user: user}}
   end
 
-  def end_auction(auction = %Auction{}) do
+  def end_auction(auction = %struct{}) when is_auction(struct) do
     %Command{command: :end_auction, data: auction}
   end
 
-  def cancel_auction(auction = %Auction{}, user) do
+  def cancel_auction(auction = %struct{}, user) when is_auction(struct) do
     %Command{command: :cancel_auction, data: %{auction: auction, user: user}}
   end
 
-  def start_duration_timer(auction = %Auction{}) do
+  def start_duration_timer(auction = %struct{}) when is_auction(struct) do
     %Command{command: :start_duration_timer, data: auction}
   end
 
-  def start_decision_duration_timer(auction = %Auction{}) do
+  def start_decision_duration_timer(auction = %struct{}) when is_auction(struct) do
     %Command{command: :start_decision_duration_timer, data: auction}
   end
 
-  def end_auction_decision_period(auction = %Auction{}) do
+  def end_auction_decision_period(auction = %struct{}) when is_auction(struct) do
     %Command{command: :end_auction_decision_period, data: auction}
   end
 

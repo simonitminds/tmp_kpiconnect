@@ -1,15 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionEvent do
   use Ecto.Schema
 
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions.{
-    Auction,
-    TermAuction,
     AuctionBarge,
     AuctionBid,
     AuctionEvent,
     Solution,
-    SpotAuctionState,
-    TermAuctionState,
     ProductBidState
   }
 
@@ -46,17 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     {:ok, updated_event}
   end
 
-  def auction_created(auction = %Auction{id: auction_id}, user) do
-    %AuctionEvent{
-      type: :auction_created,
-      auction_id: auction_id,
-      data: auction,
-      time_entered: DateTime.utc_now(),
-      user: user
-    }
-  end
-
-  def auction_created(auction = %TermAuction{id: auction_id}, user) do
+  def auction_created(auction = %struct{id: auction_id}, user) when is_auction(struct) do
     %AuctionEvent{
       type: :auction_created,
       auction_id: auction_id,
@@ -76,10 +64,10 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auction_started(
-        auction = %Auction{id: auction_id, auction_started: auction_started},
-        new_state = %SpotAuctionState{},
+        auction = %struct{id: auction_id, auction_started: auction_started},
+        new_state = %state_struct{},
         user
-      ) do
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_started,
       auction_id: auction_id,
@@ -89,7 +77,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_updated(auction = %Auction{id: auction_id}, user) do
+  def auction_updated(auction = %struct{id: auction_id}, user) when is_auction(struct) do
     %AuctionEvent{
       type: :auction_updated,
       auction_id: auction_id,
@@ -99,7 +87,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_rescheduled(auction = %Auction{id: auction_id}, user) do
+  def auction_rescheduled(auction = %struct{id: auction_id}, user) when is_auction(struct) do
     %AuctionEvent{
       type: :auction_rescheduled,
       auction_id: auction_id,
@@ -110,9 +98,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auction_ended(
-        auction = %Auction{id: auction_id, auction_ended: ended_at},
-        new_state = %SpotAuctionState{}
-      ) do
+        auction = %struct{id: auction_id, auction_ended: ended_at},
+        new_state = %state_struct{}
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_ended,
       auction_id: auction_id,
@@ -121,7 +109,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_expired(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}) do
+  def auction_expired(auction = %struct{id: auction_id}, new_state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_expired,
       auction_id: auction_id,
@@ -130,7 +118,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_canceled(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}, user) do
+  def auction_canceled(auction = %struct{id: auction_id}, new_state = %state_struct{}, user) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_canceled,
       auction_id: auction_id,
@@ -140,7 +128,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_closed(auction = %Auction{id: auction_id}, new_state = %SpotAuctionState{}) do
+  def auction_closed(auction = %struct{id: auction_id}, new_state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_closed,
       auction_id: auction_id,
@@ -149,7 +137,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_state_rebuilt(auction_id, state = %SpotAuctionState{}, time_remaining) do
+  def auction_state_rebuilt(auction_id, state = %state_struct{}, time_remaining) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_state_rebuilt,
       data: %{state: state, time_remaining: time_remaining},
@@ -242,9 +230,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   def winning_solution_selected(
         solution = %Solution{auction_id: auction_id},
         port_agent,
-        state = %SpotAuctionState{},
+        state = %state_struct{},
         user
-      ) do
+      ) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :winning_solution_selected,
       auction_id: auction_id,
@@ -256,9 +244,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_submitted(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %SpotAuctionState{},
+        state = %state_struct{},
         user
-      ) do
+      ) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :barge_submitted,
       auction_id: auction_id,
@@ -270,9 +258,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_unsubmitted(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %SpotAuctionState{},
+        state = %state_struct{},
         user
-      ) do
+      ) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :barge_unsubmitted,
       auction_id: auction_id,
@@ -284,9 +272,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_approved(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %SpotAuctionState{},
+        state = %state_struct{},
         user
-      ) do
+      ) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :barge_approved,
       auction_id: auction_id,
@@ -298,9 +286,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def barge_rejected(
         auction_barge = %AuctionBarge{auction_id: auction_id},
-        state = %SpotAuctionState{},
+        state = %state_struct{},
         user
-      ) do
+      ) when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :barge_rejected,
       auction_id: auction_id,

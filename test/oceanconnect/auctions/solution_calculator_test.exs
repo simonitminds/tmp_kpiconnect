@@ -1,8 +1,7 @@
 defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.SolutionCalculator
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionVesselFuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionVesselFuel, SpotAuctionState}
 
   def quick_bid(amount, vfid, supplier_id, auction_id, opts \\ []) do
     now = DateTime.utc_now()
@@ -50,7 +49,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf1_supplier2 = quick_bid(2.50, vf1_id, supplier2_id, auction_id)
       vf2_supplier2 = quick_bid(3.00, vf2_id, supplier3_id, auction_id)
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -83,7 +82,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf1_supplier2 = quick_bid(2.50, vf1_id, supplier2_id, auction_id)
       vf2_supplier1 = quick_bid(3.00, vf2_id, supplier1_id, auction_id)
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -124,7 +123,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf1_supplier2 = quick_bid(2.50, vf1_id, supplier2_id, auction_id)
       vf2_supplier2 = quick_bid(2.00, vf2_id, supplier2_id, auction_id)
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -161,7 +160,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf1_supplier3 = quick_bid(2.00, vf1_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
       vf2_supplier3 = quick_bid(3.00, vf2_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -202,7 +201,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf2_supplier3 = quick_bid(2.50, vf2_id, supplier3_id, auction_id, allow_split: true)
       vf2_supplier2 = quick_bid(5.00, vf2_id, supplier2_id, auction_id, allow_split: false)
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -242,7 +241,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf2_supplier2 = quick_bid(2.50, vf2_id, supplier2_id, auction_id, allow_split: false)
       vf2_supplier3 = quick_bid(3.00, vf2_id, supplier3_id, auction_id, allow_split: true)
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction_id,
         status: :open,
         product_bids: %{
@@ -311,7 +310,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       vf6_s5 = quick_bid(12.00, vf6.id, s5.id, auction.id, allow_split: false)
 
 
-      current_state = %AuctionState{
+      current_state = %SpotAuctionState{
         auction_id: auction.id,
         status: :open,
         product_bids: %{

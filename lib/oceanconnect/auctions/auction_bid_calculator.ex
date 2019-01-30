@@ -1,21 +1,17 @@
 defmodule Oceanconnect.Auctions.AuctionBidCalculator do
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
-    SpotAuctionState,
-    TermAuctionState,
     ProductBidState
   }
 
-  def process_all(auction_state = %SpotAuctionState{}, :pending) do
+  def process_all(auction_state = %state_struct{}, :pending) when is_auction_state(state_struct) do
     {auction_state, []}
   end
 
-  def process_all(auction_state = %TermAuctionState{}, :pending) do
-    {auction_state, []}
-  end
-
-  def process_all(auction_state = %SpotAuctionState{product_bids: product_bids}, status) do
+  def process_all(auction_state = %state_struct{product_bids: product_bids}, status) when is_auction_state(state_struct) do
     {new_auction_state, events} =
       product_bids
       |> Enum.reduce({auction_state, []}, fn {product_key, product_bid_state},
@@ -23,23 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         {new_product_bid_state, new_events} = process(product_bid_state, status)
 
         new_auction_state =
-          SpotAuctionState.update_product_bids(auction_state, product_key, new_product_bid_state)
-
-        {new_auction_state, events ++ new_events}
-      end)
-
-    {new_auction_state, events}
-  end
-
-  def process_all(auction_state = %TermAuctionState{product_bids: product_bids}, status) do
-    {new_auction_state, events} =
-      product_bids
-      |> Enum.reduce({auction_state, []}, fn {product_key, product_bid_state},
-                                             {auction_state, events} ->
-        {new_product_bid_state, new_events} = process(product_bid_state, status)
-
-        new_auction_state =
-          TermAuctionState.update_product_bids(auction_state, product_key, new_product_bid_state)
+          state_struct.update_product_bids(auction_state, product_key, new_product_bid_state)
 
         {new_auction_state, events ++ new_events}
       end)
@@ -341,7 +321,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
          },
          bid = %AuctionBid{
            auction_id: auction_id,
-           amount: amount,
+           amount: _amount,
            min_amount: nil
          },
          :pending

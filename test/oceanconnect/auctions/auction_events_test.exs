@@ -16,7 +16,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         duration: 1_000,
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier2_company],
-        auction_vessel_fuels: [],
+        auction_vessel_fuels: [vessel_fuel],
         buyer: buyer_company,
         is_traded_bid_allowed: true
       )

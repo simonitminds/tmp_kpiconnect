@@ -9,19 +9,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     TermAuction,
     AuctionBarge,
     AuctionBid,
-    AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,
     AuctionEventStore,
-    AuctionScheduler,
     Store,
     AuctionTimer,
     Command,
-    SolutionCalculator,
-    Solution
+    Solution,
+    SpotAuctionState,
+    TermAuctionState
   }
-
-  alias Oceanconnect.Auctions.{SpotAuctionState, TermAuctionState, ProductBidState}
   @registry_name :auctions_registry
 
   def find_pid(auction_id) do
@@ -70,12 +67,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          do: GenServer.cast(pid, {cmd, data, true})
   end
 
-  def process_command(%Command{command: cmd, data: data = %{auction: %Auction{id: auction_id}}}) do
+  def process_command(%Command{command: cmd, data: data = %{auction: %struct{id: auction_id}}}) when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
   end
 
-  def process_command(%Command{command: cmd, data: auction = %Auction{id: auction_id}}) do
+  def process_command(%Command{command: cmd, data: auction = %struct{id: auction_id}}) when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, auction, true})
   end
@@ -110,9 +107,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:start_auction, %{auction: auction = %Auction{}, user: user}, emit},
+        {:start_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
-      ) do
+      ) when is_auction(struct) do
     new_state = Store.start_auction(current_state, auction, user, emit)
 
     {:noreply, new_state}
@@ -127,9 +124,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:end_auction, auction = %Auction{}, emit},
+        {:end_auction, auction = %struct{}, emit},
         current_state = %{status: :open}
-      ) do
+      ) when is_auction(struct) do
     new_state = Store.end_auction(current_state, auction)
 
     AuctionEvent.emit(AuctionEvent.auction_ended(auction, new_state), emit)
@@ -141,9 +138,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     do: {:noreply, current_state}
 
   def handle_cast(
-        {:end_auction_decision_period, auction = %Auction{}, emit},
+        {:end_auction_decision_period, auction = %struct{}, emit},
         current_state
-      ) do
+      ) when is_auction(struct) do
     new_state = Store.expire_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_expired(auction, new_state), emit)
@@ -262,16 +259,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
-        {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
+        {:cancel_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
-      ) do
+      ) when is_auction(struct) do
     new_state = Store.cancel_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
     {:noreply, new_state}
   end
 
-  def handle_cast({:notify_upcoming_auction, %{auction: auction = %Auction{}}, emit}, state) do
+  def handle_cast({:notify_upcoming_auction, %{auction: auction = %struct{}}, emit}, state) when is_auction(struct) do
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), emit)
     {:noreply, state}
   end
@@ -288,9 +285,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created, data: auction}, _previous_state) do
+  defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %Auction{}}, _previous_state) do
     auction = Auctions.fully_loaded(auction)
-    Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    SpotAuctionState.from_auction(auction)
+  end
+
+  defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %TermAuction{}}, _previous_state) do
+    auction = Auctions.fully_loaded(auction)
+    TermAuctionState.from_auction(auction)
   end
 
   defp replay_event(

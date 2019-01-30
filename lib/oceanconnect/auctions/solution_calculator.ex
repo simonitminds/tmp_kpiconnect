@@ -1,5 +1,7 @@
 defmodule Oceanconnect.Auctions.SolutionCalculator do
-  alias Oceanconnect.Auctions.{Auction, TermAuction, Solution, SpotAuctionState, TermAuctionState}
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{Auction, TermAuction, Solution}
 
   defstruct best_single_supplier: %Solution{},
             best_overall: %Solution{},
@@ -14,7 +16,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
 
     def create(bids, _auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
       total_price =
-        Enum.reduce(bids, 0, fn bid, acc ->
+        Enum.reduce(bids, 0, fn(bid, acc) ->
           vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
 
           case vf do
@@ -31,6 +33,23 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
       %__MODULE__{
         bids: bids,
         products: bid_products,
+        total_price: total_price,
+        latest_original_time_entered: latest_original_time_entered(bids),
+        auction_id: auction_id
+      }
+    end
+
+    def create(bids, _auction = %TermAuction{id: auction_id, fuel_id: fuel_id, fuel_quantity: quantity}) do
+      total_price =
+        Enum.reduce(bids, 0, fn(bid, acc) ->
+          acc + bid.amount * quantity
+        end)
+
+      products = [fuel_id]
+
+      %__MODULE__{
+        bids: bids,
+        products: products,
         total_price: total_price,
         latest_original_time_entered: latest_original_time_entered(bids),
         auction_id: auction_id
@@ -57,36 +76,12 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
   end
 
   def process(
-        current_state = %SpotAuctionState{
+        current_state = %state_struct{
           product_bids: product_bids,
-          solutions: existing_solutions
+          solutions: _existing_solutions
         },
-        auction = %Auction{}
-      ) do
-    best_by_supplier = best_solutions_by_supplier(product_bids, auction)
-
-    best_single_supplier =
-      calculate_best_single_supplier(product_bids, auction, supplier_solutions: best_by_supplier)
-
-    best_overall =
-      calculate_best_overall(product_bids, auction, best_single_supplier: best_single_supplier)
-
-    solution_state = %__MODULE__{
-      best_by_supplier: best_by_supplier,
-      best_single_supplier: best_single_supplier,
-      best_overall: best_overall
-    }
-
-    Map.put(current_state, :solutions, solution_state)
-  end
-
-  def process(
-        current_state = %TermAuctionState{
-          product_bids: product_bids,
-          solutions: existing_solutions
-        },
-        auction = %TermAuction{}
-      ) do
+        auction = %struct{}
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     best_by_supplier = best_solutions_by_supplier(product_bids, auction)
 
     best_single_supplier =
@@ -142,7 +137,6 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
   # respecting supplier's allow_split requests.
   defp calculate_best_overall(product_bids, auction, best_single_supplier: best_single_supplier) do
     products = Map.keys(product_bids)
-    product_count = Enum.count(products)
 
     groups =
       create_bid_groups(product_bids)

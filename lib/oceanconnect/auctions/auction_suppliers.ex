@@ -1,20 +1,23 @@
 defmodule Oceanconnect.Auctions.AuctionSuppliers do
   use Ecto.Schema
   import Ecto.Changeset
+
+  import Oceanconnect.Auctions.Guards
+
   alias __MODULE__
   alias Oceanconnect.Accounts.Company
-  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers}
+  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, TermAuction}
   alias Oceanconnect.Repo
 
   schema "auction_suppliers" do
     field(:participation, :string)
     field(:alias_name, :string)
-    belongs_to(:supplier, Oceanconnect.Accounts.Company)
+    belongs_to(:supplier, Company)
 
     # Auctions and TermAuctions both reference this table. Each knows which
     # column to use as the foreign_key_constraint.
-    belongs_to(:auction, Oceanconnect.Auctions.Auction)
-    belongs_to(:term_auction, Oceanconnect.Auctions.TermAuction)
+    belongs_to(:auction, Auction)
+    belongs_to(:term_auction, TermAuction)
 
     timestamps()
   end
@@ -35,7 +38,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     Repo.get(Company, buyer_id).name
   end
 
-  def get_name_or_alias(supplier_id, %Auction{anonymous_bidding: true, suppliers: suppliers}) do
+  def get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers}) when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
 

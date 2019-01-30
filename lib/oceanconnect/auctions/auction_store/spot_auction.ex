@@ -8,7 +8,6 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,
-    AuctionEventStore,
     AuctionScheduler,
     AuctionTimer,
     Command,
@@ -85,7 +84,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     current_state
   end
 
-  def start_auction(%SpotAuctionState{} = current_state, auction = %Auction{}, _user, _emit) do
+  def start_auction(%SpotAuctionState{} = current_state, _auction = %Auction{}, _user, _emit) do
     current_state
   end
 
@@ -121,7 +120,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
 
   def update_product_bid_state(
         state = %SpotAuctionState{product_bids: product_bids},
-        auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}
+        _auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}
       ) do
     vessel_fuel_ids = Enum.map(vessel_fuels, &"#{&1.id}")
 

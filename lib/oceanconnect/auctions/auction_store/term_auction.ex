@@ -2,14 +2,12 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
-    Auction,
     TermAuction,
     AuctionBarge,
     AuctionBid,
     AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,
-    AuctionEventStore,
     AuctionScheduler,
     AuctionTimer,
     Command,
@@ -42,7 +40,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
 
   def start_auction(
         %TermAuctionState{status: status} = current_state,
-        auction = %Auction{},
+        auction = %TermAuction{},
         user,
         emit
       )
@@ -71,7 +69,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
 
   def start_auction(
         %TermAuctionState{status: :decision} = current_state,
-        auction = %Auction{},
+        auction = %TermAuction{},
         _user,
         _emit
       ) do
@@ -86,13 +84,13 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
     current_state
   end
 
-  def start_auction(%TermAuctionState{} = current_state, auction = %Auction{}, _user, _emit) do
+  def start_auction(%TermAuctionState{} = current_state, _auction = %TermAuction{}, _user, _emit) do
     current_state
   end
 
   def update_auction(
         current_state = %{status: :draft},
-        auction = %Auction{scheduled_start: start},
+        auction = %TermAuction{scheduled_start: start},
         emit
       )
       when start != nil do
@@ -122,24 +120,16 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
 
   def update_product_bid_state(
         state = %TermAuctionState{product_bids: product_bids},
-        auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}
+        _auction = %TermAuction{id: auction_id, fuel_id: fuel_id}
       ) do
-    vessel_fuel_ids = Enum.map(vessel_fuels, &"#{&1.id}")
-
-    updated_product_bids =
-      vessel_fuel_ids
-      |> Enum.reduce(%{}, fn vfid, acc ->
-        if vfid in Map.keys(product_bids) do
-          Map.put(acc, vfid, product_bids[vfid])
-        else
-          Map.put(acc, vfid, ProductBidState.for_product(vfid, auction_id))
-        end
-      end)
+    updated_product_bids = %{
+      "#{fuel_id}" => product_bids["#{fuel_id}"] || ProductBidState.for_product(fuel_id, auction_id)
+    }
 
     Map.put(state, :product_bids, updated_product_bids)
   end
 
-  def end_auction(current_state, auction = %Auction{}) do
+  def end_auction(current_state, auction = %TermAuction{}) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()

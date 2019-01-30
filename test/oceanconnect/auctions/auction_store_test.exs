@@ -1,8 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor, Solution}
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.{
+    AuctionPayload,
+    AuctionStore,
+    AuctionSupervisor,
+    Solution,
+    SpotAuctionState
+  }
 
   setup do
     supplier_company = insert(:company)
@@ -79,13 +84,13 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "starting auction_store for auction", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
+    assert AuctionStore.get_current_state(auction) == SpotAuctionState.from_auction(auction)
 
     Oceanconnect.Auctions.start_auction(auction)
 
     expected_state =
       auction
-      |> AuctionState.from_auction()
+      |> SpotAuctionState.from_auction()
       |> Map.merge(%{status: :open, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
@@ -116,7 +121,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state =
       auction
-      |> AuctionState.from_auction()
+      |> SpotAuctionState.from_auction()
       |> Map.merge(%{status: :decision, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
@@ -132,7 +137,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state =
       auction
-      |> AuctionState.from_auction()
+      |> SpotAuctionState.from_auction()
       |> Map.merge(%{status: :expired, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)

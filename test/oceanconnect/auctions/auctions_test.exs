@@ -8,8 +8,7 @@ defmodule Oceanconnect.AuctionsTest do
     Auction,
     AuctionSupervisor,
     AuctionEvent,
-    SpotAuctionState,
-    TermAuctionState
+    SpotAuctionState
   }
 
   describe "auctions" do

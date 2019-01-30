@@ -1,22 +1,23 @@
 defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction}
+  import Oceanconnect.Auctions.Guards
 
-  def notify_auction_created(auction = %Auction{}) do
+  alias Oceanconnect.Auctions
+
+  def notify_auction_created(auction = %struct{}) when is_auction(struct) do
     auction = auction |> Auctions.fully_loaded()
     invitation_emails = OceanconnectWeb.Email.auction_invitation(auction)
     invitation_emails = deliver_emails(invitation_emails)
     {:ok, invitation_emails}
   end
 
-  def notify_auction_rescheduled(auction = %Auction{}) do
+  def notify_auction_rescheduled(auction = %struct{}) when is_auction(struct) do
     auction = auction |> Auctions.fully_loaded()
     updated_emails = OceanconnectWeb.Email.auction_rescheduled(auction)
     updated_emails = deliver_emails(updated_emails)
     {:ok, updated_emails}
   end
 
-  def notify_upcoming_auction(auction = %Auction{}) do
+  def notify_upcoming_auction(auction = %struct{}) when is_auction(struct) do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       OceanconnectWeb.Email.auction_starting_soon(auction)
 
@@ -25,7 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
     {:ok, upcoming_emails}
   end
 
-  def notify_auction_canceled(auction = %Auction{}) do
+  def notify_auction_canceled(auction = %struct{}) when is_auction(struct) do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails} =
       OceanconnectWeb.Email.auction_canceled(auction)
 
