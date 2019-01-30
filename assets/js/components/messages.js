@@ -73,7 +73,7 @@ class Messages extends React.Component {
                 actions={actions}
                 connection={connection}
               />
-            : <div className="qa-auction-messages-auctions overflow--auto">
+            : <div className="messaging__menu-list qa-auction-messages-auctions">
                 { panelIsExpanded &&
                   <ul className="messaging__top-context">
                     <li className="messaging__top-context__selector"><span>Select an Auction</span></li>
