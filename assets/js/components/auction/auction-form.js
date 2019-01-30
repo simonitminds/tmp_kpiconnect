@@ -112,7 +112,7 @@ const AuctionForm = (props) => {
             </fieldset>
           </div>
         </div>
-      </section> {/* Auction type */}
+      </section>
 */}
 
       {renderFormContent(type)}

@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions.{
     AuctionEmailNotifier,
-    SpotAuctionState
+    AuctionStore.AuctionState
   }
 
   setup do
@@ -73,8 +73,8 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifierTest do
       )
     ]
 
-    %SpotAuctionState{product_bids: product_bids} =
-      SpotAuctionState.from_auction(auction)
+    %AuctionState{product_bids: product_bids} =
+      AuctionState.from_auction(auction)
 
     winning_solution = Auctions.Solution.from_bids(solution_bids, product_bids, auction)
 

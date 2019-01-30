@@ -12,12 +12,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionCache,
     AuctionEvent,
     AuctionEventStore,
-    Store,
+    StoreProtocol,
     AuctionTimer,
     Command,
     Solution,
-    SpotAuctionState,
-    TermAuctionState
+    AuctionStore.AuctionState,
+    AuctionStore.TermAuctionState
   }
   @registry_name :auctions_registry
 
@@ -81,7 +81,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def init(auction = %Auction{id: auction_id}) do
     state =
       case replay_events(auction_id) do
-        nil -> SpotAuctionState.from_auction(auction)
+        nil -> AuctionState.from_auction(auction)
         state -> maybe_emit_rebuilt_event(state)
       end
 
@@ -110,13 +110,13 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:start_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
       ) when is_auction(struct) do
-    new_state = Store.start_auction(current_state, auction, user, emit)
+    new_state = StoreProtocol.start_auction(current_state, auction, user, emit)
 
     {:noreply, new_state}
   end
 
   def handle_cast({:update_auction, %{auction: auction, user: user}, emit}, current_state) do
-    state = Store.update_auction(current_state, auction, emit)
+    state = StoreProtocol.update_auction(current_state, auction, emit)
 
     AuctionEvent.emit(AuctionEvent.auction_updated(auction, user), emit)
 
@@ -127,7 +127,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:end_auction, auction = %struct{}, emit},
         current_state = %{status: :open}
       ) when is_auction(struct) do
-    new_state = Store.end_auction(current_state, auction)
+    new_state = StoreProtocol.end_auction(current_state, auction)
 
     AuctionEvent.emit(AuctionEvent.auction_ended(auction, new_state), emit)
 
@@ -141,7 +141,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:end_auction_decision_period, auction = %struct{}, emit},
         current_state
       ) when is_auction(struct) do
-    new_state = Store.expire_auction(current_state)
+    new_state = StoreProtocol.expire_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_expired(auction, new_state), emit)
 
@@ -152,11 +152,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:process_new_bid, %{bid: bid = %{min_amount: nil}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    {new_product_state, events, new_state} = Store.process_bid(current_state, bid)
+    {new_product_state, events, new_state} = StoreProtocol.process_bid(current_state, bid)
     Enum.map(events, &AuctionEvent.emit(&1, true))
     AuctionEvent.emit(AuctionEvent.bid_placed(bid, new_product_state, user), emit)
 
-    if Store.is_lowest_bid?(new_state, bid) or Store.is_suppliers_first_bid?(current_state, bid) do
+    if StoreProtocol.is_lowest_bid?(new_state, bid) or StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
 
@@ -167,11 +167,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:process_new_bid, %{bid: bid = %{min_amount: _min_amount}, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    {new_product_state, events, new_state} = Store.process_bid(current_state, bid)
+    {new_product_state, events, new_state} = StoreProtocol.process_bid(current_state, bid)
     AuctionEvent.emit(AuctionEvent.auto_bid_placed(bid, new_product_state, user), emit)
     Enum.map(events, &AuctionEvent.emit(&1, true))
 
-    if Store.is_lowest_bid?(new_state, bid) or Store.is_suppliers_first_bid?(current_state, bid) do
+    if StoreProtocol.is_lowest_bid?(new_state, bid) or StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
 
@@ -182,7 +182,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:revoke_supplier_bids, %{product: product, supplier_id: supplier_id, user: user}, emit},
         current_state = %{auction_id: auction_id}
       ) do
-    new_state = Store.revoke_supplier_bids(current_state, product, supplier_id)
+    new_state = StoreProtocol.revoke_supplier_bids(current_state, product, supplier_id)
 
     AuctionEvent.emit(
       AuctionEvent.bids_revoked(auction_id, product, supplier_id, new_state, user),
@@ -202,7 +202,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          }, emit},
         current_state
       ) do
-    new_state = Store.select_winning_solution(current_state, solution)
+    new_state = StoreProtocol.select_winning_solution(current_state, solution)
 
     AuctionEvent.emit(
       AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user),
@@ -218,7 +218,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:submit_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
-    new_state = Store.submit_barge(current_state, auction_barge)
+    new_state = StoreProtocol.submit_barge(current_state, auction_barge)
 
     AuctionEvent.emit(AuctionEvent.barge_submitted(auction_barge, new_state, user), emit)
 
@@ -229,7 +229,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:unsubmit_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
-    new_state = Store.unsubmit_barge(current_state, auction_barge)
+    new_state = StoreProtocol.unsubmit_barge(current_state, auction_barge)
 
     AuctionEvent.emit(AuctionEvent.barge_unsubmitted(auction_barge, new_state, user), emit)
 
@@ -240,7 +240,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:approve_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
-    new_state = Store.approve_barge(current_state, auction_barge)
+    new_state = StoreProtocol.approve_barge(current_state, auction_barge)
 
     AuctionEvent.emit(AuctionEvent.barge_approved(auction_barge, new_state, user), emit)
 
@@ -251,7 +251,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:reject_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
-    new_state = Store.reject_barge(current_state, auction_barge)
+    new_state = StoreProtocol.reject_barge(current_state, auction_barge)
 
     AuctionEvent.emit(AuctionEvent.barge_rejected(auction_barge, new_state, user), emit)
 
@@ -262,7 +262,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:cancel_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
       ) when is_auction(struct) do
-    new_state = Store.cancel_auction(current_state)
+    new_state = StoreProtocol.cancel_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
     {:noreply, new_state}
@@ -287,7 +287,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %Auction{}}, _previous_state) do
     auction = Auctions.fully_loaded(auction)
-    SpotAuctionState.from_auction(auction)
+    AuctionState.from_auction(auction)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %TermAuction{}}, _previous_state) do
@@ -299,16 +299,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          %AuctionEvent{type: :auction_started, data: %{state: state, auction: auction}},
          _previous_state
        ) do
-    Store.start_auction(state, auction, nil, false)
+    StoreProtocol.start_auction(state, auction, nil, false)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
-    Store.update_auction(auction, previous_state, false)
+    StoreProtocol.update_auction(auction, previous_state, false)
   end
 
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do
     bid = AuctionBid.from_event_bid(event_bid)
-    {_product_state, _events, new_state} = Store.process_bid(previous_state, bid)
+    {_product_state, _events, new_state} = StoreProtocol.process_bid(previous_state, bid)
     new_state
   end
 
@@ -317,7 +317,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          previous_state
        ) do
     bid = AuctionBid.from_event_bid(event_bid)
-    {_product_state, _events, new_state} = Store.process_bid(previous_state, bid)
+    {_product_state, _events, new_state} = StoreProtocol.process_bid(previous_state, bid)
     new_state
   end
 
@@ -329,7 +329,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          %AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}},
          previous_state
        ) do
-    Store.revoke_supplier_bids(previous_state, product, supplier_id)
+    StoreProtocol.revoke_supplier_bids(previous_state, product, supplier_id)
   end
 
   defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
@@ -338,53 +338,53 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          %AuctionEvent{type: :auction_ended, data: %{auction: auction}},
          previous_state
        ) do
-    Store.end_auction(previous_state, auction)
+    StoreProtocol.end_auction(previous_state, auction)
   end
 
   defp replay_event(
          %AuctionEvent{type: :auction_canceled, data: %{}},
          previous_state
        ) do
-    Store.cancel_auction(previous_state)
+    StoreProtocol.cancel_auction(previous_state)
   end
 
   defp replay_event(
          %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}},
          previous_state
        ) do
-    Store.select_winning_solution(previous_state, solution)
+    StoreProtocol.select_winning_solution(previous_state, solution)
   end
 
   defp replay_event(
          %AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
-    Store.submit_barge(previous_state, auction_barge)
+    StoreProtocol.submit_barge(previous_state, auction_barge)
   end
 
   defp replay_event(
          %AuctionEvent{type: :barge_unsubmitted, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
-    Store.unsubmit_barge(previous_state, auction_barge)
+    StoreProtocol.unsubmit_barge(previous_state, auction_barge)
   end
 
   defp replay_event(
          %AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
-    Store.approve_barge(previous_state, auction_barge)
+    StoreProtocol.approve_barge(previous_state, auction_barge)
   end
 
   defp replay_event(
          %AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
-    Store.reject_barge(auction_barge, previous_state)
+    StoreProtocol.reject_barge(auction_barge, previous_state)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
-    Store.expire_auction(previous_state)
+    StoreProtocol.expire_auction(previous_state)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state),

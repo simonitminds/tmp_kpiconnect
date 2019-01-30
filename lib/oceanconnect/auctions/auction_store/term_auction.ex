@@ -1,4 +1,4 @@
-defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState do
+defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -14,7 +14,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.TermAuctionState
     ProductBidState,
     SolutionCalculator,
     Solution,
-    TermAuctionState
+    AuctionStore.TermAuctionState
   }
 
   def is_suppliers_first_bid?(%TermAuctionState{product_bids: product_bids}, %AuctionBid{

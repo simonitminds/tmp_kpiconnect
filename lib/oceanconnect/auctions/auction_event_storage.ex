@@ -9,8 +9,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
-    SpotAuctionState,
-    TermAuctionState
+    AuctionStore.AuctionState,
+    AuctionStore.TermAuctionState
   }
 
   schema "auction_events" do
@@ -52,7 +52,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   end
 
   defp state_for_type(auction = %Auction{}, []) do
-    SpotAuctionState.from_auction(auction)
+    AuctionState.from_auction(auction)
   end
 
   defp state_for_type(auction = %TermAuction{}, []) do

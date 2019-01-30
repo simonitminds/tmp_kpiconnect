@@ -1,4 +1,4 @@
-defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState do
+defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.AuctionState do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -14,10 +14,10 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     ProductBidState,
     SolutionCalculator,
     Solution,
-    SpotAuctionState
+    AuctionStore.AuctionState
   }
 
-  def is_suppliers_first_bid?(%SpotAuctionState{product_bids: product_bids}, %AuctionBid{
+  def is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
         supplier_id: supplier_id
       }) do
     !Enum.any?(
@@ -29,17 +29,17 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
   end
 
   def is_lowest_bid?(
-        state = %SpotAuctionState{},
+        state = %AuctionState{},
         bid = %AuctionBid{vessel_fuel_id: vessel_fuel_id}
       ) do
-    product_bids = SpotAuctionState.get_state_for_product(state, vessel_fuel_id)
+    product_bids = AuctionState.get_state_for_product(state, vessel_fuel_id)
 
     length(product_bids.lowest_bids) == 0 ||
       hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
   end
 
   def start_auction(
-        %SpotAuctionState{status: status} = current_state,
+        %AuctionState{status: status} = current_state,
         auction = %Auction{},
         user,
         emit
@@ -58,7 +58,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     |> AuctionScheduler.process_command(nil)
 
     {next_state, _} =
-      %SpotAuctionState{current_state | status: :open}
+      %AuctionState{current_state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
 
     next_state = SolutionCalculator.process(next_state, auction)
@@ -68,7 +68,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
   end
 
   def start_auction(
-        %SpotAuctionState{status: :decision} = current_state,
+        %AuctionState{status: :decision} = current_state,
         auction = %Auction{},
         _user,
         _emit
@@ -84,7 +84,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     current_state
   end
 
-  def start_auction(%SpotAuctionState{} = current_state, _auction = %Auction{}, _user, _emit) do
+  def start_auction(%AuctionState{} = current_state, _auction = %Auction{}, _user, _emit) do
     current_state
   end
 
@@ -119,7 +119,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
   end
 
   def update_product_bid_state(
-        state = %SpotAuctionState{product_bids: product_bids},
+        state = %AuctionState{product_bids: product_bids},
         _auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}
       ) do
     vessel_fuel_ids = Enum.map(vessel_fuels, &"#{&1.id}")
@@ -146,7 +146,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     |> Command.start_decision_duration_timer()
     |> AuctionTimer.process_command()
 
-    %SpotAuctionState{current_state | status: :decision}
+    %AuctionState{current_state | status: :decision}
   end
 
   def process_bid(
@@ -154,13 +154,13 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
         bid = %{vessel_fuel_id: vessel_fuel_id}
       ) do
     product_state =
-      SpotAuctionState.get_state_for_product(current_state, vessel_fuel_id) ||
+      AuctionState.get_state_for_product(current_state, vessel_fuel_id) ||
         ProductBidState.for_product(vessel_fuel_id, auction_id)
 
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
 
     new_state =
-      SpotAuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
+      AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
     # TODO: Not this
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
@@ -174,11 +174,11 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
         supplier_id
       ) do
     product_state =
-      SpotAuctionState.get_state_for_product(current_state, product_id) ||
+      AuctionState.get_state_for_product(current_state, product_id) ||
         ProductBidState.for_product(product_id, auction_id)
 
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
-    new_state = SpotAuctionState.update_product_bids(current_state, product_id, new_product_state)
+    new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)
 
     # TODO: Not this
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
@@ -195,7 +195,7 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
   end
 
   def submit_barge(
-        current_state = %SpotAuctionState{submitted_barges: submitted_barges},
+        current_state = %AuctionState{submitted_barges: submitted_barges},
         auction_barge = %AuctionBarge{
           auction_id: auction_id,
           barge_id: barge_id,
@@ -213,12 +213,12 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
     if barge_is_submitted do
       current_state
     else
-      %SpotAuctionState{current_state | submitted_barges: submitted_barges ++ [auction_barge]}
+      %AuctionState{current_state | submitted_barges: submitted_barges ++ [auction_barge]}
     end
   end
 
   def unsubmit_barge(
-        current_state = %SpotAuctionState{submitted_barges: submitted_barges},
+        current_state = %AuctionState{submitted_barges: submitted_barges},
         %AuctionBarge{
           auction_id: auction_id,
           barge_id: barge_id,
@@ -233,11 +233,11 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
         )
       end)
 
-    %SpotAuctionState{current_state | submitted_barges: new_submitted_barges}
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   def approve_barge(
-        current_state = %SpotAuctionState{submitted_barges: submitted_barges},
+        current_state = %AuctionState{submitted_barges: submitted_barges},
         auction_barge = %AuctionBarge{
           auction_id: auction_id,
           barge_id: barge_id,
@@ -256,11 +256,11 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
         end
       end)
 
-    %SpotAuctionState{current_state | submitted_barges: new_submitted_barges}
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   def reject_barge(
-        current_state = %SpotAuctionState{submitted_barges: submitted_barges},
+        current_state = %AuctionState{submitted_barges: submitted_barges},
         auction_barge = %AuctionBarge{
           auction_id: auction_id,
           barge_id: barge_id,
@@ -279,17 +279,17 @@ defimpl Oceanconnect.Auctions.Store, for: Oceanconnect.Auctions.SpotAuctionState
         end
       end)
 
-    %SpotAuctionState{current_state | submitted_barges: new_submitted_barges}
+    %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
   def cancel_auction(current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :duration)
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
-    %SpotAuctionState{current_state | status: :canceled}
+    %AuctionState{current_state | status: :canceled}
   end
 
   def expire_auction(current_state = %{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
-    %SpotAuctionState{current_state | status: :expired}
+    %AuctionState{current_state | status: :expired}
   end
 end

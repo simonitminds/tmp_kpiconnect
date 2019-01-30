@@ -8,7 +8,7 @@ defmodule Oceanconnect.AuctionsTest do
     Auction,
     AuctionSupervisor,
     AuctionEvent,
-    SpotAuctionState
+    AuctionStore.AuctionState
   }
 
   describe "auctions" do
@@ -408,7 +408,7 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       auction = Auctions.start_auction(auction, admin)
       assert auction.auction_started != nil
-      assert %SpotAuctionState{status: :open} = Auctions.get_auction_state!(auction)
+      assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
     end
   end
 
@@ -474,7 +474,7 @@ defmodule Oceanconnect.AuctionsTest do
       Auctions.cancel_auction(auction, buyer)
       # TODO: Eventually shutdown the auction and commit the final state
       # assert {:error, "Auciton Suppervisor Not Started"} = Auctions.AuctionSupervisor.find_pid(auction.id)
-      assert %SpotAuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
+      assert %AuctionState{status: :canceled} = Auctions.get_auction_state!(auction)
     end
   end
 

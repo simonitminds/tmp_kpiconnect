@@ -6,7 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     AuctionStore,
     AuctionSupervisor,
     Solution,
-    SpotAuctionState
+    AuctionStore.AuctionState
   }
 
   setup do
@@ -84,13 +84,13 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
   end
 
   test "starting auction_store for auction", %{auction: auction} do
-    assert AuctionStore.get_current_state(auction) == SpotAuctionState.from_auction(auction)
+    assert AuctionStore.get_current_state(auction) == AuctionState.from_auction(auction)
 
     Oceanconnect.Auctions.start_auction(auction)
 
     expected_state =
       auction
-      |> SpotAuctionState.from_auction()
+      |> AuctionState.from_auction()
       |> Map.merge(%{status: :open, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
@@ -121,7 +121,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state =
       auction
-      |> SpotAuctionState.from_auction()
+      |> AuctionState.from_auction()
       |> Map.merge(%{status: :decision, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
@@ -137,7 +137,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     expected_state =
       auction
-      |> SpotAuctionState.from_auction()
+      |> AuctionState.from_auction()
       |> Map.merge(%{status: :expired, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)

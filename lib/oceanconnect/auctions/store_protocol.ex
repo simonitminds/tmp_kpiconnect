@@ -1,4 +1,4 @@
-defprotocol Oceanconnect.Auctions.Store do
+defprotocol Oceanconnect.Auctions.StoreProtocol do
   @doc "Determines whether this is the suppliers first bid based on the auction state"
   def is_suppliers_first_bid?(state, bid)
 
