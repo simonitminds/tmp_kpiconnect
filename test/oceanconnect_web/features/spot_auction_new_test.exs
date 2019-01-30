@@ -71,10 +71,8 @@ defmodule Oceanconnect.SpotAuctionNewTest do
 
   test "visting the new auction page" do
     AuctionNewPage.visit()
-    AuctionNewPage.select_auction_type(:spot_auction)
 
     assert AuctionNewPage.has_fields?([
-             "auction_type",
              "additional_information",
              "anonymous_bidding",
              "scheduled_start",

@@ -87,8 +87,7 @@ defmodule Oceanconnect.AuctionLogTest do
   test "page has auction details", %{
     auction: auction,
     vessel_fuel: vessel_fuel,
-    supplier: supplier,
-    auction_events: auction_events
+    supplier: supplier
   } do
     expected_details = %{
       "created" => AuctionView.convert_date?(auction.inserted_at),

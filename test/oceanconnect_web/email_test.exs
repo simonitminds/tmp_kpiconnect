@@ -365,7 +365,6 @@ defmodule OceanconnectWeb.EmailTest do
   describe "registration emails" do
     setup do
       user = insert(:user)
-      admin_user = insert(:user, %{is_admin: true})
 
       {:ok, %{user: user}}
     end

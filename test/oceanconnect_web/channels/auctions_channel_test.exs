@@ -98,6 +98,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           :fuel_quantity,
           :port_id,
           :vessel_id,
+          :auction_vessel_fuels,
           :suppliers,
           :buyer_id
         ])
