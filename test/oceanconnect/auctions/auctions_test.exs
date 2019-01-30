@@ -1271,6 +1271,7 @@ defmodule Oceanconnect.AuctionsTest do
              ] = auction_state.submitted_barges
     end
   end
+
   describe "auction_fixtures" do
     alias Oceanconnect.Auctions.AuctionFixture
 
@@ -1281,7 +1282,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "fixtures_for_auction", %{auction: auction, fixtures: fixtures} do
-      assert fixtures = Auctions.fixtures_for_auction(auction)
+      assert fixtures == Auctions.fixtures_for_auction(auction)
     end
 
     test "creating fixtures for an auction_state" do
@@ -1294,6 +1295,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
     end
   end
+
   describe "barges" do
     alias Oceanconnect.Auctions.Barge
 

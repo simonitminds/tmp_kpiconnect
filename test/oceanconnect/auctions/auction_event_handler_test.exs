@@ -5,7 +5,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandlerTest do
 
   alias Oceanconnect.Auctions.{
     Auction,
-    AuctionEvent,
     AuctionEventStore,
     AuctionSupervisor,
     AuctionFixture
@@ -87,7 +86,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandlerTest do
 
     :timer.sleep(200)
 
-    state = Auctions.get_auction_state!(auction)
+    _state = Auctions.get_auction_state!(auction)
 
     events = AuctionEventStore.event_list(auction_id)
 

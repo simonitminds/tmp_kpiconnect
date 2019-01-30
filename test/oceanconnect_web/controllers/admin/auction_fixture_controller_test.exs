@@ -1,4 +1,4 @@
-defmodule OceanconnectWeb.Admin.FuelControllerTest do
+defmodule OceanconnectWeb.Admin.FixtureControllerTest do
   use OceanconnectWeb.ConnCase
   alias Oceanconnect.Auctions.{AuctionFixture}
 

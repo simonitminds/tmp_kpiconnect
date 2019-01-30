@@ -41,7 +41,7 @@ defmodule EventMigrator do
   end
 
   def migrate_event(
-        storage = %AuctionEventStorage{
+        %AuctionEventStorage{
           auction: auction = %Auction{},
           event: event
         }
@@ -72,11 +72,10 @@ defmodule EventMigrator do
   def migrate_event(
         event = %AuctionEvent{
           auction_id: auction_id,
-          data: %{bid: bid = %{fuel_id: fuel_id}, state: state}
+          data: %{bid: bid = %{fuel_id: fuel_id}, state: _state}
         }
       ) do
 
-    vessel_fuels =
       from(avf in AuctionVesselFuel,
         where: avf.fuel_id == ^fuel_id and avf.auction_id == ^auction_id
       )
@@ -139,7 +138,7 @@ defmodule EventMigrator do
           auction_id: auction_id,
           data: %{
             state:
-              state = %{
+              %{
                 product_bids: product_bids,
                 solutions: %SolutionCalculator{},
                 winning_solution: _winning_solution

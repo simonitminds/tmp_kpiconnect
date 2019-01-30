@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.Admin.AuctionFixture.{IndexPage, EditPage}
-  alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
+  alias Oceanconnect.{AuctionShowPage}
   alias Oceanconnect.Admin, as: Admin
 
   alias Oceanconnect.Auctions
@@ -10,9 +9,9 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
 
   setup do
     admin_user = insert(:user, is_admin: true)
-    user = insert(:user, is_admin: false)
-    company = insert(:company)
-    %{auction: auction, vessel_fuels: [vessel_fuel1, vessel_fuel2]} = create_closed_auction
+    _user = insert(:user, is_admin: false)
+    _company = insert(:company)
+    %{auction: auction, vessel_fuels: [vessel_fuel1, _vessel_fuel2]} = create_closed_auction()
 
     {:ok, %{admin_user: admin_user, auction: auction, vessel_fuel1: vessel_fuel1}}
   end
@@ -58,19 +57,19 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
 
     Auctions.start_auction(auction)
 
-    supplier1_bid1 =
+    _supplier1_bid1 =
       create_bid(1.25, nil, supplier.company_id, "#{vessel_fuel1.id}", auction)
       |> Auctions.place_bid()
 
-    supplier1_bid2 =
+    _supplier1_bid2 =
       create_bid(1.25, nil, supplier.company_id, "#{vessel_fuel2.id}", auction)
       |> Auctions.place_bid()
 
-    supplier2_bid1 =
+    _supplier2_bid1 =
       create_bid(1.50, nil, supplier2.company_id, "#{vessel_fuel1.id}", auction)
       |> Auctions.place_bid()
 
-    supplier2_bid2 =
+    _supplier2_bid2 =
       create_bid(1.50, nil, supplier2.company_id, "#{vessel_fuel2.id}", auction)
       |> Auctions.place_bid()
 

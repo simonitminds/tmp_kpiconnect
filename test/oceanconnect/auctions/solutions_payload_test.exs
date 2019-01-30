@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.SolutionsPayloadTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, Solution, AuctionPayload, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSupervisor}
 
   setup do
     buyer_company = insert(:company, name: "FooCompany")
@@ -55,7 +55,6 @@ defmodule Oceanconnect.Auctions.SolutionsPayloadTest do
       supplier: supplier1,
       supplier2: supplier2,
       supplier3: supplier3,
-      supplier4: supplier4,
       vessel_fuels: vessel_fuels
     } do
       [vf1, vf2, vf3, vf4 | _] = vessel_fuels

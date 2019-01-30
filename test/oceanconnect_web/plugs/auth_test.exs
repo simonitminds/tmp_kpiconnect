@@ -113,7 +113,7 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
         updated_conn
         |> Auth.invalidate_otp(user_id)
 
-      %{"otp_token" => invalid_token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(invalid_conn)
+      %{"otp_token" => invalid_token, "user_id" => _user_id} = Auth.fetch_otp_data_from_session(invalid_conn)
       refute Auth.valid_otp?(invalid_token, one_time_pass)
     end
   end

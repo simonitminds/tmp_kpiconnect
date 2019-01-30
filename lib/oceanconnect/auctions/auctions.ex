@@ -261,12 +261,6 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def fixtures_for_auction(auction = %Auction{}) do
-    auction
-    |> AuctionFixture.from_auction
-    |> Repo.all
-  end
-
   def get_auction_state!(auction = %Auction{}) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
@@ -285,7 +279,7 @@ defmodule Oceanconnect.Auctions do
 
   def update_participation_for_supplier(auction_id, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
-    query =
+    _query =
       from(auction_supplier in AuctionSuppliers,
         where:
           auction_supplier.auction_id == ^auction_id and
@@ -463,7 +457,7 @@ defmodule Oceanconnect.Auctions do
     AuctionEventStore.participants_from_events(auction_id)
   end
 
-  def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil
+  def suppliers_with_alias_names(%Auction{suppliers: nil}), do: nil
 
   def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
     Enum.map(suppliers, fn supplier ->
@@ -1209,8 +1203,18 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def fixture_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
+  def fixtures_for_auction(auction = %Auction{}) do
+    auction
+    |> AuctionFixture.from_auction
+    |> Repo.all
+  end
+
+  def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
     AuctionFixture.from_auction_vessel_fuel(avf)
-    |> Repo.one()
+    |> Repo.all()
+  end
+
+  def create_fixtures_from_snapshot(_snapshot = %AuctionEvent{type: :auction_state_snapshotted}) do
+    []
   end
 end

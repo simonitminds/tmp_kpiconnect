@@ -8,7 +8,6 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     AuctionBidCalculator,
     AuctionCache,
     AuctionEvent,
-    AuctionEventStore,
     AuctionScheduler,
     AuctionTimer,
     Command,
@@ -73,7 +72,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
 
     current_state
   end
-  def start_auction(%AuctionState{} = current_state, auction = %Auction{}, _user, _emit) do
+  def start_auction(%AuctionState{} = current_state, %Auction{}, _user, _emit) do
     current_state
   end
 
@@ -106,7 +105,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     |> AuctionScheduler.process_command(emit)
   end
 
-  def update_product_bid_state(state = %AuctionState{product_bids: product_bids}, auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
+  def update_product_bid_state(state = %AuctionState{product_bids: product_bids}, %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
     vessel_fuel_ids = Enum.map(vessel_fuels, &("#{&1.id}"))
 
     updated_product_bids =

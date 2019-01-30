@@ -6,37 +6,89 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   alias Oceanconnect.Auctions.{AuctionVesselFuel, Auction}
 
   schema "auction_fixtures" do
+    # current_relationships
     belongs_to(:auction, Oceanconnect.Auctions.Auction)
-    belongs_to(:auction_vessel_fuel, Oceanconnect.Auctions.AuctionVesselFuel)
     belongs_to(:supplier, Oceanconnect.Accounts.Company)
-    field(:winning_price, :integer)
-    field(:post_auction_price, :integer)
-    field(:post_auction_quantity)
+    belongs_to(:vessel, Oceanconnect.Auctions.Vessel)
+    belongs_to(:fuel, Oceanconnect.Auctions.Fuel)
+
+    # current fields
+    field(:price, :integer)
+    field(:quantity, :integer)
+    field(:eta, :utc_datetime_usec)
+    field(:etd, :utc_datetime_usec)
+
+    # original_relationships
+    belongs_to(:original_supplier, Oceanconnect.Accounts.Company, foreign_key: :original_supplier_id)
+    belongs_to(:original_vessel, Oceanconnect.Auctions.Vessel, foreign_key: :original_vessel_id)
+    belongs_to(:original_fuel, Oceanconnect.Auctions.Fuel, foreign_key: :original_fuel_id)
+
+    # original_fields
+    field(:original_quantity, :integer)
+    field(:original_eta, :utc_datetime_usec)
+    field(:original_etd, :utc_datetime_usec)
+    field(:original_price, :integer)
   end
 
   def changeset(%AuctionFixture{} = auction_fixture, attrs) do
     auction_fixture
     |> cast(attrs, [
       :auction_id,
-      :auction_vessel_fuel_id,
       :supplier_id,
-      :winning_price,
-      :post_auction_price,
-      :post_auction_quantity
+      :vessel_id,
+      :fuel_id,
+      :price,
+      :quantity,
+      :eta,
+      :etd,
+      :original_supplier_id,
+      :original_vessel_id,
+      :original_fuel_id,
+      :original_price,
+      :original_quantity,
+      :original_eta,
+      :original_etd
     ])
-    |> validate_required([:auction_id, :auction_vessel_fuel_id, :supplier_id, :winning_price])
+    |> validate_required([
+      :auction_id,
+      :supplier_id,
+      :vessel_id,
+      :fuel_id,
+      :price,
+      :quantity,
+      :eta,
+      :etd,
+      :original_supplier_id,
+      :original_vessel_id,
+      :original_fuel_id,
+      :original_price,
+      :original_quantity,
+      :original_eta,
+      :original_etd
+    ])
     |> foreign_key_constraint(:auction_id)
-    |> foreign_key_constraint(:auction_vessel_fuel_id)
     |> foreign_key_constraint(:supplier_id)
+    |> foreign_key_constraint(:fuel_id)
+    |> foreign_key_constraint(:vessel_id)
+    |> foreign_key_constraint(:original_supplier_id)
+    |> foreign_key_constraint(:original_fuel_id)
+    |> foreign_key_constraint(:original_vessel_id)
   end
 
-  def from_auction_vessel_fuel(%AuctionVesselFuel{id: avf_id}) do
-    from af in AuctionFixture,
-      where: af.auction_vessel_fuel_id == ^avf_id
+  def from_auction_vessel_fuel(%AuctionVesselFuel{auction_id: auction_id,
+                                                  vessel_id: vessel_id,
+                                                  fuel_id: fuel_id,
+                                                 }) do
+    from(af in AuctionFixture,
+      where: af.vessel_id == ^vessel_id and
+        af.fuel_id == ^fuel_id and
+        af.auction_id == ^auction_id
+    )
   end
 
   def from_auction(%Auction{id: auction_id}) do
-    from af in AuctionFixture,
+    from(af in AuctionFixture,
       where: af.auction_id == ^auction_id
+    )
   end
 end

@@ -119,7 +119,7 @@ defmodule OceanconnectWeb.Plugs.Auth do
     end
   end
 
-  def generate_one_time_pass(user = %User{has_2fa: true}) do
+  def generate_one_time_pass(%User{has_2fa: true}) do
     token =
       :crypto.strong_rand_bytes(8)
       |> Base.encode32()
