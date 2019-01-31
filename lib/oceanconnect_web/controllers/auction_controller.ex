@@ -244,11 +244,15 @@ defmodule OceanconnectWeb.AuctionController do
     [auction, json_auction, suppliers]
   end
 
-  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels, "vessels" => vessels})
+  defp vessel_fuels_from_params(%{
+         "auction_vessel_fuels" => auction_vessel_fuels,
+         "vessels" => vessels
+       })
        when is_map(auction_vessel_fuels) do
     Enum.flat_map(auction_vessel_fuels, fn {fuel_id, vessel_quantities} ->
       Enum.map(vessel_quantities, fn {vessel_id, quantity} ->
         vessel_data = Map.get(vessels, vessel_id)
+
         %{
           "fuel_id" => fuel_id,
           "vessel_id" => vessel_id,
@@ -268,7 +272,12 @@ defmodule OceanconnectWeb.AuctionController do
        when is_map(vessels) and is_list(fuels) do
     Enum.map(fuels, fn fuel_id ->
       Enum.flat_map(vessels, fn {vessel_id, vessel_data} ->
-        %{"vessel_id" => vessel_id, "fuel_id" => fuel_id, "eta" => vessel_data["eta"], "etd" => vessel_data["etd"]}
+        %{
+          "vessel_id" => vessel_id,
+          "fuel_id" => fuel_id,
+          "eta" => vessel_data["eta"],
+          "etd" => vessel_data["etd"]
+        }
       end)
     end)
   end

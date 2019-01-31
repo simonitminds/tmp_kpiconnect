@@ -38,7 +38,6 @@ defmodule OceanconnectWeb.UserController do
   end
 
   def reset_password(conn, %{"user_id" => user_id}) do
-    current_user = Auth.current_user(conn)
     user = Accounts.get_user!(user_id)
 
     changeset = Accounts.change_user(user)

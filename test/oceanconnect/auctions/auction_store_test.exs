@@ -1,8 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionStore, AuctionSupervisor, Solution}
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.{
+    AuctionPayload,
+    AuctionStore,
+    AuctionSupervisor,
+    Solution,
+    AuctionStore.AuctionState
+  }
 
   setup do
     supplier_company = insert(:company)

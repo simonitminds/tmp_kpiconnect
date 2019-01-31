@@ -1,12 +1,17 @@
 defmodule Oceanconnect.Auctions.AuctionBidCalculator do
-  alias Oceanconnect.Auctions.{AuctionBid, AuctionEvent}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
+  import Oceanconnect.Auctions.Guards
 
-  def process_all(auction_state = %AuctionState{}, :pending) do
+  alias Oceanconnect.Auctions.{
+    AuctionBid,
+    AuctionEvent,
+    ProductBidState
+  }
+
+  def process_all(auction_state = %state_struct{}, :pending) when is_auction_state(state_struct) do
     {auction_state, []}
   end
 
-  def process_all(auction_state = %AuctionState{product_bids: product_bids}, status) do
+  def process_all(auction_state = %state_struct{product_bids: product_bids}, status) when is_auction_state(state_struct) do
     {new_auction_state, events} =
       product_bids
       |> Enum.reduce({auction_state, []}, fn {product_key, product_bid_state},
@@ -14,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
         {new_product_bid_state, new_events} = process(product_bid_state, status)
 
         new_auction_state =
-          AuctionState.update_product_bids(auction_state, product_key, new_product_bid_state)
+          state_struct.update_product_bids(auction_state, product_key, new_product_bid_state)
 
         {new_auction_state, events ++ new_events}
       end)
@@ -316,7 +321,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
          },
          bid = %AuctionBid{
            auction_id: auction_id,
-           amount: amount,
+           amount: _amount,
            min_amount: nil
          },
          :pending

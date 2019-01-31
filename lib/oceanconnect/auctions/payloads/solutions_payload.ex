@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers, Solution}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, Solution}
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -8,10 +9,10 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
             lead_is_tied: false
 
   def get_solutions_payload!(
-        _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
-        auction: auction = %Auction{buyer_id: buyer_id},
+        _state = %state_struct{solutions: solutions, winning_solution: winning_solution},
+        auction: auction = %struct{buyer_id: buyer_id},
         buyer: buyer_id
-      ) do
+      ) when is_auction_state(state_struct) and is_auction(struct) do
     other_solutions = list_other_solutions(solutions, winning_solution)
 
     %{
@@ -29,10 +30,10 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   def get_solutions_payload!(
-        _state = %AuctionState{solutions: solutions, winning_solution: winning_solution},
-        auction: _auction,
+        _state = %state_struct{solutions: solutions, winning_solution: winning_solution},
+        auction: _auction = %struct{},
         supplier: supplier_id
-      ) do
+      ) when is_auction_state(state_struct) and is_auction(struct) do
     suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
 
     %{
@@ -115,7 +116,7 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   defp scrub_bid_for_buyer(nil, _auction), do: nil
 
-  defp scrub_bid_for_buyer(bid = %AuctionBid{}, auction = %Auction{}) do
+  defp scrub_bid_for_buyer(bid = %AuctionBid{}, auction = %struct{}) when is_auction(struct) do
     supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
 
     %{bid | supplier_id: nil, min_amount: nil}

@@ -4,7 +4,6 @@ defmodule OceanconnectWeb.ForgotPasswordController do
 
   alias Oceanconnect.Guardian
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.User
 
   def new(conn, _), do: render(conn, "forgot_password.html")
 

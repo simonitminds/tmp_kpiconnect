@@ -2,6 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
   require Logger
+  import Oceanconnect.Auctions.Guards
 
   def start_link() do
     DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
@@ -11,7 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+  def start_child(auction = %struct{id: auction_id}) when is_auction(struct) do
     with {:ok, core_services_pid} <-
            DynamicSupervisor.start_child(
              __MODULE__,

@@ -47,7 +47,7 @@ defmodule Oceanconnect.MessagesFeatureTest do
       assert MessagesPage.has_participating_auctions?([auction])
     end
 
-    test "buyer can see chat window on show page with all auctions", %{auction: auction, buyer: buyer} do
+    test "buyer can see chat window on show page with all auctions", %{auction: auction} do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.is_current_path?(auction.id)
       MessagesPage.open_message_window()

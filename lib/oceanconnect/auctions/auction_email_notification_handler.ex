@@ -1,12 +1,12 @@
 defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   use GenServer
-  alias Oceanconnect.Auctions
 
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
-    Auction,
     AuctionEvent,
     AuctionEmailNotifier,
-    AuctionStore.AuctionState,
     Solution
   }
 
@@ -39,13 +39,13 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
             solution: %Solution{
               bids: winning_solution_bids
             },
-            state: %AuctionState{
+            state: %state_struct{
               submitted_barges: submitted_barges
             }
           }
         },
         state
-      ) do
+      ) when is_auction_state(state_struct) do
     active_participants = Auctions.active_participants(auction_id)
 
     AuctionEmailNotifier.notify_auction_completed(
@@ -59,33 +59,33 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotificationHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
+        %AuctionEvent{type: :auction_created, data: auction = %struct{}},
         state
-      ) do
+      ) when is_auction(struct) do
     AuctionEmailNotifier.notify_auction_created(auction)
     {:noreply, state}
   end
 
-  def hand_info(
-        %AuctionEvent{type: :auction_rescheduled, data: auction = %Auction{}},
+  def handle_info(
+        %AuctionEvent{type: :auction_rescheduled, data: auction = %struct{}},
         state
-      ) do
+      ) when is_auction(struct) do
     AuctionEmailNotifier.notify_auction_rescheduled(auction)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: :upcoming_auction_notified, data: auction = %Auction{}},
+        %AuctionEvent{type: :upcoming_auction_notified, data: auction = %struct{}},
         state
-      ) do
+      ) when is_auction(struct) do
     AuctionEmailNotifier.notify_upcoming_auction(auction)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_canceled, data: %{auction: auction = %Auction{}}},
+        %AuctionEvent{type: :auction_canceled, data: %{auction: auction = %struct{}}},
         state
-      ) do
+      ) when is_auction(struct) do
     auction
     |> Auctions.fully_loaded()
     |> AuctionEmailNotifier.notify_auction_canceled()

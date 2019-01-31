@@ -139,7 +139,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
 
       assert message.user == "Anonymous"
 
-      [buyer_company_conversation, supplier_company2_conversation] =
+      [_buyer_company_conversation, supplier_company2_conversation] =
         Enum.reject(
           message_payload_for_anon_auction.conversations,
           &(&1 == supplier_company_conversation)

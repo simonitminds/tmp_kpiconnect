@@ -42,10 +42,47 @@ defmodule Oceanconnect.Factory do
     struct!(
       draft_auction_factory(),
       %{
+        type: "spot",
         scheduled_start: start,
         duration: 10 * 60_000,
         decision_duration: 15 * 60_000,
         auction_vessel_fuels: [build(:vessel_fuel)],
+        buyer: build(:company),
+        suppliers: [build(:company, is_supplier: true)]
+      }
+    )
+  end
+
+  def draft_term_auction_factory() do
+    %Oceanconnect.Auctions.TermAuction{
+      port: build(:port)
+    }
+  end
+
+  def term_auction_factory() do
+    start_time =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(20)
+      |> DateTime.from_naive!("Etc/UTC")
+
+    end_time =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(80)
+      |> DateTime.from_naive!("Etc/UTC")
+
+    struct!(
+      draft_term_auction_factory(),
+      %{
+        type: "forward_fixed",
+        scheduled_start: start_time,
+        start_date: start_time,
+        end_date: end_time,
+        fuel: build(:fuel),
+        fuel_quantity: 1500,
+        terminal: "TERMINAL",
+        duration: 10 * 60_000,
         buyer: build(:company),
         suppliers: [build(:company, is_supplier: true)]
       }

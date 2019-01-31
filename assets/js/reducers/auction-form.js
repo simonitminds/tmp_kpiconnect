@@ -9,6 +9,7 @@ import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_INFORMATION,
          RECEIVE_SUPPLIERS,
          SELECT_ALL_SUPPLIERS,
+         SELECT_AUCTION_TYPE,
          TOGGLE_SUPPLIER,
          DESELECT_ALL_SUPPLIERS,
  } from "../constants";
@@ -26,6 +27,7 @@ const initialState = {
   scheduled_start_time: null,
   selectedPort: null,
   selectedSuppliers: [],
+  type: null,
   suppliers: null,
   vessels: null,
   credit_margin_amount: null,
@@ -63,6 +65,7 @@ export default function(state, action) {
           scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           selectedPort: _.get(action, 'data.auction.port.id'),
           selectedSuppliers: supplierList,
+          type: _.get(action, 'data.type'),
           suppliers: _.get(action, 'data.suppliers', []),
           vessels: action.data.vessels,
         };
@@ -104,6 +107,11 @@ export default function(state, action) {
         newList = [...state.selectedSuppliers, supplier_id];
       }
       return {...state, selectedSuppliers: newList};
+    }
+    case SELECT_AUCTION_TYPE: {
+      const auctionType = action.data.type;
+
+      return {...state, type: auctionType};
     }
     case SELECT_ALL_SUPPLIERS: {
       if(state.suppliers) {

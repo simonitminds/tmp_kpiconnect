@@ -8,11 +8,15 @@ import TimeInput from '../time-input';
 import { portLocalTime } from '../../utilities';
 import SupplierList  from './supplier-list';
 import VesselFuelForm from './vessel-fuel-form';
+import SpotAuctionForm from './forms/spot-auction-form';
+import ForwardFixedAuctionForm from './forms/forward-fixed-auction-form';
 
 const AuctionForm = (props) => {
   const {
     auction,
+    type,
     deselectAllSuppliers,
+    credit_margin_amount,
     eta_date,
     eta_time,
     etd_date,
@@ -23,6 +27,7 @@ const AuctionForm = (props) => {
     scheduled_start_time,
     selectAllSuppliers,
     selectPort,
+    selectAuctionType,
     selectedSuppliers,
     suppliers,
     toggleSupplier,
@@ -30,9 +35,9 @@ const AuctionForm = (props) => {
     updateInformation,
     updateInformationFromCheckbox,
     vessels,
-    credit_margin_amount,
   } = props;
 
+  const auctionTypes = ["spot", "forward_fixed", "formula_related"];
   const port_id = auction.port_id ? auction.port_id : "";
   const selectedPort = _.chain(ports)
                         .filter(['id', auction.port_id])
@@ -53,37 +58,50 @@ const AuctionForm = (props) => {
     }
   };
 
+  const renderFormContent = (type) => {
+    switch(type) {
+    case 'spot':
+      return(<SpotAuctionForm {...props} />);
+    case 'forward_fixed':
+      return(<ForwardFixedAuctionForm {...props} />);
+    case 'formula_related':
+      return(<div>Formula Related</div>);
+    }
+  };
+
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
+      <input type="hidden" name="auction[type]" value="spot" />
 
-      <section className="auction-info is-gray-1"> {/* Port info */}
+{/*   ### PENDING TERM SETUP
+      <section className="auction-info is-gray-1">
         <div className="container">
           <div className="content">
             <fieldset>
-              <legend className="subtitle is-4" >Port</legend>
+              <legend className="subtitle is-4" >Auction Type</legend>
               <div className="field is-horizontal">
                 <div className="field-label">
                   <label htmlFor="auction_port_id" className="label">
-                    Port
+                    Auction Type
                   </label>
                 </div>
                 <div className="field-body">
                   <div className="control">
                     <div className="select is-fullwidth">
                       <select
-                        id="auction_port_id"
-                        name="auction[port_id]"
-                        className="qa-auction-port_id"
-                        value={port_id}
-                        onChange={selectPort.bind(this)}
+                        id="auction_type"
+                        name="auction[type]"
+                        className="qa-auction-type"
+                        value={auction.type}
+                        onChange={selectAuctionType}
                       >
                         <option disabled value="">
                           Please select
                         </option>
-                        {_.map(ports, port => (
-                          <option key={port.id} value={port.id}>
-                            {port.name}, {port.country}
+                        {_.map(auctionTypes, type => (
+                          <option key={type} value={type}>
+                            {_.startCase(type)}
                           </option>
                         ))}
                       </select>
@@ -91,158 +109,13 @@ const AuctionForm = (props) => {
                   </div>
                 </div>
               </div>
-
-              {portAgentDisplay()}
             </fieldset>
           </div>
         </div>
-      </section> {/* Port info */}
+      </section>
+*/}
 
-      <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}
-                    onSelectAllSuppliers={selectAllSuppliers}
-                    onToggleSupplier={toggleSupplier}
-                    selectedPort={selectedPort}
-                    selectedSuppliers={selectedSuppliers}
-                    suppliers={suppliers} />
-
-     <VesselFuelForm auction={auction}
-                     vessels={vessels}
-                     fuels={fuels}
-                     vesselFuels={auction.vessel_fuels}
-                     portId={port_id}
-                     ports={ports} />
-
-      <section className="auction-info is-gray-1"> {/* Add'l info */}
-        <div className="container">
-          <div className="content">
-            <fieldset>
-              <legend className="subtitle is-4" >Additional Information</legend>
-
-              <div className="field is-horizontal">
-                  <textarea
-                    name={'auction[additional_information]'}
-                    id={'auction_additional_information'}
-                    className="textarea qa-auction-additional_information"
-                    defaultValue={auction.additional_information}
-                    onChange={updateInformation.bind(this, 'auction.additional_information')}
-                  ></textarea>
-              </div>
-            </fieldset>
-          </div>
-        </div>
-      </section> {/* Add'l info */}
-
-      <section className="auction-info"> {/* Auction details */}
-        <div className="container">
-          <div className="content">
-            <fieldset>
-              <legend className="subtitle is-4" >Auction Details</legend>
-
-              <InputField
-                model={'auction'}
-                field={'po'}
-                labelText={'po'}
-                value={auction.po}
-                isHorizontal={true}
-                opts={{ labelClass: 'label is-uppercase' }}
-                onChange={updateInformation.bind(this, 'auction.po')}
-              />
-
-              <div className="field is-horizontal">
-                <div className="field-label">
-                  <label className="label">Auction Start</label>
-                </div>
-                <div className="field-body field-body--distribute-middle">
-                  <div className="control">
-                    <DateInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_date')} />
-                  </div>
-                  <div className="control">
-                    <TimeInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_time')} />
-                  </div>
-                  <div className="control has-text-gray-3">
-                    (GMT)
-                  </div>
-                </div>
-              </div>
-              <div className="field is-horizontal">
-                <div className="field-label">
-                  <label htmlFor="auction_duration" className="label">
-                    Duration
-                  </label>
-                </div>
-                <div className="field-body">
-                  <div className="control">
-                    <div className="select">
-                      <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
-                        <option disabled value="">
-                          Please select
-                        </option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                      </select>
-                    </div>
-                    <span className="select__extra-label">minutes</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="field is-horizontal">
-                <div className="field-label">
-                  <label htmlFor="auction_decision_duration" className="label">
-                    Decision Duration
-                  </label>
-                </div>
-                <div className="field-body">
-                  <div className="control">
-                    <div className="select">
-                      <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
-                        <option disabled value="">
-                          Please select
-                        </option>
-                        <option value="15">15</option>
-                        <option value="10">10</option>
-                      </select>
-                    </div>
-                    <span className="select__extra-label">minutes</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="field is-horizontal has-margin-bottom-md">
-                <div className="field-label"></div>
-                <div className="field-body">
-                  <CheckBoxField
-                      model={'auction'}
-                      field={'anonymous_bidding'}
-                      labelText={'anonymous bidding'}
-                      defaultChecked={auction.anonymous_bidding}
-                      opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                      onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
-                  />
-                </div>
-              </div>
-
-              { (credit_margin_amount != 0) &&
-                  <div className="field is-horizontal">
-                    <div className="field-label"></div>
-                    <div className="field-body field-body--columned">
-                      <CheckBoxField
-                          model={'auction'}
-                          field={'is_traded_bid_allowed'}
-                          labelText={'accept traded bids'}
-                          defaultChecked={auction.is_traded_bid_allowed}
-                          opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
-                          onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
-                      />
-                      <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
-                    </div>
-                  </div>
-              }
-            </fieldset>
-          </div>
-        </div>
-      </section> {/* Auction details */}
+      {renderFormContent(type)}
     </div>
   );
 }

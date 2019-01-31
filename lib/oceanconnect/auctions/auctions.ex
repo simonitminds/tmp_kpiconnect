@@ -2,6 +2,8 @@ defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionBid,
@@ -17,16 +19,19 @@ defmodule Oceanconnect.Auctions do
     Fuel,
     Port,
     Solution,
+    TermAuction,
     Vessel
   }
 
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def bids_for_bid_ids(bid_ids, %AuctionState{product_bids: product_bids})
+  @term_types ["forward_fixed", "formula_related"]
+
+  def bids_for_bid_ids(bid_ids, %state_struct{product_bids: product_bids})
+      when is_auction_state(state_struct)
       when is_list(bid_ids) do
     product_bids
     |> Enum.map(fn {_product_id, product_bid_state} ->
@@ -150,7 +155,7 @@ defmodule Oceanconnect.Auctions do
     amount / 0.25 - Float.floor(amount / 0.25) == 0.0
   end
 
-  defp duration_time_remaining?(auction = %Auction{id: auction_id}) do
+  defp duration_time_remaining?(auction = %struct{id: auction_id}) when is_auction(struct) do
     case AuctionTimer.read_timer(auction_id, :duration) do
       false -> maybe_pending(get_auction_state!(auction))
       _ -> :ok
@@ -169,19 +174,19 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def set_port_agent(auction = %Auction{}, port_agent) do
+  def set_port_agent(auction = %struct{}, port_agent) when is_auction(struct) do
     update_auction_without_event_storage!(auction, %{port_agent: port_agent})
   end
 
-  def is_participant?(auction = %Auction{}, company_id) do
+  def is_participant?(auction = %struct{}, company_id) when is_auction(struct) do
     company_id in auction_participant_ids(auction)
   end
 
-  def auction_participant_ids(auction = %Auction{}) do
+  def auction_participant_ids(auction = %struct{}) when is_auction(struct) do
     [auction.buyer_id | auction_supplier_ids(auction)]
   end
 
-  def auction_supplier_ids(auction = %Auction{}) do
+  def auction_supplier_ids(auction = %struct{}) when is_auction(struct) do
     auction_with_participants = with_participants(auction)
     Enum.map(auction_with_participants.suppliers, & &1.id)
   end
@@ -213,7 +218,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.all()
   end
 
-  def upcoming_notification_sent?(%Auction{id: auction_id}) do
+  def upcoming_notification_sent?(%struct{id: auction_id}) when is_auction(struct) do
     Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
       event.type == :auction_upcoming_notified
     end)
@@ -249,20 +254,25 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def get_auction(id) do
-    Repo.get(Auction, id)
+  def get_auction(id, module \\ nil) do
+    module = module || Auction
+
+    Repo.get(module, id)
     |> fully_loaded
   end
 
-  def get_auction!(id) do
-    Repo.get!(Auction, id)
+  def get_auction!(id, module \\ nil) do
+    module = module || Auction
+
+    Repo.get!(module, id)
     |> fully_loaded
   end
 
-  def get_auction_state!(auction = %Auction{}) do
+  def get_auction_state!(auction = %struct{}) when is_auction(struct) do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
         AuctionEventStorage.most_recent_state(auction)
+
       state ->
         state
     end
@@ -277,16 +287,15 @@ defmodule Oceanconnect.Auctions do
 
   def update_participation_for_supplier(auction_id, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
-    query =
-      from(auction_supplier in AuctionSuppliers,
-        where:
-          auction_supplier.auction_id == ^auction_id and
-            auction_supplier.supplier_id == ^supplier_id
-      )
-      |> Repo.update_all(set: [participation: response])
+    from(auction_supplier in AuctionSuppliers,
+      where:
+        auction_supplier.auction_id == ^auction_id and
+          auction_supplier.supplier_id == ^supplier_id
+    )
+    |> Repo.update_all(set: [participation: response])
   end
 
-  def start_auction(auction = %Auction{}, user \\ nil) do
+  def start_auction(auction = %struct{}, user \\ nil) when is_auction(struct) do
     updated_auction = Map.put(auction, :auction_started, DateTime.utc_now())
 
     updated_auction
@@ -296,7 +305,7 @@ defmodule Oceanconnect.Auctions do
     updated_auction
   end
 
-  def end_auction(auction = %Auction{}) do
+  def end_auction(auction = %struct{}) when is_auction(struct) do
     updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
 
     updated_auction
@@ -306,7 +315,7 @@ defmodule Oceanconnect.Auctions do
     updated_auction
   end
 
-  def expire_auction(auction = %Auction{}) do
+  def expire_auction(auction = %struct{}) when is_auction(struct) do
     updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
 
     updated_auction
@@ -316,7 +325,7 @@ defmodule Oceanconnect.Auctions do
     updated_auction
   end
 
-  def cancel_auction(auction = %Auction{}, user) do
+  def cancel_auction(auction = %struct{}, user) when is_auction(struct) do
     updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
 
     updated_auction
@@ -328,7 +337,64 @@ defmodule Oceanconnect.Auctions do
 
   def create_auction(attrs \\ %{}, user \\ nil)
 
+  def create_auction(attrs = %{"scheduled_start" => start, "type" => type}, user)
+      when start != "" and type in @term_types do
+    with {:ok, auction} <-
+           %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
+  def create_auction(attrs = %{scheduled_start: start, type: type}, user)
+      when start != "" and type in @term_types do
+    with {:ok, auction} <-
+           %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
+  def create_auction(attrs = %{"type" => type}, user)
+      when type in @term_types do
+    with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
+  def create_auction(attrs = %{type: type}, user)
+      when type in @term_types do
+    with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
   def create_auction(attrs = %{"scheduled_start" => start}, user) when start != "" do
+    with {:ok, auction} <-
+           %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
+      auction
+      |> fully_loaded
+      |> handle_auction_creation(user)
+    else
+      error -> error
+    end
+  end
+
+  def create_auction(attrs = %{scheduled_start: start}, user) when start != "" do
     with {:ok, auction} <-
            %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
@@ -366,18 +432,18 @@ defmodule Oceanconnect.Auctions do
     {:ok, auction}
   end
 
-  def update_cache(auction = %Auction{}) do
+  def update_cache(auction = %struct{}) when is_auction(struct) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
   end
 
-  def create_supplier_aliases(auction = %{suppliers: suppliers}) do
+  def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
     :random.seed()
 
     Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
       AuctionSuppliers
-      |> Repo.get_by(%{auction_id: auction.id, supplier_id: supplier.id})
+      |> Repo.get_by!(%{auction_id: auction_id, supplier_id: supplier.id})
       |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
       |> Repo.update!()
 
@@ -387,21 +453,36 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def update_auction(%Auction{} = auction, attrs, user) do
+  def create_supplier_aliases(auction = %TermAuction{suppliers: suppliers}) do
+    :random.seed()
+
+    Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
+      AuctionSuppliers
+      |> Repo.get_by(%{term_auction_id: auction.id, supplier_id: supplier.id})
+      |> AuctionSuppliers.changeset(%{alias_name: "Supplier #{acc}"})
+      |> Repo.update!()
+
+      acc + 1
+    end)
+
     auction
-    |> Auction.changeset(attrs)
+  end
+
+  def update_auction(%struct{} = auction, attrs, user) when is_auction(struct) do
+    auction
+    |> struct.changeset(attrs)
     |> Repo.update()
     |> auction_update_command(user)
   end
 
-  def update_auction!(%Auction{} = auction, attrs, user) do
+  def update_auction!(%struct{} = auction, attrs, user) when is_auction(struct) do
     auction
-    |> Auction.changeset(attrs)
+    |> struct.changeset(attrs)
     |> Repo.update!()
     |> auction_update_command(user)
   end
 
-  def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
+  def update_auction_without_event_storage!(%struct{} = auction, attrs) when is_auction(struct) do
     cleaned_attrs = clean_timestamps(attrs)
 
     changeset =
@@ -437,15 +518,15 @@ defmodule Oceanconnect.Auctions do
     Map.put(date_time, :microsecond, {elem(microsecond, 0), 6})
   end
 
-  def delete_auction(%Auction{} = auction) do
+  def delete_auction(%struct{} = auction) when is_auction(struct) do
     Repo.delete(auction)
   end
 
-  def change_auction(%Auction{} = auction) do
-    Auction.changeset(auction, %{})
+  def change_auction(%struct{} = auction) when is_auction(struct) do
+    struct.changeset(auction, %{})
   end
 
-  def with_participants(%Auction{} = auction) do
+  def with_participants(%struct{} = auction) when is_auction(struct) do
     auction
     |> Repo.preload([:buyer, :suppliers])
   end
@@ -454,9 +535,9 @@ defmodule Oceanconnect.Auctions do
     AuctionEventStore.participants_from_events(auction_id)
   end
 
-  def suppliers_with_alias_names(auction = %Auction{suppliers: nil}), do: nil
+  def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct), do: nil
 
-  def suppliers_with_alias_names(auction = %Auction{suppliers: suppliers}) do
+  def suppliers_with_alias_names(auction = %struct{suppliers: suppliers}) when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
         case get_auction_supplier(auction.id, supplier.id) do
@@ -466,6 +547,21 @@ defmodule Oceanconnect.Auctions do
 
       Map.put(supplier, :alias_name, alias_name)
     end)
+  end
+
+  def fully_loaded(term_auction = %TermAuction{}) do
+    fully_loaded_auction =
+      Repo.preload(term_auction, [
+        :port,
+        :vessels,
+        :fuel,
+        :auction_suppliers,
+        [buyer: :users],
+        [suppliers: :users]
+      ])
+
+    fully_loaded_auction
+    |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
 
   def fully_loaded(auction = %Auction{}) do
@@ -1105,7 +1201,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload(:companies)
   end
 
-  def list_auction_barges(%Auction{id: auction_id}) do
+  def list_auction_barges(%struct{id: auction_id}) when is_auction(struct) do
     auction_id
     |> AuctionBarge.by_auction()
     |> Repo.all()
@@ -1113,11 +1209,12 @@ defmodule Oceanconnect.Auctions do
   end
 
   def submit_barge(
-        %Auction{id: auction_id},
+        %struct{id: auction_id},
         barge = %Barge{id: barge_id},
         supplier_id,
         user \\ nil
-      ) do
+      )
+      when is_auction(struct) do
     {:ok, auction_barge} =
       %AuctionBarge{}
       |> AuctionBarge.changeset(%{
@@ -1134,7 +1231,8 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def unsubmit_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
+  def unsubmit_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,
@@ -1154,7 +1252,8 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def approve_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
+  def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,
@@ -1177,7 +1276,8 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def reject_barge(%Auction{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) do
+  def reject_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,

@@ -10,8 +10,6 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
     fuel1 = insert(:fuel)
     fuel2 = insert(:fuel)
-    fuel1_id = "#{fuel1.id}"
-    fuel2_id = "#{fuel2.id}"
     vessel1 = insert(:vessel)
     vessel2 = insert(:vessel)
 

@@ -1,8 +1,7 @@
 defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
   use Oceanconnect.DataCase
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
   alias Oceanconnect.Auctions.SolutionCalculator
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionVesselFuel}
+  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionVesselFuel, AuctionStore.AuctionState}
 
   def quick_bid(amount, vfid, supplier_id, auction_id, opts \\ []) do
     now = DateTime.utc_now()

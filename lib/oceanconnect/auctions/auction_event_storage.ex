@@ -4,8 +4,17 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   import Ecto.Changeset
   alias __MODULE__
 
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionStore.AuctionState,
+    AuctionStore.TermAuctionState
+  }
+
   schema "auction_events" do
-    belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:auction, Auction)
     field(:event, :binary)
     field(:version, :integer, default: 2)
 
@@ -37,13 +46,17 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     |> Enum.map(fn event -> hydrate_event(event) end)
   end
 
-  def most_recent_state(auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+  def most_recent_state(auction = %struct{id: auction_id}) when is_auction(struct) do
     events = events_by_auction(auction_id)
     state_for_type(auction, events)
   end
 
-  defp state_for_type(auction, []) do
-    Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+  defp state_for_type(auction = %Auction{}, []) do
+    AuctionState.from_auction(auction)
+  end
+
+  defp state_for_type(auction = %TermAuction{}, []) do
+    TermAuctionState.from_auction(auction)
   end
 
   defp state_for_type(auction, events) do

@@ -6,6 +6,8 @@ defmodule Oceanconnect.Auctions.Auction do
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
   schema "auctions" do
+    field(:type, :string, default: "spot")
+
     belongs_to(:port, Port)
 
     has_many(:auction_vessel_fuels, Oceanconnect.Auctions.AuctionVesselFuel,
@@ -115,7 +117,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_add_vessel_fuels(
         changeset,
-        auction = %Auction{auction_vessel_fuels: existing_vessel_fuels},
+        %Auction{auction_vessel_fuels: existing_vessel_fuels},
         %{"auction_vessel_fuels" => auction_vessel_fuels}
       )
       when is_list(existing_vessel_fuels) do
@@ -135,7 +137,7 @@ defmodule Oceanconnect.Auctions.Auction do
     put_assoc(changeset, :auction_vessel_fuels, list_of_changesets)
   end
 
-  def maybe_add_vessel_fuels(changeset, auction = %Auction{}, %{
+  def maybe_add_vessel_fuels(changeset, %Auction{}, %{
         "auction_vessel_fuels" => auction_vessel_fuels
       }) do
     vessel_fuel_changeset_proc =
@@ -243,9 +245,9 @@ defmodule Oceanconnect.Auctions.Auction do
   defp parse_duration(duration) when is_binary(duration), do: String.to_integer(duration)
   defp parse_duration(duration) when is_integer(duration), do: duration
 
+  def parse_date(dt = %DateTime{}), do: dt
   def parse_date(""), do: ""
   def parse_date(nil), do: ""
-
   def parse_date(epoch) do
     epoch
     |> String.to_integer()

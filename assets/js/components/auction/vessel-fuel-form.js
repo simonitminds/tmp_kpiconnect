@@ -113,7 +113,7 @@ export default class VesselFuelForm extends React.Component {
           isHorizontal={true}
           opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
         />
-      )
+      );
     }
 
     return(

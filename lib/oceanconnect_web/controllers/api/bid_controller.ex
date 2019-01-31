@@ -1,5 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
 
@@ -14,7 +16,7 @@ defmodule OceanconnectWeb.Api.BidController do
       |> add_flags_to_bids(is_traded)
       |> filter_placeable_bids()
 
-    with auction = %Auction{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- validate_traded_bids(is_traded, auction),
          true <- Enum.count(bids_params) > 0,
@@ -53,7 +55,7 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
 
-    with auction = %Auction{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- Auctions.revoke_supplier_bids_for_product(auction, product_id, supplier_id, user) do
       render(conn, "show.json", %{success: true, message: "Bid successfully revoked"})
@@ -88,7 +90,8 @@ defmodule OceanconnectWeb.Api.BidController do
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
-    with auction = %Auction{} <- Auctions.get_auction(auction_id) |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <-
+           Auctions.get_auction(auction_id) |> Auctions.fully_loaded(),
          true <- auction.buyer_id == buyer_id,
          state = %{status: :decision, product_bids: product_bids} <-
            Auctions.get_auction_state!(auction),
