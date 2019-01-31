@@ -22,14 +22,14 @@ defmodule Oceanconnect.Auctions.AuctionStore.TermAuctionState do
     }
   end
 
-  def update_product_bids(state, product_key, new_product_state) do
+  def update_product_bids(state = %__MODULE__{}, product_key, new_product_state) do
     %__MODULE__{
       state
       | product_bids: Map.put(state.product_bids, "#{product_key}", new_product_state)
     }
   end
 
-  def get_state_for_product(state, product_key) do
+  def get_state_for_product(state = %__MODULE__{}, product_key) do
     Map.get(state.product_bids, "#{product_key}")
   end
 end

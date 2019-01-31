@@ -19,6 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState
   }
+
   @registry_name :auctions_registry
 
   def find_pid(auction_id) do
@@ -67,12 +68,14 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          do: GenServer.cast(pid, {cmd, data, true})
   end
 
-  def process_command(%Command{command: cmd, data: data = %{auction: %struct{id: auction_id}}}) when is_auction(struct) do
+  def process_command(%Command{command: cmd, data: data = %{auction: %struct{id: auction_id}}})
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
   end
 
-  def process_command(%Command{command: cmd, data: auction = %struct{id: auction_id}}) when is_auction(struct) do
+  def process_command(%Command{command: cmd, data: auction = %struct{id: auction_id}})
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, auction, true})
   end
@@ -109,7 +112,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast(
         {:start_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     new_state = StoreProtocol.start_auction(current_state, auction, user, emit)
 
     {:noreply, new_state}
@@ -126,7 +130,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast(
         {:end_auction, auction = %struct{}, emit},
         current_state = %{status: :open}
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     new_state = StoreProtocol.end_auction(current_state, auction)
 
     AuctionEvent.emit(AuctionEvent.auction_ended(auction, new_state), emit)
@@ -140,7 +145,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast(
         {:end_auction_decision_period, auction = %struct{}, emit},
         current_state
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     new_state = StoreProtocol.expire_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_expired(auction, new_state), emit)
@@ -156,7 +162,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     Enum.map(events, &AuctionEvent.emit(&1, true))
     AuctionEvent.emit(AuctionEvent.bid_placed(bid, new_product_state, user), emit)
 
-    if StoreProtocol.is_lowest_bid?(new_state, bid) or StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
+    if StoreProtocol.is_lowest_bid?(new_state, bid) or
+         StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
 
@@ -171,7 +178,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionEvent.emit(AuctionEvent.auto_bid_placed(bid, new_product_state, user), emit)
     Enum.map(events, &AuctionEvent.emit(&1, true))
 
-    if StoreProtocol.is_lowest_bid?(new_state, bid) or StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
+    if StoreProtocol.is_lowest_bid?(new_state, bid) or
+         StoreProtocol.is_suppliers_first_bid?(current_state, bid) do
       maybe_emit_extend_auction(auction_id, AuctionTimer.extend_auction?(auction_id), emit)
     end
 
@@ -261,14 +269,16 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_cast(
         {:cancel_auction, %{auction: auction = %struct{}, user: user}, emit},
         current_state
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     new_state = StoreProtocol.cancel_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
     {:noreply, new_state}
   end
 
-  def handle_cast({:notify_upcoming_auction, %{auction: auction = %struct{}}, emit}, state) when is_auction(struct) do
+  def handle_cast({:notify_upcoming_auction, %{auction: auction = %struct{}}, emit}, state)
+      when is_auction(struct) do
     AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), emit)
     {:noreply, state}
   end
@@ -285,12 +295,18 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     end)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %Auction{}}, _previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :auction_created, data: auction = %Auction{}},
+         _previous_state
+       ) do
     auction = Auctions.fully_loaded(auction)
     AuctionState.from_auction(auction)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created, data: auction = %TermAuction{}}, _previous_state) do
+  defp replay_event(
+         %AuctionEvent{type: :auction_created, data: auction = %TermAuction{}},
+         _previous_state
+       ) do
     auction = Auctions.fully_loaded(auction)
     TermAuctionState.from_auction(auction)
   end
@@ -380,7 +396,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          %AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
-    StoreProtocol.reject_barge(auction_barge, previous_state)
+    StoreProtocol.reject_barge(previous_state, auction_barge)
   end
 
   defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
@@ -395,7 +411,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   defp replay_event(_event, _previous_state), do: nil
 
-  defp maybe_emit_rebuilt_event(state = %{status: :open, auction_id: auction_id}) do
+  defp maybe_emit_rebuilt_event(state = %auction_state{status: :open, auction_id: auction_id})
+       when is_auction_state(auction_state) do
     time_remaining = AuctionTimer.read_timer(auction_id, :duration)
 
     AuctionEvent.emit(AuctionEvent.auction_state_rebuilt(auction_id, state, time_remaining), true)
@@ -403,7 +420,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     state
   end
 
-  defp maybe_emit_rebuilt_event(state = %{status: :decision, auction_id: auction_id}) do
+  defp maybe_emit_rebuilt_event(state = %auction_state{status: :decision, auction_id: auction_id})
+       when is_auction_state(auction_state) do
     time_remaining = AuctionTimer.read_timer(auction_id, :decision_duration)
 
     AuctionEvent.emit(AuctionEvent.auction_state_rebuilt(auction_id, state, time_remaining), true)

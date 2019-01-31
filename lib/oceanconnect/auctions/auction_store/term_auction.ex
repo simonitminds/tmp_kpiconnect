@@ -1,4 +1,5 @@
-defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
+defimpl Oceanconnect.Auctions.StoreProtocol,
+  for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -89,7 +90,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def update_auction(
-        current_state = %{status: :draft},
+        current_state = %TermAuctionState{status: :draft},
         auction = %TermAuction{scheduled_start: start},
         emit
       )
@@ -101,14 +102,14 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     |> update_product_bid_state(auction)
   end
 
-  def update_auction(current_state, auction, emit) do
+  def update_auction(current_state = %TermAuctionState{}, auction = %TermAuction{}, emit) do
     update_auction_side_effects(auction, emit)
 
     current_state
     |> update_product_bid_state(auction)
   end
 
-  defp update_auction_side_effects(auction, emit) do
+  defp update_auction_side_effects(auction = %TermAuction{}, emit) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
@@ -123,13 +124,14 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         _auction = %TermAuction{id: auction_id, fuel_id: fuel_id}
       ) do
     updated_product_bids = %{
-      "#{fuel_id}" => product_bids["#{fuel_id}"] || ProductBidState.for_product(fuel_id, auction_id)
+      "#{fuel_id}" =>
+        product_bids["#{fuel_id}"] || ProductBidState.for_product(fuel_id, auction_id)
     }
 
     Map.put(state, :product_bids, updated_product_bids)
   end
 
-  def end_auction(current_state, auction = %TermAuction{}) do
+  def end_auction(current_state = %TermAuctionState{}, auction = %TermAuction{}) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
@@ -142,7 +144,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def process_bid(
-        current_state = %{auction_id: auction_id, status: status},
+        current_state = %TermAuctionState{auction_id: auction_id, status: status},
         bid = %{vessel_fuel_id: vessel_fuel_id}
       ) do
     product_state =
@@ -161,7 +163,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def revoke_supplier_bids(
-        current_state = %{auction_id: auction_id},
+        current_state = %TermAuctionState{auction_id: auction_id},
         product_id,
         supplier_id
       ) do
@@ -178,7 +180,10 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_state
   end
 
-  def select_winning_solution(current_state = %{auction_id: auction_id}, solution = %Solution{}) do
+  def select_winning_solution(
+        current_state = %TermAuctionState{auction_id: auction_id},
+        solution = %Solution{}
+      ) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
 
     current_state
@@ -274,13 +279,13 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     %TermAuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
-  def cancel_auction(current_state = %{auction_id: auction_id}) do
+  def cancel_auction(current_state = %TermAuctionState{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :duration)
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
     %TermAuctionState{current_state | status: :canceled}
   end
 
-  def expire_auction(current_state = %{auction_id: auction_id}) do
+  def expire_auction(current_state = %TermAuctionState{auction_id: auction_id}) do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
     %TermAuctionState{current_state | status: :expired}
   end

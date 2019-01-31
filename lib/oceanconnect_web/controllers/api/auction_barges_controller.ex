@@ -8,7 +8,7 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
 
-    with auction = %{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          available_barges <- Accounts.list_company_barges(supplier_id),
          {barge_id, _} <- Integer.parse(barge_id),
          barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id)) do
@@ -33,7 +33,7 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
 
-    with auction = %{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          available_barges <- Accounts.list_company_barges(supplier_id),
          {barge_id, _} <- Integer.parse(barge_id),
          barge = %Barge{} <- Enum.find(available_barges, &(&1.id == barge_id)) do
@@ -62,7 +62,7 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
 
-    with auction = %{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- buyer_id == auction.buyer_id,
          {barge_id, _} <- Integer.parse(barge_id),
          barge <- Auctions.get_barge(barge_id) do
@@ -91,7 +91,7 @@ defmodule OceanconnectWeb.Api.AuctionBargesController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     buyer_id = user.company_id
 
-    with auction = %{} <- Auctions.get_auction(auction_id),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- buyer_id == auction.buyer_id,
          {barge_id, _} <- Integer.parse(barge_id),
          barge <- Auctions.get_barge(barge_id) do

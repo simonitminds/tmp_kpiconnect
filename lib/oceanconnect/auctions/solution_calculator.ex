@@ -16,7 +16,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
 
     def create(bids, _auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
       total_price =
-        Enum.reduce(bids, 0, fn(bid, acc) ->
+        Enum.reduce(bids, 0, fn bid, acc ->
           vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
 
           case vf do
@@ -39,9 +39,12 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
       }
     end
 
-    def create(bids, _auction = %TermAuction{id: auction_id, fuel_id: fuel_id, fuel_quantity: quantity}) do
+    def create(
+          bids,
+          _auction = %TermAuction{id: auction_id, fuel_id: fuel_id, fuel_quantity: quantity}
+        ) do
       total_price =
-        Enum.reduce(bids, 0, fn(bid, acc) ->
+        Enum.reduce(bids, 0, fn bid, acc ->
           acc + bid.amount * quantity
         end)
 
@@ -81,7 +84,8 @@ defmodule Oceanconnect.Auctions.SolutionCalculator do
           solutions: _existing_solutions
         },
         auction = %struct{}
-      ) when is_auction(struct) and is_auction_state(state_struct) do
+      )
+      when is_auction(struct) and is_auction_state(state_struct) do
     best_by_supplier = best_solutions_by_supplier(product_bids, auction)
 
     best_single_supplier =

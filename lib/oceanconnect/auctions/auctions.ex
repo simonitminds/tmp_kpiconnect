@@ -28,7 +28,10 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def bids_for_bid_ids(bid_ids, %state_struct{product_bids: product_bids}) when is_auction_state(state_struct)
+  @term_types ["forward_fixed", "formula_related"]
+
+  def bids_for_bid_ids(bid_ids, %state_struct{product_bids: product_bids})
+      when is_auction_state(state_struct)
       when is_list(bid_ids) do
     product_bids
     |> Enum.map(fn {_product_id, product_bid_state} ->
@@ -253,12 +256,14 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction(id, module \\ nil) do
     module = module || Auction
+
     Repo.get(module, id)
     |> fully_loaded
   end
 
   def get_auction!(id, module \\ nil) do
     module = module || Auction
+
     Repo.get!(module, id)
     |> fully_loaded
   end
@@ -333,7 +338,7 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start, "type" => type}, user)
-      when start != "" and type in ["forward_fixed", "formula_related"] do
+      when start != "" and type in @term_types do
     with {:ok, auction} <-
            %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
@@ -343,8 +348,9 @@ defmodule Oceanconnect.Auctions do
       error -> error
     end
   end
+
   def create_auction(attrs = %{scheduled_start: start, type: type}, user)
-      when start != "" and type in ["forward_fixed", "formula_related"] do
+      when start != "" and type in @term_types do
     with {:ok, auction} <-
            %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
@@ -356,7 +362,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_auction(attrs = %{"type" => type}, user)
-      when type in ["forward_fixed", "formula_related"] do
+      when type in @term_types do
     with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
       auction
       |> fully_loaded
@@ -365,8 +371,9 @@ defmodule Oceanconnect.Auctions do
       error -> error
     end
   end
+
   def create_auction(attrs = %{type: type}, user)
-      when type in ["forward_fixed", "formula_related"] do
+      when type in @term_types do
     with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
       auction
       |> fully_loaded
@@ -386,6 +393,7 @@ defmodule Oceanconnect.Auctions do
       error -> error
     end
   end
+
   def create_auction(attrs = %{scheduled_start: start}, user) when start != "" do
     with {:ok, auction} <-
            %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
@@ -444,6 +452,7 @@ defmodule Oceanconnect.Auctions do
 
     auction
   end
+
   def create_supplier_aliases(auction = %TermAuction{suppliers: suppliers}) do
     :random.seed()
 
@@ -524,8 +533,9 @@ defmodule Oceanconnect.Auctions do
     AuctionEventStore.participants_from_events(auction_id)
   end
 
-  def suppliers_with_alias_names(_auction = %{suppliers: nil}), do: nil
-  def suppliers_with_alias_names(auction = %{suppliers: suppliers}) do
+  def suppliers_with_alias_names(_auction = %struct{suppliers: nil}), when is_auction(struct) do: nil
+
+  def suppliers_with_alias_names(auction = %struct{suppliers: suppliers}) when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
         case get_auction_supplier(auction.id, supplier.id) do
@@ -1201,7 +1211,8 @@ defmodule Oceanconnect.Auctions do
         barge = %Barge{id: barge_id},
         supplier_id,
         user \\ nil
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     {:ok, auction_barge} =
       %AuctionBarge{}
       |> AuctionBarge.changeset(%{
@@ -1218,7 +1229,8 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def unsubmit_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) when is_auction(struct) do
+  def unsubmit_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,
@@ -1238,7 +1250,8 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) when is_auction(struct) do
+  def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,
@@ -1261,7 +1274,8 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def reject_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil) when is_auction(struct) do
+  def reject_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
+      when is_auction(struct) do
     query =
       from(
         ab in AuctionBarge,
