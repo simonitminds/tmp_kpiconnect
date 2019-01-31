@@ -265,6 +265,7 @@ defmodule Oceanconnect.Auctions do
     case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
         AuctionEventStorage.most_recent_state(auction)
+
       state ->
         state
     end
@@ -409,7 +410,7 @@ defmodule Oceanconnect.Auctions do
 
     changeset =
       cleaned_attrs
-      |> Enum.reduce(Ecto.Changeset.change(auction), fn({attr, value}, acc) ->
+      |> Enum.reduce(Ecto.Changeset.change(auction), fn {attr, value}, acc ->
         Ecto.Changeset.force_change(acc, attr, value)
       end)
 
@@ -427,7 +428,7 @@ defmodule Oceanconnect.Auctions do
 
   defp clean_timestamps(attrs) do
     [:auction_started, :auction_ended, :auction_closed_time]
-    |> Enum.reduce(attrs, fn(attribute, acc) ->
+    |> Enum.reduce(attrs, fn attribute, acc ->
       if initial_value = attrs[attribute] do
         Map.put(acc, attribute, fix_time_weirdness(initial_value))
       else
@@ -1205,16 +1206,46 @@ defmodule Oceanconnect.Auctions do
 
   def fixtures_for_auction(auction = %Auction{}) do
     auction
-    |> AuctionFixture.from_auction
-    |> Repo.all
-  end
-
-  def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
-    AuctionFixture.from_auction_vessel_fuel(avf)
+    |> AuctionFixture.from_auction()
     |> Repo.all()
   end
 
-  def create_fixtures_from_snapshot(_snapshot = %AuctionEvent{type: :auction_state_snapshotted}) do
-    []
+  def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
+    AuctionFixture.for_auction_vessel_fuel(avf)
+    |> Repo.all()
+  end
+
+  def create_fixtures_from_snapshot(
+        snapshot = %AuctionEvent{
+          type: :auction_state_snapshotted,
+          data: %{
+            state: %{
+              winning_solution: %Solution{bids: bids, total_price: total_price, valid: true}
+            }
+          }
+        }
+      ) do
+    fixtures = bids
+    |> Enum.map(&fixture_from_bid/1)
+    {:ok, fixtures}
+  end
+  def create_fixtures_from_snapshot(event) do
+    {:ok, []}
+  end
+
+  def fixture_from_bid(%AuctionBid{
+        amount: amount,
+        vessel_fuel_id: avf_id,
+        supplier_id: supplier_id,
+        active: true,
+        auction_id: auction_id
+      }) do
+    case Repo.get(AuctionVesselFuel, avf_id) do
+      %AuctionVesselFuel{quantity: qty, eta: eta, etd: etd, fuel_id: fuel_id, vessel_id: vessel_id, eta: eta, etd: etd} ->
+        {:ok, fixture} = AuctionFixture.from_bid_and_vessel_fuel(auction_id, vessel_id, fuel_id, qty, amount, eta, etd, supplier_id)
+        |> Repo.insert
+        fixture
+      nil -> nil
+    end
   end
 end

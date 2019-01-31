@@ -127,9 +127,9 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
     AuctionNotifier.notify_participants(auction_state)
 
-    {:ok, _event} = AuctionEvent.auction_state_snapshotted(auction, auction_state)
+    {:ok, event} = AuctionEvent.auction_state_snapshotted(auction, auction_state)
     |> AuctionEventStore.create_auction_snapshot()
-    {:ok, _fixtures} = Auctions.create_fixtures_from_snapshot(auction_state)
+    {:ok, _fixtures} = Auctions.create_fixtures_from_snapshot(event)
 
     Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}

@@ -13,13 +13,16 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     belongs_to(:fuel, Oceanconnect.Auctions.Fuel)
 
     # current fields
-    field(:price, :integer)
+    field(:price, :decimal)
     field(:quantity, :integer)
     field(:eta, :utc_datetime_usec)
     field(:etd, :utc_datetime_usec)
 
     # original_relationships
-    belongs_to(:original_supplier, Oceanconnect.Accounts.Company, foreign_key: :original_supplier_id)
+    belongs_to(:original_supplier, Oceanconnect.Accounts.Company,
+      foreign_key: :original_supplier_id
+    )
+
     belongs_to(:original_vessel, Oceanconnect.Auctions.Vessel, foreign_key: :original_vessel_id)
     belongs_to(:original_fuel, Oceanconnect.Auctions.Fuel, foreign_key: :original_fuel_id)
 
@@ -27,7 +30,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     field(:original_quantity, :integer)
     field(:original_eta, :utc_datetime_usec)
     field(:original_etd, :utc_datetime_usec)
-    field(:original_price, :integer)
+    field(:original_price, :decimal)
   end
 
   def changeset(%AuctionFixture{} = auction_fixture, attrs) do
@@ -75,14 +78,14 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:original_vessel_id)
   end
 
-  def from_auction_vessel_fuel(%AuctionVesselFuel{auction_id: auction_id,
-                                                  vessel_id: vessel_id,
-                                                  fuel_id: fuel_id,
-                                                 }) do
+  def for_auction_vessel_fuel(%AuctionVesselFuel{
+        auction_id: auction_id,
+        vessel_id: vessel_id,
+        fuel_id: fuel_id
+      }) do
     from(af in AuctionFixture,
-      where: af.vessel_id == ^vessel_id and
-        af.fuel_id == ^fuel_id and
-        af.auction_id == ^auction_id
+      where:
+        af.vessel_id == ^vessel_id and af.fuel_id == ^fuel_id and af.auction_id == ^auction_id
     )
   end
 
@@ -90,5 +93,24 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     from(af in AuctionFixture,
       where: af.auction_id == ^auction_id
     )
+  end
+
+  def from_bid_and_vessel_fuel(auction_id, vessel_id, fuel_id, quantity, amount, eta, etd, supplier_id) do
+    %AuctionFixture{}
+    |> changeset(%{auction_id: auction_id,
+                  supplier_id: supplier_id,
+                  vessel_id: vessel_id,
+                  fuel_id: fuel_id,
+                  price: amount,
+                  quantity: quantity,
+                  eta: eta,
+                  etd: etd,
+                  original_supplier_id: supplier_id,
+                  original_vessel_id: vessel_id,
+                  original_fuel_id: fuel_id,
+                  original_price: amount,
+                  original_quantity: quantity,
+                  original_eta: eta,
+                  original_etd: etd})
   end
 end

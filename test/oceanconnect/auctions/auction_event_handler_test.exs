@@ -86,11 +86,12 @@ defmodule Oceanconnect.Auctions.AuctionEventHandlerTest do
 
     :timer.sleep(200)
 
-    _state = Auctions.get_auction_state!(auction)
+    state = Auctions.get_auction_state!(auction)
 
     events = AuctionEventStore.event_list(auction_id)
+    |> Enum.map(&(&1.type))
 
-    assert Enum.any?(events, fn event -> event.type == :auction_state_snapshotted end)
+    assert Enum.any?(events, fn(event) -> event == :auction_state_snapshotted end)
     assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
   end
 end

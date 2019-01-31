@@ -1287,8 +1287,14 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "creating fixtures for an auction_state" do
       auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
+      supplier_id = hd(auction.suppliers).id
+      vessel_fuel_id = hd(auction.auction_vessel_fuels).id
+
+      bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
       state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      state = %{state | status: :closed}
+      state = Oceanconnect.Auctions.AuctionStateActions.start_auction(state, auction, nil, false)
+      {_product_state, _events, new_state} = Oceanconnect.Auctions.AuctionStateActions.process_bid(state, bid)
+      state  = Oceanconnect.Auctions.AuctionStateActions.select_winning_solution(new_state.solutions.best_overall, new_state)
       event = AuctionEvent.auction_state_snapshotted(auction, state)
       Oceanconnect.Auctions.create_fixtures_from_snapshot(event)
 
