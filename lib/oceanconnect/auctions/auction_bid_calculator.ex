@@ -4,7 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
-    ProductBidState
+    AuctionStore.ProductBidState
   }
 
   def process_all(auction_state = %state_struct{}, :pending) when is_auction_state(state_struct) do

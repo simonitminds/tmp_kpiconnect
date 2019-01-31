@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionBidCalculatorTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions.AuctionBidCalculator
-  alias Oceanconnect.Auctions.{AuctionBid, AuctionEvent, ProductBidState}
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionEvent, AuctionStore.ProductBidState}
 
   setup do
     supplier_company = insert(:company)

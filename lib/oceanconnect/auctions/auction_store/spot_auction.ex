@@ -11,7 +11,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     AuctionScheduler,
     AuctionTimer,
     Command,
-    ProductBidState,
+    AuctionStore.ProductBidState,
     SolutionCalculator,
     Solution,
     AuctionStore.AuctionState

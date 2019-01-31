@@ -12,9 +12,9 @@ defimpl Oceanconnect.Auctions.StoreProtocol,
     AuctionScheduler,
     AuctionTimer,
     Command,
-    ProductBidState,
     SolutionCalculator,
     Solution,
+    AuctionStore.ProductBidState,
     AuctionStore.TermAuctionState
   }
 

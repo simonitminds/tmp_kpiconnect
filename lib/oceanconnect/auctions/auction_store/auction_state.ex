@@ -1,5 +1,5 @@
 defmodule Oceanconnect.Auctions.AuctionStore.AuctionState do
-  alias Oceanconnect.Auctions.{Auction, SolutionCalculator, ProductBidState}
+  alias Oceanconnect.Auctions.{Auction, SolutionCalculator, AuctionStore.ProductBidState}
 
   defstruct auction_id: nil,
             status: :pending,

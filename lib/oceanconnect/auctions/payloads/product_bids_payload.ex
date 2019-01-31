@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, ProductBidState}
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, AuctionStore.ProductBidState}
 
   defstruct lowest_bids: [],
             bid_history: [],
