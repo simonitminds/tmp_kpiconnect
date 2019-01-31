@@ -44,6 +44,16 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     {:ok, updated_event}
   end
 
+  def auction_state_snapshotted(auction = %struct{id: auction_id}, new_state = %auction_state{})
+      when is_auction(struct) and is_auction_state(auction_state) do
+    %AuctionEvent{
+      type: :auction_state_snapshotted,
+      auction_id: auction_id,
+      data: %{state: new_state, auction: auction},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
   def auction_created(auction = %struct{id: auction_id}, user) when is_auction(struct) do
     %AuctionEvent{
       type: :auction_created,

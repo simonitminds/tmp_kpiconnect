@@ -11,12 +11,18 @@
     <% if @new_user_info["company_name"] do %>
       <p style="margin-top: 0.25rem;"><b>Company Name:</b> <%= @new_user_info["company_name"] %></p>
     <% end %>
+    <%= if @new_user_info["country"] do %>
+      <p style="margin-top: 0.25rem;"><b>Country:</b> <%= @new_user_info["country"] %></p>
+    <% end %>
     <p style="margin-top: 0.25rem;"><b>Email Address:</b> <a href="mailto:<%= @new_user_info["email"] %>"><%= @new_user_info["email"]%></a></p>
     <%= if @new_user_info["office_phone"] do %>
       <p style="margin-top: 0.25rem;"><b>Office Phone:</b> <%= @new_user_info["office_phone"] %></p>
     <% end %>
     <%= if @new_user_info["mobile_phone"] do %>
       <p style="margin-top: 0.25rem;"><b>Mobile Phone:</b> <%= @new_user_info["mobile_phone"] %></p>
+    <% end %>
+    <%= if @new_user_info["reason"] do %>
+      <p style="margin-top: 0.25rem;"><b>What is Your Interest in OCM?</b> <%= @new_user_info["reason"] %></p>
     <% end %>
     <br>
     </td>

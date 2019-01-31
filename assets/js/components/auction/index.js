@@ -55,11 +55,30 @@ export default class AuctionsIndex extends React.Component {
     };
 
     const chronologicalAuctionPayloads = (auctionPayloads, status) => {
-      if (status === 'pending') {
-        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.scheduled_start], ['asc']);
-      } else {
-        return _.orderBy(auctionPayloads, [auctionPayload => auctionPayload.auction.auction_started], ['asc']);
+      let sortField = 'auction_started';
+      switch(status) {
+        case 'pending':
+          sortField = 'scheduled_start';
+          break;
+        case 'open':
+        case 'decision':
+          sortField = 'auction_started';
+          break;
+        case 'closed':
+        case 'cancelled':
+        case 'expired':
+          sortField = 'auction_closed_time';
+          break;
+        default:
+          sortField = 'id';
+          break;
       }
+      return _.orderBy(auctionPayloads, [
+          auctionPayload => _.get(auctionPayload.auction, sortField),
+          auctionPayload => auctionPayload.auction.id
+        ],
+        ['desc', 'desc']
+      );
     };
 
     const filteredAuctionsDisplay = (status) => {

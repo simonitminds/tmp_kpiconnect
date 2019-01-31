@@ -485,9 +485,14 @@ defmodule Oceanconnect.Auctions do
   def update_auction_without_event_storage!(%struct{} = auction, attrs) when is_auction(struct) do
     cleaned_attrs = clean_timestamps(attrs)
 
+    changeset =
+      cleaned_attrs
+      |> Enum.reduce(Ecto.Changeset.change(auction), fn({attr, value}, acc) ->
+        Ecto.Changeset.force_change(acc, attr, value)
+      end)
+
     updated_auction =
-      auction
-      |> struct.changeset(cleaned_attrs)
+      changeset
       |> Repo.update!()
       |> fully_loaded
 
@@ -498,22 +503,19 @@ defmodule Oceanconnect.Auctions do
     updated_auction
   end
 
-  defp clean_timestamps(attrs = %{auction_started: auction_started}) do
-    Map.put(attrs, :auction_started, fix_time_weirdness(auction_started))
+  defp clean_timestamps(attrs) do
+    [:auction_started, :auction_ended, :auction_closed_time]
+    |> Enum.reduce(attrs, fn(attribute, acc) ->
+      if initial_value = attrs[attribute] do
+        Map.put(acc, attribute, fix_time_weirdness(initial_value))
+      else
+        acc
+      end
+    end)
   end
-
-  defp clean_timestamps(attrs = %{auction_ended: auction_ended}) do
-    Map.put(attrs, :auction_ended, fix_time_weirdness(auction_ended))
-  end
-
-  defp clean_timestamps(attrs = %{auction_closed_time: auction_ended}) do
-    Map.put(attrs, :auction_closed_time, fix_time_weirdness(auction_ended))
-  end
-
-  defp clean_timestamps(attrs), do: attrs
 
   defp fix_time_weirdness(date_time = %DateTime{microsecond: microsecond}) do
-    Map.put(date_time, :microsecond, {elem(microsecond, 0), 5})
+    Map.put(date_time, :microsecond, {elem(microsecond, 0), 6})
   end
 
   def delete_auction(%struct{} = auction) when is_auction(struct) do
@@ -533,7 +535,7 @@ defmodule Oceanconnect.Auctions do
     AuctionEventStore.participants_from_events(auction_id)
   end
 
-  def suppliers_with_alias_names(_auction = %struct{suppliers: nil}), when is_auction(struct) do: nil
+  def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct), do: nil
 
   def suppliers_with_alias_names(auction = %struct{suppliers: suppliers}) when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->

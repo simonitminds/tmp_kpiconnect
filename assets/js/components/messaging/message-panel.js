@@ -3,6 +3,8 @@ import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+const MAX_MESSAGE_LENGTH = 1024;
+
 export default class MessagePanel extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +26,24 @@ export default class MessagePanel extends React.Component {
       () => this.tick(),
       1200
     );
+
+    // Resize text area based on content (reference: https://www.impressivewebs.com/textarea-auto-resize/)
+
+    let txt = document.querySelector('.messaging__input textarea'),
+    hiddenDiv = document.createElement('div'),
+    content = null;
+
+    hiddenDiv.classList.add('hiddendiv', 'common');
+
+    document.body.appendChild(hiddenDiv);
+
+    txt.addEventListener('keyup', function () {
+
+      content = this.value;
+      hiddenDiv.innerHTML = content + '\n\n';
+      this.style.height = (hiddenDiv.getBoundingClientRect().height - 15) + 'px';
+
+    }, false);
   }
 
   componentWillUnmount() {
@@ -67,7 +87,9 @@ export default class MessagePanel extends React.Component {
 
     const newMessage = this.state.newMessage;
     const messageHasContent = !!newMessage;
-    const canSubmit = connection && messageHasContent;
+    const contentLength = newMessage.length;
+    const contentMaxLength = MAX_MESSAGE_LENGTH;
+    const canSubmit = connection && messageHasContent && contentLength <= contentMaxLength;
 
     return (
       <div className='messaging__message-container'>
@@ -109,9 +131,9 @@ export default class MessagePanel extends React.Component {
 
         <form onSubmit={this.submitMessage.bind(this)}>
           <div className="messaging__input">
-            <div className="field has-addons">
+            <div className="field is-grouped has-margin-bottom-xs">
               <div className="control">
-                <input className="input" placeholder='Type message here' value={newMessage} onChange={this.handleMessageChange.bind(this)} />
+                <textarea className="textarea" rows="1" placeholder='Type message here' value={newMessage} onChange={this.handleMessageChange.bind(this)} />
               </div>
 
               <div className="control">
@@ -123,6 +145,7 @@ export default class MessagePanel extends React.Component {
                 />
               </div>
             </div>
+            <p className={`messaging__input__char-count${contentLength > contentMaxLength ? ' has-text-red has-text-weight-bold' : ''}`}>{contentLength}/{contentMaxLength} characters</p>
           </div>
         </form>
       </div>

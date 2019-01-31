@@ -4,10 +4,12 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
-    AuctionNotifier
+    AuctionNotifier,
+    AuctionEventStore
   }
 
   @registry_name :auction_event_handler_registry
@@ -69,14 +71,16 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{type: :auction_created, data: %struct{scheduled_start: nil}},
         state
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     {:noreply, state}
   end
 
   def handle_info(
         %AuctionEvent{type: :auction_created, data: auction = %struct{}},
         state
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     AuctionNotifier.notify_participants(auction)
     {:noreply, state}
   end
@@ -88,7 +92,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           time_entered: time_entered
         },
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     auction
     |> Auctions.update_auction_without_event_storage!(%{auction_started: time_entered})
 
@@ -103,7 +108,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           time_entered: time_entered
         },
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     auction
     |> Auctions.update_auction_without_event_storage!(%{auction_ended: time_entered})
 
@@ -118,11 +124,19 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           time_entered: time_entered
         },
         state
-      ) when is_auction_state(state_struct) and type in [:auction_expired, :auction_canceled, :auction_closed] do
+      )
+      when is_auction_state(state_struct) and
+             type in [:auction_expired, :auction_canceled, :auction_closed] do
     auction
     |> Auctions.update_auction_without_event_storage!(%{auction_closed_time: time_entered})
 
     AuctionNotifier.notify_participants(auction_state)
+
+    {:ok, _event} =
+      AuctionEvent.auction_state_snapshotted(auction, auction_state)
+      |> AuctionEventStore.create_auction_snapshot()
+
+    Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}
   end
 
@@ -132,7 +146,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:noreply, state}
   end
 
-  def handle_info(%AuctionEvent{type: _type, data: auction_state = %state_struct{}}, state) when is_auction_state(state_struct) do
+  def handle_info(%AuctionEvent{type: _type, data: auction_state = %state_struct{}}, state)
+      when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -140,7 +155,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{type: _type, data: %{state: auction_state = %state_struct{}}},
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -151,7 +167,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           data: %{state: auction_state = %state_struct{}}
         },
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -162,7 +179,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
           data: %{state: auction_state = %state_struct{}}
         },
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -170,7 +188,8 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %state_struct{}}},
         state
-      ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end

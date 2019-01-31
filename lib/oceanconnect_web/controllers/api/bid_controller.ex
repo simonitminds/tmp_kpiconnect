@@ -1,5 +1,7 @@
 defmodule OceanconnectWeb.Api.BidController do
   use OceanconnectWeb, :controller
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
 

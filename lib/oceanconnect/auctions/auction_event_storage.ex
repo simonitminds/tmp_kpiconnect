@@ -66,7 +66,10 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
          :auction_rescheduled,
          :upcoming_auction_notified,
          :auction_created,
-         :duration_extended
+         :duration_extended,
+         :bid_placed,
+         :auto_bid_placed,
+         :auto_bid_triggered
        ] do
       [_last | rest] = events
       state_for_type(auction, rest)

@@ -1,5 +1,7 @@
 defmodule OceanconnectWeb.Api.AuctionBargesController do
   use OceanconnectWeb, :controller
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Barge, AuctionPayload}
