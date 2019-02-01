@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     AuctionBid,
     AuctionEvent,
     Solution,
-    ProductBidState
+    AuctionStore.ProductBidState
   }
 
   defstruct id: nil,
