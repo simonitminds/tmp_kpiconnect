@@ -25,7 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   @doc false
   def changeset(%AuctionSuppliers{} = auction_suppliers, attrs) do
     auction_suppliers
-    |> cast(attrs, [:participation, :alias_name, :auction_id, :supplier_id])
+    |> cast(attrs, [:participation, :alias_name, :auction_id, :term_auction_id, :supplier_id])
     |> validate_required([:supplier_id])
     |> validate_belongs_to_an_auction()
     |> foreign_key_constraint(:auction_id)

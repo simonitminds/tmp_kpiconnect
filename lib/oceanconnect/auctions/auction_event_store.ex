@@ -64,18 +64,18 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     {:reply, current_state, current_state}
   end
 
+  def handle_call({:persist_auction_snapshot, event = %AuctionEvent{auction_id: auction_id, type: :auction_state_snapshotted}}, _from, current_events) do
+    {:ok, %AuctionEventStorage{event: persisted_event}} =
+      @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
+    events = [persisted_event | current_events]
+    {:reply, {:ok, event}, events}
+  end
+
   def handle_info(event = %AuctionEvent{auction_id: auction_id}, current_events) do
     {:ok, %AuctionEventStorage{event: persisted_event}} =
       @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
 
     events = [persisted_event | current_events]
     {:noreply, events}
-  end
-
-  def handle_call({:persist_auction_snapshot, event = %AuctionEvent{auction_id: auction_id, type: :auction_state_snapshotted}}, _from, current_events) do
-    {:ok, %AuctionEventStorage{event: persisted_event}} =
-      @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
-    events = [persisted_event | current_events]
-    {:reply, {:ok, event}, events}
   end
 end

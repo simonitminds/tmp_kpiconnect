@@ -14,7 +14,7 @@ const TermFuelFormSection = (props) => {
             <legend className="subtitle is-4" >Fuel</legend>
             <div className="field is-horizontal">
               <div className="field-label">
-                <label htmlFor="auction_term_fuel_id" className="label">
+                <label htmlFor="auction_fuel_id" className="label">
                   Fuel
                 </label>
               </div>
@@ -22,11 +22,11 @@ const TermFuelFormSection = (props) => {
                 <div className="control">
                   <div className="select is-fullwidth">
                     <select
-                      id="auction_term_fuel_id"
-                      name="auction[term_fuel_id]"
-                      className="qa-auction-term_fuel_id"
-                      value={auction.term_fuel_id}
-                      onChange={updateInformation.bind(this, 'auction.term_fuel_id')}
+                      id="auction_fuel_id"
+                      name="auction[fuel_id]"
+                      className="qa-auction-select-fuel"
+                      value={auction.fuel_id}
+                      onChange={updateInformation.bind(this, 'auction.fuel_id')}
                     >
                       <option disabled value="">
                         Please select
@@ -44,12 +44,12 @@ const TermFuelFormSection = (props) => {
 
             <InputField
               model={'auction'}
-              field={'term_fuel_quantity'}
+              field={'fuel_quantity'}
               labelText={'Fuel Quantity (MT)'}
-              value={auction.term_fuel_quantity}
+              value={auction.fuel_quantity}
               isHorizontal={true}
               opts={{type: 'number'}}
-              onChange={updateInformation.bind(this, 'auction.term_fuel_quantity')}
+              onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
             />
           </fieldset>
         </div>

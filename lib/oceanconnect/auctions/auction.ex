@@ -63,6 +63,7 @@ defmodule Oceanconnect.Auctions.Auction do
   end
 
   @required_fields [
+    :type,
     :port_id
   ]
 

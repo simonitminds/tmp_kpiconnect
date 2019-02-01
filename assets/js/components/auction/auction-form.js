@@ -72,9 +72,7 @@ const AuctionForm = (props) => {
   return (
     <div>
       <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
-      <input type="hidden" name="auction[type]" value="spot" />
 
-{/*   ### PENDING TERM SETUP
       <section className="auction-info is-gray-1">
         <div className="container">
           <div className="content">
@@ -93,7 +91,7 @@ const AuctionForm = (props) => {
                         id="auction_type"
                         name="auction[type]"
                         className="qa-auction-type"
-                        value={auction.type}
+                        value={type}
                         onChange={selectAuctionType}
                       >
                         <option disabled value="">
@@ -113,7 +111,7 @@ const AuctionForm = (props) => {
           </div>
         </div>
       </section>
-*/}
+
 
       {renderFormContent(type)}
     </div>

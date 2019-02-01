@@ -319,7 +319,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
-    StoreProtocol.update_auction(auction, previous_state, false)
+    StoreProtocol.update_auction(previous_state, auction, false)
   end
 
   defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do

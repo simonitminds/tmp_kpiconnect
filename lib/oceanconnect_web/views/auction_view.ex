@@ -5,6 +5,7 @@ defmodule OceanconnectWeb.AuctionView do
 
   alias Oceanconnect.Auctions.{
     Auction,
+    TermAuction,
     AuctionBid,
     AuctionEvent,
     AuctionBarge,
@@ -52,6 +53,34 @@ defmodule OceanconnectWeb.AuctionView do
       buyer: auction_map.buyer,
       suppliers: auction_map.suppliers || [],
       vessel_fuels: auction_map.auction_vessel_fuels || [],
+      is_traded_bid_allowed: auction_map.is_traded_bid_allowed
+    }
+    |> Poison.encode!()
+  end
+
+  def auction_json_for_form(auction = %TermAuction{}) do
+    auction_map =
+      auction
+      |> Auctions.strip_non_loaded()
+
+    %{
+      po: auction_map.po,
+      port_agent: auction_map.port_agent,
+      start_date: auction_map.start_date,
+      end_date: auction_map.end_date,
+      scheduled_start: auction_map.scheduled_start,
+      auction_started: auction_map.auction_started,
+      auction_ended: auction_map.auction_ended,
+      auction_closed_time: auction_map.auction_closed_time,
+      duration: auction_map.duration,
+      anonymous_bidding: auction_map.anonymous_bidding,
+      additional_information: auction_map.additional_information,
+      port_id: auction_map.port_id,
+      buyer: auction_map.buyer,
+      suppliers: auction_map.suppliers || [],
+      vessels: auction_map.vessels || [],
+      fuel: auction_map.fuel,
+      fuel_quantity: auction_map.fuel_quantity,
       is_traded_bid_allowed: auction_map.is_traded_bid_allowed
     }
     |> Poison.encode!()

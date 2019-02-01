@@ -1,6 +1,4 @@
 defmodule Oceanconnect.Auctions.AuctionStore.ProductBidState do
-  alias __MODULE__
-
   defstruct auction_id: nil,
             vessel_fuel_id: nil,
             lowest_bids: [],

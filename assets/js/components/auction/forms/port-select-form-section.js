@@ -85,27 +85,27 @@ const PortSelectFormSection = (props) => {
                   <div className="field-body">
                     <DateInput
                       className={'qa-auction-start_month'}
-                      value={auction.term_start_month}
+                      value={auction.start_month}
                       model={'auction'}
-                      field={'term_start'}
+                      field={'start'}
                       labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'term_start_month')} />
+                      onChange={updateDate.bind(this, 'start_month')} />
                   </div>
                 </div>
 
 
                 <div className="field is-horizontal">
                   <div className="field-label">
-                    <label className="label">Start Month</label>
+                    <label className="label">End Month</label>
                   </div>
                   <div className="field-body">
                     <DateInput
                       className={'qa-auction-end_month'}
-                      value={auction.term_end_month}
+                      value={auction.end_month}
                       model={'auction'}
-                      field={'term_end'}
+                      field={'end'}
                       labelText={'End Month'}
-                      onChange={updateDate.bind(this, 'term_end_month')} />
+                      onChange={updateDate.bind(this, 'end_month')} />
                   </div>
                 </div>
               </div>

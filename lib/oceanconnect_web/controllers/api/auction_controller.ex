@@ -1,18 +1,20 @@
 defmodule OceanconnectWeb.Api.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionPayload}
+  alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
-    user_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
+    user_id = Auth.current_user(conn).company_id
 
     auction_payloads =
-      case OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn) do
+      case Auth.current_user_is_admin?(conn) do
         true ->
           Auctions.list_auctions()
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
-            |> Auctions.AuctionPayload.get_admin_auction_payload!()
+            |> AuctionPayload.get_admin_auction_payload!()
           end)
 
         false ->
@@ -20,7 +22,7 @@ defmodule OceanconnectWeb.Api.AuctionController do
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
-            |> Auctions.AuctionPayload.get_auction_payload!(user_id)
+            |> AuctionPayload.get_auction_payload!(user_id)
           end)
       end
 

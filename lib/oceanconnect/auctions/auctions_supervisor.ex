@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     end
   end
 
-  def stop_child(auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+  def stop_child(_auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
     with {:ok, pid} <- Oceanconnect.Auctions.AuctionSupervisor.find_pid(auction_id),
          :ok <- DynamicSupervisor.terminate_child(__MODULE__, pid) do
       Logger.info("Auction ID: #{auction_id} Services Stopped")
