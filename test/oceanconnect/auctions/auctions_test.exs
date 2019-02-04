@@ -1281,8 +1281,13 @@ defmodule Oceanconnect.AuctionsTest do
       %{auction: auction, fixtures: fixtures}
     end
 
-    test "fixtures_for_auction", %{auction: auction, fixtures: fixtures} do
-      assert fixtures == Auctions.fixtures_for_auction(auction)
+    test "from_bid_and_vessel_fuel", %{auction: auction = %Auction{auction_vessel_fuels: [vessel_fuel | _rest], suppliers: [supplier]}} do
+      bid = create_bid(3.50, 3.50, supplier.id, vessel_fuel.id, auction)
+      assert %AuctionFixture{} = Auctions.fixture_from_bid(bid)
+    end
+
+    test "fixtures_for_auction", %{auction: auction = %Auction{id: auction_id}, fixtures: [%AuctionFixture{id: fixture1_id}, %AuctionFixture{id: fixture2_id}]} do
+      assert [%AuctionFixture{auction_id: ^auction_id, id: ^fixture1_id}, %AuctionFixture{auction_id: ^auction_id, id: ^fixture2_id}] = Auctions.fixtures_for_auction(auction)
     end
 
     test "creating fixtures for an auction_state" do

@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   import Ecto.Query, warn: false
   import Ecto.Changeset
   alias __MODULE__
-  alias Oceanconnect.Auctions.{AuctionVesselFuel, Auction}
+  alias Oceanconnect.Auctions.{AuctionVesselFuel, Auction, AuctionBid}
 
   schema "auction_fixtures" do
     # current_relationships
@@ -95,22 +95,31 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     )
   end
 
-  def from_bid_and_vessel_fuel(auction_id, vessel_id, fuel_id, quantity, amount, eta, etd, supplier_id) do
+  def changeset_from_bid_and_vessel_fuel(
+        %AuctionBid{
+          amount: amount,
+          supplier_id: supplier_id,
+          auction_id: auction_id
+        },
+        %AuctionVesselFuel{vessel_id: vessel_id, fuel_id: fuel_id, eta: eta, etd: etd, quantity: quantity}
+      ) do
     %AuctionFixture{}
-    |> changeset(%{auction_id: auction_id,
-                  supplier_id: supplier_id,
-                  vessel_id: vessel_id,
-                  fuel_id: fuel_id,
-                  price: amount,
-                  quantity: quantity,
-                  eta: eta,
-                  etd: etd,
-                  original_supplier_id: supplier_id,
-                  original_vessel_id: vessel_id,
-                  original_fuel_id: fuel_id,
-                  original_price: amount,
-                  original_quantity: quantity,
-                  original_eta: eta,
-                  original_etd: etd})
+    |> changeset(%{
+      auction_id: auction_id,
+      supplier_id: supplier_id,
+      vessel_id: vessel_id,
+      fuel_id: fuel_id,
+      price: amount,
+      quantity: quantity,
+      eta: eta,
+      etd: etd,
+      original_supplier_id: supplier_id,
+      original_vessel_id: vessel_id,
+      original_fuel_id: fuel_id,
+      original_price: amount,
+      original_quantity: quantity,
+      original_eta: eta,
+      original_etd: etd
+    })
   end
 end

@@ -1,14 +1,11 @@
 defmodule Oceanconnect.Auctions.AuctionFixtureTest do
   use Oceanconnect.DataCase
-#  alias Oceanconnect.Auctions
-#  alias Oceanconnect.Auctions.{Auction, AuctionFixture}
-  alias Oceanconnect.Auctions.AuctionFixture
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Auction, AuctionFixture, AuctionBid}
+
   setup do
-    auction = insert(:auction)
+    auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
     fixtures = insert_list(2, :auction_fixture, auction: auction)
-    # factory up an auction
-    # close it
-    # Fixtures should get generated
     {:ok, %{auction: auction, fixtures: fixtures}}
   end
 
