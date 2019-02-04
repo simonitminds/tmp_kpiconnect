@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import moment from 'moment';
 import InputField from '../input-field';
 import InputErrors from '../input-errors';
 import CheckBoxField from '../check-box-field';
@@ -74,8 +73,6 @@ const AuctionForm = (props) => {
 
   return (
     <div>
-      <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
-
       <section className="auction-info is-gray-1">
         <div className="container">
           <div className="content">

@@ -80,6 +80,7 @@ defmodule OceanconnectWeb.AuctionController do
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
     changeset = Auctions.change_auction(%Auction{})
+    |> Map.put(:errors, %{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
     render(

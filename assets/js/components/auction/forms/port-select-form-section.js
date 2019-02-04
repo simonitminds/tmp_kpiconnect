@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 import InputField from '../../input-field';
 import InputErrors from '../../input-errors';
 import DateInput from '../../date-input';
@@ -85,16 +86,17 @@ const PortSelectFormSection = (props) => {
 
                 <div className="field is-horizontal">
                   <div className="field-label">
-                    <label className="label">Start Month</label>
+                    <label className="label">Start Date</label>
                   </div>
                   <div className="field-body">
+                    <input type="hidden" name="auction[start_date]" className="qa-auction-start_date" value={auction.start_date ? moment(auction.start_date).utc() : ""} />
                     <DateInput
                       className={'qa-auction-start_date'}
                       value={auction.start_date}
                       model={'auction'}
-                      field={'start'}
+                      field={'start_date'}
                       labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'start_date')} />
+                      onChange={updateDate.bind(this, 'start_date_date')} />
                     <InputErrors errors={errors.start_date} />
                   </div>
                 </div>
@@ -102,16 +104,17 @@ const PortSelectFormSection = (props) => {
 
                 <div className="field is-horizontal">
                   <div className="field-label">
-                    <label className="label">End Month</label>
+                    <label className="label">End Date</label>
                   </div>
                   <div className="field-body">
+                    <input type="hidden" name="auction[end_date]" className="qa-auction-end_date" value={auction.end_date ? moment(auction.end_date).utc() : ""} />
                     <DateInput
                       className={'qa-auction-end_date'}
                       value={auction.end_date}
                       model={'auction'}
-                      field={'end'}
+                      field={'end_date'}
                       labelText={'End Month'}
-                      onChange={updateDate.bind(this, 'end_date')} />
+                      onChange={updateDate.bind(this, 'end_date_date')} />
                     <InputErrors errors={errors.end_date} />
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import CheckBoxField from '../../check-box-field';
 import DateInput from '../../date-input';
 import InputField from '../../input-field';
@@ -38,6 +39,7 @@ const AuctionDetailsFormSection = (props) => {
                 <label className="label">Auction Start</label>
               </div>
               <div className="field-body field-body--distribute-middle">
+                <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
                 <div className="control">
                   <DateInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_date')} />
                 </div>
@@ -50,6 +52,7 @@ const AuctionDetailsFormSection = (props) => {
                 <InputErrors errors={errors.scheduled_start} />
               </div>
             </div>
+
             <div className="field is-horizontal">
               <div className="field-label">
                 <label htmlFor="auction_duration" className="label">
