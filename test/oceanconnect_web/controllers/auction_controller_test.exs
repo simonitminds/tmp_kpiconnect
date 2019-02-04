@@ -51,19 +51,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         }
       })
 
-    term_auction_params =
-      string_params_for(
-        :term_auction,
-        fuel: selected_fuel,
-        fuel_quantity: 15000,
-        vessels: [selected_vessel],
-        port: port,
-        is_traded_bid_allowed: true
-      )
-      |> Oceanconnect.Utilities.maybe_convert_date_times()
-      |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
-      |> Map.put("scheduled_start", valid_start_time)
-
     authed_conn = login_user(build_conn(), buyer)
 
     auction =
@@ -72,18 +59,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         port: port,
         buyer: buyer_company,
         auction_vessel_fuels: auction_vessel_fuels,
-        suppliers: [supplier_company],
-        is_traded_bid_allowed: true
-      )
-      |> Auctions.fully_loaded()
-    term_auction =
-      insert(
-        :term_auction,
-        port: port,
-        buyer: buyer_company,
-        fuel: selected_fuel,
-        fuel_quantity: 15000,
-        vessels: [selected_vessel],
         suppliers: [supplier_company],
         is_traded_bid_allowed: true
       )

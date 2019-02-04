@@ -15,6 +15,7 @@ import AuctionDetailsFormSection from './auction-details-form-section';
 const SpotAuctionForm = (props) => {
   const {
     auction,
+    errors,
     type,
     deselectAllSuppliers,
     credit_margin_amount,
@@ -47,6 +48,7 @@ const SpotAuctionForm = (props) => {
   return (
     <React.Fragment>
       <PortSelectFormSection auction={auction}
+                             errors={errors}
                              port_id={port_id}
                              ports={ports}
                              selectPort={selectPort}
@@ -58,18 +60,21 @@ const SpotAuctionForm = (props) => {
                     onToggleSupplier={toggleSupplier}
                     selectedPort={selectedPort}
                     selectedSuppliers={selectedSuppliers}
-                    suppliers={suppliers} />
+                    suppliers={suppliers}
+                    errors={errors} />
 
      <VesselFuelForm auction={auction}
+                     errors={errors}
                      vessels={vessels}
                      fuels={fuels}
                      vesselFuels={auction.vessel_fuels}
                      portId={port_id}
                      ports={ports} />
 
-      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} isTermAuction={false}/>
+      <AdditionalInfoFormSection auction={auction} errors={errors} updateInformation={updateInformation} isTermAuction={false}/>
 
       <AuctionDetailsFormSection auction={auction}
+                                 errors={errors}
                                  credit_margin_amount={credit_margin_amount}
                                  isTermAuction={false}
                                  updateInformation={updateInformation}

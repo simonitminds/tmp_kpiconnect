@@ -17,6 +17,7 @@ import { receiveAuctionFormData,
 const mapStateToProps = (state, props) => {
   return {
     auction: state.auctionFormReducer.auction || props.auction,
+    errors: state.auctionFormReducer.errors || props.errors || {},
     type: state.auctionFormReducer.type || props.type || 'spot',
     scheduled_start_date: state.auctionFormReducer.scheduled_start_date,
     scheduled_start_time: state.auctionFormReducer.scheduled_start_time,

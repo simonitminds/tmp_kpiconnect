@@ -5,7 +5,7 @@
     <div class="container is-fullhd">
       <div class="content has-margin-top-lg">
         <div class="alert alert-danger">
-          <p class="help is-danger">To save a future requirement auction, specify a <strong>Port</strong>, at least one <strong>Vessel</strong> with an ETA, and at least one <strong>Fuel</strong> with a Quantity. To schedule an auction, <strong>Auction Start</strong> also needs to be specified.</p>
+          <p class="help is-danger">Could not save auction. See errors below.</p>
         </div>
       </div>
     </div>
@@ -19,6 +19,7 @@
       data-ports="<%= @ports %>"
       data-vessels="<%= @vessels %>"
       data-credit_margin_amount="<%= @credit_margin_amount %>"
+      data-errors="<%= errors_json_for_form(@changeset) %>"
     ></div>
   </div>
 

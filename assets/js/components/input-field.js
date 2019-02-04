@@ -1,7 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
+import InputErrors from './input-errors';
 
-const InputField = ({model, field, labelText, value, opts, onChange, expandedInput, isHorizontal}) => {
+const InputField = ({model, field, labelText, value, errors, opts, onChange, expandedInput, isHorizontal}) => {
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : _.capitalize(labelText);
   const type = _.has(opts, 'type') ? opts.type : 'text';
@@ -26,6 +27,7 @@ const InputField = ({model, field, labelText, value, opts, onChange, expandedInp
             onChange={onChange}
           />
         </div>
+        <InputErrors errors={errors} />
       </div>
     </div>
   );

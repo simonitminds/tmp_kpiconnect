@@ -1,8 +1,10 @@
 import React from 'react';
+import InputErrors from '../../input-errors';
 
 const AdditionalInfoFormSection = (props) => {
   const {
     auction,
+    errors,
     isTermAuction,
     updateInformation
   } = props;
@@ -24,6 +26,7 @@ const AdditionalInfoFormSection = (props) => {
                 defaultValue={auction.additional_information}
                 onChange={updateInformation.bind(this, 'auction.additional_information')}>
               </textarea>
+              <InputErrors errors={errors.additional_information} />
             </div>
           </fieldset>
         </div>

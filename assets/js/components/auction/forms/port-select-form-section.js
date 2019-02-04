@@ -1,11 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
 import InputField from '../../input-field';
+import InputErrors from '../../input-errors';
 import DateInput from '../../date-input';
 
 const PortSelectFormSection = (props) => {
   const {
     auction,
+    errors,
     port_id,
     ports,
     hasDurationAndTerminal,
@@ -21,6 +23,7 @@ const PortSelectFormSection = (props) => {
         field={'port_agent'}
         labelText={'Port Agent'}
         value={auction.port_agent}
+        errors={errors.port_agent}
         opts={{type: 'text'}}
         onChange={updateInformation.bind(this, 'auction.port_agent')}
         isHorizontal={true}
@@ -61,6 +64,7 @@ const PortSelectFormSection = (props) => {
                     </select>
                   </div>
                 </div>
+                <InputErrors errors={errors.port_id} />
               </div>
             </div>
 
@@ -74,6 +78,7 @@ const PortSelectFormSection = (props) => {
                   field={'terminal'}
                   labelText={'Terminal/Anchorage'}
                   value={auction.terminal}
+                  errors={errors.terminal}
                   isHorizontal={true}
                   opts={{ labelClass: 'label' }}
                   onChange={updateInformation.bind(this, 'auction.terminal')} />
@@ -84,12 +89,13 @@ const PortSelectFormSection = (props) => {
                   </div>
                   <div className="field-body">
                     <DateInput
-                      className={'qa-auction-start_month'}
-                      value={auction.start_month}
+                      className={'qa-auction-start_date'}
+                      value={auction.start_date}
                       model={'auction'}
                       field={'start'}
                       labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'start_month')} />
+                      onChange={updateDate.bind(this, 'start_date')} />
+                    <InputErrors errors={errors.start_date} />
                   </div>
                 </div>
 
@@ -100,12 +106,13 @@ const PortSelectFormSection = (props) => {
                   </div>
                   <div className="field-body">
                     <DateInput
-                      className={'qa-auction-end_month'}
-                      value={auction.end_month}
+                      className={'qa-auction-end_date'}
+                      value={auction.end_date}
                       model={'auction'}
                       field={'end'}
                       labelText={'End Month'}
-                      onChange={updateDate.bind(this, 'end_month')} />
+                      onChange={updateDate.bind(this, 'end_date')} />
+                    <InputErrors errors={errors.end_date} />
                   </div>
                 </div>
               </div>

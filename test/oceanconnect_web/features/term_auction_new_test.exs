@@ -124,7 +124,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     port: port,
     fuels: [selected_fuel | _rest],
     buyer_company: buyer_company,
-    buyer_vessels: [selected_vessel | _reset],
+    buyer_vessels: [selected_vessel | _reset]
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -190,7 +190,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
 
-
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",
        %{
          buyer_with_no_credit: buyer_with_no_credit
@@ -199,5 +198,26 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
     assert_raise Hound.NoSuchElementError, fn -> AuctionNewPage.is_traded_bid_allowed() end
+  end
+
+  test "errors messages render for required fields when creating a scheduled auction", %{
+    params: params,
+    port: port,
+    buyer_vessels: buyer_vessels
+  } do
+    params =
+      params
+      |> Map.drop([:start_date, :end_date])
+
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:forward_fixed)
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+
+    AuctionNewPage.submit()
+
+    refute current_path() =~ ~r/auctions\/\d/
+    assert AuctionNewPage.has_content?("Can't be blank")
   end
 end

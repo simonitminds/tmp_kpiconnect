@@ -27,7 +27,12 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:fuel, Fuel)
     field(:fuel_quantity, :integer)
 
-    has_many(:term_auction_vessels, TermAuctionVessel, foreign_key: :auction_id, on_replace: :delete, on_delete: :delete_all)
+    has_many(:term_auction_vessels, TermAuctionVessel,
+      foreign_key: :auction_id,
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
+
     many_to_many(
       :vessels,
       Vessel,
@@ -51,7 +56,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
     timestamps()
   end
 
-
   @required_fields [
     :type,
     :port_id
@@ -67,6 +71,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :duration,
     :end_date,
     :fuel_id,
+    :fuel_quantity,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
@@ -90,7 +95,9 @@ defmodule Oceanconnect.Auctions.TermAuction do
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
-    |> validate_required(@required_fields ++ [:scheduled_start])
+    |> validate_required(
+      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date]
+    )
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> cast_assoc(:fuel)
@@ -99,23 +106,25 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> maybe_add_vessels(attrs)
   end
 
-
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
   end
+
   def maybe_add_suppliers(changeset, %{suppliers: suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
   end
+
   def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def maybe_add_vessels(changeset, %{"vessels" => vessels}) do
     put_assoc(changeset, :vessels, vessels)
   end
+
   def maybe_add_vessels(changeset, %{vessels: vessels}) do
     put_assoc(changeset, :vessels, vessels)
   end
-  def maybe_add_vessels(changeset, _attrs), do: changeset
 
+  def maybe_add_vessels(changeset, _attrs), do: changeset
 
   def from_params(params) do
     params
@@ -187,8 +196,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
   def maybe_load_vessels(params, "vessels") do
     case params do
       %{"vessels" => vessels} ->
-        vessel_ids =
-          Enum.map(vessels, fn {vessel_id, _data} -> String.to_integer(vessel_id) end)
+        vessel_ids = Enum.map(vessels, fn {vessel_id, _data} -> String.to_integer(vessel_id) end)
 
         query =
           from(
@@ -209,13 +217,13 @@ defmodule Oceanconnect.Auctions.TermAuction do
   def parse_date(dt = %DateTime{}), do: dt
   def parse_date(""), do: ""
   def parse_date(nil), do: ""
+
   def parse_date(epoch) do
     epoch
     |> String.to_integer()
     |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_iso8601()
   end
-
 
   def select_upcoming(query \\ TermAuction, time_frame) do
     current_time = DateTime.utc_now()

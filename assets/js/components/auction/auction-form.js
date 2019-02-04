@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import InputField from '../input-field';
+import InputErrors from '../input-errors';
 import CheckBoxField from '../check-box-field';
 import DateInput from '../date-input';
 import TimeInput from '../time-input';
@@ -14,6 +15,7 @@ import ForwardFixedAuctionForm from './forms/forward-fixed-auction-form';
 const AuctionForm = (props) => {
   const {
     auction,
+    errors,
     type,
     deselectAllSuppliers,
     credit_margin_amount,
@@ -51,6 +53,7 @@ const AuctionForm = (props) => {
         field={'port_agent'}
         labelText={'Port Agent'}
         value={auction.port_agent}
+        errors={errors.port_agent}
         opts={{type: 'text'}}
         onChange={updateInformation.bind(this, 'auction.port_agent')}
         isHorizontal={true}
@@ -105,6 +108,7 @@ const AuctionForm = (props) => {
                       </select>
                     </div>
                   </div>
+                  <InputErrors errors={errors.type} />
                 </div>
               </div>
             </fieldset>

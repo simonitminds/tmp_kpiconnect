@@ -2,9 +2,10 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import InputField from '../../input-field';
+import InputErrors from '../../input-errors';
 
 const TermFuelFormSection = (props) => {
-  const { auction, fuels, updateInformation } = props;
+  const { auction, errors, fuels, updateInformation } = props;
 
   return (
     <section className="auction-info"> {/* Fuel info */}
@@ -39,6 +40,7 @@ const TermFuelFormSection = (props) => {
                     </select>
                   </div>
                 </div>
+                <InputErrors errors={errors.fuel_id} />
               </div>
             </div>
 
@@ -47,6 +49,7 @@ const TermFuelFormSection = (props) => {
               field={'fuel_quantity'}
               labelText={'Fuel Quantity (MT)'}
               value={auction.fuel_quantity}
+              errors={errors.fuel_quantity}
               isHorizontal={true}
               opts={{type: 'number'}}
               onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
