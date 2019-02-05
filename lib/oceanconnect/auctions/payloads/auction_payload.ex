@@ -25,13 +25,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct) do
-    # auction = Auctions.fully_loaded(auction)
     auction_state = Auctions.get_auction_state!(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
   def get_auction_payload!(auction = %struct{}, supplier_id) when is_auction(struct) do
-    # auction = Auctions.fully_loaded(auction)
     auction_state = Auctions.get_auction_state!(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end

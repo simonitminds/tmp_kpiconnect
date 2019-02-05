@@ -4,7 +4,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{TermAuction, Fuel, Port, Vessel, TermAuctionVessel}
 
-  @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
+  @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers, :term_auction_vessels]}
   schema "auctions" do
     field(:type, :string)
     field(:start_date, :utc_datetime_usec, source: :start_date)
@@ -26,6 +26,12 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Fuel)
     field(:fuel_quantity, :integer)
+
+    has_many(:term_auction_vessels, TermAuctionVessel,
+      foreign_key: :auction_id,
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
 
     many_to_many(
       :vessels,
@@ -50,8 +56,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     timestamps()
   end
 
-
   @required_fields [
+    :type,
     :port_id
   ]
 
@@ -65,6 +71,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :duration,
     :end_date,
     :fuel_id,
+    :fuel_quantity,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
@@ -79,22 +86,24 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_required(@required_fields)
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
-    |> cast_assoc(:vessels)
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
+    |> maybe_add_vessels(attrs)
   end
 
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
-    |> validate_required(@required_fields ++ [:scheduled_start])
+    |> validate_required(
+      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date]
+    )
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
-    |> cast_assoc(:vessels)
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
+    |> maybe_add_vessels(attrs)
   end
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
@@ -106,6 +115,115 @@ defmodule Oceanconnect.Auctions.TermAuction do
   end
 
   def maybe_add_suppliers(changeset, _attrs), do: changeset
+
+  def maybe_add_vessels(changeset, %{"vessels" => vessels}) do
+    put_assoc(changeset, :vessels, vessels)
+  end
+
+  def maybe_add_vessels(changeset, %{vessels: vessels}) do
+    put_assoc(changeset, :vessels, vessels)
+  end
+
+  def maybe_add_vessels(changeset, _attrs), do: changeset
+
+  def from_params(params) do
+    params
+    |> maybe_parse_date_field("scheduled_start")
+    |> maybe_parse_date_field("start_date")
+    |> maybe_parse_date_field("end_date")
+    |> maybe_convert_checkbox("is_traded_bid_allowed")
+    |> maybe_convert_checkbox("anonymous_bidding")
+    |> maybe_convert_duration("duration")
+    |> maybe_load_suppliers("suppliers")
+    |> maybe_load_vessels("vessels")
+  end
+
+  def maybe_convert_checkbox(params, key) do
+    case params do
+      %{^key => value} ->
+        if value == "on" || value == true || value == "true" do
+          Map.put(params, key, true)
+        else
+          Map.put(params, key, false)
+        end
+
+      _ ->
+        params
+    end
+  end
+
+  def maybe_parse_date_field(params, key) do
+    case params do
+      %{^key => date} ->
+        updated_date = parse_date(date)
+        Map.put(params, key, updated_date)
+
+      _ ->
+        params
+    end
+  end
+
+  def maybe_convert_duration(params, key) do
+    case params do
+      %{^key => duration} ->
+        updated_duration = parse_duration(duration) * 60_000
+        Map.put(params, key, updated_duration)
+
+      _ ->
+        params
+    end
+  end
+
+  def maybe_load_suppliers(params, "suppliers") do
+    case params do
+      %{"suppliers" => suppliers} ->
+        supplier_ids =
+          Enum.map(suppliers, fn {_key, supplier_id} -> String.to_integer(supplier_id) end)
+
+        query =
+          from(
+            c in Oceanconnect.Accounts.Company,
+            where: c.id in ^supplier_ids
+          )
+
+        Map.put(params, "suppliers", Oceanconnect.Repo.all(query))
+
+      _ ->
+        params
+    end
+  end
+
+  def maybe_load_vessels(params, "vessels") do
+    case params do
+      %{"vessels" => vessels} ->
+        vessel_ids = Enum.map(vessels, fn {vessel_id, _data} -> String.to_integer(vessel_id) end)
+
+        query =
+          from(
+            v in Oceanconnect.Auctions.Vessel,
+            where: v.id in ^vessel_ids
+          )
+
+        Map.put(params, "vessels", Oceanconnect.Repo.all(query))
+
+      _ ->
+        params
+    end
+  end
+
+  defp parse_duration(duration) when is_binary(duration), do: String.to_integer(duration)
+  defp parse_duration(duration) when is_integer(duration), do: duration
+
+  def parse_date(dt = %DateTime{}), do: dt
+  def parse_date(""), do: ""
+  def parse_date(nil), do: ""
+
+  def parse_date(epoch) do
+    epoch
+    |> String.to_integer()
+    |> DateTime.from_unix!(:millisecond)
+    |> DateTime.to_iso8601()
+  end
 
   def select_upcoming(query \\ TermAuction, time_frame) do
     current_time = DateTime.utc_now()

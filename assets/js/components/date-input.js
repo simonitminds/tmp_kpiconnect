@@ -30,9 +30,6 @@ export default class DateInput extends React.Component {
 
     return(
       <div>
-        {/* <label htmlFor={`${model}_${field}`} className="label">
-          {labelText}
-        </label> */}
         <div className={`control qa-${model}-${field}_date`}>
           <SingleDatePicker
             id={fieldName}

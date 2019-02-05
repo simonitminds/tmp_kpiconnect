@@ -16,6 +16,7 @@ import AuctionDetailsFormSection from './auction-details-form-section';
 const ForwardFixedAuctionForm = (props) => {
   const {
     auction,
+    errors,
     type,
     deselectAllSuppliers,
     credit_margin_amount,
@@ -48,6 +49,7 @@ const ForwardFixedAuctionForm = (props) => {
   return (
     <React.Fragment>
       <PortSelectFormSection auction={auction}
+                             errors={errors}
                              port_id={port_id}
                              ports={ports}
                              hasDurationAndTerminal={true}
@@ -60,19 +62,22 @@ const ForwardFixedAuctionForm = (props) => {
                     onToggleSupplier={toggleSupplier}
                     selectedPort={selectedPort}
                     selectedSuppliers={selectedSuppliers}
-                    suppliers={suppliers} />
+                    suppliers={suppliers}
+                    errors={errors} />
 
 
       <TermVesselFormSection auction={auction}
+                             errors={errors}
                              vessels={vessels}
                              portId={port_id}
                              ports={ports} />
 
-      <TermFuelFormSection auction={auction} fuels={fuels} updateInformation={updateInformation} />
+      <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} updateInformation={updateInformation} />
 
-      <AdditionalInfoFormSection auction={auction} updateInformation={updateInformation} isTermAuction={true }/>
+      <AdditionalInfoFormSection auction={auction} errors={errors} updateInformation={updateInformation} isTermAuction={true }/>
 
       <AuctionDetailsFormSection auction={auction}
+                                 errors={errors}
                                  credit_margin_amount={credit_margin_amount}
                                  isTermAuction={true}
                                  updateInformation={updateInformation}

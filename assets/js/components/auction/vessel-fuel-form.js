@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import InputField from '../input-field';
+import InputErrors from '../input-errors';
 import DateTimeInput from '../date-time-input';
 
 export default class VesselFuelForm extends React.Component {
@@ -48,7 +49,7 @@ export default class VesselFuelForm extends React.Component {
   }
 
   render() {
-    const { auction, vessels, fuels, vesselFuels, portId, ports } = this.props;
+    const { auction, errors, vessels, fuels, vesselFuels, portId, ports } = this.props;
     const availableVessels = _.reject(vessels, (v) => {
       return _.some(this.state.selectedVessels, (sv) => v.id == sv);
     });
@@ -60,6 +61,8 @@ export default class VesselFuelForm extends React.Component {
       const vesselFuel = _.find(vesselFuels, {vessel_id: vessel_id, fuel_id: fuel_id});
       return vesselFuel ? vesselFuel.quantity : 0;
     };
+
+    const hasErrors = _.some(errors.auction_vessel_fuels, (error) => !_.isEmpty(error))
 
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
@@ -123,6 +126,9 @@ export default class VesselFuelForm extends React.Component {
             <div className="content">
               <fieldset>
                 <legend className="subtitle is-4" >Vessels</legend>
+                { hasErrors &&
+                  <p className="has-text-danger">All vessels must have an ETA when the auction is scheduled.</p>
+                }
                 <div className="field is-horizontal">
                   <div className="field-label">
                     <label htmlFor="auction_vessel_id" className="label">

@@ -1,19 +1,21 @@
 import React from 'react';
+import moment from 'moment';
 import CheckBoxField from '../../check-box-field';
 import DateInput from '../../date-input';
 import InputField from '../../input-field';
+import InputErrors from '../../input-errors';
 import TimeInput from '../../time-input';
 
 const AuctionDetailsFormSection = (props) => {
   const {
     auction,
+    errors,
     credit_margin_amount,
     isTermAuction,
     updateInformation,
     updateInformationFromCheckbox,
     updateDate
   } = props;
-
   return (
     <section className="auction-info"> {/* Auction details */}
       <div className="container">
@@ -26,6 +28,7 @@ const AuctionDetailsFormSection = (props) => {
               field={'po'}
               labelText={'po'}
               value={auction.po}
+              errors={errors.po}
               isHorizontal={true}
               opts={{ labelClass: 'label is-uppercase' }}
               onChange={updateInformation.bind(this, 'auction.po')}
@@ -36,6 +39,7 @@ const AuctionDetailsFormSection = (props) => {
                 <label className="label">Auction Start</label>
               </div>
               <div className="field-body field-body--distribute-middle">
+                <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
                 <div className="control">
                   <DateInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_date')} />
                 </div>
@@ -45,8 +49,10 @@ const AuctionDetailsFormSection = (props) => {
                 <div className="control has-text-gray-3">
                   (GMT)
                 </div>
+                <InputErrors errors={errors.scheduled_start} />
               </div>
             </div>
+
             <div className="field is-horizontal">
               <div className="field-label">
                 <label htmlFor="auction_duration" className="label">
@@ -67,6 +73,7 @@ const AuctionDetailsFormSection = (props) => {
                   </div>
                   <span className="select__extra-label">minutes</span>
                 </div>
+                <InputErrors errors={errors.auction_duration} />
               </div>
             </div>
 
@@ -90,6 +97,7 @@ const AuctionDetailsFormSection = (props) => {
                     </div>
                     <span className="select__extra-label">minutes</span>
                   </div>
+                  <InputErrors errors={errors.decision_duration} />
                 </div>
               </div>
             }
@@ -105,6 +113,7 @@ const AuctionDetailsFormSection = (props) => {
                     opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                     onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
                 />
+                <InputErrors errors={errors.anonymous_bidding} />
               </div>
             </div>
 
@@ -120,6 +129,7 @@ const AuctionDetailsFormSection = (props) => {
                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
                     />
+                    <InputErrors errors={errors.is_traded_bid_allowed} />
                     <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
                   </div>
                 </div>

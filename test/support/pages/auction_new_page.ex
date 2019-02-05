@@ -100,16 +100,6 @@ defmodule Oceanconnect.AuctionNewPage do
     |> fill_form_element("select", fuel_id)
   end
 
-  def add_term_fuel(fuel_id) do
-    find_element(:css, ".qa-auction-term_fuel_id")
-    |> fill_form_element("select", fuel_id)
-  end
-
-  def add_term_fuel_quantity(fuel_quantity) do
-    find_element(:css, ".qa-auction-term_fuel_quantity")
-    |> fill_form_element("input", fuel_quantity)
-  end
-
   def add_vessels_fuel_quantity(fuel_id, vessels, fuel_quantity) do
     Enum.each(vessels, fn vessel ->
       find_element(:css, ".qa-auction-vessel-#{vessel.id}-fuel-#{fuel_id}-quantity")

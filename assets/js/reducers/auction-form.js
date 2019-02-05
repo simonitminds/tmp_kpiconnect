@@ -16,6 +16,7 @@ import { RECEIVE_AUCTION_FORM_DATA,
 
 const initialState = {
   auction: null,
+  errors: null,
   eta_date: null,
   eta_time: null,
   etd_date: null,
@@ -52,6 +53,7 @@ export default function(state, action) {
         return {
           ...state,
           auction: action.data.auction,
+          errors: action.data.errors,
           credit_margin_amount: formatPrice(action.data.credit_margin_amount),
           is_traded_bid_allowed: _.get(action, 'data.auction.is_traded_bid_allowed'),
           eta_date: setUTCDateTime(action.data.auction.eta),
@@ -65,7 +67,7 @@ export default function(state, action) {
           scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           selectedPort: _.get(action, 'data.auction.port.id'),
           selectedSuppliers: supplierList,
-          type: _.get(action, 'data.type'),
+          type: _.get(action, 'data.auction.type'),
           suppliers: _.get(action, 'data.suppliers', []),
           vessels: action.data.vessels,
         };

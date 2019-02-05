@@ -1,4 +1,4 @@
-defmodule Oceanconnect.SpotAuctionNewTest do
+defmodule Oceanconnect.AuctionNewTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionNewPage, AuctionShowPage}
 
@@ -221,5 +221,30 @@ defmodule Oceanconnect.SpotAuctionNewTest do
     login_user(buyer_with_no_credit)
     AuctionNewPage.visit()
     assert_raise Hound.NoSuchElementError, fn -> AuctionNewPage.is_traded_bid_allowed() end
+  end
+
+  test "errors messages render for required fields when creating a scheduled auction", %{
+    params: params,
+    port: port,
+    buyer_vessels: buyer_vessels,
+    fuels: fuels
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+
+    Enum.each(fuels, fn fuel ->
+      AuctionNewPage.add_fuel(fuel.id)
+      AuctionNewPage.add_vessels_fuel_quantity(fuel.id, buyer_vessels, 1500)
+    end)
+
+    AuctionNewPage.submit()
+
+    refute current_path() =~ ~r/auctions\/\d/
+
+    assert AuctionNewPage.has_content?(
+             "All vessels must have an ETA when the auction is scheduled."
+           )
   end
 end

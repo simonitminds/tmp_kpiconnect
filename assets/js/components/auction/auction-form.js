@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
-import moment from 'moment';
 import InputField from '../input-field';
+import InputErrors from '../input-errors';
 import CheckBoxField from '../check-box-field';
 import DateInput from '../date-input';
 import TimeInput from '../time-input';
@@ -14,6 +14,7 @@ import ForwardFixedAuctionForm from './forms/forward-fixed-auction-form';
 const AuctionForm = (props) => {
   const {
     auction,
+    errors,
     type,
     deselectAllSuppliers,
     credit_margin_amount,
@@ -51,6 +52,7 @@ const AuctionForm = (props) => {
         field={'port_agent'}
         labelText={'Port Agent'}
         value={auction.port_agent}
+        errors={errors.port_agent}
         opts={{type: 'text'}}
         onChange={updateInformation.bind(this, 'auction.port_agent')}
         isHorizontal={true}
@@ -71,10 +73,6 @@ const AuctionForm = (props) => {
 
   return (
     <div>
-      <input type="hidden" name="auction[scheduled_start]" className="qa-auction-scheduled_start" value={auction.scheduled_start ? moment(auction.scheduled_start).utc() : ""} />
-      <input type="hidden" name="auction[type]" value="spot" />
-
-{/*   ### PENDING TERM SETUP
       <section className="auction-info is-gray-1">
         <div className="container">
           <div className="content">
@@ -93,7 +91,7 @@ const AuctionForm = (props) => {
                         id="auction_type"
                         name="auction[type]"
                         className="qa-auction-type"
-                        value={auction.type}
+                        value={type}
                         onChange={selectAuctionType}
                       >
                         <option disabled value="">
@@ -107,13 +105,14 @@ const AuctionForm = (props) => {
                       </select>
                     </div>
                   </div>
+                  <InputErrors errors={errors.type} />
                 </div>
               </div>
             </fieldset>
           </div>
         </div>
       </section>
-*/}
+
 
       {renderFormContent(type)}
     </div>

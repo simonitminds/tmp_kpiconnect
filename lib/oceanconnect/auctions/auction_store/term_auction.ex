@@ -1,7 +1,5 @@
-defimpl Oceanconnect.Auctions.StoreProtocol,
-  for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
+defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
   alias Oceanconnect.Auctions
-
   alias Oceanconnect.Auctions.{
     TermAuction,
     AuctionBarge,
