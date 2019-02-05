@@ -5,7 +5,6 @@ import moment from 'moment';
 import AuctionInvitation from './auction-invitation';
 import AuctionShowSidebarDetails from './show-sidebar-details';
 import BargeSubmission from './barge-submission';
-import FuelRequirementDisplay from './fuel-requirement-display';
 
 
 const SupplierAuctionShowSidebar = (props) => {

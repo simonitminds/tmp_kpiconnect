@@ -7,7 +7,7 @@ import DateInput from '../date-input';
 import TimeInput from '../time-input';
 import { portLocalTime } from '../../utilities';
 import SupplierList  from './supplier-list';
-import VesselFuelForm from './vessel-fuel-form';
+import VesselFuelForm from './forms/vessel-fuel-form';
 import SpotAuctionForm from './forms/spot-auction-form';
 import ForwardFixedAuctionForm from './forms/forward-fixed-auction-form';
 

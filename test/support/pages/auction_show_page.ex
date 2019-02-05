@@ -182,7 +182,7 @@ defmodule Oceanconnect.AuctionShowPage do
   def select_custom_solution_bids(bids, container \\ ".qa-auction-solution-custom") do
     container = find_element(:css, container)
 
-    Enum.each(bids, fn(%{vessel_fuel_id: vfid, id: bid_id}) ->
+    Enum.each(bids, fn %{vessel_fuel_id: vfid, id: bid_id} ->
       selector =
         container
         |> find_within_element(:css, ".qa-custom-bid-selector-#{vfid} .select")

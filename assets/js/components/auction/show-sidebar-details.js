@@ -3,28 +3,13 @@ import React from 'react';
 import { formatUTCDateTime } from '../../utilities';
 import moment from 'moment';
 import AuctionLogLink from './auction-log-link';
-import FuelRequirementDisplay from './fuel-requirement-display';
+import FuelRequirementsDisplay from './show/fuel-requirements-display';
+import ArrivalInformationDisplay from './show/arrival-information-display';
 import InvitedSuppliers from './invited-suppliers';
 
 const AuctionShowSidebarDetails = (props) => {
   const { auctionPayload, isEditable } = props;
   const { auction, status } = auctionPayload;
-  const vesselFuels = _.get(auction, 'auction_vessel_fuels');
-  const vessels = _.get(auction, 'vessels');
-
-  const vesselsWithETAs = _.map(vessels, (vessel) => {
-    const vesselFuelsForVessel = _.filter(vesselFuels, {vessel_id: vessel.id});
-    const eta = _.chain(vesselFuelsForVessel)
-      .map('eta')
-      .min()
-      .value();
-    const etd = _.chain(vesselFuelsForVessel)
-      .filter({vessel_id: vessel.id})
-      .map('etd')
-      .min()
-      .value();
-    return { ...vessel, eta, etd };
-  });
 
   return(
     <div className="box has-margin-bottom-md">
@@ -46,35 +31,11 @@ const AuctionShowSidebarDetails = (props) => {
       </div>
       <div className="box__subsection">
         <h3 className="box__header">Fuel Requirements</h3>
-        <ul className="list has-no-bullets">
-          <FuelRequirementDisplay vesselFuels={vesselFuels} />
-        </ul>
+        <FuelRequirementsDisplay auction={auction} />
       </div>
       <div className="box__subsection">
         <h3 className="box__header">Arrival Information</h3>
-        <ul className="list has-no-bullets">
-          <li className="is-not-flex">
-            <strong>Port</strong>
-            {auction.port.name}
-          </li>
-          { auction.port_agent
-            ? <li className="is-not-flex">
-                <strong>Port Agent</strong>
-                <span className="qa-port_agent">{auction.port_agent || "Not Specified"}</span>
-              </li>
-            : <span className="qa-port_agent"></span>
-          }
-          { _.map(vesselsWithETAs, (vessel) => {
-              return (
-                <li className="is-not-flex has-margin-top-md" key={vessel.id}>
-                  <strong className="is-block">{vessel.name}</strong>
-                  <span className="is-block"><strong>ETA</strong> {formatUTCDateTime(vessel.eta)}</span>
-                  <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(vessel.etd)}</span>
-                </li>
-              );
-            })
-          }
-        </ul>
+        <ArrivalInformationDisplay auction={auction} />
       </div>
       <div className="box__subsection">
         <h3 className="box__header">Additional Information</h3>

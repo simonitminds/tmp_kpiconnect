@@ -1,9 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
-import InputField from '../input-field';
-import InputErrors from '../input-errors';
-import DateTimeInput from '../date-time-input';
+import InputField from '../../input-field';
+import InputErrors from '../../input-errors';
+import DateTimeInput from '../../date-time-input';
 
 export default class VesselFuelForm extends React.Component {
   constructor(props) {

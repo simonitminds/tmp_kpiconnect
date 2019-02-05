@@ -32,7 +32,7 @@ export const formatUTCDateTime = (dateTime) => {
 
 export const formatUTCDate = (date) => {
   if (date) {
-    return `${formatDateTime(moment(date).utc())} GMT`;
+    return `${formatDate(moment(date).utc())}`;
   } else {
     return "Not Scheduled";
   }

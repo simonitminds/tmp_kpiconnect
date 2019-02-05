@@ -6,7 +6,6 @@ import AuctionInvitation from './auction-invitation';
 import BargeSubmission from './barge-submission';
 import BidStatus from './bid-status';
 import BiddingForm from './bidding-form';
-import FuelRequirementDisplay from './fuel-requirement-display';
 import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';

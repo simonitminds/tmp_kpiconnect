@@ -4,7 +4,6 @@ import { formatUTCDateTime } from '../../utilities';
 import moment from 'moment';
 import AuctionLogLink from './auction-log-link';
 import AuctionShowSidebarDetails from './show-sidebar-details';
-import FuelRequirementDisplay from './fuel-requirement-display';
 import InvitedSuppliers from './invited-suppliers';
 
 const BuyerAuctionShowSidebar = (props) => {
