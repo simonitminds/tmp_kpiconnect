@@ -203,19 +203,40 @@ defmodule Oceanconnect.Auctions do
   end
 
   def list_auctions do
-    Repo.all(Auction)
-    |> fully_loaded
+    regular_auctions =
+      from(a in Auction, where: a.type == "spot")
+      |> Repo.all()
+      |> fully_loaded
+    term_auctions =
+      from(ta in TermAuction, where: ta.type in ["forward_fixed", "formula_related"])
+      |> Repo.all()
+      |> fully_loaded
+
+    regular_auctions ++ term_auctions
   end
 
   def list_participating_auctions(company_id) do
-    (buyer_auctions(company_id) ++ supplier_auctions(company_id))
+    (
+      buyer_auctions(company_id) ++
+      buyer_term_auctions(company_id) ++
+      supplier_auctions(company_id) ++
+      supplier_term_auctions(company_id)
+    )
     |> Enum.uniq_by(& &1.id)
   end
 
   def list_upcoming_auctions(time_frame) do
-    Auction
-    |> Auction.select_upcoming(time_frame)
-    |> Repo.all()
+    regular_auctions =
+      Auction
+      |> Auction.select_upcoming(time_frame)
+      |> Repo.all()
+
+    term_auctions =
+      TermAuction
+      |> TermAuction.select_upcoming(time_frame)
+      |> Repo.all()
+
+    regular_auctions ++ term_auctions
   end
 
   def upcoming_notification_sent?(%struct{id: auction_id}) when is_auction(struct) do
@@ -228,7 +249,7 @@ defmodule Oceanconnect.Auctions do
     query =
       from(
         a in Auction,
-        where: a.buyer_id == ^buyer_id,
+        where: a.buyer_id == ^buyer_id and a.type == "spot",
         order_by: a.scheduled_start
       )
 
@@ -237,19 +258,40 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  defp supplier_auctions(supplier_id) do
-    query =
-      from(
-        as in AuctionSuppliers,
-        join: a in Auction,
-        on: a.id == as.auction_id,
-        where: as.supplier_id == ^supplier_id,
-        where: not is_nil(a.scheduled_start),
-        select: a,
-        order_by: a.scheduled_start
-      )
+  defp buyer_term_auctions(buyer_id) do
+    from(
+      ta in TermAuction,
+      where: ta.buyer_id == ^buyer_id and ta.type in ["forward_fixed", "formula_related"],
+      order_by: ta.scheduled_start
+    )
+    |> Repo.all()
+    |> fully_loaded
+  end
 
-    query
+  defp supplier_auctions(supplier_id) do
+    from(
+      as in AuctionSuppliers,
+      join: a in Auction,
+      on: a.id == as.auction_id and a.type == "spot",
+      where: as.supplier_id == ^supplier_id,
+      where: not is_nil(a.scheduled_start),
+      select: a,
+      order_by: a.scheduled_start
+    )
+    |> Repo.all()
+    |> fully_loaded
+  end
+
+  defp supplier_term_auctions(supplier_id) do
+    from(
+      as in AuctionSuppliers,
+      join: ta in TermAuction,
+      on: ta.id == as.term_auction_id and ta.type in ["forward_fixed", "formula_related"],
+      where: as.supplier_id == ^supplier_id,
+      where: not is_nil(ta.scheduled_start),
+      select: ta,
+      order_by: ta.scheduled_start
+    )
     |> Repo.all()
     |> fully_loaded
   end

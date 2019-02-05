@@ -50,7 +50,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
     }
 
     show_params = %{
-      vessels: buyer_vessels,
       port: port.name,
       suppliers: suppliers
     }
