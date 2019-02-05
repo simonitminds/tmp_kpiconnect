@@ -12,6 +12,6 @@ defmodule Oceanconnect.Admin.Fixture.IndexPage do
   end
 
   def has_fixture?(%{id: auction_fixture_id}) do
-    has_css?(".qa-fixture-for-auction-#{auction_fixture_id}")
+    has_css?(".qa-auction-fixture-#{auction_fixture_id}")
   end
 end
