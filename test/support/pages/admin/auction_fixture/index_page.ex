@@ -11,7 +11,7 @@ defmodule Oceanconnect.Admin.Fixture.IndexPage do
     current_path() == "#{@page_path}/#{auction_id}/fixtures"
   end
 
-  def has_fixture?(vessel_fuel_id) do
-    has_css?(".qa-fixture-for-auction-#{vessel_fuel_id}")
+  def has_fixture?(%{id: auction_fixture_id}) do
+    has_css?(".qa-fixture-for-auction-#{auction_fixture_id}")
   end
 end

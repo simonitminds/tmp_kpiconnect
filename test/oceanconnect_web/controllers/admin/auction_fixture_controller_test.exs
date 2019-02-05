@@ -71,8 +71,9 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
       assert redirected_to(final_conn) == auction_path(final_conn, :index)
     end
 
-    test "redirects for pending" do
-      assert false, "Needs Implemented"
+    test "redirects for pending", %{auction: auction, admin_conn: admin_conn} do
+      final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
+      assert redirected_to(final_conn) == auction_path(final_conn, :index)
     end
 
     def start_auction!(auction) do

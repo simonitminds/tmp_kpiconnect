@@ -21,6 +21,9 @@ const BuyerAuctionShowSidebar = (props) => {
 
   return (
     <React.Fragment>
+      { (isAdmin && (status == 'closed' || status == 'expired')) && 
+        <a class="qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.auction.id}/fixtures`}>View fixtures</a>
+      }
       { (isAdmin || (status != 'pending' && status != 'open')) &&
         <AuctionLogLink auction={auction} />
       }

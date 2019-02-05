@@ -4,6 +4,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   alias Oceanconnect.Admin, as: Admin
 
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionFixture}
 
   hound_session()
 
@@ -12,19 +13,22 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
     _user = insert(:user, is_admin: false)
     _company = insert(:company)
     %{auction: auction, vessel_fuels: [vessel_fuel1, _vessel_fuel2]} = create_closed_auction()
-
-    {:ok, %{admin_user: admin_user, auction: auction, vessel_fuel1: vessel_fuel1}}
+    auction_fixtures = Auctions.fixtures_for_auction(auction)
+    {:ok, %{admin_user: admin_user, auction: auction, vessel_fuel1: vessel_fuel1, auction_fixtures: auction_fixtures }}
   end
 
   test "visiting the auction fixture index page shows a list fixtures for the auction", %{
     admin_user: admin_user,
     auction: %{id: auction_id},
-    vessel_fuel1: vessel_fuel1
+    vessel_fuel1: vessel_fuel1,
+    auction_fixtures: [auction_fixture1, auction_fixture2]
   } do
     login_user(admin_user)
-    Admin.Fixture.IndexPage.visit(auction_id)
+    AuctionShowPage.visit(auction_id)
+    AuctionShowPage.view_auction_fixtures
     assert Admin.Fixture.IndexPage.is_current_path?(auction_id)
-    assert Admin.Fixture.IndexPage.has_fixture?(vessel_fuel1.id)
+    assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture1)
+    assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture2)
   end
 
   def create_closed_auction do
@@ -80,6 +84,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
     AuctionShowPage.select_solution(:best_overall)
     :timer.sleep(100)
     AuctionShowPage.accept_bid()
+    :timer.sleep(500)
 
     %{auction: auction, vessel_fuels: [vessel_fuel1, vessel_fuel2]}
   end

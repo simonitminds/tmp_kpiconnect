@@ -1,1 +1,49 @@
-<h1> Auction <%= @auction.id %> Fixtures </h1>
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Auction <%= "#{@auction.id}" %> Fixtures </span>
+					<%= link to: "/admin/auctions/fixtures/new", class: "button is-link is-inline-block has-margin-left-auto" do %>
+						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Fixtures
+					<% end %>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Auction</th>
+							<th>Fuel</th>
+              <th>Vessel</th>
+							<th>Supplier</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>ETA</th>
+              <th>ETD</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for fixture <- @fixtures do %>
+							<tr class="qa-auction-fixture-<%= fixture.id %>">
+								<td class="qa-auction-fixture-auction-name"><%= auction_name(@auction) %></td>
+								<td class="qa-auction-fixture-fuel"><%= fuel_name(fixture) %></td>
+								<td class="qa-auction-fixture-supplier"><%= supplier_name(fixture) %></td>
+								<td class="qa-auction-fixture-price"><%= fixture.price %></td>
+								<td class="qa-auction-fixture-quantity"><%= fixture.quantity %></td>
+                <td class="qa-auction-fixture-eta"><%= fixture.eta %></td>
+                <td class="qa-auction-fixture-etd"><%= fixture.etd %></td>
+								<td class="text-right">
+									<%= link "Edit", to: "/admin/auctions/#{@auction.id}/fixtures/#{fixture.id}", class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</div>
+</div>

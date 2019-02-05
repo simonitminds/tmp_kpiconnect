@@ -33,6 +33,7 @@ const BuyerAuctionShowBody = (props) => {
       <div>
         { currentUser.isAdmin
           ? <div>
+              <a class="qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.id}/fixtures`}>View fixtures</a>
               <BuyerBestSolution auctionPayload={auctionPayload} />
               <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
             </div>
