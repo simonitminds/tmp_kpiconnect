@@ -38,7 +38,7 @@ defmodule Oceanconnect.AuctionsTest do
       {:ok,
        %{
          auction: Auctions.get_auction!(auction.id),
-         term_auction: term_auction,
+         term_auction: Auctions.get_auction!(term_auction.id),
          port: port,
          vessel: vessel,
          fuel: fuel,
@@ -288,28 +288,32 @@ defmodule Oceanconnect.AuctionsTest do
              ] == auctions
     end
 
-    test "get_auction!/1 returns the auction with given id", %{auction: auction} do
-      assert Auctions.get_auction!(auction.id) == auction
+    test "get_auction!/1 returns a spot auction with given id", %{auction: auction} do
+      auction_id = auction.id
+      got_auction = Auctions.get_auction!(auction_id)
+      assert %Auction{id: auction_id} = got_auction
+      assert got_auction == auction
     end
 
-    test "get_auction!/2 returns the auction with give id and type", %{
-      auction: auction,
-      term_auction: term_auction
-    } do
-      assert %Auction{} = Auctions.get_auction!(auction.id, Auction)
-      assert %TermAuction{} = Auctions.get_auction!(term_auction.id, TermAuction)
+    test "get_auction!/1 returns a term auction with given id", %{term_auction: term_auction} do
+      term_auction_id = term_auction.id
+      got_auction = Auctions.get_auction!(term_auction_id)
+      assert %TermAuction{id: term_auction_id} = got_auction
+      assert got_auction == term_auction
     end
 
-    test "get_auction/1 returns the auction with given id", %{auction: auction} do
-      assert Auctions.get_auction(auction.id) == auction
+    test "get_auction/1 returns a spot auction with given id", %{auction: auction} do
+      auction_id = auction.id
+      got_auction = Auctions.get_auction(auction_id)
+      assert %Auction{id: auction_id} = got_auction
+      assert got_auction == auction
     end
 
-    test "get_auction/2 returns the auction with give id and type", %{
-      auction: auction,
-      term_auction: term_auction
-    } do
-      assert %Auction{} = Auctions.get_auction(auction.id, Auction)
-      assert %TermAuction{} = Auctions.get_auction(term_auction.id, TermAuction)
+    test "get_auction/1 returns a term auction with given id", %{term_auction: term_auction} do
+      term_auction_id = term_auction.id
+      got_auction = Auctions.get_auction(term_auction_id)
+      assert %TermAuction{id: term_auction_id} = got_auction
+      assert got_auction == term_auction
     end
 
     test "create_auction/1 with valid data creates an auction", %{auction_attrs: auction_attrs} do
@@ -321,7 +325,7 @@ defmodule Oceanconnect.AuctionsTest do
       term_auction_attrs: term_auction_attrs
     } do
       assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
-      assert %TermAuction{} = Auctions.get_auction!(auction_id, TermAuction)
+      assert %TermAuction{} = Auctions.get_auction!(auction_id)
     end
 
     test "create_auction/1 with a scheduled_start time in the past returns error changeset", %{
@@ -337,7 +341,7 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       auction_attrs = Map.drop(auction_attrs, [:scheduled_start])
       assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
-      assert %Auction{} = Auctions.get_auction!(auction_id, Auction)
+      assert %Auction{} = Auctions.get_auction!(auction_id)
     end
 
     test "create_auction/1 with invalid data returns error changeset" do

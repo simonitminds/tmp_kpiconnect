@@ -208,7 +208,7 @@ defmodule Oceanconnect.Auctions do
       |> Repo.all()
       |> fully_loaded
     term_auctions =
-      from(ta in TermAuction, where: ta.type in ["forward_fixed", "formula_related"])
+      from(ta in TermAuction, where: ta.type in @term_types)
       |> Repo.all()
       |> fully_loaded
 
@@ -261,7 +261,7 @@ defmodule Oceanconnect.Auctions do
   defp buyer_term_auctions(buyer_id) do
     from(
       ta in TermAuction,
-      where: ta.buyer_id == ^buyer_id and ta.type in ["forward_fixed", "formula_related"],
+      where: ta.buyer_id == ^buyer_id and ta.type in @term_types,
       order_by: ta.scheduled_start
     )
     |> Repo.all()
@@ -286,7 +286,7 @@ defmodule Oceanconnect.Auctions do
     from(
       as in AuctionSuppliers,
       join: ta in TermAuction,
-      on: ta.id == as.term_auction_id and ta.type in ["forward_fixed", "formula_related"],
+      on: ta.id == as.term_auction_id and ta.type in @term_types,
       where: as.supplier_id == ^supplier_id,
       where: not is_nil(ta.scheduled_start),
       select: ta,
@@ -296,18 +296,37 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  def get_auction(id, module \\ nil) do
-    module = module || Auction
+  def get_auction(id) do
+    if auction_type = get_auction_type(id) do
+      Repo.get(auction_type, id)
+      |> fully_loaded
+    end
+  end
 
-    Repo.get(module, id)
+  def get_auction!(id) do
+    get_auction_type!(id)
+    |> Repo.get!(id)
     |> fully_loaded
   end
 
-  def get_auction!(id, module \\ nil) do
-    module = module || Auction
+  defp get_auction_type(auction_id) do
+    try do
+      get_auction_type!(auction_id)
+    rescue
+      Ecto.NoResultsError -> nil
+    end
+  end
 
-    Repo.get!(module, id)
-    |> fully_loaded
+  defp get_auction_type!(auction_id) do
+    auction_type =
+      from(a in Auction, select: a.type)
+      |> Repo.get!(auction_id)
+
+    case auction_type do
+      "spot" -> Auction
+      t when t in @term_types -> TermAuction
+      _ -> nil
+    end
   end
 
   def get_auction_state!(auction = %struct{}) when is_auction(struct) do
