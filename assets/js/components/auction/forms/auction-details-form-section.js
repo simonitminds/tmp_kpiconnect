@@ -17,7 +17,7 @@ const AuctionDetailsFormSection = (props) => {
     updateDate
   } = props;
   return (
-    <section className="auction-info"> {/* Auction details */}
+    <section className="auction-info is-gray-1"> {/* Auction details */}
       <div className="container">
         <div className="content">
           <fieldset>

@@ -121,7 +121,7 @@ export default class VesselFuelForm extends React.Component {
 
     return(
       <div>
-        <section className="auction-info is-gray-1"> {/* Vessels info */}
+        <section className="auction-info"> {/* Vessels info */}
           <div className="container">
             <div className="content">
               <fieldset>
@@ -167,7 +167,7 @@ export default class VesselFuelForm extends React.Component {
           </div>
         </section>
 
-        <section className="auction-info"> {/* Fuels info */}
+        <section className="auction-info is-gray-1"> {/* Fuels info */}
           <div className="container">
             <div className="content">
               <fieldset>

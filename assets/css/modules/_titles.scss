@@ -43,3 +43,8 @@ $size-7: 0.75rem; .is-size-7, .is-7 { font-size: 0.75rem; }
     }
   }
 }
+
+h1.title {
+  width: 100%;
+  text-align: left !important;
+}

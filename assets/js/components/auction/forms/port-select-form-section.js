@@ -33,7 +33,7 @@ const PortSelectFormSection = (props) => {
   };
 
   return (
-    <section className="auction-info is-gray-1">
+    <section className="auction-info">
       <div className="container">
         <div className="content">
           <fieldset>

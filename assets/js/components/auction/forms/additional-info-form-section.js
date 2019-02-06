@@ -10,7 +10,7 @@ const AdditionalInfoFormSection = (props) => {
   } = props;
 
   return (
-    <section className="auction-info is-gray-1"> {/* Add'l info */}
+    <section className="auction-info"> {/* Add'l info */}
       <div className="container">
         <div className="content">
           <fieldset>

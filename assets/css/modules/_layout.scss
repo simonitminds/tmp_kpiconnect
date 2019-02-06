@@ -179,7 +179,18 @@ section {
 
   &--list {
     width: 100vw !important;
-    margin-top: 4rem;
+  }
+
+  &--create {
+    width: 100vw !important;
+    padding: 0 1rem;
+
+    @media (max-width: 1087px) {
+      padding: 0 2rem;
+    }
+    @media (max-width: 768px) {
+      padding: 0 1.5rem;
+    }
   }
 }
 
