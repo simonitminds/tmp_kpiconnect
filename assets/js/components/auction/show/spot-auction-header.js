@@ -8,6 +8,7 @@ import {
 } from '../../../utilities';
 import MediaQuery from 'react-responsive';
 import AuctionHeaderTimers from '../auction-header-timers';
+import AuctionTitle from '../auction-title';
 
 
 const SpotAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
@@ -39,18 +40,7 @@ const SpotAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTim
                   </MediaQuery>
                   <div className="qa-auction-vessels">
                     <h1 className="auction-header__vessel title has-text-weight-bold">
-                        { _.map(vessels, (vessel) => {
-                            return(
-                              <div key={vessel.name} className={`auction-header__vessel-item qa-auction-vessel-${vessel.id}`}>
-                                {vessel.name} <span className="auction-header__vessel__imo">({vessel.imo})</span>
-                              </div>
-                            );
-                          })
-                        }
-                        { auction.is_traded_bid_allowed &&
-                        <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
-                        </span>
-                      }
+                      <AuctionTitle auction={auction} />
                       <span className="auction-header__company">{auction.buyer.name}</span>
                     </h1>
                   </div>

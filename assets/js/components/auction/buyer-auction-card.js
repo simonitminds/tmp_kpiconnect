@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
 import SupplierBidStatus from './supplier-bid-status';
 import AuctionTimeRemaining from './auction-time-remaining';
+import AuctionTitle from './auction-title';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
@@ -171,9 +172,7 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-title">
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
-          <span className="has-text-gray-3 is-inline-block has-padding-right-sm">{auction.id}</span>
-            { vesselNameDisplay(vesselFuels) }
-            {auction.is_traded_bid_allowed && <span> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3 card__traded-bid-marker" action-label="Traded Bids Accepted" /> </span>}
+            <AuctionTitle auction={auction} />
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>

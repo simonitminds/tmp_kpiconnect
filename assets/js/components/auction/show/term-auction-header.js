@@ -9,6 +9,7 @@ import {
 } from '../../../utilities';
 import MediaQuery from 'react-responsive';
 import AuctionHeaderTimers from '../auction-header-timers';
+import AuctionTitle from '../auction-title';
 
 
 const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
@@ -46,11 +47,7 @@ const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTim
                   </MediaQuery>
                   <div className="qa-auction-port">
                     <h1 className="auction-header__vessel title has-text-weight-bold">
-                      {portName}
-                      { auction.is_traded_bid_allowed &&
-                        <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
-                        </span>
-                      }
+                      <AuctionTitle auction={auction} />
                       <span className="auction-header__company">{auction.buyer.name}</span>
                     </h1>
                   </div>
