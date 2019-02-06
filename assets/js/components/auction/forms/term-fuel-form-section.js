@@ -8,7 +8,7 @@ const TermFuelFormSection = (props) => {
   const { auction, errors, fuels, updateInformation } = props;
 
   return (
-    <section className="auction-info"> {/* Fuel info */}
+    <section className="auction-info is-gray-1"> {/* Fuel info */}
       <div className="container">
         <div className="content">
           <fieldset>
@@ -20,7 +20,7 @@ const TermFuelFormSection = (props) => {
                 </label>
               </div>
               <div className="field-body">
-                <div className="control">
+                <div className="control has-margin-right-sm">
                   <div className="select is-fullwidth">
                     <select
                       id="auction_fuel_id"

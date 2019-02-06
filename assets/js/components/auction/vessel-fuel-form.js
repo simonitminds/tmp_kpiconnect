@@ -121,13 +121,15 @@ export default class VesselFuelForm extends React.Component {
 
     return(
       <div>
-        <section className="auction-info is-gray-1"> {/* Vessels info */}
+        <section className="auction-info"> {/* Vessels info */}
           <div className="container">
             <div className="content">
               <fieldset>
                 <legend className="subtitle is-4" >Vessels</legend>
                 { hasErrors &&
-                  <p className="has-text-danger">All vessels must have an ETA when the auction is scheduled.</p>
+                  <div className="alert alert-danger alert--inline">
+                    <p className="help is-danger">All vessels must have an ETA when the auction is scheduled.</p>
+                  </div>
                 }
                 <div className="field is-horizontal">
                   <div className="field-label">
@@ -167,7 +169,7 @@ export default class VesselFuelForm extends React.Component {
           </div>
         </section>
 
-        <section className="auction-info"> {/* Fuels info */}
+        <section className="auction-info is-gray-1"> {/* Fuels info */}
           <div className="container">
             <div className="content">
               <fieldset>

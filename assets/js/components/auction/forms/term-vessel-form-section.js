@@ -39,7 +39,7 @@ export default class TermVesselFormSection extends React.Component {
 
       return (
         <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>
-          <span className="selected-list__item-title">{vessel.name}, {vessel.imo}</span>
+          <span className="selected-list__item-title has-margin-bottom-none">{vessel.name}, {vessel.imo}</span>
           <span className="selected-list__item-delete" onClick={(ev) => {
             this.removeVessel(vessel.id);
             ev.preventDefault();
@@ -52,7 +52,7 @@ export default class TermVesselFormSection extends React.Component {
     };
 
     return (
-      <section className="auction-info is-gray-1"> {/* Vessels info */}
+      <section className="auction-info"> {/* Vessels info */}
         <div className="container">
           <div className="content">
             <fieldset>

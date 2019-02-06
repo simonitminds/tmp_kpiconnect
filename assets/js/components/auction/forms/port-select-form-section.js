@@ -33,7 +33,7 @@ const PortSelectFormSection = (props) => {
   };
 
   return (
-    <section className="auction-info is-gray-1">
+    <section className="auction-info">
       <div className="container">
         <div className="content">
           <fieldset>
@@ -45,7 +45,7 @@ const PortSelectFormSection = (props) => {
                 </label>
               </div>
               <div className="field-body">
-                <div className="control">
+                <div className="control has-margin-right-sm">
                   <div className="select is-fullwidth">
                     <select
                       id="auction_port_id"
@@ -96,7 +96,8 @@ const PortSelectFormSection = (props) => {
                       model={'auction'}
                       field={'start_date'}
                       labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'start_date_date')} />
+                      onChange={updateDate.bind(this, 'start_date_date')}
+                      className={'has-margin-right-sm'} />
                     <InputErrors errors={errors.start_date} />
                   </div>
                 </div>
@@ -109,7 +110,7 @@ const PortSelectFormSection = (props) => {
                   <div className="field-body">
                     <input type="hidden" name="auction[end_date]" className="qa-auction-end_date" value={auction.end_date ? moment(auction.end_date).utc() : ""} />
                     <DateInput
-                      className={'qa-auction-end_date'}
+                      className={'qa-auction-end_date has-margin-right-sm'}
                       value={auction.end_date}
                       model={'auction'}
                       field={'end_date'}

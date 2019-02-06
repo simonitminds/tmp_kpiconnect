@@ -17,7 +17,7 @@ const AuctionDetailsFormSection = (props) => {
     updateDate
   } = props;
   return (
-    <section className="auction-info"> {/* Auction details */}
+    <section className="auction-info is-gray-1"> {/* Auction details */}
       <div className="container">
         <div className="content">
           <fieldset>
@@ -46,7 +46,7 @@ const AuctionDetailsFormSection = (props) => {
                 <div className="control">
                   <TimeInput value={auction.scheduled_start} model={'auction'} field={'scheduled_start'} labelText={'Auction Start'} onChange={updateDate.bind(this, 'scheduled_start_time')} />
                 </div>
-                <div className="control has-text-gray-3">
+                <div className="control has-text-gray-3 has-margin-right-sm">
                   (GMT)
                 </div>
                 <InputErrors errors={errors.scheduled_start} />
@@ -60,7 +60,7 @@ const AuctionDetailsFormSection = (props) => {
                 </label>
               </div>
               <div className="field-body">
-                <div className="control">
+                <div className="control has-margin-right-sm">
                   <div className="select">
                     <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
                       <option disabled value="">
@@ -85,7 +85,7 @@ const AuctionDetailsFormSection = (props) => {
                   </label>
                 </div>
                 <div className="field-body">
-                  <div className="control">
+                  <div className="control has-margin-right-sm">
                     <div className="select">
                       <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
                         <option disabled value="">
@@ -112,6 +112,7 @@ const AuctionDetailsFormSection = (props) => {
                     defaultChecked={auction.anonymous_bidding}
                     opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                     onChange={updateInformation.bind(this, 'auction.anonymous_bidding')}
+                    className={'has-margin-right-sm'}
                 />
                 <InputErrors errors={errors.anonymous_bidding} />
               </div>
@@ -128,6 +129,7 @@ const AuctionDetailsFormSection = (props) => {
                         defaultChecked={auction.is_traded_bid_allowed}
                         opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                         onChange={updateInformationFromCheckbox.bind(this, 'auction.is_traded_bid_allowed')}
+                        className={'has-margin-right-sm'}
                     />
                     <InputErrors errors={errors.is_traded_bid_allowed} />
                     <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
