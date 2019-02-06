@@ -249,7 +249,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          }, emit},
         current_state
       ) do
-    new_state = AuctionStateActions.select_winning_solution(solution, current_state)
+    new_state = AuctionStateActions.select_winning_solution(solution, port_agent, current_state)
 
     AuctionEvent.emit(
       AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user),
@@ -312,6 +312,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state = AuctionStateActions.cancel_auction(current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
+
     {:noreply, new_state}
   end
 
@@ -391,10 +392,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(
-         %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}},
+         %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution, port_agent: port_agent}},
          previous_state
        ) do
-    AuctionStateActions.select_winning_solution(solution, previous_state)
+    AuctionStateActions.select_winning_solution(solution, port_agent, previous_state)
   end
 
   defp replay_event(

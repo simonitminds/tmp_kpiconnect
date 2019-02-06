@@ -1,5 +1,4 @@
 defmodule Oceanconnect.Auctions.AuctionEventHandler do
-
   use GenServer
   alias Oceanconnect.Auctions
 
@@ -13,6 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   }
 
   @registry_name :auction_event_handler_registry
+  require Logger
 
   # Client
   def start_link(auction_id) do
@@ -91,9 +91,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         },
         state
       ) do
-    auction
-    |> Auctions.update_auction_without_event_storage!(%{auction_started: time_entered})
-
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -106,9 +103,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         },
         state
       ) do
-    auction
-    |> Auctions.update_auction_without_event_storage!(%{auction_ended: time_entered})
-
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -122,16 +116,14 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       )
       when type in [:auction_expired, :auction_canceled, :auction_closed] do
-    auction
-    |> Auctions.update_auction_without_event_storage!(%{auction_closed_time: time_entered})
-
     AuctionNotifier.notify_participants(auction_state)
+    with {:ok, finalized_auction} <- Auctions.finalize_auction(auction, auction_state) do
+      Auctions.AuctionsSupervisor.stop_child(auction)
+    else
+      {:error, _msg} ->
+        Logger.error("Could not finalize auction detail records for auction #{auction.id}")
+    end
 
-    {:ok, event} = AuctionEvent.auction_state_snapshotted(auction, auction_state)
-    |> AuctionEventStore.create_auction_snapshot()
-    {:ok, _fixtures} = Auctions.create_fixtures_from_snapshot(event)
-
-    Auctions.AuctionsSupervisor.stop_child(auction)
     {:noreply, state}
   end
 

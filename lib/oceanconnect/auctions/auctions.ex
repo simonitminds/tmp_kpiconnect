@@ -252,13 +252,23 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction(id) do
-    Repo.get(Auction, id)
-    |> fully_loaded
+    with %{auction: auction} <- AuctionCache.read(id) do
+      auction
+    else
+      _ ->
+        Repo.get(Auction, id)
+        |> fully_loaded
+    end
   end
 
   def get_auction!(id) do
-    Repo.get!(Auction, id)
-    |> fully_loaded
+    with %{auction: auction} <- AuctionCache.read(id) do
+      auction
+    else
+      _ ->
+        Repo.get!(Auction, id)
+        |> fully_loaded
+    end
   end
 
   def get_auction_state!(auction = %Auction{}) do
@@ -295,43 +305,55 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %Auction{}, user \\ nil) do
-    updated_auction = Map.put(auction, :auction_started, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def end_auction(auction = %Auction{}) do
-    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.end_auction()
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def expire_auction(auction = %Auction{}) do
-    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.end_auction_decision_period()
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def cancel_auction(auction = %Auction{}, user) do
-    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.cancel_auction(user)
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
+  end
+
+  def finalize_auction(auction = %Auction{id: auction_id}, auction_state) do
+    with event = %AuctionEvent{} <-
+           AuctionEvent.auction_state_snapshotted(auction, auction_state),
+         {:ok, snapshot} <- AuctionEventStore.create_auction_snapshot(event),
+         {:ok, _fixtures} <- create_fixtures_from_snapshot(snapshot),
+         cached_auction = %Auction{} <- AuctionCache.read(auction_id),
+         finalized_auction = %Auction{} <- persist_auction_from_cache(cached_auction) do
+      {:ok, finalized_auction}
+    else
+      _ -> {:error, "Could not finalize auction details"}
+    end
+  end
+
+  def persist_auction_from_cache(auction = %Auction{id: auction_id}) do
+    attrs = Map.take(auction, [:auction_started, :auction_ended, :auction_closed_time, :port_agent])
+    old_auction = Repo.get(Auction, auction_id)
+    |> Auction.changeset(attrs)
+    |> Repo.update!
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
@@ -410,19 +432,15 @@ defmodule Oceanconnect.Auctions do
   end
 
   # this is kind of a lie because we emit an event....
-  def update_auction_without_event_storage!(%Auction{} = auction, attrs) do
+  def update_auction_without_event_storage!(auction = %Auction{id: auction_id} = auction, attrs) do
     cleaned_attrs = clean_timestamps(attrs)
 
-    changeset =
-      cleaned_attrs
-      |> Enum.reduce(Ecto.Changeset.change(auction), fn {attr, value}, acc ->
-        Ecto.Changeset.force_change(acc, attr, value)
-      end)
-
     updated_auction =
-      changeset
-      |> Repo.update!()
-      |> fully_loaded
+      auction
+      |> Map.merge(cleaned_attrs)
+
+    updated_auction
+    |> update_cache
 
     updated_auction
     |> AuctionEvent.auction_updated(nil)

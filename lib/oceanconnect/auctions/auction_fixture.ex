@@ -60,14 +60,12 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       :price,
       :quantity,
       :eta,
-      :etd,
       :original_supplier_id,
       :original_vessel_id,
       :original_fuel_id,
       :original_price,
       :original_quantity,
       :original_eta,
-      :original_etd
     ])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:supplier_id)

@@ -14,7 +14,14 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
     _company = insert(:company)
     %{auction: auction, vessel_fuels: [vessel_fuel1, _vessel_fuel2]} = create_closed_auction()
     auction_fixtures = Auctions.fixtures_for_auction(auction)
-    {:ok, %{admin_user: admin_user, auction: auction, vessel_fuel1: vessel_fuel1, auction_fixtures: auction_fixtures }}
+
+    {:ok,
+     %{
+       admin_user: admin_user,
+       auction: auction,
+       vessel_fuel1: vessel_fuel1,
+       auction_fixtures: auction_fixtures
+     }}
   end
 
   test "visiting the auction fixture index page shows a list fixtures for the auction", %{
@@ -25,10 +32,19 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   } do
     login_user(admin_user)
     AuctionShowPage.visit(auction_id)
-    AuctionShowPage.view_auction_fixtures
+    AuctionShowPage.view_auction_fixtures()
     assert Admin.Fixture.IndexPage.is_current_path?(auction_id)
     assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture1)
     assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture2)
+  end
+
+  test "editing an auction fixture", %{
+    admin_user: admin_user,
+    auction: %{id: auction_id},
+    vessel_fuel1: vessel_fuel1,
+    auction_fixtures: [auction_fixture1, _auction_fixture2]
+  } do
+    Admin.Fixture.IndexPage.visit(auction_id)
   end
 
   def create_closed_auction do

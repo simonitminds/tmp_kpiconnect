@@ -30,6 +30,7 @@ defmodule OceanconnectWeb.Router do
     # Routes requiring authentication
     pipe_through(:authenticated)
     get("/auctions", AuctionController, :index, as: :auction_api)
+    get("/auctions/:auction_id", AuctionController, :show, as: :auction_api)
     post("/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api)
     post("/auctions/:auction_id/revoke_bid", BidController, :revoke, as: :auction_bid_api)
 

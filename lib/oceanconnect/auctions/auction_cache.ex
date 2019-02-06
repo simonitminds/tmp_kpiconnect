@@ -45,6 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionCache do
 
   def handle_cast({:update_cache, auction = %Auction{}}, current_state) do
     updated_state = Map.put(current_state, :auction, auction)
+    IO.inspect(auction.port_agent, label: "CACHE UPDATED FOR PORT AGENT")
 
     {:noreply, updated_state}
   end

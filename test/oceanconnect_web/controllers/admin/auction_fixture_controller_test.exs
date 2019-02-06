@@ -1,7 +1,6 @@
 defmodule OceanconnectWeb.Admin.FixtureControllerTest do
   use OceanconnectWeb.ConnCase
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionFixture, AuctionEvent, AuctionEventStorage, AuctionStateActions}
+  alias Oceanconnect.Auctions.{AuctionFixture}
 
   setup do
     user = insert(:user, password: "password", is_admin: "true")
@@ -74,39 +73,6 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
     test "redirects for pending", %{auction: auction, admin_conn: admin_conn} do
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
       assert redirected_to(final_conn) == auction_path(final_conn, :index)
-    end
-
-    def start_auction!(auction) do
-      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      next_state = AuctionStateActions.start_auction(state, auction, nil, true)
-      event = AuctionEvent.auction_started(auction, next_state, nil)
-      AuctionEventStorage.persist(%AuctionEventStorage{event: event})
-    end
-
-    def cancel_auction!(auction) do
-      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      new_state = AuctionStateActions.cancel_auction(state)
-      AuctionEventStorage.persist(%AuctionEventStorage{event: AuctionEvent.auction_canceled(auction, new_state, nil)})
-    end
-
-    def expire_auction!(auction) do
-      current_state = Auctions.get_auction_state!(auction)
-      new_state = AuctionStateActions.expire_auction(current_state)
-      event = AuctionEvent.auction_expired(auction, new_state)
-      AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
-    end
-
-    def close_auction!(auction) do
-      supplier_id = hd(auction.suppliers).id
-      vessel_fuel_id = hd(auction.auction_vessel_fuels).id
-      bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
-      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      state = AuctionStateActions.start_auction(state, auction, nil, false)
-      {_product_state, _events, new_state} = AuctionStateActions.process_bid(state, bid)
-      solution = new_state.solutions.best_overall
-      state  = AuctionStateActions.select_winning_solution(solution, new_state)
-      event = AuctionEvent.winning_solution_selected(solution, "", state, nil)
-      AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
     end
   end
 end
