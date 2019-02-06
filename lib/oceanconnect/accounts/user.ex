@@ -33,7 +33,17 @@ defmodule Oceanconnect.Accounts.User do
 
   def admin_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :has_2fa])
+    |> cast(attrs, [
+      :email,
+      :first_name,
+      :last_name,
+      :office_phone,
+      :mobile_phone,
+      :is_active,
+      :company_id,
+      :is_admin,
+      :has_2fa
+    ])
     |> validate_required([:email, :company_id])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()
@@ -42,7 +52,17 @@ defmodule Oceanconnect.Accounts.User do
 
   def seed_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :office_phone, :mobile_phone, :is_active, :company_id, :is_admin, :password])
+    |> cast(attrs, [
+      :email,
+      :first_name,
+      :last_name,
+      :office_phone,
+      :mobile_phone,
+      :is_active,
+      :company_id,
+      :is_admin,
+      :password
+    ])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()
     |> unique_constraint(:email)
@@ -80,6 +100,13 @@ defmodule Oceanconnect.Accounts.User do
   end
 
   defp upcase_email(changeset), do: changeset
+
+  def alphabetical(query \\ User) do
+    from(
+      q in query,
+      order_by: q.last_name
+    )
+  end
 
   def select_active(query \\ User) do
     from(
