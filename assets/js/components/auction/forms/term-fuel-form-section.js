@@ -20,7 +20,7 @@ const TermFuelFormSection = (props) => {
                 </label>
               </div>
               <div className="field-body">
-                <div className="control">
+                <div className="control has-margin-right-sm">
                   <div className="select is-fullwidth">
                     <select
                       id="auction_fuel_id"

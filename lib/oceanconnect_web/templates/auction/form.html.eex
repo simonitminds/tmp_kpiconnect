@@ -2,13 +2,15 @@
 <%= form_for @changeset, @action, [class: "control", onsubmit: "debouncedSubmit()"], fn _f -> %>
 
   <%= if @changeset.action do %>
-    <div class="container is-fullhd">
-      <div class="content has-margin-top-lg">
-        <div class="alert alert-danger">
-          <p class="help is-danger">Could not save auction. See errors below.</p>
+    <section class="auction-info has-margin-top-none has-padding-top-none">
+      <div class="container has-padding-none">
+        <div class="content">
+          <div class="alert alert-danger">
+            <p class="help is-danger">Could not save pending auction. See errors below.</p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   <% end %>
 
   <div id="auctions-app">

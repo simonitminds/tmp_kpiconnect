@@ -127,7 +127,9 @@ export default class VesselFuelForm extends React.Component {
               <fieldset>
                 <legend className="subtitle is-4" >Vessels</legend>
                 { hasErrors &&
-                  <p className="has-text-danger">All vessels must have an ETA when the auction is scheduled.</p>
+                  <div className="alert alert-danger alert--inline">
+                    <p className="help is-danger">All vessels must have an ETA when the auction is scheduled.</p>
+                  </div>
                 }
                 <div className="field is-horizontal">
                   <div className="field-label">

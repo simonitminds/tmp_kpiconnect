@@ -6,7 +6,9 @@ const InputErrors = ({errors}) => {
   const hasErrors = !!errors
   if(!hasErrors) return null;
   return (
-    <p className="help has-text-danger">{errorString}</p>
+    <div className="alert alert-danger alert--inline-flex">
+      <p className="help is-danger has-margin-top-none">{errorString}</p>
+    </div>
   );
 }
 

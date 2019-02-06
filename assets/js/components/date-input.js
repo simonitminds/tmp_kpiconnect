@@ -29,7 +29,7 @@ export default class DateInput extends React.Component {
     const fieldName = name === false ? "" : name || `${model}_${field}_date`;
 
     return(
-      <div>
+      <div className="has-margin-right-sm">
         <div className={`control qa-${model}-${field}_date`}>
           <SingleDatePicker
             id={fieldName}
