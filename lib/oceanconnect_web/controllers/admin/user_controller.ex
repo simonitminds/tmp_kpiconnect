@@ -6,16 +6,13 @@ defmodule OceanconnectWeb.Admin.UserController do
   alias Oceanconnect.Guardian
 
   def index(conn, params) do
+    IO.inspect(params)
     page = Accounts.list_users(params)
-
-    alphabetized_users =
-      page.entries
-      |> Enum.sort_by(&String.first(&1.last_name))
 
     render(
       conn,
       "index.html",
-      users: alphabetized_users,
+      users: page.entries,
       page_number: page.page_number,
       page_size: page.page_size,
       total_pages: page.total_pages,
@@ -104,7 +101,10 @@ defmodule OceanconnectWeb.Admin.UserController do
     |> OceanconnectWeb.Mailer.deliver_later()
 
     conn
-    |> put_flash(:info, "An email has been sent to the user with instructions to reset their password")
+    |> put_flash(
+      :info,
+      "An email has been sent to the user with instructions to reset their password"
+    )
     |> put_status(200)
     |> render("edit.html", user: user, changeset: changeset, companies: companies)
   end

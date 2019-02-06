@@ -23,7 +23,7 @@ defmodule Oceanconnect.Accounts do
   end
 
   def list_users(params) do
-    User
+    User.alphabetical()
     |> Repo.paginate(params)
   end
 
