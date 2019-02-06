@@ -1,0 +1,96 @@
+import React from 'react';
+import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  convertToMinutes,
+  etaAndEtdForAuction,
+  formatUTCDateTime,
+  formatMonthYear
+} from '../../../utilities';
+import MediaQuery from 'react-responsive';
+import AuctionHeaderTimers from '../auction-header-timers';
+
+
+const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
+  const auction = _.get(auctionPayload, 'auction');
+  const auctionType = _.get(auction, 'type');
+  const auctionStatus = _.get(auctionPayload, 'status');
+
+  const portName = _.get(auction, 'port.name');
+  const vessels = _.get(auction, 'vessels');
+  const startDate = _.get(auction, 'start_date');
+  const endDate = _.get(auction, 'end_date');
+
+
+  const displayAuctionStartTime = () => {
+    if (auctionStatus == 'pending') {
+      return formatUTCDateTime(auction.scheduled_start);
+    } else {
+      return formatUTCDateTime(auction.auction_started);
+    }
+  }
+
+  return(
+    <div className="auction-app__header auction-app__header--show">
+      <section className="auction-page">
+        <div className="container">
+          <div className="has-margin-top-lg">
+            <div className="auction-header">
+              <div className="columns has-margin-bottom-none">
+                <div className="column">
+                  <div className={`auction-status auction-status--${auctionStatus} tag is-rounded qa-auction-status`} id="time-remaining">
+                    {auctionStatus}
+                  </div>
+                  <MediaQuery query="(max-width: 768px)">
+                    <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={true} />
+                  </MediaQuery>
+                  <div className="qa-auction-port">
+                    <h1 className="auction-header__vessel title has-text-weight-bold">
+                      {portName}
+                      { auction.is_traded_bid_allowed &&
+                        <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
+                        </span>
+                      }
+                      <span className="auction-header__company">{auction.buyer.name}</span>
+                    </h1>
+                  </div>
+                </div>
+                <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
+                  <MediaQuery query="(min-width: 769px)">
+                    <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={false} />
+                  </MediaQuery>
+
+                  <div className={`auction-header__start-time has-text-left-mobile ${auctionStatus != 'pending' ? 'is-hidden-mobile' : ''}`}>
+                    <span className="has-text-weight-bold is-uppercase">Start time</span> {displayAuctionStartTime()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="auction-page auction-page--gray is-hidden-mobile">
+        <div className="container">
+          <div className="auction-header__ports">
+            <span className="qa-auction-vessels is-inline-block">
+              { _.map(vessels, (vessel) => {
+                  return(
+                    <span key={vessel.name} className={`qa-auction-vessel-${vessel.id} has-margin-right-sm`}>
+                      <strong>{vessel.name}</strong> ({vessel.imo})
+                    </span>
+                  );
+                })
+              }
+            </span>
+            <br/>
+            <span className="is-inline-block">
+              <strong>{_.startCase(auctionType)} Term</strong> ({formatMonthYear(startDate)} &ndash; {formatMonthYear(endDate)})
+            </span>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default TermAuctionHeader;

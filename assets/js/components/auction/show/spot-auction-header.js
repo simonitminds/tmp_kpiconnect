@@ -5,12 +5,12 @@ import {
   convertToMinutes,
   etaAndEtdForAuction,
   formatUTCDateTime
-} from '../../utilities';
+} from '../../../utilities';
 import MediaQuery from 'react-responsive';
-import AuctionHeaderTimers from './auction-header-timers';
+import AuctionHeaderTimers from '../auction-header-timers';
 
 
-const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
+const SpotAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
   const { eta, etd } = etaAndEtdForAuction(auction);
@@ -39,15 +39,15 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
                   </MediaQuery>
                   <div className="qa-auction-vessels">
                     <h1 className="auction-header__vessel title has-text-weight-bold">
-                      { _.map(auction.vessels, (vessel) => {
-                          return(
-                            <div key={vessel.name} className={`auction-header__vessel-item qa-auction-vessel-${vessel.id}`}>
-                              {vessel.name} <span className="auction-header__vessel__imo">({vessel.imo})</span>
-                            </div>
-                          );
-                        })
-                      }
-                      { auction.is_traded_bid_allowed &&
+                        { _.map(vessels, (vessel) => {
+                            return(
+                              <div key={vessel.name} className={`auction-header__vessel-item qa-auction-vessel-${vessel.id}`}>
+                                {vessel.name} <span className="auction-header__vessel__imo">({vessel.imo})</span>
+                              </div>
+                            );
+                          })
+                        }
+                        { auction.is_traded_bid_allowed &&
                         <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
                         </span>
                       }
@@ -88,4 +88,4 @@ const AuctionHeader = ({auctionPayload, timeRemaining, connection, serverTime}) 
   );
 };
 
-export default AuctionHeader;
+export default SpotAuctionHeader;

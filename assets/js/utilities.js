@@ -2,9 +2,34 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 
+export function auctionTitle(auction) {
+  const auctionType = _.get(auction, 'type');
+
+  switch (auctionType) {
+    case ('spot'):
+      const vessels = _.get(auction, 'vessels');
+      return(
+        <span>
+          { _.map(vessels, (vessel) => {
+              return (
+                <div key={vessel.name}>
+                  <strong>{vessel.name}</strong> ({vessel.imo})
+                </div>
+              );
+            })
+          }
+        </span>
+      );
+
+    default:
+      const portName = _.get(auction, 'port.name');
+      return(<strong>{portName}</strong>);
+  }
+}
+
 export function replaceListItem(list, oldItem, newItem) {
   const index = _.indexOf(list, oldItem);
-  if(newItem) {
+  if (newItem) {
     return [
       ..._.slice(list, 0, index),
       newItem,
@@ -49,6 +74,14 @@ export const formatDateTime = (dateTime) => {
 export const formatDate = (date) => {
   if (date) {
     return moment(date).format("DD/MM/YYYY");
+  } else {
+    return "";
+  }
+}
+
+export const formatMonthYear = (date) => {
+  if (date) {
+    return moment(date).format("MMMM YYYY");
   } else {
     return "";
   }

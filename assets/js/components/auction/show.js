@@ -4,7 +4,8 @@ import { formatUTCDateTime, timeRemainingCountdown } from '../../utilities';
 import moment from 'moment';
 import ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './auction-bread-crumbs';
-import AuctionHeader from './auction-header';
+import SpotAuctionHeader from './show/spot-auction-header';
+import TermAuctionHeader from './show/term-auction-header';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
 import MediaQuery from 'react-responsive';
@@ -48,12 +49,24 @@ export default class AuctionShow extends React.Component {
       isAdmin: window.isAdmin && !window.isImpersonating
     };
 
+    const auctionType = _.get(auction, 'type');
+    const renderAuctionHeader = (type) => {
+      switch(type) {
+        case 'spot':
+          return(<SpotAuctionHeader auctionPayload={auctionPayload} connection={connection} />);
+        case 'forward_fixed':
+          return(<TermAuctionHeader auctionPayload={auctionPayload} connection={connection} />);
+        case 'formula_related':
+          return(<TermAuctionHeader auctionPayload={auctionPayload} connection={connection} />);
+      }
+    }
+
     return (
       <div className="auction-app">
         <MediaQuery query="(min-width: 769px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
-        <AuctionHeader auctionPayload={auctionPayload} connection={connection} />
+        {renderAuctionHeader(auctionType)}
         <MediaQuery query="(min-width: 769px)">
           <div className="auction-app__body">
             <section className="auction-page"> {/* Auction details */}
