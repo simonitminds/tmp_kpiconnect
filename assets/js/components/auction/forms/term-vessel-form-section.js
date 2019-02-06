@@ -52,7 +52,7 @@ export default class TermVesselFormSection extends React.Component {
     };
 
     return (
-      <section className="auction-info is-gray-1"> {/* Vessels info */}
+      <section className="auction-info"> {/* Vessels info */}
         <div className="container">
           <div className="content">
             <fieldset>
