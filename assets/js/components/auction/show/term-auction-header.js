@@ -69,7 +69,7 @@ const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTim
       <section className="auction-page auction-page--gray is-hidden-mobile">
         <div className="container">
           <div className="auction-header__ports">
-            <span className="qa-auction-vessels is-inline-block">
+            <div className="qa-auction-vessels is-block">
               { _.map(vessels, (vessel) => {
                   return(
                     <span key={vessel.name} className={`qa-auction-vessel-${vessel.id} has-margin-right-sm`}>
@@ -78,11 +78,10 @@ const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTim
                   );
                 })
               }
-            </span>
-            <br/>
-            <span className="is-inline-block">
+            </div>
+            <div className="is-block">
               <strong>{_.startCase(auctionType)} Term</strong> ({formatMonthYear(startDate)} &ndash; {formatMonthYear(endDate)})
-            </span>
+            </div>
           </div>
         </div>
       </section>

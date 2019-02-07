@@ -43,7 +43,7 @@ const FuelRequirementsDisplay = (props) => {
                 </li>
               );
             }
-          )};
+          )}
         </ul>
       );
 
@@ -59,7 +59,7 @@ const FuelRequirementsDisplay = (props) => {
           </li>
           <li className="is-not-flex">
             <strong>Quantity</strong>
-            <span className="qa-auction-fuel_quantity">{fuel_quantity}</span> M/T
+            <span className="qa-auction-fuel_quantity">{fuel_quantity}</span> MT
           </li>
         </ul>
       );
