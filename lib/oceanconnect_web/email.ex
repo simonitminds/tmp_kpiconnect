@@ -2,14 +2,16 @@ defmodule OceanconnectWeb.Email do
   import Bamboo.Email
   use Bamboo.Phoenix, view: OceanconnectWeb.EmailView
 
-  alias Oceanconnect.Accounts
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.Auction
+  import Oceanconnect.Auctions.Guards
 
-  def auction_invitation(auction = %Auction{}) do
+  alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.{User, Company}
+  alias Oceanconnect.Auctions
+
+  def auction_invitation(auction = %struct{}) when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
-    %Auction{
+    %{
       buyer: buyer,
       port: port,
       suppliers: supplier_companies,
@@ -39,10 +41,10 @@ defmodule OceanconnectWeb.Email do
     end)
   end
 
-  def auction_rescheduled(auction = %Auction{}) do
+  def auction_rescheduled(auction = %struct{}) when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
-    %Auction{
+    %{
       buyer: buyer,
       port: port,
       suppliers: supplier_companies,
@@ -72,10 +74,10 @@ defmodule OceanconnectWeb.Email do
     end)
   end
 
-  def auction_starting_soon(auction = %Auction{}) do
+  def auction_starting_soon(auction = %struct{}) when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
-    %Auction{
+    %{
       suppliers: supplier_companies,
       buyer: buyer_company,
       vessels: vessels,
@@ -129,12 +131,12 @@ defmodule OceanconnectWeb.Email do
   def auction_closed(
         bids,
         approved_barges,
-        auction = %Auction{},
+        auction = %struct{},
         active_participants
-      ) do
+      ) when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
-    %Auction{
+    %{
       buyer_id: buyer_id,
       auction_vessel_fuels: vessel_fuels,
       port: port
@@ -243,10 +245,10 @@ defmodule OceanconnectWeb.Email do
     |> List.flatten()
   end
 
-  def auction_canceled(auction = %Auction{}) do
+  def auction_canceled(auction = %struct{}) when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
-    %Auction{
+    %{
       suppliers: supplier_companies,
       buyer_id: buyer_id,
       vessels: vessels,
@@ -293,7 +295,7 @@ defmodule OceanconnectWeb.Email do
     %{supplier_emails: supplier_emails, buyer_emails: buyer_emails}
   end
 
-  def password_reset(%Accounts.User{} = user, token) do
+  def password_reset(%User{} = user, token) do
     base_email(user)
     |> subject("Reset your password")
     |> render(
@@ -303,7 +305,7 @@ defmodule OceanconnectWeb.Email do
     )
   end
 
-  def two_factor_auth(%Accounts.User{has_2fa: true} = user, one_time_pass) do
+  def two_factor_auth(%User{has_2fa: true} = user, one_time_pass) do
     two_factor_email(user)
     |> subject("Two factor authentication")
     |> render(
@@ -327,18 +329,18 @@ defmodule OceanconnectWeb.Email do
     |> Enum.uniq()
   end
 
-  defp buyer_company_for_email(_is_traded_bid = true, %Accounts.Company{
+  defp buyer_company_for_email(_is_traded_bid = true, %Company{
          broker_entity_id: broker_id
        }) do
     Accounts.get_company!(broker_id)
   end
 
-  defp buyer_company_for_email(_is_traded_bid = false, buyer_company = %Accounts.Company{}),
+  defp buyer_company_for_email(_is_traded_bid = false, buyer_company = %Company{}),
     do: buyer_company
 
   defp supplier_company_for_email(
          _is_traded_bid = true,
-         %Accounts.Company{
+         %Company{
            broker_entity_id: broker_id
          },
          _supplier_company
@@ -349,7 +351,7 @@ defmodule OceanconnectWeb.Email do
   defp supplier_company_for_email(
          _is_traded_bid = false,
          _buyer_company,
-         supplier_company = %Accounts.Company{}
+         supplier_company = %Company{}
        ),
        do: supplier_company
 

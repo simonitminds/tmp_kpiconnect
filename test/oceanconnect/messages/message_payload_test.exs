@@ -107,7 +107,7 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
                &(&1.auction_id == auction.id or &1.auction_id == anon_auction.id)
              )
 
-      assert Enum.map(message_payloads_for_company, & &1.unseen_messages) == [1, 2]
+      assert Enum.map(message_payloads_for_company, & &1.unseen_messages) |> Enum.sum() == 3
 
       message_payload_for_anon_auction =
         Enum.find(message_payloads_for_company, &(&1.auction_id == anon_auction.id))

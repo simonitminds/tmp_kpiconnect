@@ -1,11 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Auctions.{Auction, AuctionPayload, AuctionStore.AuctionState}
+  alias Oceanconnect.Auctions.{AuctionPayload}
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  def notify_participants(%AuctionState{auction_id: auction_id}) do
+  def notify_participants(%state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
     auction =
       Auctions.AuctionCache.read(auction_id)
       |> Auctions.fully_loaded()
@@ -13,7 +15,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     notify_participants(auction)
   end
 
-  def notify_participants(auction = %Auction{}) do
+  def notify_participants(auction = %struct{}) when is_auction(struct) do
     participants = Auctions.auction_participant_ids(auction)
 
     Enum.map(participants, fn user_id ->
@@ -27,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     notify_admin(auction)
   end
 
-  def notify_buyer_participants(auction = %Auction{buyer_id: buyer_id}) do
+  def notify_buyer_participants(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
     payload = AuctionPayload.get_auction_payload!(auction, buyer_id)
     send_notification_to_participants("user_auctions", payload, [buyer_id])
 
@@ -62,15 +64,14 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  defp notify_admin(auction = %Auction{}) do
-    admin_ids =
-      Enum.map(Accounts.list_admin_users(), & &1.id)
-      |> Enum.map(fn admin_id ->
-        admin_payload =
-          auction
-          |> AuctionPayload.get_admin_auction_payload!()
+  defp notify_admin(auction = %struct{}) when is_auction(struct) do
+    Enum.map(Accounts.list_admin_users(), & &1.id)
+    |> Enum.map(fn admin_id ->
+      admin_payload =
+        auction
+        |> AuctionPayload.get_admin_auction_payload!()
 
-        send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-      end)
+      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
+    end)
   end
 end

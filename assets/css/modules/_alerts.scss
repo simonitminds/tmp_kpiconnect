@@ -55,6 +55,18 @@
   }
 }
 
+.alert--inline {
+  display: inline-block;
+  margin: 0 0 2.5rem 0 !important;
+  padding: 0.5rem 1rem 0.75rem 1rem;
+}
+
+.alert--inline-flex {
+  display: inline-block;
+  margin: 0;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
 .alert-info {
   @extend .is-info;
 }

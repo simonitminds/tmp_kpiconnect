@@ -1,8 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
+  import Oceanconnect.Auctions.Guards
+
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionTimer, AuctionSuppliers}
-  alias Oceanconnect.Auctions.AuctionStore.AuctionState
+  alias Oceanconnect.Auctions.{
+    AuctionTimer,
+    AuctionSuppliers
+  }
+
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
   defstruct time_remaining: nil,
@@ -15,35 +20,33 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             solutions: %{},
             submitted_barges: []
 
-  def get_admin_auction_payload!(auction = %Auction{buyer_id: buyer_id}) do
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
     get_auction_payload!(auction, buyer_id)
   end
 
-  def get_auction_payload!(auction = %Auction{buyer_id: buyer_id}, buyer_id) do
-    # auction = Auctions.fully_loaded(auction)
+  def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct) do
     auction_state = Auctions.get_auction_state!(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
-  def get_auction_payload!(auction = %Auction{}, supplier_id) do
-    # auction = Auctions.fully_loaded(auction)
+  def get_auction_payload!(auction = %struct{}, supplier_id) when is_auction(struct) do
     auction_state = Auctions.get_auction_state!(auction)
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
   def get_auction_payload!(
-        auction = %Auction{buyer_id: buyer_id},
+        auction = %struct{buyer_id: buyer_id},
         buyer_id,
-        auction_state = %AuctionState{}
-      ) do
+        auction_state = %state_struct{}
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
-  def get_auction_payload!(auction = %Auction{}, supplier_id, auction_state = %AuctionState{}) do
+  def get_auction_payload!(auction = %struct{}, supplier_id, auction_state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
-  def get_bid_history(supplier_id, %AuctionState{product_bids: product_bids}) do
+  def get_bid_history(supplier_id, %state_struct{product_bids: product_bids}) when is_auction_state(state_struct) do
     Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
@@ -53,13 +56,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_supplier_auction_payload(
-        auction = %Auction{},
+        auction = %struct{},
         supplier_id,
-        state = %AuctionState{
+        state = %state_struct{
           product_bids: product_bids,
           status: status
         }
-      ) do
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -88,13 +91,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_buyer_auction_payload(
-        auction = %Auction{},
+        auction = %struct{},
         buyer_id,
-        state = %AuctionState{
+        state = %state_struct{
           product_bids: product_bids,
           status: status
         }
-      ) do
+      ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -128,28 +131,28 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     end
   end
 
-  defp get_participations(%Auction{anonymous_bidding: true}), do: %{}
+  defp get_participations(%struct{anonymous_bidding: true}) when is_auction(struct), do: %{}
 
-  defp get_participations(%Auction{auction_suppliers: auction_suppliers}) do
+  defp get_participations(%struct{auction_suppliers: auction_suppliers}) when is_auction(struct) do
     auction_suppliers
     |> Enum.reduce(%{}, fn auction_supplier, acc ->
       Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation)
     end)
   end
 
-  defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :open}) do
+  defp get_time_remaining(auction = %struct{}, %state_struct{status: :open}) when is_auction(struct) and is_auction_state(state_struct) do
     AuctionTimer.read_timer(auction.id, :duration)
   end
 
-  defp get_time_remaining(auction = %Auction{}, %AuctionState{status: :decision}) do
+  defp get_time_remaining(auction = %struct{}, %state_struct{status: :decision}) when is_auction(struct) and is_auction_state(state_struct) do
     AuctionTimer.read_timer(auction.id, :decision_duration)
   end
 
-  defp get_time_remaining(_auction = %Auction{}, %AuctionState{}), do: 0
+  defp get_time_remaining(_auction = %struct{}, %state_struct{}) when is_auction(struct) and is_auction_state(state_struct), do: 0
 
-  defp scrub_auction(auction = %Auction{buyer_id: buyer_id}, buyer_id), do: auction
+  defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct), do: auction
 
-  defp scrub_auction(auction = %Auction{}, _supplier_id) do
+  defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
     Map.delete(auction, :suppliers)
   end
 

@@ -2,8 +2,14 @@ defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionSupervisor, AuctionEvent}
-  alias Oceanconnect.Auctions.AuctionStore.{AuctionState}
+
+  alias Oceanconnect.Auctions.{
+    TermAuction,
+    Auction,
+    AuctionSupervisor,
+    AuctionEvent,
+    AuctionStore.AuctionState
+  }
 
   describe "auctions" do
     alias Oceanconnect.Auctions.Auction
@@ -13,14 +19,33 @@ defmodule Oceanconnect.AuctionsTest do
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction =
-        insert(:auction, @valid_attrs)
-        |> Auctions.fully_loaded()
+      auction = insert(:auction, @valid_attrs) |> Auctions.fully_loaded()
+      term_auction = insert(:term_auction) |> Auctions.fully_loaded()
 
       port = insert(:port)
       vessel = insert(:vessel)
       fuel = insert(:fuel)
-      {:ok, %{auction: Auctions.get_auction!(auction.id), port: port, vessel: vessel, fuel: fuel}}
+
+      auction_attrs = params_for(:auction, port: port)
+      term_auction_attrs = params_for(:term_auction, port: port, fuel: fuel)
+
+      invalid_start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix()
+        |> Kernel.-(60_000)
+        |> DateTime.from_unix!()
+
+      {:ok,
+       %{
+         auction: Auctions.get_auction!(auction.id),
+         term_auction: Auctions.get_auction!(term_auction.id),
+         port: port,
+         vessel: vessel,
+         fuel: fuel,
+         auction_attrs: auction_attrs,
+         term_auction_attrs: term_auction_attrs,
+         invalid_start_time: invalid_start_time
+       }}
     end
 
     test "#maybe_parse_date_field" do
@@ -76,7 +101,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => nil,
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => nil,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -125,7 +155,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => nil, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => nil,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -141,7 +176,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => nil, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => nil,
+            "fuel_id" => fuel.id,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -157,7 +197,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => nil, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => nil,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -174,7 +219,12 @@ defmodule Oceanconnect.AuctionsTest do
         "port_id" => port.id,
         "scheduled_start" => DateTime.utc_now(),
         "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "fuel_id" => fuel.id, "quantity" => 1500, "eta" => DateTime.utc_now()}
+          %{
+            "vessel_id" => vessel.id,
+            "fuel_id" => fuel.id,
+            "quantity" => 1500,
+            "eta" => DateTime.utc_now()
+          }
         ]
       }
 
@@ -182,11 +232,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "list_auctions/0 returns all auctions", %{auction: auction} do
+    test "list_auctions/0 returns all auctions", %{auction: auction, term_auction: term_auction} do
       assert Auctions.list_auctions()
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
-             |> MapSet.equal?(MapSet.new([auction.id]))
+             |> MapSet.equal?(MapSet.new([auction.id, term_auction.id]))
     end
 
     test "list_participating_auctions/1 returns all auctions a company is a participant in", %{
@@ -238,61 +288,60 @@ defmodule Oceanconnect.AuctionsTest do
              ] == auctions
     end
 
-    test "get_auction!/1 returns the auction with given id", %{auction: auction} do
-      assert Auctions.get_auction!(auction.id) == auction
+    test "get_auction!/1 returns a spot auction with given id", %{auction: auction} do
+      auction_id = auction.id
+      got_auction = Auctions.get_auction!(auction_id)
+      assert %Auction{id: auction_id} = got_auction
+      assert got_auction == auction
     end
 
-    test "create_auction/1 with valid data creates a auction", %{auction: auction} do
-      auction_with_participants =
-        Auctions.with_participants(auction)
-        |> Auctions.fully_loaded()
-
-      auction_attrs =
-        auction_with_participants
-        |> Map.take(
-          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
-            Map.keys(@valid_attrs)
-        )
-
-      assert {:ok, %Auction{} = new_auction} = Auctions.create_auction(auction_attrs)
-      # create_auction has a side effect of starting the AuctionsSupervisor, thus the sleep
-      :timer.sleep(200)
-
-      assert all_values_match?(Map.drop(auction_attrs, [:auction_vessel_fuels]), new_auction)
-
-      supplier = hd(auction_with_participants.suppliers)
-
-      auction_supplier =
-        Repo.get_by(Auctions.AuctionSuppliers, %{
-          auction_id: new_auction.id,
-          supplier_id: supplier.id
-        })
-
-      assert auction_supplier.alias_name == "Supplier 1"
+    test "get_auction!/1 returns a term auction with given id", %{term_auction: term_auction} do
+      term_auction_id = term_auction.id
+      got_auction = Auctions.get_auction!(term_auction_id)
+      assert %TermAuction{id: term_auction_id} = got_auction
+      assert got_auction == term_auction
     end
 
-    test "create_auction/1 with a scheduled_start time ion the past returns error changeset", %{
-      auction: auction
+    test "get_auction/1 returns a spot auction with given id", %{auction: auction} do
+      auction_id = auction.id
+      got_auction = Auctions.get_auction(auction_id)
+      assert %Auction{id: auction_id} = got_auction
+      assert got_auction == auction
+    end
+
+    test "get_auction/1 returns a term auction with given id", %{term_auction: term_auction} do
+      term_auction_id = term_auction.id
+      got_auction = Auctions.get_auction(term_auction_id)
+      assert %TermAuction{id: term_auction_id} = got_auction
+      assert got_auction == term_auction
+    end
+
+    test "create_auction/1 with valid data creates an auction", %{auction_attrs: auction_attrs} do
+      assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+      assert %Auction{} = Auctions.get_auction!(auction_id)
+    end
+
+    test "create_auction/1 with valid term data creates a term auction", %{
+      term_auction_attrs: term_auction_attrs
     } do
-      invalid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.-(60_000)
-        |> DateTime.from_unix!()
+      assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
+      assert %TermAuction{} = Auctions.get_auction!(auction_id)
+    end
 
-      auction_with_participants =
-        Auctions.with_participants(auction)
-        |> Auctions.fully_loaded()
-        |> Map.put(:scheduled_start, invalid_start_time)
-
-      auction_attrs =
-        auction_with_participants
-        |> Map.take(
-          [:scheduled_start, :port_id, :suppliers, :buyer_id, :auction_vessel_fuels] ++
-            Map.keys(@valid_attrs)
-        )
-
+    test "create_auction/1 with a scheduled_start time in the past returns error changeset", %{
+      auction_attrs: auction_attrs,
+      invalid_start_time: invalid_start_time
+    } do
+      auction_attrs = Map.put(auction_attrs, :scheduled_start, invalid_start_time)
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(auction_attrs)
+    end
+
+    test "create_auction/1 with no scheduled_start time creates a draft auction", %{
+      auction_attrs: auction_attrs
+    } do
+      auction_attrs = Map.drop(auction_attrs, [:scheduled_start])
+      assert {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+      assert %Auction{} = Auctions.get_auction!(auction_id)
     end
 
     test "create_auction/1 with invalid data returns error changeset" do

@@ -104,6 +104,8 @@ defmodule OceanconnectWeb.Router do
     )
 
     delete("/sessions/logout", SessionController, :delete)
+    get("/auctions/t:id", TermAuctionController, :show)
+    # post("/auctions", TermAuctionController, :create)
     resources("/auctions", AuctionController, except: [:delete])
     get("/auctions/:id/log", AuctionController, :log)
     get("/auctions/:id/start", AuctionController, :start)

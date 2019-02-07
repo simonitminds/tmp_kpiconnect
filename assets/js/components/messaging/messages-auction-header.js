@@ -14,16 +14,20 @@ const MessagesAuctionHeader = ({payload, onSelect}) => {
       <div className={`auction-status auction-status--${payload.status}`}>
         {payload.status}
       </div>
+      <div>
+        <span className="has-text-gray-3 has-padding-right-xs">{payload.auction_id}</span>
       {
         _.map(payload.vessels, (vessel) => {
           return(
-            <span key={vessel.id}><span className="has-text-gray-3">{payload.auction_id}</span> {vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
+            <span key={vessel.id} className="messaging__vessel-name">{vessel.name} <span className="has-text-gray-3">({vessel.imo})</span></span>
           );
         })
       }
+      </div>
       { payload.unseen_messages > 0 &&
         <span className="messaging__notifications qa-messages-unseen-count"><FontAwesomeIcon icon="envelope" className="has-margin-right-xs" /> {payload.unseen_messages}</span>
       }
+
     </div>
   );
 }

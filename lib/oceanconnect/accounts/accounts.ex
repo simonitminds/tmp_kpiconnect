@@ -23,7 +23,7 @@ defmodule Oceanconnect.Accounts do
   end
 
   def list_users(params) do
-    User
+    User.alphabetical()
     |> Repo.paginate(params)
   end
 
@@ -176,6 +176,7 @@ defmodule Oceanconnect.Accounts do
   end
 
   def verify_login(%{"email" => email, "password" => password}) do
+    # TODO: don't pass comeonin error message to end user
     case Repo.get_by(User, email: String.upcase(email)) do
       nil -> {:error, "Invalid email/password"}
       user -> Comeonin.Bcrypt.check_pass(user, password)

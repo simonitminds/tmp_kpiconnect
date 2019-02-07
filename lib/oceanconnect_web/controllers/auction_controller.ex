@@ -1,7 +1,16 @@
 defmodule OceanconnectWeb.AuctionController do
   use OceanconnectWeb, :controller
+
+  import Oceanconnect.Auctions.Guards
+
   alias Oceanconnect.{Auctions, Messages}
-  alias Oceanconnect.Auctions.{Auction, AuctionEventStore, AuctionPayload, Payloads}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionEventStore,
+    AuctionPayload,
+    Payloads
+  }
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -18,7 +27,7 @@ defmodule OceanconnectWeb.AuctionController do
 
     auction_state = Auctions.get_auction_state!(auction)
 
-    with %Auction{} <- auction,
+    with %struct{} when is_auction(struct) <- auction,
          true <- current_company_id == auction.buyer_id or Auth.current_user_is_admin?(conn),
          true <-
            auction_state.status not in [:draft, :pending, :open] or
@@ -71,6 +80,7 @@ defmodule OceanconnectWeb.AuctionController do
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
     changeset = Auctions.change_auction(%Auction{})
+    |> Map.put(:errors, %{})
     [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
     render(
@@ -87,16 +97,13 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def create(conn, %{"auction" => auction_params}) do
-    auction_vessel_fuels = vessel_fuels_from_params(auction_params)
-
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
 
     updated_params =
       auction_params
-      |> Auction.from_params()
       |> Map.put("buyer_id", user.company.id)
-      |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
+      |> normalize_auction_params()
 
     case Auctions.create_auction(updated_params, user) do
       {:ok, auction} ->
@@ -137,7 +144,7 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == Auth.current_user(conn).company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       changeset = Auctions.change_auction(auction)
@@ -170,7 +177,7 @@ defmodule OceanconnectWeb.AuctionController do
 
     user = Auth.current_user(conn)
 
-    with auction = %Auction{} <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params =
@@ -206,6 +213,19 @@ defmodule OceanconnectWeb.AuctionController do
       _ ->
         redirect(conn, to: auction_path(conn, :index))
     end
+  end
+
+  defp normalize_auction_params(params = %{"type" => type}) when type in ["forward_fixed", "formula_related"] do
+    params
+    |> TermAuction.from_params()
+  end
+
+  defp normalize_auction_params(params) do
+    auction_vessel_fuels = vessel_fuels_from_params(params)
+
+    params
+    |> Auction.from_params()
+    |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
   end
 
   defp auction_inputs_by_buyer(conn) do
@@ -244,11 +264,15 @@ defmodule OceanconnectWeb.AuctionController do
     [auction, json_auction, suppliers]
   end
 
-  defp vessel_fuels_from_params(%{"auction_vessel_fuels" => auction_vessel_fuels, "vessels" => vessels})
+  defp vessel_fuels_from_params(%{
+         "auction_vessel_fuels" => auction_vessel_fuels,
+         "vessels" => vessels
+       })
        when is_map(auction_vessel_fuels) do
     Enum.flat_map(auction_vessel_fuels, fn {fuel_id, vessel_quantities} ->
       Enum.map(vessel_quantities, fn {vessel_id, quantity} ->
         vessel_data = Map.get(vessels, vessel_id)
+
         %{
           "fuel_id" => fuel_id,
           "vessel_id" => vessel_id,
@@ -268,7 +292,12 @@ defmodule OceanconnectWeb.AuctionController do
        when is_map(vessels) and is_list(fuels) do
     Enum.map(fuels, fn fuel_id ->
       Enum.flat_map(vessels, fn {vessel_id, vessel_data} ->
-        %{"vessel_id" => vessel_id, "fuel_id" => fuel_id, "eta" => vessel_data["eta"], "etd" => vessel_data["etd"]}
+        %{
+          "vessel_id" => vessel_id,
+          "fuel_id" => fuel_id,
+          "eta" => vessel_data["eta"],
+          "etd" => vessel_data["etd"]
+        }
       end)
     end)
   end

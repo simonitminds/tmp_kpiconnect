@@ -1,14 +1,13 @@
 defmodule Oceanconnect.Auctions.AuctionEmailSupervisor do
   use Supervisor
+  import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions.{
-    Auction,
-    AuctionEmailNotificationHandler
-  }
+  alias Oceanconnect.Auctions.AuctionEmailNotificationHandler
 
   @registry_name :auction_email_supervisor_registry
 
-  def start_link({auction = %Auction{id: auction_id}, config}) do
+  def start_link({auction = %struct{id: auction_id}, config})
+      when is_auction(struct) do
     Supervisor.start_link(
       __MODULE__,
       {auction, config},
@@ -16,7 +15,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailSupervisor do
     )
   end
 
-  def init({%Auction{id: auction_id}, _options}) do
+  def init({%struct{id: auction_id}, _options}) when is_auction(struct) do
     children = [
       {AuctionEmailNotificationHandler, auction_id}
     ]
@@ -44,6 +43,4 @@ defmodule Oceanconnect.Auctions.AuctionEmailSupervisor do
 
     children_included
   end
-
-  defp exclude_children(children, %{}), do: children |> Map.values()
 end

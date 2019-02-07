@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
-  alias Oceanconnect.Auctions.{Auction, AuctionBid, AuctionSuppliers}
-  alias Oceanconnect.Auctions.AuctionStore.ProductBidState
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, AuctionStore.ProductBidState}
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -38,13 +39,13 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
   defp scrub_bid_for_supplier(
          bid = %AuctionBid{supplier_id: supplier_id},
          supplier_id,
-         _auction = %Auction{}
-       ) do
+         _auction = %struct{}
+       ) when is_auction(struct) do
     %{bid | min_amount: bid.min_amount, comment: bid.comment}
     |> Map.from_struct()
   end
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, _auction = %Auction{}) do
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, _auction = %struct{}) when is_auction(struct) do
     %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
     |> Map.from_struct()
     |> Map.delete(:supplier_id)
@@ -52,7 +53,7 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
 
   defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
 
-  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %Auction{}) do
+  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{}) when is_auction(struct) do
     supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
 
     %{bid | supplier_id: nil, min_amount: nil}

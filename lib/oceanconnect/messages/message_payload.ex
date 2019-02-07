@@ -1,7 +1,9 @@
 defmodule Oceanconnect.Messages.MessagePayload do
+  import Oceanconnect.Auctions.Guards
+
   alias __MODULE__
   alias Oceanconnect.{Accounts, Auctions, Messages, Repo}
-  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers}
+  alias Oceanconnect.Auctions.{AuctionSuppliers}
 
   defstruct auction_id: nil,
             anonymous_bidding: false,
@@ -24,7 +26,7 @@ defmodule Oceanconnect.Messages.MessagePayload do
     end)
   end
 
-  defp load_auction_info_for_message_payload(%Auction{} = auction) do
+  defp load_auction_info_for_message_payload(%struct{} = auction) when is_auction(struct) do
     auction
     |> Repo.preload([:suppliers, :vessels])
     |> Map.take([:id, :anonymous_bidding, :buyer_id, :suppliers, :vessels])

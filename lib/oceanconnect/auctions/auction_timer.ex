@@ -1,8 +1,11 @@
 defmodule Oceanconnect.Auctions.AuctionTimer do
   use GenServer
+
+  import Oceanconnect.Auctions.Guards
+
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionCache, Command}
+  alias Oceanconnect.Auctions.{AuctionCache, Command}
 
   @registry_name :auction_timers_registry
   @extension_time 3 * 60_000
@@ -43,16 +46,16 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def process_command(%Command{
         command: :start_duration_timer,
-        data: auction = %Auction{id: auction_id}
-      }) do
+        data: auction = %struct{id: auction_id}
+      }) when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:start_duration_timer, auction, pid})
   end
 
   def process_command(%Command{
         command: :start_decision_duration_timer,
-        data: auction = %Auction{id: auction_id}
-      }) do
+        data: auction = %struct{id: auction_id}
+      }) when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:start_decision_duration_timer, auction, pid})
   end
@@ -143,20 +146,20 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, new_state, new_state}
   end
 
-  def handle_cast({:start_duration_timer, %Auction{duration: duration}, pid}, current_state) do
+  def handle_cast({:start_duration_timer, %struct{duration: duration}, pid}, current_state) when is_auction(struct) do
     new_timer = create_timer(pid, duration, :duration)
     new_state = Map.put(current_state, :duration_timer, new_timer)
     {:noreply, new_state}
   end
 
   def handle_cast(
-        {:start_decision_duration_timer, %Auction{decision_duration: decision_duration}, pid},
+        {:start_decision_duration_timer, %struct{decision_duration: decision_duration}, pid},
         current_state = %{duration_timer: duration_timer}
-      ) do
-
+      ) when is_auction(struct) do
     if duration_timer do
       Process.cancel_timer(duration_timer)
     end
+
     new_timer = create_timer(pid, decision_duration, :decision_duration)
 
     new_state =
