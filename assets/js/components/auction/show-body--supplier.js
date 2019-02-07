@@ -6,6 +6,7 @@ import AuctionInvitation from './auction-invitation';
 import BargeSubmission from './barge-submission';
 import BidStatus from './bid-status';
 import BiddingForm from './bidding-form';
+import TermBiddingForm from './show/term-bidding-form';
 import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
@@ -25,12 +26,22 @@ const SupplierAuctionShowBody = (props) => {
   const { status, message, solutions } = auctionPayload;
   const otherSolutions = _.get(solutions, 'other_solutions');
 
+  const auctionType = _.get(auctionPayload, 'auction.type');
+  const renderBiddingForm = (type) => {
+    switch (type) {
+      case 'spot':
+        return (<BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />);
+      default:
+        return (<TermBiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />);
+    }
+  }
+
   if (status == 'open') {
     return (
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
-        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        {renderBiddingForm(auctionType)}
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );
@@ -59,7 +70,7 @@ const SupplierAuctionShowBody = (props) => {
           </h3>
         </div>
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
-        <BiddingForm formSubmit={formSubmit} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        {renderBiddingForm(auctionType)}
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );

@@ -36,4 +36,33 @@ defmodule Oceanconnect.TermAuctionShowTest do
        fuel: fuel
      }}
   end
+
+  describe "supplier login" do
+    test "supplier can enter a bid", %{
+      auction: auction,
+      bid_params: bid_params,
+      vessel_fuel1: vessel_fuel1
+    } do
+      AuctionShowPage.enter_bid(bid_params)
+      AuctionShowPage.submit_bid()
+
+      :timer.sleep(500)
+
+      auction_state =
+        auction
+        |> Auctions.get_auction_state!()
+
+      stored_bid_list =
+        auction_state.product_bids[vessel_fuel1].bids
+        |> AuctionShowPage.convert_to_supplier_names(auction)
+
+      bid_list_params =
+        Enum.map(stored_bid_list, fn bid ->
+          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
+        end)
+
+      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_params)
+      assert AuctionShowPage.has_bid_message?("Bids successfully placed")
+    end
+  end
 end

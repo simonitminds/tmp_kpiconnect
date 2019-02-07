@@ -38,39 +38,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  formSubmit(auctionId, ev) {
-    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.fuelInput);
-    const vesselFuelBoxes = _.reject(ev.target.elements, (e) => !e.dataset.vesselFuel);
-
-    const fuelBids = _.reduce(bidElements, (acc, e) => {
-      acc[e.dataset.fuel] = acc[e.dataset.fuel] || {};
-      switch(e.type) {
-        case 'checkbox':
-          acc[e.dataset.fuel][e.name] = e.checked;
-          break;
-
-        default:
-          acc[e.dataset.fuel][e.name] = e.value;
-          break;
-      }
-      return acc;
-    }, {});
-
-    const bidsByProduct = _.reduce(vesselFuelBoxes, (acc, vfBox) => {
-      const {vesselFuel, fuel} = vfBox.dataset;
-      if(vfBox.checked) {
-        acc[vesselFuel] = { ...fuelBids[fuel] };
-      }
-      return acc;
-    }, {});
-
-    const elements = ev.target.elements;
-    _.forEach(elements, (e) => e.value = "");
-
-    dispatch(submitBid(auctionId, {
-      "bids": bidsByProduct,
-      "is_traded_bid": elements && elements.is_traded_bid && elements.is_traded_bid.checked
-    }));
+  formSubmit(auction, formData) {
+    dispatch(submitBid(auctionId, formData));
   },
   revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));

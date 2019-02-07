@@ -62,18 +62,54 @@ class BiddingForm extends React.Component {
     });
   }
 
+  createFormData(ev) {
+    const bidElements = _.reject(ev.target.elements, (e) => !e.dataset.fuelInput);
+    const vesselFuelBoxes = _.reject(ev.target.elements, (e) => !e.dataset.vesselFuel);
+
+    const fuelBids = _.reduce(bidElements, (acc, e) => {
+      acc[e.dataset.fuel] = acc[e.dataset.fuel] || {};
+      switch(e.type) {
+        case 'checkbox':
+          acc[e.dataset.fuel][e.name] = e.checked;
+          break;
+
+        default:
+          acc[e.dataset.fuel][e.name] = e.value;
+          break;
+      }
+      return acc;
+    }, {});
+
+    const bidsByProduct = _.reduce(vesselFuelBoxes, (acc, vfBox) => {
+      const {vesselFuel, fuel} = vfBox.dataset;
+      if(vfBox.checked) {
+        acc[vesselFuel] = { ...fuelBids[fuel] };
+      }
+      return acc;
+    }, {});
+
+    const elements = ev.target.elements;
+    _.forEach(elements, (e) => e.value = "");
+
+    const tradedBid = elements && elements.is_traded_bid && elements.is_traded_bid.checked;
+
+    const formData = {'bids': bidsByProduct, 'is_traded_bid': tradedBid}
+    return (formData);
+  }
+
   submitForm(ev) {
     ev.preventDefault();
     const {auctionPayload, formSubmit} = this.props;
     const {auction} = auctionPayload;
     if(this.state.isSubmittable) {
-      formSubmit(auction.id, ev);
+      const formData = this.createFormData(ev)
+      formSubmit(auction.id, formData);
       this.setState({ isSubmittable: false });
     }
   }
 
   render(){
-    const {auctionPayload, revokeBid, barges, supplierId} = this.props;
+    const {auctionPayload, revokeBid, supplierId} = this.props;
     const {isSubmittable} = this.state;
     const fuels = _.get(auctionPayload, 'auction.fuels');
     const auction = auctionPayload.auction;
