@@ -139,7 +139,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   # Server
   def init(auction = %Auction{id: auction_id}) do
     state =
-      case replay_events(auction_id) do
+      case replay_events(auction) do
         nil -> AuctionState.from_auction(auction)
         state -> maybe_emit_rebuilt_event(state)
       end
@@ -188,7 +188,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:end_auction_decision_period, auction = %Auction{}, emit},
         current_state
       ) do
-    new_state = AuctionStateActions.expire_auction(current_state)
+    new_state = AuctionStateActions.expire_auction(auction, current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_expired(auction, new_state), emit)
 
@@ -249,7 +249,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          }, emit},
         current_state
       ) do
-    new_state = AuctionStateActions.select_winning_solution(solution, port_agent, current_state)
+    new_state = AuctionStateActions.select_winning_solution(solution, port_agent, auction, current_state)
 
     AuctionEvent.emit(
       AuctionEvent.winning_solution_selected(solution, port_agent, current_state, user),
@@ -309,7 +309,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:cancel_auction, %{auction: auction = %Auction{}, user: user}, emit},
         current_state
       ) do
-    new_state = AuctionStateActions.cancel_auction(current_state)
+    new_state = AuctionStateActions.cancel_auction(auction, current_state)
 
     AuctionEvent.emit(AuctionEvent.auction_canceled(auction, new_state, user), emit)
 
@@ -321,41 +321,41 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, state}
   end
 
-  defp replay_events(auction_id) do
+  defp replay_events(auction = %Auction{id: auction_id}) do
     auction_id
     |> AuctionEventStore.event_list()
     |> Enum.reverse()
     |> Enum.reduce(nil, fn event, acc ->
-      case replay_event(event, acc) do
+      case replay_event(auction, event, acc) do
         nil -> acc
         result -> result
       end
     end)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_created, data: auction}, _previous_state) do
+  defp replay_event(_auction, %AuctionEvent{type: :auction_created, data: auction}, _previous_state) do
     auction = Auctions.fully_loaded(auction)
     Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :auction_started, data: %{state: state, auction: auction}},
          _previous_state
        ) do
    AuctionStateActions.start_auction(state, auction, nil, false)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
+  defp replay_event(_auction, %AuctionEvent{type: :auction_updated, data: auction}, previous_state) do
    AuctionStateActions.update_auction(auction, previous_state, false)
   end
 
-  defp replay_event(%AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do
+  defp replay_event(_auction, %AuctionEvent{type: :bid_placed, data: %{bid: event_bid}}, previous_state) do
     bid = AuctionBid.from_event_bid(event_bid)
     {_product_state, _events, new_state} = AuctionStateActions.process_bid(previous_state, bid)
     new_state
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :auto_bid_placed, data: %{bid: event_bid}},
          previous_state
        ) do
@@ -364,79 +364,79 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     new_state
   end
 
-  defp replay_event(%AuctionEvent{type: :auto_bid_triggered, data: %{bid: _bid}}, previous_state) do
+  defp replay_event(_auction, %AuctionEvent{type: :auto_bid_triggered, data: %{bid: _bid}}, previous_state) do
     previous_state
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :bids_revoked, data: %{product: product, supplier_id: supplier_id}},
          previous_state
        ) do
    AuctionStateActions.revoke_supplier_bids(previous_state, product, supplier_id)
   end
 
-  defp replay_event(%AuctionEvent{type: :duration_extended}, _previous_state), do: nil
+  defp replay_event(_auction, %AuctionEvent{type: :duration_extended}, _previous_state), do: nil
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :auction_ended, data: %{auction: auction}},
          previous_state
        ) do
    AuctionStateActions.end_auction(previous_state, auction)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :auction_canceled, data: %{}},
          previous_state
        ) do
    AuctionStateActions.cancel_auction(previous_state)
   end
 
-  defp replay_event(
+  defp replay_event(auction,
          %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution, port_agent: port_agent}},
          previous_state
        ) do
-    AuctionStateActions.select_winning_solution(solution, port_agent, previous_state)
+    AuctionStateActions.select_winning_solution(solution, port_agent, auction, previous_state)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
    AuctionStateActions.submit_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :barge_unsubmitted, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
     AuctionStateActions.unsubmit_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :barge_approved, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
     AuctionStateActions.approve_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(
+  defp replay_event(_auction,
          %AuctionEvent{type: :barge_rejected, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
    AuctionStateActions.reject_barge(auction_barge, previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_expired}, previous_state) do
+  defp replay_event(_auction,%AuctionEvent{type: :auction_expired}, previous_state) do
     AuctionStateActions.expire_auction(previous_state)
   end
 
-  defp replay_event(%AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state),
+  defp replay_event(_auction, %AuctionEvent{type: :auction_closed, data: %{state: state}}, _previous_state),
     do: state
 
-  defp replay_event(%AuctionEvent{type: :auction_state_rebuilt, data: _state}, _previous_state),
+  defp replay_event(_auction, %AuctionEvent{type: :auction_state_rebuilt, data: _state}, _previous_state),
     do: nil
 
-  defp replay_event(_event, _previous_state), do: nil
+  defp replay_event(_auction, _event, _previous_state), do: nil
 
   defp maybe_emit_rebuilt_event(state = %AuctionState{status: :open, auction_id: auction_id}) do
     time_remaining = AuctionTimer.read_timer(auction_id, :duration)

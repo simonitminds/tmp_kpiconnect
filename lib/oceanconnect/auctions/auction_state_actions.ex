@@ -66,6 +66,10 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     auction = %{ auction | auction_started: DateTime.utc_now()}
 
     auction
+    |> Command.update_cache()
+    |> AuctionCache.process_command()
+
+    auction
     |> Command.start_decision_duration_timer()
     |> AuctionTimer.process_command()
 
@@ -171,8 +175,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     new_state
   end
 
-  def select_winning_solution(solution = %Solution{}, port_agent, current_state = %{auction_id: auction_id}) do
-    auction = AuctionCache.read(auction_id)
+  def select_winning_solution(solution = %Solution{}, port_agent, auction, current_state = %{auction_id: auction_id}) do
     auction = %{auction | port_agent: port_agent}
     auction
     |> Command.update_cache()
@@ -273,8 +276,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
-  def cancel_auction(current_state = %{auction_id: auction_id}) do
-    auction = AuctionCache.read(auction_id)
+  def cancel_auction(auction, current_state = %{auction_id: auction_id}) do
     auction = %{ auction | auction_closed_time: DateTime.utc_now()}
 
     auction
@@ -286,8 +288,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     %AuctionState{current_state | status: :canceled}
   end
 
-  def expire_auction(current_state = %{auction_id: auction_id}) do
-    auction = AuctionCache.read(auction_id)
+  def expire_auction(auction, current_state = %{auction_id: auction_id}) do
     auction = %{ auction | auction_closed_time: DateTime.utc_now()}
 
     auction

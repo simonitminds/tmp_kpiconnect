@@ -128,6 +128,17 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
   test "ensure decision_duration timer is canceled when rebuilding expired auction", %{
     auction: auction = %Auction{id: auction_id}
   } do
+    {:ok, pid} = AuctionStore.find_pid(auction_id)
+    Process.exit(pid, :shutdown)
+    refute Process.alive?(pid)
+
+    Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+    :timer.sleep(200)
+    {:ok, new_pid} = AuctionStore.find_pid(auction_id)
+    refute pid == new_pid
+
+    :timer.sleep(200)
+
     auction
     |> Auctions.start_auction()
     |> Auctions.end_auction()
@@ -136,15 +147,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     current_state = Auctions.get_auction_state!(auction)
     current_event_list = AuctionEventStore.event_list(auction_id)
 
-    # # Crash AuctionStore / AuctionSupervisor and let restart
-    {:ok, pid} = AuctionStore.find_pid(auction_id)
-    Process.exit(pid, :shutdown)
-    refute Process.alive?(pid)
     :timer.sleep(200)
-    {:ok, new_pid} = AuctionStore.find_pid(auction_id)
-    refute pid == new_pid
 
-    :timer.sleep(200)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
   end

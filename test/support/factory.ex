@@ -158,7 +158,7 @@ defmodule Oceanconnect.Factory do
 
   def cancel_auction!(auction) do
     state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-    new_state = AuctionStateActions.cancel_auction(state)
+    new_state = AuctionStateActions.cancel_auction(auction, state)
 
     AuctionEventStorage.persist(%AuctionEventStorage{
       event: AuctionEvent.auction_canceled(auction, new_state, nil)
@@ -167,7 +167,7 @@ defmodule Oceanconnect.Factory do
 
   def expire_auction!(auction) do
     current_state = Auctions.get_auction_state!(auction)
-    new_state = AuctionStateActions.expire_auction(current_state)
+    new_state = AuctionStateActions.expire_auction(auction, current_state)
     event = AuctionEvent.auction_expired(auction, new_state)
     AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
   end
@@ -180,7 +180,7 @@ defmodule Oceanconnect.Factory do
     state = AuctionStateActions.start_auction(state, auction, nil, false)
     {_product_state, _events, new_state} = AuctionStateActions.process_bid(state, bid)
     solution = new_state.solutions.best_overall
-    state = AuctionStateActions.select_winning_solution(solution, "Smith", new_state)
+    state = AuctionStateActions.select_winning_solution(solution, "Smith", auction, new_state)
     event = AuctionEvent.winning_solution_selected(solution, "", state, nil)
     AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
   end
