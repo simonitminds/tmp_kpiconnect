@@ -6,7 +6,6 @@ defmodule OceanconnectWeb.Admin.UserController do
   alias Oceanconnect.Guardian
 
   def index(conn, params) do
-    IO.inspect(params)
     page = Accounts.list_users(params)
 
     render(

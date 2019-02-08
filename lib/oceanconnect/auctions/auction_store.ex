@@ -95,7 +95,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def init(auction = %TermAuction{id: auction_id}) do
     state =
-      case replay_events(auction_id) do
+      case replay_events(auction) do
         nil -> TermAuctionState.from_auction(auction)
         state -> maybe_emit_rebuilt_event(state)
       end
@@ -284,7 +284,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, state}
   end
 
-  defp replay_events(auction = %Auction{id: auction_id}) do
+  defp replay_events(auction = %struct{id: auction_id}) when is_auction(struct) do
     auction_id
     |> AuctionEventStore.event_list()
     |> Enum.reverse()
@@ -358,11 +358,11 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     StoreProtocol.end_auction(previous_state, auction)
   end
 
-  defp replay_event(_auction,
+  defp replay_event(auction,
          %AuctionEvent{type: :auction_canceled, data: %{}},
          previous_state
        ) do
-    StoreProtocol.cancel_auction(previous_state)
+    StoreProtocol.cancel_auction(previous_state, auction)
   end
 
   defp replay_event(auction,

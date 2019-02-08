@@ -15,13 +15,13 @@ defprotocol Oceanconnect.Auctions.StoreProtocol do
   def update_product_bid_state(state, auction)
 
   @doc "Cancel an auction"
-  def cancel_auction(state)
+  def cancel_auction(state, auction)
 
   @doc "Ends the auction"
   def end_auction(state, auction)
 
   @doc "Expire an auction"
-  def expire_auction(state)
+  def expire_auction(state, auction)
 
   @doc "Processes a bid"
   def process_bid(state, bid)
@@ -30,7 +30,7 @@ defprotocol Oceanconnect.Auctions.StoreProtocol do
   def revoke_supplier_bids(state, product_id, supplier_id)
 
   @doc "Select a winning solution"
-  def select_winning_solution(state, solution)
+  def select_winning_solution(state, solution, port_agent, auction)
 
   @doc "Submit an auction barge"
   def submit_barge(state, barge)

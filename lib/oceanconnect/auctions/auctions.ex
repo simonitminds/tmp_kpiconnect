@@ -352,7 +352,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction_status!(auction) do
-    %AuctionState{status: status} = get_auction_state!(auction)
+    %{status: status} = get_auction_state!(auction)
     status
   end
 

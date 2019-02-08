@@ -323,7 +323,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid term data creates a term auction", %{
       term_auction_attrs: term_auction_attrs
-    } do
+   } do
       assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
       assert %TermAuction{} = Auctions.get_auction!(auction_id)
     end
