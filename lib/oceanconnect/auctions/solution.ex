@@ -1,5 +1,7 @@
 defmodule Oceanconnect.Auctions.Solution do
-  alias Oceanconnect.Auctions.Auction
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{Auction, TermAuction}
 
   defstruct valid: false,
             auction_id: nil,
@@ -10,19 +12,11 @@ defmodule Oceanconnect.Auctions.Solution do
             latest_original_time_entered: nil,
             comment: nil
 
-  def from_bids(bids, product_bids, %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
+
+  def from_bids(bids, product_bids, auction = %struct{id: auction_id}) when is_auction(struct) do
     product_ids = Map.keys(product_bids)
 
-    product_quantities =
-      product_bids
-      |> Enum.reduce(%{}, fn {product_id, _bids}, acc ->
-        total_quantity =
-          vessel_fuels
-          |> Enum.filter(fn vf -> "#{vf.id}" == product_id end)
-          |> Enum.reduce(0, fn vf, acc -> acc + vf.quantity end)
-
-        Map.put(acc, product_id, total_quantity)
-      end)
+    product_quantities = product_quantities_for_auction(product_bids, auction)
 
     %__MODULE__{
       auction_id: auction_id,
@@ -34,6 +28,24 @@ defmodule Oceanconnect.Auctions.Solution do
       latest_original_time_entered: latest_original_time_entered(bids)
     }
   end
+
+
+  defp product_quantities_for_auction(product_bids, %Auction{auction_vessel_fuels: vessel_fuels}) do
+    product_bids
+    |> Enum.reduce(%{}, fn {product_id, _bids}, acc ->
+      total_quantity =
+        vessel_fuels
+        |> Enum.filter(fn vf -> "#{vf.id}" == product_id end)
+        |> Enum.reduce(0, fn vf, acc -> acc + vf.quantity end)
+
+      Map.put(acc, product_id, total_quantity)
+    end)
+  end
+
+  defp product_quantities_for_auction(product_bids, %TermAuction{fuel: fuel, fuel_quantity: fuel_quantity}) do
+    product_quantities = %{ "#{fuel.id}" => fuel_quantity }
+  end
+
 
   def sort_tuple(solution) do
     # Sorting by `valid` first ensures that invalid/incomplete solutions are considered last.

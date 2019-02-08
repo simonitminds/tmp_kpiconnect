@@ -13,11 +13,11 @@ defmodule Oceanconnect.TermAuctionShowTest do
     [supplier_company] = auction.suppliers
 
     buyer = insert(:user, company: buyer_company)
-    supplier = insert(:user, commpany: supplier_company)
+    supplier = insert(:user, company: supplier_company)
 
     bid_params = %{
       amount: 1.25,
-      comment: "Screw you!"
+      # comment: "Screw you!"
     }
 
     {:ok, _pid} =
@@ -33,15 +33,24 @@ defmodule Oceanconnect.TermAuctionShowTest do
        buyer_company: buyer_company,
        supplier: supplier,
        bid_params: bid_params,
-       fuel: fuel
+       fuel: fuel,
+       fuel_id: "#{fuel.id}"
      }}
   end
 
   describe "supplier login" do
+    setup %{auction: auction, supplier: supplier} do
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      :ok
+    end
+
     test "supplier can enter a bid", %{
       auction: auction,
+      supplier: supplier,
       bid_params: bid_params,
-      vessel_fuel1: vessel_fuel1
+      fuel_id: fuel_id
     } do
       AuctionShowPage.enter_bid(bid_params)
       AuctionShowPage.submit_bid()
@@ -53,7 +62,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
         |> Auctions.get_auction_state!()
 
       stored_bid_list =
-        auction_state.product_bids[vessel_fuel1].bids
+        auction_state.product_bids[fuel_id].bids
         |> AuctionShowPage.convert_to_supplier_names(auction)
 
       bid_list_params =

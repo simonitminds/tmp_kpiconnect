@@ -5,15 +5,30 @@ import { formatTime, formatPrice } from '../../utilities';
 
 const SupplierBidList = ({auctionPayload, buyer}) => {
   const vesselFuels = _.chain(auctionPayload)
-                .get('auction.auction_vessel_fuels')
-                 .reduce((acc, vf) => {
-                   acc[vf.id] = vf;
-                   return(acc);
-                 }, {})
-                .value();
-  const productBids = _.chain(auctionPayload)
-                   .get('product_bids');
+      .get('auction.auction_vessel_fuels')
+      .reduce((acc, vf) => {
+        acc[vf.id] = vf;
+        return(acc);
+      }, {})
+      .value();
+
+  const fuel = _.get(auctionPayload, 'auction.fuel');
+  const products = { [fuel.id]: fuel };
+
   const bidList = _.get(auctionPayload, 'bid_history', []);
+  const auctionType = _.get(auctionPayload, 'auction.type');
+
+  const productName = (bid) => {
+    const productId = bid.vessel_fuel_id;
+
+    switch(auctionType) {
+      case 'spot':
+        return `${vesselFuels[productId].fuel.name} to ${vesselFuels[productId].vessel.name}`;
+      case 'forward_fixed':
+      case 'formula_related':
+        return `${products[productId].name}`;
+    }
+  }
 
   if(bidList.length > 0) {
     return(
@@ -28,10 +43,11 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
             </tr>
           </thead>
           <tbody>
-            {_.map(bidList, ({id, amount, min_amount, vessel_fuel_id, is_traded_bid, time_entered}) => {
+            {_.map(bidList, (bid) => {
+              const {id, amount, min_amount, vessel_fuel_id, is_traded_bid, time_entered} = bid;
               return (
                 <tr key={id} className={`qa-auction-bid-${id}`}>
-                  <td className="qa-auction-bid-product">{vesselFuels[vessel_fuel_id].fuel.name} to {vesselFuels[vessel_fuel_id].vessel.name}</td>
+                  <td className="qa-auction-bid-product">{productName(bid)}</td>
                   <td className="qa-auction-bid-amount">
                     <span className="auction__bid-amount">${formatPrice(amount)}</span>
                     { min_amount &&
