@@ -1,9 +1,8 @@
 defmodule Oceanconnect.AuctionShowPage do
   use Oceanconnect.Page
 
+  import ExUnit.Assertions
   import Oceanconnect.Auctions.Guards
-
-  alias Oceanconnect.Auctions.Auction
 
   def visit(id) do
     navigate_to("/auctions/#{id}")
@@ -33,7 +32,7 @@ defmodule Oceanconnect.AuctionShowPage do
   def has_values_from_params?(params) do
     Enum.all?(params, fn {k, v} ->
       element = find_element(:class, "qa-auction-#{k}")
-      value_equals_element_text?(k, element, v)
+      assert value_equals_element_text?(k, element, v)
     end)
   end
 

@@ -3,27 +3,35 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../utilities';
 
+function productsForAuction(auctionPayload) {
+  const auctionType = _.get(auctionPayload, 'auction.type');
+  switch(auctionType) {
+    case 'spot':
+      return _.chain(auctionPayload)
+          .get('auction.auction_vessel_fuels')
+          .reduce((acc, vf) => {
+            acc[vf.id] = vf;
+            return(acc);
+          }, {})
+          .value();
+    case 'forward_fixed':
+    case 'formula_related':
+      const fuel = _.get(auctionPayload, 'auction.fuel');
+      return { [fuel.id]: fuel };
+  }
+}
+
 const SupplierBidList = ({auctionPayload, buyer}) => {
-  const vesselFuels = _.chain(auctionPayload)
-      .get('auction.auction_vessel_fuels')
-      .reduce((acc, vf) => {
-        acc[vf.id] = vf;
-        return(acc);
-      }, {})
-      .value();
-
-  const fuel = _.get(auctionPayload, 'auction.fuel');
-  const products = { [fuel.id]: fuel };
-
   const bidList = _.get(auctionPayload, 'bid_history', []);
   const auctionType = _.get(auctionPayload, 'auction.type');
+  const products = productsForAuction(auctionPayload);
 
   const productName = (bid) => {
     const productId = bid.vessel_fuel_id;
 
     switch(auctionType) {
       case 'spot':
-        return `${vesselFuels[productId].fuel.name} to ${vesselFuels[productId].vessel.name}`;
+        return `${products[productId].fuel.name} to ${products[productId].vessel.name}`;
       case 'forward_fixed':
       case 'formula_related':
         return `${products[productId].name}`;

@@ -36,7 +36,7 @@ const ArrivalInformationDisplay = (props) => {
         <ul className="list has-no-bullets">
           <li className="is-not-flex">
             <strong>Port</strong>
-            {port.name}
+            <span className="qa-auction-port">{port.name}</span>
           </li>
           { portAgent
             ? <li className="is-not-flex">

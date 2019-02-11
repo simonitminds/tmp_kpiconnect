@@ -45,12 +45,10 @@ const TermAuctionHeader = ({auctionPayload, timeRemaining, connection, serverTim
                   <MediaQuery query="(max-width: 768px)">
                     <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={true} />
                   </MediaQuery>
-                  <div className="qa-auction-port">
-                    <h1 className="auction-header__vessel title has-text-weight-bold">
-                      <AuctionTitle auction={auction} />
-                      <span className="auction-header__company">{auction.buyer.name}</span>
-                    </h1>
-                  </div>
+                  <h1 className="auction-header__vessel title has-text-weight-bold">
+                    <AuctionTitle auction={auction} />
+                    <span className="auction-header__company">{auction.buyer.name}</span>
+                  </h1>
                 </div>
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>
                   <MediaQuery query="(min-width: 769px)">
