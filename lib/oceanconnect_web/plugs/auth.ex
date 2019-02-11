@@ -119,7 +119,7 @@ defmodule OceanconnectWeb.Plugs.Auth do
     end
   end
 
-  def generate_one_time_pass(_user = %User{has_2fa: true}) do
+  def generate_one_time_pass(%User{has_2fa: true}) do
     token =
       :crypto.strong_rand_bytes(8)
       |> Base.encode32()
@@ -141,8 +141,7 @@ defmodule OceanconnectWeb.Plugs.Auth do
     Kernel.get_in(conn.private, [:plug_session, "user_data"])
   end
 
-  def valid_otp?(token, one_time_pass) do
-    case token do
+  def valid_otp?(token, one_time_pass) do case token do
       nil -> false
       _ ->
         case :pot.valid_hotp(one_time_pass, token, [{:last, 0}]) do

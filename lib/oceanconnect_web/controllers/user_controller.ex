@@ -2,6 +2,7 @@ defmodule OceanconnectWeb.UserController do
   use OceanconnectWeb, :controller
 
   alias Oceanconnect.Accounts
+  alias Oceanconnect.Accounts.User
   alias OceanconnectWeb.Plugs.Auth
   alias Oceanconnect.Guardian
 
@@ -38,6 +39,8 @@ defmodule OceanconnectWeb.UserController do
   end
 
   def reset_password(conn, %{"user_id" => user_id}) do
+    int_id = String.to_integer(user_id)
+    %User{id: ^int_id} = Auth.current_user(conn)
     user = Accounts.get_user!(user_id)
 
     changeset = Accounts.change_user(user)

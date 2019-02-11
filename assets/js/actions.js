@@ -44,13 +44,13 @@ const defaultHeaders = {
   'x-expires': window.expiration
 };
 
-export function subscribeToAuctionUpdates() {
+export function subscribeToAuctionUpdates(dispatchAction) {
   return (dispatch, getState) => {
     auctionChannel.join()
       .receive("ok", resp => {
         console.log("Joined successful", resp);
         dispatch({type: AUCTION_CHANNEL_CONNECTED});
-        dispatch(getAllAuctionPayloads());
+        dispatch(dispatchAction());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
@@ -116,7 +116,7 @@ export function sendMessage(auctionId, recipientCompany, content) {
   };
 }
 
-function getAllAuctionPayloads() {
+export function getAllAuctionPayloads() {
   return dispatch => {
     fetch('/api/auctions', { headers: defaultHeaders })
       .then(checkStatus)
@@ -127,6 +127,16 @@ function getAllAuctionPayloads() {
   };
 }
 
+export function getAuctionPayload(auctionId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}`, { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveAuctionPayloads([response.data]));
+      });
+  };
+}
 export function getCompanyBarges(companyId) {
   return dispatch => {
     fetch(`/api/companies/${companyId}/barges`, { headers: defaultHeaders })
@@ -246,21 +256,6 @@ export function acceptWinningSolution(auctionId, solution) {
       headers: defaultHeaders,
       method: 'POST',
       body: JSON.stringify(solution)
-    })
-      .then(checkStatus)
-      .then(parseJSON)
-      .then((response) => {
-        return console.log(response);
-      });
-  };
-}
-
-export function setPortAgent(auctionId, portAgent) {
-  return dispatch => {
-    fetch(`/api/auctions/${auctionId}/port_agent`, {
-      headers: defaultHeaders,
-      method: 'POST',
-      body: JSON.stringify(portAgent)
     })
       .then(checkStatus)
       .then(parseJSON)

@@ -1,4 +1,4 @@
-defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.AuctionState do
+defmodule Oceanconnect.Auctions.AuctionStateActions do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -11,15 +11,14 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     AuctionScheduler,
     AuctionTimer,
     Command,
-    AuctionStore.ProductBidState,
     SolutionCalculator,
-    Solution,
-    AuctionStore.AuctionState
+    Solution
   }
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
 
   def is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
         supplier_id: supplier_id
-      }) do
+                               }) do
     !Enum.any?(
       product_bids,
       fn {_product_key, %ProductBidState{bids: bids}} ->
@@ -29,22 +28,16 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def is_lowest_bid?(
-        state = %AuctionState{},
-        bid = %AuctionBid{vessel_fuel_id: vessel_fuel_id}
-      ) do
+    state = %AuctionState{},
+    bid = %AuctionBid{vessel_fuel_id: vessel_fuel_id}
+  ) do
     product_bids = AuctionState.get_state_for_product(state, vessel_fuel_id)
 
     length(product_bids.lowest_bids) == 0 ||
       hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
   end
 
-  def start_auction(
-        %AuctionState{status: status} = current_state,
-        auction = %Auction{},
-        user,
-        emit
-      )
-      when status in [:pending, :open] do
+  def start_auction(%AuctionState{status: status} = current_state, auction = %Auction{}, user, emit) when status in [:pending, :open] do
     auction = %{ auction | auction_started: DateTime.utc_now()}
 
     auction
@@ -54,6 +47,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     auction
     |> Command.start_duration_timer()
     |> AuctionTimer.process_command()
+
 
     auction
     |> Command.cancel_scheduled_start()
@@ -68,14 +62,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     AuctionEvent.emit(AuctionEvent.auction_started(auction, next_state, user), emit)
     next_state
   end
-
-  def start_auction(
-        %AuctionState{status: :decision} = current_state,
-        auction = %Auction{},
-        _user,
-        _emit
-      ) do
-
+  def start_auction(%AuctionState{status: :decision} = current_state, auction = %Auction{}, _user, _emit) do
     auction = %{ auction | auction_started: DateTime.utc_now()}
 
     auction
@@ -92,17 +79,16 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
 
     current_state
   end
-
-  def start_auction(%AuctionState{} = current_state, _auction = %Auction{}, _user, _emit) do
+  def start_auction(%AuctionState{} = current_state, %Auction{}, _user, _emit) do
     current_state
   end
 
   def update_auction(
-        current_state = %{status: :draft},
-        auction = %Auction{scheduled_start: start},
-        emit
-      )
-      when start != nil do
+         auction = %Auction{scheduled_start: start},
+         current_state = %{status: :draft},
+         emit
+       )
+       when start != nil do
     update_auction_side_effects(auction, emit)
 
     current_state
@@ -110,14 +96,13 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     |> update_product_bid_state(auction)
   end
 
-  def update_auction(current_state, auction, emit) do
+  def update_auction(auction, current_state, emit) do
     update_auction_side_effects(auction, emit)
-
     current_state
     |> update_product_bid_state(auction)
   end
 
-  defp update_auction_side_effects(auction, emit) do
+  def update_auction_side_effects(auction, emit) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
@@ -127,15 +112,12 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     |> AuctionScheduler.process_command(emit)
   end
 
-  def update_product_bid_state(
-        state = %AuctionState{product_bids: product_bids},
-        _auction = %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}
-      ) do
-    vessel_fuel_ids = Enum.map(vessel_fuels, &"#{&1.id}")
+  def update_product_bid_state(state = %AuctionState{product_bids: product_bids}, %Auction{id: auction_id, auction_vessel_fuels: vessel_fuels}) do
+    vessel_fuel_ids = Enum.map(vessel_fuels, &("#{&1.id}"))
 
     updated_product_bids =
       vessel_fuel_ids
-      |> Enum.reduce(%{}, fn vfid, acc ->
+      |> Enum.reduce(%{}, fn(vfid, acc) ->
         if vfid in Map.keys(product_bids) do
           Map.put(acc, vfid, product_bids[vfid])
         else
@@ -159,17 +141,15 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def process_bid(
-        current_state = %{auction_id: auction_id, status: status},
-        bid = %{vessel_fuel_id: vessel_fuel_id}
-      ) do
+         current_state = %{auction_id: auction_id, status: status},
+         bid = %{vessel_fuel_id: vessel_fuel_id}
+       ) do
     product_state =
       AuctionState.get_state_for_product(current_state, vessel_fuel_id) ||
         ProductBidState.for_product(vessel_fuel_id, auction_id)
 
     {new_product_state, events} = AuctionBidCalculator.process(product_state, bid, status)
-
-    new_state =
-      AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
+    new_state = AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
     # TODO: Not this
     auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
@@ -178,10 +158,10 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def revoke_supplier_bids(
-        current_state = %{auction_id: auction_id},
-        product_id,
-        supplier_id
-      ) do
+         current_state = %{auction_id: auction_id},
+         product_id,
+         supplier_id
+       ) do
     product_state =
       AuctionState.get_state_for_product(current_state, product_id) ||
         ProductBidState.for_product(product_id, auction_id)
@@ -195,7 +175,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_state
   end
 
-  def select_winning_solution(current_state = %{auction_id: auction_id}, solution = %Solution{}, port_agent, auction) do
+  def select_winning_solution(solution = %Solution{}, port_agent, auction, current_state = %{auction_id: auction_id}) do
     auction = %{auction | port_agent: port_agent}
     auction
     |> Command.update_cache()
@@ -209,13 +189,13 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def submit_barge(
-        current_state = %AuctionState{submitted_barges: submitted_barges},
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id
-        }
-      ) do
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
     barge_is_submitted =
       Enum.any?(submitted_barges, fn barge ->
         match?(
@@ -232,13 +212,13 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def unsubmit_barge(
-        current_state = %AuctionState{submitted_barges: submitted_barges},
-        %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id
-        }
-      ) do
+         %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
     new_submitted_barges =
       Enum.reject(submitted_barges, fn barge ->
         match?(
@@ -251,14 +231,14 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def approve_barge(
-        current_state = %AuctionState{submitted_barges: submitted_barges},
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id,
-          approval_status: "APPROVED"
-        }
-      ) do
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id,
+           approval_status: "APPROVED"
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
     new_submitted_barges =
       Enum.map(submitted_barges, fn barge ->
         case barge do
@@ -274,14 +254,14 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
   end
 
   def reject_barge(
-        current_state = %AuctionState{submitted_barges: submitted_barges},
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id,
-          approval_status: "REJECTED"
-        }
-      ) do
+         auction_barge = %AuctionBarge{
+           auction_id: auction_id,
+           barge_id: barge_id,
+           supplier_id: supplier_id,
+           approval_status: "REJECTED"
+         },
+         current_state = %AuctionState{submitted_barges: submitted_barges}
+       ) do
     new_submitted_barges =
       Enum.map(submitted_barges, fn barge ->
         case barge do
@@ -296,20 +276,19 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     %AuctionState{current_state | submitted_barges: new_submitted_barges}
   end
 
-  def cancel_auction(current_state = %{auction_id: auction_id}, %Auction{} = auction) do
+  def cancel_auction(auction, current_state = %{auction_id: auction_id}) do
     auction = %{ auction | auction_closed_time: DateTime.utc_now()}
 
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
 
-
     AuctionTimer.cancel_timer(auction_id, :duration)
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
     %AuctionState{current_state | status: :canceled}
   end
 
-  def expire_auction(current_state = %{auction_id: auction_id}, auction = %Auction{}) do
+  def expire_auction(auction, current_state = %{auction_id: auction_id}) do
     auction = %{ auction | auction_closed_time: DateTime.utc_now()}
 
     auction

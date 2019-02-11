@@ -37,6 +37,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     {:ok, %{auction: auction, vessel_fuel_id: vessel_fuel_id, supplier: supplier_company}}
   end
 
+
   test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
     assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
 

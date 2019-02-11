@@ -4,9 +4,9 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AuctionShow from '../components/auction/show';
 import {
+  getAuctionPayload,
   getCompanyBarges,
   acceptWinningSolution,
-  setPortAgent,
   subscribeToAuctionUpdates,
   submitBargeForApproval,
   unsubmitBargeForApproval,
@@ -109,7 +109,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 export class AuctionContainer extends React.Component {
   dispatchItem() {
-    this.props.dispatch(subscribeToAuctionUpdates());
+    this.props.dispatch(subscribeToAuctionUpdates(() => getAuctionPayload(window.auctionId)));
     this.props.dispatch(getCompanyBarges(window.companyId));
   }
   componentDidMount() {

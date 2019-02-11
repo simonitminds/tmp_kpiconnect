@@ -1,6 +1,9 @@
 defmodule Oceanconnect.Factory do
   use ExMachina.Ecto, repo: Oceanconnect.Repo
 
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{AuctionFixture, AuctionEvent, AuctionEventStorage, AuctionStateActions}
+
   def set_password(user) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)
     %{user | password_hash: hashed_password}
@@ -157,6 +160,18 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def auction_fixture_factory() do
+    %Oceanconnect.Auctions.AuctionFixture{
+      auction: build(:auction),
+      supplier: build(:company, is_supplier: true),
+      vessel: build(:vessel),
+      fuel: build(:fuel),
+      original_supplier: build(:company, is_supplier: true),
+      original_vessel: build(:vessel),
+      original_fuel: build(:fuel)
+    }
+  end
+
   def create_bid(amount, min_amount, supplier_id, vessel_fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,
@@ -169,5 +184,41 @@ defmodule Oceanconnect.Factory do
     }
 
     Oceanconnect.Auctions.AuctionBid.from_params_to_auction_bid(bid_params, auction)
+  end
+
+  def start_auction!(auction) do
+    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    next_state = AuctionStateActions.start_auction(state, auction, nil, true)
+    event = AuctionEvent.auction_started(auction, next_state, nil)
+    AuctionEventStorage.persist(%AuctionEventStorage{event: event})
+  end
+
+  def cancel_auction!(auction) do
+    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    new_state = AuctionStateActions.cancel_auction(auction, state)
+
+    AuctionEventStorage.persist(%AuctionEventStorage{
+      event: AuctionEvent.auction_canceled(auction, new_state, nil)
+    })
+  end
+
+  def expire_auction!(auction) do
+    current_state = Auctions.get_auction_state!(auction)
+    new_state = AuctionStateActions.expire_auction(auction, current_state)
+    event = AuctionEvent.auction_expired(auction, new_state)
+    AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
+  end
+
+  def close_auction!(auction) do
+    supplier_id = hd(auction.suppliers).id
+    vessel_fuel_id = hd(auction.auction_vessel_fuels).id
+    bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
+    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    state = AuctionStateActions.start_auction(state, auction, nil, false)
+    {_product_state, _events, new_state} = AuctionStateActions.process_bid(state, bid)
+    solution = new_state.solutions.best_overall
+    state = AuctionStateActions.select_winning_solution(solution, "Smith", auction, new_state)
+    event = AuctionEvent.winning_solution_selected(solution, "", state, nil)
+    AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
   end
 end

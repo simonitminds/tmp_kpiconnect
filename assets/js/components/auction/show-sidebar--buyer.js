@@ -21,9 +21,15 @@ const BuyerAuctionShowSidebar = (props) => {
 
   return (
     <React.Fragment>
-      { (isAdmin || (status != 'pending' && status != 'open')) &&
-        <AuctionLogLink auction={auction} />
-      }
+      <div className="box">
+        <h3 className="box__header box__header--bordered has-margin-bottom-md">Auction Reports</h3>
+        { (isAdmin && (status == 'closed' || status == 'expired')) &&
+          <a className="button is-info has-family-copy has-margin-right-sm qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.auction.id}/fixtures`}>View Fixtures</a>
+        }
+        { (isAdmin || (status != 'pending' && status != 'open')) &&
+          <AuctionLogLink auction={auction} />
+        }
+      </div>
       <InvitedSuppliers
         auctionPayload={auctionPayload}
         approveBargeForm={approveBargeForm}

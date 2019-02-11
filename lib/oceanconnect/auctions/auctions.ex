@@ -11,10 +11,12 @@ defmodule Oceanconnect.Auctions do
     AuctionEvent,
     AuctionEventStore,
     AuctionEventStorage,
+    AuctionFixture,
     AuctionStore,
     AuctionSuppliers,
     AuctionBarge,
     AuctionTimer,
+    AuctionVesselFuel,
     Barge,
     Fuel,
     Port,
@@ -297,16 +299,26 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction(id) do
-    if auction_type = get_auction_type(id) do
-      Repo.get(auction_type, id)
-      |> fully_loaded
+    with %{auction: auction} <- AuctionCache.read(id) do
+      auction
+    else
+      _ ->
+        if auction_type = get_auction_type(id) do
+          Repo.get(auction_type, id)
+          |> fully_loaded
+        end
     end
   end
 
   def get_auction!(id) do
-    get_auction_type!(id)
-    |> Repo.get!(id)
-    |> fully_loaded
+    with %{auction: auction} <- AuctionCache.read(id) do
+      auction
+    else
+      _ ->
+        get_auction_type!(id)
+        |> Repo.get!(id)
+        |> fully_loaded
+    end
   end
 
   defp get_auction_type(auction_id) do
@@ -339,6 +351,11 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def get_auction_status!(auction) do
+    %{status: status} = get_auction_state!(auction)
+    status
+  end
+
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
 
@@ -357,43 +374,55 @@ defmodule Oceanconnect.Auctions do
   end
 
   def start_auction(auction = %struct{}, user \\ nil) when is_auction(struct) do
-    updated_auction = Map.put(auction, :auction_started, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.start_auction(user)
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def end_auction(auction = %struct{}) when is_auction(struct) do
-    updated_auction = Map.put(auction, :auction_ended, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.end_auction()
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def expire_auction(auction = %struct{}) when is_auction(struct) do
-    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.end_auction_decision_period()
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
   end
 
   def cancel_auction(auction = %struct{}, user) when is_auction(struct) do
-    updated_auction = Map.put(auction, :auction_closed_time, DateTime.utc_now())
-
-    updated_auction
+    auction
     |> Command.cancel_auction(user)
     |> AuctionStore.process_command()
 
-    updated_auction
+    auction
+  end
+
+  def finalize_auction(auction = %Auction{id: auction_id}, auction_state) do
+    with event = %AuctionEvent{} <-
+           AuctionEvent.auction_state_snapshotted(auction, auction_state),
+         {:ok, snapshot} <- AuctionEventStore.create_auction_snapshot(event),
+         {:ok, _fixtures} <- create_fixtures_from_snapshot(snapshot),
+         cached_auction = %Auction{} <- AuctionCache.read(auction_id),
+         finalized_auction = %Auction{} <- persist_auction_from_cache(cached_auction) do
+      {:ok, finalized_auction}
+    else
+      _ -> {:error, "Could not finalize auction details"}
+    end
+  end
+
+  def persist_auction_from_cache(auction = %Auction{id: auction_id}) do
+    attrs = Map.take(auction, [:auction_started, :auction_ended, :auction_closed_time, :port_agent])
+    old_auction = Repo.get(Auction, auction_id)
+    |> Auction.changeset(attrs)
+    |> Repo.update!
   end
 
   def create_auction(attrs \\ %{}, user \\ nil)
@@ -546,16 +575,12 @@ defmodule Oceanconnect.Auctions do
   def update_auction_without_event_storage!(%struct{} = auction, attrs) when is_auction(struct) do
     cleaned_attrs = clean_timestamps(attrs)
 
-    changeset =
-      cleaned_attrs
-      |> Enum.reduce(Ecto.Changeset.change(auction), fn({attr, value}, acc) ->
-        Ecto.Changeset.force_change(acc, attr, value)
-      end)
-
     updated_auction =
-      changeset
-      |> Repo.update!()
-      |> fully_loaded
+      auction
+      |> Map.merge(cleaned_attrs)
+
+    updated_auction
+    |> update_cache
 
     updated_auction
     |> AuctionEvent.auction_updated(nil)
@@ -566,7 +591,7 @@ defmodule Oceanconnect.Auctions do
 
   defp clean_timestamps(attrs) do
     [:auction_started, :auction_ended, :auction_closed_time]
-    |> Enum.reduce(attrs, fn(attribute, acc) ->
+    |> Enum.reduce(attrs, fn attribute, acc ->
       if initial_value = attrs[attribute] do
         Map.put(acc, attribute, fix_time_weirdness(initial_value))
       else
@@ -597,7 +622,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct), do: nil
-
   def suppliers_with_alias_names(auction = %struct{suppliers: suppliers}) when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
@@ -1359,5 +1383,60 @@ defmodule Oceanconnect.Auctions do
       |> Command.reject_barge(user)
       |> AuctionStore.process_command()
     end)
+  end
+
+  def fixtures_for_auction(auction = %Auction{}) do
+    auction
+    |> AuctionFixture.from_auction()
+    |> Repo.all()
+    |> Repo.preload([:supplier, :fuel])
+  end
+
+  def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
+    AuctionFixture.for_auction_vessel_fuel(avf)
+    |> Repo.all()
+  end
+
+  def create_fixtures_from_snapshot(
+        snapshot = %AuctionEvent{
+          type: :auction_state_snapshotted,
+          data: %{
+            state: %{
+              winning_solution: %Solution{bids: bids, total_price: total_price, valid: true}
+            }
+          }
+        }
+      ) do
+    fixtures =
+      bids
+      |> Enum.map(&fixture_from_bid/1)
+
+    {:ok, fixtures}
+  end
+
+  def create_fixtures_from_snapshot(event) do
+    {:ok, []}
+  end
+
+  def fixture_from_bid(
+        bid = %AuctionBid{
+          amount: amount,
+          vessel_fuel_id: avf_id,
+          supplier_id: supplier_id,
+          active: true,
+          auction_id: auction_id
+        }
+      ) do
+    case Repo.get(AuctionVesselFuel, avf_id) do
+      vessel_fuel = %AuctionVesselFuel{} ->
+        {:ok, fixture} =
+          AuctionFixture.changeset_from_bid_and_vessel_fuel(bid, vessel_fuel)
+          |> Repo.insert()
+
+        fixture
+
+      nil ->
+        nil
+    end
   end
 end

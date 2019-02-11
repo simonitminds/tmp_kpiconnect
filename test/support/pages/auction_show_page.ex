@@ -11,6 +11,10 @@ defmodule Oceanconnect.AuctionShowPage do
     current_path() == "/auctions/#{id}"
   end
 
+  def view_auction_fixtures do
+    find_element(:class, "qa-admin-fixtures-link") |> click
+  end
+
   def auction_status() do
     find_element(:class, "qa-auction-status")
     |> inner_text()

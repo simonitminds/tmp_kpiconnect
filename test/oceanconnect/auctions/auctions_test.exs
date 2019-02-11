@@ -323,7 +323,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid term data creates a term auction", %{
       term_auction_attrs: term_auction_attrs
-    } do
+   } do
       assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
       assert %TermAuction{} = Auctions.get_auction!(auction_id)
     end
@@ -351,11 +351,15 @@ defmodule Oceanconnect.AuctionsTest do
     test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
       auction: auction
     } do
-      assert auction =
-               %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
 
+      assert %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
+      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
       assert auction.po == "some updated po"
-      assert auction == Auctions.get_auction(auction.id) |> Auctions.fully_loaded()
     end
 
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
@@ -411,6 +415,9 @@ defmodule Oceanconnect.AuctionsTest do
       admin: admin
     } do
       auction = Auctions.start_auction(auction, admin)
+      :timer.sleep(200)
+      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
+
       assert auction.auction_started != nil
       assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
     end
@@ -516,7 +523,7 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.start_auction()
       |> Auctions.end_auction()
 
-      assert_receive %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert_receive %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
 
       assert_receive %AuctionEvent{
         type: :auction_ended,
@@ -524,11 +531,7 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: time_entered
       }
 
-      assert_receive %AuctionEvent{
-        type: :auction_updated,
-        auction_id: ^auction_id,
-        data: data = %Auction{auction_ended: auction_ended}
-      }
+      %Auction{auction_ended: auction_ended} = Auctions.get_auction(auction_id)
 
       assert time_entered == auction_ended
     end
@@ -1321,6 +1324,41 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
+  describe "auction_fixtures" do
+    alias Oceanconnect.Auctions.AuctionFixture
+
+    setup do
+      auction = insert(:auction)
+      fixtures = insert_list(2, :auction_fixture, auction: auction)
+      %{auction: auction, fixtures: fixtures}
+    end
+
+    test "from_bid_and_vessel_fuel", %{auction: auction = %Auction{auction_vessel_fuels: [vessel_fuel | _rest], suppliers: [supplier]}} do
+      bid = create_bid(3.50, 3.50, supplier.id, vessel_fuel.id, auction)
+      assert %AuctionFixture{} = Auctions.fixture_from_bid(bid)
+    end
+
+    test "fixtures_for_auction", %{auction: auction = %Auction{id: auction_id}, fixtures: [%AuctionFixture{id: fixture1_id}, %AuctionFixture{id: fixture2_id}]} do
+      assert [%AuctionFixture{auction_id: ^auction_id, id: ^fixture1_id}, %AuctionFixture{auction_id: ^auction_id, id: ^fixture2_id}] = Auctions.fixtures_for_auction(auction)
+    end
+
+    test "creating fixtures for an auction_state" do
+      auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
+      supplier_id = hd(auction.suppliers).id
+      vessel_fuel_id = hd(auction.auction_vessel_fuels).id
+
+      bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
+      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+      state = Oceanconnect.Auctions.AuctionStateActions.start_auction(state, auction, nil, false)
+      {_product_state, _events, new_state} = Oceanconnect.Auctions.AuctionStateActions.process_bid(state, bid)
+      state  = Oceanconnect.Auctions.AuctionStateActions.select_winning_solution(new_state.solutions.best_overall, "Smith", auction, new_state)
+      event = AuctionEvent.auction_state_snapshotted(auction, state)
+      Oceanconnect.Auctions.create_fixtures_from_snapshot(event)
+
+      assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
+    end
+  end
+
   describe "barges" do
     alias Oceanconnect.Auctions.Barge
 
@@ -1483,5 +1521,6 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert barge.companies == companies
     end
+
   end
 end

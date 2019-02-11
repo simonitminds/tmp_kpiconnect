@@ -24,12 +24,13 @@ defmodule OceanconnectWeb.Router do
     plug(OceanconnectWeb.Plugs.CheckAdmin)
   end
 
-  # Other scopes may use custom stacks.
+
   scope "/api", OceanconnectWeb.Api do
     pipe_through(:api)
     # Routes requiring authentication
     pipe_through(:authenticated)
     get("/auctions", AuctionController, :index, as: :auction_api)
+    get("/auctions/:auction_id", AuctionController, :show, as: :auction_api)
     post("/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api)
     post("/auctions/:auction_id/revoke_bid", BidController, :revoke, as: :auction_bid_api)
 
@@ -137,6 +138,7 @@ defmodule OceanconnectWeb.Router do
       :stop_impersonating,
       as: :admin_stop_impersonating_session
     )
+    get("/auctions/:auction_id/fixtures", AuctionFixtureController, :index, as: :admin_auction_fixtures)
 
     resources("/vessels", VesselController, as: :admin_vessel)
     post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)
