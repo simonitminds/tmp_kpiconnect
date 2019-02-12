@@ -138,7 +138,11 @@ defmodule OceanconnectWeb.Router do
       :stop_impersonating,
       as: :admin_stop_impersonating_session
     )
+
     get("/auctions/:auction_id/fixtures", AuctionFixtureController, :index, as: :admin_auction_fixtures)
+    post("/auctions/:auction_id/fixtures", AuctionFixtureController, :create, as: :admin_auction_fixture)
+    put("/auctions/:auction_id/fixtures/:fixture_id", AuctionFixtureController, :update, as: :admin_auction_fixture)
+    get("/auctions/:auction_id/fixtures/new", AuctionFixtureController, :new, as: :admin_auction_fixture)
 
     resources("/vessels", VesselController, as: :admin_vessel)
     post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)

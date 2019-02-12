@@ -9,7 +9,8 @@
 			<!-- <%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %> -->
 			<section class="admin-panel__content">
 				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fixture List</span>
-					<%= link to: "/admin/auctions/fixtures/new", class: "button is-link is-inline-block has-margin-left-auto" do %>
+					<%= link to: admin_auction_fixture_path(@conn, :new, @auction), class: "button is-link is-inline-block has-margin-left-auto" do %>
+
 						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Fixture
 					<% end %>
 				</h2>
