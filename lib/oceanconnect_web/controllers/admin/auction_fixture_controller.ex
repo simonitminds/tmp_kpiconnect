@@ -55,10 +55,9 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
       {:ok, _fixture} ->
         conn
         |> put_flash(:info, "Fixture updated successfully.")
-        |> redirect(to: admin_auction_fixture_path(conn, :index, auction))
+        |> redirect(to: admin_auction_fixtures_path(conn, :index, auction))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        IO.inspect(changeset)
         render(conn, "new.html",
           changeset: changeset,
           auction: auction,
@@ -79,9 +78,9 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     fuels = Auctions.list_all_fuels()
 
     changeset = Auctions.change_fixture(fixture)
-
     if status in [:closed, :expired] do
-      render(conn, "edit.html", status, %{
+
+      render(conn, "edit.html", %{
         auction: auction,
         fixture: fixture,
         changeset: changeset,
@@ -113,7 +112,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
       {:ok, _fixture} ->
         conn
         |> put_flash(:info, "Fixture updated successfully.")
-        |> redirect(to: admin_auction_fixture_path(conn, :index, auction))
+        |> redirect(to: admin_auction_fixtures_path(conn, :index, auction))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html",

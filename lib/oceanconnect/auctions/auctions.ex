@@ -1395,10 +1395,12 @@ defmodule Oceanconnect.Auctions do
 
   def get_fixture(fixture_id) do
     Repo.get(AuctionFixture, fixture_id)
+    |> Repo.preload([:supplier, :vessel, :fuel])
   end
 
   def get_fixture!(fixture_id) do
-    Repo.get!(AucitonFixture, fixture_id)
+    Repo.get!(AuctionFixture, fixture_id)
+    |> Repo.preload([:supplier, :vessel, :fuel])
   end
 
   def fixtures_for_auction(auction = %Auction{}) do
@@ -1413,8 +1415,8 @@ defmodule Oceanconnect.Auctions do
     |> Repo.all()
   end
 
-  def change_fixture(%AuctionFixture{}) do
-    %AuctionFixture{}
+  def change_fixture(change = %AuctionFixture{}) do
+    change
     |> AuctionFixture.update_changeset(%{})
   end
 
@@ -1439,9 +1441,10 @@ defmodule Oceanconnect.Auctions do
     {:ok, []}
   end
 
-  def create_fixture(attrs \\ %{}) do
+  def create_fixture(auction_id, attrs \\ %{}) do
+    attrs =  Map.put(attrs, "auction_id", auction_id)
     %AuctionFixture{}
-    |> AuctionFixture.changeset(attrs)
+    |> AuctionFixture.update_changeset(attrs)
     |> Repo.insert()
   end
 

@@ -40,7 +40,7 @@
                 <td class="qa-auction-fixture-eta"><%= fixture.eta %></td>
                 <td class="qa-auction-fixture-etd"><%= fixture.etd %></td>
 								<td class="text-right">
-									<%= link "Edit", to: "/admin/auctions/#{@auction.id}/fixtures/#{fixture.id}", class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
+									<%= link "Edit", to: admin_auction_fixture_path(@conn, :edit, @auction, fixture), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
 								</td>
 							</tr>
 						<% end %>

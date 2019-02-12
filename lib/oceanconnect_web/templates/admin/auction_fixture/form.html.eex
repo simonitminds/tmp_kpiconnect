@@ -52,6 +52,19 @@
           <%= error_tag f, :quantity %>
       </div>
 
+      <div class="form-group">
+        <%= label f, :eta, class: "control-label" %>
+        <%= datetime_select f, :eta, class: "form-control qa-admin-fixture-eta" %>
+        <%= error_tag f, :eta %>
+       </div>
+
+       <div class="form-group">
+           <%= label f, :etd, class: "control-label" %>
+           <%= datetime_select f, :etd, class: "form-control qa-admin-fixture-etd" %>
+           <%= error_tag f, :etd %>
+        </div>
+
+
 
       <div class="field has-margin-top-lg">
     		<div class="control">
