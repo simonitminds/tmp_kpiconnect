@@ -6,7 +6,7 @@
   <% end %>
   <div class="columns">
     <div class="column is-one-third">
-      <div class="field" >
+      <div class="field">
         <%= label f, :vessel_id, class: "label" do %>
           Vessel
         <%end%>
@@ -16,7 +16,7 @@
               <%= error_tag f, :vessel_id %>
           </div>
         </div>
-
+      </div>
 			<div class="field">
 				<%= label f, :supplier_id, class: "label" do %>
 					Supplier
@@ -40,31 +40,37 @@
               </div>
           </div>
       </div>
-      <div class="form-group">
-          <%= label f, :price, class: "control-label" %>
-          <%= text_input f, :price, class: "form-control qa-admin-fixture-price" %>
+      <div class="field">
+          <%= label f, :price, class: "label" %>
+          <div class="control">
+            <%= text_input f, :price, class: "input qa-admin-fixture-price" %>
+          </div>
           <%= error_tag f, :price %>
       </div>
 
-      <div class="form-group">
-          <%= label f, :quantity, class: "control-label" %>
-          <%= text_input f, :quantity, class: "form-control qa-admin-fixture-quantity" %>
+      <div class="field">
+          <%= label f, :quantity, class: "label" %>
+          <div class="control">
+            <%= text_input f, :quantity, class: "input qa-admin-fixture-quantity" %>
+          </div>
           <%= error_tag f, :quantity %>
       </div>
 
-      <div class="form-group">
-        <%= label f, :eta, class: "control-label" %>
-        <%= datetime_select f, :eta, class: "form-control qa-admin-fixture-eta" %>
+      <div class="field">
+        <%= label f, :eta, class: "label is-uppercase" %>
+        <div class="control">
+          <%= datetime_select f, :eta, class: "select qa-admin-fixture-eta" %>
+        </div>
         <%= error_tag f, :eta %>
        </div>
 
-       <div class="form-group">
-           <%= label f, :etd, class: "control-label" %>
-           <%= datetime_select f, :etd, class: "form-control qa-admin-fixture-etd" %>
+       <div class="field">
+           <%= label f, :etd, class: "label is-uppercase" %>
+           <div class="control">
+             <%= datetime_select f, :etd, class: "select qa-admin-fixture-etd" %>
+           </div>
            <%= error_tag f, :etd %>
         </div>
-
-
 
       <div class="field has-margin-top-lg">
     		<div class="control">
