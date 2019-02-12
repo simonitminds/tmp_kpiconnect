@@ -4,7 +4,7 @@ import { formatPrice } from '../../utilities';
 import CheckBoxField from '../check-box-field';
 import MediaQuery from 'react-responsive';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import BidTag from './bid-tag';
+import BidTag from './common/bid-tag';
 
 
 const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierId}) => {

@@ -75,13 +75,6 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         _user,
         _emit
       ) do
-
-    auction = %{ auction | auction_started: DateTime.utc_now()}
-
-    auction
-    |> Command.update_cache()
-    |> AuctionCache.process_command()
-
     auction
     |> Command.start_decision_duration_timer()
     |> AuctionTimer.process_command()
@@ -302,7 +295,6 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
-
 
     AuctionTimer.cancel_timer(auction_id, :duration)
     AuctionTimer.cancel_timer(auction_id, :decision_duration)

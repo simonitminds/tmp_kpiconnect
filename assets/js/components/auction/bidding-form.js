@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import k from 'react-responsive';
-import CollapsibleSection from './collapsible-section';
+import CollapsibleSection from './common/collapsible-section';
 import { formatPrice } from '../../utilities';
 import BiddingFormProduct from './bidding-form-product';
 import CheckBoxField from '../check-box-field';

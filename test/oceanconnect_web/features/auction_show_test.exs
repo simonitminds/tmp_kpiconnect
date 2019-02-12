@@ -151,7 +151,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :ok
     end
 
-    test "buyer can see his view of the auction card", %{auction: auction} do
+    test "buyer can see their view of the auction show page", %{auction: auction} do
       buyer_params = %{
         suppliers: auction.suppliers
       }

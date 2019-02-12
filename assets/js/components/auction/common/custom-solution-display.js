@@ -2,12 +2,12 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MediaQuery from 'react-responsive';
-import { formatTime, formatPrice } from '../../utilities';
+import { formatTime, formatPrice } from '../../../utilities';
 import BidTag from './bid-tag';
-import CustomSolutionBidSelector from './custom-solution-bid-selector';
-import SolutionAcceptDisplay from './solution-accept-display';
-import SolutionDisplayBarges from './solution-display-barges';
-import SolutionDisplayProductPrices from './solution-display-product-prices';
+import CustomSolutionBidSelector from './solution-display/custom-solution-bid-selector';
+import SolutionAcceptDisplay from './solution-display/solution-accept-display';
+import SolutionDisplayBarges from './solution-display/solution-display-barges';
+import SolutionDisplayProductPrices from './solution-display/solution-display-product-prices';
 
 export default class CustomSolutionDisplay extends React.Component {
   constructor(props) {

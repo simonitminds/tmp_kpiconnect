@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import InputField from '../input-field';
+import InputField from '../../../input-field';
 import SolutionComment from './solution-comment';
 
 const SolutionAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, acceptSolution, cancelSelection}) => {

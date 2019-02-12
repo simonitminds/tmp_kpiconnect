@@ -193,7 +193,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
-    take_screenshot()
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
 

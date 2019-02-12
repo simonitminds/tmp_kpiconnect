@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../utilities';
+import BidTable from './common/bid-table';
 
 const BuyerBidList = ({auctionPayload, buyer}) => {
   const vesselFuels = _.chain(auctionPayload)
@@ -32,47 +33,16 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         { _.map(products, (vfId) => {
             const lowestBids = productBids[vfId].lowest_bids;
+            const productName = `${vesselFuels[vfId].fuel.name} for ${vesselFuels[vfId].vessel.name}`;
 
-            return(
-              <table key={vfId} className="table table--grade-display is-fullwidth is-striped is-marginless">
-                <thead>
-                  <tr>
-                    <th>{vesselFuels[vfId].fuel.name} for {vesselFuels[vfId].vessel.name}</th>
-                    <th>Price</th>
-                    <th>Time</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  { lowestBids.length > 0
-                    ? _.map(lowestBids, ({id, amount, vfId, is_traded_bid, time_entered, supplier}) => {
-                        return (
-                          <tr key={id} className={`qa-auction-bid-${id}`}>
-                            <td className="qa-auction-bid-supplier">{supplier}</td>
-                            <td className="qa-auction-bid-amount"><span className="auction__bid-amount">${formatPrice(amount)}</span>
-                              <span className="qa-auction-bid-is_traded_bid">
-                                {is_traded_bid &&
-                                  <span className="auction__traded-bid-tag">
-                                    <span action-label="Traded Bid" className="auction__traded-bid-marker">
-                                      <FontAwesomeIcon icon="exchange-alt" />
-                                    </span>
-                                    <span className="has-padding-left-sm">Traded Bid</span>
-                                  </span>
-                                }
-                              </span>
-                            </td>
-                            <td>({formatTime(time_entered)})</td>
-                          </tr>
-                        );
-                      })
-                    : <tr>
-                        <td colSpan="3"><i>No bids have been placed on this product</i></td>
-                        <td></td>
-                      </tr>
-                  }
-                </tbody>
-              </table>
-            );
+            return <BidTable
+              key={vfId}
+              className="table--grade-display"
+              bids={lowestBids}
+              columns={["supplier", "amount", "time_entered"]}
+              headers={[productName, "Price", "Time"]}
+              showMinAmount={false}
+            />;
           })
         }
       </div>

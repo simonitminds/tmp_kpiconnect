@@ -1,8 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatPrice } from '../../utilities';
+import { formatPrice } from '../../../utilities';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+/* BidTag
+ *
+ * Renders a small tag with the title and the amount from the given `bid`. If
+ * `highlightOwn` is truthy, a crown will appear next to the title.
+ */
 const BidTag = ({bid, title, highlightOwn}) => {
   return (
     <div className="tags auction-bidding__best-price has-addons">

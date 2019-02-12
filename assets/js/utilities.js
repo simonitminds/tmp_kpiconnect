@@ -2,46 +2,6 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 
-export function auctionTitle(auction) {
-  const auctionType = _.get(auction, 'type');
-  const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')
-
-  switch (auctionType) {
-    case ('spot'):
-      const vessels = _.get(auction, 'vessels');
-      return(
-        <span>
-          { _.map(vessels, (vessel) => {
-              return (
-                <div key={vessel.name} className={`auction-title-item qa-auction-vessel-${vessel.id}`}>
-                  <span className="auction-title__vessel-name">{vessel.name}</span> <span className="auction-title__vessel-imo">({vessel.imo})</span>
-                </div>
-              );
-            })
-          }
-          { is_traded_bid_allowed &&
-            <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
-            </span>
-          }
-        </span>
-      );
-
-    default:
-      const portName = _.get(auction, 'port.name');
-      return(
-        <span>
-          <div className="auction-title__port-name">
-            {portName}
-          </div>
-          { is_traded_bid_allowed &&
-            <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
-            </span>
-          }
-        </span>
-      );
-  }
-}
-
 export function replaceListItem(list, oldItem, newItem) {
   const index = _.indexOf(list, oldItem);
   if (newItem) {
