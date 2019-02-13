@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureView do
   use OceanconnectWeb, :view
   alias Oceanconnect.Repo
   alias Oceanconnect.Accounts.Company
-  alias Oceanconnect.Auctions.{AuctionFixture, Fuel}
+  alias Oceanconnect.Auctions.{AuctionFixture, Fuel, Vessel}
 
   def auction_name(auction) do
     "auction - #{auction.id}"
@@ -14,5 +14,9 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureView do
 
   def fuel_name(%AuctionFixture{fuel: %Fuel{name: fuel_name}}) do
     fuel_name
+  end
+
+  def vessel_name(%AuctionFixture{vessel: %Vessel{name: vessel_name}}) do
+    vessel_name
   end
 end
