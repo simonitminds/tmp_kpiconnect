@@ -41,7 +41,7 @@
           </div>
       </div>
       <div class="field">
-          <%= label f, :price, class: "label" %>
+          <%= label f, :price, "Price Per Unit", class: "label"  %>
           <div class="control">
             <%= text_input f, :price, class: "input qa-admin-fixture-price" %>
           </div>
@@ -49,7 +49,7 @@
       </div>
 
       <div class="field">
-          <%= label f, :quantity, class: "label" %>
+          <%= label f, :quantity, "Quantity (MT)", class: "label" %>
           <div class="control">
             <%= text_input f, :quantity, class: "input qa-admin-fixture-quantity" %>
           </div>

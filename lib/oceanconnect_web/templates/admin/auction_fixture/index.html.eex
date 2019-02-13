@@ -32,7 +32,7 @@
 						<%= for fixture <- @fixtures do %>
 							<tr class="qa-auction-fixture-<%= fixture.id %>">
 								<td class="qa-auction-fixture-auction-name"><%= "#{@auction.id}" %></td>
-								<td class="qa-auction-fixture-supplier"><%= fixture.vessel_id %></td>
+								<td class="qa-auction-fixture-supplier"><%= vessel_name(fixture) %></td>
 								<td class="qa-auction-fixture-fuel"><%= fuel_name(fixture) %></td>
 								<td class="qa-auction-fixture-price">$<%= fixture.price %></td>
 								<td class="qa-auction-fixture-quantity"><%= fixture.quantity %></td>

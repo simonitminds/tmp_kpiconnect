@@ -1407,7 +1407,7 @@ defmodule Oceanconnect.Auctions do
     auction
     |> AuctionFixture.from_auction()
     |> Repo.all()
-    |> Repo.preload([:supplier, :fuel])
+    |> Repo.preload([:supplier, :fuel, :vessel])
   end
 
   def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
