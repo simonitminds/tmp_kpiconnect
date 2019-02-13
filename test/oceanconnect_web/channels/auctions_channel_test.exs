@@ -27,6 +27,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       )
       |> Auctions.fully_loaded()
 
+    [vessel_fuel] = auction.auction_vessel_fuels
+    vessel_fuel_id = vessel_fuel.id
+
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
@@ -57,7 +60,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
        non_participant: non_participant,
        expected_payload: expected_payload,
        auction: auction,
-       fuel_id: fuel_id
+       fuel_id: fuel_id,
+       vessel_fuel_id: vessel_fuel_id
      }}
   end
 
@@ -510,14 +514,15 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       auction: auction = %{id: auction_id},
       supplier_id: supplier_id,
       supplier3: supplier3,
-      fuel_id: fuel_id
+      fuel_id: fuel_id,
+      vessel_fuel_id: vessel_fuel_id
     } do
       channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
 
-      create_bid(1.25, nil, supplier_id, fuel_id, auction, false)
+      create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
       supplier_auction_payload =

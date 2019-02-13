@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AuctionForm from '../components/auction/auction-form';
+import Form from '../components/auction/form';
 import { receiveAuctionFormData,
          updateDate,
          updateInformation,
@@ -64,7 +64,7 @@ export class AuctionFormContainer extends React.Component {
       if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>;
     } else {
-      return <AuctionForm {...this.props} />;
+      return <Form {...this.props} />;
     }
   }
 }

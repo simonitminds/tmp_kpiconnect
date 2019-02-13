@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import AuctionTitle from '../auction/auction-title';
+import AuctionTitle from '../auction/common/auction-title';
 
 const MessagesAuctionHeader = ({payload, onSelect}) => {
   const {

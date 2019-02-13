@@ -3,9 +3,9 @@ import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
-import SupplierBidStatus from './supplier-bid-status';
+import SupplierBidStatus from './spot/show/supplier-bid-status';
 import AuctionTimeRemaining from './auction-time-remaining';
-import AuctionTitle from './auction-title';
+import AuctionTitle from './common/auction-title';
 
 const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');

@@ -6,8 +6,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
   hound_session()
 
   setup do
-    buyer_company = insert(:company, credit_margin_amount: 5.00)
-    buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
     supplier_company3 = insert(:company, is_supplier: true)
@@ -23,6 +21,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
     fuel = auction.fuel
     buyer_company = auction.buyer
+    buyer = insert(:user, company: buyer_company)
 
     bid_params = %{
       amount: 1.25,
