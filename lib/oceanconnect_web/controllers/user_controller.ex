@@ -52,7 +52,7 @@ defmodule OceanconnectWeb.UserController do
     |> OceanconnectWeb.Mailer.deliver_later()
 
     conn
-    |> put_flash(:info, "An email has been with instructions to reset your password")
+    |> put_flash(:info, "An email has been sent with instructions to reset your password")
     |> put_status(200)
     |> render("edit.html", user: user, changeset: changeset)
   end
