@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../../../utilities';
-import SolutionDisplay from '../../common/show/solution-display';
+import SolutionDisplay from './solution-display';
 
 const WinningSolution = ({auctionPayload, supplierId}) => {
   const solution = _.get(auctionPayload, 'solutions.winning_solution');

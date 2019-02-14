@@ -1,11 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../../../utilities';
-import CustomSolutionDisplay from '../../common/show/custom-solution-display';
-import SolutionDisplay from '../../common/show/solution-display';
+import SolutionDisplay from './solution-display';
 import InputField from '../../../input-field';
 
-const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution}) => {
+const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
   if (solutions.length > 0) {
     return(
       <div className="auction-solution__container qa-auction-other-solutions">
@@ -18,9 +17,6 @@ const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution})
                 );
               })
             }
-            { showCustom &&
-              <CustomSolutionDisplay auctionPayload={auctionPayload} acceptSolution={acceptSolution} className="qa-auction-solution-custom" />
-            }
           </div>
         </div>
       </div>
@@ -30,5 +26,5 @@ const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution})
   }
 };
 
-export default OtherSolutions;
+export default RankedOffers;
 

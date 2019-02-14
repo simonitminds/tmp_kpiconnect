@@ -4,9 +4,8 @@ import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import BargeSubmission from '../../common/show/barge-submission';
-import BuyerBestSolution from './buyer-best-solution';
-import BuyerBidList from './buyer-bid-list';
-import OtherSolutions from './other-solutions';
+import BuyerGradeDisplay from './buyer-grade-display';
+import RankedOffers from './ranked-offers';
 import WinningSolution from './winning-solution';
 
 const BuyerBody = (props) => {
@@ -16,31 +15,19 @@ const BuyerBody = (props) => {
     acceptSolution
   } = props;
   const { status, solutions } = auctionPayload;
-  const otherSolutions = _.get(solutions, 'other_solutions');
+  const rankedOffers = _.chain(solutions)
+    .get('best_by_supplier')
+    .values()
+    .sortBy('normalized_price')
+    .value();
+
+  console.log(rankedOffers);
 
   if (status == 'open') {
     return (
       <div>
-        <BuyerBestSolution auctionPayload={auctionPayload} />
-        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
-        <BuyerBidList auctionPayload={auctionPayload} />
-      </div>
-    );
-  } else if (status == 'decision') {
-    return (
-      <div>
-        { currentUser.isAdmin
-          ? <div>
-              <a className="qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.id}/fixtures`}>View fixtures</a>
-              <BuyerBestSolution auctionPayload={auctionPayload} />
-              <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
-            </div>
-          : <div>
-              <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
-              <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
-            </div>
-        }
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else if (status != 'pending') {
@@ -48,10 +35,10 @@ const BuyerBody = (props) => {
       <div>
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
-          ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
-          : <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={false} />
+          ? <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+          : <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
         }
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else {

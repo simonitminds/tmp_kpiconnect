@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../../../utilities';
-import SolutionDisplay from '../../common/show/solution-display';
+import SolutionDisplay from './solution-display';
 
 const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');

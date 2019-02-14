@@ -90,6 +90,28 @@ defmodule Oceanconnect.TermAuctionShowTest do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_expectations)
     end
+
+    test "buyer selects solution", %{
+      auction: auction,
+      buyer: buyer,
+      fuel_id: fuel_id
+    } do
+
+      supplier = hd(auction.suppliers)
+
+      bid =
+        create_bid(1.75, nil, supplier.id, fuel_id, auction, true)
+        |> Auctions.place_bid(insert(:user, company: supplier))
+
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.select_solution(0)
+      :timer.sleep(100)
+      AuctionShowPage.accept_bid()
+      :timer.sleep(500)
+
+      assert AuctionShowPage.auction_status() == "CLOSED"
+      assert AuctionShowPage.winning_solution_has_bids?([bid])
+    end
   end
 
   describe "supplier login" do

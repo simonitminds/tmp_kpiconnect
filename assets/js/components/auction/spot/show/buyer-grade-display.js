@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../../../utilities';
 import BidTable from '../../common/show/bid-table';
 
-const BuyerBidList = ({auctionPayload, buyer}) => {
+const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
   const vesselFuels = _.chain(auctionPayload)
     .get('auction.auction_vessel_fuels')
     .reduce((acc, vesselFuel) => {
@@ -59,4 +59,4 @@ const BuyerBidList = ({auctionPayload, buyer}) => {
   }
 };
 
-export default BuyerBidList;
+export default BuyerGradeDisplay;

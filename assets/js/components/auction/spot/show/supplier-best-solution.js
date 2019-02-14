@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import SupplierBidStatus from './supplier-bid-status';
-import SolutionDisplay from '../../common/show/solution-display';
+import SolutionDisplay from './solution-display';
 
 const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid}) => {
   const auctionStatus = _.get(auctionPayload, 'status');

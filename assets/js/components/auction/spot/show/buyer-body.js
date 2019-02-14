@@ -4,8 +4,8 @@ import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import BargeSubmission from '../../common/show/barge-submission';
-import BuyerBestSolution from './buyer-best-solution';
-import BuyerBidList from './buyer-bid-list';
+import BuyerBestSolution from './buyer-best-solution'
+import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
 
@@ -24,7 +24,7 @@ const BuyerBody = (props) => {
       <div>
         <BuyerBestSolution auctionPayload={auctionPayload} />
         <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else if (status == 'decision') {
@@ -41,7 +41,7 @@ const BuyerBody = (props) => {
               <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
             </div>
         }
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else if (status != 'pending') {
@@ -52,7 +52,7 @@ const BuyerBody = (props) => {
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
           : <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={false} />
         }
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else {

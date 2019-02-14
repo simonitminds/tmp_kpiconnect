@@ -5,12 +5,9 @@ import { formatTime, formatPrice } from '../../../../utilities';
 import MediaQuery from 'react-responsive';
 import BidTag from '../bid-tag';
 import SolutionAcceptDisplay from './solution-display/solution-accept-display';
-import SolutionDisplayBarges from './solution-display/solution-display-barges';
-import SolutionDisplayProductPrices from './solution-display/solution-display-product-prices';
-import SolutionDisplayProductSection from './solution-display/solution-display-product-section';
 
 
-export default class SolutionDisplay extends React.Component {
+export default class SolutionDisplayWrapper extends React.Component {
   constructor(props) {
     super(props);
     const isExpanded = this.props.isExpanded;
@@ -59,39 +56,14 @@ export default class SolutionDisplay extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, children, className} = this.props;
-    const isSupplier = !!supplierId;
-    const auctionStatus = auctionPayload.status;
-    const auctionBarges = _.get(auctionPayload, 'submitted_barges');
-    const suppliers = _.get(auctionPayload, 'auction.suppliers');
-    const fuels = _.get(auctionPayload, 'auction.fuels');
-    const vessels = _.get(auctionPayload, 'auction.vessels');
-    const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
+    const {auctionPayload, solution, title, subtitle, acceptSolution, supplierId, revokeBid, highlightOwn, best, children, headerExtras, className, price} = this.props;
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
-    const acceptable = !!acceptSolution && auctionStatus == 'decision';
-    const revokable = isSupplier && revokeBid;
+    const acceptable = !!acceptSolution;
     const isExpanded = this.state.expanded;
 
-    const bidsByFuel = _.chain(fuels)
-      .reduce((acc, fuel) => {
-        const vfIds = _.chain(vesselFuels)
-          .filter((vf) => vf.fuel_id == fuel.id)
-          .map((vf) => `${vf.id}`)
-          .value();
-        const fuelBids = _.filter(bids, (bid) => _.includes(vfIds, bid.vessel_fuel_id));
-        acc[fuel.name] = fuelBids;
-        return acc;
-      }, {})
-      .value();
-
-    const lowestFuelBids = _.chain(bidsByFuel)
-      .reduce((acc, bids, fuel) => {
-        acc[fuel] = _.minBy(bids,'amount');
-        return acc;
-      }, {})
-      .value();
+    const displayPrice = price != undefined ? price : `$${formatPrice(normalized_price)}`;
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -108,6 +80,8 @@ export default class SolutionDisplay extends React.Component {
       }
     };
 
+    const displaySubtitle = subtitle || solutionTitle();
+
     return (
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
         <div className="auction-solution__header auction-solution__header--bordered">
@@ -119,7 +93,7 @@ export default class SolutionDisplay extends React.Component {
               }
               <span className="is-inline-block">
                 <span className="auction-solution__title__category">{title}</span>
-                <span className="auction-solution__title__description">{solutionTitle()}</span>
+                <span className="auction-solution__title__description">{displaySubtitle}</span>
               </span>
               <MediaQuery query="(max-width: 480px)">
                 { acceptable &&
@@ -128,8 +102,10 @@ export default class SolutionDisplay extends React.Component {
               </MediaQuery>
             </h3>
             <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">${formatPrice(normalized_price)}</span>
-              ({formatTime(latest_time_entered)})
+              <span className="has-text-weight-bold has-padding-right-xs">{displayPrice}</span>
+              {latest_time_entered &&
+                `(${formatTime(latest_time_entered)})`
+              }
               <MediaQuery query="(min-width: 480px)">
                 { acceptable &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
@@ -137,33 +113,11 @@ export default class SolutionDisplay extends React.Component {
               </MediaQuery>
             </div>
           </div>
-          <SolutionDisplayProductPrices lowestFuelBids={lowestFuelBids} supplierId={supplierId} highlightOwn={highlightOwn} />
+          {headerExtras}
         </div>
 
         <div className="auction-solution__body">
-          { !isSupplier &&
-            <div className="auction-solution__barge-section">
-              <strong className="is-inline-block has-margin-right-sm">Approved Barges</strong>
-              <SolutionDisplayBarges suppliers={suppliers} bids={bids} auctionBarges={auctionBarges} />
-            </div>
-          }
-          { _.map(bidsByFuel, (bids, fuelName) => {
-              const fuel = _.find(fuels, {name: fuelName});
-              return (
-                <SolutionDisplayProductSection
-                  key={fuelName}
-                  fuel={fuel}
-                  bids={bids}
-                  vesselFuels={vesselFuels}
-                  supplierId={supplierId}
-                  revokable={revokable}
-                  revokeBid={revokeBid}
-                  highlightOwn={highlightOwn}
-                  auctionPayload={auctionPayload}
-                />
-              );
-            })
-          }
+          {children}
         </div>
         { acceptable && this.state.selected &&
           <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />

@@ -1,8 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
 import { formatTime, formatPrice } from '../../../../utilities';
-import CustomSolutionDisplay from '../../common/show/custom-solution-display';
-import SolutionDisplay from '../../common/show/solution-display';
+import CustomSolutionDisplay from './custom-solution-display';
+import SolutionDisplay from './solution-display';
 import InputField from '../../../input-field';
 
 const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution}) => {

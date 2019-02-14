@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Downshift from 'downshift';
-import { formatPrice } from '../../../../../utilities';
+import { formatPrice } from '../../../../utilities';
 
 // The `bids` object passed to this component can supply additional information
 // on each bid indicating if it should be disabled, and if so, a message of why
