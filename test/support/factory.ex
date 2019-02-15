@@ -1,8 +1,13 @@
 defmodule Oceanconnect.Factory do
   use ExMachina.Ecto, repo: Oceanconnect.Repo
 
-  alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionFixture, AuctionEvent, AuctionEventStorage, AuctionStateActions}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionEventStore,
+    Solution,
+    Command,
+    StoreProtocol
+  }
 
   def set_password(user) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)
@@ -187,38 +192,61 @@ defmodule Oceanconnect.Factory do
   end
 
   def start_auction!(auction) do
-    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-    next_state = AuctionStateActions.start_auction(state, auction, nil, true)
-    event = AuctionEvent.auction_started(auction, next_state, nil)
-    AuctionEventStorage.persist(%AuctionEventStorage{event: event})
+    initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    command = Command.start_auction(auction, DateTime.utc_now(), nil)
+    {:ok, events} = StoreProtocol.process(initial_state, command)
+    Enum.map(events, &AuctionEventStore.persist/1)
   end
 
   def cancel_auction!(auction) do
-    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-    new_state = AuctionStateActions.cancel_auction(auction, state)
-
-    AuctionEventStorage.persist(%AuctionEventStorage{
-      event: AuctionEvent.auction_canceled(auction, new_state, nil)
-    })
+    initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+    command = Command.cancel_auction(auction, DateTime.utc_now(), nil)
+    {:ok, events} = StoreProtocol.process(initial_state, command)
+    Enum.map(events, &AuctionEventStore.persist/1)
   end
 
   def expire_auction!(auction) do
-    current_state = Auctions.get_auction_state!(auction)
-    new_state = AuctionStateActions.expire_auction(auction, current_state)
-    event = AuctionEvent.auction_expired(auction, new_state)
-    AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
+    initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+
+      [
+        Command.start_auction(auction, DateTime.utc_now(), nil),
+        Command.end_auction(auction, DateTime.utc_now()),
+        Command.end_auction_decision_period(auction, DateTime.utc_now())
+      ]
+      |> Enum.reduce(initial_state, fn command, state ->
+        {:ok, events} = StoreProtocol.process(state, command)
+        Enum.map(events, &AuctionEventStore.persist/1)
+
+        events
+        |> Enum.reduce(state, fn event, state ->
+          {:ok, state} = StoreProtocol.apply(state, event)
+          state
+        end)
+      end)
   end
 
-  def close_auction!(auction) do
-    supplier_id = hd(auction.suppliers).id
+  def close_auction!(auction = %Auction{suppliers: suppliers}) do
+    supplier_id = hd(suppliers).id
     vessel_fuel_id = hd(auction.auction_vessel_fuels).id
     bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
-    state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-    state = AuctionStateActions.start_auction(state, auction, nil, false)
-    {_product_state, _events, new_state} = AuctionStateActions.process_bid(state, bid)
-    solution = new_state.solutions.best_overall
-    state = AuctionStateActions.select_winning_solution(solution, "Smith", auction, new_state)
-    event = AuctionEvent.winning_solution_selected(solution, "", state, nil)
-    AuctionEventStorage.persist(%AuctionEventStorage{event: event, auction_id: auction.id})
+    solution = %Solution{bids: [bid]}
+    initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+
+      [
+        Command.start_auction(auction, DateTime.utc_now(), nil),
+        Command.process_new_bid(bid, nil),
+        Command.end_auction(auction, DateTime.utc_now()),
+        Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
+      ]
+      |> Enum.reduce(initial_state, fn command, state ->
+        {:ok, events} = StoreProtocol.process(state, command)
+        Enum.map(events, &AuctionEventStore.persist/1)
+
+        events
+        |> Enum.reduce(state, fn event, state ->
+          {:ok, state} = StoreProtocol.apply(state, event)
+          state
+        end)
+      end)
   end
 end

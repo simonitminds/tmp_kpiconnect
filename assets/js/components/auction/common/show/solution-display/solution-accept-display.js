@@ -34,6 +34,7 @@ const SolutionAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, ac
           </div>
           <div className="control">
               <button
+                disabled={auctionPayload.status != 'decision' && !window.isAdmin}
                 className={`button is-success qa-accept-bid`}
                 type="submit"
               >

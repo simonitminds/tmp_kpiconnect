@@ -9,7 +9,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     AuctionBid,
     AuctionEvent,
     AuctionNotifier,
-    AuctionEventStore
   }
 
   @registry_name :auction_event_handler_registry
@@ -89,8 +88,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_started,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}}
         },
         state
       )
@@ -102,8 +100,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_ended,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}}
         },
         state
       )
@@ -115,8 +112,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: type,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}, auction: auction}
         },
         state
       )
@@ -124,7 +120,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
              type in [:auction_expired, :auction_canceled, :auction_closed] do
     AuctionNotifier.notify_participants(auction_state)
     with {:ok, finalized_auction} <- Auctions.finalize_auction(auction, auction_state) do
-      Auctions.AuctionsSupervisor.stop_child(auction)
+      Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else
       {:error, _msg} ->
         Logger.error("Could not finalize auction detail records for auction #{auction.id}")

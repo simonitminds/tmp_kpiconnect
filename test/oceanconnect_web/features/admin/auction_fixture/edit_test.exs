@@ -36,8 +36,11 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
     assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture2)
   end
 
+  #TODO UMM FINISH THIS TEST
   test "editing an auction fixture", %{
-    auction: %{id: auction_id}
+    auction: %{id: auction_id},
+    vessel_fuel1: vessel_fuel1,
+    auction_fixtures: [_auction_fixture1, _auction_fixture2]
   } do
     Admin.Fixture.IndexPage.visit(auction_id)
   end

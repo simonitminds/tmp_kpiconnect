@@ -1,0 +1,111 @@
+defmodule Oceanconnect.Auctions.EventNotifier do
+  import Oceanconnect.Auctions.Guards
+
+  alias Oceanconnect.Auctions.{
+    Auction,
+    AuctionCache,
+    AuctionScheduler,
+    AuctionTimer,
+    AuctionEvent,
+    Command
+  }
+
+  def emit(state, event = %AuctionEvent{}) do
+    # React before emitting the event to ensure things like cache updates and
+    # persistence have occurred before other handlers respond.
+    react_to(event, state)
+    AuctionEvent.emit(event, true)
+    {:ok, true}
+  end
+
+
+  def react_to(%AuctionEvent{type: :auction_updated, data: auction}, _state) do
+    update_cache(auction)
+
+    auction
+    |> Command.update_scheduled_start()
+    |> AuctionScheduler.process_command(false)
+  end
+
+  def react_to(%AuctionEvent{type: :upcoming_auction_notified}, _state) do
+    #noop
+  end
+
+  def react_to(%AuctionEvent{type: :auction_started, auction_id: auction_id, time_entered: started_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    auction = %{auction | auction_started: started_at}
+
+    update_cache(auction)
+
+    auction
+    |> Command.start_duration_timer()
+    |> AuctionTimer.process_command()
+
+    auction
+    |> Command.cancel_scheduled_start()
+    |> AuctionScheduler.process_command(nil)
+  end
+
+  def react_to(%AuctionEvent{type: :auction_ended, auction_id: auction_id, time_entered: ended_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    auction = %{auction | auction_ended: ended_at}
+
+    update_cache(auction)
+
+    case auction do
+      %Auction{} ->
+        auction
+        |> Command.start_decision_duration_timer()
+        |> AuctionTimer.process_command()
+      _ -> :ok
+    end
+  end
+
+  def react_to(%AuctionEvent{type: :auction_closed, auction_id: auction_id, time_entered: closed_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    auction = %{auction | auction_closed_time: closed_at}
+
+    update_cache(auction)
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+  end
+
+  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    auction = %{auction | auction_closed_time: expired_at}
+
+    update_cache(auction)
+
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+  end
+
+  def react_to(%AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    auction = %{auction | auction_closed_time: canceled_at}
+
+    update_cache(auction)
+
+    AuctionTimer.cancel_timer(auction_id, :duration)
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+  end
+
+  def react_to(%AuctionEvent{type: :duration_extended, auction_id: auction_id}, _state) do
+    auction_id
+    |> Command.extend_duration()
+    |> AuctionTimer.process_command()
+  end
+
+  def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}, time_entered: closed_at}, _state) do
+    auction = AuctionCache.read(auction_id)
+    %{auction | port_agent: port_agent, auction_closed_time: closed_at}
+  end
+
+  def react_to(%AuctionEvent{}, _state) do
+    # Nothing by default
+  end
+
+  defp update_cache(auction = %struct{}) when is_auction(struct) do
+    auction
+    |> Command.update_cache()
+    |> AuctionCache.process_command()
+  end
+end

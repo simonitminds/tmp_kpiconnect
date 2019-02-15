@@ -75,8 +75,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auction_started(
-        auction = %struct{id: auction_id, auction_started: auction_started},
+        auction = %struct{id: auction_id},
         new_state = %state_struct{},
+        started_at,
         user
       )
       when is_auction(struct) and is_auction_state(state_struct) do
@@ -84,7 +85,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :auction_started,
       auction_id: auction_id,
       data: %{state: new_state, auction: auction},
-      time_entered: auction_started,
+      time_entered: started_at,
       user: user
     }
   end
@@ -110,7 +111,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def auction_ended(
-        auction = %struct{id: auction_id, auction_ended: ended_at},
+        auction = %struct{id: auction_id},
+        ended_at,
         new_state = %state_struct{}
       )
       when is_auction(struct) and is_auction_state(state_struct) do
@@ -122,34 +124,34 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_expired(auction = %struct{id: auction_id}, new_state = %state_struct{})
+  def auction_expired(auction = %struct{id: auction_id}, expired_at, new_state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_expired,
       auction_id: auction_id,
       data: %{state: new_state, auction: auction},
-      time_entered: DateTime.utc_now()
+      time_entered: expired_at
     }
   end
 
-  def auction_canceled(auction = %struct{id: auction_id}, new_state = %state_struct{}, user)
+  def auction_canceled(auction = %struct{id: auction_id}, canceled_at, new_state = %state_struct{}, user)
       when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_canceled,
       auction_id: auction_id,
       data: %{state: new_state, auction: auction},
-      time_entered: DateTime.utc_now(),
+      time_entered: canceled_at,
       user: user
     }
   end
 
-  def auction_closed(auction = %struct{id: auction_id}, new_state = %state_struct{})
+  def auction_closed(auction = %struct{id: auction_id}, closed_at, new_state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       type: :auction_closed,
       auction_id: auction_id,
       data: %{state: new_state, auction: auction},
-      time_entered: DateTime.utc_now()
+      time_entered: closed_at
     }
   end
 
@@ -174,20 +176,6 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       data: %{bid: bid, state: new_state},
       time_entered: time_entered,
       user: user
-    }
-  end
-
-  def auto_bid_placed(
-        bid = %AuctionBid{auction_id: auction_id, time_entered: time_entered},
-        new_state = %ProductBidState{},
-        nil
-      ) do
-    %AuctionEvent{
-      type: :auto_bid_placed,
-      auction_id: auction_id,
-      data: %{bid: bid, state: new_state},
-      time_entered: time_entered,
-      user: nil
     }
   end
 
@@ -245,7 +233,9 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def winning_solution_selected(
-        solution = %Solution{auction_id: auction_id},
+        auction_id,
+        solution = %Solution{},
+        closed_at,
         port_agent,
         state = %state_struct{},
         user
@@ -255,7 +245,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :winning_solution_selected,
       auction_id: auction_id,
       data: %{solution: solution, port_agent: port_agent, state: state},
-      time_entered: DateTime.utc_now(),
+      time_entered: closed_at,
       user: user
     }
   end

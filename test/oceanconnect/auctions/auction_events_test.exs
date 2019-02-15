@@ -93,8 +93,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
     end
 
-    test "update_auction/2 with a new start time adds an auction_rescheduled event to the event store",
-         %{
+    test "update_auction/2 with a new start time adds an auction_rescheduled event to the event store", %{
            auction: auction = %Auction{id: auction_id}
          } do
       new_start_time =

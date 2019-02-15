@@ -17,6 +17,7 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
     test "creating fixtures with out optional fields " do
       auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel, etd: nil)])
       close_auction!(auction)
+      :timer.sleep(200)
       new_state = Auctions.get_auction_state!(auction)
       snapshot = AuctionEvent.auction_state_snapshotted(auction, new_state)
 

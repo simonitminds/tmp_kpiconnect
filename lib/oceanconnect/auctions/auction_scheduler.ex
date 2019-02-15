@@ -3,7 +3,11 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionCache, Command, AuctionEvent}
+  alias Oceanconnect.Auctions.{
+    AuctionCache,
+    AuctionStore,
+    Command
+  }
 
   @registry_name :auction_scheduler_registry
 
@@ -90,16 +94,16 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, emit},
+        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, _emit},
         state = %{timer_ref: nil}
       ) when is_auction(struct) do
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     timer_ref = Process.send_after(self(), :start_auction, delay)
     new_state = %{state | scheduled_start: scheduled_start, timer_ref: timer_ref}
 
-    if emit do
-      AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
-    end
+    auction
+    |> Command.reschedule_auction(nil)
+    |> AuctionStore.process_command()
 
     {:noreply, new_state}
   end
@@ -129,7 +133,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, emit},
+        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, _emit},
         state = %{timer_ref: timer_ref}
       )
       when is_auction(struct) do
@@ -137,9 +141,9 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     delay = get_schedule_delay(DateTime.diff(scheduled_start, DateTime.utc_now(), :millisecond))
     new_timer_ref = Process.send_after(self(), :start_auction, delay)
 
-    if emit do
-      AuctionEvent.emit(AuctionEvent.auction_rescheduled(auction, nil), true)
-    end
+    auction
+    |> Command.reschedule_auction(nil)
+    |> AuctionStore.process_command()
 
     new_state =
       state
