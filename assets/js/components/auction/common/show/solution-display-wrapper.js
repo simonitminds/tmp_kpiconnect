@@ -56,7 +56,23 @@ export default class SolutionDisplayWrapper extends React.Component {
   }
 
   render() {
-    const {auctionPayload, solution, title, subtitle, acceptSolution, supplierId, revokeBid, highlightOwn, headerOnly, best, children, headerExtras, className, price} = this.props;
+    const {
+      auctionPayload,
+      solution,
+      title,
+      subtitle,
+      acceptSolution,
+      supplierId,
+      revokeBid,
+      highlightOwn,
+      headerOnly,
+      best,
+      children,
+      headerExtras,
+      className,
+      price,
+      endButton
+    } = this.props;
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
@@ -94,9 +110,7 @@ export default class SolutionDisplayWrapper extends React.Component {
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-              { !headerOnly &&
-                expandIcon(isExpanded)
-              }
+              { !headerOnly && expandIcon(isExpanded) }
               <span className="is-inline-block">
                 <span className="auction-solution__title__category">{title}</span>
                 <span className="auction-solution__title__description">{displaySubtitle}</span>
@@ -118,6 +132,7 @@ export default class SolutionDisplayWrapper extends React.Component {
                 }
               </MediaQuery>
             </div>
+            {endButton}
           </div>
           {headerExtras}
         </div>

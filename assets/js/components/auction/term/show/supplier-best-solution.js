@@ -22,19 +22,33 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
     return confirm(`Are you sure you want to cancel your bid?`) ? revokeBid(auctionId, productId) : false;
   };
 
-  const supplierSolutionTitle = <span>
-    Your Offer
+  const endButton =
     <span className={`tag revoke-bid__button qa-auction-product-${fuel.id}-revoke has-margin-left-sm`} onClick={confirmBidRevoke} data-product-id={fuel.id}>
       <FontAwesomeIcon icon="times" />
-    </span>
-  </span>;
+    </span>;
 
   const supplierSection = suppliersBestSolution
-      ? <SolutionDisplay key={"supplier"} auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title={supplierSolutionTitle} />
-      : <div key={"supplier"} className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
+      ? <SolutionDisplay
+            key="supplier"
+            auctionPayload={auctionPayload}
+            solution={suppliersBestSolution}
+            isExpanded={true}
+            supplierId={supplierId}
+            highlightOwn={true}
+            title="Your Offer"
+            endButton={endButton}
+        />
+      : <div key="supplier" className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
   const competitorSection = nextBestSolution
-      ? <SolutionDisplay key={"other"} auctionPayload={auctionPayload} solution={nextBestSolution} isExpanded={false} headerOnly={true} title="Competitor" />
-      : <div key={"other"} className="auction-table-placeholder"><i>No other bids have been placed on this auction</i></div>;
+      ? <SolutionDisplay
+            key="other"
+            auctionPayload={auctionPayload}
+            solution={nextBestSolution}
+            isExpanded={false}
+            headerOnly={true}
+            title="Competitor"
+        />
+      : <div key="other" className="auction-table-placeholder"><i>No other bids have been placed on this auction</i></div>;
 
   const orderedSections = suppliersPrice <= nextBestPrice
       ? [supplierSection, competitorSection]
