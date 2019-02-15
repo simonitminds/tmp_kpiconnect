@@ -21,12 +21,10 @@ const BuyerBody = (props) => {
     .sortBy('normalized_price')
     .value();
 
-  console.log(rankedOffers);
-
   if (status == 'open') {
     return (
       <div>
-        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
@@ -34,10 +32,7 @@ const BuyerBody = (props) => {
     return (
       <div>
         <WinningSolution auctionPayload={auctionPayload} />
-        { currentUser.isAdmin
-          ? <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
-          : <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
-        }
+        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );

@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.Api.BidController do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
+  alias Oceanconnect.Auctions.{AuctionNotifier}
 
   def create(conn, params = %{"auction_id" => auction_id, "bids" => bids_params}) do
     time_entered = DateTime.utc_now()

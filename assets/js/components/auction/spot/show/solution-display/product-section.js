@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatTime, formatPrice } from '../../../../utilities';
+import { formatTime, formatPrice } from '../../../../../utilities';
 
 const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, highlightOwn, revokable, revokeBid, auctionPayload}) => {
   const sortedBids = _.sortBy(bids, [

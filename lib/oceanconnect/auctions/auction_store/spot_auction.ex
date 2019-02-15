@@ -1,6 +1,4 @@
 defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.AuctionState do
-  alias Oceanconnect.Auctions
-
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionBarge,
@@ -164,8 +162,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_state =
       AuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
-    # TODO: Not this
-    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    auction = AuctionCache.read(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
     {new_product_state, events, new_state}
   end
@@ -182,8 +179,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = AuctionState.update_product_bids(current_state, product_id, new_product_state)
 
-    # TODO: Not this
-    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    auction = AuctionCache.read(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
     new_state
   end

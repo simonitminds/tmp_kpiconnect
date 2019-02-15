@@ -4,15 +4,18 @@ defmodule Oceanconnect.FeatureCase do
   using do
     quote do
       alias Oceanconnect.Repo
+      alias Oceanconnect.Utilities
+
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
       import Oceanconnect.Factory
-      use Hound.Helpers
       import Oceanconnect.AsyncHelpers
+
+      use Phoenix.ConnTest
       use Oceanconnect.Page
+      use Hound.Helpers
 
       def login_user(user) do
         alias Oceanconnect.Session.NewPage

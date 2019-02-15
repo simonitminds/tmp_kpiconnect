@@ -77,7 +77,7 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
     "#{fuel} for #{vessel}"
   end
 
-  defp product_for_bid(bid, %TermAuction{fuel: fuel}) do
+  defp product_for_bid(_bid, %TermAuction{fuel: fuel}) do
     "#{fuel.name}"
   end
 

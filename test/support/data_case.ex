@@ -13,10 +13,13 @@ defmodule Oceanconnect.DataCase do
   """
 
   use ExUnit.CaseTemplate
+  import Oceanconnect.Auctions.Guards
+  alias Oceanconnect.Auctions.AuctionSupervisor
 
   using do
     quote do
       alias Oceanconnect.Repo
+      alias Oceanconnect.Utilities
 
       import Ecto
       import Ecto.Changeset
@@ -41,6 +44,30 @@ defmodule Oceanconnect.DataCase do
       Map.fetch!(struct, k) == v
     end)
   end
+
+  def start_auction_supervisor(auction = %struct{}, excluded_children \\ []) when is_auction(struct) do
+    {:ok, pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: excluded_children}}}
+      )
+
+    on_exit(fn ->
+      case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+        [] ->
+          nil
+
+        children ->
+          Enum.map(children, fn {_, pid, _, _} ->
+            Process.unlink(pid)
+            Process.exit(pid, :shutdown)
+          end)
+      end
+    end)
+
+    {:ok, pid}
+  end
+
 
   @doc """
   A helper that transform changeset errors to a map of messages.

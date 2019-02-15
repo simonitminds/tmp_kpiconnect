@@ -66,23 +66,6 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     next_state
   end
 
-  def start_auction(
-        %TermAuctionState{status: :decision} = current_state,
-        auction = %TermAuction{},
-        _user,
-        _emit
-      ) do
-    auction
-    |> Command.start_decision_duration_timer()
-    |> AuctionTimer.process_command()
-
-    auction
-    |> Command.cancel_scheduled_start()
-    |> AuctionScheduler.process_command(nil)
-
-    current_state
-  end
-
   def start_auction(%TermAuctionState{} = current_state, _auction = %TermAuction{}, _user, _emit) do
     current_state
   end
@@ -129,16 +112,36 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     Map.put(state, :product_bids, updated_product_bids)
   end
 
-  def end_auction(current_state = %TermAuctionState{}, auction = %TermAuction{}) do
+  def end_auction(current_state = %TermAuctionState{}, auction = %TermAuction{id: auction_id}) do
     auction
     |> Command.update_cache()
     |> AuctionCache.process_command()
 
-    auction
-    |> Command.start_decision_duration_timer()
-    |> AuctionTimer.process_command()
+    AuctionTimer.cancel_timer(auction_id, :duration)
+    %TermAuctionState{current_state | status: :expired}
+  end
 
-    %TermAuctionState{current_state | status: :decision}
+  def expire_auction(current_state = %TermAuctionState{auction_id: auction_id}, auction = %TermAuction{}) do
+    auction = %{ auction | auction_closed_time: DateTime.utc_now()}
+
+    auction
+    |> Command.update_cache()
+    |> AuctionCache.process_command()
+
+    AuctionTimer.cancel_timer(auction_id, :duration)
+    %TermAuctionState{current_state | status: :expired}
+  end
+
+  def cancel_auction(current_state = %TermAuctionState{auction_id: auction_id}, auction = %TermAuction{}) do
+    auction = %{ auction | auction_closed_time: DateTime.utc_now()}
+
+    auction
+    |> Command.update_cache()
+    |> AuctionCache.process_command()
+
+    AuctionTimer.cancel_timer(auction_id, :duration)
+    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+    %TermAuctionState{current_state | status: :canceled}
   end
 
   def process_bid(
@@ -154,8 +157,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_state =
       TermAuctionState.update_product_bids(current_state, vessel_fuel_id, new_product_state)
 
-    # TODO: Not this
-    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    auction = AuctionCache.read(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
     {new_product_state, events, new_state}
   end
@@ -172,8 +174,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     new_product_state = AuctionBidCalculator.revoke_supplier_bids(product_state, supplier_id)
     new_state = TermAuctionState.update_product_bids(current_state, product_id, new_product_state)
 
-    # TODO: Not this
-    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    auction = AuctionCache.read(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
     new_state
   end
@@ -189,7 +190,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     |> Command.update_cache()
     |> AuctionCache.process_command()
 
-    AuctionTimer.cancel_timer(auction_id, :decision_duration)
+    AuctionTimer.cancel_timer(auction_id, :duration)
 
     current_state
     |> Map.put(:winning_solution, solution)
@@ -282,28 +283,5 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
       end)
 
     %TermAuctionState{current_state | submitted_barges: new_submitted_barges}
-  end
-
-  def cancel_auction(current_state = %TermAuctionState{auction_id: auction_id}, auction = %TermAuction{}) do
-    auction = %{ auction | auction_closed_time: DateTime.utc_now()}
-
-    auction
-    |> Command.update_cache()
-    |> AuctionCache.process_command()
-
-    AuctionTimer.cancel_timer(auction_id, :duration)
-    AuctionTimer.cancel_timer(auction_id, :decision_duration)
-    %TermAuctionState{current_state | status: :canceled}
-  end
-
-  def expire_auction(current_state = %TermAuctionState{auction_id: auction_id}, auction = %TermAuction{}) do
-    auction = %{ auction | auction_closed_time: DateTime.utc_now()}
-
-    auction
-    |> Command.update_cache()
-    |> AuctionCache.process_command()
-
-    AuctionTimer.cancel_timer(auction_id, :decision_duration)
-    %TermAuctionState{current_state | status: :expired}
   end
 end

@@ -1,12 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatTime, formatPrice } from '../../../../utilities';
-import MediaQuery from 'react-responsive';
 import SolutionDisplayWrapper from '../../common/show/solution-display-wrapper';
 import SolutionDisplayBarges from '../../common/show/solution-display/solution-display-barges';
-import SolutionDisplayProductSection from './solution-display-product-section';
-import SolutionDisplayProductPrices from './solution-display-product-prices';
+import SolutionDisplayProductSection from './solution-display/product-section';
+import SolutionDisplayProductPrices from './solution-display/product-prices';
 
 const SolutionDisplay = (props) => {
   const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, className} = props;

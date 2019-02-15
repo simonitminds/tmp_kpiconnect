@@ -1,6 +1,5 @@
 defmodule OceanconnectWeb.Admin.AuctionFixtureView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Repo
   alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions.{AuctionFixture, Fuel}
 

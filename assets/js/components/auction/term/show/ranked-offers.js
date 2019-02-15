@@ -10,11 +10,16 @@ const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
       <div className="auction-solution__container qa-auction-other-solutions">
         <div className="box">
           <div className="box__subsection has-padding-bottom-none">
-            <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
+            <h3 className="box__header box__header--bordered has-margin-bottom-md">Ranked Offers</h3>
             { _.map(solutions, (solution, index) => {
-                return (
-                  <SolutionDisplay key={index} auctionPayload={auctionPayload} solution={solution} acceptSolution={acceptSolution} best={false} className="qa-auction-other-solution" />
-                );
+                return <SolutionDisplay
+                    key={index}
+                    auctionPayload={auctionPayload}
+                    solution={solution}
+                    acceptSolution={acceptSolution}
+                    best={false}
+                    className="qa-auction-other-solution"
+                  />;
               })
             }
           </div>
@@ -22,7 +27,11 @@ const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
       </div>
     )
   } else {
-    return "";
+    return (
+      <div className="auction-table-placeholder">
+        <i>No bids have been placed on this auction</i>
+      </div>
+    );
   }
 };
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { formatTime, formatPrice } from '../../../../utilities';
-import BidTag from '../../common/bid-tag';
+import BidTag from '../../../common/bid-tag';
 
 const SolutionDisplayProductPrices = (props) => {
   const {

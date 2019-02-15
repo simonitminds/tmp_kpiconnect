@@ -204,12 +204,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         {:select_winning_solution,
          %{
            solution: solution = %Solution{},
-           auction: auction = %Auction{},
+           auction: auction = %struct{},
            port_agent: port_agent,
            user: user
          }, emit},
         current_state
-      ) do
+      ) when is_auction(struct) do
     new_state = StoreProtocol.select_winning_solution(current_state, solution, port_agent, auction)
 
     AuctionEvent.emit(
