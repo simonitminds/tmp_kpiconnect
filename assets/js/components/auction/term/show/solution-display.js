@@ -44,7 +44,7 @@ const SolutionDisplay = (props) => {
                 </div>
               );
             })
-          : <div className="qa-solution-no-comments">
+          : <div className="auction-table-placeholder has-margin-top-xs has-margin-bottom-sm qa-solution-no-comments">
               <p className="is-italic">No conditions have been placed on this offer.</p>
             </div>
         }

@@ -88,7 +88,7 @@
 
     @media (max-width: 480px) {
       align-items: flex-start;
-      
+
       &> svg {
         margin-top: 0.375rem;
       }
@@ -224,6 +224,7 @@
 }
 
 .auction-solution {
+  margin-bottom: 0.25rem !important;
   transition: max-height 0.75s cubic-bezier(0, 1, 0, 1);
 
   .auction-solution__body {
@@ -246,7 +247,6 @@
   }
 
   &--closed {
-    margin-bottom: 0.5rem;
 
     &> .auction-solution__body {
       transition: max-height 0.75s cubic-bezier(0, 1, 0, 1);

@@ -36,7 +36,7 @@ const AuctionTitle = ({auction}) => {
             {portName}
           </div>
           { is_traded_bid_allowed &&
-            <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
+            <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker has-margin-left-sm"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
             </span>
           }
         </div>

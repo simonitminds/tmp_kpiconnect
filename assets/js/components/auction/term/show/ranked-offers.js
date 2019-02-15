@@ -29,7 +29,7 @@ const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
     )
   } else {
     return (
-      <div className="auction-table-placeholder">
+      <div className="auction-table-placeholder has-margin-bottom-lg">
         <i>No bids have been placed on this auction</i>
       </div>
     );
@@ -37,4 +37,3 @@ const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
 };
 
 export default RankedOffers;
-
