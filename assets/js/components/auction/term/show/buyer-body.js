@@ -24,11 +24,22 @@ const BuyerBody = (props) => {
   if (status == 'open') {
     return (
       <div>
-        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+        { currentUser.isAdmin
+          ? <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+          : <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+        }
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
-  } else if (status != 'pending') {
+  } else if (status == 'closed') {
+    return (
+      <div>
+        <WinningSolution auctionPayload={auctionPayload} />
+        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
+      </div>
+    );
+  } else if (status == 'pending') {
     return (
       <div>
         <WinningSolution auctionPayload={auctionPayload} />

@@ -2,11 +2,13 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   use Ecto.Schema
   import Ecto.Query, warn: false
   import Ecto.Changeset
+  import Oceanconnect.Auctions.Guards
   alias __MODULE__
-  alias Oceanconnect.Auctions.{AuctionVesselFuel, Auction, AuctionBid}
+  alias Oceanconnect.Auctions.{AuctionVesselFuel, AuctionBid}
 
   schema "auction_fixtures" do
     # current_relationships
+    # TODO: virtualize auction to work with term auctions
     belongs_to(:auction, Oceanconnect.Auctions.Auction)
     belongs_to(:supplier, Oceanconnect.Accounts.Company)
     belongs_to(:vessel, Oceanconnect.Auctions.Vessel)
@@ -87,7 +89,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     )
   end
 
-  def from_auction(%Auction{id: auction_id}) do
+  def from_auction(%struct{id: auction_id}) when is_auction(struct) do
     from(af in AuctionFixture,
       where: af.auction_id == ^auction_id
     )

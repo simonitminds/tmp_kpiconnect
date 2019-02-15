@@ -2,6 +2,8 @@ import React from 'react';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatTime, formatPrice } from '../../../../../utilities';
+import TradedBidTag from '../../../common/show/traded-bid-tag';
+import NonSplittableBidTag from '../../../common/show/non-splittable-bid-tag';
 
 const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, highlightOwn, revokable, revokeBid, auctionPayload}) => {
   const sortedBids = _.sortBy(bids, [
@@ -22,12 +24,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
     return(
       <span>
         { bid.is_traded_bid
-          ? <span className="auction__traded-bid-tag">
-              <span action-label="Traded Bid" className="auction__traded-bid-marker">
-                <FontAwesomeIcon icon="exchange-alt" />
-              </span>
-              <span className="has-padding-left-sm">Traded Bid</span>
-            </span>
+          ? <TradedBidTag />
           : ""
         }
       </span>
@@ -38,12 +35,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
     return(
       <span>
         { bid.allow_split == false
-          ? <span className="auction__nonsplittable-bid-tag">
-              <span action-label="Can't Be Split" className="auction__nonsplittable-bid-marker">
-                <FontAwesomeIcon icon="ban" />
-              </span>
-              <span className="has-padding-left-sm">Unsplittable</span>
-            </span>
+          ? <NonSplittableBidTag />
           : ""
         }
       </span>

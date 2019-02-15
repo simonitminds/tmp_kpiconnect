@@ -4,7 +4,6 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   alias Oceanconnect.Admin, as: Admin
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionFixture}
 
   hound_session()
 
@@ -27,7 +26,6 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   test "visiting the auction fixture index page shows a list fixtures for the auction", %{
     admin_user: admin_user,
     auction: %{id: auction_id},
-    vessel_fuel1: vessel_fuel1,
     auction_fixtures: [auction_fixture1, auction_fixture2]
   } do
     login_user(admin_user)
@@ -39,10 +37,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   end
 
   test "editing an auction fixture", %{
-    admin_user: admin_user,
-    auction: %{id: auction_id},
-    vessel_fuel1: vessel_fuel1,
-    auction_fixtures: [auction_fixture1, _auction_fixture2]
+    auction: %{id: auction_id}
   } do
     Admin.Fixture.IndexPage.visit(auction_id)
   end

@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionFixtureTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionFixture, AuctionBid, AuctionEvent}
+  alias Oceanconnect.Auctions.{AuctionFixture, AuctionEvent}
 
   setup do
     auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])

@@ -49,19 +49,19 @@ export default class SolutionDisplayWrapper extends React.Component {
   }
 
   toggleOverflow(e) {
-      this.setState({hasOverflow: true});
-      let timer = setTimeout(() => {this.setState({hasOverflow: false})}, 750);
-      this.setState({overflowTimer: timer})
+    this.setState({hasOverflow: true});
+    let timer = setTimeout(() => {this.setState({hasOverflow: false})}, 750);
+    this.setState({overflowTimer: timer})
     return false;
   }
 
   render() {
-    const {auctionPayload, solution, title, subtitle, acceptSolution, supplierId, revokeBid, highlightOwn, best, children, headerExtras, className, price} = this.props;
+    const {auctionPayload, solution, title, subtitle, acceptSolution, supplierId, revokeBid, highlightOwn, headerOnly, best, children, headerExtras, className, price} = this.props;
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
     const acceptable = !!acceptSolution;
-    const isExpanded = this.state.expanded;
+    const isExpanded = !headerOnly && this.state.expanded;
 
     const displayPrice = price != undefined ? price : `$${formatPrice(normalized_price)}`;
 
@@ -82,14 +82,20 @@ export default class SolutionDisplayWrapper extends React.Component {
 
     const displaySubtitle = subtitle || solutionTitle();
 
+    const expandIcon = (isExpanded) => {
+      return isExpanded
+        ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
+        : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
+      ;
+    }
+
     return (
-      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open":"closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
+      <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open" : "closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-              { isExpanded
-                ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
-                : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
+              { !headerOnly &&
+                expandIcon(isExpanded)
               }
               <span className="is-inline-block">
                 <span className="auction-solution__title__category">{title}</span>
@@ -116,9 +122,11 @@ export default class SolutionDisplayWrapper extends React.Component {
           {headerExtras}
         </div>
 
-        <div className="auction-solution__body">
-          {children}
-        </div>
+        { !headerOnly &&
+          <div className="auction-solution__body">
+            {children}
+          </div>
+        }
         { acceptable && this.state.selected &&
           <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
         }

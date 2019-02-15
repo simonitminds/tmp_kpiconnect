@@ -90,15 +90,10 @@ defmodule OceanconnectWeb.Api.BidController do
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
-    with auction = %struct{} when is_auction(struct) <-
-           Auctions.get_auction(auction_id) |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
-         state = %{status: :decision, product_bids: product_bids} <-
-           Auctions.get_auction_state!(auction),
+         state = %{product_bids: product_bids} <- Auctions.get_auction_state!(auction),
          selected_bids <- Auctions.bids_for_bid_ids(bid_ids, state) do
-
-#      Auctions.set_port_agent(auction, port_agent)
-
       Auctions.select_winning_solution(
         selected_bids,
         product_bids,

@@ -12,7 +12,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(auction = %struct{id: auction_id}) when is_auction(struct) do
+  def start_child(auction = %struct{}) when is_auction(struct) do
     with {:ok, core_services_pid} <-
            DynamicSupervisor.start_child(
              __MODULE__,
@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
       {:ok, {core_services_pid, email_servies_pid}}
     else
       {:error, {:already_started, pid}} ->
-        {auction_id, pid}
+        {:error, {:already_started, pid}}
 
       error ->
         Logger.error(inspect(error))
@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
     end
   end
 
-  def stop_child(_auction = %Oceanconnect.Auctions.Auction{id: auction_id}) do
+  def stop_child(_auction = %struct{id: auction_id}) when is_auction(struct) do
     with {:ok, pid} <- Oceanconnect.Auctions.AuctionSupervisor.find_pid(auction_id),
          :ok <- DynamicSupervisor.terminate_child(__MODULE__, pid) do
       Logger.info("Auction ID: #{auction_id} Services Stopped")

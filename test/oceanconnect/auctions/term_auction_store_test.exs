@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Auctions.AuctionStoreTest do
+defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{

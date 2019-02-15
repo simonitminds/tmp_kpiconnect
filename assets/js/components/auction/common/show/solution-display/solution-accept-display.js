@@ -5,7 +5,7 @@ import SolutionComment from './solution-comment';
 
 const SolutionAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, acceptSolution, cancelSelection}) => {
   const auctionStatus = auctionPayload.status;
-  if(auctionStatus == 'closed'){
+  if(auctionStatus == 'closed') {
     return "";
   } else {
     return (

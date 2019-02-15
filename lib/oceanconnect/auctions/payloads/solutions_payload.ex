@@ -35,13 +35,17 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
         supplier: supplier_id
       ) when is_auction_state(state_struct) and is_auction(struct) do
     suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
+    next_best_solution =
+      list_other_solutions(solutions, suppliers_best_solution)
+      |> Enum.at(0)
 
     %{
       best_single_supplier:
         scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id, auction),
       best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id, auction),
       suppliers_best_solution: scrub_solution_for_supplier(suppliers_best_solution, supplier_id, auction),
-      winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id, auction)
+      winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id, auction),
+      next_best_solution: scrub_solution_for_supplier(next_best_solution, supplier_id, auction)
     }
   end
 

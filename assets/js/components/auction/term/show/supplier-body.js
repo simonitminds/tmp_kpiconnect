@@ -4,6 +4,7 @@ import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import BidStatus from './bid-status';
 import BiddingForm from './bidding-form';
+import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
 import WinningSolution from './winning-solution';
@@ -26,6 +27,7 @@ const SupplierBody = (props) => {
     return (
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
+        <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
         <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
