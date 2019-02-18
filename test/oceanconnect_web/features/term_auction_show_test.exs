@@ -129,7 +129,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
-      :timer.sleep(100)
+      :timer.sleep(500)
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
 
