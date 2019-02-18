@@ -4,15 +4,10 @@ import { formatUTCDateTime, timeRemainingCountdown } from '../../utilities';
 import moment from 'moment';
 import ServerDate from '../../serverdate';
 import AuctionBreadCrumbs from './auction-bread-crumbs';
-import AuctionHeader from './auction-header';
-import OtherSolutions from './other-solutions';
-import WinningSolution from './winning-solution';
 import MediaQuery from 'react-responsive';
-import BuyerAuctionShowSidebar from './show-sidebar--buyer';
-import SupplierAuctionShowSidebar from './show-sidebar--supplier';
-import BuyerAuctionShowBody from './show-body--buyer';
-import SupplierAuctionShowBody from './show-body--supplier';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Spot from './spot/spot';
+import Term from './term/term';
 
 export default class AuctionShow extends React.Component {
   constructor(props) {
@@ -23,6 +18,17 @@ export default class AuctionShow extends React.Component {
     // For adjusting the auction app body and header
     // portions based on header content in mobile
     updateAuctionBodySize();
+  }
+
+  auctionComponents(type) {
+    switch (type) {
+      case 'spot':
+        return Spot;
+      case 'forward_fixed':
+        return Term;
+      case 'formula_related':
+        return null;
+    }
   }
 
   render() {
@@ -48,12 +54,15 @@ export default class AuctionShow extends React.Component {
       isAdmin: window.isAdmin && !window.isImpersonating
     };
 
+    const auctionType = _.get(auction, 'type');
+    const AuctionType = this.auctionComponents(auctionType);
+
     return (
       <div className="auction-app">
         <MediaQuery query="(min-width: 769px)">
           <AuctionBreadCrumbs auction={auction} />
         </MediaQuery>
-        <AuctionHeader auctionPayload={auctionPayload} connection={connection} />
+        <AuctionType.Header auctionPayload={auctionPayload} connection={connection} />
         <MediaQuery query="(min-width: 769px)">
           <div className="auction-app__body">
             <section className="auction-page"> {/* Auction details */}
@@ -69,12 +78,12 @@ export default class AuctionShow extends React.Component {
                         </ul>
                       </div>
                     { (currentUser.isBuyer || currentUser.isAdmin)
-                      ? <BuyerAuctionShowBody
+                      ? <AuctionType.BuyerBody
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
                           currentUser={currentUser}
                         />
-                      : <SupplierAuctionShowBody
+                      : <AuctionType.SupplierBody
                           auctionPayload={auctionPayload}
                           currentUser={currentUser}
                           connection={connection}
@@ -95,15 +104,16 @@ export default class AuctionShow extends React.Component {
                       </div>
                       <TabPanel>
                         { currentUser.isBuyer || currentUser.isAdmin
-                          ? <BuyerAuctionShowSidebar
+                          ? <AuctionType.BuyerSidebar
                               auctionPayload={auctionPayload}
                               approveBargeForm={approveBargeForm}
                               rejectBargeForm={rejectBargeForm}
                             />
-                          : <SupplierAuctionShowSidebar
+                          : <AuctionType.SupplierSidebar
                               auctionPayload={auctionPayload}
                               submitBargeForm={submitBargeForm}
                               unsubmitBargeForm={unsubmitBargeForm}
+                              rejectBargeForm={rejectBargeForm}
                               currentUserCompanyId={currentUserCompanyId}
                               companyProfile={companyProfile}
                             />
@@ -129,12 +139,12 @@ export default class AuctionShow extends React.Component {
                   </div>
                   <TabPanel>
                     { (currentUser.isBuyer || currentUser.isAdmin)
-                      ? <BuyerAuctionShowBody
+                      ? <AuctionType.BuyerBody
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
                           currentUser={currentUser}
                         />
-                      : <SupplierAuctionShowBody
+                      : <AuctionType.SupplierBody
                           auctionPayload={auctionPayload}
                           currentUser={currentUser}
                           connection={connection}
@@ -147,12 +157,12 @@ export default class AuctionShow extends React.Component {
                   </TabPanel>
                   <TabPanel>
                     { currentUser.isBuyer || currentUser.isAdmin
-                      ? <BuyerAuctionShowSidebar
+                      ? <AuctionType.BuyerSidebar
                           auctionPayload={auctionPayload}
                           approveBargeForm={approveBargeForm}
                           rejectBargeForm={rejectBargeForm}
                         />
-                      : <SupplierAuctionShowSidebar
+                      : <AuctionType.SupplierSidebar
                           auctionPayload={auctionPayload}
                           submitBargeForm={submitBargeForm}
                           unsubmitBargeForm={unsubmitBargeForm}

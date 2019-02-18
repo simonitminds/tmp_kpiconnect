@@ -151,7 +151,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :ok
     end
 
-    test "buyer can see his view of the auction card", %{auction: auction} do
+    test "buyer can see their view of the auction show page", %{auction: auction} do
       buyer_params = %{
         suppliers: auction.suppliers
       }
@@ -356,6 +356,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
+      :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
       auction_state =

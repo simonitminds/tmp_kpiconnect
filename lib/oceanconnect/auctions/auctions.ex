@@ -405,23 +405,23 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def finalize_auction(auction = %Auction{id: auction_id}, auction_state) do
+  def finalize_auction(auction = %struct{id: auction_id}, auction_state) when is_auction(struct) do
     with event = %AuctionEvent{} <-
            AuctionEvent.auction_state_snapshotted(auction, auction_state),
          {:ok, snapshot} <- AuctionEventStore.create_auction_snapshot(event),
          {:ok, _fixtures} <- create_fixtures_from_snapshot(snapshot),
-         cached_auction = %Auction{} <- AuctionCache.read(auction_id),
-         finalized_auction = %Auction{} <- persist_auction_from_cache(cached_auction) do
+         cached_auction = %struct{} when is_auction(struct) <- AuctionCache.read(auction_id),
+         finalized_auction = %struct{} when is_auction(struct) <- persist_auction_from_cache(cached_auction) do
       {:ok, finalized_auction}
     else
       _ -> {:error, "Could not finalize auction details"}
     end
   end
 
-  def persist_auction_from_cache(auction = %Auction{id: auction_id}) do
+  def persist_auction_from_cache(auction = %struct{id: auction_id}) when is_auction(struct) do
     attrs = Map.take(auction, [:auction_started, :auction_ended, :auction_closed_time, :port_agent])
-    old_auction = Repo.get(Auction, auction_id)
-    |> Auction.changeset(attrs)
+    Repo.get(struct, auction_id)
+    |> struct.changeset(attrs)
     |> Repo.update!
   end
 
@@ -1403,7 +1403,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:supplier, :vessel, :fuel])
   end
 
-  def fixtures_for_auction(auction = %Auction{}) do
+  def fixtures_for_auction(auction = %struct{}) when is_auction(struct) do  
     auction
     |> AuctionFixture.from_auction()
     |> Repo.all()
@@ -1421,11 +1421,11 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_fixtures_from_snapshot(
-        snapshot = %AuctionEvent{
+        _snapshot = %AuctionEvent{
           type: :auction_state_snapshotted,
           data: %{
             state: %{
-              winning_solution: %Solution{bids: bids, total_price: total_price, valid: true}
+              winning_solution: %Solution{bids: bids, valid: true}
             }
           }
         }
@@ -1437,7 +1437,7 @@ defmodule Oceanconnect.Auctions do
     {:ok, fixtures}
   end
 
-  def create_fixtures_from_snapshot(event) do
+  def create_fixtures_from_snapshot(_event) do
     {:ok, []}
   end
 
@@ -1456,11 +1456,8 @@ defmodule Oceanconnect.Auctions do
 
   def fixture_from_bid(
         bid = %AuctionBid{
-          amount: amount,
           vessel_fuel_id: avf_id,
-          supplier_id: supplier_id,
-          active: true,
-          auction_id: auction_id
+          active: true
         }
       ) do
     case Repo.get(AuctionVesselFuel, avf_id) do

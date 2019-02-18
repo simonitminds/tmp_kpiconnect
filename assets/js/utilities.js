@@ -4,7 +4,7 @@ import moment from 'moment';
 
 export function replaceListItem(list, oldItem, newItem) {
   const index = _.indexOf(list, oldItem);
-  if(newItem) {
+  if (newItem) {
     return [
       ..._.slice(list, 0, index),
       newItem,
@@ -32,7 +32,7 @@ export const formatUTCDateTime = (dateTime) => {
 
 export const formatUTCDate = (date) => {
   if (date) {
-    return `${formatDateTime(moment(date).utc())} GMT`;
+    return `${formatDate(moment(date).utc())}`;
   } else {
     return "Not Scheduled";
   }
@@ -49,6 +49,14 @@ export const formatDateTime = (dateTime) => {
 export const formatDate = (date) => {
   if (date) {
     return moment(date).format("DD/MM/YYYY");
+  } else {
+    return "";
+  }
+}
+
+export const formatMonthYear = (date) => {
+  if (date) {
+    return moment(date).format("MMMM YYYY");
   } else {
     return "";
   }

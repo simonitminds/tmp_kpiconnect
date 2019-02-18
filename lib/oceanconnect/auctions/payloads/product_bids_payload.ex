@@ -1,7 +1,13 @@
 defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, AuctionStore.ProductBidState}
+  alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionBid,
+    AuctionSuppliers,
+    AuctionStore.ProductBidState
+  }
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -39,15 +45,17 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
   defp scrub_bid_for_supplier(
          bid = %AuctionBid{supplier_id: supplier_id},
          supplier_id,
-         _auction = %struct{}
+         auction = %struct{}
        ) when is_auction(struct) do
-    %{bid | min_amount: bid.min_amount, comment: bid.comment}
+    %{bid | min_amount: bid.min_amount, comment: bid.comment }
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.from_struct()
   end
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, _auction = %struct{}) when is_auction(struct) do
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, auction = %struct{}) when is_auction(struct) do
     %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
     |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.delete(:supplier_id)
   end
 
@@ -58,7 +66,19 @@ defmodule Oceanconnect.Auctions.Payloads.ProductBidsPayload do
 
     %{bid | supplier_id: nil, min_amount: nil}
     |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.put(:supplier, supplier)
+  end
+
+  defp product_for_bid(bid, %Auction{auction_vessel_fuels: vessel_fuels}) do
+    vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+    vessel = vf.vessel.name
+    fuel = vf.fuel.name
+    "#{fuel} for #{vessel}"
+  end
+
+  defp product_for_bid(_bid, %TermAuction{fuel: fuel}) do
+    "#{fuel.name}"
   end
 
   defp is_leading?(_state = %ProductBidState{lowest_bids: []}, _supplier_id), do: false

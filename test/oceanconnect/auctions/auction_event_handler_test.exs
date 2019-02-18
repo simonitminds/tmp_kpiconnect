@@ -86,8 +86,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandlerTest do
 
     :timer.sleep(200)
 
-    state = Auctions.get_auction_state!(auction)
-
     events = AuctionEventStore.event_list(auction_id)
     |> Enum.map(&(&1.type))
 

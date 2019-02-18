@@ -115,9 +115,6 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
       assert %MessagePayload{} = message_payload_for_anon_auction
       assert length(message_payload_for_anon_auction.conversations) == 3
 
-      vessel_names = Enum.map(anon_auction.vessels, & &1.name)
-      assert Enum.all?(message_payload_for_anon_auction.vessels, &(&1.name in vessel_names))
-
       anon_auction_supplier_alias_name =
         Enum.find(anon_auction.suppliers, &(&1.id == supplier_company.id)).alias_name
 
@@ -128,7 +125,6 @@ defmodule Oceanconnect.Messages.MessagePayloadTest do
         )
 
       assert supplier_company_conversation.unseen_messages == 2
-      assert message_payload_for_anon_auction.suppliers == []
 
       [message | _] = supplier_company_conversation.messages
 

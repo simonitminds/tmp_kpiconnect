@@ -17,6 +17,7 @@ alias Oceanconnect.Auctions
 
 alias Oceanconnect.Auctions.{
   Auction,
+  TermAuction,
   AuctionVesselFuel,
   AuctionEvent,
   AuctionEventStorage,
@@ -28,7 +29,7 @@ alias Oceanconnect.Auctions.{
 }
 
 defmodule SupplierHelper do
-  def set_suppliers_for_auction(%Auction{} = auction, suppliers) when is_list(suppliers) do
+  def set_suppliers_for_auction(auction, suppliers) when is_list(suppliers) do
     auction
     |> Repo.preload(:suppliers)
     |> Ecto.Changeset.change()
@@ -600,7 +601,8 @@ auctions_params = [
     po: "1234567",
     buyer_id: nigeria.id,
     duration: 1 * 60_000,
-    decision_duration: 1 * 60_000
+    decision_duration: 1 * 60_000,
+    anonymous_bidding: true
   },
   %Auction{
     auction_vessel_fuels: [
@@ -630,6 +632,19 @@ auctions_params = [
     duration: 10 * 60_000,
     decision_duration: 15 * 60_000,
     is_traded_bid_allowed: true
+  },
+  %TermAuction{
+    type: "forward_fixed",
+    fuel_id: List.last(fuels).id,
+    fuel_quantity: 12500,
+    port_id: singapore.id,
+    scheduled_start: date_time,
+    po: "214215",
+    buyer_id: qatargas.id,
+    duration: 10 * 60_000,
+    is_traded_bid_allowed: true,
+    start_date: date_time,
+    end_date: date_time
   }
 ]
 
@@ -649,15 +664,16 @@ Repo.delete_all(AuctionEventStorage)
 Repo.delete_all(AuctionSuppliers)
 Repo.delete_all(AuctionVesselFuel)
 Repo.delete_all(Auction)
+Repo.delete_all(TermAuction)
 
-[auction1, auction2, auction3] =
-  Enum.map(auctions_params, fn auction_params ->
+[auction1, auction2, auction3, term_auction1] =
+  Enum.map(auctions_params, fn (%struct{} = auction_params) ->
     auction_params
-    |> Auction.changeset(%{})
+    |> struct.changeset(%{})
     |> Repo.insert!()
   end)
 
-[auction1, auction2, auction3]
+[auction1, auction2, auction3, term_auction1]
 |> Enum.map(fn auction ->
   event = AuctionEvent.auction_created(auction, nil)
   event_storage = %AuctionEventStorage{event: event, auction_id: auction.id}
@@ -667,3 +683,4 @@ end)
 SupplierHelper.set_suppliers_for_auction(auction1, suppliers)
 SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
 SupplierHelper.set_suppliers_for_auction(auction3, suppliers)
+SupplierHelper.set_suppliers_for_auction(term_auction1, suppliers)

@@ -27,6 +27,9 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       )
       |> Auctions.fully_loaded()
 
+    [vessel_fuel] = auction.auction_vessel_fuels
+    vessel_fuel_id = "#{vessel_fuel.id}"
+
     {:ok, _pid} =
       start_supervised(
         {AuctionSupervisor,
@@ -57,7 +60,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
        non_participant: non_participant,
        expected_payload: expected_payload,
        auction: auction,
-       fuel_id: fuel_id
+       fuel_id: fuel_id,
+       vessel_fuel_id: vessel_fuel_id
      }}
   end
 
@@ -430,21 +434,21 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       auction: auction = %{id: auction_id},
       buyer_id: buyer_id,
       supplier_id: supplier_id,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       channel = "user_auctions:#{Integer.to_string(buyer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
 
-      create_bid(1.25, nil, supplier_id, fuel_id, auction, false)
+      create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
       buyer_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
-      buyer_payload = buyer_auction_payload.product_bids[fuel_id]
+      buyer_payload = buyer_auction_payload.product_bids[vessel_fuel_id]
 
       receive do
         _ -> nil
@@ -460,7 +464,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: %{id: ^auction_id},
             status: :open,
             product_bids: %{
-              ^fuel_id => %{
+              ^vessel_fuel_id => %{
                 lowest_bids: lowest_bids,
                 bid_history: bid_history
               }
@@ -481,7 +485,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(buyer_id)
 
-      decision_buyer_payload = decision_buyer_auction_payload.product_bids[fuel_id]
+      decision_buyer_payload = decision_buyer_auction_payload.product_bids[vessel_fuel_id]
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -490,7 +494,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: %{id: ^auction_id},
             status: :decision,
             product_bids: %{
-              ^fuel_id => %{
+              ^vessel_fuel_id => %{
                 lowest_bids: lowest_bids,
                 bid_history: bid_history
               }
@@ -510,21 +514,21 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       auction: auction = %{id: auction_id},
       supplier_id: supplier_id,
       supplier3: supplier3,
-      fuel_id: fuel_id
+      vessel_fuel_id: vessel_fuel_id
     } do
       channel = "user_auctions:#{Integer.to_string(supplier_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
 
-      create_bid(1.25, nil, supplier_id, fuel_id, auction, false)
+      create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
       supplier_auction_payload =
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
-      supplier_payload = supplier_auction_payload.product_bids[fuel_id]
+      supplier_payload = supplier_auction_payload.product_bids[vessel_fuel_id]
 
       # NOTE: There seems to be an extra event that gets sent when bids are
       # placed that does not contain the bids. Unsure of where this event is
@@ -542,7 +546,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction = %{id: ^auction_id},
             status: :open,
             product_bids: %{
-              ^fuel_id => %{
+              ^vessel_fuel_id => %{
                 lowest_bids: lowest_bids,
                 bid_history: bid_history
               }
@@ -561,7 +565,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert false, "Expected message received nothing."
       end
 
-      create_bid(1.25, nil, supplier3.id, fuel_id, auction, false)
+      create_bid(1.25, nil, supplier3.id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
       receive do
@@ -577,7 +581,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         auction
         |> Auctions.AuctionPayload.get_auction_payload!(supplier_id)
 
-      decision_supplier_payload = decision_supplier_auction_payload.product_bids[fuel_id]
+      decision_supplier_payload = decision_supplier_auction_payload.product_bids[vessel_fuel_id]
 
       receive do
         %Phoenix.Socket.Broadcast{
@@ -586,7 +590,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
             auction: auction = %{id: ^auction_id},
             status: :decision,
             product_bids: %{
-              ^fuel_id => %{
+              ^vessel_fuel_id => %{
                 lowest_bids: lowest_bids,
                 bid_history: bid_history
               }

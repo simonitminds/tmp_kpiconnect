@@ -21,6 +21,7 @@ defmodule OceanconnectWeb.ConnCase do
       use Phoenix.ConnTest
       import OceanconnectWeb.Router.Helpers
       import Oceanconnect.Factory
+      alias Oceanconnect.Utilities
       # The default endpoint for testing
       @endpoint OceanconnectWeb.Endpoint
 

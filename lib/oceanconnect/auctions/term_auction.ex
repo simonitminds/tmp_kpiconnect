@@ -76,7 +76,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :po,
     :port_agent,
     :scheduled_start,
-    :start_date
+    :start_date,
+    :terminal
   ]
 
   @doc false

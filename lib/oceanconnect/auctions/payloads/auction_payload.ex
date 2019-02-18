@@ -4,6 +4,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   alias __MODULE__
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionBid,
     AuctionTimer,
     AuctionSuppliers
   }
@@ -46,15 +49,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
-  def get_bid_history(supplier_id, %state_struct{product_bids: product_bids}) when is_auction_state(state_struct) do
-    Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
-      Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
-    end)
-    |> List.flatten()
-    |> Enum.sort_by(&DateTime.to_unix(&1.time_entered, :microsecond))
-    |> Enum.reverse()
-  end
-
   def get_supplier_auction_payload(
         auction = %struct{},
         supplier_id,
@@ -73,7 +67,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
-      bid_history: get_bid_history(supplier_id, state),
+      bid_history: get_bid_history(state, supplier_id, auction),
       product_bids:
         Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
           Map.put(
@@ -122,6 +116,17 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
+  defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction) when is_auction_state(state_struct) do
+    Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
+      Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
+    end)
+    |> List.flatten()
+    |> Enum.sort_by(&DateTime.to_unix(&1.time_entered, :microsecond))
+    |> Enum.reverse()
+    |> Enum.map(&scrub_bid_for_supplier(&1, supplier_id, auction))
+  end
+
+
   defp get_supplier_participation(auction_suppliers, supplier_id) do
     with %AuctionSuppliers{participation: participation} <-
            Enum.find(auction_suppliers, fn supplier -> supplier.supplier_id == supplier_id end) do
@@ -154,6 +159,47 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
     Map.delete(auction, :suppliers)
+  end
+
+  defp scrub_bid_for_supplier(nil, _supplier_id, _auction), do: nil
+
+  defp scrub_bid_for_supplier(
+         bid = %AuctionBid{supplier_id: supplier_id},
+         supplier_id,
+         auction = %struct{}
+       ) when is_auction(struct) do
+    %{bid | min_amount: bid.min_amount, comment: bid.comment }
+    |> Map.put(:product, product_for_bid(bid, auction))
+    |> Map.from_struct()
+  end
+
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, auction = %struct{}) when is_auction(struct) do
+    %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
+    |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
+    |> Map.delete(:supplier_id)
+  end
+
+  defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
+
+  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{}) when is_auction(struct) do
+    supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
+
+    %{bid | supplier_id: nil, min_amount: nil}
+    |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
+    |> Map.put(:supplier, supplier)
+  end
+
+  defp product_for_bid(bid, %Auction{auction_vessel_fuels: vessel_fuels}) do
+    vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+    vessel = vf.vessel.name
+    fuel = vf.fuel.name
+    "#{fuel} for #{vessel}"
+  end
+
+  defp product_for_bid(_bid, %TermAuction{fuel: fuel}) do
+    "#{fuel.name}"
   end
 
   def json_from_payload(%AuctionPayload{

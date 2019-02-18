@@ -6,8 +6,8 @@ import { cardDateFormat, timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
 import BuyerAuctionCard from './buyer-auction-card';
 import SupplierAuctionCard from './supplier-auction-card';
-import CollapsibleSection from './collapsible-section';
-import ChannelConnectionStatus from './channel-connection-status';
+import CollapsibleSection from './common/collapsible-section';
+import ChannelConnectionStatus from './common/channel-connection-status';
 import MediaQuery from 'react-responsive';
 
 

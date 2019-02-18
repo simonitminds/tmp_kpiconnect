@@ -13,7 +13,7 @@
             </div>
             <div class="field-body">
               <div class="control is-expanded">
-                <%= text_input f, :email, class: "input qa-session-email" %>
+                <%= text_input f, :email, class: "input qa-session-email", autofocus: true %>
               </div>
             </div>
           </div>

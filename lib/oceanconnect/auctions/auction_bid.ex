@@ -1,4 +1,6 @@
 defmodule Oceanconnect.Auctions.AuctionBid do
+  import Oceanconnect.Auctions.Guards
+
   @enforce_keys [:auction_id, :amount, :supplier_id, :vessel_fuel_id]
   defstruct id: nil,
             auction_id: nil,
@@ -25,8 +27,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "supplier_id" => supplier_id,
           "time_entered" => time_entered
         },
-        auction = %Oceanconnect.Auctions.Auction{}
-      ) do
+        auction = %struct{}
+      ) when is_auction(struct) do
     %__MODULE__{
       id: UUID.uuid4(:hex),
       auction_id: auction.id,

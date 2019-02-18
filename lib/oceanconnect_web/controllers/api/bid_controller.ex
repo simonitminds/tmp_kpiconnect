@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.Api.BidController do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionNotifier}
+  alias Oceanconnect.Auctions.{AuctionNotifier}
 
   def create(conn, params = %{"auction_id" => auction_id, "bids" => bids_params}) do
     time_entered = DateTime.utc_now()
@@ -90,15 +90,10 @@ defmodule OceanconnectWeb.Api.BidController do
     buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
-    with auction = %struct{} when is_auction(struct) <-
-           Auctions.get_auction(auction_id) |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- auction.buyer_id == buyer_id,
-         state = %{status: :decision, product_bids: product_bids} <-
-           Auctions.get_auction_state!(auction),
+         state = %{product_bids: product_bids} <- Auctions.get_auction_state!(auction),
          selected_bids <- Auctions.bids_for_bid_ids(bid_ids, state) do
-
-#      Auctions.set_port_agent(auction, port_agent)
-
       Auctions.select_winning_solution(
         selected_bids,
         product_bids,
@@ -117,7 +112,7 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  defp validate_traded_bids(is_traded_bid, %Auction{is_traded_bid_allowed: is_traded_bid_allowed}) do
+  defp validate_traded_bids(is_traded_bid, %struct{is_traded_bid_allowed: is_traded_bid_allowed}) when is_auction(struct) do
     case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
       true -> :ok
       false -> {:invalid_traded_bid, "Auction not accepting traded bids"}

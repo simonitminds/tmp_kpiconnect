@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import CollapsibleSection from './auction/collapsible-section';
+import CollapsibleSection from './auction/common/collapsible-section';
 import MessagesAuctionView from './messaging/messages-auction-view';
 import MessagesAuctionHeader from './messaging/messages-auction-header';
 

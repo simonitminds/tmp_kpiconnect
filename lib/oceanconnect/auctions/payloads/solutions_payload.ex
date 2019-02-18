@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions.{AuctionBid, AuctionSuppliers, Solution}
+  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionBid, AuctionSuppliers, Solution}
 
   defstruct lowest_bids: [],
             bid_history: [],
@@ -31,17 +31,21 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
   def get_solutions_payload!(
         _state = %state_struct{solutions: solutions, winning_solution: winning_solution},
-        auction: _auction = %struct{},
+        auction: auction = %struct{},
         supplier: supplier_id
       ) when is_auction_state(state_struct) and is_auction(struct) do
     suppliers_best_solution = Map.get(solutions.best_by_supplier, supplier_id)
+    next_best_solution =
+      list_other_solutions(solutions, suppliers_best_solution)
+      |> Enum.at(0)
 
     %{
       best_single_supplier:
-        scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id),
-      best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id),
-      suppliers_best_solution: scrub_solution_for_supplier(suppliers_best_solution, supplier_id),
-      winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id)
+        scrub_solution_for_supplier(solutions.best_single_supplier, supplier_id, auction),
+      best_overall: scrub_solution_for_supplier(solutions.best_overall, supplier_id, auction),
+      suppliers_best_solution: scrub_solution_for_supplier(suppliers_best_solution, supplier_id, auction),
+      winning_solution: scrub_solution_for_supplier(winning_solution, supplier_id, auction),
+      next_best_solution: scrub_solution_for_supplier(next_best_solution, supplier_id, auction)
     }
   end
 
@@ -78,19 +82,17 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
     |> Enum.sort_by(&Solution.sort_tuple/1)
   end
 
-  defp scrub_solution_for_supplier(nil, _supplier_id), do: nil
-  defp scrub_solution_for_supplier(%Solution{bids: []}, _auction), do: nil
-
-  defp scrub_solution_for_supplier(solution = %Solution{bids: bids}, supplier_id) do
+  defp scrub_solution_for_supplier(nil, _supplier_id, _auction), do: nil
+  defp scrub_solution_for_supplier(%Solution{bids: []}, _supplier_id, _auction), do: nil
+  defp scrub_solution_for_supplier(solution = %Solution{bids: bids}, supplier_id, auction) do
     %Solution{
       solution
-      | bids: Enum.map(bids, fn bid -> scrub_bid_for_supplier(bid, supplier_id) end)
+      | bids: Enum.map(bids, fn bid -> scrub_bid_for_supplier(bid, supplier_id, auction) end)
     }
   end
 
   defp scrub_solution_for_buyer(nil, _auction), do: nil
   defp scrub_solution_for_buyer(%Solution{bids: []}, _auction), do: nil
-
   defp scrub_solution_for_buyer(solution = %Solution{bids: bids}, auction) do
     %Solution{solution | bids: Enum.map(bids, fn bid -> scrub_bid_for_buyer(bid, auction) end)}
   end
@@ -101,16 +103,22 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
   end
 
   # TODO: dedupe this across payloads
-  defp scrub_bid_for_supplier(nil, _supplier_id), do: nil
+  defp scrub_bid_for_supplier(nil, _supplier_id, _auction), do: nil
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{supplier_id: supplier_id}, supplier_id) do
-    %{bid | min_amount: bid.min_amount, comment: bid.comment}
+  defp scrub_bid_for_supplier(
+         bid = %AuctionBid{supplier_id: supplier_id},
+         supplier_id,
+         auction = %struct{}
+       ) when is_auction(struct) do
+    %{bid | min_amount: bid.min_amount, comment: bid.comment }
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.from_struct()
   end
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id) do
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, auction = %struct{}) when is_auction(struct) do
     %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
     |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.delete(:supplier_id)
   end
 
@@ -121,7 +129,19 @@ defmodule Oceanconnect.Auctions.Payloads.SolutionsPayload do
 
     %{bid | supplier_id: nil, min_amount: nil}
     |> Map.from_struct()
+    |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.put(:supplier, supplier)
+  end
+
+  defp product_for_bid(bid, %Auction{auction_vessel_fuels: vessel_fuels}) do
+    vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+    vessel = vf.vessel.name
+    fuel = vf.fuel.name
+    "#{fuel} for #{vessel}"
+  end
+
+  defp product_for_bid(_bid, %TermAuction{fuel: fuel}) do
+    "#{fuel.name}"
   end
 
   defp supplier_for_solution(nil), do: nil

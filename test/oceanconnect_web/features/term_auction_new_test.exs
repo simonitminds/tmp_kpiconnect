@@ -11,6 +11,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     buyer_with_no_credit = insert(:user, company: buyer_company_with_no_credit)
     login_user(buyer)
     fuels = insert_list(2, :fuel)
+    selected_fuel = hd(fuels)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     supplier_companies = insert_list(3, :company, is_supplier: true)
 
@@ -33,6 +34,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     auction_params = %{
       anonymous_bidding: false,
       duration: 10,
+      terminal: "AA",
       is_traded_bid_allowed: true,
       scheduled_start_date: valid_start_time,
       scheduled_start_time: valid_start_time,
@@ -51,7 +53,10 @@ defmodule Oceanconnect.TermAuctionNewTest do
 
     show_params = %{
       port: port.name,
-      suppliers: suppliers
+      suppliers: suppliers,
+      terminal: "AA",
+      fuel: selected_fuel.name,
+      fuel_quantity: "15000"
     }
 
     {:ok,
@@ -65,6 +70,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
        suppliers: suppliers,
        port: port,
        fuels: fuels,
+       selected_fuel: selected_fuel,
        selected_vessel: selected_vessel,
        date_time: date_time
      }}
@@ -122,9 +128,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     params: params,
     show_params: show_params,
     port: port,
-    fuels: [selected_fuel | _rest],
+    selected_fuel: selected_fuel,
     buyer_company: buyer_company,
-    buyer_vessels: [selected_vessel | _reset],
+    buyer_vessels: [selected_vessel | _reset]
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -148,7 +154,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     params: params,
     show_params: show_params,
     port: port,
-    fuels: [selected_fuel | _rest],
+    selected_fuel: selected_fuel,
     buyer_company: buyer_company,
     buyer_vessels: buyer_vessels
   } do
@@ -172,7 +178,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     params: params,
     show_params: show_params,
     port: port,
-    fuels: [selected_fuel | _rest],
+    selected_fuel: selected_fuel,
     buyer_company: buyer_company
   } do
     AuctionNewPage.visit()
@@ -190,9 +196,10 @@ defmodule Oceanconnect.TermAuctionNewTest do
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
 
-  test "a buyer should not be able to create a traded bid auction with no credit margin amount", %{
-    buyer_with_no_credit: buyer_with_no_credit
-  } do
+  test "a buyer should not be able to create a traded bid auction with no credit margin amount",
+       %{
+         buyer_with_no_credit: buyer_with_no_credit
+       } do
     login_user(buyer_with_no_credit)
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -202,7 +209,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
   test "errors messages render for required fields when creating a scheduled auction", %{
     params: params,
     port: port,
-    fuels: [selected_fuel | _rest],
+    selected_fuel: selected_fuel,
     buyer_vessels: buyer_vessels
   } do
     params =
