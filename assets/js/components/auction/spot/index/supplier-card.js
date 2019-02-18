@@ -2,13 +2,14 @@ import _ from 'lodash';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
-import SupplierBidStatus from './spot/show/supplier-bid-status'
-import AuctionTimeRemaining from './auction-time-remaining';
-import AuctionInvitation from './common/auction-invitation';
-import AuctionTitle from './common/auction-title';
+import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../../../utilities';
+import SupplierBidStatus from '../show/supplier-bid-status'
+import AuctionTimeRemaining from '../../common/auction-time-remaining';
+import AuctionInvitation from '../../common/auction-invitation';
+import AuctionTitle from '../../common/auction-title';
+import FuelPriceDisplay from '../../common/index/fuel-price-display';
 
-const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
+const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
   const vessels = _.get(auction, 'vessels');
@@ -39,69 +40,40 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
     }
   }
 
-  const vesselNameDisplay = (vesselFuels) => {
-    const vesselNames = _.chain(vesselFuels)
-      .map((vf) => vf.vessel)
-      .filter()
-      .uniqBy('id')
-      .map("name")
-      .value();
+  const uniqueFuels = _.chain(vesselFuels)
+    .map((vf) => vf.fuel)
+    .filter()
+    .uniqBy('id')
+    .value();
 
-    return vesselNames.join(", ");
-  };
-
-  const fuelPriceDisplay = (vesselFuels, solution) => {
-    const uniqueFuels = _.chain(vesselFuels)
-      .map((vf) => vf.fuel)
-      .filter()
-      .uniqBy('id')
-      .value();
-
-    const fuelQuantities = _.chain(uniqueFuels)
-        .reduce((acc, fuel) => {
-          acc[fuel.id] = _.chain(vesselFuels)
-            .filter((vf) => vf.fuel_id == fuel.id)
-            .sumBy((vf) => vf.quantity)
-            .value();
-          return acc;
-        }, {})
-        .value();
-
-    const fuelForVesselFuels = _.chain(vesselFuels)
-      .reduce((acc, vf) => {
-        acc[vf.id] = vf.fuel_id;
+  const fuelQuantities = _.chain(uniqueFuels)
+      .reduce((acc, fuel) => {
+        acc[fuel.id] = _.chain(vesselFuels)
+          .filter((vf) => vf.fuel_id == fuel.id)
+          .sumBy((vf) => vf.quantity)
+          .value();
         return acc;
       }, {})
       .value();
 
-    const solutionBidsByFuel =  _.chain(solution)
-      .get('bids', [])
-      .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
-      .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())
-      .value();
+  const fuelForVesselFuels = _.chain(vesselFuels)
+    .reduce((acc, vf) => {
+      acc[vf.id] = vf.fuel_id;
+      return acc;
+    }, {})
+    .value();
 
+  const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
 
+  const solutionBidsByFuel =  _.chain(solution)
+    .get('bids', [])
+    .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
+    .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())
+    .value();
 
-    return _.map(uniqueFuels, (fuel) => {
-      const fuelBid = solutionBidsByFuel[fuel.id];
-
-      return(
-        <div className="card-content__product" key={fuel.id}>
-          <span className="fuel-name">{fuel.name}</span>
-          { fuelQuantities[fuel.id]
-            ? <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
-            : <span className="no-amount has-text-gray-3">(no quantity given)</span>
-          }
-          <span className="card-content__best-price">
-            { fuelBid
-              ? `$${formatPrice(fuelBid.amount)}`
-              : "No bid"
-            }
-          </span>
-        </div>
-      );
-    });
-  };
+  const products = _.map(uniqueFuels, (fuel) => {
+    return {fuel: fuel, quantity: fuelQuantities[fuel.id], bid: solutionBidsByFuel[fuel.id]};
+  })
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -127,10 +99,8 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
         <div className="card-content__products">
-          { auctionStatus != 'pending' &&
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-          }
-          { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
+          <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
+          <FuelPriceDisplay products={products} />
         </div>
         { bidStatusDisplay() }
       </div>
@@ -138,4 +108,4 @@ const SupplierAuctionCard = ({auctionPayload, timeRemaining, connection, current
   );
 }
 
-export default SupplierAuctionCard;
+export default SupplierCard;

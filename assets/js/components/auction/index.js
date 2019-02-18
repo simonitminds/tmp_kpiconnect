@@ -4,12 +4,10 @@ import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cardDateFormat, timeRemainingCountdown } from '../../utilities';
 import ServerDate from '../../serverdate';
-import BuyerAuctionCard from './buyer-auction-card';
-import SupplierAuctionCard from './supplier-auction-card';
 import CollapsibleSection from './common/collapsible-section';
 import ChannelConnectionStatus from './common/channel-connection-status';
 import MediaQuery from 'react-responsive';
-
+import { componentsForAuction } from './common';
 
 export default class AuctionsIndex extends React.Component {
   constructor(props) {
@@ -18,29 +16,6 @@ export default class AuctionsIndex extends React.Component {
       timeRemaining: {},
       serverTime: moment().utc()
     };
-  }
-
-  // componentDidMount() {
-  //   this.timerID = setInterval(
-  //     () => this.tick(),
-  //     500
-  //   );
-  // }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-
-
-  tick() {
-    let time = moment(ServerDate.now()).utc();
-    this.setState({
-      timeRemaining: _.reduce(this.props.auctionPayloads, (acc, auctionPayload) => {
-        acc[_.get(auctionPayload, 'auction.id', 'temp')] = timeRemainingCountdown(auctionPayload, time);
-          return acc;
-        }, {}),
-      serverTime: time
-    });
   }
 
   render() {
@@ -92,14 +67,16 @@ export default class AuctionsIndex extends React.Component {
         return(
           <div className="columns is-multiline">
             { _.map(filteredPayloads, (auctionPayload) => {
+              const auctionType = _.get(auctionPayload, 'auction.type');
+              const { BuyerCard, SupplierCard } = componentsForAuction(auctionType);
               if (currentUserIsBuyer(auctionPayload.auction)) {
-                return <BuyerAuctionCard
+                return <BuyerCard
                   key={auctionPayload.auction.id}
                   auctionPayload={auctionPayload}
                   timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
                 />;
               } else {
-                return <SupplierAuctionCard
+                return <SupplierCard
                   key={auctionPayload.auction.id}
                   auctionPayload={auctionPayload}
                   timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}

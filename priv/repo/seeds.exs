@@ -638,6 +638,7 @@ auctions_params = [
     fuel_id: List.last(fuels).id,
     fuel_quantity: 12500,
     port_id: singapore.id,
+    vessels: [hd(vessels)],
     scheduled_start: date_time,
     po: "214215",
     buyer_id: qatargas.id,
