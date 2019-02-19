@@ -10,13 +10,13 @@ const AuctionTitle = ({auction}) => {
     case ('spot'):
       const vessels = _.get(auction, 'vessels');
       return(
-        <div className="is-flex">
+        <div className="">
           <span className="has-text-gray-3 is-inline-block has-padding-right-sm auction-title__auction-id">{auction.id}</span>
           { _.map(vessels, (vessel) => {
               return (
-                <div key={vessel.name} className={`auction-title-item has-margin-right-sm qa-auction-vessel-${vessel.id}`}>
-                  <span className="auction-title__vessel-name">{vessel.name}</span> <span className="auction-title__vessel-imo has-text-gray-3">({vessel.imo})</span>
-                </div>
+                <span key={vessel.name} className={`auction-title-item qa-auction-vessel-${vessel.id}`}>
+                  <span className="auction-title__vessel-name">{vessel.name}</span>
+                </span>
               );
             })
           }
@@ -30,7 +30,7 @@ const AuctionTitle = ({auction}) => {
     default:
       const portName = _.get(auction, 'port.name');
       return(
-        <div className="is-flex">
+        <div className="">
           <span className="has-text-gray-3 is-inline-block has-padding-right-sm auction-title__auction-id">{auction.id}</span>
           <span className="auction-title__port-name qa-auction-port">{portName}</span> <span className="auction-title__vessel-imo has-text-gray-3 has-margin-left-xs">(Term)</span>
           { is_traded_bid_allowed &&
