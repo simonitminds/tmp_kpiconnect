@@ -6,6 +6,9 @@
 	</div>
 	<div class="admin-panel__body container">
 		<div class="content">
+      <%= link( to: auction_path(@conn, :show, @auction.id), class: "button has-margin-left-auto") do %>
+          <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+      <%  end%>
 			<!-- <%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %> -->
 			<section class="admin-panel__content">
 				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fixture List</span>
