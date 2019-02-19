@@ -6,7 +6,8 @@ import CollapsibleSection from '../../common/collapsible-section';
 import { formatPrice } from '../../../../utilities';
 import CheckBoxField from '../../../check-box-field';
 import MediaQuery from 'react-responsive';
-import TermBiddingFormProduct from './bidding-form-product';
+import BiddingFormProduct from './bidding-form-product';
+import BiddingFormComment from './bidding-form-comment';
 
 class BiddingForm extends React.Component {
   constructor(props){
@@ -101,11 +102,14 @@ class BiddingForm extends React.Component {
                   <FontAwesomeIcon icon="info-circle" className="is-inline-block has-margin-right-sm" /> Add the above credit margin to your baseline price when placing your bid
                 </div>
               }
-              <TermBiddingFormProduct
+              <BiddingFormProduct
                 fuel={fuel}
                 auctionPayload={auctionPayload}
                 supplierId={supplierId}
                 onRevoke={revokeBid} />
+              <BiddingFormComment
+                fuel={fuel}
+                auctionPayload={auctionPayload} />
             </div>
             <div className="field is-horizontal is-expanded">
               <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">

@@ -4,6 +4,7 @@ import { formatTime, formatPrice } from '../../../../utilities';
 import SolutionDisplayWrapper from '../../common/show/solution-display-wrapper';
 import SolutionDisplayBarges from '../../common/show/solution-display/solution-display-barges';
 import TradedBidTag from '../../common/show/traded-bid-tag';
+import SolutionComments from './solution-comments';
 
 const SolutionDisplay = (props) => {
   const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, className} = props;
@@ -11,8 +12,7 @@ const SolutionDisplay = (props) => {
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
   const {bids, normalized_price} = solution;
-  // TODO: implement bid comments for conditions on the solution.
-  const conditions = [];
+  const comments = _.map(bids, 'comment');
 
   const hasTradedBid = _.some(bids, 'is_traded_bid');
   const price = `$${formatPrice(normalized_price)}`;
@@ -35,20 +35,7 @@ const SolutionDisplay = (props) => {
       }
 
       <h3 className="has-text-weight-bold has-margin-top-md">Offer Conditions</h3>
-      <div className="qa-solution-comments">
-        { conditions.length > 0
-          ? _.map(conditions, (condition) => {
-              return (
-                <div className="qa-solution-comment">
-                  {condition}
-                </div>
-              );
-            })
-          : <div className="auction-table-placeholder has-margin-top-xs has-margin-bottom-sm qa-solution-no-comments">
-              <p className="is-italic">No conditions have been placed on this offer.</p>
-            </div>
-        }
-      </div>
+      <SolutionComments solution={solution} />
     </SolutionDisplayWrapper>
   );
 }

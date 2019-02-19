@@ -395,6 +395,24 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
+  def enter_condition(condition) do
+    fill_field({:css, ".qa-auction-condition"}, condition)
+  end
+
+  def submit_condition() do
+    click({:css, ".qa-auction-condition-submit"})
+  end
+
+  def has_condition?(index, condition) do
+    text =
+      find_element(:css, ".qa-auction-solution-conditions")
+      |> find_all_within_element(:css, ".qa-auction-solution-condition")
+      |> Enum.at(index)
+      |> inner_text()
+
+    text =~ condition
+  end
+
   defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers}) when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end

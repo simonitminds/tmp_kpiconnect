@@ -1403,7 +1403,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload([:supplier, :vessel, :fuel])
   end
 
-  def fixtures_for_auction(auction = %struct{}) when is_auction(struct) do  
+  def fixtures_for_auction(auction = %struct{}) when is_auction(struct) do
     auction
     |> AuctionFixture.from_auction()
     |> Repo.all()

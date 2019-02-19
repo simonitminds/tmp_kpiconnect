@@ -273,7 +273,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
       AuctionShowPage.submit_bid()
       :timer.sleep(700)
 
-      take_screenshot()
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"
 
@@ -297,6 +296,22 @@ defmodule Oceanconnect.TermAuctionShowTest do
         end)
 
       assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
+    end
+
+    test "supplier can add conditions to offers", %{
+      auction: auction,
+      fuel_id: fuel_id
+    } do
+      AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(700)
+
+      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+
+      AuctionShowPage.enter_condition("You have to buy this!")
+      AuctionShowPage.submit_condition()
+
+      assert AuctionShowPage.has_condition?(0, "You have to buy this!")
     end
   end
 
