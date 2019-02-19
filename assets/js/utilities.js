@@ -56,7 +56,7 @@ export const formatDate = (date) => {
 
 export const formatMonthYear = (date) => {
   if (date) {
-    return moment(date).format("MMMM YYYY");
+    return moment(date).format("MMM YYYY");
   } else {
     return "";
   }
