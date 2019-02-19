@@ -38,7 +38,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  formSubmit(auction, formData) {
+  formSubmit(auctionId, formData) {
     dispatch(submitBid(auctionId, formData));
   },
   revokeSupplierBid(auctionId, productId) {
