@@ -32,9 +32,7 @@ const AuctionTitle = ({auction}) => {
       return(
         <div className="is-flex">
           <span className="has-text-gray-3 is-inline-block has-padding-right-sm auction-title__auction-id">{auction.id}</span>
-          <div className="auction-title__port-name">
-            {portName}
-          </div>
+          <span className="auction-title__port-name qa-auction-port">{portName}</span> <span className="auction-title__vessel-imo has-text-gray-3 has-margin-left-xs">(Term)</span>
           { is_traded_bid_allowed &&
             <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker has-margin-left-sm"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
             </span>

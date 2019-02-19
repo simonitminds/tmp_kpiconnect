@@ -2,12 +2,15 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../utilities';
-import SupplierBidStatus from './spot/show/supplier-bid-status';
-import AuctionTimeRemaining from './auction-time-remaining';
-import AuctionTitle from './common/auction-title';
+import { cardDateFormat, etaAndEtdForAuction, formatPrice } from '../../../../utilities';
+import SupplierBidStatus from '../show/supplier-bid-status';
+import AuctionTimeRemaining from '../../common/auction-time-remaining';
+import AuctionTitle from '../../common/auction-title';
+import LowestBidMessage from '../../common/index/lowest-bid-message';
+import SuppliersParticipating from '../../common/index/suppliers-participating';
+import FuelPriceDisplay from '../../common/index/fuel-price-display';
 
-const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
+const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const vessels = _.get(auction, 'vessels');
   const { eta, etd } = etaAndEtdForAuction(auction);
@@ -16,56 +19,15 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
-  const participations = _.get(auctionPayload, 'participations');
-  const participationCounts = _.countBy(participations, _.identity);
-  const {"yes": rsvpYesCount, "no": rsvpNoCount, "maybe": rsvpMaybeCount, null: rsvpNoResponseCount} = participationCounts;
 
   const confirmCancellation = (e) => { event.preventDefault();
                                        return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
-
-  const lowestBidMessage = () => {
-    if (winningSolution) {
-      const suppliers = _.chain(winningSolution.bids).map("supplier").uniq().value();
-      if(suppliers.length == 1) {
-        return (
-          <div className="card-content__best-bidder card-content__best-bidder--winner">
-            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div>
-          </div>
-        )
-      } else {
-        return (
-          <div className="card-content__best-bidder card-content__best-bidder--winner">
-            <div className="card-content__best-bidder__name">Winner: {suppliers[0]}</div><div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>
-          </div>
-        )
-      }
-    } else if (auctionStatus == 'expired') {
-      return (
-        <div className="card-content__best-bidder">
-          <div className="card-content__best-bidder__name">No offer was selected</div>
-        </div>
-      )
-    } else if (bestSolution) {
-      const suppliers = _.chain(bestSolution.bids).map("supplier").uniq().value();
-      return (
-        <div className="card-content__best-bidder">
-          <div className="card-content__best-bidder__name">Best Solution: {suppliers[0]}</div>{suppliers.length > 1 && <div className="card-content__best-bidder__count">(+{suppliers.length - 1})</div>}
-        </div>
-      )
-    } else {
-      return (
-        <div className="card-content__best-bidder">
-          Lowest Bid: <i>No bids yet</i>
-        </div>
-      )
-    }
-  }
 
   const bidStatusDisplay = () => {
     if (auctionStatus != 'pending' && bestSolution) {
       return (
         <div className="card-content__bid-status">
-          {lowestBidMessage()}
+          <LowestBidMessage auctionPayload={auctionPayload} />
         </div>
       );
     } else {
@@ -73,67 +35,40 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
     }
   }
 
-  const vesselNameDisplay = (vesselFuels) => {
-    const vesselNames = _.chain(vesselFuels)
-      .map((vf) => vf.vessel)
-      .filter()
-      .uniqBy('id')
-      .map("name")
-      .value();
+  const uniqueFuels = _.chain(vesselFuels)
+    .map((vf) => vf.fuel)
+    .filter()
+    .uniqBy('id')
+    .value();
 
-    return vesselNames.join(", ");
-  };
-
-  const fuelPriceDisplay = (vesselFuels, solution) => {
-    const uniqueFuels = _.chain(vesselFuels)
-      .map((vf) => vf.fuel)
-      .filter()
-      .uniqBy('id')
-      .value();
-
-    const fuelQuantities = _.chain(uniqueFuels)
-        .reduce((acc, fuel) => {
-          acc[fuel.id] = _.chain(vesselFuels)
-            .filter((vf) => vf.fuel_id == fuel.id)
-            .sumBy((vf) => vf.quantity)
-            .value();
-          return acc;
-        }, {})
-        .value();
-
-    const fuelForVesselFuels = _.chain(vesselFuels)
-      .reduce((acc, vf) => {
-        acc[vf.id] = vf.fuel_id;
+  const fuelQuantities = _.chain(uniqueFuels)
+      .reduce((acc, fuel) => {
+        acc[fuel.id] = _.chain(vesselFuels)
+          .filter((vf) => vf.fuel_id == fuel.id)
+          .sumBy((vf) => vf.quantity)
+          .value();
         return acc;
       }, {})
       .value();
 
-    const solutionBidsByFuel =  _.chain(solution)
-      .get('bids', [])
-      .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
-      .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())
-      .value();
+  const fuelForVesselFuels = _.chain(vesselFuels)
+    .reduce((acc, vf) => {
+      acc[vf.id] = vf.fuel_id;
+      return acc;
+    }, {})
+    .value();
 
-    return _.map(uniqueFuels, (fuel) => {
-      const fuelBid = solutionBidsByFuel[fuel.id];
+  const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
 
-      return(
-        <div className="card-content__product" key={fuel.id}>
-          <span className="fuel-name">{fuel.name}</span>
-          { fuelQuantities[fuel.id]
-            ? <span className="fuel-amount has-text-gray-3">({fuelQuantities[fuel.id]}&nbsp;MT)</span>
-            : <span className="no-amount has-text-gray-3">(no quantity given)</span>
-          }
-          <span className="card-content__best-price">
-            { fuelBid
-              ? `$${formatPrice(fuelBid.amount)}`
-              : "No bid"
-            }
-          </span>
-        </div>
-      );
-    });
-  };
+  const solutionBidsByFuel =  _.chain(solution)
+    .get('bids', [])
+    .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
+    .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())
+    .value();
+
+  const products = _.map(uniqueFuels, (fuel) => {
+    return {fuel: fuel, quantity: fuelQuantities[fuel.id], bid: solutionBidsByFuel[fuel.id]};
+  })
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -178,10 +113,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
         <div className="card-content__products">
-          { auctionStatus != 'pending' &&
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-          }
-          { fuelPriceDisplay(vesselFuels, ((auctionStatus == closed) ? winningSolution : bestSolution)) }
+          <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
+          <FuelPriceDisplay products={products} />
         </div>
         { auctionStatus == 'pending'
           ? <div className="card-content__products">
@@ -196,14 +129,8 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
 
         <div>
           { auctionStatus == 'pending' || auctionStatus == 'open'
-            ? <div className="card-content__auction-status">
-                <div>Suppliers Participating</div>
-                <div className="card-content__rsvp qa-auction-suppliers">
-                  <span className="icon has-text-success has-margin-right-xs"><FontAwesomeIcon icon="check-circle" /></span>{rsvpYesCount || "0"}&nbsp;
-                  <span className="icon has-text-warning has-margin-right-xs"><FontAwesomeIcon icon="adjust" /></span>{rsvpMaybeCount || "0"}&nbsp;
-                  <span className="icon has-text-danger has-margin-right-xs"><FontAwesomeIcon icon="times-circle" /></span>{rsvpNoCount || "0"}&nbsp;
-                  <span className="icon has-text-dark has-margin-right-xs"><FontAwesomeIcon icon="question-circle" /></span>{rsvpNoResponseCount || "0"}&nbsp;
-                </div>
+              ? <div className="card-content__auction-status">
+                <SuppliersParticipating auctionPayload={auctionPayload} />
               </div>
             : <div className="is-none"></div>
           }
@@ -240,4 +167,4 @@ const BuyerAuctionCard = ({auctionPayload, timeRemaining}) => {
   );
 }
 
-export default BuyerAuctionCard;
+export default BuyerCard;

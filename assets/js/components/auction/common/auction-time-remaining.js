@@ -2,8 +2,8 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { cardDateFormat, formatTimeRemaining, formatTimeRemainingColor, timeRemainingCountdown } from '../../utilities';
-import ServerDate from '../../serverdate';
+import { cardDateFormat, formatTimeRemaining, formatTimeRemainingColor, timeRemainingCountdown } from '../../../utilities';
+import ServerDate from '../../../serverdate';
 
 class AuctionTimeRemaining extends React.Component {
   constructor(props) {

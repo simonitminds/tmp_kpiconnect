@@ -1,7 +1,11 @@
 <div class="auction-app">
 	<div class="admin-panel__header container">
 		<div class="content is-clearfix">
-			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl">Auction <%= "#{@auction.id}" %> Fixtures</h1>
+			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl is-flex"><span class="is-inline-block">Auction <%= "#{@auction.id}" %> Fixtures</span>
+				<%= link( to: auction_path(@conn, :show, @auction.id), class: "button is-inline-block has-margin-left-auto has-family-copy") do %>
+	          <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+	      <% end %>
+			</h1>
 		</div>
 	</div>
 	<div class="admin-panel__body container">
@@ -10,14 +14,13 @@
 			<section class="admin-panel__content">
 				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fixture List</span>
 					<%= link to: admin_auction_fixture_path(@conn, :new, @auction), class: "button is-link is-inline-block has-margin-left-auto" do %>
-
 						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Fixture
 					<% end %>
 				</h2>
 				<table class="admin-panel__table">
 					<thead>
 						<tr>
-							<th>Auction ID</th>
+							<th>Fixture ID</th>
 							<th>Vessel</th>
 							<th>Fuel</th>
               <th>Price</th>
@@ -31,7 +34,7 @@
 					<tbody>
 						<%= for fixture <- @fixtures do %>
 							<tr class="qa-auction-fixture-<%= fixture.id %>">
-								<td class="qa-auction-fixture-auction-name"><%= "#{@auction.id}" %></td>
+								<td class="qa-auction-fixture-auction-name"><%= fixture.id %></td>
 								<td class="qa-auction-fixture-supplier"><%= vessel_name(fixture) %></td>
 								<td class="qa-auction-fixture-fuel"><%= fuel_name(fixture) %></td>
 								<td class="qa-auction-fixture-price">$<%= fixture.price %></td>
