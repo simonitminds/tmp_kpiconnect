@@ -3,7 +3,6 @@ import React from 'react';
 
 const BiddingFormComment = ({fuel, auctionPayload, supplierId}) => {
   const {id: fuelId} = fuel;
-  const auction = _.get(auctionPayload, 'auction');
   const auctionStatus = _.get(auctionPayload, 'status');
 
   return (

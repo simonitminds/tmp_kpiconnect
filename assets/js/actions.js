@@ -250,6 +250,21 @@ export function revokeBid(auctionId, bidData) {
   };
 }
 
+export function submitComment(auctionId, comment) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/submit_comment`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(comment)
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((resonse) => {
+      return console.log(repsonse)
+    });
+  };
+}
+
 export function acceptWinningSolution(auctionId, solution) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/select_solution`, {

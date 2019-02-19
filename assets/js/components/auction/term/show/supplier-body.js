@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
+import MediaQuery from 'react-responsive';
 import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import BidStatus from './bid-status';
 import BiddingForm from './bidding-form';
+import CommentForm from './comment-form';
 import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
@@ -18,7 +20,8 @@ const SupplierBody = (props) => {
     currentUserCompanyId,
     updateBidStatus,
     revokeSupplierBid,
-    formSubmit
+    formSubmit,
+    addCommentToSolution
   } = props;
   const { status, message, solutions } = auctionPayload;
   const otherSolutions = _.get(solutions, 'other_solutions');
@@ -28,7 +31,12 @@ const SupplierBody = (props) => {
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
-        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <div className={`auction-bidding ${status == 'pending'? `auction-bidding--pending` : ``} box box--nested-base`}>
+          <MediaQuery query="(min-width: 769px)">
+            <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+            <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+          </MediaQuery>
+        </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );
@@ -49,7 +57,12 @@ const SupplierBody = (props) => {
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
           </h3>
         </div>
-        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <div className={`auction-bidding ${status == 'pending'? `auction-bidding--pending` : ``} box box--nested-base`}>
+          <MediaQuery query="(min-width: 769px)">
+            <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+            <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+          </MediaQuery>
+        </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );
