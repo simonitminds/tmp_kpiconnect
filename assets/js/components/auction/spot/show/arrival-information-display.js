@@ -44,7 +44,7 @@ const ArrivalInformationDisplay = (props) => {
       }
       { _.map(vesselsWithETAs, (vessel) => {
           return (
-            <li className="is-not-flex has-margin-top-md" key={vessel.id}>
+            <li className={`is-not-flex has-margin-top-md qa-auction-vessel-${vessel.id}`} key={vessel.id}>
               <strong className="is-block">{vessel.name}</strong>
               <span className="is-block"><strong>ETA</strong> {formatUTCDateTime(vessel.eta)}</span>
               <span className="is-block"><strong>ETD</strong> {formatUTCDateTime(vessel.etd)}</span>
