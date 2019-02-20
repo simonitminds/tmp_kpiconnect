@@ -227,3 +227,7 @@
     font-family: $family-sans-serif;
   }
 }
+
+.auction-title-item + .auction-title-item:before {
+  content: ", ";
+}

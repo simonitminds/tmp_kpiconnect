@@ -60,7 +60,8 @@ defmodule Oceanconnect.AuctionShowPage do
         find_within_element(element, :css, ".qa-auction-vessel-#{vessel.id}")
         |> inner_text
 
-      "#{vessel.name} (#{vessel.imo})" == text
+      text =~ "#{vessel.name}" &&
+        text =~ "(#{vessel.imo})"
     end)
   end
 
