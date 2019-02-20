@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   alias Oceanconnect.Auctions.{
     AuctionBarge,
     AuctionBid,
+    AuctionComment,
     AuctionEvent,
     Solution,
     AuctionStore.ProductBidState
@@ -254,6 +255,34 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       type: :winning_solution_selected,
       auction_id: auction_id,
       data: %{solution: solution, port_agent: port_agent, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def comment_submitted(
+    comment = %AuctionComment{auction_id: auction_id},
+    state = %state_struct{},
+    user
+  ) when is_auction_state(state_struct) do
+    %AuctionEvent{
+      type: :comment_submitted,
+      auction_id: auction_id,
+      data: %{comment: comment, state: state},
+      time_entered: DateTime.utc_now(),
+      user: user
+    }
+  end
+
+  def comment_unsubmitted(
+    comment = %AuctionComment{auction_id: auction_id},
+    state = %state_struct{},
+    user
+  ) when is_auction_state(state_struct) do
+    %AuctionEvent{
+      type: :comment_unsubmitted,
+      auction_id: auction_id,
+      data: %{comment: comment, state: state},
       time_entered: DateTime.utc_now(),
       user: user
     }

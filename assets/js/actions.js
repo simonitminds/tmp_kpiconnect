@@ -176,6 +176,35 @@ export function unsubmitBargeForApproval(auctionId, bargeId) {
   };
 }
 
+export function submitComment(auctionId, comment) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/comments`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(comment)
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+    });
+  };
+}
+
+export function unsubmitComment(auctionId, commentId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/comments/${commentId}`, {
+      headers: defaultHeaders,
+      method: 'DELETE',
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+    });
+  }
+}
+
 export function approveBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/approve`, {
@@ -246,21 +275,6 @@ export function revokeBid(auctionId, bidData) {
       return dispatch(updateBidStatus(auctionId, response));
     }).catch((error) => {
       return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
-    });
-  };
-}
-
-export function submitComment(auctionId, comment) {
-  return dispatch => {
-    fetch(`/api/auctions/${auctionId}/submit_comment`, {
-      headers: defaultHeaders,
-      method: 'POST',
-      body: JSON.stringify(comment)
-    })
-    .then(checkStatus)
-    .then(parseJSON)
-    .then((resonse) => {
-      return console.log(repsonse)
     });
   };
 }

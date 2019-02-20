@@ -10,6 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionBarge,
     AuctionBid,
     AuctionCache,
+    AuctionComment,
     AuctionEvent,
     AuctionEventStore,
     StoreProtocol,
@@ -50,6 +51,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
+  end
+
+  def process_command(
+    %Command{
+      command: cmd,
+      data: data = %{comment: %AuctionComment{auction_id: auction_id}}
+    }
+  ) do
+    with {:ok, pid} <- find_pid(auction_id), do: GenServer.cast(pid, {cmd, data, true})
   end
 
   def process_command(%Command{
@@ -218,6 +228,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     )
 
     AuctionEvent.emit(AuctionEvent.auction_closed(auction, new_state), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+    {:submit_comment, %{comment: comment, user: user}, emit},
+    current_state
+  ) do
+    new_state = StoreProtocol.submit_comment(current_state, comment)
+
+    AuctionEvent.emit(AuctionEvent.comment_submitted(comment, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+    {:unsubmit_comment, %{comment: comment, user: user}, emit},
+    current_state
+  ) do
+    new_state = StoreProtocol.unsubmit_comment(current_state, comment)
+
+    AuctionEvent.emit(AuctionEvent.comment_unsubmitted(comment, new_state, user), emit)
 
     {:noreply, new_state}
   end

@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.Command do
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions.{AuctionBarge, AuctionBid, Solution}
+  alias Oceanconnect.Auctions.{AuctionBarge, AuctionBid, AuctionComment, Solution}
   alias __MODULE__
 
   defstruct command: :get_current_state, data: nil
@@ -66,6 +66,17 @@ defmodule Oceanconnect.Auctions.Command do
     %Command{
       command: :select_winning_solution,
       data: %{solution: solution, auction: auction, port_agent: port_agent, user: user}
+    }
+  end
+
+  def submit_comment(comment = %AuctionComment{}, user) do
+    %Command{command: :submit_comment, data: %{comment: comment, user: user}}
+  end
+
+  def unsubmit_comment(comment = %AuctionComment{}, user) do
+    %Command{
+      command: :unsubmit_comment,
+      data: %{comment: comment, user: user}
     }
   end
 

@@ -15,6 +15,7 @@ import {
   submitBid,
   revokeBid,
   submitComment,
+  unsubmitComment,
   updateBidStatus
 } from '../actions';
 
@@ -44,6 +45,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   addCommentToSolution(auctionId, formData) {
     dispatch(submitComment(auctionId, formData));
+  },
+  removeCommentFromSolution(auctionId, commentId) {
+    dispatch(unsubmitComment(auctionId, commentId))
   },
   revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));

@@ -8,6 +8,7 @@ defmodule Oceanconnect.Auctions do
     Auction,
     AuctionBid,
     AuctionCache,
+    AuctionComment,
     AuctionEvent,
     AuctionEventStore,
     AuctionEventStorage,
@@ -31,6 +32,56 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
   @term_types ["forward_fixed", "formula_related"]
+
+  def submit_comment(
+    auction,
+    comment_params = %{},
+    supplier_id,
+    time_entered \\ DateTime.utc_now(),
+    user \\ nil
+  ) do
+    comment =
+      %{
+        "supplier_id" => supplier_id,
+        "time_entered" => time_entered
+      }
+      |> Map.merge(comment_params)
+      |> AuctionComment.from_params_to_auction_comment(auction)
+
+    comment
+    |> Command.submit_comment(user)
+    |> AuctionStore.process_command()
+
+
+    case comment do
+      %{comment: nil} -> {:invalid_comment, comment_params}
+      _ -> {:ok, comment}
+    end
+  end
+
+  def unsubmit_comment(
+    %struct{id: auction_id},
+    comment_id,
+    supplier_id,
+    user \\ nil
+  ) when is_auction(struct) do
+    case comment_id do
+      nil ->
+        {:error, "Cannot delete comment"}
+      _ ->
+
+        %AuctionComment{
+          id: comment_id,
+          auction_id: auction_id,
+          supplier_id: supplier_id,
+          comment: ""
+        }
+        |> Command.unsubmit_comment(user)
+        |> AuctionStore.process_command()
+
+        :ok
+    end
+  end
 
   def bids_for_bid_ids(bid_ids, %state_struct{product_bids: product_bids})
       when is_auction_state(state_struct)

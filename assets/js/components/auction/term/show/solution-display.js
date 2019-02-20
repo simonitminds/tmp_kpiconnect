@@ -5,9 +5,10 @@ import SolutionDisplayWrapper from '../../common/show/solution-display-wrapper';
 import SolutionDisplayBarges from '../../common/show/solution-display/solution-display-barges';
 import TradedBidTag from '../../common/show/traded-bid-tag';
 import SolutionComments from './solution-comments';
+import CommentsDisplay from './comments-display';
 
 const SolutionDisplay = (props) => {
-  const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, className} = props;
+  const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, unsubmitComment, highlightOwn, best, className} = props;
   const isSupplier = !!supplierId;
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -36,6 +37,7 @@ const SolutionDisplay = (props) => {
 
       <h3 className="has-text-weight-bold has-margin-top-md">Offer Conditions</h3>
       <SolutionComments solution={solution} />
+      <CommentsDisplay auctionPayload={auctionPayload} unsubmitComment={unsubmitComment} />
     </SolutionDisplayWrapper>
   );
 }

@@ -21,7 +21,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             bid_history: [],
             product_bids: %{},
             solutions: %{},
-            submitted_barges: []
+            submitted_barges: [],
+            submitted_comments: []
 
   def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
     get_auction_payload!(auction, buyer_id)
@@ -54,7 +55,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         supplier_id,
         state = %state_struct{
           product_bids: product_bids,
-          status: status
+          status: status,
+          submitted_comments: submitted_comments
         }
       ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
@@ -80,7 +82,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           )
         end),
       submitted_barges:
-        BargesPayload.get_barges_payload!(state.submitted_barges, supplier: supplier_id)
+        BargesPayload.get_barges_payload!(state.submitted_barges, supplier: supplier_id),
+      submitted_comments: Enum.filter(submitted_comments, &(&1.supplier_id == supplier_id))
     }
   end
 
@@ -89,7 +92,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         buyer_id,
         state = %state_struct{
           product_bids: product_bids,
-          status: status
+          status: status,
+          submitted_comments: submitted_comments
         }
       ) when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
@@ -112,7 +116,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             )
           )
         end),
-      submitted_barges: BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id)
+      submitted_barges:
+        BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
+      submitted_comments: submitted_comments
     }
   end
 

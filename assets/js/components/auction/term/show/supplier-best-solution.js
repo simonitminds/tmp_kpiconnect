@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SupplierBidStatus from './supplier-bid-status';
 import SolutionDisplay from './solution-display';
 
-const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid}) => {
+const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid, unsubmitComment}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const fuel = _.get(auctionPayload, 'auction.fuel');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
@@ -37,6 +37,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             highlightOwn={true}
             title="Your Offer"
             endButton={endButton}
+            unsubmitComment={unsubmitComment}
         />
       : <div key="supplier" className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
   const competitorSection = nextBestSolution

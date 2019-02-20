@@ -155,6 +155,28 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
+    %AuctionEvent{
+      type: :comment_submitted,
+      data: %{state: auction_state = %state_struct{}}
+    },
+    state
+  ) when is_auction_state(state_struct) do
+    AuctionNotifier.notify_participants(auction_state)
+    {:noreply, state}
+  end
+
+  def handle_info(
+    %AuctionEvent{
+      type: :comment_unsubmitted,
+      data: %{state: auction_state = %state_struct{}}
+    },
+    state
+  ) when is_auction_state(state_struct) do
+    AuctionNotifier.notify_participants(auction_state)
+    {:noreply, state}
+  end
+
+  def handle_info(
         %AuctionEvent{
           type: :barge_submitted,
           data: %{state: auction_state = %state_struct{}}

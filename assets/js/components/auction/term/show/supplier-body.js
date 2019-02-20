@@ -21,6 +21,7 @@ const SupplierBody = (props) => {
     updateBidStatus,
     revokeSupplierBid,
     formSubmit,
+    removeCommentFromSolution,
     addCommentToSolution
   } = props;
   const { status, message, solutions } = auctionPayload;
@@ -30,11 +31,18 @@ const SupplierBody = (props) => {
     return (
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
-        <SupplierBestSolution auctionPayload={auctionPayload} connection={connection} revokeBid={revokeSupplierBid} supplierId={currentUserCompanyId} />
+        <SupplierBestSolution auctionPayload={auctionPayload}
+          connection={connection}
+          revokeBid={revokeSupplierBid}
+          unsubmitComment={removeCommentFromSolution}
+          supplierId={currentUserCompanyId} />
         <div className={`auction-bidding ${status == 'pending'? `auction-bidding--pending` : ``} box box--nested-base`}>
           <MediaQuery query="(min-width: 769px)">
             <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
-            <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+            <CommentForm addCommentToSolution={addCommentToSolution}
+              auctionPayload={auctionPayload}
+              supplierId={currentUserCompanyId}
+              unsubmitComment={removeCommentFromSolution} />
           </MediaQuery>
         </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
@@ -44,7 +52,9 @@ const SupplierBody = (props) => {
     return (
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
-        <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
+        <SupplierBidStatus auctionPayload={auctionPayload}
+          connection={connection}
+          supplierId={currentUserCompanyId} />
         <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
@@ -60,7 +70,7 @@ const SupplierBody = (props) => {
         <div className={`auction-bidding ${status == 'pending'? `auction-bidding--pending` : ``} box box--nested-base`}>
           <MediaQuery query="(min-width: 769px)">
             <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
-            <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+            <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} unsubmitComment={removeCommentFromSolution} />
           </MediaQuery>
         </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />

@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStore.TermAuctionState do
             status: :pending,
             solutions: %SolutionCalculator{},
             submitted_barges: [],
+            submitted_comments: [],
             product_bids: %{},
             winning_solution: nil
 

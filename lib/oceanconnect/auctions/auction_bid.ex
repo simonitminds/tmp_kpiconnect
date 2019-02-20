@@ -25,8 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "min_amount" => min_amount,
           "vessel_fuel_id" => vessel_fuel_id,
           "supplier_id" => supplier_id,
-          "time_entered" => time_entered,
-          "comment" => comment
+          "time_entered" => time_entered
         },
         auction = %struct{}
       ) when is_auction(struct) do
@@ -38,7 +37,6 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       amount: amount,
       min_amount: min_amount,
       time_entered: time_entered,
-      comment: comment,
       original_time_entered: time_entered,
       allow_split: Map.get(params, "allow_split", true),
       is_traded_bid: Map.get(params, "is_traded_bid", false)

@@ -32,6 +32,12 @@ defprotocol Oceanconnect.Auctions.StoreProtocol do
   @doc "Select a winning solution"
   def select_winning_solution(state, solution, port_agent, auction)
 
+  @doc "Submit a comment"
+  def submit_comment(state, comment)
+
+  @doc "Unsubmit a comment"
+  def unsubmit_comment(state, comment)
+
   @doc "Submit an auction barge"
   def submit_barge(state, barge)
 

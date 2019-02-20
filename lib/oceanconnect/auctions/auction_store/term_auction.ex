@@ -6,6 +6,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     AuctionBid,
     AuctionBidCalculator,
     AuctionCache,
+    AuctionComment,
     AuctionEvent,
     AuctionScheduler,
     AuctionTimer,
@@ -195,6 +196,48 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     current_state
     |> Map.put(:winning_solution, solution)
     |> Map.put(:status, :closed)
+  end
+
+  def submit_comment(
+    current_state = %TermAuctionState{submitted_comments: submitted_comments},
+    comment = %AuctionComment{
+      id: comment_id,
+      auction_id: auction_id,
+      supplier_id: supplier_id
+    }
+  ) do
+    comment_already_submitted =
+      Enum.any?(submitted_comments, fn comment ->
+        match?(
+          %AuctionComment{id: ^comment_id, auction_id: ^auction_id, supplier_id: ^supplier_id},
+          comment
+        )
+      end)
+
+    if comment_already_submitted do
+      current_state
+    else
+      %TermAuctionState{current_state | submitted_comments: submitted_comments ++ [comment]}
+    end
+  end
+
+  def unsubmit_comment(
+        current_state = %TermAuctionState{submitted_comments: submitted_comments},
+        %AuctionComment{
+          id: comment_id,
+          auction_id: auction_id,
+          supplier_id: supplier_id
+        }
+      ) do
+    new_submitted_comments =
+      Enum.reject(submitted_comments, fn comment ->
+        match?(
+          %AuctionComment{id: ^comment_id, auction_id: ^auction_id, supplier_id: ^supplier_id},
+          comment
+        )
+      end)
+
+    %TermAuctionState{current_state | submitted_comments: new_submitted_comments}
   end
 
   def submit_barge(
