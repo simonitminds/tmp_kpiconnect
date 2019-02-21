@@ -186,7 +186,6 @@ export function submitComment(auctionId, comment) {
     .then(checkStatus)
     .then(parseJSON)
     .then((response) => {
-      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
     });
   };
 }

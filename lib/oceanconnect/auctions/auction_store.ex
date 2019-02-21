@@ -405,6 +405,20 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   defp replay_event(_auction,
+         %AuctionEvent{type: :comment_submitted, data: %{comment: comment}},
+         previous_state
+       ) do
+    StoreProtocol.submit_comment(previous_state, comment)
+  end
+
+  defp replay_event(_auction,
+         %AuctionEvent{type: :comment_unsubmitted, data: %{comment: comment}},
+         previous_state
+       ) do
+    StoreProtocol.unsubmit_comment(previous_state, comment)
+  end
+
+  defp replay_event(_auction,
          %AuctionEvent{type: :barge_submitted, data: %{auction_barge: auction_barge}},
          previous_state
        ) do
