@@ -217,7 +217,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         product_bids: product_bids,
         participations: participations,
         solutions: solutions,
-        submitted_barges: submitted_barges
+        submitted_barges: submitted_barges,
+        submitted_comments: submitted_comments
       }) do
     %{
       time_remaining: time_remaining,
@@ -228,7 +229,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       product_bids: product_bids,
       participations: participations,
       solutions: solutions,
-      submitted_barges: submitted_barges
+      submitted_barges: submitted_barges,
+      submitted_comments: submitted_comments
     }
   end
 end

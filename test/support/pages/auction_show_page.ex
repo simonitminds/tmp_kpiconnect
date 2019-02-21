@@ -395,22 +395,29 @@ defmodule Oceanconnect.AuctionShowPage do
     end)
   end
 
-  def enter_condition(condition) do
-    fill_field({:css, ".qa-auction-condition"}, condition)
+  def enter_comment(comment) do
+    fill_field({:css, ".qa-auction-bid-comment"}, comment)
   end
 
-  def submit_condition() do
-    click({:css, ".qa-auction-condition-submit"})
+  def submit_comment() do
+    click({:css, ".qa-auction-comment-submit"})
   end
 
-  def has_condition?(index, condition) do
+  def delete_comment(index) when is_integer(index) do
+    execute_script("document.getElementsByClassName('qa-auction-solution-comment-delete')[#{index}].click()")
+  end
+
+  def solution_has_comment?(index, comment) do
     text =
-      find_element(:css, ".qa-auction-solution-conditions")
-      |> find_all_within_element(:css, ".qa-auction-solution-condition")
+      find_element(:css, ".qa-auction-other-solutions")
+      |> find_all_within_element(:css, ".qa-auction-other-solution")
+      |> Enum.at(index)
+      |> find_within_element(:css, ".qa-auction-solution-comments")
+      |> find_all_within_element(:css, ".qa-auction-solution-comment")
       |> Enum.at(index)
       |> inner_text()
 
-    text =~ condition
+    text =~ comment
   end
 
   defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers}) when is_auction(struct) do

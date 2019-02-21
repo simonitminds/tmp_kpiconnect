@@ -16,10 +16,13 @@ class CommentForm extends React.Component {
     const comment = this.commentInput.value;
     const formData = {comment: comment}
     addCommentToSolution(auction.id, formData);
+    this.commentInput.value = "";
   }
 
   render() {
     const {auctionPayload, unsubmitComment} = this.props;
+    const auctionId = _.get(auctionPayload, 'auction.id');
+    const comments = _.get(auctionPayload, 'submitted_comments', []);
 
     return (
       <React.Fragment>
@@ -38,12 +41,12 @@ class CommentForm extends React.Component {
           <div className="field is-horizontal is-expanded">
             <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
               <div className="control">
-                <button type="submit" className="button is-primary has-margin-top-sm qa-auction-bid-submit">Add Conditions</button>
+                <button type="submit" className="button is-primary has-margin-top-sm qa-auction-comment-submit">Add Conditions</button>
               </div>
             </div>
           </div>
         </form>
-        <CommentsDisplay auctionPayload={auctionPayload} unsubmitComment={unsubmitComment} />
+        <CommentsDisplay comments={comments} auctionId={auctionId} unsubmitComment={unsubmitComment} isSupplier={true} />
       </React.Fragment>
     );
   }

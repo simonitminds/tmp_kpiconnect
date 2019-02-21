@@ -14,14 +14,8 @@ defmodule OceanconnectWeb.Api.AuctionCommentsController do
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          {:ok, _comment} = Auctions.submit_comment(auction, comment_params, supplier_id, time_entered, user) do
-
-      auction_payload =
-        auction
-        |> Auctions.fully_loaded()
-        |> AuctionPayload.get_auction_payload!(supplier_id)
-
       conn
-      |> render("submit.json", auction_payload: auction_payload)
+      |> render("show.json", %{success: true, message: "Comment created successfully"})
     else
       _ ->
         conn
@@ -37,13 +31,8 @@ defmodule OceanconnectWeb.Api.AuctionCommentsController do
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
          :ok <- Auctions.unsubmit_comment(auction, comment_id, supplier_id, user) do
-
-      auction_payload =
-        auction
-        |> Auctions.fully_loaded()
-        |> AuctionPayload.get_auction_payload!(supplier_id)
-
-      render(conn, "submit.json", auction_payload: auction_payload)
+      conn
+      |> render("show.json", %{success: true, message: "Comment deleted successfully"})
     else
       {:error, message} ->
         conn

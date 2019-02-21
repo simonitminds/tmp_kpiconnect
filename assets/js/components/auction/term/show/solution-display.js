@@ -9,11 +9,24 @@ import CommentsDisplay from './comments-display';
 
 const SolutionDisplay = (props) => {
   const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, unsubmitComment, highlightOwn, best, className} = props;
+  const auctionId = _.get(auctionPayload, 'auction.id');
   const isSupplier = !!supplierId;
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
   const {bids, normalized_price} = solution;
-  const comments = _.map(bids, 'comment');
+  const comments = _.get(auctionPayload, 'submitted_comments', []);
+  const bidSupplierIDs = _.chain(bids)
+    .map((bid) => {
+      if(bid.supplier_id) {
+        return bid.supplier_id;
+      } else {
+        const supplier = _.find(suppliers, {name: bid.supplier});
+        return supplier && supplier.id;
+      }
+    })
+    .uniq()
+    .value();
+
 
   const hasTradedBid = _.some(bids, 'is_traded_bid');
   const price = `$${formatPrice(normalized_price)}`;
@@ -22,7 +35,19 @@ const SolutionDisplay = (props) => {
           <TradedBidTag className="has-margin-right-sm qa-auction-bid-is_traded_bid" />
           {price}
         </span>
-      : price;
+    : price;
+
+  const renderCommentsForSolution = () => {
+    if (isSupplier) {
+      return <CommentsDisplay comments={comments} auctionId={auctionId} isSupplier={isSupplier} unsubmitComment={unsubmitComment} />
+    } else {
+      const commentsForSolution = _.chain(comments)
+        .filter((comment) => _.includes(bidSupplierIDs, comment.supplier_id))
+        .value();
+
+      return <CommentsDisplay comments={commentsForSolution} auctionId={auctionId} isSupplier={isSupplier} unsubmitComment={unsubmitComment} />
+    }
+  }
 
   return (
     <SolutionDisplayWrapper {...props} price={priceSection}>
@@ -36,8 +61,7 @@ const SolutionDisplay = (props) => {
       }
 
       <h3 className="has-text-weight-bold has-margin-top-md">Offer Conditions</h3>
-      <SolutionComments solution={solution} />
-      <CommentsDisplay auctionPayload={auctionPayload} unsubmitComment={unsubmitComment} />
+      {renderCommentsForSolution()}
     </SolutionDisplayWrapper>
   );
 }
