@@ -60,7 +60,7 @@ const SolutionDisplay = (props) => {
         </div>
       }
 
-      <h3 className="has-text-weight-bold has-margin-top-md">Offer Conditions</h3>
+      <h3 className="has-text-weight-bold has-margin-top-md has-margin-bottom-sm">Offer Conditions</h3>
       {renderCommentsForSolution()}
     </SolutionDisplayWrapper>
   );

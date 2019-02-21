@@ -28,6 +28,7 @@ class CommentForm extends React.Component {
       <React.Fragment>
         <form onSubmit={this.submitForm.bind(this)}>
           <h3 className="auction-comment__title title is-size-6 is-uppercase has-margin-top-sm">Conditions</h3>
+          <p className="is-italic has-text-gray-3 has-margin-bottom-md">Specify minimum parcel size, number of day's notice required for vessel and quantity nomination, and if any additional charges may apply.</p>
           <div className="auction-comment__form-body">
             <textarea
               type="text"
@@ -38,6 +39,7 @@ class CommentForm extends React.Component {
               className="textarea qa-auction-bid-comment">
             </textarea>
           </div>
+          <CommentsDisplay comments={comments} auctionId={auctionId} unsubmitComment={unsubmitComment} isSupplier={true} />
           <div className="field is-horizontal is-expanded">
             <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
               <div className="control">
@@ -46,7 +48,6 @@ class CommentForm extends React.Component {
             </div>
           </div>
         </form>
-        <CommentsDisplay comments={comments} auctionId={auctionId} unsubmitComment={unsubmitComment} isSupplier={true} />
       </React.Fragment>
     );
   }
