@@ -32,6 +32,8 @@ export default class AuctionShow extends React.Component {
       currentUserCompanyId,
       revokeSupplierBid,
       formSubmit,
+      removeCommentFromSolution,
+      addCommentToSolution,
       connection
     } = this.props;
     const {auction, status} = auctionPayload;
@@ -79,6 +81,8 @@ export default class AuctionShow extends React.Component {
                           updateBidStatus={updateBidStatus}
                           revokeSupplierBid={revokeSupplierBid}
                           formSubmit={formSubmit}
+                          addCommentToSolution={addCommentToSolution}
+                          removeCommentFromSolution={removeCommentFromSolution}
                         />
                     }
                     </div>
@@ -140,6 +144,8 @@ export default class AuctionShow extends React.Component {
                           updateBidStatus={updateBidStatus}
                           revokeSupplierBid={revokeSupplierBid}
                           formSubmit={formSubmit}
+                          addCommentToSolution={addCommentToSolution}
+                          removeCommentFromSolution={removeCommentFromSolution}
                         />
                     }
                   </TabPanel>

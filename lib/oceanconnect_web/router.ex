@@ -35,6 +35,20 @@ defmodule OceanconnectWeb.Router do
     post("/auctions/:auction_id/revoke_bid", BidController, :revoke, as: :auction_bid_api)
 
     post(
+      "/auctions/:auction_id/comments",
+      AuctionCommentsController,
+      :create,
+      as: :auction_comments_api
+    )
+
+    delete(
+      "/auctions/:auction_id/comments/:comment_id",
+      AuctionCommentsController,
+      :delete,
+      as: :auction_comments_api
+    )
+
+    post(
       "/auctions/:auction_id/select_solution",
       BidController,
       :select_solution,

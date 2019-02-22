@@ -1141,6 +1141,30 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier2_id} = second
     end
 
+    test "submit_comment/3", %{auction: auction, supplier: supplier} do
+      assert {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
+
+      auction_id = auction.id
+      supplier_id = supplier.id
+      assert %{auction_id: ^auction_id, supplier_id: ^supplier_id, comment: "Hi"} = comment
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_id)
+      assert length(auction_payload.submitted_comments) == 1
+    end
+
+    test "unsubmit_comment/3", %{auction: auction, supplier: supplier} do
+      assert {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
+
+      auction_id = auction.id
+      supplier_id = supplier.id
+      assert %{auction_id: ^auction_id, supplier_id: ^supplier_id, comment: "Hi"} = comment
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_id)
+      assert length(auction_payload.submitted_comments) == 1
+
+      assert :ok = Auctions.unsubmit_comment(auction, comment.id, supplier_id)
+      auction_payload = Auctions.AuctionPayload.get_auction_payload!(auction, supplier_id)
+      assert length(auction_payload.submitted_comments) == 0
+    end
+
     test "submit_barge/3 adds given barge to auction for the supplier", %{
       auction: auction,
       supplier: supplier
@@ -1160,6 +1184,7 @@ defmodule Oceanconnect.AuctionsTest do
                approval_status: "PENDING"
              } = hd(auction_state.submitted_barges)
     end
+
 
     test "submit_barge/3 allows multiple suppliers to submit the same barge", %{
       auction: auction,

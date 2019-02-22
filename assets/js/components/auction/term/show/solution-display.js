@@ -4,15 +4,29 @@ import { formatTime, formatPrice } from '../../../../utilities';
 import SolutionDisplayWrapper from '../../common/show/solution-display-wrapper';
 import SolutionDisplayBarges from '../../common/show/solution-display/solution-display-barges';
 import TradedBidTag from '../../common/show/traded-bid-tag';
+import SolutionComments from './solution-comments';
+import CommentsDisplay from './comments-display';
 
 const SolutionDisplay = (props) => {
-  const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, className} = props;
+  const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, unsubmitComment, highlightOwn, best, className} = props;
+  const auctionId = _.get(auctionPayload, 'auction.id');
   const isSupplier = !!supplierId;
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
   const {bids, normalized_price} = solution;
-  // TODO: implement bid comments for conditions on the solution.
-  const conditions = [];
+  const comments = _.get(auctionPayload, 'submitted_comments', []);
+  const bidSupplierIDs = _.chain(bids)
+    .map((bid) => {
+      if(bid.supplier_id) {
+        return bid.supplier_id;
+      } else {
+        const supplier = _.find(suppliers, {name: bid.supplier});
+        return supplier && supplier.id;
+      }
+    })
+    .uniq()
+    .value();
+
 
   const hasTradedBid = _.some(bids, 'is_traded_bid');
   const price = `$${formatPrice(normalized_price)}`;
@@ -21,7 +35,19 @@ const SolutionDisplay = (props) => {
           <TradedBidTag className="has-margin-right-sm qa-auction-bid-is_traded_bid" />
           {price}
         </span>
-      : price;
+    : price;
+
+  const renderCommentsForSolution = () => {
+    if (isSupplier) {
+      return <CommentsDisplay comments={comments} auctionId={auctionId} isSupplier={isSupplier} unsubmitComment={unsubmitComment} />
+    } else {
+      const commentsForSolution = _.chain(comments)
+        .filter((comment) => _.includes(bidSupplierIDs, comment.supplier_id))
+        .value();
+
+      return <CommentsDisplay comments={commentsForSolution} auctionId={auctionId} isSupplier={isSupplier} unsubmitComment={unsubmitComment} />
+    }
+  }
 
   return (
     <SolutionDisplayWrapper {...props} price={priceSection}>
@@ -34,21 +60,8 @@ const SolutionDisplay = (props) => {
         </div>
       }
 
-      <h3 className="has-text-weight-bold has-margin-top-md">Offer Conditions</h3>
-      <div className="qa-solution-comments">
-        { conditions.length > 0
-          ? _.map(conditions, (condition) => {
-              return (
-                <div className="qa-solution-comment">
-                  {condition}
-                </div>
-              );
-            })
-          : <div className="auction-table-placeholder has-margin-top-xs has-margin-bottom-sm qa-solution-no-comments">
-              <p className="is-italic">No conditions have been placed on this offer.</p>
-            </div>
-        }
-      </div>
+      <h3 className="has-text-weight-bold has-margin-top-md has-margin-bottom-sm">Offer Conditions</h3>
+      {renderCommentsForSolution()}
     </SolutionDisplayWrapper>
   );
 }

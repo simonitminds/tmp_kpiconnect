@@ -6,6 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionStateActions do
     AuctionBarge,
     AuctionBid,
     AuctionBidCalculator,
+    AuctionComment,
     AuctionCache,
     AuctionEvent,
     AuctionScheduler,

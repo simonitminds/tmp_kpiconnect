@@ -176,6 +176,29 @@ export function unsubmitBargeForApproval(auctionId, bargeId) {
   };
 }
 
+export function submitComment(auctionId, comment) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/comments`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(comment)
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+  };
+}
+
+export function unsubmitComment(auctionId, commentId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/comments/${commentId}`, {
+      headers: defaultHeaders,
+      method: 'DELETE',
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+  }
+}
+
 export function approveBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/approve`, {

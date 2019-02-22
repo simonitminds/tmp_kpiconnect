@@ -158,6 +158,25 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.auction_status() == "CLOSED"
       assert AuctionShowPage.winning_solution_has_bids?([bid])
     end
+
+    test "buyer can see supplier's comments on ranked offers", %{auction: auction, supplier: supplier} do
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+        :timer.sleep(100)
+        AuctionShowPage.enter_bid(%{amount: 9.50})
+        AuctionShowPage.submit_bid()
+        :timer.sleep(100)
+
+        AuctionShowPage.enter_comment("Hi")
+        AuctionShowPage.submit_comment()
+
+        assert AuctionShowPage.has_content?("Hi")
+      end)
+      AuctionShowPage.select_solution(0)
+      :timer.sleep(100)
+      assert AuctionShowPage.has_content?("Hi")
+    end
   end
 
   describe "supplier login" do
@@ -273,11 +292,11 @@ defmodule Oceanconnect.TermAuctionShowTest do
       AuctionShowPage.submit_bid()
       :timer.sleep(700)
 
-      take_screenshot()
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"
 
       AuctionShowPage.revoke_bid_for_product(fuel_id)
+      :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
       auction_state =
@@ -297,6 +316,36 @@ defmodule Oceanconnect.TermAuctionShowTest do
         end)
 
       assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
+    end
+
+    test "supplier can add comments to offers" do
+      AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(100)
+
+      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+
+      AuctionShowPage.enter_comment("You have to buy this!")
+      AuctionShowPage.submit_comment()
+      :timer.sleep(100)
+      assert AuctionShowPage.has_content?("You have to buy this!")
+    end
+
+    test "supplier can delete their comments" do
+      AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(100)
+
+      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+
+      AuctionShowPage.enter_comment("You have to buy this!")
+      AuctionShowPage.submit_comment()
+      :timer.sleep(100)
+      assert AuctionShowPage.has_content?("You have to buy this!")
+
+      AuctionShowPage.delete_comment(0)
+      :timer.sleep(100)
+      refute AuctionShowPage.has_content?("You have to buy this!")
     end
   end
 

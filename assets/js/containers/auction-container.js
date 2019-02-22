@@ -14,6 +14,8 @@ import {
   rejectBarge,
   submitBid,
   revokeBid,
+  submitComment,
+  unsubmitComment,
   updateBidStatus
 } from '../actions';
 
@@ -38,8 +40,14 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  formSubmit(auction, formData) {
+  formSubmit(auctionId, formData) {
     dispatch(submitBid(auctionId, formData));
+  },
+  addCommentToSolution(auctionId, formData) {
+    dispatch(submitComment(auctionId, formData));
+  },
+  removeCommentFromSolution(auctionId, commentId) {
+    dispatch(unsubmitComment(auctionId, commentId))
   },
   revokeSupplierBid(auctionId, productId) {
     dispatch(revokeBid(auctionId, { "product": productId }));

@@ -10,6 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     AuctionBarge,
     AuctionBid,
     AuctionCache,
+    AuctionComment,
     AuctionEvent,
     AuctionEventStore,
     StoreProtocol,
@@ -50,6 +51,15 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       }) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {cmd, data, true})
+  end
+
+  def process_command(
+    %Command{
+      command: cmd,
+      data: data = %{comment: %AuctionComment{auction_id: auction_id}}
+    }
+  ) do
+    with {:ok, pid} <- find_pid(auction_id), do: GenServer.cast(pid, {cmd, data, true})
   end
 
   def process_command(%Command{
@@ -223,6 +233,28 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_cast(
+    {:submit_comment, %{comment: comment, user: user}, emit},
+    current_state
+  ) do
+    new_state = StoreProtocol.submit_comment(current_state, comment)
+
+    AuctionEvent.emit(AuctionEvent.comment_submitted(comment, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
+    {:unsubmit_comment, %{comment: comment, user: user}, emit},
+    current_state
+  ) do
+    new_state = StoreProtocol.unsubmit_comment(current_state, comment)
+
+    AuctionEvent.emit(AuctionEvent.comment_unsubmitted(comment, new_state, user), emit)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast(
         {:submit_barge, %{auction_barge: auction_barge, user: user}, emit},
         current_state
       ) do
@@ -370,6 +402,20 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          previous_state
        ) do
     StoreProtocol.select_winning_solution(previous_state, solution, port_agent, auction)
+  end
+
+  defp replay_event(_auction,
+         %AuctionEvent{type: :comment_submitted, data: %{comment: comment}},
+         previous_state
+       ) do
+    StoreProtocol.submit_comment(previous_state, comment)
+  end
+
+  defp replay_event(_auction,
+         %AuctionEvent{type: :comment_unsubmitted, data: %{comment: comment}},
+         previous_state
+       ) do
+    StoreProtocol.unsubmit_comment(previous_state, comment)
   end
 
   defp replay_event(_auction,

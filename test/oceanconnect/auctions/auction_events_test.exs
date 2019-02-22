@@ -1,55 +1,56 @@
 defmodule Oceanconnect.Auctions.AuctionEventsTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionEvent, AuctionEventStore, AuctionSupervisor}
+  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent, AuctionEventStore, AuctionSupervisor}
 
-  setup do
-    supplier_company = insert(:company)
-    supplier2_company = insert(:company)
-    buyer_company = insert(:company, is_supplier: false)
-    vessel_fuel = insert(:vessel_fuel)
-    vessel_fuel_id = "#{vessel_fuel.id}"
+  describe "auction events" do
+    setup do
+      supplier_company = insert(:company)
+      supplier2_company = insert(:company)
+      buyer_company = insert(:company, is_supplier: false)
+      vessel_fuel = insert(:vessel_fuel)
+      vessel_fuel_id = "#{vessel_fuel.id}"
 
-    auction =
-      insert(
-        :auction,
-        duration: 1_000,
-        decision_duration: 1_000,
-        suppliers: [supplier_company, supplier2_company],
-        auction_vessel_fuels: [vessel_fuel],
-        buyer: buyer_company,
-        is_traded_bid_allowed: true
+      auction =
+        insert(
+          :auction,
+          duration: 1_000,
+          decision_duration: 1_000,
+          suppliers: [supplier_company, supplier2_company],
+          auction_vessel_fuels: [vessel_fuel],
+          buyer: buyer_company,
+          is_traded_bid_allowed: true
+        )
+        |> Auctions.fully_loaded()
+
+      term_auction = insert(:term_auction, suppliers: [supplier_company])
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler
+              ]
+            }}}
+        )
+
+      {:ok, %{auction: auction, term_auction: term_auction, vessel_fuel_id: vessel_fuel_id, supplier: supplier_company}}
+    end
+
+    test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      AuctionEvent.emit(
+        %AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}},
+        true
       )
-      |> Auctions.fully_loaded()
 
-    {:ok, _pid} =
-      start_supervised(
-        {AuctionSupervisor,
-         {auction,
-          %{
-            exclude_children: [
-              :auction_reminder_timer,
-              :auction_event_handler
-            ]
-          }}}
-      )
+      assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}
+    end
 
-    {:ok, %{auction: auction, vessel_fuel_id: vessel_fuel_id, supplier: supplier_company}}
-  end
-
-
-  test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-
-    AuctionEvent.emit(
-      %AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}},
-      true
-    )
-
-    assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}
-  end
-
-  describe "auction event store" do
     test "creating an auction adds an auction_created event to the event store", %{
       auction: auction
     } do
@@ -334,6 +335,57 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert [
                %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id},
                %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+             ] = AuctionEventStore.event_list(auction.id)
+    end
+  end
+
+  describe "term auction events" do
+    setup do
+      supplier_company = insert(:company)
+      term_auction = insert(:term_auction, suppliers: [supplier_company])
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {term_auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler
+              ]
+            }}}
+        )
+
+      {:ok, %{term_auction: term_auction, supplier: supplier_company}}
+    end
+
+    test "submitting a comment", %{term_auction: auction = %TermAuction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
+      :timer.sleep(200)
+
+      assert_received %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
+
+      assert [
+               %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
+             ] = AuctionEventStore.event_list(auction.id)
+    end
+
+    test "unsubmitting a comment", %{term_auction: auction = %TermAuction{id: auction_id}, supplier: supplier} do
+      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+
+      {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
+      :timer.sleep(200)
+      assert_received %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
+
+      assert :ok = Auctions.unsubmit_comment(auction, comment.id, supplier.id)
+      :timer.sleep(200)
+      assert_received %AuctionEvent{type: :comment_unsubmitted, auction_id: ^auction_id}
+
+      assert [
+               %AuctionEvent{type: :comment_unsubmitted, auction_id: ^auction_id},
+               %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
              ] = AuctionEventStore.event_list(auction.id)
     end
   end

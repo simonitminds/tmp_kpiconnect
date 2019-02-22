@@ -13,8 +13,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
             allow_split: true,
             is_traded_bid: false,
             active: true,
-            # Unused
             comment: nil,
+            # Unused
             credit_terms: nil,
             expiration: nil,
             total_price: nil
