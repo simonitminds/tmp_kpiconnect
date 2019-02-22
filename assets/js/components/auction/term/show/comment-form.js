@@ -14,7 +14,7 @@ class CommentForm extends React.Component {
     const {auctionPayload, addCommentToSolution} = this.props;
     const {auction} = auctionPayload;
     const comment = this.commentInput.value;
-    const formData = {comment: comment}
+    const formData = {comment: comment};
     addCommentToSolution(auction.id, formData);
     this.commentInput.value = "";
   }

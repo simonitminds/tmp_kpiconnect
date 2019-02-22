@@ -80,9 +80,9 @@ export default class AuctionShow extends React.Component {
                           currentUserCompanyId={currentUserCompanyId}
                           updateBidStatus={updateBidStatus}
                           revokeSupplierBid={revokeSupplierBid}
-                          removeCommentFromSolution={removeCommentFromSolution}
                           formSubmit={formSubmit}
                           addCommentToSolution={addCommentToSolution}
+                          removeCommentFromSolution={removeCommentFromSolution}
                         />
                     }
                     </div>
@@ -143,9 +143,9 @@ export default class AuctionShow extends React.Component {
                           currentUserCompanyId={currentUserCompanyId}
                           updateBidStatus={updateBidStatus}
                           revokeSupplierBid={revokeSupplierBid}
-                          removeCommentFromSolution={removeCommentFromSolution}
                           formSubmit={formSubmit}
                           addCommentToSolution={addCommentToSolution}
+                          removeCommentFromSolution={removeCommentFromSolution}
                         />
                     }
                   </TabPanel>
