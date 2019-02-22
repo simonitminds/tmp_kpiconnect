@@ -4,7 +4,7 @@ import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import BargeSubmission from '../../common/show/barge-submission';
-import BuyerBestSolution from './buyer-best-solution'
+import BuyerBestSolution from './buyer-best-solution';
 import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
@@ -51,7 +51,7 @@ const BuyerBody = (props) => {
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
           : <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={false} />
         }
-        <BuyerBidList auctionPayload={auctionPayload} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else if(status == 'expired') {
@@ -63,7 +63,7 @@ const BuyerBody = (props) => {
                   <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
                 </div>
               : <div>
-                  <BuyerBidList auctionPayload={auctionPayload} />
+                  <BuyerGradeDisplay auctionPayload={auctionPayload} />
                 </div>
         }
      </div>

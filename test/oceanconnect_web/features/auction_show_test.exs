@@ -518,6 +518,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
 
+
       AuctionShowPage.visit(auction.id)
 
       assert AuctionShowPage.port_agent() == "Test Agent"

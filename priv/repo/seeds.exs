@@ -18,10 +18,14 @@ alias Oceanconnect.Auctions
 alias Oceanconnect.Auctions.{
   Auction,
   TermAuction,
+  AuctionStore.AuctionState,
+  AuctionStore.TermAuctionState,
+  StoreProtocol,
   AuctionVesselFuel,
-  AuctionEvent,
+  AuctionEventStore,
   AuctionEventStorage,
   AuctionSuppliers,
+  Command,
   Barge,
   Fuel,
   Port,
@@ -676,9 +680,19 @@ Repo.delete_all(TermAuction)
 
 [auction1, auction2, auction3, term_auction1]
 |> Enum.map(fn auction ->
-  event = AuctionEvent.auction_created(auction, nil)
-  event_storage = %AuctionEventStorage{event: event, auction_id: auction.id}
-  AuctionEventStorage.persist(event_storage)
+  state =
+    case auction do
+      %Auction{} -> %AuctionState{auction_id: auction.id}
+      %TermAuction{} -> %TermAuctionState{auction_id: auction.id}
+    end
+
+  command =
+    auction
+    |> Auctions.fully_loaded()
+    |> Command.create_auction(nil)
+
+  {:ok, events} = StoreProtocol.process(state, command)
+  Enum.map(events, &AuctionEventStore.persist/1)
 end)
 
 SupplierHelper.set_suppliers_for_auction(auction1, suppliers)

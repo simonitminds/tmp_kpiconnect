@@ -25,6 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   def changeset(%AuctionEventStorage{} = storage, attrs) do
     storage
     |> cast(attrs, [:auction_id, :event, :version])
+    |> validate_required([:auction_id, :event, :version])
     |> foreign_key_constraint(:auction_id)
   end
 

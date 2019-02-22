@@ -97,6 +97,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}, time_entered: closed_at}, _state) do
     auction = AuctionCache.read(auction_id)
     %{auction | port_agent: port_agent, auction_closed_time: closed_at}
+    |> update_cache()
   end
 
   def react_to(%AuctionEvent{}, _state) do
