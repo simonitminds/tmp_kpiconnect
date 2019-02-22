@@ -296,6 +296,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
                "You have the best overall offer for this auction"
 
       AuctionShowPage.revoke_bid_for_product(fuel_id)
+      :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
 
       auction_state =
@@ -343,6 +344,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.has_content?("You have to buy this!")
 
       AuctionShowPage.delete_comment(0)
+      :term.sleep(100)
       refute AuctionShowPage.has_content?("You have to buy this!")
     end
   end
