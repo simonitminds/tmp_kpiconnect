@@ -344,7 +344,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.has_content?("You have to buy this!")
 
       AuctionShowPage.delete_comment(0)
-      :term.sleep(100)
+      :timer.sleep(100)
       refute AuctionShowPage.has_content?("You have to buy this!")
     end
   end
