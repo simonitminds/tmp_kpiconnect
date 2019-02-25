@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
+    Aggregate,
     Auction,
     TermAuction,
     AuctionCache,
@@ -54,8 +55,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
         closed_at = DateTime.utc_now()
         current_state = Auctions.get_auction_state!(auction)
         new_state = [
-          Command.select_winning_solution(solution, auction, closed_at, port_agent, user),
-          Command.finalize_auction(auction)
+          Command.select_winning_solution(solution, auction, closed_at, port_agent, user)
         ] |> Enum.reduce(current_state, fn(command, state) ->
           {:ok, events} = Aggregate.process(state, command)
           events
@@ -65,6 +65,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
             state
           end)
         end)
+
+        Auctions.finalize_auction(auction, new_state)
 
         #TODO: This should be picked up by a reaction on the notifier
         active_participants = Auctions.active_participants(auction_id)

@@ -11,7 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     TermAuction,
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState,
-    StoreProtocol
+    Aggregate
   }
 
   schema "auction_events" do
@@ -58,7 +58,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     events
     |> Enum.reverse
     |> Enum.reduce(state_for_type(auction), fn(event, state) ->
-      {:ok, state} = StoreProtocol.apply(state, event)
+      {:ok, state} = Aggregate.apply(state, event)
       state
     end)
   end

@@ -39,7 +39,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   #TODO UMM FINISH THIS TEST
   test "editing an auction fixture", %{
     auction: %{id: auction_id},
-    vessel_fuel1: vessel_fuel1,
+    vessel_fuel1: _vessel_fuel1,
     auction_fixtures: _fixtures
   } do
     Admin.Fixture.IndexPage.visit(auction_id)

@@ -236,6 +236,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}
 
       assert [
+               %AuctionEvent{type: :auction_state_snapshotted, auction_id: ^auction_id},
+               %AuctionEvent{type: :auction_finalized, auction_id: ^auction_id},
                %AuctionEvent{type: :auction_closed, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},

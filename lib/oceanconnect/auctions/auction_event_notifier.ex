@@ -1,13 +1,15 @@
 defmodule Oceanconnect.Auctions.EventNotifier do
   import Oceanconnect.Auctions.Guards
 
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionCache,
     AuctionScheduler,
     AuctionTimer,
     AuctionEvent,
-    Command
+    Command,
+    Aggregate
   }
 
   def emit(state, event = %AuctionEvent{}) do
@@ -72,7 +74,6 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, _state) do
     auction = AuctionCache.read(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
-
     update_cache(auction)
 
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
@@ -81,7 +82,6 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   def react_to(%AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at}, _state) do
     auction = AuctionCache.read(auction_id)
     auction = %{auction | auction_closed_time: canceled_at}
-
     update_cache(auction)
 
     AuctionTimer.cancel_timer(auction_id, :duration)
@@ -94,10 +94,21 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     |> AuctionTimer.process_command()
   end
 
-  def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}, time_entered: closed_at}, _state) do
+  def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}}, _state) do
     auction = AuctionCache.read(auction_id)
-    %{auction | port_agent: port_agent, auction_closed_time: closed_at}
+    %{auction | port_agent: port_agent}
     |> update_cache()
+  end
+
+  def react_to(%AuctionEvent{type: :auction_finalized, data: %{auction: auction}}, state) do
+    with  {:ok, _snapshot_event} <- Aggregate.snapshot(state),
+          {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
+      Auctions.AuctionsSupervisor.stop_child(finalized_auction)
+    else
+      {:error, _msg} ->
+        require Logger
+        Logger.error("Could not finalize auction detail records for auction #{auction.id}")
+    end
   end
 
   def react_to(%AuctionEvent{}, _state) do

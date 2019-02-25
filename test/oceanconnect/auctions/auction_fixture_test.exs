@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionFixtureTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionFixture, AuctionEvent}
+  alias Oceanconnect.Auctions.{AuctionFixture}
 
   setup do
     auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
@@ -19,9 +19,8 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
       close_auction!(auction)
       :timer.sleep(200)
       new_state = Auctions.get_auction_state!(auction)
-      snapshot = AuctionEvent.auction_state_snapshotted(auction, new_state)
 
-      assert {:ok, [%AuctionFixture{etd: nil}]} = Auctions.create_fixtures_from_snapshot(snapshot)
+      assert {:ok, [%AuctionFixture{etd: nil}]} = Auctions.create_fixtures_from_state(new_state)
     end
   end
 end

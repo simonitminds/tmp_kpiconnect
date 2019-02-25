@@ -468,11 +468,8 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def finalize_auction(auction = %struct{id: auction_id}, auction_state) when is_auction(struct) do
-    with event = %AuctionEvent{} <-
-           AuctionEvent.auction_state_snapshotted(auction, auction_state),
-         {:ok, snapshot} <- AuctionEventStore.create_auction_snapshot(event),
-         {:ok, _fixtures} <- create_fixtures_from_snapshot(snapshot),
+  def finalize_auction(_auction = %struct{id: auction_id}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+    with {:ok, _fixtures} <- create_fixtures_from_state(state),
          cached_auction = %struct{} when is_auction(struct) <- AuctionCache.read(auction_id),
          finalized_auction = %struct{} when is_auction(struct) <- persist_auction_from_cache(cached_auction) do
       {:ok, finalized_auction}
@@ -1488,23 +1485,18 @@ defmodule Oceanconnect.Auctions do
     |> AuctionFixture.update_changeset(%{})
   end
 
-  def create_fixtures_from_snapshot(
-        _snapshot = %AuctionEvent{
-          type: :auction_state_snapshotted,
-          data: %{
-            state: %{
-              winning_solution: %Solution{bids: bids}
-            }
-          }
+  def create_fixtures_from_state(
+        _snapshot = %state_struct{
+          winning_solution: %Solution{bids: bids}
         }
-      ) do
+      ) when is_auction_state(state_struct) do
     fixtures =
       bids
       |> Enum.map(&fixture_from_bid/1)
     {:ok, fixtures}
   end
 
-  def create_fixtures_from_snapshot(_event) do
+  def create_fixtures_from_state(_state) do
     {:ok, []}
   end
 

@@ -1,4 +1,4 @@
-defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.AuctionState do
+defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore.AuctionState do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
     Auction,
@@ -11,12 +11,13 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
 =======
 >>>>>>> Event Sourcing 2: Non-eclectic Boogaloo
     AuctionEvent,
+    AuctionEventStore,
     AuctionTimer,
     Command,
-    AuctionStore.ProductBidState,
     SolutionCalculator,
     Solution,
-    AuctionStore.AuctionState
+    AuctionStore.AuctionState,
+    AuctionStore.ProductBidState
   }
 
   defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
@@ -95,7 +96,8 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         %Command{command: :cancel_auction, data: %{auction: auction, canceled_at: canceled_at, user: user}}
       ) do
     {:ok, [
-      AuctionEvent.auction_canceled(auction, canceled_at, state, user)
+      AuctionEvent.auction_canceled(auction, canceled_at, state, user),
+      AuctionEvent.auction_finalized(auction)
     ]}
   end
 
@@ -120,7 +122,8 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         %Command{command: :end_auction_decision_period, data: %{auction: auction, expired_at: expired_at}}
       ) do
     {:ok, [
-      AuctionEvent.auction_expired(auction, expired_at, state)
+      AuctionEvent.auction_expired(auction, expired_at, state),
+      AuctionEvent.auction_finalized(auction)
     ]}
   end
 
@@ -195,7 +198,8 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
       ) do
     {:ok, [
       AuctionEvent.winning_solution_selected(auction.id, solution, closed_at, port_agent, state, user),
-      AuctionEvent.auction_closed(auction, closed_at, state)
+      AuctionEvent.auction_closed(auction, closed_at, state),
+      AuctionEvent.auction_finalized(auction)
     ]}
   end
 
@@ -294,9 +298,9 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
 
   # TODO: Move to Notifications context and fire as a reaction to `auction_rescheduled` or similar.
   def process(
-    %AuctionState{auction_id: _auction_id},
-    %Command{command: :notify_upcoming_auction, data: %{ auction: auction}}
-  ) do
+        %AuctionState{auction_id: _auction_id},
+        %Command{command: :notify_upcoming_auction, data: %{auction: auction}}
+      ) do
     {:ok, [AuctionEvent.upcoming_auction_notified(auction)]}
   end
 
@@ -306,8 +310,21 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         command = %Command{command: type}
       ) do
     require Logger
-    Logger.error("AuctionStore for Auction #{auction_id} received unhandled command #{type}")
+    Logger.warn("AuctionStore for Auction #{auction_id} received unhandled command #{type}")
     {:error, command}
+  end
+
+
+  ###
+  # Snapshot
+  ###
+
+  def snapshot(state = %AuctionState{}, adapter \\ AuctionEventStore) do
+    event = AuctionEvent.auction_state_snapshotted(state)
+    event
+    |> adapter.persist()
+
+    {:ok, event}
   end
 
 
@@ -588,10 +605,17 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     {:ok, %AuctionState{state | submitted_barges: new_submitted_barges}}
   end
 
+
+  @nop_events [
+    :upcoming_auction_notified,
+    :auction_state_snapshotted,
+    :auction_finalized
+  ]
+
   def apply(
-    state = %AuctionState{auction_id: _auction_id},
-    %AuctionEvent{type: :upcoming_auction_notified}
-  ) do
+        state = %AuctionState{},
+        %AuctionEvent{type: type}
+      ) when type in @nop_events do
     {:ok, state}
   end
 
@@ -603,7 +627,6 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     Logger.warn("AuctionStore for Auction #{auction_id} received unhandled event: #{type}")
     {:ok, state}
   end
-
 
 
 

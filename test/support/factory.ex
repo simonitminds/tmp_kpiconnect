@@ -6,7 +6,7 @@ defmodule Oceanconnect.Factory do
     AuctionEventStore,
     Solution,
     Command,
-    StoreProtocol
+    Aggregate
   }
 
   def set_password(user) do
@@ -194,14 +194,14 @@ defmodule Oceanconnect.Factory do
   def start_auction!(auction) do
     initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
     command = Command.start_auction(auction, DateTime.utc_now(), nil)
-    {:ok, events} = StoreProtocol.process(initial_state, command)
+    {:ok, events} = Aggregate.process(initial_state, command)
     Enum.map(events, &AuctionEventStore.persist/1)
   end
 
   def cancel_auction!(auction) do
     initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
     command = Command.cancel_auction(auction, DateTime.utc_now(), nil)
-    {:ok, events} = StoreProtocol.process(initial_state, command)
+    {:ok, events} = Aggregate.process(initial_state, command)
     Enum.map(events, &AuctionEventStore.persist/1)
   end
 
@@ -214,12 +214,12 @@ defmodule Oceanconnect.Factory do
         Command.end_auction_decision_period(auction, DateTime.utc_now())
       ]
       |> Enum.reduce(initial_state, fn command, state ->
-        {:ok, events} = StoreProtocol.process(state, command)
+        {:ok, events} = Aggregate.process(state, command)
         Enum.map(events, &AuctionEventStore.persist/1)
 
         events
         |> Enum.reduce(state, fn event, state ->
-          {:ok, state} = StoreProtocol.apply(state, event)
+          {:ok, state} = Aggregate.apply(state, event)
           state
         end)
       end)
@@ -239,12 +239,12 @@ defmodule Oceanconnect.Factory do
         Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
       ]
       |> Enum.reduce(initial_state, fn command, state ->
-        {:ok, events} = StoreProtocol.process(state, command)
+        {:ok, events} = Aggregate.process(state, command)
         Enum.map(events, &AuctionEventStore.persist/1)
 
         events
         |> Enum.reduce(state, fn event, state ->
-          {:ok, state} = StoreProtocol.apply(state, event)
+          {:ok, state} = Aggregate.apply(state, event)
           state
         end)
       end)

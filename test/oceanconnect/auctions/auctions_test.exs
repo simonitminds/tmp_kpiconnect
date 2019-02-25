@@ -10,7 +10,7 @@ defmodule Oceanconnect.AuctionsTest do
     AuctionSupervisor,
     AuctionEvent,
     AuctionStore.AuctionState,
-    StoreProtocol,
+    Aggregate,
     Command,
     Solution
   }
@@ -1384,16 +1384,15 @@ defmodule Oceanconnect.AuctionsTest do
         Command.process_new_bid(bid, nil),
         Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
       ] |> Enum.reduce(initial_state, fn(command, state) ->
-        {:ok, events} = StoreProtocol.process(state, command)
+        {:ok, events} = Aggregate.process(state, command)
         events
         |> Enum.reduce(state, fn(event, state) ->
-          {:ok, state} = StoreProtocol.apply(state, event)
+          {:ok, state} = Aggregate.apply(state, event)
           state
         end)
       end)
 
-      event = AuctionEvent.auction_state_snapshotted(auction, state)
-      Oceanconnect.Auctions.create_fixtures_from_snapshot(event)
+      Oceanconnect.Auctions.create_fixtures_from_state(state)
 
       assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
     end

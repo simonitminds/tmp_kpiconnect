@@ -1,4 +1,4 @@
-defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
+defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
     TermAuction,
@@ -11,6 +11,7 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
 =======
 >>>>>>> Event Sourcing 2: Non-eclectic Boogaloo
     AuctionEvent,
+    AuctionEventStore,
     AuctionTimer,
     Command,
     SolutionCalculator,
@@ -104,7 +105,8 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         %Command{command: :end_auction, data: %{auction: auction, ended_at: ended_at}}
       ) do
     {:ok, [
-      AuctionEvent.auction_expired(auction, ended_at, state)
+      AuctionEvent.auction_expired(auction, ended_at, state),
+      AuctionEvent.auction_finalized(auction)
     ]}
   end
 
@@ -113,15 +115,6 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
         %Command{command: :end_auction}
       ) do
     {:ok, []}
-  end
-
-  def process(
-        state = %TermAuctionState{},
-        %Command{command: :end_auction_decision_period, data: %{auction: auction, expired_at: expired_at}}
-      ) do
-    {:ok, [
-      AuctionEvent.auction_expired(auction, expired_at, state)
-    ]}
   end
 
   def process(
@@ -195,7 +188,8 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
       ) do
     {:ok, [
       AuctionEvent.winning_solution_selected(auction.id, solution, closed_at, port_agent, state, user),
-      AuctionEvent.auction_closed(auction, closed_at, state)
+      AuctionEvent.auction_closed(auction, closed_at, state),
+      AuctionEvent.auction_finalized(auction)
     ]}
   end
 
@@ -294,12 +288,11 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
 
   # TODO: Move to Notifications context and fire as a reaction to `auction_rescheduled` or similar.
   def process(
-    %TermAuctionState{},
-    %Command{command: :notify_upcoming_auction, data: %{ auction: auction}}
-  ) do
+        %TermAuctionState{},
+        %Command{command: :notify_upcoming_auction, data: %{ auction: auction}}
+      ) do
     {:ok, [AuctionEvent.upcoming_auction_notified(auction)]}
   end
-
 
   def process(
         _state = %TermAuctionState{auction_id: auction_id},
@@ -308,6 +301,19 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     require Logger
     Logger.error("AuctionStore for Auction #{auction_id} received unhandled command #{type}")
     {:error, command}
+  end
+
+
+  ###
+  # Snapshot
+  ###
+
+  def snapshot(state = %TermAuctionState{}, adapter \\ AuctionEventStore) do
+    event = AuctionEvent.auction_state_snapshotted(state)
+    event
+    |> adapter.persist()
+
+    {:ok, event}
   end
 
 
@@ -580,13 +586,19 @@ defimpl Oceanconnect.Auctions.StoreProtocol, for: Oceanconnect.Auctions.AuctionS
     {:ok, %TermAuctionState{state | submitted_barges: new_submitted_barges}}
   end
 
+
+  @nop_events [
+    :upcoming_auction_notified,
+    :auction_state_snapshotted,
+    :auction_finalized
+  ]
+
   def apply(
-        state = %TermAuctionState{auction_id: _auction_id},
-        %AuctionEvent{type: :upcoming_auction_notified}
-      ) do
+        state = %TermAuctionState{},
+        %AuctionEvent{type: type}
+      ) when type in @nop_events do
     {:ok, state}
   end
-
 
   def apply(
         state = %TermAuctionState{auction_id: auction_id},

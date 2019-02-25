@@ -19,7 +19,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
   end
 
   def create_auction_snapshot(event = %AuctionEvent{type: :auction_state_snapshotted, auction_id: auction_id}) do
-    {:ok, %AuctionEventStorage{event: persisted_event}} =
+    {:ok, %AuctionEventStorage{event: _persisted_event}} =
         @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
   end
 end

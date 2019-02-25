@@ -77,6 +77,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     current_cache = AuctionCache.read(auction_id)
     current_state = Auctions.get_auction_state!(auction)
     current_event_list = AuctionEventStore.event_list(auction_id)
+    |> Enum.reject(&(&1.type == :auction_state_snapshotted))
 
     # # Crash AuctionStore / AuctionSupervisor and let restart
     {:ok, pid} = AuctionStore.find_pid(auction_id)
@@ -90,6 +91,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     assert current_cache == AuctionCache.read(auction_id)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
+    |> Enum.reject(&(&1.type == :auction_state_snapshotted))
   end
 
   test "ensure decision_duration timer is canceled when rebuilding expired auction", %{
