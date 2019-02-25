@@ -4,9 +4,6 @@
 // ========================== //
 // ========================== //
 
-
-// Associated Variables
-
 // Adaptations
 
 .field {
@@ -46,7 +43,7 @@
   margin-top: 0.5rem;
   padding: 0.5rem 1rem;
   background-color: $white;
-  border-radius: 3px;
+  border-radius: $border-radius;
   max-width: 21rem;
 
 }
@@ -146,7 +143,7 @@ fieldset {
   width: 100%;
   padding: 0.5rem 0.75rem 0.5rem 0;
   border: 1px solid $gray-2;
-  border-radius: 3px;
+  border-radius: $border-radius;
   background-color: $white;
   overflow: hidden;
 
@@ -221,8 +218,8 @@ fieldset {
   background-color: $white;
   border: 1px solid $gray-2;
   border-top: none;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
 
   & > div { // Target actual items in dropdown.
     border-top: 1px solid $gray-2;
@@ -249,15 +246,15 @@ fieldset {
 .select--transparent { // Transparent background select for use on colored backgrounds
   select {
     background-color: transparent;
-    color: #fff;
-    border: 1px solid #fff !important;
+    color: $white;
+    border: 1px solid $white !important;
 
     &:hover, &:focus {
-      border-color: #f3f3f3;
+      border-color: $gray-0;
     }
   }
   &::after {
-    border-color: #fff !important;
+    border-color: $white !important;
   }
 }
 
@@ -374,11 +371,15 @@ fieldset {
   width: 100%;
 }
 
+.button--borderless {
+  border: none;
+}
+
 .button--icon {
   background-color: transparent;
   border: none;
 
   &:hover, &:focus {
-    color: darken(#363636, 15%);
+    color: darken($black, 15%);
   }
 }

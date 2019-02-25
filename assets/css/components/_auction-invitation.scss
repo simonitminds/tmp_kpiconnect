@@ -69,7 +69,7 @@
     .auction-invitation__status--unanswered .auction-invitation__status__marker { background-color: none; color: $gray-3; }
 
     .auction-invitation__status__copy {
-      font-size: 1rem;
+      font-size: $size-6;
     }
     .auction-invitation__status > div { // Row of RSVP buttons
       margin-left: 1rem;
@@ -94,7 +94,7 @@
       align-items: center;
       display: inline-flex;
       justify-content: center;
-      color: #fff;
+      color: $white;
       text-align: center;
     }
 
@@ -106,7 +106,7 @@
     .auction-invitation__status__copy {
       margin-right: 1rem;
       margin-bottom: 0.5rem;
-      font-size: 1rem;
+      font-size: $size-6;
 
       .auction-invitation__status__marker { display: none; }
     }

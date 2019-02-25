@@ -69,7 +69,7 @@
     text-transform: uppercase;
     font-family: $family-header;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: $size-6;
 
     &.is-closed {
       border-top: none;
@@ -112,7 +112,7 @@
     text-transform: uppercase;
     font-family: $family-header;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: $size-6;
   }
 
   .collapsible-section__counter { display: none; }

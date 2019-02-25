@@ -15,15 +15,46 @@
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
   margin-bottom: 1.5rem;
+  @extend .box;
 
   .icon.is-medium { // Modify height to keep spacing consistent even when invite status text wraps.
     height: 0.75rem;
   }
+}
 
-  &__status {
-    h3 { line-height: 1.3;}
+
+// Different messages based on notification context
+
+.auction-notification__show-message {
+  h3 {
+    font-weight: bold;
+    margin-bottom: 0;
+    line-height: 1.3;
+    @extend .is-size-6;
+  }
+
+  .card-content__bid-status & { // Hide on auction list
+    display: none;
   }
 }
+
+.auction-notification__card-message {
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+  h3 {
+    margin-bottom: 0 !important;;
+    width: calc(100% - 120px);
+  }
+
+  .auction-content  & { // Hide on auction show
+    display: none;
+  }
+}
+
+// Animation for show page update
 
 .auction-notification__container {
   animation: 3s ease-out 0s 1 fancy-flip-container;
@@ -76,7 +107,7 @@
     opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
-    color: #fff;
+    color: $white;
     background-color: $green;
     transform: rotateX(0deg);
   }
@@ -85,7 +116,7 @@
     opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
-    color: #fff;
+    color: $white;
     background-color: $green;
     transform: rotateX(0deg);
   }
@@ -124,7 +155,7 @@
     opacity: 1;
     height: 50px;
     margin-bottom: 1rem;
-    color: #fff;
+    color: $white;
     background-color: $red;
     transform: rotateX(0deg);
   }
@@ -133,7 +164,7 @@
     opacity: 1;
     height: 50px;
     margin-bottom: -1rem;
-    color: #fff;
+    color: $white;
     background-color: $red;
     transform: rotateX(0deg);
   }
@@ -163,7 +194,7 @@
 
 // Variant in Auction List Context...
 
-.card-content__bid-status > .auction-notification.box {
+.card-content__bid-status > .auction-notification {
   display: block;
   position: relative;
   width: 100%;
@@ -173,15 +204,11 @@
   z-index: 0;
   border-radius: 0 !important;
 
-  &> h3 { // Copy container...
-    margin-bottom: 0;
-    width: calc(100% - 120px);
-  }
-
   .auction-notification__copy {
     display: block;
-    color: #fff;
-    font-size: 1rem;
+    color: $white;
+    font-size: $size-6;
+    font-weight: bold;
     margin-top: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -191,26 +218,5 @@
   &+ .card-content__best-price {
     position: absolute;
     right: 12px;
-  }
-}
-
-// Different message based on page context...
-
-.auction-notification__show-message {
-  display: block;
-
- .card-content__bid-status & {
-   display: none;
- }
-}
-
-.auction-notification__card-message {
-  display: block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-
-  .auction-content  & {
-    display: none;
   }
 }

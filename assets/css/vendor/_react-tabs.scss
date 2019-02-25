@@ -8,6 +8,7 @@
 
 .react-tabs__tab {
   display: inline-block;
+  overflow: hidden;
   border-bottom: 4px solid $gray-2;
   bottom: auto;
   position: relative;
@@ -25,7 +26,7 @@
 .react-tabs__tab--selected {
   // Borrow from Bulma's selected tab styles.
   border-bottom-color: $link;
-  color: #363636;
+  color: $black;
 }
 
 .react-tabs__tab--disabled {

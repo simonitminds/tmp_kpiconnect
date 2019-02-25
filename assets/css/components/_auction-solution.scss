@@ -359,7 +359,7 @@
 .auction-bidding__vessels {
   background-color: $gray-2;
   margin: 0 !important;
-  border-radius: 3px;
+  border-radius: $border-radius;
 
   & > div:first-child {
     display: flex;
@@ -392,8 +392,8 @@
   }
   .tag:last-child { // Price
     border-radius: 0 !important;
-    border-bottom-left-radius: 3px !important;
-    border-bottom-right-radius: 3px !important;
+    border-bottom-left-radius: $border-radius !important;
+    border-bottom-right-radius: $border-radius !important;
   }
 
   @media(max-width: 1280px) and (min-width: 1088px) {
@@ -406,13 +406,13 @@
 
     .tag:first-child { // Label
       border-radius: 0 !important;
-      border-top-left-radius: 3px !important;
-      border-top-right-radius: 3px !important;
+      border-top-left-radius: $border-radius !important;
+      border-top-right-radius: $border-radius !important;
     }
     .tag:last-child { // Price
       border-radius: 0 !important;
-      border-bottom-left-radius: 3px !important;
-      border-bottom-right-radius: 3px !important;
+      border-bottom-left-radius: $border-radius !important;
+      border-bottom-right-radius: $border-radius !important;
     }
   }
 }
@@ -431,7 +431,7 @@
   display: inline-block;
   background-color: $gray-0;
   padding: 0.5rem 0.75rem;
-  border-radius: 3px;
+  border-radius: $border-radius;
   text-transform: capitalize;
 
   &:hover, &:focus {

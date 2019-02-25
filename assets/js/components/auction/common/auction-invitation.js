@@ -68,7 +68,7 @@ const AuctionInvitation = ({auctionPayload, supplierId}) => {
               </a>
             </p>
             <p className="control">
-                <a className={`button is-gray-3 qa-auction-${auction.id}-rsvp-response qa-auction-${auction.id}-rsvp-response-maybe`} data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
+                <a className={`button button--borderless is-gray-3 qa-auction-${auction.id}-rsvp-response qa-auction-${auction.id}-rsvp-response-maybe`} data-selected={suppliersParticipationStatus == "maybe"} href={`/auctions/${auction.id}/rsvp?response=maybe`}>
                 <span>Maybe</span>
               </a>
             </p>

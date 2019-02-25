@@ -1,7 +1,7 @@
 <div class="auction-app">
 	<div class="admin-panel__header container">
 		<div class="content is-clearfix">
-			<h1 class="title is-3 has-margin-top-xl has-margin-bottom-xl is-flex"><span class="is-inline-block">Auction <%= "#{@auction.id}" %> Fixtures</span>
+			<h1 class="title has-margin-top-xl has-margin-bottom-xl is-flex"><span class="is-inline-block">Auction <%= "#{@auction.id}" %> Fixtures</span>
 				<%= link( to: auction_path(@conn, :show, @auction.id), class: "button is-inline-block has-margin-left-auto has-family-copy") do %>
 	          <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
 	      <% end %>

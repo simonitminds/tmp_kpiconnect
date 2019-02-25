@@ -26,10 +26,16 @@
     margin-bottom: 0.125rem;
     color: $gray-3;
   }
+  &__auction-id { // Auction ID number
+    display: inline-block;
+    padding-right: 0.5rem;
+    color: $gray-3;
+  }
   &__vessel { // Auction Vessel (informally the title)
-    @extend .is-size-3;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+    font-family: $family-header;
+    font-weight: bold;
 
     &__imo { // Auction Vessel IMO number
       color: $gray-3;
@@ -46,10 +52,10 @@
 
   &__company { // Name of the Buyer (MOBILE ONLY)
     display: none;
+    font-size: $size-7;
 
     @media (max-width: 768px) {
       display: block;
-      font-size: 0.85rem;
       margin: 0.25rem 0 0 0;
       font-weight: normal !important;
     }
@@ -88,7 +94,6 @@
 
     &> div {
       display: inline-flex;
-      // width: 1.675rem;
       border-radius: 50%;
     }
   }
@@ -124,19 +129,6 @@
           text-shadow: -1px -1px 0 $red, 1px -1px 0 $red, -1px 1px 0 $red, 1px 1px 0 $red;
         }
       }
-
-      // Connection Button on Auction List
-
-      .auction-list__time-box & {
-        // width: 1.7rem;
-      }
-
-      // Connection Button on Auction Show
-
-      .auction-header__timer & {
-        // width: 1.675rem;
-      }
-
     }
   }
 
@@ -164,12 +156,11 @@
   // FOOTER... OF... HEADER?
 
   &__ports { // Auction Ports (i.e. where the vessel will be docking)
-    // background-color: $gray-2;
     padding: 0.25rem 1rem;
     margin: 0 -1rem 0;
 
     span {
-      font-size: 1rem;
+      font-size: $size-6;
     }
 
     &--mobile { // Styles for relocated mobile variant of the port and ETA.
@@ -219,7 +210,7 @@
 .auction-timer {
   @extend .tag;
   width: 240px;
-  font-size: 1rem !important;
+  font-size: $size-6 !important;
   font-weight: bold;
   text-transform: uppercase;
   color: $white !important;
@@ -313,7 +304,6 @@
 }
 
 .auction-bidding--pending { // Adjust how children fit when there's no proper box parent for the bid box.
-  // box-shadow: none;
   border: 1px solid $gray-2;
 }
 
@@ -330,7 +320,7 @@
   display: inline-block;
   margin-left: auto;
   padding: 0.25rem 0.5rem;
-  border-radius: 3px;
+  border-radius: $border-radius;
   background-color: $gray-3;
   color: $white;
   font-size: 0.85rem;
@@ -362,8 +352,8 @@
   &:hover:after {
     content: attr(action-label);
     position: absolute;
-    background-color: #363636;
-    color: #ffffff;
+    background-color: $black;
+    color: $white;
     padding: 0.5rem 0.75rem;
     border-radius: 5px;
     z-index: 999;
@@ -426,7 +416,7 @@
   display: inline-block;
   margin-left: auto;
   padding: 0.25rem 0.5rem;
-  border-radius: 3px;
+  border-radius: $border-radius;
   background-color: $gray-3;
   color: $white;
   font-size: 0.85rem;
@@ -449,8 +439,8 @@
     &:hover:after, &:focus:after {
       content: attr(action-label);
       position: absolute;
-      background-color: #363636;
-      color: #ffffff;
+      background-color: $black;
+      color: $white;
       padding: 0.5rem 0.75rem;
       border-radius: 5px;
       z-index: 999;
@@ -472,8 +462,8 @@
     &:hover:after, &:focus:after {
       content: attr(action-label);
       position: absolute;
-      background-color: #363636;
-      color: #ffffff;
+      background-color: $black;
+      color: $white;
       padding: 0.5rem 0.75rem;
       border-radius: 5px;
       z-index: 999;
@@ -494,8 +484,8 @@
   &:hover:after, &:focus:after {
     content: attr(action-label);
     position: absolute;
-    background-color: #363636;
-    color: #ffffff;
+    background-color: $black;
+    color: $white;
     padding: 0.5rem 0.75rem;
     border-radius: 5px;
     z-index: 999;
