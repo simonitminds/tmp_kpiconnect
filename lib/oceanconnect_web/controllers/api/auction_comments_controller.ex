@@ -3,7 +3,6 @@ defmodule OceanconnectWeb.Api.AuctionCommentsController do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.AuctionPayload
 
   def create(conn, %{"auction_id" => auction_id, "comment" => comment}) do
     comment_params = %{"comment" => comment}

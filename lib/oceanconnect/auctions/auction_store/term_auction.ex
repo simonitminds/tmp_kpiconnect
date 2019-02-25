@@ -5,11 +5,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     AuctionBarge,
     AuctionBid,
     AuctionBidCalculator,
-<<<<<<< HEAD
-    AuctionCache,
     AuctionComment,
-=======
->>>>>>> Event Sourcing 2: Non-eclectic Boogaloo
     AuctionEvent,
     AuctionEventStore,
     AuctionTimer,
@@ -286,6 +282,32 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {:ok, events}
   end
 
+  def process(
+        state = %TermAuctionState{submitted_comments: submitted_comments},
+        %Command{command: :submit_comment, data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}}
+      ) do
+    comment_already_submitted =
+      Enum.any?(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+
+    events =
+      if comment_already_submitted, do: [], else: [AuctionEvent.comment_submitted(comment, state, user)]
+
+    {:ok, events}
+  end
+
+  def process(
+        state = %TermAuctionState{submitted_comments: submitted_comments},
+        %Command{command: :unsubmit_comment, data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}}
+      ) do
+    comment_already_submitted =
+      Enum.any?(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+
+    events =
+      if comment_already_submitted, do: [AuctionEvent.comment_unsubmitted(comment, state, user)], else: []
+
+    {:ok, events}
+  end
+
   # TODO: Move to Notifications context and fire as a reaction to `auction_rescheduled` or similar.
   def process(
         %TermAuctionState{},
@@ -459,61 +481,9 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {:ok, state}
   end
 
-<<<<<<< HEAD
-  def submit_comment(
-    current_state = %TermAuctionState{submitted_comments: submitted_comments},
-    comment = %AuctionComment{
-      id: comment_id,
-      auction_id: auction_id,
-      supplier_id: supplier_id
-    }
-  ) do
-    comment_already_submitted =
-      Enum.any?(submitted_comments, fn comment ->
-        match?(
-          %AuctionComment{id: ^comment_id, auction_id: ^auction_id, supplier_id: ^supplier_id},
-          comment
-        )
-      end)
-
-    if comment_already_submitted do
-      current_state
-    else
-      %TermAuctionState{current_state | submitted_comments: submitted_comments ++ [comment]}
-    end
-  end
-
-  def unsubmit_comment(
-        current_state = %TermAuctionState{submitted_comments: submitted_comments},
-        %AuctionComment{
-          id: comment_id,
-          auction_id: auction_id,
-          supplier_id: supplier_id
-        }
-      ) do
-    new_submitted_comments =
-      Enum.reject(submitted_comments, fn comment ->
-        match?(
-          %AuctionComment{id: ^comment_id, auction_id: ^auction_id, supplier_id: ^supplier_id},
-          comment
-        )
-      end)
-
-    %TermAuctionState{current_state | submitted_comments: new_submitted_comments}
-  end
-
-  def submit_barge(
-        current_state = %TermAuctionState{submitted_barges: submitted_barges},
-        auction_barge = %AuctionBarge{
-          auction_id: auction_id,
-          barge_id: barge_id,
-          supplier_id: supplier_id
-        }
-=======
   def apply(
         state = %TermAuctionState{},
         %AuctionEvent{type: :winning_solution_selected, data: %{solution: solution}}
->>>>>>> Event Sourcing 2: Non-eclectic Boogaloo
       ) do
     {:ok, %TermAuctionState{state | winning_solution: solution}}
   end
@@ -585,6 +555,24 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
     {:ok, %TermAuctionState{state | submitted_barges: new_submitted_barges}}
   end
+
+  def apply(
+        state = %TermAuctionState{submitted_comments: submitted_comments},
+        %AuctionEvent{type: :comment_submitted, data: %{comment: comment}}
+      ) do
+    {:ok, %TermAuctionState{state | submitted_comments: submitted_comments ++ [comment]}}
+  end
+
+  def apply(
+        state = %TermAuctionState{submitted_comments: submitted_comments},
+        %AuctionEvent{type: :comment_unsubmitted, data: %{comment: %AuctionComment{id: comment_id}}}
+      ) do
+    new_submitted_comments =
+      Enum.reject(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+
+    {:ok, %TermAuctionState{state | submitted_comments: new_submitted_comments}}
+  end
+
 
 
   @nop_events [

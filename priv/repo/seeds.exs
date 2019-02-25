@@ -20,7 +20,7 @@ alias Oceanconnect.Auctions.{
   TermAuction,
   AuctionStore.AuctionState,
   AuctionStore.TermAuctionState,
-  StoreProtocol,
+  Aggregate,
   AuctionVesselFuel,
   AuctionEventStore,
   AuctionEventStorage,
@@ -691,7 +691,7 @@ Repo.delete_all(TermAuction)
     |> Auctions.fully_loaded()
     |> Command.create_auction(nil)
 
-  {:ok, events} = StoreProtocol.process(state, command)
+  {:ok, events} = Aggregate.process(state, command)
   Enum.map(events, &AuctionEventStore.persist/1)
 end)
 
