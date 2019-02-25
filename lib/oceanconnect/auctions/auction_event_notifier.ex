@@ -34,7 +34,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :auction_started, auction_id: auction_id, time_entered: started_at}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_started: started_at}
 
     update_cache(auction)
@@ -49,7 +49,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :auction_ended, auction_id: auction_id, time_entered: ended_at}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_ended: ended_at}
 
     update_cache(auction)
@@ -64,7 +64,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :auction_closed, auction_id: auction_id, time_entered: closed_at}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: closed_at}
 
     update_cache(auction)
@@ -72,7 +72,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
     update_cache(auction)
 
@@ -80,7 +80,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: canceled_at}
     update_cache(auction)
 
@@ -95,7 +95,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}}, _state) do
-    auction = AuctionCache.read(auction_id)
+    auction = Auctions.get_auction!(auction_id)
     %{auction | port_agent: port_agent}
     |> update_cache()
   end

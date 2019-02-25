@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(%state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
     auction =
-      Auctions.AuctionCache.read(auction_id)
+      Auctions.get_auction!(auction_id)
       |> Auctions.fully_loaded()
 
     notify_participants(auction)

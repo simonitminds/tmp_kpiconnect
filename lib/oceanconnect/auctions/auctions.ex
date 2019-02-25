@@ -470,7 +470,7 @@ defmodule Oceanconnect.Auctions do
 
   def finalize_auction(_auction = %struct{id: auction_id}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
     with {:ok, _fixtures} <- create_fixtures_from_state(state),
-         cached_auction = %struct{} when is_auction(struct) <- AuctionCache.read(auction_id),
+         cached_auction = %struct{} when is_auction(struct) <- get_auction(auction_id),
          finalized_auction = %struct{} when is_auction(struct) <- persist_auction_from_cache(cached_auction) do
       {:ok, finalized_auction}
     else

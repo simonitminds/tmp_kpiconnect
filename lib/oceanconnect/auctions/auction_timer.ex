@@ -5,7 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   alias __MODULE__
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionCache, Command}
+  alias Oceanconnect.Auctions.{Command}
 
   @registry_name :auction_timers_registry
   @extension_time 3 * 60_000
@@ -84,7 +84,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_timer, state = %{auction_id: auction_id}) do
     auction_id
-    |> AuctionCache.read()
+    |> Auctions.get_auction()
     |> Auctions.end_auction()
 
     {:noreply, state}
@@ -92,7 +92,7 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
 
   def handle_info(:end_auction_decision_timer, state = %{auction_id: auction_id}) do
     auction_id
-    |> AuctionCache.read()
+    |> Auctions.get_auction()
     |> Auctions.expire_auction()
 
     new_state = Map.put(state, :decision_duration_timer, nil)

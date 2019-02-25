@@ -58,15 +58,8 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           Command.select_winning_solution(solution, auction, closed_at, port_agent, user)
         ] |> Enum.reduce(current_state, fn(command, state) ->
           {:ok, events} = Aggregate.process(state, command)
-          events
-          |> Enum.reduce(state, fn(event, state) ->
-            {:ok, state} = Aggregate.apply(state, event)
-            {:ok, _notified} = EventNotifier.emit(state, event)
-            state
-          end)
+          persist_and_apply(events, state)
         end)
-
-        Auctions.finalize_auction(auction, new_state)
 
         #TODO: This should be picked up by a reaction on the notifier
         active_participants = Auctions.active_participants(auction_id)
@@ -124,16 +117,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_continue(events, current_state) do
+    new_state = persist_and_apply(events, current_state)
+    {:noreply, new_state}
+  end
+
+  defp persist_and_apply(events, current_state) do
     events
     |> Enum.map(&AuctionEventStore.persist/1)
 
-    new_state = Enum.reduce(events, current_state, fn(event, state) ->
+    Enum.reduce(events, current_state, fn(event, state) ->
       {:ok, state} = Aggregate.apply(state, event)
       {:ok, _notified} = EventNotifier.emit(state, event)
       state
     end)
-
-    {:noreply, new_state}
   end
 
   defp replay_events(initial_state = %state_struct{}, %struct{id: auction_id}) when is_auction_state(state_struct) and is_auction(struct) do

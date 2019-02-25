@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       ) do
     auction_id
-    |> Auctions.AuctionCache.read()
+    |> Auctions.get_auction!()
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
 
     {:noreply, state}
@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       ) do
     auction_id
-    |> Auctions.AuctionCache.read()
+    |> Auctions.get_auction!()
     |> AuctionNotifier.notify_participants()
 
     {:noreply, state}

@@ -4,7 +4,6 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{
-    AuctionCache,
     AuctionStore,
     Command
   }
@@ -76,7 +75,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
 
   def handle_info(:start_auction, state = %{auction_id: auction_id}) do
     auction_id
-    |> AuctionCache.read()
+    |> Auctions.get_auction!()
     |> Auctions.start_auction()
 
     {:noreply, state}
