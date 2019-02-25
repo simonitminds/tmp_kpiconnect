@@ -23,6 +23,18 @@ defmodule Oceanconnect.Auctions.AuctionStore.TermAuctionState do
     }
   end
 
+  def from_state(state = %__MODULE__{}) do
+    %__MODULE__{
+      auction_id: Map.get(state, :auction_id, nil),
+      status: Map.get(state, :status, :pending),
+      solutions: Map.get(state, :solutions, %SolutionCalculator{}),
+      submitted_barges: Map.get(state, :submitted_barges, []),
+      submitted_comments: Map.get(state, :submitted_comments, []),
+      product_bids: Map.get(state, :product_bids, %{}),
+      winning_solution: Map.get(state, :winning_solution, nil)
+    }
+  end
+
   def update_product_bids(state = %__MODULE__{}, product_key, new_product_state) do
     %__MODULE__{
       state

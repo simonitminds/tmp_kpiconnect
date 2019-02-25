@@ -59,6 +59,14 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     TermAuctionState.from_auction(auction)
   end
 
+  defp state_for_type(state = %AuctionState{}) do
+    AuctionState.from_state(state)
+  end
+
+  defp state_for_type(state = %TermAuctionState{}) do
+    TermAuctionState.from_state(state)
+  end
+
   defp state_for_type(auction, events) do
     last_event = hd(events)
     if last_event.type in [
@@ -74,7 +82,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
       [_last | rest] = events
       state_for_type(auction, rest)
     else
-      last_event.data.state
+      state_for_type(last_event.data.state)
     end
   end
 
