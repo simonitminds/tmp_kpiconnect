@@ -208,21 +208,21 @@ defmodule Oceanconnect.Factory do
   def expire_auction!(auction) do
     initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
 
-      [
-        Command.start_auction(auction, DateTime.utc_now(), nil),
-        Command.end_auction(auction, DateTime.utc_now()),
-        Command.end_auction_decision_period(auction, DateTime.utc_now())
-      ]
-      |> Enum.reduce(initial_state, fn command, state ->
-        {:ok, events} = Aggregate.process(state, command)
-        Enum.map(events, &AuctionEventStore.persist/1)
+    [
+      Command.start_auction(auction, DateTime.utc_now(), nil),
+      Command.end_auction(auction, DateTime.utc_now()),
+      Command.end_auction_decision_period(auction, DateTime.utc_now())
+    ]
+    |> Enum.reduce(initial_state, fn command, state ->
+      {:ok, events} = Aggregate.process(state, command)
+      Enum.map(events, &AuctionEventStore.persist/1)
 
-        events
-        |> Enum.reduce(state, fn event, state ->
-          {:ok, state} = Aggregate.apply(state, event)
-          state
-        end)
+      events
+      |> Enum.reduce(state, fn event, state ->
+        {:ok, state} = Aggregate.apply(state, event)
+        state
       end)
+    end)
   end
 
   def close_auction!(auction = %Auction{suppliers: suppliers}) do
@@ -232,21 +232,21 @@ defmodule Oceanconnect.Factory do
     solution = %Solution{bids: [bid]}
     initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
 
-      [
-        Command.start_auction(auction, DateTime.utc_now(), nil),
-        Command.process_new_bid(bid, nil),
-        Command.end_auction(auction, DateTime.utc_now()),
-        Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
-      ]
-      |> Enum.reduce(initial_state, fn command, state ->
-        {:ok, events} = Aggregate.process(state, command)
-        Enum.map(events, &AuctionEventStore.persist/1)
+    [
+      Command.start_auction(auction, DateTime.utc_now(), nil),
+      Command.process_new_bid(bid, nil),
+      Command.end_auction(auction, DateTime.utc_now()),
+      Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
+    ]
+    |> Enum.reduce(initial_state, fn command, state ->
+      {:ok, events} = Aggregate.process(state, command)
+      Enum.map(events, &AuctionEventStore.persist/1)
 
-        events
-        |> Enum.reduce(state, fn event, state ->
-          {:ok, state} = Aggregate.apply(state, event)
-          state
-        end)
+      events
+      |> Enum.reduce(state, fn event, state ->
+        {:ok, state} = Aggregate.apply(state, event)
+        state
       end)
+    end)
   end
 end

@@ -20,10 +20,10 @@ config :oceanconnect, Oceanconnect.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   ownership_timeout: 25_000
 
+config :oceanconnect, :disable_css_transitions, true
 config :oceanconnect, :sql_sandbox, true
 
 config :oceanconnect, :task_supervisor, Oceanconnect.FakeTaskSupervisor
-config :oceanconnect, :event_storage, Oceanconnect.FakeEventStorage
 config :oceanconnect, :store_starter, true
 
 config :hound,
