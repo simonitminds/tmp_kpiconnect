@@ -538,7 +538,7 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(200)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.expand_solution(:custom)
-      :timer.sleep(800)
+      :timer.sleep(500)
       AuctionShowPage.select_custom_solution_bids([supplier2_bid1, supplier1_bid2])
       AuctionShowPage.select_solution(:custom)
       :timer.sleep(100)
