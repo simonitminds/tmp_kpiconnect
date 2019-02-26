@@ -4,16 +4,13 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
-    AuctionNotifier,
-    AuctionEventStore
+    AuctionNotifier
   }
 
   @registry_name :auction_event_handler_registry
-  require Logger
 
   # Client
   def start_link(auction_id) do
@@ -48,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       ) do
     auction_id
-    |> Auctions.AuctionCache.read()
+    |> Auctions.get_auction!()
     |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
 
     {:noreply, state}
@@ -63,7 +60,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       ) do
     auction_id
-    |> Auctions.AuctionCache.read()
+    |> Auctions.get_auction!()
     |> AuctionNotifier.notify_participants()
 
     {:noreply, state}
@@ -89,8 +86,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_started,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}}
         },
         state
       )
@@ -102,8 +98,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: :auction_ended,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}}
         },
         state
       )
@@ -115,21 +110,18 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   def handle_info(
         %AuctionEvent{
           type: type,
-          data: %{state: auction_state = %state_struct{}, auction: auction},
-          time_entered: time_entered
+          data: %{state: auction_state = %state_struct{}}
         },
         state
       )
       when is_auction_state(state_struct) and
              type in [:auction_expired, :auction_canceled, :auction_closed] do
     AuctionNotifier.notify_participants(auction_state)
-    with {:ok, finalized_auction} <- Auctions.finalize_auction(auction, auction_state) do
-      Auctions.AuctionsSupervisor.stop_child(auction)
-    else
-      {:error, _msg} ->
-        Logger.error("Could not finalize auction detail records for auction #{auction.id}")
-    end
+    {:noreply, state}
+  end
 
+  def handle_info(%AuctionEvent{type: :auction_finalized, data: %{auction: auction = %struct{}}}, state) when is_auction(struct) do
+    AuctionNotifier.notify_participants(auction)
     {:noreply, state}
   end
 

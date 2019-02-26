@@ -4,7 +4,9 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
 
   alias Oceanconnect.Auctions.{
     AuctionEvent,
-    AuctionEventStore
+    AuctionEventStore,
+    AuctionStore,
+    Command
   }
 
   @registry_name :auction_reminder_timers_registry
@@ -54,7 +56,8 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimer do
   end
 
   def handle_info({:remind_participants, auction = %struct{}}, state) when is_auction(struct) do
-    AuctionEvent.emit(AuctionEvent.upcoming_auction_notified(auction), true)
+    Command.notify_upcoming_auction(auction, nil)
+    |> AuctionStore.process_command()
     {:stop, :normal, state}
   end
 

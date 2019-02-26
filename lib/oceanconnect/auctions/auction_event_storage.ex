@@ -10,7 +10,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     Auction,
     TermAuction,
     AuctionStore.AuctionState,
-    AuctionStore.TermAuctionState
+    AuctionStore.TermAuctionState,
+    Aggregate
   }
 
   schema "auction_events" do
@@ -24,6 +25,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   def changeset(%AuctionEventStorage{} = storage, attrs) do
     storage
     |> cast(attrs, [:auction_id, :event, :version])
+    |> validate_required([:auction_id, :event, :version])
+    |> foreign_key_constraint(:auction_id)
   end
 
   def persist(event_storage = %AuctionEventStorage{event: event}) do
@@ -48,43 +51,20 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
 
   def most_recent_state(auction = %struct{id: auction_id}) when is_auction(struct) do
     events = events_by_auction(auction_id)
-    state_for_type(auction, events)
+    state_for_events(auction, events)
   end
 
-  defp state_for_type(auction = %Auction{}, []) do
-    AuctionState.from_auction(auction)
+  defp state_for_events(auction, events) do
+    events
+    |> Enum.reverse
+    |> Enum.reduce(state_for_type(auction), fn(event, state) ->
+      {:ok, state} = Aggregate.apply(state, event)
+      state
+    end)
   end
 
-  defp state_for_type(auction = %TermAuction{}, []) do
-    TermAuctionState.from_auction(auction)
-  end
-
-  defp state_for_type(state = %AuctionState{}) do
-    AuctionState.from_state(state)
-  end
-
-  defp state_for_type(state = %TermAuctionState{}) do
-    TermAuctionState.from_state(state)
-  end
-
-  defp state_for_type(auction, events) do
-    last_event = hd(events)
-    if last_event.type in [
-         :auction_updated,
-         :auction_rescheduled,
-         :upcoming_auction_notified,
-         :auction_created,
-         :duration_extended,
-         :bid_placed,
-         :auto_bid_placed,
-         :auto_bid_triggered
-       ] do
-      [_last | rest] = events
-      state_for_type(auction, rest)
-    else
-      state_for_type(last_event.data.state)
-    end
-  end
+  defp state_for_type(auction = %Auction{}), do: AuctionState.from_auction(auction)
+  defp state_for_type(auction = %TermAuction{}), do: TermAuctionState.from_auction(auction)
 
   def hydrate_event(nil), do: nil
 

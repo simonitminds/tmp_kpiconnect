@@ -23,7 +23,6 @@ defmodule Oceanconnect.Application do
         {Registry, keys: :unique, name: :auction_reminder_timers_registry},
         {Registry, keys: :unique, name: :auction_scheduler_registry},
         {Registry, keys: :unique, name: :auction_bids_registry},
-        {Registry, keys: :unique, name: :auction_event_store_registry},
         {Registry, keys: :unique, name: :auction_event_handler_registry},
         {Registry, keys: :unique, name: :auction_email_notification_handler_registry},
         worker(AuctionsSupervisor, [], restart: :permanent)

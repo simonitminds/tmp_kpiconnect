@@ -42,8 +42,8 @@ defmodule Oceanconnect.Auctions.Solution do
     end)
   end
 
-  defp product_quantities_for_auction(product_bids, %TermAuction{fuel: fuel, fuel_quantity: fuel_quantity}) do
-    product_quantities = %{ "#{fuel.id}" => fuel_quantity }
+  defp product_quantities_for_auction(_product_bids, %TermAuction{fuel: fuel, fuel_quantity: fuel_quantity}) do
+    %{ "#{fuel.id}" => fuel_quantity }
   end
 
 

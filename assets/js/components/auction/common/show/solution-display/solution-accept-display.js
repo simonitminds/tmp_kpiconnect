@@ -33,10 +33,7 @@ const SolutionAcceptDisplay = ({bidIds, auctionPayload, bestSolutionSelected, ac
             </button>
           </div>
           <div className="control">
-              <button
-                className={`button is-success qa-accept-bid`}
-                type="submit"
-              >
+              <button className={`button is-success qa-accept-bid`} type="submit">
                 Accept Offer
               </button>
           </div>

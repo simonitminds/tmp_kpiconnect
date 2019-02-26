@@ -6,9 +6,13 @@ defmodule Oceanconnect.AuctionsTest do
   alias Oceanconnect.Auctions.{
     TermAuction,
     Auction,
+    AuctionCache,
     AuctionSupervisor,
     AuctionEvent,
-    AuctionStore.AuctionState
+    AuctionStore.AuctionState,
+    Aggregate,
+    Command,
+    Solution
   }
 
   describe "auctions" do
@@ -53,7 +57,7 @@ defmodule Oceanconnect.AuctionsTest do
 
       epoch =
         expected_date
-        |> DateTime.to_unix(:milliseconds)
+        |> DateTime.to_unix(:millisecond)
         |> Integer.to_string()
 
       params = %{"scheduled_start" => epoch}
@@ -348,20 +352,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
 
-    test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
-      auction: auction
-    } do
-      {:ok, _pid} =
-        start_supervised(
-          {AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
-        )
-
-      assert %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
-      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
-      assert auction.po == "some updated po"
-    end
-
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
       assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs, nil)
       assert auction.po == "some updated po"
@@ -415,8 +405,8 @@ defmodule Oceanconnect.AuctionsTest do
       admin: admin
     } do
       auction = Auctions.start_auction(auction, admin)
-      :timer.sleep(200)
-      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
+      :timer.sleep(500)
+      {:ok, auction} = Oceanconnect.Auctions.AuctionCache.read(auction.id)
 
       assert auction.auction_started != nil
       assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
@@ -531,7 +521,7 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: time_entered
       }
 
-      %Auction{auction_ended: auction_ended} = Auctions.get_auction(auction_id)
+      {:ok, %Auction{auction_ended: auction_ended}} = AuctionCache.read(auction_id)
 
       assert time_entered == auction_ended
     end
@@ -1371,14 +1361,24 @@ defmodule Oceanconnect.AuctionsTest do
       auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
       supplier_id = hd(auction.suppliers).id
       vessel_fuel_id = hd(auction.auction_vessel_fuels).id
-
       bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
-      state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      state = Oceanconnect.Auctions.AuctionStateActions.start_auction(state, auction, nil, false)
-      {_product_state, _events, new_state} = Oceanconnect.Auctions.AuctionStateActions.process_bid(state, bid)
-      state  = Oceanconnect.Auctions.AuctionStateActions.select_winning_solution(new_state.solutions.best_overall, "Smith", auction, new_state)
-      event = AuctionEvent.auction_state_snapshotted(auction, state)
-      Oceanconnect.Auctions.create_fixtures_from_snapshot(event)
+      solution = %Solution{bids: [bid]}
+
+      initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
+      state = [
+        Command.start_auction(auction, DateTime.utc_now(), nil),
+        Command.process_new_bid(bid, nil),
+        Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
+      ] |> Enum.reduce(initial_state, fn(command, state) ->
+        {:ok, events} = Aggregate.process(state, command)
+        events
+        |> Enum.reduce(state, fn(event, state) ->
+          {:ok, state} = Aggregate.apply(state, event)
+          state
+        end)
+      end)
+
+      Oceanconnect.Auctions.create_fixtures_from_state(state)
 
       assert [%AuctionFixture{}] = Auctions.fixtures_for_auction(auction)
     end

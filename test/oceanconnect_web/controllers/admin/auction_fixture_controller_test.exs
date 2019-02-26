@@ -25,6 +25,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
       insert(:auction_fixture, auction: auction)
 
       close_auction!(auction)
+      :timer.sleep(200)
 
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
       response = html_response(final_conn, 200)
@@ -39,6 +40,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
 
     test "renders for expired auctions", %{auction: auction, admin_conn: admin_conn} do
       expire_auction!(auction)
+      :timer.sleep(200)
 
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
 
@@ -48,6 +50,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
 
     test "renders for closed", %{auction: auction, admin_conn: admin_conn} do
       close_auction!(auction)
+      :timer.sleep(200)
 
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
 
@@ -57,6 +60,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
 
     test "redirects for canceled", %{auction: auction, admin_conn: admin_conn} do
       cancel_auction!(auction)
+      :timer.sleep(200)
 
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
 
@@ -65,6 +69,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
 
     test "redirects for open", %{auction: auction, admin_conn: admin_conn} do
       start_auction!(auction)
+      :timer.sleep(200)
 
       final_conn = get(admin_conn, admin_auction_fixtures_path(admin_conn, :index, auction.id))
       assert redirected_to(final_conn) == auction_path(final_conn, :index)

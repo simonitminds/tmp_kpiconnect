@@ -9,7 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionComment do
             time_entered: DateTime.utc_now()
 
   def from_params_to_auction_comment(
-    params = %{
+    _params = %{
       "comment" => comment,
       "supplier_id" => supplier_id,
       "time_entered" => time_entered

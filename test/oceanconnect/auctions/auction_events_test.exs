@@ -89,12 +89,11 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
 
-      cached_auction = Auctions.AuctionCache.read(auction_id)
+      {:ok, cached_auction} = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
     end
 
-    test "update_auction/2 with a new start time adds an auction_rescheduled event to the event store",
-         %{
+    test "update_auction/2 with a new start time adds an auction_rescheduled event to the event store", %{
            auction: auction = %Auction{id: auction_id}
          } do
       new_start_time =
@@ -237,6 +236,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}
 
       assert [
+               %AuctionEvent{type: :auction_state_snapshotted, auction_id: ^auction_id},
+               %AuctionEvent{type: :auction_finalized, auction_id: ^auction_id},
                %AuctionEvent{type: :auction_closed, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id, data: _},
                %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},

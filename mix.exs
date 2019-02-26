@@ -61,7 +61,7 @@ defmodule Oceanconnect.Mixfile do
       {:ex_machina, "~> 2.2"},
       {:hackney, "~> 1.14"},
       {:hound, "~> 1.0", only: :test},
-      {:guardian, "~> 1.1"},
+      {:guardian, "~> 1.2.1"},
       {:gettext, "~> 0.16"},
       {:scrivener_ecto, "~> 2.0"},
       {:uuid, "~> 1.1"},

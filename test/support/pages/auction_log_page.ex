@@ -1,5 +1,7 @@
 defmodule Oceanconnect.AuctionLogPage do
   use Oceanconnect.Page
+  import ExUnit.Assertions
+
   alias OceanconnectWeb.AuctionView
 
   def visit(id) do
@@ -10,7 +12,7 @@ defmodule Oceanconnect.AuctionLogPage do
     Enum.all?(events, fn event ->
       element = find_element(:class, "qa-event-#{event.id}")
 
-      find_within_element(element, :class, "qa-event-type") |> inner_text =~
+      assert find_within_element(element, :class, "qa-event-type") |> inner_text =~
         AuctionView.convert_event_type(event.type)
     end)
   end

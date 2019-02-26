@@ -58,9 +58,9 @@ defmodule Oceanconnect.Auctions.AuctionCache do
   end
 
   def handle_call(:read_cache, _from, current_state = %{available: false}),
-    do: {:reply, "Auction Not Available", current_state}
+    do: {:reply, {:error, "Auction Not Available"}, current_state}
 
   def handle_call(:read_cache, _from, current_state = %{auction: auction}) do
-    {:reply, auction, current_state}
+    {:reply, {:ok, auction}, current_state}
   end
 end

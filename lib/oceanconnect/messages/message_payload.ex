@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Messages.MessagePayload do
   import Oceanconnect.Auctions.Guards
 
-  alias __MODULE__
   alias Oceanconnect.{Accounts, Auctions, Messages}
   alias Oceanconnect.Auctions.{AuctionSuppliers}
 

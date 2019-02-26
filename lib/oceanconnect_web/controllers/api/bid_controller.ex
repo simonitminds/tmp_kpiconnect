@@ -87,12 +87,11 @@ defmodule OceanconnectWeb.Api.BidController do
         "port_agent" => port_agent
       }) do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
-    buyer_id = user.company_id
     auction_id = String.to_integer(auction_id)
 
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
-         true <- auction.buyer_id == buyer_id,
          state = %{product_bids: product_bids} <- Auctions.get_auction_state!(auction),
+         true <- Auctions.solution_selectable?(user, auction, state),
          selected_bids <- Auctions.bids_for_bid_ids(bid_ids, state) do
       Auctions.select_winning_solution(
         selected_bids,

@@ -39,7 +39,7 @@ defmodule Oceanconnect.Auctions.AuctionReminderTimerTest do
     {:ok, _pid} =
       start_supervised({AuctionSupervisor, {auction, %{exclude_children: [:auction_scheduler]}}})
 
-    :timer.sleep(1000)
+    :timer.sleep(500)
 
     assert length(
              Enum.filter(AuctionEventStore.event_list(auction.id), fn event ->

@@ -5,7 +5,6 @@ import SolutionDisplay from './solution-display';
 import InputField from '../../../input-field';
 
 const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
-
   if (solutions.length > 0) {
     return(
       <div className="auction-solution__container qa-auction-other-solutions">

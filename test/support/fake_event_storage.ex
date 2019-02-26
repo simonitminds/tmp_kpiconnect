@@ -9,7 +9,7 @@ defmodule Oceanconnect.FakeEventStorage do
     end
 
     def init([]) do
-      {:ok, []}
+      {:ok, %{events: [], next_id: 1}}
     end
 
     def seed(data) do
@@ -28,9 +28,13 @@ defmodule Oceanconnect.FakeEventStorage do
       {:noreply, data}
     end
 
-    def handle_cast({:add_event, event}, current_state) do
-      new_state = [event | current_state]
-      {:noreply, new_state}
+    def handle_cast({:add_event, event}, current_state = %{events: events, next_id: next_id}) do
+      event = %{event | id: next_id}
+
+      {:noreply, %{
+        events: [event | events],
+        next_id: next_id + 1
+      }}
     end
 
     def handle_call(:read_cache, _from, state), do: {:reply, state, state}

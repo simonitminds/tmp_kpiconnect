@@ -29,7 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
   end
 
   test "reading from the cache", %{auction: auction} do
-    assert ^auction = AuctionCache.read(auction.id)
+    assert {:ok, ^auction} = AuctionCache.read(auction.id)
   end
 
   test "updating the cache", %{auction: auction} do
@@ -38,6 +38,6 @@ defmodule Oceanconnect.Auctions.AuctionCacheTest do
 
     :timer.sleep(200)
 
-    assert %Auction{po: "TEST STRING"} = AuctionCache.read(auction.id)
+    assert {:ok, %Auction{po: "TEST STRING"}} = AuctionCache.read(auction.id)
   end
 end
