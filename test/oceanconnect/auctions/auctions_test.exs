@@ -352,20 +352,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_auction(@invalid_attrs)
     end
 
-    test "update_auction_without_event_storage!/2 with valid data updates the auction", %{
-      auction: auction
-    } do
-      {:ok, _pid} =
-        start_supervised(
-          {AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
-        )
-
-      assert %Auction{} = Auctions.update_auction_without_event_storage!(auction, @update_attrs)
-      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
-      assert auction.po == "some updated po"
-    end
-
     test "update_auction!/3 with valid data updates the auction", %{auction: auction} do
       assert auction = %Auction{} = Auctions.update_auction!(auction, @update_attrs, nil)
       assert auction.po == "some updated po"
@@ -420,7 +406,7 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       auction = Auctions.start_auction(auction, admin)
       :timer.sleep(500)
-      auction = Oceanconnect.Auctions.AuctionCache.read(auction.id)
+      {:ok, auction} = Oceanconnect.Auctions.AuctionCache.read(auction.id)
 
       assert auction.auction_started != nil
       assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
@@ -535,7 +521,7 @@ defmodule Oceanconnect.AuctionsTest do
         time_entered: time_entered
       }
 
-      %Auction{auction_ended: auction_ended} = AuctionCache.read(auction_id)
+      {:ok, %Auction{auction_ended: auction_ended}} = AuctionCache.read(auction_id)
 
       assert time_entered == auction_ended
     end

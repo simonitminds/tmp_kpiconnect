@@ -74,7 +74,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
 
     :timer.sleep(200)
 
-    current_cache = AuctionCache.read(auction_id)
+    {:ok, current_cache} = AuctionCache.read(auction_id)
     current_state = Auctions.get_auction_state!(auction)
     current_event_list = AuctionEventStore.event_list(auction_id)
     |> Enum.reject(&(&1.type == :auction_state_snapshotted))
@@ -88,7 +88,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     refute pid == new_pid
 
     :timer.sleep(200)
-    assert current_cache == AuctionCache.read(auction_id)
+    assert {:ok, ^current_cache} = AuctionCache.read(auction_id)
     assert current_state == Auctions.get_auction_state!(auction)
     assert current_event_list == AuctionEventStore.event_list(auction_id)
     |> Enum.reject(&(&1.type == :auction_state_snapshotted))

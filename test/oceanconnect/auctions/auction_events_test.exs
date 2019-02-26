@@ -89,7 +89,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       :timer.sleep(200)
       assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
 
-      cached_auction = Auctions.AuctionCache.read(auction_id)
+      {:ok, cached_auction} = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
     end
 

@@ -17,7 +17,6 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(auction = %struct{}) when is_auction(struct) do
     participants = Auctions.auction_participant_ids(auction)
-
     Enum.map(participants, fn user_id ->
       payload =
         auction

@@ -36,9 +36,10 @@ defmodule Oceanconnect.AuctionIndexTest do
       assert AuctionIndexPage.auction_is_status?(auction, "canceled")
     end
 
-    test "canceling an auction creates a snapshop", %{auction: auction} do
+    test "canceling an auction creates a snapshot", %{auction: auction} do
       AuctionIndexPage.visit()
       AuctionIndexPage.cancel_auction(auction)
+      :timer.sleep(200)
 
       assert AuctionIndexPage.auction_is_status?(auction, "canceled")
       AuctionLogPage.visit(auction.id)

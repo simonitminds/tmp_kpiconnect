@@ -241,10 +241,6 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
-  def set_port_agent(auction = %struct{}, port_agent) when is_auction(struct) do
-    update_auction_without_event_storage!(auction, %{port_agent: port_agent})
-  end
-
   def is_participant?(auction = %struct{}, company_id) when is_auction(struct) do
     company_id in auction_participant_ids(auction)
   end
@@ -362,7 +358,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction(id) do
-    with %{auction: auction} <- AuctionCache.read(id) do
+    with {:ok, auction} <- AuctionCache.read(id) do
       auction
     else
       _ ->
@@ -374,7 +370,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction!(id) do
-    with %{auction: auction} <- AuctionCache.read(id) do
+    with {:ok, auction} <- AuctionCache.read(id) do
       auction
     else
       _ ->
@@ -632,23 +628,6 @@ defmodule Oceanconnect.Auctions do
     |> struct.changeset(attrs)
     |> Repo.update!()
     |> auction_update_command(user)
-  end
-
-  def update_auction_without_event_storage!(%struct{} = auction, attrs) when is_auction(struct) do
-    cleaned_attrs = clean_timestamps(attrs)
-
-    updated_auction =
-      auction
-      |> Map.merge(cleaned_attrs)
-
-    updated_auction
-    |> update_cache
-
-    updated_auction
-    |> AuctionEvent.auction_updated(nil)
-    |> AuctionEvent.emit(true)
-
-    updated_auction
   end
 
   defp clean_timestamps(attrs) do

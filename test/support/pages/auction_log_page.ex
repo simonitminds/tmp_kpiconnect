@@ -10,7 +10,6 @@ defmodule Oceanconnect.AuctionLogPage do
 
   def has_events?(events) do
     Enum.all?(events, fn event ->
-      IO.inspect({event.id, event.type})
       element = find_element(:class, "qa-event-#{event.id}")
 
       assert find_within_element(element, :class, "qa-event-type") |> inner_text =~
