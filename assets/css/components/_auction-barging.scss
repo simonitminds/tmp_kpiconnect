@@ -30,7 +30,7 @@
   margin-bottom: 1rem !important;
   padding: 0.75rem 0 !important;
   background-color: $white;
-  border-radius: 3px;
+  border-radius: $border-radius;
 
   > .container {
     width: auto;
@@ -63,25 +63,25 @@
     display: none;
   }
   .auction-barging__barge__trigger > span:first-child { // Ersatz header. Probably a little brittle.
-    font-size: 1rem;
+    font-size: $size-6;
     font-weight: bold;
   }
   .auction-barging__barge__trigger > span:last-child { // Toggle button. Probably a little brittle.
-    font-size: 1rem;
+    font-size: $size-6;
     margin-right: 0.5rem;
   }
   .auction-barging__barge__toggle {
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: $size-6;
   }
   .auction-barging__barge__title {
     margin-right: 0.5rem;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: $size-6;
   }
   .auction-barging__barge__status {
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: $size-6;
   }
   .auction-barging__barge__content {
     margin-top: 1rem;
@@ -136,7 +136,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
   margin-bottom: 1rem !important;
   padding: 0;
   background-color: $white;
-  border-radius: 3px;
+  border-radius: $border-radius;
 
   > .container {
     width: auto;
@@ -168,7 +168,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
 
   .collapsing-barge__barge__trigger > .collapsible-section__category-icon { // Ersatz header. Probably a little brittle.
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: $size-6;
     color: $gray-3;
 
     &--approved { color: $green };
@@ -177,28 +177,28 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     &--available { display: none };
   }
   .collapsing-barge__barge__trigger > .collapsible-section__title { // Ersatz header. Probably a little brittle.
-    font-size: 1rem;
+    font-size: $size-6;
     font-weight: bold;
     line-height: 1.3;
     text-transform: capitalize;
   }
   .collapsing-barge__barge__trigger > .collapsible-section__toggle-icon { // Toggle button. Probably a little brittle.
-    font-size: 1rem;
+    font-size: $size-6;
     margin-right: 0.5rem;
   }
   .collapsing-barge__barge__toggle {
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: $size-6;
   }
   .collapsing-barge__barge__title {
     margin-right: 0.5rem;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: $size-6;
     text-transform: capitalize;
   }
   .collapsing-barge__barge__status {
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: $size-6;
   }
   .collapsing-barge__barge__button {
     flex-shrink: 0;
@@ -315,11 +315,6 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
     flex-direction: column;
     align-items: flex-start;
 
-    .collapsing-barge__barge__trigger {
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
     .collapsing-barge__barge__button {
       margin-left: 0rem;
     }
@@ -343,11 +338,6 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
   .collapsing-barge__barge > .container > .content {
     flex-direction: column;
     align-items: flex-start;
-
-    .collapsing-barge__barge__trigger {
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
 
     .collapsing-barge__barge__button {
       margin-left: 0rem;

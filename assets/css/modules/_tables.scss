@@ -10,7 +10,7 @@
 // Adaptations
 
 .table.is-striped tbody tr:not(.is-selected):nth-child(2n) {
-  background-color: #fff;
+  background-color: $white;
 }
 
 .table.is-striped tbody tr:not(.is-selected):nth-child(2n-1) {

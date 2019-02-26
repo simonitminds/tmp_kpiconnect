@@ -39,7 +39,7 @@ const Header = ({auctionPayload, connection}) => {
                     <AuctionHeaderTimers auctionPayload={auctionPayload} connection={connection} isMobile={true} />
                   </MediaQuery>
                   <div className="qa-auction-vessels">
-                    <h1 className="auction-header__vessel title has-text-weight-bold">
+                    <h1 className="title auction-header__vessel has-text-weight-bold">
                       <AuctionTitle auction={auction} />
                       <span className="auction-header__company">{auction.buyer.name}</span>
                     </h1>

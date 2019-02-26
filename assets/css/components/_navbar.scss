@@ -36,7 +36,7 @@ $navbar-background-color: $primary;
 .navbar-dropdown { // Set the nav dropdown to be flush right
   right: 0;
   left: auto !important;
-  font-size: 1rem !important;
+  font-size: $size-6 !important;
 
   .navbar-item {
     padding: 0.5rem 1rem !important;

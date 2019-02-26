@@ -41,6 +41,7 @@
   }
   &__header { // Headers for a box element
     margin-bottom: 0.5rem;
+    @extend .is-size-6;
     font-weight: 700;
     text-transform: uppercase;
     font-family: $family-header;
@@ -49,7 +50,7 @@
       margin-left: -1.25rem;
       margin-right: -1.25rem;
       padding: 0 1.25rem;
-      border-bottom: 4px solid $turquoise;
+      border-bottom: 4px solid $gray-3;
     }
   }
   &__icon-marker {

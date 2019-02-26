@@ -53,7 +53,7 @@ const SupplierBody = (props) => {
   } else {
     return (
       <div>
-        <div className="auction-notification box is-gray-0" >
+        <div className="auction-notification is-gray-0" >
           <h3 className="has-text-weight-bold is-flex">
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
           </h3>

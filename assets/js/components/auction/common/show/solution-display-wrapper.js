@@ -109,7 +109,7 @@ export default class SolutionDisplayWrapper extends React.Component {
       <div className={`box auction-solution ${className || ''} auction-solution--${isExpanded ? "open" : "closed"}${this.state.hasOverflow ? " overflow--hidden" : ""}`} ref={this.container} onClick={this.toggleOverflow.bind(this)}>
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
-            <h3 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
+            <h4 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
               { !headerOnly && expandIcon(isExpanded) }
               <span className="is-inline-block">
                 <span className="auction-solution__title__category">{title}</span>
@@ -120,7 +120,7 @@ export default class SolutionDisplayWrapper extends React.Component {
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
-            </h3>
+            </h4>
             <div className="auction-solution__content">
               <span className="has-text-weight-bold has-padding-right-xs">{displayPrice}</span>
               {latest_time_entered &&

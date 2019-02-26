@@ -63,7 +63,7 @@ export default class AuctionShow extends React.Component {
                       <div className="tabs is-fullwidth is-medium">
                         <ul>
                           <li className="is-active">
-                            <h2 className="title is-size-5"><a className="has-text-left">Auction Monitor</a></h2>
+                            <h2 className="title"><a className="has-text-left">Auction Monitor</a></h2>
                           </li>
                         </ul>
                       </div>
@@ -90,7 +90,7 @@ export default class AuctionShow extends React.Component {
                       <div className="tabs is-fullwidth is-medium">
                         <TabList>
                           <Tab>
-                            <h2 className="title is-size-5">Auction Details</h2>
+                            <h2 className="title">Auction Details</h2>
                           </Tab>
                         </TabList>
                       </div>
@@ -125,8 +125,8 @@ export default class AuctionShow extends React.Component {
                 <Tabs className="auction-content auction-content--mobile">
                   <div className="tabs is-fullwidth is-medium">
                     <TabList>
-                      <Tab><h2 className="title is-size-5">Monitor</h2></Tab>
-                      <Tab><h2 className="title is-size-5">Details</h2></Tab>
+                      <Tab><h2 className="title">Monitor</h2></Tab>
+                      <Tab><h2 className="title">Details</h2></Tab>
                     </TabList>
                   </div>
                   <TabPanel>

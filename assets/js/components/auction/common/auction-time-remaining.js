@@ -56,28 +56,28 @@ class AuctionTimeRemaining extends React.Component {
       return (
         <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
           <span className="icon has-margin-right-xs"><FontAwesomeIcon icon={["far", "clock"]} /></span>
-          Not Scheduled
+          <span>Not Scheduled</span>
         </span>
       );
     } else if (auctionStatus == "pending") {
       return (
         <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
           <span className="icon has-margin-right-xs"><FontAwesomeIcon icon={["far", "clock"]} /></span>
-          {cardDateFormat(auctionStartTime)}
+          <span>{cardDateFormat(auctionStartTime)}</span>
         </span>
       );
     } else if (auctionStatus == "canceled") {
       return (
         <span className="auction-card__time-remaining auction-card__time-remaining--inactive">
           <span className="icon has-margin-right-xs"><FontAwesomeIcon icon={["far", "clock"]} /></span>
-          {cardDateFormat(auctionClosedTime)}
+          <span>{cardDateFormat(auctionClosedTime)}</span>
         </span>
       );
     } else {
       return (
         <span className={`auction-card__time-remaining auction-card__time-remaining--${formatTimeRemainingColor(auctionStatus, timeRemaining)}`}>
           <span className="icon has-margin-right-xs"><FontAwesomeIcon icon={["far", "clock"]} /></span>
-          {cardDateFormat(auctionClosedTime)}
+          <span>{cardDateFormat(auctionClosedTime)}</span>
         </span>
       );
     }

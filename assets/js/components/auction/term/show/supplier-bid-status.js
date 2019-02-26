@@ -26,7 +26,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const messageDisplay = (message) => {
     return (
-      <h3 className="has-text-weight-bold has-margin-bottom-none">
+      <h3>
         <span className="auction-notification__copy qa-supplier-bid-status-message">
           {message}
         </span>
@@ -38,13 +38,13 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     return <i>The auction has not started</i>;
   } else if (auctionStatus == "expired") {
     return (
-      <div className="auction-notification box is-gray-3">
+      <div className="auction-notification is-gray-3">
         {messageDisplay("No offer was selected")}
       </div>
     );
   } else if (auctionStatus == "closed" && isWinningSolution) {
     return (
-      <div className="auction-notification box is-success">
+      <div className="auction-notification is-success">
         <div className="auction-notification__show-message">
           {messageDisplay(`You won the entire auction`)}
         </div>
@@ -55,7 +55,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (auctionStatus == "closed" && !isInWinningSolution) {
     return (
-      <div className="auction-notification box is-danger">
+      <div className="auction-notification is-danger">
         <div className="auction-notification__show-message">
           {messageDisplay("Regretfully, you were unsuccessful in this auction. Thank you for quoting")}
         </div>
@@ -66,7 +66,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (auctionStatus == "open" && !connection) {
     return (
-      <div className="auction-notification box is-gray-3">
+      <div className="auction-notification is-gray-3">
         <div className="auction-notification__show-message">
           {messageDisplay("Your connection to the server has been lost")}
         </div>
@@ -77,7 +77,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     )
   } else if (auctionStatus == "open" && !hasActiveBid) {
     return (
-      <div className="auction-notification box is-warning">
+      <div className="auction-notification is-warning">
         <div className="auction-notification__show-message">
           {messageDisplay("You have not bid on this auction")}
         </div>
@@ -88,7 +88,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else if (isBestOverallSolution) {
     return (
-      <div className="auction-notification box is-success">
+      <div className="auction-notification is-success">
         <div className="auction-notification__show-message">
           {messageDisplay("You have the best overall offer for this auction")}
         </div>
@@ -99,7 +99,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     );
   } else {
     return (
-      <div className="auction-notification box is-danger">
+      <div className="auction-notification is-danger">
         <div className="auction-notification__show-message">
           {messageDisplay("Your bid is not the best offer")}
         </div>

@@ -112,7 +112,7 @@ export default class AuctionsIndex extends React.Component {
                 </a>
               </div>
             </MediaQuery>
-            <h1 className="auction-list__title title is-3">Auction Listing</h1>
+            <h1 className="title auction-list__title">Auction Listing</h1>
             <MediaQuery query="(min-width: 600px)">
               <div>
                 <a href="/auctions/new" className="button is-link is-pulled-right">
