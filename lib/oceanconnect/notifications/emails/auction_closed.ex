@@ -1,4 +1,9 @@
 defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
+  import Bamboo.Email
+  use Bamboo.Phoenix, view: OceanconnectWeb.EmailView
+  alias Oceanconnect.Accounts
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.{Solution, Guards}
 
   def generate(auction_state = %{
         auction_id: auction_id,
@@ -127,5 +132,4 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     end)
     |> List.flatten()
   end
-
 end
