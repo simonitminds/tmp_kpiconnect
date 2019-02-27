@@ -104,19 +104,23 @@
                     for
                     <%= if @auction_payload.auction.type == "spot" do %>
                       <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
-                    <% else %>
-                      <span class="qa-auction-detail-winning-solution-entry-fuel"><%= @auction_payload.auction.fuel.name %></span>
-                    <% end %>
-                    from
-                    <span><%= bid.supplier %></span>
-                    <%= if bid_is_traded?(bid) do %>
-                      &nbsp;
-                      <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
-                    <% end %>
-                    <% if @auction_payload.auction.type == "spot" do %>
+                      from
+                      <span><%= bid.supplier %></span>
+                      <%= if bid_is_traded?(bid) do %>
+                        &nbsp;
+                        <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                      <% end %>
                       to
                       <span class="qa-auction-detail-winning-solution-entry-vessel"><%= auction_log_vessel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
-                    <% end %>
+                    <% else %>
+                      <span class="qa-auction-detail-winning-solution-entry-fuel"><%= @auction_payload.auction.fuel.name %></span>
+                      from
+                      <span><%= bid.supplier %></span>
+                        <%= if bid_is_traded?(bid) do %>
+                          &nbsp;
+                          <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                        <% end %>
+                      <% end %>
                   </p>
                 <% end %>
               <% else %>
