@@ -43,34 +43,53 @@
             <th>Port Agent</th>
             <td><%= @auction_payload.auction.port_agent || "—" %></td>
           </tr>
-          <tr>
-            <th>ETA/ETD</th>
-            <td>
-              <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction_payload.auction) do %>
-                <p class="qa-auction-etas-<%= vessel.id %> has-margin-bottom-sm">
-                  <span class="qa-auction-etas-<%= vessel.id %>-vessel"><%= vessel.name %></span>
-                  (<span class="qa-auction-etas-<%= vessel.id %>-eta"><%= convert_date?(eta, "Not Specified") %></span>
-                  &ndash;
-                  <span class="qa-auction-etas-<%= vessel.id %>-etd"><%= convert_date?(etd, "Not Specified") %></span>)
-                </p>
-              <% end %>
-          </tr>
-          <tr>
-            <th>Deliverables</th>
-            <td>
-                <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
-                        vessel_fuel <- vessel_fuels do %>
-                  <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
-                    <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
-                    <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
-                    <span class="qa-auction-deliverable-vessel">
-                      <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
-                    </span>
+          <%= if @auction_payload.auction.type == "spot" do %>
+            <tr>
+              <th>ETA/ETD</th>
+              <td>
+                <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction_payload.auction) do %>
+                  <p class="qa-auction-etas-<%= vessel.id %> has-margin-bottom-sm">
+                    <span class="qa-auction-etas-<%= vessel.id %>-vessel"><%= vessel.name %></span>
+                    (<span class="qa-auction-etas-<%= vessel.id %>-eta"><%= convert_date?(eta, "Not Specified") %></span>
+                    &ndash;
+                    <span class="qa-auction-etas-<%= vessel.id %>-etd"><%= convert_date?(etd, "Not Specified") %></span>)
                   </p>
                 <% end %>
-              </ul>
-            </td>
-          </tr>
+            </tr>
+            <tr>
+              <th>Deliverables</th>
+              <td>
+                  <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
+                          vessel_fuel <- vessel_fuels do %>
+                    <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
+                      <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
+                      <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
+                      <span class="qa-auction-deliverable-vessel">
+                        <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
+                      </span>
+                    </p>
+                  <% end %>
+                </ul>
+              </td>
+            </tr>
+          <% else %>
+            <tr>
+              <th>Term Period</th>
+              <td>
+                <span class="qa-auction-start_date"><%= convert_date?(@auction_payload.auction.start_date) %></span> — <span class="qa-auction-end_date"><%= convert_date?(@auction_payload.auction.end_date) %></span>
+              </td>
+            </tr>
+            <tr>
+              <th>Deliverables</th>
+              <td>
+                <span class="qa-auction-fuel_quantity"><%= @auction_payload.auction.fuel_quantity %></span> MT of
+                <span class="qa-auction-fuel"><%= @auction_payload.auction.fuel.name %></span>
+                <%= for vessel <- @auction_payload.auction.vessels do %>
+                  <span class="qa-auction-vessel"><%= vessel.name %> (<%= vessel.imo %>)</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
           <tr>
             <th>Additional Information</th>
             <td><%= additional_information(@auction_payload.auction) %></td>
@@ -83,15 +102,25 @@
                   <p class="qa-auction-detail-winning-solution-entry has-margin-bottom-sm">
                     <span class="qa-auction-detail-winning-solution-entry-amount"><%= format_price(bid.amount) %></span>/unit
                     for
-                    <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
-                    from
-                    <span><%= bid.supplier %></span>
-                    <%= if bid_is_traded?(bid) do %>
-                      &nbsp;
-                      <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
-                    <% end %>
-                    to
-                    <span class="qa-auction-detail-winning-solution-entry-vessel"><%= auction_log_vessel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
+                    <%= if @auction_payload.auction.type == "spot" do %>
+                      <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
+                      from
+                      <span><%= bid.supplier %></span>
+                      <%= if bid_is_traded?(bid) do %>
+                        &nbsp;
+                        <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                      <% end %>
+                      to
+                      <span class="qa-auction-detail-winning-solution-entry-vessel"><%= auction_log_vessel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
+                    <% else %>
+                      <span class="qa-auction-detail-winning-solution-entry-fuel"><%= @auction_payload.auction.fuel.name %></span>
+                      from
+                      <span><%= bid.supplier %></span>
+                        <%= if bid_is_traded?(bid) do %>
+                          &nbsp;
+                          <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
+                        <% end %>
+                      <% end %>
                   </p>
                 <% end %>
               <% else %>

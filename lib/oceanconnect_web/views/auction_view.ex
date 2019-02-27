@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
+  import Oceanconnect.Auctions.Guards
   alias Oceanconnect.{Accounts, Auctions}
   alias Oceanconnect.Accounts.User
 
@@ -99,11 +100,11 @@ defmodule OceanconnectWeb.AuctionView do
     |> Poison.encode!()
   end
 
-  def actual_duration(%Auction{
+  def actual_duration(%struct{
         auction_started: started,
         auction_ended: ended,
         auction_closed_time: closed
-      }) do
+      }) when is_auction(struct) do
     cond do
       started && ended -> "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
       started && closed -> "#{trunc(DateTime.diff(closed, started) / 60)} minutes"
@@ -112,9 +113,9 @@ defmodule OceanconnectWeb.AuctionView do
     end
   end
 
-  def additional_information(%Auction{additional_information: nil}), do: "—"
+  def additional_information(%struct{additional_information: nil}) when is_auction(struct), do: "—"
 
-  def additional_information(%Auction{additional_information: additional_information}),
+  def additional_information(%struct{additional_information: additional_information}) when is_auction(struct),
     do: additional_information
 
   def auction_log_suppliers(%{winning_solution: %{bids: bids}}) do
