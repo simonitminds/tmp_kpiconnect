@@ -1,14 +1,16 @@
 defmodule Oceanconnect.Notifications.NotificationsSupervisor do
   use Supervisor
-  alias Oceanconnect.Notifications.NotificationStore
+  alias Oceanconnect.Notifications.EmailNotificationStore
+  import Oceanconnect.Auctions.Guards
 
   def start_link() do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def init({%struct{id: auction_id}, _options}) when is_auction(struct) do
+  def init([]) do
     children = [
-      {NotificationStore, []}
+      {EmailNotificationStore, []}
+      {ChannelNotifier, []},
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

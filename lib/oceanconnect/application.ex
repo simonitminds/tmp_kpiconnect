@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Application do
   use Application
   alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter}
+  alias Oceanconnect.Notifications.NotificationsSupervisor
   import Supervisor.Spec
 
   # See https://hexdocs.pm/elixir/Application.html

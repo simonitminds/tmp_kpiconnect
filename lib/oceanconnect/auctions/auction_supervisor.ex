@@ -5,7 +5,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
 
   alias Oceanconnect.Auctions.{
     AuctionCache,
-    AuctionEventHandler,
     AuctionScheduler,
     AuctionStore,
     AuctionTimer,
@@ -28,7 +27,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     all_children = %{
       auction_a_timer: {AuctionTimer, auction_id},
       auction_cache: {AuctionCache, auction},
-      auction_event_handler: {AuctionEventHandler, auction_id},
       auction_scheduler: {AuctionScheduler, auction},
       auction_store: {AuctionStore, auction},
       auction_reminder_timer:

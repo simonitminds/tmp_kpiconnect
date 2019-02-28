@@ -1,14 +1,14 @@
 defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
-  import Bamboo.Email
-  use Bamboo.Phoenix, view: OceanconnectWeb.EmailView
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Solution, Guards}
+  alias Oceanconnect.Auctions.{Solution}
+  import Oceanconnect.Auctions.Guards
+  use Oceanconnect.Notifications.Email
 
   def generate(auction_state = %{
         auction_id: auction_id,
         winning_solution: solution,
-        submitted_barges: barges
+        submitted_barges: submitted_barges
       }) do
     auction = Auctions.get_auction(auction_id)
     participants = Auctions.active_participants(auction)

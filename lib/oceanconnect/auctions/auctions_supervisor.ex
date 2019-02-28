@@ -17,13 +17,8 @@ defmodule Oceanconnect.Auctions.AuctionsSupervisor do
            DynamicSupervisor.start_child(
              __MODULE__,
              {Oceanconnect.Auctions.AuctionSupervisor, {auction, %{exclude_children: []}}}
-           ),
-         {:ok, email_servies_pid} <-
-           DynamicSupervisor.start_child(
-             __MODULE__,
-             {Oceanconnect.Auctions.AuctionEmailSupervisor, {auction, %{exclude_children: []}}}
            ) do
-      {:ok, {core_services_pid, email_servies_pid}}
+      {:ok, {core_services_pid}}
     else
       {:error, {:already_started, pid}} ->
         {:error, {:already_started, pid}}

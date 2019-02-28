@@ -28,7 +28,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     :ok =
       Phoenix.PubSub.broadcast(
         :auction_pubsub,
-        "auction:#{id}",
+        "auctions",
         event
       )
 
@@ -40,7 +40,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
       event
       |> Map.put(:user, nil)
 
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{id}", updated_event)
+    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", updated_event)
     {:ok, updated_event}
   end
 
