@@ -26,6 +26,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Fuel)
     field(:fuel_quantity, :integer)
+    field(:total_fuel_volume, :integer)
+    field(:show_total_fuel_volume, :boolean)
 
     has_many(:term_auction_vessels, TermAuctionVessel,
       foreign_key: :auction_id,
@@ -72,6 +74,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :end_date,
     :fuel_id,
     :fuel_quantity,
+    :total_fuel_volume,
+    :show_total_fuel_volume,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
@@ -91,6 +95,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> add_total_fuel_volume()
   end
 
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
@@ -105,6 +110,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> add_total_fuel_volume()
   end
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
@@ -126,6 +132,22 @@ defmodule Oceanconnect.Auctions.TermAuction do
   end
 
   def maybe_add_vessels(changeset, _attrs), do: changeset
+
+  def add_total_fuel_volume(
+    %Ecto.Changeset{
+      valid?: true,
+      changes: %{start_date: start_date, end_date: end_date, fuel_quantity: fuel_quantity}
+    } = changeset) do
+      months = DateTime.diff(end_date, start_date, :month)
+      cond do
+        months >= 1 ->
+          change(changeset, %{total_fuel_volume: fuel_quantity * months})
+        true ->
+          changeset
+      end
+  end
+
+  def add_total_fuel_volume(changeset), do: changeset
 
   def from_params(params) do
     params

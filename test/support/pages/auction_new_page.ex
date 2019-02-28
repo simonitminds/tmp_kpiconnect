@@ -134,6 +134,13 @@ defmodule Oceanconnect.AuctionNewPage do
     find_element(:css, ".qa-auction-is_traded_bid_allowed")
   end
 
+  def total_fuel_volume do
+    click({:css, ".qa-auction-show-total-fuel_quantity"})
+
+    find_element(:css, ".qa-auction-total-fuel_quantity")
+    |> inner_text()
+  end
+
   def submit do
     submit_element({:css, ".qa-auction-submit"})
   end

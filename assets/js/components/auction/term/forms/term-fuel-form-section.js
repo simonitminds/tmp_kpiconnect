@@ -3,9 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import InputField from '../../../input-field';
 import InputErrors from '../../../input-errors';
+import CheckBoxField from '../../../check-box-field';
 
 const TermFuelFormSection = (props) => {
-  const { auction, errors, fuels, updateInformation } = props;
+  const { auction, errors, fuels, updateInformation, updateInformationFromCheckbox } = props;
+  const totalFuelVolume = _.get(auction, 'total_fuel_volume');
 
   return (
     <section className="auction-info is-gray-1"> {/* Fuel info */}
@@ -47,13 +49,31 @@ const TermFuelFormSection = (props) => {
             <InputField
               model={'auction'}
               field={'fuel_quantity'}
-              labelText={'Fuel Quantity (MT)'}
+              labelText={'Fuel Quantity (MT)/Month'}
               value={auction.fuel_quantity}
               errors={errors.fuel_quantity}
               isHorizontal={true}
               opts={{type: 'number'}}
               onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
             />
+
+            <div className="fiel is-horizontal">
+              <div className="field-label"></div>
+              <div className="field-body field-body--columned">
+                <CheckBoxField
+                    model={'auction'}
+                    field={'show_total_fuel_volume'}
+                    labelText={'purchase as complete lot'}
+                    defaultChecked={false}
+                    opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
+                    onChange={updateInformationFromCheckbox.bind(this, 'auction.show_total_fuel_volume')}
+                    className={'has-margin-right-sm'}
+                />
+                <InputErrors errors={errors.show_total_fuel_volume} />
+                <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}><strong>Your Total Volume:</strong> $<span className="qa-auction-total_fuel_volume">{totalFuelVolume}</span></div>
+              </div>
+            </div>
+
           </fieldset>
         </div>
       </div>

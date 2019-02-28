@@ -72,7 +72,7 @@ const ForwardFixedAuctionForm = (props) => {
                              portId={port_id}
                              ports={ports} />
 
-      <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} updateInformation={updateInformation} />
+      <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} updateInformation={updateInformation} updateInformationFromCheckbox={updateInformationFromCheckbox} />
 
       <AdditionalInfoFormSection auction={auction} errors={errors} updateInformation={updateInformation} isTermAuction={true }/>
 
