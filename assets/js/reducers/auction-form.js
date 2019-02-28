@@ -25,6 +25,11 @@ const initialState = {
   fuel_quantity: null,
   loading: true,
   ports: null,
+  start_date: null,
+  end_date: null,
+  fuel_quantity: null,
+  total_fuel_volume: null,
+  show_total_fuel_volume: null,
   scheduled_start_date: null,
   scheduled_start_time: null,
   selectedPort: null,
@@ -46,6 +51,11 @@ const setUTCDateTime = (dateTime) => {
   }
 }
 
+const calculateTotalFuelVolume = (startDate, endDate, fuelQuantity) => {
+  let months = endDate.diff(startDate, 'months')
+  return fuelQuantity * months;
+}
+
 export default function(state, action) {
   switch(action.type) {
     case RECEIVE_AUCTION_FORM_DATA: {
@@ -53,6 +63,9 @@ export default function(state, action) {
         return state;
       } else {
         const supplierList = _.map(action.data.auction.suppliers, 'id');
+        const startDate = _.get(action, 'data.auction.start_date');
+        const endDate = _.get(action, 'data.auction.end_date');
+        const fuelQuantity _.get(action, 'data.auction.fuel_quantity'),
         return {
           ...state,
           auction: action.data.auction,
@@ -66,6 +79,11 @@ export default function(state, action) {
           fuels: action.data.fuels,
           loading: false,
           ports: action.data.ports,
+          start_date: setUTCDateTime(startDate),
+          end_date: setUTCDateTime(endDate),
+          fuel_quantity: fuelQuantity,
+          total_fuel_volume: calculateTotalFuelVolume(startDate, endDate, fuelQuantity),
+          show_total_fuel_volume: _.get(action, 'data.auction.show_total_fuel_volume') || false,
           scheduled_start_date: setUTCDateTime(action.data.auction.scheduled_start),
           scheduled_start_time: setUTCDateTime(action.data.auction.scheduled_start),
           selectedPort: _.get(action, 'data.auction.port.id'),

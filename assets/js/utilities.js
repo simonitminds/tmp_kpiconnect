@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React from 'react';
-import moment from 'moment';
 
 export function replaceListItem(list, oldItem, newItem) {
   const index = _.indexOf(list, oldItem);
