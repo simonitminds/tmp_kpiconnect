@@ -39,4 +39,11 @@ defmodule Oceanconnect.Notifications do
   ) when is_auction_state(state_struct) do
     Emails.AuctionCanceled.generate(auction_state)
   end
+
+  def emails_for_event(
+    %AuctionEvent{type: _type},
+    _auction_state
+  ) do
+    []
+  end
 end

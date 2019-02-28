@@ -5,7 +5,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   import Oceanconnect.Auctions.Guards
   use Oceanconnect.Notifications.Email
 
-  def generate(auction_state = %{
+  def generate(_auction_state = %{
         auction_id: auction_id,
         winning_solution: solution,
         submitted_barges: submitted_barges

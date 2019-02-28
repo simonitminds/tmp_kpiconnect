@@ -24,7 +24,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   def emit(%AuctionEvent{}, false), do: nil
 
-  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data, user: _user}, _emit) do
+  def emit(event = %AuctionEvent{type: _type, data: _data, user: _user}, _emit) do
     :ok =
       Phoenix.PubSub.broadcast(
         :auction_pubsub,
@@ -35,7 +35,7 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     {:ok, event}
   end
 
-  def emit(event = %AuctionEvent{type: _type, auction_id: id, data: _data}, _emit) do
+  def emit(event = %AuctionEvent{type: _type, data: _data}, _emit) do
     updated_event =
       event
       |> Map.put(:user, nil)

@@ -32,7 +32,8 @@ defmodule OceanconnectWeb.AuctionView do
     :auction_expired,
     :auction_closed,
     :auction_state_snapshotted,
-    :auction_finalized
+    :auction_finalized,
+    :auction_rescheduled
   ]
   @events_for_barges [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]
 

@@ -644,21 +644,6 @@ defmodule Oceanconnect.Auctions do
     |> auction_update_command(user)
   end
 
-  defp clean_timestamps(attrs) do
-    [:auction_started, :auction_ended, :auction_closed_time]
-    |> Enum.reduce(attrs, fn attribute, acc ->
-      if initial_value = attrs[attribute] do
-        Map.put(acc, attribute, fix_time_weirdness(initial_value))
-      else
-        acc
-      end
-    end)
-  end
-
-  defp fix_time_weirdness(date_time = %DateTime{microsecond: microsecond}) do
-    Map.put(date_time, :microsecond, {elem(microsecond, 0), 6})
-  end
-
   def delete_auction(%struct{} = auction) when is_auction(struct) do
     Repo.delete(auction)
   end

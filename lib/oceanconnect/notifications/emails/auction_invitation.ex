@@ -3,7 +3,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitation do
   alias Oceanconnect.Auctions
   use Oceanconnect.Notifications.Email
 
-  def generate(auction_state = %{auction_id: auction_id}) do
+  def generate(_auction_state = %{auction_id: auction_id}) do
     auction_id
     |> Auctions.get_auction()
     |> emails()

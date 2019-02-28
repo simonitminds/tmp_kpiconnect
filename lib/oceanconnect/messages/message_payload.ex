@@ -23,7 +23,7 @@ defmodule Oceanconnect.Messages.MessagePayload do
            id: auction_id,
            anonymous_bidding: anonymous_bidding,
            buyer_id: buyer_id,
-           suppliers: suppliers
+           suppliers: _suppliers
          } = auction,
          company_id
        )

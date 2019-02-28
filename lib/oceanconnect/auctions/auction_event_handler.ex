@@ -1,10 +1,9 @@
-defmodule Oceanconnect.Notifications.EventHandlers.ChannelNotifier do
+defmodule Oceanconnect.Auctions.AuctionEventHandler do
   use GenServer
 
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
-
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
@@ -15,14 +14,22 @@ defmodule Oceanconnect.Notifications.EventHandlers.ChannelNotifier do
 
   # Client
   def start_link(auction_id) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+    GenServer.start_link(__MODULE__, auction_id, name: get_event_handler_name(auction_id))
+  end
+
+  def find_pid(auction_id) do
+    with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
+      {:ok, pid}
+    else
+      [] -> {:error, "Auction Store Not Started"}
+    end
   end
 
   # Server
 
-  def init([]) do
-    Phoenix.PubSub.subscribe(:auction_pubsub, "auctions")
-    {:ok, []}
+  def init(auction_id) do
+    Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    {:ok, auction_id}
   end
 
   def handle_info(%AuctionEvent{type: type}, state) when type == :auction_state_rebuilt do
@@ -113,11 +120,7 @@ defmodule Oceanconnect.Notifications.EventHandlers.ChannelNotifier do
     {:noreply, state}
   end
 
-  def handle_info(
-        %AuctionEvent{type: :auction_finalized, data: %{auction: auction = %struct{}}},
-        state
-      )
-      when is_auction(struct) do
+  def handle_info(%AuctionEvent{type: :auction_finalized, data: %{auction: auction = %struct{}}}, state) when is_auction(struct) do
     AuctionNotifier.notify_participants(auction)
     {:noreply, state}
   end
@@ -144,25 +147,23 @@ defmodule Oceanconnect.Notifications.EventHandlers.ChannelNotifier do
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: :comment_submitted,
-          data: %{state: auction_state = %state_struct{}}
-        },
-        state
-      )
-      when is_auction_state(state_struct) do
+    %AuctionEvent{
+      type: :comment_submitted,
+      data: %{state: auction_state = %state_struct{}}
+    },
+    state
+  ) when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: :comment_unsubmitted,
-          data: %{state: auction_state = %state_struct{}}
-        },
-        state
-      )
-      when is_auction_state(state_struct) do
+    %AuctionEvent{
+      type: :comment_unsubmitted,
+      data: %{state: auction_state = %state_struct{}}
+    },
+    state
+  ) when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end
@@ -170,18 +171,6 @@ defmodule Oceanconnect.Notifications.EventHandlers.ChannelNotifier do
   def handle_info(
         %AuctionEvent{
           type: :barge_submitted,
-          data: %{state: auction_state = %state_struct{}}
-        },
-        state
-      )
-      when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
-    {:noreply, state}
-  end
-
-  def handle_info(
-        %AuctionEvent{
-          type: :barge_rejected,
           data: %{state: auction_state = %state_struct{}}
         },
         state
