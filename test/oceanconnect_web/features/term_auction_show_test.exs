@@ -173,6 +173,8 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
         assert AuctionShowPage.has_content?("Hi")
       end)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(100)
       AuctionShowPage.select_solution(0)
       :timer.sleep(100)
       assert AuctionShowPage.has_content?("Hi")

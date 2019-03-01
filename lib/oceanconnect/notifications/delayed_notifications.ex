@@ -104,43 +104,4 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
 
   defp normalize_delay(delay) when delay <= 0, do: 500
   defp normalize_delay(delay), do: delay
-
-  # def init(auction = %struct{id: auction_id, scheduled_start: start_time}) when is_auction(struct) do
-  #   AuctionEventStore.event_list(auction_id)
-
-  #   if Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
-  #        if(%AuctionEvent{} = event) do
-  #          event.type == :upcoming_auction_notified
-  #        else
-  #          :erlang.binary_to_term(event).type == :upcoming_auction_notified
-  #        end
-  #      end) do
-  #     Process.send_after(self(), :shutdown_timer, 5_000)
-  #     {:ok, start_time}
-  #   else
-  #     duration =
-  #       DateTime.to_unix(start_time, :millisecond) -
-  #         DateTime.to_unix(DateTime.utc_now(), :millisecond) - 3_600_000
-
-  #     Process.send_after(self(), {:remind_participants, auction}, max(0, duration))
-  #     {:ok, start_time}
-  #   end
-  # end
-
-  # def handle_info(:shutdown_timer, state) do
-  #   {:stop, :normal, state}
-  # end
-
-  # def handle_info({:remind_participants, auction = %struct{}}, state) when is_auction(struct) do
-  #   Command.notify_upcoming_auction(auction, nil)
-  #   |> AuctionStore.process_command()
-  #   {:stop, :normal, state}
-  # end
-
-
-  # def terminate(reason) do
-  #   if reason == :normal || reason == :shutdown do
-  #     {:ok, :shutdown}
-  #   end
-  # end
 end

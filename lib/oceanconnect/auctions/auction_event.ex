@@ -22,28 +22,6 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   alias __MODULE__
 
-  def emit(%AuctionEvent{}, false), do: nil
-
-  def emit(event = %AuctionEvent{type: _type, data: _data, user: _user}, _emit) do
-    :ok =
-      Phoenix.PubSub.broadcast(
-        :auction_pubsub,
-        "auctions",
-        event
-      )
-
-    {:ok, event}
-  end
-
-  def emit(event = %AuctionEvent{type: _type, data: _data}, _emit) do
-    updated_event =
-      event
-      |> Map.put(:user, nil)
-
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", updated_event)
-    {:ok, updated_event}
-  end
-
   def auction_state_snapshotted(new_state = %auction_state{auction_id: auction_id}) when is_auction_state(auction_state) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
