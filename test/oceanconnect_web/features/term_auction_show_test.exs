@@ -351,6 +351,125 @@ defmodule Oceanconnect.TermAuctionShowTest do
     end
   end
 
+  describe "decision period" do
+    setup %{
+      auction: auction,
+      supplier: supplier,
+      supplier2: supplier2,
+      fuel_id: fuel_id
+    } do
+      Auctions.start_auction(auction)
+
+      supplier1_bid1 =
+        create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
+        |> Auctions.place_bid()
+      supplier2_bid1 =
+        create_bid(1.50, nil, supplier2.company_id, fuel_id, auction)
+        |> Auctions.place_bid()
+
+      Auctions.end_auction(auction)
+      {:ok, %{
+        supplier1_bid1: supplier1_bid1,
+        supplier2_bid1: supplier2_bid1
+      }}
+    end
+
+    test "supplier view of decision period", %{auction: auction, supplier: supplier} do
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.auction_status() == "DECISION"
+      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
+    end
+
+    test "buyer view of decision period", %{auction: auction, supplier1_bid1: supplier1_bid1, supplier2_bid1: supplier2_bid1, buyer: buyer} do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.solution_has_bids?(0, [supplier1_bid1])
+      assert AuctionShowPage.solution_has_bids?(1, [supplier2_bid1])
+    end
+
+    test "buyer selects best solution", %{
+      auction: auction,
+      supplier1_bid1: supplier1_bid1,
+      buyer: buyer,
+      supplier: supplier,
+      supplier2: supplier2
+    } do
+      login_user(buyer)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.select_solution(0)
+      :timer.sleep(100)
+      AuctionShowPage.accept_bid()
+      :timer.sleep(500)
+      take_screenshot()
+      assert AuctionShowPage.auction_status() == "CLOSED"
+      assert AuctionShowPage.winning_solution_has_bids?([supplier1_bid1])
+
+      in_browser_session(:supplier2, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_bid_status() =~ "You won the entire auction"
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+    end
+
+    test "buyer selects other solution and provides comment", %{
+      auction: auction,
+      supplier2_bid1: supplier2_bid1,
+      buyer: buyer,
+      supplier: supplier,
+      supplier2: supplier2,
+      supplier3: supplier3
+    } do
+      login_user(buyer)
+      :timer.sleep(200)
+      AuctionShowPage.visit(auction.id)
+      AuctionShowPage.expand_solution(1)
+      AuctionShowPage.select_solution(1)
+      :timer.sleep(100)
+      AuctionShowPage.enter_solution_comment("Screw you!")
+      AuctionShowPage.accept_bid()
+      :timer.sleep(500)
+
+      assert AuctionShowPage.auction_status() == "CLOSED"
+      assert AuctionShowPage.winning_solution_has_bids?([supplier2_bid1])
+
+      in_browser_session(:supplier, fn ->
+        login_user(supplier)
+        AuctionShowPage.visit(auction.id)
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "Regretfully, you were unsuccessful in this auction. Thank you for quoting"
+
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+
+      in_browser_session(:supplier2, fn ->
+        login_user(supplier2)
+        AuctionShowPage.visit(auction.id)
+        :timer.sleep(500)
+        assert AuctionShowPage.auction_bid_status() =~ "You won the entire auction"
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+
+      in_browser_session(:supplier3, fn ->
+        login_user(supplier3)
+        AuctionShowPage.visit(auction.id)
+        assert AuctionShowPage.auction_status() == "CLOSED"
+      end)
+    end
+  end
+
 
   describe "barges" do
     test "supplier cannot submit a barge for approval once an auction has expired", %{

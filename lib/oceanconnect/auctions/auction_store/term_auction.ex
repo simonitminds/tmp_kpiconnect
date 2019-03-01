@@ -101,8 +101,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         %Command{command: :end_auction, data: %{auction: auction, ended_at: ended_at}}
       ) do
     {:ok, [
-      AuctionEvent.auction_expired(auction, ended_at, state),
-      AuctionEvent.auction_finalized(auction)
+      AuctionEvent.auction_ended(auction, ended_at, state)
     ]}
   end
 
@@ -111,6 +110,16 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         %Command{command: :end_auction}
       ) do
     {:ok, []}
+  end
+
+  def process(
+        state = %TermAuctionState{},
+        %Command{command: :end_auction_decision_period, data: %{auction: auction, expired_at: expired_at}}
+      ) do
+    {:ok, [
+      AuctionEvent.auction_expired(auction, expired_at, state),
+      AuctionEvent.auction_finalized(auction)
+    ]}
   end
 
   def process(

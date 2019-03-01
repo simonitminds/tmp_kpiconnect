@@ -303,12 +303,11 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
         |> Auctions.place_bid(supplier2)
 
       :timer.sleep(200)
-      Auctions.end_auction(auction)
 
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
-    test "winning solution can be selected", %{
+    test "winning solution can be selected while auction is open", %{
       auction: auction,
       bid: bid,
       fuel: fuel
@@ -319,6 +318,37 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
 
       auction_state = Auctions.get_auction_state!(auction)
 
+      Auctions.select_winning_solution(
+        [bid],
+        auction_state.product_bids,
+        auction,
+        "you win",
+        "Agent 9"
+      )
+
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert %Solution{
+               auction_id: ^auction_id,
+               bids: [
+                 %{id: ^bid_id, amount: 1.25, vessel_fuel_id: ^fuel_id}
+               ],
+               comment: "you win"
+             } = auction_payload.solutions.winning_solution
+    end
+
+    test "winning solution can be selected while auction is in decision", %{
+      auction: auction,
+      bid: bid,
+      fuel: fuel
+    } do
+
+      auction_id = auction.id
+      fuel_id = "#{fuel.id}"
+      bid_id = bid.id
+      auction_state = Auctions.get_auction_state!(auction)
+
+      Auctions.end_auction(auction)
       Auctions.select_winning_solution(
         [bid],
         auction_state.product_bids,

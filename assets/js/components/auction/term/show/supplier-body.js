@@ -73,6 +73,17 @@ const SupplierBody = (props) => {
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );
+  } else if (status == 'decision') {
+    return (
+      <div>
+        <SupplierBestSolution auctionPayload={auctionPayload}
+          connection={connection}
+          revokeBid={revokeSupplierBid}
+          unsubmitComment={removeCommentFromSolution}
+          supplierId={currentUserCompanyId} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+      </div>
+    );
   } else if (status != 'pending') {
     return (
       <div>
