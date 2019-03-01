@@ -4,7 +4,7 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   alias Oceanconnect.Auctions.{
     AuctionEvent,
     AuctionEventStore,
-    AuctionStore
+    AuctionStore,
   }
   alias Oceanconnect.Notifications.Command
   alias OceanconnectWeb.Mailer
@@ -20,31 +20,34 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     end
   end
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  defp get_delayed_notification_name(notification_name) do
+    {:via, Registry, {@registry_name, notification_name}}
   end
 
-  def process_command(command = %Command{name: name}) do
+  def start_link(name) do
+    GenServer.start_link(__MODULE__, name, name: get_delayed_notification_name(name))
+  end
+
+  def process_command(command = %Command{command: name}) do
     with {:ok, pid} <- find_pid(name),
         do: GenServer.cast(pid, {:process, command})
   end
 
-
-
-  def init([]) do
+  def init(name) do
     {:ok, %{
+      name: name,
       timer_ref: nil,
       send_time: nil,
       emails: []
     }}
   end
 
-  def handle_cast({:process, command = %Command{}, state) do
-    new_state = process(command, state)
-    {:noreply, state}
+  def handle_cast({:process, command = %Command{}}, state) do
+    {:ok, new_state} = process(command, state)
+    {:noreply, new_state}
   end
 
-  def handle_cast({:send_now}, state = %{timer_ref: ref, emails: emails}) do
+  def handle_cast(:send_now, state = %{timer_ref: ref, emails: emails}) do
     cancel_timer(ref)
     send(emails)
 
@@ -52,39 +55,37 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   end
 
 
-  def process(
-        %Command{command: :schedule_notification, name: name, data: %{send_time: send_time},
+  defp process(
+        %Command{command: :schedule_notification, data: %{send_time: send_time, emails: emails}},
         state = %{timer_ref: nil}
       ) do
     delay = time_until(send_time)
     ref = Process.send_after(self(), :send_now, delay)
 
-    {:ok, %{state | timer_ref: ref}}
+    {:ok, %{state | timer_ref: ref, emails: emails, send_time: send_time}}
   end
 
-  def process(
-        %Command{command: :reschedule_notification, name: name, data: %{send_time: new_send_time},
+  defp process(
+        %Command{command: :reschedule_notification, data: %{send_time: new_send_time, emails: emails}},
         state = %{timer_ref: ref, send_time: send_time}
       ) do
     if send_time == new_send_time do
       cancel_timer(ref)
       delay = time_until(new_send_time)
       ref = Process.send_after(self(), :send_now, delay)
-      {:ok, %{state | timer_ref: ref}}
+      {:ok, %{state | timer_ref: ref, emails: emails, send_time: new_send_time}}
     else
       {:ok, state}
     end
   end
 
-  def process(
-        %Command{command: :cancel_notification, name: name, data: %{},
+  defp process(
+        %Command{command: :cancel_notification, data: %{}},
         state = %{timer_ref: ref}
       ) do
     cancel_timer(ref)
     {:ok, %{state | timer_ref: nil}}
   end
-
-
 
   defp send(emails) do
     Enum.map(emails, fn(email) ->
@@ -103,14 +104,6 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
 
   defp normalize_delay(delay) when delay <= 0, do: 500
   defp normalize_delay(delay), do: delay
-
-
-
-
-
-
-
-
 
   # def init(auction = %struct{id: auction_id, scheduled_start: start_time}) when is_auction(struct) do
   #   AuctionEventStore.event_list(auction_id)

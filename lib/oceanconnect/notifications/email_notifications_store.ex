@@ -3,10 +3,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   require Logger
 
   alias OceanconnectWeb.Mailer
+  alias Oceanconnect.Auctions.AuctionEvent
   alias Oceanconnect.Notifications
   alias Oceanconnect.Notifications.{
     Command,
-    DelayedNotification
+    DelayedNotifications,
+    DelayedNotificationsSupervisor
   }
 
   def start_link([]) do
@@ -24,7 +26,9 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   def handle_info({event, event_state}, state) do
-    process(event, event_state)
+    if needs_processed?(event) do
+      process(event, event_state)
+    end
     {:noreply, state}
   end
 
@@ -33,27 +37,45 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-
   defp process(event = %AuctionEvent{type: :auction_created, auction_id: auction_id}, state) do
-    NotificationCommand.schedule_notification("auction:#{auction_id}:upcoming_reminder")
-    |> DelayedNotifications.process_command()
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
+    emails = Notifications.emails_for_event(event, state)
+    case calculate_upcoming_reminder_send_time(auction_id) do
+      false ->
+        {:ok, :nothing_to_schedule}
+      send_time ->
+        Command.schedule_notification(notification_name, send_time, emails)
+        |> DelayedNotifications.process_command()
+    end
   end
 
   defp process(event = %AuctionEvent{type: :auction_rescheduled, auction_id: auction_id}, state) do
-    NotificationCommand.reschedule_notification("auction:#{auction_id}:upcoming_reminder")
-    |> DelayedNotifications.process_command()
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
+    emails = Notifications.emails_for_event(event, state)
+    case calculate_upcoming_reminder_send_time(auction_id) do
+      false ->
+        {:ok, :nothing_to_schedule}
+      send_time ->
+        Command.reschedule_notification("auction:#{auction_id}:upcoming_reminder", send_time, emails)
+        |> DelayedNotifications.process_command()
+    end
   end
 
   defp process(event = %AuctionEvent{type: :auction_canceled, auction_id: auction_id}, state) do
-    NotificationCommand.cancel_notification("auction:#{auction_id}:upcoming_reminder")
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
+    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder")
     |> DelayedNotifications.process_command()
   end
 
   defp process(event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, state) do
-    NotificationCommand.cancel_notification("auction:#{auction_id}:upcoming_reminder")
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
+    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder")
     |> DelayedNotifications.process_command()
   end
-
 
   defp process(event, state) do
     emails = Notifications.emails_for_event(event, state)
@@ -62,8 +84,22 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     end)
   end
 
-
   defp subscribe_to_notifications() do
     Phoenix.PubSub.subscribe(:auction_pubsub, "auctions")
+  end
+
+  #TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
+  def needs_processed?(_event) do
+    true
+  end
+
+  defp calculate_upcoming_reminder_send_time(auction_id) do
+    %{scheduled_start: start_time} = Oceanconnect.Auctions.get_auction!(auction_id)
+    if start_time do
+      (DateTime.to_unix(start_time, :millisecond) - 3_600_000)
+      |> DateTime.from_unix
+    else
+      false
+    end
   end
 end

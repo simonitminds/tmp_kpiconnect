@@ -9,7 +9,6 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     AuctionScheduler,
     AuctionStore,
     AuctionTimer,
-    AuctionReminderTimer
   }
 
   @registry_name :auction_supervisor_registry
@@ -30,9 +29,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
       auction_cache: {AuctionCache, auction},
       auction_event_handler: {AuctionEventHandler, auction_id},
       auction_scheduler: {AuctionScheduler, auction},
-      auction_store: {AuctionStore, auction},
-      auction_reminder_timer:
-        Supervisor.child_spec({AuctionReminderTimer, auction}, restart: :transient)
+      auction_store: {AuctionStore, auction}
     }
 
     children = exclude_children(all_children, options)
@@ -52,15 +49,8 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
   end
 
   defp exclude_children(all_children, %{exclude_children: exclusions}) do
-    children =
-      if :auction_reminder_timer in exclusions do
-        Enum.reject(all_children, fn child -> child == :auction_reminder_timer end)
-      else
-        all_children
-      end
-
     children_included =
-      children
+      all_children
       |> Enum.reject(fn {k, _v} -> k in exclusions end)
       |> Enum.map(fn {_, v} -> v end)
 
