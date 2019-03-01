@@ -135,9 +135,9 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def total_fuel_volume do
-    click({:css, ".qa-auction-show-total-fuel_quantity"})
+    click({:css, ".qa-auction-show_total_fuel_volume"})
 
-    find_element(:css, ".qa-auction-total-fuel_quantity")
+    find_element(:css, ".qa-auction-total_fuel_volume")
     |> inner_text()
   end
 

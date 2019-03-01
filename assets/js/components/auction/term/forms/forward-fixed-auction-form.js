@@ -14,7 +14,7 @@ import AdditionalInfoFormSection from '../../common/forms/additional-info-form-s
 import AuctionDetailsFormSection from '../../common/forms/auction-details-form-section';
 
 class ForwardFixedAuctionForm extends React.Component {
-  construct(porps) {
+  constructor(props) {
     super(props);
   }
 
@@ -30,6 +30,8 @@ class ForwardFixedAuctionForm extends React.Component {
       etd_date,
       etd_time,
       fuels,
+      total_fuel_volume,
+      show_total_fuel_volume,
       ports,
       scheduled_start_date,
       scheduled_start_time,
@@ -42,6 +44,7 @@ class ForwardFixedAuctionForm extends React.Component {
       updateDate,
       updateInformation,
       updateInformationFromCheckbox,
+      recalculateTotalFuelVolume,
       vessels,
     } = this.props;
 
@@ -77,7 +80,7 @@ class ForwardFixedAuctionForm extends React.Component {
                                portId={port_id}
                                ports={ports} />
 
-        <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} updateInformation={updateInformation} updateInformationFromCheckbox={updateInformationFromCheckbox} />
+        <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} totalFuelVolume={total_fuel_volume} updateInformation={updateInformation} updateInformationFromCheckbox={updateInformationFromCheckbox} recalculateTotalFuleVolume={recalculateTotalFuelVolume} />
 
         <AdditionalInfoFormSection auction={auction} errors={errors} updateInformation={updateInformation} isTermAuction={true }/>
 

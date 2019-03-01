@@ -27,7 +27,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:fuel, Fuel)
     field(:fuel_quantity, :integer)
     field(:total_fuel_volume, :integer)
-    field(:show_total_fuel_volume, :boolean)
+    field(:show_total_fuel_volume, :boolean, default: true);
 
     has_many(:term_auction_vessels, TermAuctionVessel,
       foreign_key: :auction_id,
@@ -138,10 +138,19 @@ defmodule Oceanconnect.Auctions.TermAuction do
       valid?: true,
       changes: %{start_date: start_date, end_date: end_date, fuel_quantity: fuel_quantity}
     } = changeset) do
-      months = DateTime.diff(end_date, start_date, :month)
+      IO.inspect(fuel_quantity)
+      months =
+        DateTime.diff(end_date, start_date, :second) / 2_629_800
+        |> Float.round()
+
+      total_fuel_volume =
+        months * fuel_quantity
+        |> :erlang.float_to_binary(decimals: 0)
+        |> :erlang.binary_to_integer()
+
       cond do
         months >= 1 ->
-          change(changeset, %{total_fuel_volume: fuel_quantity * months})
+          change(changeset, %{total_fuel_volume: total_fuel_volume})
         true ->
           changeset
       end
@@ -156,6 +165,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> maybe_parse_date_field("end_date")
     |> maybe_convert_checkbox("is_traded_bid_allowed")
     |> maybe_convert_checkbox("anonymous_bidding")
+    |> maybe_convert_checkbox("show_total_fuel_volume")
     |> maybe_convert_duration("duration")
     |> maybe_load_suppliers("suppliers")
     |> maybe_load_vessels("vessels")

@@ -245,6 +245,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_fuel(selected_fuel.id)
 
-    assert AuctionNewPage.total_fuel_volume() == 30_000
+    assert AuctionNewPage.total_fuel_volume() == "30000"
   end
 end
