@@ -6,8 +6,8 @@ export default class TermVesselFormSection extends React.Component {
   constructor(props) {
     super(props);
 
-    const vessels = this.props.vessels;
-    const selectedVessels = _.chain(vessels).map('vessel_id').uniq().filter().value();
+    const auctionVessels = this.props.auction.vessels
+    const selectedVessels = _.chain(auctionVessels).map('id').uniq().filter().value();
     this.state = {
       selectedVessels: selectedVessels
     };

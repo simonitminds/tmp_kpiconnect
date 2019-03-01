@@ -148,6 +148,8 @@ defmodule OceanconnectWeb.AuctionController do
          true <- auction.buyer_id == Auth.current_user(conn).company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       changeset = Auctions.change_auction(auction)
+
+      IO.inspect(auction)
       [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
       [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
@@ -173,17 +175,15 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def update(conn, %{"id" => id, "auction" => auction_params}) do
-    auction_vessel_fuels = vessel_fuels_from_params(auction_params)
-
     user = Auth.current_user(conn)
+    credit_margin_amount = user.company.credit_margin_amount
 
     with auction = %struct{} when is_auction(struct) <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params =
         auction_params
-        |> Auction.from_params()
-        |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
+        |> normalize_auction_params()
 
       case Auctions.update_auction(auction, updated_params, user) do
         {:ok, auction} ->
@@ -194,7 +194,6 @@ defmodule OceanconnectWeb.AuctionController do
         {:error, %Ecto.Changeset{} = changeset} ->
           [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
           [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
-          credit_margin_amount = user.company.credit_margin_amount
 
           render(
             conn,
