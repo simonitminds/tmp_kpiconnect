@@ -617,7 +617,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction(%struct{} = auction, %{"scheduled_start" => nil} = attrs, user) when is_auction(struct) do
-    IO.inspect(attrs)
     auction
     |> struct.changeset(attrs)
     |> Repo.update()
@@ -625,7 +624,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction(%struct{} = auction, attrs, user) when is_auction(struct) do
-    IO.inspect(attrs)
     auction
     |> struct.changeset_for_scheduled_auction(attrs)
     |> Repo.update()
@@ -633,7 +631,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction!(%struct{} = auction, %{"scheduled_start" => nil} = attrs, user) when is_auction(struct) do
-    IO.inspect(attrs)
     auction
     |> struct.changeset(attrs)
     |> Repo.update!()
@@ -641,7 +638,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def update_auction!(%struct{} = auction, attrs, user) when is_auction(struct) do
-    IO.inspect(attrs)
     auction
     |> struct.changeset_for_scheduled_auction(attrs)
     |> Repo.update!()

@@ -105,7 +105,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
-    |> IO.inspect
   end
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do

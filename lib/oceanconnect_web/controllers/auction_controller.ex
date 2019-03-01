@@ -149,7 +149,6 @@ defmodule OceanconnectWeb.AuctionController do
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       changeset = Auctions.change_auction(auction)
 
-      IO.inspect(auction)
       [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
       [fuels, ports, vessels] = auction_inputs_by_buyer(conn)
 
