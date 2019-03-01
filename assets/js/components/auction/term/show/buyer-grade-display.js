@@ -23,7 +23,7 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         { _.map(products, (fuelId) => {
             const lowestBids = productBids[fuelId].lowest_bids;
-          const productName = `${_.get(fuel, 'name')} ${fuelQuantity} MT/Month`
+          const productName = `${_.get(fuel, 'name')} × ${fuelQuantity} MT/month`
 
             return <BidTable
               key={fuelId}
@@ -50,4 +50,3 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
 };
 
 export default BuyerGradeDisplay;
-

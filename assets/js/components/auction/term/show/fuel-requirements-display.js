@@ -20,12 +20,10 @@ const FuelRequirementsDisplay = (props) => {
         <strong>Quantity</strong>
         { showTotalFuelVolume ?
             <div>
-              <span className="qa-auction-total_fuel_volume">{totalFuelVolume}</span> MT
-              <br/>
-              (~<span className="qa-auction-fuel_quantity">{fuelQuantity}</span> MT/Month)
+              <span className="qa-auction-total_fuel_volume">{totalFuelVolume}</span> MT (<span className="qa-auction-fuel_quantity">{fuelQuantity}</span> MT/month)
             </div>
           :
-            <span><span className="qa-auction-fuel_quantity">{fuelQuantity}</span> MT/Month</span>
+            <span><span className="qa-auction-fuel_quantity">{fuelQuantity}</span> MT/month</span>
         }
       </li>
     </ul>

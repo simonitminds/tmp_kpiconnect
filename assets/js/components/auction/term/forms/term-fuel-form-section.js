@@ -37,7 +37,12 @@ const TermFuelFormSection = (props) => {
     }
 
     let months = endDate.diff(startDate, 'months');
-    return fuelQuantity * months;
+
+    if (fuelQuantity && months) {
+      return fuelQuantity * months;
+    } else {
+      return "—";
+    }
   }
 
 
@@ -81,7 +86,7 @@ const TermFuelFormSection = (props) => {
             <InputField
               model={'auction'}
               field={'fuel_quantity'}
-              labelText={'Fuel Quantity (MT)/Month'}
+              labelText={'Fuel Quantity per Month (MT)'}
               value={auction.fuel_quantity}
               errors={errors.fuel_quantity}
               isHorizontal={true}
@@ -89,7 +94,7 @@ const TermFuelFormSection = (props) => {
               onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
             />
 
-            <div className="fiel is-horizontal">
+            <div className="field is-horizontal">
               <div className="field-label"></div>
               <div className="field-body field-body--columned">
                 <CheckBoxField
@@ -103,7 +108,8 @@ const TermFuelFormSection = (props) => {
                 />
                 <InputErrors errors={errors.show_total_fuel_volume} />
                   <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}>
-                    <strong>Your Total Volume:</strong> <span className="qa-auction-total_fuel_volume">{calculateTotalFuelVolume()}</span> M/T
+                    <strong>Your Total Volume:</strong>
+                    <span className="qa-auction-total_fuel_volume"> {calculateTotalFuelVolume()} MT</span>
                   </div>
               </div>
             </div>

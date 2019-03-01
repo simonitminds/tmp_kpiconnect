@@ -79,7 +79,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
 
   const messageDisplay = (message) => {
     return (
-      <h3>
+      <h3 className="has-margin-bottom-none">
         <span className="auction-notification__copy qa-supplier-bid-status-message">
           {message}
         </span>

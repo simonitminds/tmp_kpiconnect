@@ -9,7 +9,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
   const auctionType = _.get(auctionPayload, 'auction.type');
   const fuel = _.get(auctionPayload, 'auction.fuel');
   const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity')
-  const productName = `${_.get(fuel, 'name')} ${fuelQuantity} M/T/Month`
+  const productName = `${_.get(fuel, 'name')} × ${fuelQuantity} MT/month`
 
   if(bidList.length > 0) {
     return(
@@ -38,4 +38,3 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
 };
 
 export default SupplierBidList;
-
