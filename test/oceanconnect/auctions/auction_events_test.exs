@@ -42,11 +42,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
-
-      AuctionEvent.emit(
-        %AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}},
-        true
-      )
+      Oceanconnect.Auctions.EventNotifier.emit(%{}, %AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}})
 
       assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}
     end
