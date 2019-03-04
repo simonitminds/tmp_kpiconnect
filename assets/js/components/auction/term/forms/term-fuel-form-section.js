@@ -109,7 +109,7 @@ const TermFuelFormSection = (props) => {
                 <InputErrors errors={errors.show_total_fuel_volume} />
                   <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}>
                     <strong>Your Total Volume:</strong>
-                    <span className="qa-auction-total_fuel_volume"> {calculateTotalFuelVolume()} MT</span>
+                    <span className="qa-auction-total_fuel_volume">{calculateTotalFuelVolume()}</span> MT
                   </div>
               </div>
             </div>
