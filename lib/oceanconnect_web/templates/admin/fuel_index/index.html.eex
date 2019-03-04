@@ -1,0 +1,59 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fuel Index Entries</span>
+					<%= link to: admin_fuel_index_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" do %>
+						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Fuel Index
+					<% end %>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+              <th>Name</th>
+              <th>Code</th>
+
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for fuel_index <- @fuel_index_entries do %>
+							<tr class="qa-admin-fuel_index-<%= fuel_index.id %>">
+                <td class="qa-admin-fuel_index-name"><%= fuel_index.name %></td>
+                <td class="qa-admin-fuel_index-code"><%= fuel_index.code %></td>
+								<td class="text-right">
+									<%= link "Edit", to: admin_fuel_index_path(@conn, :edit, fuel_index), class: "button is-small is-primary is-inline-block has-margin-bottom-xs qa-admin-fuel_index-edit" %>
+									<%= if fuel_index.is_active do %>
+                    <%= link "Deactivate", to: admin_fuel_index_path(@conn, :deactivate, fuel_index), method: :post, class: "button is-small is-danger is-inline-block has-margin-bottom-xs qa-admin-fuel_index-deactivate" %>
+									<% else %>
+                    <%= link "Activate", to: admin_fuel_index_path(@conn, :activate, fuel_index), method: :post, class: "button is-small is-success is-inline-block has-margin-bottom-xs qa-admin-fuel_index-activate" %>
+									<% end %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+				<div class="is-flex">
+					<div class="has-margin-left-auto">
+						<%= if @page_number > 1 do %>
+							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number - 1), class: "button is-inline-block" do %>
+								<i class="fas fa-chevron-left is-inline-block has-margin-right-sm"></i> Previous Page
+							<% end %>
+						<% end %>
+						<%= if @page_number < @total_pages do %>
+							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number + 1), class: "button is-inline-block" do %>
+								Next Page <i class="fas fa-chevron-right is-inline-block has-margin-left-sm"></i>
+							<% end %>
+						<% end %>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>

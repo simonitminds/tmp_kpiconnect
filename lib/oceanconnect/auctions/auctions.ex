@@ -20,6 +20,7 @@ defmodule Oceanconnect.Auctions do
     AuctionVesselFuel,
     Barge,
     Fuel,
+    FuelIndex,
     Port,
     Solution,
     TermAuction,
@@ -1509,5 +1510,122 @@ defmodule Oceanconnect.Auctions do
       nil ->
         nil
     end
+  end
+
+  @doc """
+  Returns the list of fuel_index_entries.
+
+  ## Examples
+
+      iex> list_fuel_index_entries()
+      [%FuelIndex{}, ...]
+
+  """
+  def list_fuel_index_entries do
+    FuelIndex.alphabetical()
+    |> Repo.paginate()
+  end
+
+  def list_active_fuel_index_entries do
+    FuelIndex.select_active()
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single fuel_index.
+
+  Raises `Ecto.NoResultsError` if the Fuel index does not exist.
+
+  ## Examples
+
+      iex> get_fuel_index!(123)
+      %FuelIndex{}
+
+      iex> get_fuel_index!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_fuel_index!(id), do: Repo.get!(FuelIndex, id)
+
+  def get_active_fuel_index!(id) do
+    FuelIndex.select_active()
+    |> Repo.get!(id)
+  end
+
+  @doc """
+  Creates a fuel_index.
+
+  ## Examples
+
+      iex> create_fuel_index(%{field: value})
+      {:ok, %FuelIndex{}}
+
+      iex> create_fuel_index(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_fuel_index(attrs \\ %{}) do
+    %FuelIndex{}
+    |> FuelIndex.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a fuel_index.
+
+  ## Examples
+
+      iex> update_fuel_index(fuel_index, %{field: new_value})
+      {:ok, %FuelIndex{}}
+
+      iex> update_fuel_index(fuel_index, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_fuel_index(%FuelIndex{} = fuel_index, attrs) do
+    fuel_index
+    |> FuelIndex.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a FuelIndex.
+
+  ## Examples
+
+      iex> delete_fuel_index(fuel_index)
+      {:ok, %FuelIndex{}}
+
+      iex> delete_fuel_index(fuel_index)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_fuel_index(%FuelIndex{} = fuel_index) do
+    Repo.delete(fuel_index)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking fuel_index changes.
+
+  ## Examples
+
+      iex> change_fuel_index(fuel_index)
+      %Ecto.Changeset{source: %FuelIndex{}}
+
+  """
+  def change_fuel_index(%FuelIndex{} = fuel_index) do
+    FuelIndex.changeset(fuel_index, %{})
+  end
+
+  def activate_fuel_index(fuel_index = %FuelIndex{}) do
+    fuel_index
+    |> FuelIndex.changeset(%{is_active: true})
+    |> Repo.update()
+  end
+
+  def deactivate_fuel_index(fuel_index = %FuelIndex{}) do
+    fuel_index
+    |> FuelIndex.changeset(%{is_active: false})
+    |> Repo.update()
   end
 end
