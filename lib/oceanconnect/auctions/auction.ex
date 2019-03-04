@@ -101,7 +101,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> validate_scheduled_start(attrs)
-    |> validate_vessel_fuels(attrs)
+    |> validate_vessel_fuels()
     |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end
@@ -304,27 +304,9 @@ defmodule Oceanconnect.Auctions.Auction do
     scheduled_start
   end
 
-  def validate_vessel_fuels(changeset, %{auction_vessel_fuels: vessel_fuels}) do
-    cond do
-      vessel_fuels == nil || length(vessel_fuels) < 1 ->
-        add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
-
-      true ->
-        changeset
-    end
-  end
-
-  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) do
-    cond do
-      vessel_fuels == nil || length(vessel_fuels) < 1 ->
-        add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
-
-      true ->
-        changeset
-    end
-  end
-
-  def validate_vessel_fuels(changeset, _attrs) do
+  def validate_vessel_fuels(%Ecto.Changeset{data: %{auction_vessel_fuels: vessel_fuels}} = changeset) when is_nil(vessel_fuels) or vessel_fuels < 1 do
     add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
   end
+
+  def validate_vessel_fuels(changeset), do: changeset
 end
