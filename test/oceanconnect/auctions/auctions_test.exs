@@ -1557,7 +1557,7 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       update_attrs = %{name: "some new name"}
       fuel_index = insert(:fuel_index)
-      inactive_fuel_index = insert(:fuel_index, is_active: true)
+      inactive_fuel_index = insert(:fuel_index, is_active: false)
 
       fuel = insert(:fuel)
       port = insert(:port)
