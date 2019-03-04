@@ -606,7 +606,8 @@ auctions_params = [
     buyer_id: nigeria.id,
     duration: 1 * 60_000,
     decision_duration: 1 * 60_000,
-    anonymous_bidding: true
+    anonymous_bidding: true,
+    type: "spot"
   },
   %Auction{
     auction_vessel_fuels: [
@@ -617,7 +618,8 @@ auctions_params = [
     po: "2345678",
     buyer_id: chevron.id,
     duration: 4 * 60_000,
-    decision_duration: 4 * 60_000
+    decision_duration: 4 * 60_000,
+    type: "spot"
   },
   %Auction{
     auction_vessel_fuels: [
@@ -635,7 +637,8 @@ auctions_params = [
     buyer_id: qatargas.id,
     duration: 10 * 60_000,
     decision_duration: 15 * 60_000,
-    is_traded_bid_allowed: true
+    is_traded_bid_allowed: true,
+    type: "spot"
   },
   %TermAuction{
     type: "forward_fixed",
