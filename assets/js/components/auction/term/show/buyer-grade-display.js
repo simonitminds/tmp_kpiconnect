@@ -6,6 +6,7 @@ import BidTable from '../../common/show/bid-table';
 
 const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel');
+  const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity');
 
   const productBids = _.get(auctionPayload, 'product_bids');
   const products = _.keys(productBids);
@@ -22,7 +23,7 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         { _.map(products, (fuelId) => {
             const lowestBids = productBids[fuelId].lowest_bids;
-            const productName = _.get(fuel, 'name')
+          const productName = `${_.get(fuel, 'name')} × ${fuelQuantity} MT/month`
 
             return <BidTable
               key={fuelId}
@@ -49,4 +50,3 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
 };
 
 export default BuyerGradeDisplay;
-

@@ -7,7 +7,9 @@ import BidTable from '../../common/show/bid-table';
 const SupplierBidList = ({auctionPayload, buyer}) => {
   const bidList = _.get(auctionPayload, 'bid_history', []);
   const auctionType = _.get(auctionPayload, 'auction.type');
-  const productName = _.get(auctionPayload, 'auction.fuel.name');
+  const fuel = _.get(auctionPayload, 'auction.fuel');
+  const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity')
+  const productName = `${_.get(fuel, 'name')} × ${fuelQuantity} MT/month`
 
   if(bidList.length > 0) {
     return(
@@ -36,4 +38,3 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
 };
 
 export default SupplierBidList;
-

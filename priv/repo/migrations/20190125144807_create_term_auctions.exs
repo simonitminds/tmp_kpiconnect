@@ -3,7 +3,7 @@ defmodule Oceanconnect.Repo.Migrations.AddTermToAuctions do
 
   def change do
     alter table(:auctions) do
-      add(:type, :string)
+      add(:type, :string, default: "spot")
       add(:start_date, :utc_datetime_usec)
       add(:end_date, :utc_datetime_usec)
       add(:terminal, :string)

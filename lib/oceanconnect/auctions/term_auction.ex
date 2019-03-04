@@ -26,6 +26,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Fuel)
     field(:fuel_quantity, :integer)
+    field(:total_fuel_volume, :integer)
+    field(:show_total_fuel_volume, :boolean, default: true);
 
     has_many(:term_auction_vessels, TermAuctionVessel,
       foreign_key: :auction_id,
@@ -72,6 +74,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :end_date,
     :fuel_id,
     :fuel_quantity,
+    :total_fuel_volume,
+    :show_total_fuel_volume,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
@@ -91,6 +95,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> add_total_fuel_volume()
   end
 
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
@@ -105,6 +110,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> add_total_fuel_volume()
   end
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
@@ -127,6 +133,31 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_add_vessels(changeset, _attrs), do: changeset
 
+  def add_total_fuel_volume(
+    %Ecto.Changeset{
+      valid?: true,
+      changes: %{start_date: start_date, end_date: end_date, fuel_quantity: fuel_quantity}
+    } = changeset) do
+      IO.inspect(fuel_quantity)
+      months =
+        DateTime.diff(end_date, start_date, :second) / 2_629_800
+        |> Float.round()
+
+      total_fuel_volume =
+        months * fuel_quantity
+        |> :erlang.float_to_binary(decimals: 0)
+        |> :erlang.binary_to_integer()
+
+      cond do
+        months >= 1 ->
+          change(changeset, %{total_fuel_volume: total_fuel_volume})
+        true ->
+          changeset
+      end
+  end
+
+  def add_total_fuel_volume(changeset), do: changeset
+
   def from_params(params) do
     params
     |> maybe_parse_date_field("scheduled_start")
@@ -134,6 +165,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> maybe_parse_date_field("end_date")
     |> maybe_convert_checkbox("is_traded_bid_allowed")
     |> maybe_convert_checkbox("anonymous_bidding")
+    |> maybe_convert_checkbox("show_total_fuel_volume")
     |> maybe_convert_duration("duration")
     |> maybe_load_suppliers("suppliers")
     |> maybe_load_vessels("vessels")

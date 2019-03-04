@@ -13,6 +13,7 @@ import FuelPriceDisplay from '../../common/index/fuel-price-display';
 const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionType = _.get(auction, 'type')
+  console.log(auctionType);
   const vessels = _.get(auction, 'vessels');
   const startDate = _.get(auction, 'start_date');
   const endDate = _.get(auction, 'end_date');
@@ -86,7 +87,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
-          <FuelPriceDisplay products={products} />
+          <FuelPriceDisplay products={products} auctionType={auctionType} />
         </div>
         { auctionStatus == 'pending'
           ? <div className="card-content__products">

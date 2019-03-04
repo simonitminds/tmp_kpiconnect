@@ -71,7 +71,7 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
-          <FuelPriceDisplay products={products} />
+          <FuelPriceDisplay products={products} auctionType={auctionType} />
         </div>
         { bidStatusDisplay() }
       </div>

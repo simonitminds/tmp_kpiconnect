@@ -228,4 +228,23 @@ defmodule Oceanconnect.TermAuctionNewTest do
     refute current_path() =~ ~r/auctions\/\d/
     assert AuctionNewPage.has_content?("Can't be blank")
   end
+
+  test "a buyer can see the total fuel volume over the term when they chose to purchase by lot", %{params: params, port: port, selected_fuel: selected_fuel} do
+    params =
+      params
+      |> Map.replace!(:end_date_date,
+        DateTime.utc_now()
+        |> DateTime.to_unix()
+        |> Kernel.+(5_259_600) # 2 months in seconds
+        |> DateTime.from_unix!()
+      )
+
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:forward_fixed)
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_fuel(selected_fuel.id)
+
+    assert AuctionNewPage.total_fuel_volume() == "30000"
+  end
 end

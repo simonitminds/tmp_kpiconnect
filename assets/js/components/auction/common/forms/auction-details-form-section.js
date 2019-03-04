@@ -132,7 +132,9 @@ const AuctionDetailsFormSection = (props) => {
                         className={'has-margin-right-sm'}
                     />
                     <InputErrors errors={errors.is_traded_bid_allowed} />
-                    <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}><strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></div>
+                    <div className="field-body__note" style={{display: auction.is_traded_bid_allowed === true ? `inline-block` : `none`}}>
+                      <strong>Your Credit Margin Amount:</strong> $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span>
+                    </div>
                   </div>
                 </div>
             }

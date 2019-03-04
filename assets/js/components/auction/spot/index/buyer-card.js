@@ -12,6 +12,7 @@ import FuelPriceDisplay from '../../common/index/fuel-price-display';
 
 const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
+  const auctionType = _.get(auction, 'type');
   const vessels = _.get(auction, 'vessels');
   const { eta, etd } = etaAndEtdForAuction(auction);
   const fuels = _.get(auction, 'fuels');
@@ -114,7 +115,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-          <FuelPriceDisplay products={products} />
+          <FuelPriceDisplay products={products} auctionType={auctionType} />
         </div>
         { auctionStatus == 'pending'
           ? <div className="card-content__products">
