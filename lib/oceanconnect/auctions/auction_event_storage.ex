@@ -35,7 +35,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     {:ok, Map.put(stored, :event, event)}
   end
 
-  def events_by_auction(auction_id) do
+  def events_by_auction(auction_id) when is_integer(auction_id) do
     query =
       from(
         storage in __MODULE__,

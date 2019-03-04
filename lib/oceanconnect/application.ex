@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Application do
   use Application
   alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter}
+  alias Oceanconnect.Notifications.NotificationsSupervisor
   import Supervisor.Spec
 
   # See https://hexdocs.pm/elixir/Application.html
@@ -16,15 +17,13 @@ defmodule Oceanconnect.Application do
         supervisor(OceanconnectWeb.Endpoint, []),
         supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
         {Registry, keys: :unique, name: :auction_supervisor_registry},
-        {Registry, keys: :unique, name: :auction_email_supervisor_registry},
         {Registry, keys: :unique, name: :auctions_registry},
         {Registry, keys: :unique, name: :auction_cache_registry},
-        {Registry, keys: :unique, name: :auction_timers_registry},
-        {Registry, keys: :unique, name: :auction_reminder_timers_registry},
-        {Registry, keys: :unique, name: :auction_scheduler_registry},
-        {Registry, keys: :unique, name: :auction_bids_registry},
         {Registry, keys: :unique, name: :auction_event_handler_registry},
-        {Registry, keys: :unique, name: :auction_email_notification_handler_registry},
+        {Registry, keys: :unique, name: :auction_scheduler_registry},
+        {Registry, keys: :unique, name: :auction_timers_registry},
+        {Registry, keys: :unique, name: :delayed_notifications_registry},
+        worker(NotificationsSupervisor, [], restart: :permanent),
         worker(AuctionsSupervisor, [], restart: :permanent)
         # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
       ]

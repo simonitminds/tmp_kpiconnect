@@ -2,7 +2,6 @@ defmodule Oceanconnect.AuctionIndexTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.AuctionIndexPage
   alias Oceanconnect.AdminPage
-  alias Oceanconnect.AuctionLogPage
   alias Oceanconnect.Auctions
 
   setup do

@@ -42,6 +42,10 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.call(pid, :get_current_state)
   end
+  def get_current_state(auction_id) when is_integer(auction_id) do
+    with {:ok, pid} <- find_pid(auction_id),
+         do: GenServer.call(pid, :get_current_state)
+  end
 
   def process_command(command = %Command{
         command: :select_winning_solution,

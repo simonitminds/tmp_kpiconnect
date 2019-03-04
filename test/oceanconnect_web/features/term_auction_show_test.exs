@@ -165,7 +165,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
         AuctionShowPage.visit(auction.id)
         :timer.sleep(100)
         AuctionShowPage.enter_bid(%{amount: 9.50})
-        AuctionShowPage.submit_bid()
+        AuctionShowPage.force_submit_bid!()
         :timer.sleep(100)
 
         AuctionShowPage.enter_comment("Hi")
@@ -173,6 +173,9 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
         assert AuctionShowPage.has_content?("Hi")
       end)
+      AuctionShowPage.visit(auction.id)
+      :timer.sleep(100)
+      Hound.Helpers.Screenshot.take_screenshot()
       AuctionShowPage.select_solution(0)
       :timer.sleep(100)
       assert AuctionShowPage.has_content?("Hi")
@@ -268,8 +271,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
         AuctionShowPage.visit(auction.id)
         :timer.sleep(500)
         AuctionShowPage.enter_bid(%{amount: 9.50})
-        AuctionShowPage.submit_bid()
-        :timer.sleep(500)
+        AuctionShowPage.force_submit_bid!()
         assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
       end)
 

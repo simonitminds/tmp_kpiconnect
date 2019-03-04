@@ -16,8 +16,13 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     # React before emitting the event to ensure things like cache updates and
     # persistence have occurred before other handlers respond.
     react_to(event, state)
-    AuctionEvent.emit(event, true)
+    broadcast(event, state)
     {:ok, true}
+  end
+
+  def broadcast(event = %AuctionEvent{auction_id: auction_id}, state) do
+    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{auction_id}", event)
+    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {event, state})
   end
 
 

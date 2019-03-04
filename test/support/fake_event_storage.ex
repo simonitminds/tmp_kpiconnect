@@ -28,7 +28,7 @@ defmodule Oceanconnect.FakeEventStorage do
       {:noreply, data}
     end
 
-    def handle_cast({:add_event, event}, current_state = %{events: events, next_id: next_id}) do
+    def handle_cast({:add_event, event}, %{events: events, next_id: next_id}) do
       event = %{event | id: next_id}
 
       {:noreply, %{
