@@ -3,7 +3,7 @@ defmodule Oceanconnect.Repo.Migrations.CreateFuelIndexEntries do
 
   def change do
     create table(:fuel_index_entries) do
-      add :code, :integer
+      add :code, :string
       add :name, :string
       add :fuel_id, references(:fuels)
       add :port_id, references(:ports)

@@ -6,7 +6,7 @@ defmodule Oceanconnect.Auctions.FuelIndex do
 
 
   schema "fuel_index_entries" do
-    field :code, :integer
+    field :code, :string
     belongs_to :fuel, Fuel
     field :name, :string
     belongs_to :port, Port
