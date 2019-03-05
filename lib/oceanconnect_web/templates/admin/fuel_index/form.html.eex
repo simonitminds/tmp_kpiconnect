@@ -7,7 +7,7 @@
   <div class="columns">
     <div class="column is-one-third">
       <div class="field" >
-        <%= label f, :code, class: "label" %>
+        <%= label f, :code, class: "label" do %>
           Index Code
         <% end %>
     		<div class="control">
