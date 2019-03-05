@@ -8,6 +8,8 @@
     <div class="column is-one-third">
       <div class="field" >
         <%= label f, :code, class: "label" %>
+          Index Code
+        <% end %>
     		<div class="control">
     			<%= text_input f, :code, class: "input qa-admin-fuel_index-code" %>
     			<%= error_tag f, :code %>
@@ -16,7 +18,7 @@
 
       <div class="field" >
         <%= label f, :name, class: "label" do %>
-          Index Code
+          Index Name
         <%end%>
     		<div class="control">
     			<%= text_input f, :name, class: "input qa-admin-fuel_index-name" %>
