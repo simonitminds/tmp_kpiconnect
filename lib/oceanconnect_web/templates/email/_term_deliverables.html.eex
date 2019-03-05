@@ -1,0 +1,8 @@
+<h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Deliverables</h1>
+<hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
+<p style="margin-top: 0.25rem;"><b>Fuel Grade:</b> <%= @auction.fuel.name %></p>
+<p style="margin-top: 0.25rem;"><b>Monthly Quantity:</b> <%= @auction.fuel_quantity %> MT/month</p>
+<p style="margin-top: 0.25rem;"><b>Term Length:</b> <%= term_length(@auction) %> months</p>
+<%= if @auction.show_total_fuel_volume do %>
+  <p style="margin-top: 0.25rem;"><b>Total Volume:</b> <%= @auction.total_fuel_volume %> MT</p>
+<% end %>
