@@ -1545,7 +1545,10 @@ defmodule Oceanconnect.Auctions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_fuel_index!(id), do: Repo.get!(FuelIndex, id)
+  def get_fuel_index!(id) do
+    FuelIndex
+    |> Repo.get!(id)
+  end
 
   def get_active_fuel_index!(id) do
     FuelIndex.select_active()

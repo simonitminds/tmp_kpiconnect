@@ -18,9 +18,8 @@ defmodule Oceanconnect.Auctions.FuelIndex do
   @doc false
   def changeset(%__MODULE__{} = fuel_index, attrs) do
     fuel_index
-    |> cast(attrs, [:code, :name, :is_active])
+    |> cast(attrs, [:code, :name, :is_active, :fuel_id, :port_id])
     |> validate_required([:code, :name])
-    |> cast_assoc(:fuel)
     |> cast_assoc(:port)
   end
 
