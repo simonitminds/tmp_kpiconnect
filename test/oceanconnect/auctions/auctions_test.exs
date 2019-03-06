@@ -1576,7 +1576,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "get_fuel_index!/1 returns the fuel_index with given id", %{fuel_index: fuel_index} do
-      assert Auctions.get_fuel_index!(fuel_index.id) == fuel_index
+      assert Auctions.get_fuel_index!(fuel_index.id).id == fuel_index.id
     end
 
     test "create_fuel_index/1 with valid data creates a fuel_index", %{valid_attrs: valid_attrs} do
@@ -1597,7 +1597,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "update_fuel_index/2 with invalid data returns error changeset", %{fuel_index: fuel_index} do
       assert {:error, %Ecto.Changeset{}} = Auctions.update_fuel_index(fuel_index, @invalid_attrs)
-      assert fuel_index == Auctions.get_fuel_index!(fuel_index.id)
+      assert fuel_index.id == Auctions.get_fuel_index!(fuel_index.id).id
     end
 
     test "delete_fuel_index/1 deletes the fuel_index", %{fuel_index: fuel_index} do
