@@ -1562,7 +1562,7 @@ defmodule Oceanconnect.AuctionsTest do
       fuel = insert(:fuel)
       port = insert(:port)
 
-      valid_attrs = %{name: "some name", code: 1234, is_active: true, fuel_id: fuel.id, port_id: port.id}
+      valid_attrs = %{name: "some name", code: "1234", is_active: true, fuel_id: fuel.id, port_id: port.id}
 
       {:ok, %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index, valid_attrs: valid_attrs, update_attrs: update_attrs, fuel: fuel, port: port}}
     end
@@ -1581,7 +1581,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_fuel_index/1 with valid data creates a fuel_index", %{valid_attrs: valid_attrs} do
       assert {:ok, %FuelIndex{} = fuel_index} = Auctions.create_fuel_index(valid_attrs)
-      assert fuel_index.code == 1234
+      assert fuel_index.code == "1234"
       assert fuel_index.name == "some name"
     end
 
