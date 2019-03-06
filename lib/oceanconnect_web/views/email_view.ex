@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.EmailView do
   use OceanconnectWeb, :view
+  import Oceanconnect.Auctions.Guards
 
   def full_name(user), do: Oceanconnect.Accounts.get_user_name!(user)
 
@@ -73,6 +74,14 @@ defmodule OceanconnectWeb.EmailView do
       nil -> nil
       _ -> Enum.map(winning_solution_bids[vessel_fuel_id], & &1.amount)
     end
+  end
+
+  def partial_name_for_type(%struct{type: type}, partial_type) when is_auction(struct) do
+    "_#{type}_#{partial_type}.html"
+  end
+
+  def term_length(%{start_date: %{month: start_month}, end_date: %{month: end_month}}) do
+    end_month - start_month
   end
 
   defp leftpad(integer) do

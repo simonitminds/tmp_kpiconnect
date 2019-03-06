@@ -12,22 +12,9 @@
     <p style="margin-top: 0.25rem;"><b>Transaction Duration:</b> <%= duration_minute_string(@auction.duration)%></p>
     <p style="margin-top: 0.25rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
     <p style="margin-top: 0.25rem;"><b>Port:</b> <%= @auction.port.name %></p>
-    <p style="margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessels (ETA/ETD):</b>
-    <%= if Oceanconnect.Auctions.is_term?(@auction) == false do %>
-      <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction) do %>
-        <p style="margin-top: 0.25rem;">
-          <%= vessel.name %> (<%= convert_date?(eta, "Not Specified") %> &ndash; <%= convert_date?(etd, "Not Specified") %>)
-        </p>
-      <% end %>
-      <br>
-      <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Deliverables</h1>
-      <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-      <%= for vessel_fuel <- @auction.auction_vessel_fuels do %>
-        <p style="margin-top: 0.75rem;"><b>Vessel:</b> <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)</p>
-        <p style="margin-top: 0.25rem;"><b>Grade:</b> <%= vessel_fuel.fuel.name %></p>
-        <p style="margin-top: 0.25rem;"><b>Quantity:</b> <%= vessel_fuel.quantity %> MT</p>
-      <% end %>
-    <%  end %>
+    <%= render partial_name_for_type(@auction, "duration"), Map.put(assigns, :auction, @auction) %>
+    <br>
+    <%= render partial_name_for_type(@auction, "deliverables"), Map.put(assigns, :auction, @auction) %>
     <br>
     <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Buyer Information</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>

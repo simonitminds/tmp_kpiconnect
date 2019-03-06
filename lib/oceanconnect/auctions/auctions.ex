@@ -131,6 +131,8 @@ defmodule Oceanconnect.Auctions do
   end
 
   def make_bids(auction, bids_params, supplier_id, time_entered) do
+    IO.inspect(bids_params)
+    IO.inspect(auction.fuel.id)
     Enum.reduce_while(bids_params, {:ok, []}, fn {product_id, bid_params}, {:ok, acc} ->
       case make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
         {:ok, bid} -> {:cont, {:ok, acc ++ [bid]}}

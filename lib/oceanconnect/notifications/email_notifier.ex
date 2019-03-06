@@ -2,6 +2,13 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Notifications.Emails.{
+    AuctionInvitation,
+    AuctionRescheduled,
+    AuctionStartingSoon,
+    AuctionCanceled,
+    AuctionClosed
+  }
 
   def notify_auction_created(auction = %struct{}) when is_auction(struct) do
     auction = auction |> Auctions.fully_loaded()

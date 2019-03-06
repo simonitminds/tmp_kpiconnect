@@ -2,7 +2,6 @@ defmodule Oceanconnect.AuctionShowTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Auctions
-  #  import Hound.Helpers.Session
 
   hound_session()
 
