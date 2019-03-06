@@ -180,6 +180,10 @@ defmodule OceanconnectWeb.Router do
     post("/fuels/:fuel_id/deactivate", FuelController, :deactivate, as: :admin_fuel)
     post("/fuels/:fuel_id/activate", FuelController, :activate, as: :admin_fuel)
 
+    resources("/fuel_index_entries", FuelIndexController, as: :admin_fuel_index)
+    post("/fuel_index_entries/:fuel_index_id/deactivate", FuelIndexController, :deactivate, as: :admin_fuel_index)
+    post("/fuel_index_entries/:fuel_index_id/activate", FuelIndexController, :activate, as: :admin_fuel_index)
+
     resources("/ports", PortController, as: :admin_port)
     post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)
     post("/ports/:port_id/activate", PortController, :activate, as: :admin_port)

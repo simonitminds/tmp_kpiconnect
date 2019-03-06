@@ -1548,4 +1548,73 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
   end
+
+  describe "fuel_index_entries" do
+    alias Oceanconnect.Auctions.FuelIndex
+
+    @invalid_attrs %{code: nil, fuel_id: nil, name: nil, port_id: nil}
+
+    setup do
+      update_attrs = %{name: "some new name"}
+      fuel_index = insert(:fuel_index)
+      inactive_fuel_index = insert(:fuel_index, is_active: false)
+
+      fuel = insert(:fuel)
+      port = insert(:port)
+
+      valid_attrs = %{name: "some name", code: "1234", is_active: true, fuel_id: fuel.id, port_id: port.id}
+
+      {:ok, %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index, valid_attrs: valid_attrs, update_attrs: update_attrs, fuel: fuel, port: port}}
+    end
+
+    test "list_fuel_index_entries/0 returns all fuel_index_entries", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do
+      assert Auctions.list_fuel_index_entries().entries == [fuel_index, inactive_fuel_index]
+    end
+
+    test "list_active_fuel_index_entries/0 returns all active fuel_index_entires", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do
+      refute Auctions.list_active_fuel_index_entries() == [fuel_index, inactive_fuel_index]
+    end
+
+    test "get_fuel_index!/1 returns the fuel_index with given id", %{fuel_index: fuel_index} do
+      assert Auctions.get_fuel_index!(fuel_index.id).id == fuel_index.id
+    end
+
+    test "create_fuel_index/1 with valid data creates a fuel_index", %{valid_attrs: valid_attrs} do
+      assert {:ok, %FuelIndex{} = fuel_index} = Auctions.create_fuel_index(valid_attrs)
+      assert fuel_index.code == "1234"
+      assert fuel_index.name == "some name"
+    end
+
+    test "create_fuel_index/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Auctions.create_fuel_index(@invalid_attrs)
+    end
+
+    test "update_fuel_index/2 with valid data updates the fuel_index", %{fuel_index: fuel_index, update_attrs: update_attrs} do
+      assert {:ok, fuel_index} = Auctions.update_fuel_index(fuel_index, update_attrs)
+      assert %FuelIndex{} = fuel_index
+      assert fuel_index.name == "some new name"
+    end
+
+    test "update_fuel_index/2 with invalid data returns error changeset", %{fuel_index: fuel_index} do
+      assert {:error, %Ecto.Changeset{}} = Auctions.update_fuel_index(fuel_index, @invalid_attrs)
+      assert fuel_index.id == Auctions.get_fuel_index!(fuel_index.id).id
+    end
+
+    test "delete_fuel_index/1 deletes the fuel_index", %{fuel_index: fuel_index} do
+      assert {:ok, %FuelIndex{}} = Auctions.delete_fuel_index(fuel_index)
+      assert_raise Ecto.NoResultsError, fn -> Auctions.get_fuel_index!(fuel_index.id) end
+    end
+
+    test "change_fuel_index/1 returns a fuel_index changeset", %{fuel_index: fuel_index} do
+      assert %Ecto.Changeset{} = Auctions.change_fuel_index(fuel_index)
+    end
+
+    test "activate_fuel_index/1 marks the port as active", %{inactive_fuel_index: inactive_fuel_index} do
+      assert {:ok, %FuelIndex{is_active: true}} = Auctions.activate_fuel_index(inactive_fuel_index)
+    end
+
+    test "deactivate_fuel_index/1 marks the port as inactive", %{fuel_index: fuel_index} do
+      assert {:ok, %FuelIndex{is_active: false}} = Auctions.deactivate_fuel_index(fuel_index)
+    end
+  end
 end

@@ -9,6 +9,7 @@
 			<li><%= link "Vessels", to: admin_vessel_path(@conn, :index) %></li>
 			<li><%= link "Barges", to: admin_barge_path(@conn, :index) %></li>
 			<li><%= link "Fuel Grades", to: admin_fuel_path(@conn, :index) %></li>
+			<li><%= link "Fuel Index Entries", to: admin_fuel_index_path(@conn, :index) %></li>
 			<li><%= link "Ports", to: admin_port_path(@conn, :index) %></li>
 		</ul>
 		<p class="menu-label">

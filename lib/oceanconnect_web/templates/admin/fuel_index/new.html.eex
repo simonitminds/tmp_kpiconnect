@@ -1,0 +1,20 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block"><span class="is-inline-block has-margin-right-sm has-text-gray-3">New Fuel Index Entry</span></span>
+					<%= link to: admin_fuel_index_path(@conn, :index), class: "button has-margin-left-auto" do %>
+						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+					<%end%>
+				</h2>
+				<%= render "form.html", Map.put(assigns, :action, admin_fuel_index_path(@conn, :create)) %>
+			</section>
+		</div>
+	</div>
+</div>

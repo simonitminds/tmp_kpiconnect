@@ -1,0 +1,60 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert is-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+  <div class="columns">
+    <div class="column is-one-third">
+      <div class="field" >
+        <%= label f, :code, class: "label" do %>
+          Index Code
+        <% end %>
+    		<div class="control">
+    			<%= text_input f, :code, class: "input qa-admin-fuel_index-code" %>
+    			<%= error_tag f, :code %>
+    		</div>
+      </div>
+
+      <div class="field" >
+        <%= label f, :name, class: "label" do %>
+          Index Name
+        <%end%>
+    		<div class="control">
+    			<%= text_input f, :name, class: "input qa-admin-fuel_index-name" %>
+    			<%= error_tag f, :name %>
+    		</div>
+      </div>
+
+			<div class="field">
+				<%= label f, :fuel_id, class: "label" do %>
+					Index Fuel Type
+				<% end %>
+				<div class="control">
+					<div class="select">
+					  <%= select f, :fuel_id, Enum.map(@fuels, &{&1.name, &1.id}), class: "qa-admin-fuel_index-fuel_id", prompt: "Select a fuel type" %>
+						<%= error_tag f, :fuel_id %>
+					</div>
+				</div>
+			</div>
+
+			<div class="field">
+				<%= label f, :port_id, class: "label" do %>
+					Associated Port
+				<% end %>
+				<div class="control">
+					<div class="select">
+					  <%= select f, :port_id, Enum.map(@ports, &{&1.name, &1.id}), class: "qa-admin-fuel_index-port_id", prompt: "Select a port" %>
+						<%= error_tag f, :port_id %>
+					</div>
+				</div>
+			</div>
+
+    	<div class="field has-margin-top-lg">
+    		<div class="control">
+    			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>
+    		</div>
+    	</div>
+    </div>
+  </div>
+<% end %>

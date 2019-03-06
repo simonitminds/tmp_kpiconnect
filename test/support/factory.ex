@@ -113,6 +113,15 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def fuel_index_factory() do
+    %Oceanconnect.Auctions.FuelIndex{
+      name: "New Fuel Index",
+      code: "1234",
+      fuel: build(:fuel),
+      port: build(:port)
+    }
+  end
+
   def port_factory() do
     %Oceanconnect.Auctions.Port{
       name: "New Port",
