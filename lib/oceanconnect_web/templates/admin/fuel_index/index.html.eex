@@ -18,6 +18,8 @@
 						<tr>
               <th>Name</th>
               <th>Code</th>
+              <th>Fuel</th>
+              <th>Port</th>
 
 							<th>Actions</th>
 						</tr>
@@ -27,6 +29,8 @@
 							<tr class="qa-admin-fuel_index-<%= fuel_index.id %>">
                 <td class="qa-admin-fuel_index-name"><%= fuel_index.name %></td>
                 <td class="qa-admin-fuel_index-code"><%= fuel_index.code %></td>
+                <td class="qa-admin-fuel_index-fuel"><%= fuel_index.fuel.name %></td>
+                <td class="qa-admin-fuel_index-port"><%= fuel_index.port.name %></td>
 								<td class="text-right">
 									<%= link "Edit", to: admin_fuel_index_path(@conn, :edit, fuel_index), class: "button is-small is-primary is-inline-block has-margin-bottom-xs qa-admin-fuel_index-edit" %>
 									<%= if fuel_index.is_active do %>

@@ -1523,6 +1523,7 @@ defmodule Oceanconnect.Auctions do
   """
   def list_fuel_index_entries do
     FuelIndex.alphabetical()
+    |> preload([:fuel, :port])
     |> Repo.paginate()
   end
 
