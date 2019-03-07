@@ -2,6 +2,7 @@ import React from 'react';
 import Picker from 'react-month-picker';
 import moment from 'moment';
 import _ from 'lodash';
+import { formatMonthYear } from '../utilities';
 
 export default class DateMonthInput extends React.Component {
   constructor(props) {
@@ -21,7 +22,7 @@ export default class DateMonthInput extends React.Component {
   }
 
   handleClickInput(e) {
-    this.refs.pickAMonth.show()
+    this.refs.monthPicker.show()
   }
   handleAMonthChange(value, text) {
     //
@@ -39,14 +40,12 @@ export default class DateMonthInput extends React.Component {
       model, field, labelText, value, name, onChange, defaultValue
     } = this.props;
     const fieldName = name === false ? "" : name || `${model}_${field}`;
-    console.log(fieldName);
     const years = () => {
       let firstYear = moment().year();
       let lastYear = firstYear + 5;
       return _.range(firstYear, lastYear);
     }
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    console.log(this.state.date.month());
     const mvalue = {year: this.state.date.year(), month: this.state.date.month()};
 
     const makeText = (date) => {
@@ -64,14 +63,15 @@ export default class DateMonthInput extends React.Component {
         <div className={`control qa-${model}_${field}`}>
           <Picker
             id={fieldName}
-            ref='pickAMonth'
+            ref='monthPicker'
             years={years()}
             lang={months}
-            value={mvalue}
+            value={{year: mvalue.year, month: mvalue.month + 1}}
+            defaultValue={value}
             onChange={this.handleAMonthChange.bind(this)}
             onDismiss={this.handAMonthDismiss.bind(this)}
           />
-          <input value={makeText(mvalue)} onClick={this.handleClickInput.bind(this)} readOnly={true} />
+          <input value={formatMonthYear(mvalue)} onClick={this.handleClickInput.bind(this)} readOnly={true} />
         </div>
       </div>
     );
