@@ -383,3 +383,10 @@ fieldset {
     color: darken($black, 15%);
   }
 }
+
+// Input Adaptations
+
+.input__fuel-unit-container {
+  display: flex;
+  align-items: center;
+}
