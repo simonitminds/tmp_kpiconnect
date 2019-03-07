@@ -4,6 +4,7 @@ import moment from 'moment';
 import InputField from '../../../input-field';
 import InputErrors from '../../../input-errors';
 import DateInput from '../../../date-input';
+import DateMonthInput from '../../../date-month-input';
 
 const PortSelectFormSection = (props) => {
   const {
@@ -31,6 +32,8 @@ const PortSelectFormSection = (props) => {
       />;
     }
   };
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   return (
     <section className="auction-info">
@@ -97,6 +100,13 @@ const PortSelectFormSection = (props) => {
                       field={'start_date'}
                       labelText={'Start Month'}
                       onChange={updateDate.bind(this, 'start_date_date')}
+                      className={'has-margin-right-sm'} />
+                    <DateMonthInput
+                      value={{year: moment(auction.start_date).year(), month: moment(auction.start_date).month()}}
+                      model={'auction'}
+                      field={'start_date'}
+                      labelText={'Start Month'}
+                      onChange={updateDate.bind(this, 'start_date')}
                       className={'has-margin-right-sm'} />
                     <InputErrors errors={errors.start_date} />
                   </div>

@@ -6402,6 +6402,13 @@ react-moment-proptypes@^1.5.0:
   dependencies:
     moment ">=1.6.0"
 
+react-month-picker@^1.3.8:
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/react-month-picker/-/react-month-picker-1.3.8.tgz#349e978b68655c7930de273d8f77fb11c03e6793"
+  integrity sha512-lVwJ5pq8EK7laqRo8BZ6h5oVH3FFHILG3OpxTmFS7Jiy0amTxjKnxhC2UB/ALrRdZxr+5oCHM3zCt1nmfH6mrQ==
+  dependencies:
+    react-tapper "^0.1.16"
+
 react-portal@^4.1.2:
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/react-portal/-/react-portal-4.1.5.tgz#6665d4d2a92d47d6f8b07a6529e26fc52d5cccde"
@@ -6450,6 +6457,11 @@ react-tabs@^2.2.2:
   dependencies:
     classnames "^2.2.0"
     prop-types "^15.5.0"
+
+react-tapper@^0.1.16:
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/react-tapper/-/react-tapper-0.1.16.tgz#d5fb60e250aa9dc43c07d1120e6b399cbdc65bd3"
+  integrity sha512-5+UQaBeTiywbhIUZgPtxYT2CEB4QRbi0wjuSiXeeP/Z/SMa9Luz86hGGaWstqLFcUJfITk4Fh39q25weSq+2SA==
 
 react-with-direction@^1.3.0:
   version "1.3.0"
