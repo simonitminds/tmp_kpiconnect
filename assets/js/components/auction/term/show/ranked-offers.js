@@ -29,7 +29,10 @@ const RankedOffers = ({auctionPayload, solutions, acceptSolution}) => {
   } else {
     return (
       <div className="auction-table-placeholder has-margin-bottom-lg">
+        { auctionPayload.status == 'pending' ?
+        <i>Any bids placed during the pending period will display upon auction start</i> :
         <i>No bids have been placed on this auction</i>
+        }
       </div>
     );
   }

@@ -10,6 +10,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
   const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
   const anySolutionExists = bestSolution || bestSingleSupplier || suppliersBestSolution;
+  const { status } = auctionPayload;
 
   return(
     <div className="auction-lowest-bid">
@@ -32,17 +33,14 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
           </div>
         </div>
       }
-      <div className="box">
-        <div className="box__subsection">
-          <h3 className="box__header box__header--bordered">Your {auctionStatus == 'pending' ? 'Opening Offer' : 'Best Offer'}</h3>
-          { suppliersBestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={true} supplierId={supplierId} revokeBid={revokeBid} title="Your Best Offer" / >
-          }
-          { !suppliersBestSolution &&
-            <div className="auction-table-placeholder"><i>You have not bid on this auction</i></div>
-          }
+      { auctionStatus == 'pending' &&
+        <div className="box">
+          <div className="box__subsection">
+            <h3 className="box__header box__header--bordered">Your {auctionStatus == 'pending' ? 'Opening Offer' : 'Best Offers'}</h3>
+            <div className="auction-table-placeholder"><i>Any bids placed during the pending period will display upon auction start</i></div>
+          </div>
         </div>
-      </div>
+      }
     </div>
   );
 };

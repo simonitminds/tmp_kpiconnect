@@ -65,7 +65,10 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
       <div className="box">
         <div className="box__subsection">
           <h3 className="box__header box__header--bordered">Ranked Offers</h3>
-          { orderedSections }
+          { auctionStatus != 'pending' ?
+            orderedSections :
+            <div className="auction-table-placeholder"><i>Any bids placed during the pending period will display upon auction start</i></div>
+          }
         </div>
       </div>
     </div>

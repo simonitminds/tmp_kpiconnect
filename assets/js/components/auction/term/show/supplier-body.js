@@ -67,6 +67,11 @@ const SupplierBody = (props) => {
             <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
           </h3>
         </div>
+        <SupplierBestSolution auctionPayload={auctionPayload}
+          connection={connection}
+          revokeBid={revokeSupplierBid}
+          unsubmitComment={removeCommentFromSolution}
+          supplierId={currentUserCompanyId} />
         <div className={`auction-bidding ${status == 'pending'? `auction-bidding--pending` : ``} box box--nested-base`}>
           <MediaQuery query="(min-width: 769px)">
             <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
@@ -80,4 +85,3 @@ const SupplierBody = (props) => {
 };
 
 export default SupplierBody;
-
