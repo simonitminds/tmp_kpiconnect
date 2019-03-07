@@ -26,7 +26,7 @@ const TermFuelFormSection = (props) => {
     const endDate = !!auction.end_date ? moment(auction.end_date) : moment().add(1, 'months');
     console.log(endDate);
 
-    const months = endDate.diff(startDate, 'months');
+    const months = endDate.diff(startDate, 'months') + 1;
 
     const totalFuelVolume = !!fuelQuantity && !!months ? fuelQuantity * months : "—";
     return totalFuelVolume;

@@ -34,8 +34,6 @@ const PortSelectFormSection = (props) => {
     }
   };
 
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
   return (
     <section className="auction-info">
       <div className="container">
@@ -113,7 +111,7 @@ const PortSelectFormSection = (props) => {
                   <div className="field-body">
                     <input type="hidden" name="auction[end_date]" className="qa-auction-end_date" value={auction.end_date ? moment(auction.end_date).utc() : ""} />
                     <DateMonthInput
-                      value={{year: moment(auction.end_date).year(), month: moment(auction.end_date).month() + 1}}
+                      value={{year: moment(auction.end_date).year(), month: moment(auction.end_date).month()}}
                       model={'auction'}
                       field={'end_date'}
                       labelText={'Start Month'}

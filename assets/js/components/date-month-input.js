@@ -71,7 +71,11 @@ export default class DateMonthInput extends React.Component {
             onChange={this.handleAMonthChange.bind(this)}
             onDismiss={this.handAMonthDismiss.bind(this)}
           />
-          <input className="input" value={formatMonthYear(mvalue)} onClick={this.handleClickInput.bind(this)} readOnly={true} />
+          <input
+            className="input"
+            value={formatMonthYear(mvalue)}
+            onClick={this.handleClickInput.bind(this)}
+            readOnly={true} />
         </div>
       </div>
     );
