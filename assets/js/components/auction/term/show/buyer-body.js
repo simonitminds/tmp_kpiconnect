@@ -43,7 +43,10 @@ const BuyerBody = (props) => {
     return (
       <div>
         <WinningSolution auctionPayload={auctionPayload} />
-        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+        { currentUser.isAdmin
+          ? <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+          : <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        }
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
