@@ -11,13 +11,15 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
   const productBids = _.get(auctionPayload, 'product_bids');
   const products = _.keys(productBids);
 
+  const { status } = auctionPayload;
+
   const bidList = _.chain(productBids)
     .map('lowest_bids')
     .flatten()
     .orderBy(['amount', 'time_entered'], ['asc', 'desc'])
     .value();
 
-  if(bidList.length > 0) {
+  if(status != 'pending' && bidList.length > 0) {
     return(
       <div className="box qa-buyer-bid-history">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
@@ -42,7 +44,10 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
       <div className="box">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         <div className="auction-table-placeholder">
+          { status == 'pending' ?
+          <i>Any bids placed during the pending period will display upon auction start</i> :
           <i>No bids have been placed on this auction</i>
+          }
         </div>
       </div>
     );
