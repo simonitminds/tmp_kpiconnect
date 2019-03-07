@@ -21,32 +21,15 @@ const TermFuelFormSection = (props) => {
   } = props;
 
   const calculateTotalFuelVolume = () => {
-    let fuelQuantity;
-    let startDate;
-    let endDate;
-    if (document.getElementById('auction_fuel_quantity')) {
-      fuelQuantity = document.getElementById('auction_fuel_quantity').value;
-    } else {
-      fuelQuantity = 0;
-    }
-    if (document.getElementById('auction_start_date_date')) {
-      startDate = moment(document.getElementById('auction_start_date_date').value);
-    } else {
-      startDate = moment();
-    }
-    if (document.getElementById('auction_end_date_date')) {
-      endDate = moment(document.getElementById('auction_end_date_date').value);
-    } else {
-      endDate = moment().add(1, 'months');
-    }
+    const fuelQuantity = !!auction.fuel_quantity ? auction.fuel_quantity : 0;
+    const startDate = !!auction.start_date ? moment(auction.start_date) : moment();
+    const endDate = !!auction.end_date ? moment(auction.end_date) : moment().add(1, 'months');
+    console.log(endDate);
 
-    let months = endDate.diff(startDate, 'months');
+    const months = endDate.diff(startDate, 'months');
 
-    if (fuelQuantity && months) {
-      return fuelQuantity * months;
-    } else {
-      return "—";
-    }
+    const totalFuelVolume = !!fuelQuantity && !!months ? fuelQuantity * months : "—";
+    return totalFuelVolume;
   }
 
 
@@ -112,7 +95,7 @@ const TermFuelFormSection = (props) => {
                 />
                 <InputErrors errors={errors.show_total_fuel_volume} />
                   <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}>
-                    <strong>Your Total Volume:</strong>
+                    <strong>Your Total Volume: </strong>
                     <span className="qa-auction-total_fuel_volume">{calculateTotalFuelVolume()}</span> MT
                   </div>
               </div>

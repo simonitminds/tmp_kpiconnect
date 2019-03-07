@@ -28,36 +28,37 @@ export default class DateMonthInput extends React.Component {
   }
   handAMonthDismiss(value, onChange) {
     if (value) {
-      console.log(value);
-      const value = moment(value)
-      this.props.onChange(value);
+      const newValue = {year: value.year, month: value.month - 1}
+      this.props.onChange(newValue);
     }
-    this.setState({ date: value });
+    this.setState({ date: moment(value).utc() });
   }
 
   render() {
     const {
-      model, field, labelText, value, name, onChange
+      model, field, labelText, value, name, onChange, defaultValue
     } = this.props;
     const fieldName = name === false ? "" : name || `${model}_${field}`;
-    console.log(this.state.date)
-
+    console.log(fieldName);
     const years = () => {
       let firstYear = moment().year();
       let lastYear = firstYear + 5;
       return _.range(firstYear, lastYear);
     }
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    console.log(this.state.date.month());
     const mvalue = {year: this.state.date.year(), month: this.state.date.month()};
 
-    const makeText = (m) => {
+    const makeText = (date) => {
       let text;
-      if (m && m.year && m.month) {
-        text = months[m.month - 1] + ' ' + m.year;
+      if (date && date.year && date.month) {
+        text = months[date.month] + ' ' + date.year;
       } else {
         text = "";
       }
+      return text;
     }
+
     return(
       <div className="has-margin-right-sm">
         <div className={`control qa-${model}_${field}`}>
@@ -70,7 +71,7 @@ export default class DateMonthInput extends React.Component {
             onChange={this.handleAMonthChange.bind(this)}
             onDismiss={this.handAMonthDismiss.bind(this)}
           />
-          <input value={makeText(mvalue)} onClick={this.handleClickInput.bind(this)} />
+          <input value={makeText(mvalue)} onClick={this.handleClickInput.bind(this)} readOnly={true} />
         </div>
       </div>
     );

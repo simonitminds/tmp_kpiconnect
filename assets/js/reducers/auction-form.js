@@ -6,6 +6,7 @@ import { replaceListItem,
 import dotProp from 'dot-prop-immutable';
 import { RECEIVE_AUCTION_FORM_DATA,
          UPDATE_DATE,
+         UPDATE_MONTH,
          UPDATE_INFORMATION,
          RECEIVE_SUPPLIERS,
          SELECT_ALL_SUPPLIERS,
@@ -104,6 +105,14 @@ export default function(state, action) {
       return { ...state,
         [auctionProperty + "_date"]: value,
         [auctionProperty + "_time"]: value,
+        auction: { ...state.auction, [auctionProperty]: value}
+      };
+    }
+    case UPDATE_MONTH: {
+      const auctionProperty = action.data.property.slice(0, -5);
+      let value = action.data.value;
+      return { ...state,
+        [auctionProperty + "_date"]: value,
         auction: { ...state.auction, [auctionProperty]: value}
       };
     }

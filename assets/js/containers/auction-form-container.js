@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Form from '../components/auction/form';
 import { receiveAuctionFormData,
          updateDate,
+         updateMonth,
          updateInformation,
          updateInformationFromCheckbox,
          selectAuctionType,
@@ -41,6 +42,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
   ...bindActionCreators({ updateDate,
+                          updateMonth,
                           updateInformation,
                           updateInformationFromCheckbox,
                           selectAuctionType,

@@ -45,6 +45,7 @@ class TermAuctionForm extends React.Component {
       suppliers,
       toggleSupplier,
       updateDate,
+      updateMonth,
       updateInformation,
       updateInformationFromCheckbox,
       recalculateTotalFuelVolume,
@@ -67,6 +68,7 @@ class TermAuctionForm extends React.Component {
                                hasDurationAndTerminal={true}
                                selectPort={selectPort}
                                updateDate={updateDate}
+                               updateMonth={updateMonth}
                                updateInformation={updateInformation} />
 
         <SupplierList onDeSelectAllSuppliers={deselectAllSuppliers}

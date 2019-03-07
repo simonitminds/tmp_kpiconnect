@@ -24,6 +24,7 @@ import {
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
   UPDATE_DATE,
+  UPDATE_MONTH,
   UPDATE_INFORMATION,
   UPDATE_MESSAGE_PAYLOAD
 } from "./constants";
@@ -346,6 +347,15 @@ export function updateInformationFromCheckbox(property, value) {
 
 export function updateDate(property, value) {
   return {type: UPDATE_DATE,
+          data: {
+            property,
+            'value': _.get(value, 'target.value', value)
+          }
+        };
+}
+
+export function updateMonth(property, value) {
+  return {type: UPDATE_MONTH,
           data: {
             property,
             'value': _.get(value, 'target.value', value)

@@ -15,7 +15,8 @@ const PortSelectFormSection = (props) => {
     hasDurationAndTerminal,
     selectPort,
     updateInformation,
-    updateDate
+    updateDate,
+    updateMonth
   } = props;
 
   const portAgentDisplay = () => {
@@ -93,20 +94,12 @@ const PortSelectFormSection = (props) => {
                   </div>
                   <div className="field-body">
                     <input type="hidden" name="auction[start_date]" className="qa-auction-start_date" value={auction.start_date ? moment(auction.start_date).utc() : ""} />
-                    <DateInput
-                      className={'qa-auction-start_date'}
-                      value={auction.start_date}
-                      model={'auction'}
-                      field={'start_date'}
-                      labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'start_date_date')}
-                      className={'has-margin-right-sm'} />
                     <DateMonthInput
                       value={{year: moment(auction.start_date).year(), month: moment(auction.start_date).month()}}
                       model={'auction'}
                       field={'start_date'}
                       labelText={'Start Month'}
-                      onChange={updateDate.bind(this, 'start_date')}
+                      onChange={updateMonth.bind(this, 'start_date_date')}
                       className={'has-margin-right-sm'} />
                     <InputErrors errors={errors.start_date} />
                   </div>
@@ -119,13 +112,14 @@ const PortSelectFormSection = (props) => {
                   </div>
                   <div className="field-body">
                     <input type="hidden" name="auction[end_date]" className="qa-auction-end_date" value={auction.end_date ? moment(auction.end_date).utc() : ""} />
-                    <DateInput
-                      className={'qa-auction-end_date has-margin-right-sm'}
-                      value={auction.end_date}
+                    <DateMonthInput
+                      value={{year: moment(auction.end_date).year(), month: moment(auction.end_date).month()}}
+                      defaultValue={{year: moment(auction.end_date).year(), month: moment(auction.end_date).month() + 1}}
                       model={'auction'}
                       field={'end_date'}
-                      labelText={'End Month'}
-                      onChange={updateDate.bind(this, 'end_date_date')} />
+                      labelText={'Start Month'}
+                      onChange={updateMonth.bind(this, 'end_date_date')}
+                      className={'has-margin-right-sm'} />
                     <InputErrors errors={errors.end_date} />
                   </div>
                 </div>

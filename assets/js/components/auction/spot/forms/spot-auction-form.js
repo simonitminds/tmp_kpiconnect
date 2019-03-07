@@ -34,6 +34,7 @@ const SpotAuctionForm = (props) => {
     suppliers,
     toggleSupplier,
     updateDate,
+    updateMonth,
     updateInformation,
     updateInformationFromCheckbox,
     vessels,
@@ -52,6 +53,7 @@ const SpotAuctionForm = (props) => {
                              port_id={port_id}
                              ports={ports}
                              selectPort={selectPort}
+                             updateMonth={updateMonth}
                              updateInformation={updateInformation}
                              hasDurationAndTerminal={false} />
 

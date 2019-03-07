@@ -35,6 +35,7 @@ const Form = (props) => {
     suppliers,
     toggleSupplier,
     updateDate,
+    updateMonth,
     updateInformation,
     updateInformationFromCheckbox,
     vessels,
