@@ -24,10 +24,7 @@ const TermFuelFormSection = (props) => {
     const fuelQuantity = !!auction.fuel_quantity ? auction.fuel_quantity : 0;
     const startDate = !!auction.start_date ? moment(auction.start_date) : moment();
     const endDate = !!auction.end_date ? moment(auction.end_date) : moment().add(1, 'months');
-    console.log(endDate);
-
     const months = endDate.diff(startDate, 'months') + 1;
-
     const totalFuelVolume = !!fuelQuantity && !!months ? fuelQuantity * months : "—";
     return totalFuelVolume;
   }
@@ -96,7 +93,8 @@ const TermFuelFormSection = (props) => {
                 <InputErrors errors={errors.show_total_fuel_volume} />
                   <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}>
                     <strong>Your Total Volume: </strong>
-                    <span className="qa-auction-total_fuel_volume">{calculateTotalFuelVolume()}</span> MT
+                    <input type="hidden" name="auction[total_fuel_volume]" className="qa-auction-total_fuel_volume" value={auction.total_fuel_volume ? aucton.tota_fuel_volume : calculateTotalFuelVolume()} />
+                    <span className="qa-auction-total_fuel_volume">{auction.total_fuel_volume ? auction.total_fuel_volume : calculateTotalFuelVolume()}</span> MT
                   </div>
               </div>
             </div>
