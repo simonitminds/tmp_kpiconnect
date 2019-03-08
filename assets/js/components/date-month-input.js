@@ -24,10 +24,10 @@ export default class DateMonthInput extends React.Component {
   handleClickInput(e) {
     this.refs.monthPicker.show()
   }
-  handleAMonthChange(value, text) {
+  handleMonthChange(value, text) {
     //
   }
-  handAMonthDismiss(value, onChange) {
+  handleMonthDismiss(value, onChange) {
     if (value) {
       const newValue = {year: value.year, month: value.month - 1}
       this.props.onChange(newValue);
@@ -60,22 +60,21 @@ export default class DateMonthInput extends React.Component {
 
     return(
       <div className="has-margin-right-sm">
-        <div className={`control qa-${model}_${field}`}>
+        <div className={`control`}>
           <Picker
-            id={fieldName}
             ref='monthPicker'
             years={years()}
             lang={months}
             value={{year: mvalue.year, month: mvalue.month + 1}}
             defaultValue={value}
-            onChange={this.handleAMonthChange.bind(this)}
-            onDismiss={this.handAMonthDismiss.bind(this)}
+            onChange={this.handleMonthChange.bind(this)}
+            onDismiss={this.handleMonthDismiss.bind(this)}
           />
           <input
-            className="input"
+            className={`input`}
             value={formatMonthYear(mvalue)}
             onClick={this.handleClickInput.bind(this)}
-            readOnly={true} />
+             />
         </div>
       </div>
     );

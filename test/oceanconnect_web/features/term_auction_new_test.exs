@@ -41,8 +41,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
       is_traded_bid_allowed: true,
       scheduled_start_date: valid_start_time,
       scheduled_start_time: valid_start_time,
-      start_date_date: date_time,
-      end_date_date: date_time,
       fuel_quantity: 15000,
       suppliers: [
         %{
@@ -130,6 +128,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
+<<<<<<< HEAD
   test "creating a term auction", %{
     params: params,
     show_params: show_params,
@@ -285,7 +284,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
   } do
     params =
       params
-      |> Map.drop([:start_date_date, :end_date_date])
+      |> Map.drop([:fuel_quantity])
 
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -298,24 +297,5 @@ defmodule Oceanconnect.TermAuctionNewTest do
 
     refute current_path() =~ ~r/auctions\/\d/
     assert AuctionNewPage.has_content?("This field is required.")
-  end
-
-  test "a buyer can see the total fuel volume over the term when they chose to purchase by lot", %{params: params, port: port, selected_fuel: selected_fuel} do
-    params =
-      params
-      |> Map.replace!(:end_date_date,
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.+(5_259_600) # 2 months in seconds
-        |> DateTime.from_unix!()
-      )
-
-    AuctionNewPage.visit()
-    AuctionNewPage.select_auction_type(:forward_fixed)
-    AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_fuel(selected_fuel.id)
-
-    assert AuctionNewPage.total_fuel_volume() == "30000"
   end
 end
