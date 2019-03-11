@@ -10,6 +10,7 @@ import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
 import WinningSolution from './winning-solution';
+import CollapsibleSection from '../../common/collapsible-section';
 
 
 const SupplierBody = (props) => {
@@ -44,6 +45,19 @@ const SupplierBody = (props) => {
               supplierId={currentUserCompanyId}
               unsubmitComment={removeCommentFromSolution} />
           </MediaQuery>
+          <MediaQuery query="(max-width: 768px)">
+            <CollapsibleSection
+              trigger="Place Bid"
+              classParentString="collapsing-auction-bidding"
+              open={true}
+            >
+            <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+            <CommentForm addCommentToSolution={addCommentToSolution}
+              auctionPayload={auctionPayload}
+              supplierId={currentUserCompanyId}
+              unsubmitComment={removeCommentFromSolution} />
+            </CollapsibleSection>
+          </MediaQuery>
         </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
@@ -56,6 +70,7 @@ const SupplierBody = (props) => {
           connection={connection}
           supplierId={currentUserCompanyId} />
         <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>
     );
@@ -76,6 +91,16 @@ const SupplierBody = (props) => {
           <MediaQuery query="(min-width: 769px)">
             <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
             <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} unsubmitComment={removeCommentFromSolution} />
+          </MediaQuery>
+          <MediaQuery query="(max-width: 768px)">
+            <CollapsibleSection
+              trigger="Place Bid"
+              classParentString="collapsing-auction-bidding"
+              open={true}
+            >
+              <BiddingForm formSubmit={formSubmit} revokeBid={revokeSupplierBid} auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+              <CommentForm addCommentToSolution={addCommentToSolution} auctionPayload={auctionPayload} unsubmitComment={removeCommentFromSolution} />
+            </CollapsibleSection>
           </MediaQuery>
         </div>
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
