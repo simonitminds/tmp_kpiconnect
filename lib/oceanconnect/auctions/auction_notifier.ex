@@ -7,7 +7,8 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  def notify_participants(%state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
+  def notify_participants(state = %state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
+    IO.inspect(state.solutions, label: "AUCTION NOTIFIER SOLUTIONS ----------------------------------> 4")
     auction =
       Auctions.get_auction!(auction_id)
       |> Auctions.fully_loaded()
@@ -21,6 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
       payload =
         auction
         |> AuctionPayload.get_auction_payload!(user_id)
+
+      IO.inspect(payload.solutions)
 
       send_notification_to_participants("user_auctions", payload, [user_id])
     end)
@@ -37,7 +40,6 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def send_notification_to_participants(channel, payload, participants) do
     {:ok, pid} = Task.Supervisor.start_link()
-
     @task_supervisor.async_nolink(pid, fn ->
       Enum.map(participants, fn id ->
         OceanconnectWeb.Endpoint.broadcast("#{channel}:#{id}", "auctions_update", payload)
