@@ -3,7 +3,6 @@ import React from 'react';
 import { formatPrice } from '../../../../utilities';
 
 const FuelPriceDisplay = ({products, auctionType}) => {
-  console.log(auctionType);
   return (
     <React.Fragment>
       { _.map(products, ({fuel, quantity, bid}) => {

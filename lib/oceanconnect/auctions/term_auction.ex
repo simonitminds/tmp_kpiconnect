@@ -138,7 +138,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
       valid?: true,
       changes: %{start_date: start_date, end_date: end_date, fuel_quantity: fuel_quantity}
     } = changeset) do
-      IO.inspect(fuel_quantity)
       months =
         DateTime.diff(end_date, start_date, :second) / 2_629_800
         |> Float.round()
