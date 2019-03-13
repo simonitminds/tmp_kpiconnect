@@ -52,7 +52,7 @@ const TermFuelIndexFormSection = (props) => {
           value={current_index_price}
           errors={errors.current_index_price}
           isHorizontal={true}
-          opts={{type: 'number'}}
+          opts={{type: 'number', step: '0.01'}}
           onChange={updateInformation.bind(this, 'auction.current_index_price')} />
         }
     </React.Fragment>
