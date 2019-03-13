@@ -13,7 +13,7 @@ import PortSelectFormSection from '../../common/forms/port-select-form-section';
 import AdditionalInfoFormSection from '../../common/forms/additional-info-form-section';
 import AuctionDetailsFormSection from '../../common/forms/auction-details-form-section';
 
-class ForwardFixedAuctionForm extends React.Component {
+class TermAuctionForm extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -30,6 +30,9 @@ class ForwardFixedAuctionForm extends React.Component {
       etd_date,
       etd_time,
       fuels,
+      fuel_indexes,
+      current_index_price,
+      hasFuelIndex,
       total_fuel_volume,
       show_total_fuel_volume,
       ports,
@@ -48,6 +51,7 @@ class ForwardFixedAuctionForm extends React.Component {
       vessels,
     } = this.props;
 
+    const isAdmin = window.isAdmin;
     const port_id = auction.port_id ? auction.port_id : "";
     const selectedPort = _.chain(ports)
           .filter(['id', auction.port_id])
@@ -80,7 +84,16 @@ class ForwardFixedAuctionForm extends React.Component {
                                portId={port_id}
                                ports={ports} />
 
-        <TermFuelFormSection auction={auction} errors={errors} fuels={fuels} totalFuelVolume={total_fuel_volume} updateInformation={updateInformation} updateInformationFromCheckbox={updateInformationFromCheckbox} recalculateTotalFuleVolume={recalculateTotalFuelVolume} />
+        <TermFuelFormSection auction={auction}
+                             errors={errors}
+                             fuels={fuels}
+                             fuel_indexes={fuel_indexes}
+                             hasFuelIndex={hasFuelIndex}
+                             isAdmin={isAdmin}
+                             totalFuelVolume={total_fuel_volume}
+                             updateInformation={updateInformation}
+                             updateInformationFromCheckbox={updateInformationFromCheckbox}
+                             recalculateTotalFuleVolume={recalculateTotalFuelVolume} />
 
         <AdditionalInfoFormSection auction={auction} errors={errors} updateInformation={updateInformation} isTermAuction={true }/>
 
@@ -97,4 +110,4 @@ class ForwardFixedAuctionForm extends React.Component {
   }
 };
 
-export default ForwardFixedAuctionForm;
+export default TermAuctionForm;

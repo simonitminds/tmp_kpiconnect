@@ -9,7 +9,7 @@ import { portLocalTime } from '../../utilities';
 import SupplierList  from './common/forms/supplier-list';
 import VesselFuelForm from './spot/forms/vessel-fuel-form';
 import SpotAuctionForm from './spot/forms/spot-auction-form';
-import ForwardFixedAuctionForm from './term/forms/forward-fixed-auction-form';
+import TermAuctionForm from './term/forms/term-auction-form';
 
 const Form = (props) => {
   const {
@@ -23,6 +23,8 @@ const Form = (props) => {
     etd_date,
     etd_time,
     fuels,
+    fuel_indexes,
+    current_index_price,
     ports,
     scheduled_start_date,
     scheduled_start_time,
@@ -65,9 +67,9 @@ const Form = (props) => {
     case 'spot':
       return(<SpotAuctionForm {...props} />);
     case 'forward_fixed':
-      return(<ForwardFixedAuctionForm {...props} />);
+      return(<TermAuctionForm {...props} />);
     case 'formula_related':
-      return(<div>Formula Related</div>);
+      return(<TermAuctionForm {...props} hasFuelIndex={true} />);
     }
   };
 

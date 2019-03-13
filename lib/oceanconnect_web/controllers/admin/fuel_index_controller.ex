@@ -4,8 +4,8 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.FuelIndex
 
-  def index(conn, _) do
-    page = Auctions.list_fuel_index_entries()
+  def index(conn, params) do
+    page = Auctions.list_fuel_index_entries(params)
     render(conn,
       "index.html",
       fuel_index_entries: page.entries,

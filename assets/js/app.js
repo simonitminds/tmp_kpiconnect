@@ -39,10 +39,11 @@ function getDataForComponent(componentName) {
   let errors = JSON.parse(data.errors);
   let suppliers = JSON.parse(data.suppliers);
   let fuels = JSON.parse(data.fuels);
+  let fuel_indexes = JSON.parse(data.fuel_indexes);
   let ports = JSON.parse(data.ports);
   let vessels = JSON.parse(data.vessels);
   let credit_margin_amount = data.credit_margin_amount;
-  return <AuctionFormContainer auction={auction} errors={errors} suppliers={suppliers} fuels={fuels} ports={ports} vessels={vessels} credit_margin_amount={credit_margin_amount} />;
+  return <AuctionFormContainer auction={auction} errors={errors} suppliers={suppliers} fuels={fuels} fuel_indexes={fuel_indexes} ports={ports} vessels={vessels} credit_margin_amount={credit_margin_amount} />;
 }
 
 let currentUserCompanyId = null;

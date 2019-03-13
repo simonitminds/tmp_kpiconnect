@@ -5,12 +5,16 @@ import _ from 'lodash';
 import InputField from '../../../input-field';
 import InputErrors from '../../../input-errors';
 import CheckBoxField from '../../../check-box-field';
+import TermFuelIndexFormSection from './term-fuel-index-form-section';
 
 const TermFuelFormSection = (props) => {
   const {
     auction,
     errors,
     fuels,
+    fuel_indexes,
+    hasFuelIndex,
+    current_index_price,
     totalFuelVolume,
     updateInformation,
     updateInformationFromCheckbox
@@ -93,6 +97,14 @@ const TermFuelFormSection = (props) => {
               opts={{type: 'number'}}
               onChange={updateInformation.bind(this, 'auction.fuel_quantity')}
             />
+            { hasFuelIndex &&
+              <TermFuelIndexFormSection
+                auction={auction}
+                errors={errors}
+                fuel_indexes={fuel_indexes}
+                current_index_price={current_index_price}
+                updateInformation={updateInformation} />
+            }
 
             <div className="field is-horizontal">
               <div className="field-label"></div>

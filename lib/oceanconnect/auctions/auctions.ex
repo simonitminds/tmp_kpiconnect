@@ -692,6 +692,7 @@ defmodule Oceanconnect.Auctions do
         :port,
         :vessels,
         :fuel,
+        :fuel_index,
         :auction_suppliers,
         [buyer: :users],
         [suppliers: :users]
@@ -1529,7 +1530,9 @@ defmodule Oceanconnect.Auctions do
       [%FuelIndex{}, ...]
 
   """
-  def list_fuel_index_entries do
+  def list_fuel_index_entries, do: Repo.all(FuelIndex)
+
+  def list_fuel_index_entries(params) do
     FuelIndex.alphabetical()
     |> preload([:fuel, :port])
     |> Repo.paginate()
