@@ -34,6 +34,14 @@ defmodule Oceanconnect.Auctions do
 
   @term_types ["forward_fixed", "formula_related"]
 
+  def is_term?(%{type: TermAuction}) do
+    true
+  end
+  def is_term?(auction) do
+    false
+  end
+
+
   def submit_comment(
     auction,
     comment_params = %{},

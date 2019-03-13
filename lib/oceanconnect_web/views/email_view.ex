@@ -9,6 +9,7 @@ defmodule OceanconnectWeb.EmailView do
     |> Enum.join(", ")
   end
 
+
   def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
     Enum.map(vessels, fn(vessel) ->
       eta =
@@ -24,6 +25,9 @@ defmodule OceanconnectWeb.EmailView do
 
       {vessel, eta, etd}
     end)
+  end
+  def auction_log_vessel_etas(auction) do
+    []
   end
 
   def duration_minute_string(duration) do

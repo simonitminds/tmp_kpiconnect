@@ -39,27 +39,36 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   defp process(event = %AuctionEvent{type: :auction_created, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
-    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
-    emails = Notifications.emails_for_event(event, state)
-    case calculate_upcoming_reminder_send_time(auction_id) do
-      false ->
+    case DelayedNotificationsSupervisor.start_child(notification_name) do
+      {:ok, pid} ->
+        emails = Notifications.emails_for_event(event, state)
+        case calculate_upcoming_reminder_send_time(auction_id) do
+          false ->
+            {:ok, :nothing_to_schedule}
+          send_time ->
+            Command.schedule_notification(notification_name, send_time, emails)
+            |> DelayedNotifications.process_command()
+        end
+      _ ->
+
         {:ok, :nothing_to_schedule}
-      send_time ->
-        Command.schedule_notification(notification_name, send_time, emails)
-        |> DelayedNotifications.process_command()
     end
   end
 
   defp process(event = %AuctionEvent{type: :auction_rescheduled, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
-    {:ok, pid} = DelayedNotificationsSupervisor.start_child(notification_name)
-    emails = Notifications.emails_for_event(event, state)
-    case calculate_upcoming_reminder_send_time(auction_id) do
-      false ->
-        {:ok, :nothing_to_schedule}
-      send_time ->
-        Command.reschedule_notification("auction:#{auction_id}:upcoming_reminder", send_time, emails)
-        |> DelayedNotifications.process_command()
+
+    case DelayedNotificationsSupervisor.start_child(notification_name) do
+      {:ok, pid} ->
+        emails = Notifications.emails_for_event(event, state)
+        case calculate_upcoming_reminder_send_time(auction_id) do
+          false ->
+            {:ok, :nothing_to_schedule}
+          send_time ->
+            Command.reschedule_notification("auction:#{auction_id}:upcoming_reminder", send_time, emails)
+            |> DelayedNotifications.process_command()
+        end
+        _ -> {:ok, :nothing_to_schedule}
     end
   end
 
