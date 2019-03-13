@@ -33,7 +33,7 @@ defmodule Oceanconnect.AuctionNewPage do
 
       if key in [:start_date, :end_date, :scheduled_start_date] do
         type = Hound.Helpers.Element.tag_name(element)
-        fill_form_element(element, type, value, key)
+        fill_form_element(element, type, value)
       else
         type = Hound.Helpers.Element.tag_name(element)
         fill_form_element(element, type, value)
@@ -41,9 +41,10 @@ defmodule Oceanconnect.AuctionNewPage do
     end)
   end
 
-  def fill_form_element(element, _type, value = %DateTime{}, key)
-      when key in [:start_date, :scheduled_start_date, :end_date] do
-    execute_script("document.getElementById('auction-#{key}').value = '#{value}'")
+  def fill_form_element(element, _type, value = %DateTime{}) do
+    element
+    |> find_within_element(:css, "input")
+    |> fill_field(value)
   end
 
   def fill_form_element(element, _type, value = %DateTime{}) do
