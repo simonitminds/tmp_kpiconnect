@@ -56,8 +56,12 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {new_state, events} =
       %AuctionState{state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
+<<<<<<< HEAD
     new_state = SolutionCalculator.process(new_state, auction)
     IO.inspect(new_state.solutions, label: "AUCTION STORE SOLUTIONS --------------------------> 1")
+=======
+      new_state = SolutionCalculator.process(new_state, auction)
+>>>>>>> Fixes problem with bids that occur prior to start not being processed
     {:ok, [
       AuctionEvent.auction_started(auction, new_state, started_at, user)
     ] ++ events}
@@ -405,10 +409,16 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   end
 
   def apply(
-        state,
+        state = %AuctionState{auction_id: auction_id},
         %AuctionEvent{type: :auction_started}
       ) do
-    {:ok, %AuctionState{state | status: :open}}
+
+       {next_state, _} =
+         %AuctionState{state | status: :open}
+         |> AuctionBidCalculator.process_all(:open)
+       auction = Auctions.get_auction!(auction_id)
+       next_state = SolutionCalculator.process(next_state, auction)
+    {:ok, next_state}
   end
 
   def apply(
@@ -448,7 +458,6 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
     auction = Auctions.get_auction!(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
-
     {:ok, new_state}
   end
 
@@ -460,7 +469,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     new_state = AuctionState.update_product_bids(state, vessel_fuel_id, new_product_state)
 
     # TODO: Not this
-    auction = Auctions.get_auction!(auction_id) |> Auctions.fully_loaded()
+    auction = Auctions.get_auction!(auction_id)
     new_state = SolutionCalculator.process(new_state, auction)
 
     {:ok, new_state}
