@@ -85,8 +85,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
          do: GenServer.call(pid, {:process, command})
   end
 
-
-
   # Server
   def init(auction = %Auction{id: auction_id}) do
     AuctionCache.make_cache_available(auction_id)
@@ -109,7 +107,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_call(:get_current_state, _from, current_state) do
     {:reply, current_state, current_state}
   end
-
 
   def handle_call({:process, command = %Command{}}, _from, current_state) do
     with {:ok, events} <- Aggregate.process(current_state, command) do

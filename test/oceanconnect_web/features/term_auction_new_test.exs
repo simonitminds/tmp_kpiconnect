@@ -150,51 +150,51 @@ defmodule Oceanconnect.TermAuctionNewTest do
            )
   end
 
-  test "creating a term auction with multiple vessels", %{
-    params: params,
-    show_params: show_params,
-    port: port,
-    selected_fuel: selected_fuel,
-    buyer_company: buyer_company,
-    buyer_vessels: buyer_vessels
-  } do
-    AuctionNewPage.visit()
-    AuctionNewPage.select_auction_type(:forward_fixed)
-    AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_vessels(buyer_vessels)
-    AuctionNewPage.add_fuel(selected_fuel.id)
+  # test "creating a term auction with multiple vessels", %{
+  #   params: params,
+  #   show_params: show_params,
+  #   port: port,
+  #   selected_fuel: selected_fuel,
+  #   buyer_company: buyer_company,
+  #   buyer_vessels: buyer_vessels
+  # } do
+  #   AuctionNewPage.visit()
+  #   AuctionNewPage.select_auction_type(:forward_fixed)
+  #   AuctionNewPage.select_port(port.id)
+  #   AuctionNewPage.fill_form(params)
+  #   AuctionNewPage.add_vessels(buyer_vessels)
+  #   AuctionNewPage.add_fuel(selected_fuel.id)
 
-    assert AuctionNewPage.credit_margin_amount() ==
-             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+  #   assert AuctionNewPage.credit_margin_amount() ==
+  #            :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
-    AuctionNewPage.submit()
+  #   AuctionNewPage.submit()
 
-    assert current_path() =~ ~r/auctions\/\d/
-    assert AuctionShowPage.has_values_from_params?(show_params)
-  end
+  #   assert current_path() =~ ~r/auctions\/\d/
+  #   assert AuctionShowPage.has_values_from_params?(show_params)
+  # end
 
-  test "creating a term auction with no vessels", %{
-    params: params,
-    show_params: show_params,
-    port: port,
-    selected_fuel: selected_fuel,
-    buyer_company: buyer_company
-  } do
-    AuctionNewPage.visit()
-    AuctionNewPage.select_auction_type(:forward_fixed)
-    AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_fuel(selected_fuel.id)
+  # test "creating a term auction with no vessels", %{
+  #   params: params,
+  #   show_params: show_params,
+  #   port: port,
+  #   selected_fuel: selected_fuel,
+  #   buyer_company: buyer_company
+  # } do
+  #   AuctionNewPage.visit()
+  #   AuctionNewPage.select_auction_type(:forward_fixed)
+  #   AuctionNewPage.select_port(port.id)
+  #   AuctionNewPage.fill_form(params)
+  #   AuctionNewPage.add_fuel(selected_fuel.id)
 
-    assert AuctionNewPage.credit_margin_amount() ==
-             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+  #   assert AuctionNewPage.credit_margin_amount() ==
+  #            :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
-    AuctionNewPage.submit()
+  #   AuctionNewPage.submit()
 
-    assert current_path() =~ ~r/auctions\/\d/
-    assert AuctionShowPage.has_values_from_params?(show_params)
-  end
+  #   assert current_path() =~ ~r/auctions\/\d/
+  #   assert AuctionShowPage.has_values_from_params?(show_params)
+  # end
 
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",
        %{

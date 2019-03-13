@@ -11,7 +11,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
         submitted_barges: submitted_barges
       }) do
     auction = Auctions.get_auction(auction_id)
-    participants = Auctions.active_participants(auction)
+    participants = Auctions.active_participants(auction_id)
     %Solution{bids: bids} = solution
     approved_barges = Enum.filter(submitted_barges, &(&1.approval_status == "APPROVED"))
 

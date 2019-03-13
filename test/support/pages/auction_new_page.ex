@@ -14,7 +14,7 @@ defmodule Oceanconnect.AuctionNewPage do
 
   def select_auction_type(type) do
     find_element(:css, ".qa-auction-type")
-    |> find_within_element(:css,  "option[value='#{type}']")
+    |> find_within_element(:css, "option[value='#{type}']")
     |> click
   end
 
@@ -30,14 +30,26 @@ defmodule Oceanconnect.AuctionNewPage do
     params
     |> Enum.map(fn {key, value} ->
       element = find_element(:css, ".qa-auction-#{key}")
-      type = Hound.Helpers.Element.tag_name(element)
-      fill_form_element(element, type, value)
+
+      if key in [:start_date, :end_date, :scheduled_start_date] do
+        type = Hound.Helpers.Element.tag_name(element)
+        fill_form_element(element, type, value)
+      else
+        type = Hound.Helpers.Element.tag_name(element)
+        fill_form_element(element, type, value)
+      end
     end)
   end
 
   def fill_form_element(element, _type, value = %DateTime{}) do
     element
     |> find_within_element(:css, "input")
+    |> fill_field(value)
+  end
+
+  def fill_form_element(element, _type, value = %DateTime{}) do
+    element
+    |> find_within_element(:class, "qa-date-time-picker")
     |> fill_field(value)
   end
 
@@ -76,12 +88,13 @@ defmodule Oceanconnect.AuctionNewPage do
   end
 
   def add_vessel_timestamps(vessels, eta, etd) do
-    Enum.each(vessels, fn(vessel) ->
+    Enum.each(vessels, fn vessel ->
       container = find_element(:css, ".qa-auction-vessel-#{vessel.id}")
 
       container
       |> find_within_element(:css, ".qa-vessel-eta_date")
       |> fill_form_element("datetime", eta)
+
       container
       |> find_within_element(:css, ".qa-vessel-eta_time")
       |> fill_form_element("datetime", eta)
@@ -89,6 +102,7 @@ defmodule Oceanconnect.AuctionNewPage do
       container
       |> find_within_element(:css, ".qa-vessel-etd_date")
       |> fill_form_element("datetime", etd)
+
       container
       |> find_within_element(:css, ".qa-vessel-etd_time")
       |> fill_form_element("datetime", etd)
