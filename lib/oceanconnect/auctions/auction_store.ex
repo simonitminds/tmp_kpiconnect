@@ -67,6 +67,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
         #TODO: This should be picked up by a reaction on the notifier
         active_participants = Auctions.active_participants(auction_id)
+        Auctions.AuctionNotifier.notify_participants(new_state)
         AuctionEmailNotifier.notify_auction_completed(
           solution.bids,
           current_state.submitted_barges,
