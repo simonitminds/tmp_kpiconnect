@@ -10,6 +10,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
   const {id: fuelId, name} = fuel;
   const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity');
 
+  const auctionType = _.get(auctionPayload.auction, 'type');
+
   const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price', 0.00);
 
   const lowestBid = _.get(auctionPayload, `product_bids['${fuelId}'].lowest_bids[0]`)
@@ -29,7 +31,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
             </div>
           }
           <div className="control control--flex-limit has-margin-top-sm">
-            <BidTag bid={lowestBid} title="Bid to Beat" highlightOwn={hasLowestBid} />
+            <BidTag bid={lowestBid} title="Bid to Beat" highlightOwn={hasLowestBid} auctionType={auctionType} />
           </div>
         </div>
         <div className="column">
@@ -37,7 +39,7 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
             <div className="column">
               <div className="field">
                 <label className="label" htmlFor="bid">Bid Amount</label>
-                <div className="control auction-bidding__input has-icons-left">
+                <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice ? 'has-input-add-right' : ''}`}>
                   <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                   <input
                     type="number"
@@ -50,13 +52,16 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
                     data-fuel-input
                     data-fuel={fuelId}
                   />
+                  { currentIndexPrice &&
+                    <span className="input-add is-right has-text-gray-3">(Est: ${formatPrice(currentIndexPrice)})</span>
+                  }
                 </div>
               </div>
             </div>
             <div className="column">
               <div className="field">
-                <label className="label" htmlFor="bid">Minimum Bid</label>
-                <div className="control auction-bidding__input has-icons-left">
+                <label className="label" htmlFor="bid">Minimum Bid {auctionPayload.type}</label>
+                <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice ? 'has-input-add-right' : ''}`}>
                   <input
                     type="number"
                     step="0.25"
@@ -68,6 +73,9 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
                     data-fuel-input
                     data-fuel={fuelId}
                   />
+                  { currentIndexPrice &&
+                    <span className="input-add is-right has-text-gray-3">(Est: ${formatPrice(currentIndexPrice)})</span>
+                  }
                   <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                 </div>
               </div>

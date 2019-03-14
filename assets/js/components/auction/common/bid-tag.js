@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
  * Renders a small tag with the title and the amount from the given `bid`. If
  * `highlightOwn` is truthy, a crown will appear next to the title.
  */
-const BidTag = ({bid, title, highlightOwn, indexPrice}) => {
+const BidTag = ({bid, title, highlightOwn, indexPrice, auctionType}) => {
 
   return (
     <div className="tags auction-bidding__best-price has-addons">
@@ -17,7 +17,7 @@ const BidTag = ({bid, title, highlightOwn, indexPrice}) => {
         <span className="truncate">{title}</span>
       </span>
         { bid
-          ? <span className={`tag ${indexPrice ? 'is-teal has-text-white' : 'is-yellow'} has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none`}> ${ indexPrice ? formatPrice(bid) : formatPrice(bid.amount)}</span>
+          ? <span className={`tag ${indexPrice ? 'is-teal has-text-white' : 'is-yellow'} has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none`}> {auctionType == 'formula_related' ? "+" : ""}${ indexPrice ? formatPrice(bid) : formatPrice(bid.amount)}</span>
           : <span className="tag auction-bidding__best-price--price has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
         }
     </div>
