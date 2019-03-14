@@ -16,6 +16,7 @@ const SupplierBidList = ({auctionPayload, buyer}) => {
       <div className="qa-supplier-bid-history box has-margin-top-md">
         <h3 className="box__header box__header--bordered">Your Bid History</h3>
         <BidTable
+          isFormulaRelated={auctionType == "formula_related"}
           className="table--supplier-bid-history qa-auction-bidlist"
           bids={bidList}
           columns={["product", "amount", "time_entered"]}

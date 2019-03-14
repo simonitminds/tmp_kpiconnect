@@ -19,11 +19,10 @@ import { formatTime, formatPrice } from '../../../../utilities';
  * `Unsplittable` tags if they apply. If `showMinAmounts` is true, any
  * `amount` display will also include the `min_amount` value if present.
  */
-const BidTable = ({bids, columns, headers, showMinAmounts=false, className}) => {
+const BidTable = ({isFormulaRelated, bids, columns, headers, showMinAmounts=false, className}) => {
   // If `headers` is given, it will be used for the header row of the table.
   // Otherwise, the `columns` names will be used instead.
   const tableHeaders = headers || _.map(columns, (c) => _.startCase(_.toLower(c)));
-
   const columnContent = (bid, column) => {
     const value = bid[column];
 
@@ -33,7 +32,7 @@ const BidTable = ({bids, columns, headers, showMinAmounts=false, className}) => 
         const isTradedBid = bid.is_traded_bid;
         return (
           <React.Fragment>
-            <span className="auction__bid-amount">${formatPrice(value)}</span>
+            <span className="auction__bid-amount">{isFormulaRelated ? "+" : ""}${formatPrice(value)}</span>
             { showMinAmounts && minAmount &&
               <i className="has-text-gray-4"> (Min: ${formatPrice(minAmount)})</i>
             }
