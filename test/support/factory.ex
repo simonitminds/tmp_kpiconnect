@@ -97,6 +97,38 @@ defmodule Oceanconnect.Factory do
     )
   end
 
+  def formula_related_auction_factory() do
+    start_time =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(20)
+      |> DateTime.from_naive!("Etc/UTC")
+
+    end_time =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(80)
+      |> DateTime.from_naive!("Etc/UTC")
+
+    struct!(
+      draft_term_auction_factory(),
+      %{
+        type: "formula_related",
+        current_index_price: 750.00,
+        scheduled_start: start_time,
+        start_date: start_time,
+        end_date: end_time,
+        fuel: build(:fuel),
+        fuel_index: build(:fuel_index),
+        fuel_quantity: 1500,
+        terminal: "TERMINAL",
+        duration: 10 * 60_000,
+        buyer: build(:company),
+        suppliers: [build(:company, is_supplier: true)]
+      }
+    )
+  end
+
   def vessel_fuel_factory() do
     %Oceanconnect.Auctions.AuctionVesselFuel{
       vessel: build(:vessel),

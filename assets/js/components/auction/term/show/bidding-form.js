@@ -68,6 +68,7 @@ class BiddingForm extends React.Component {
     } = this.props;
 
     const auction = _.get(auctionPayload, 'auction');
+    const currentIndexPrice = _.get(auction, 'current_index_price', 0.00);
     const fuel = _.get(auction, 'fuel');
     const auctionStatus = _.get(auctionPayload, 'status');
     const credit_margin_amount = formatPrice(_.get(auction, 'buyer.credit_margin_amount'))
@@ -102,7 +103,8 @@ class BiddingForm extends React.Component {
             fuel={fuel}
             auctionPayload={auctionPayload}
             supplierId={supplierId}
-            onRevoke={revokeBid} />
+            onRevoke={revokeBid}
+            currentIndexPrice={currentIndexPrice} />
         </div>
         <div className="field is-horizontal is-expanded">
           <div className="field is-expanded is-grouped is-grouped-right has-margin-top-xs has-margin-bottom-sm has-margin-left-auto">
