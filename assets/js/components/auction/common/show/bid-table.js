@@ -22,6 +22,17 @@ import { formatTime, formatPrice } from '../../../../utilities';
 const BidTable = ({isFormulaRelated, bids, columns, headers, showMinAmounts=false, className}) => {
   // If `headers` is given, it will be used for the header row of the table.
   // Otherwise, the `columns` names will be used instead.
+
+
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
+
   const tableHeaders = headers || _.map(columns, (c) => _.startCase(_.toLower(c)));
   const columnContent = (bid, column) => {
     const value = bid[column];
@@ -30,11 +41,12 @@ const BidTable = ({isFormulaRelated, bids, columns, headers, showMinAmounts=fals
       case 'amount':
         const minAmount = bid.min_amount;
         const isTradedBid = bid.is_traded_bid;
+
         return (
           <React.Fragment>
-            <span className="auction__bid-amount">{isFormulaRelated ? "+" : ""}${formatPrice(value)}</span>
+            <span className="auction__bid-amount">{value > 0 && isFormulaRelated ? "+" : "-"}${formatPrice(normalizeValue(value))}</span>
             { showMinAmounts && minAmount &&
-              <i className="has-text-gray-4"> (Min: ${formatPrice(minAmount)})</i>
+              <i className="has-text-gray-4"> (Min: {value > 0 && isFormulaRelated ? "+" : "-"}${formatPrice(normalizeValue(minAmount))})</i>
             }
             <span className="qa-auction-bid-is_traded_bid">
               { isTradedBid &&

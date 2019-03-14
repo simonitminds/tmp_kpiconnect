@@ -125,7 +125,7 @@ export default class SolutionDisplayWrapper extends React.Component {
               </MediaQuery>
             </h4>
             <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">{auctionType == 'formula_related' ? "+" : ""}{displayPrice} {auctionType == 'formula_related' && displayPrice ? <span className="has-text-gray-3">(Est: {estimatedPrice})</span> : ""}</span>
+              <span className="has-text-weight-bold has-padding-right-xs">{displayPrice} {auctionType == 'formula_related' && displayPrice ? <span className="has-text-gray-3">(Est: {estimatedPrice})</span> : ""}</span>
               {latest_time_entered &&
                 `(${formatTime(latest_time_entered)})`
               }

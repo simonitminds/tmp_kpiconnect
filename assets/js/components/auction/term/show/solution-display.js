@@ -28,9 +28,18 @@ const SolutionDisplay = (props) => {
     .uniq()
     .value();
 
+  const isFormulaRelated = auctionType == 'formula_related';
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
 
   const hasTradedBid = _.some(bids, 'is_traded_bid');
-  const price = `$${formatPrice(normalized_price)}`;
+  const price = `${normalized_price > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(normalized_price))}`;
   const priceSection = hasTradedBid
       ? <span>
           <TradedBidTag className="has-margin-right-sm qa-auction-bid-is_traded_bid" />

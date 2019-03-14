@@ -10,6 +10,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
  */
 const BidTag = ({bid, title, highlightOwn, indexPrice, auctionType}) => {
 
+  const isFormulaRelated = auctionType == 'formula_related';
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
+
+  const displayPrice = (bid) => {
+    if (indexPrice) {
+      return `$${formatPrice(bid)}`
+    } else {
+      return`${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+    }
+  }
+
   return (
     <div className="tags auction-bidding__best-price has-addons">
       <span className="tag is-gray-3 has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none">
@@ -17,7 +35,7 @@ const BidTag = ({bid, title, highlightOwn, indexPrice, auctionType}) => {
         <span className="truncate">{title}</span>
       </span>
         { bid
-          ? <span className={`tag ${indexPrice ? 'is-teal has-text-white' : 'is-yellow'} has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none`}> {auctionType == 'formula_related' ? "+" : ""}${ indexPrice ? formatPrice(bid) : formatPrice(bid.amount)}</span>
+          ? <span className={`tag ${indexPrice ? 'is-teal has-text-white' : 'is-yellow'} has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none`}> {displayPrice(bid)}</span>
           : <span className="tag auction-bidding__best-price--price has-family-copy has-text-weight-bold is-capitalized has-margin-bottom-none"><i>None</i></span>
         }
     </div>
