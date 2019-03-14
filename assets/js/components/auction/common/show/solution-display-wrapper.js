@@ -82,6 +82,7 @@ export default class SolutionDisplayWrapper extends React.Component {
     const isExpanded = !headerOnly && this.state.expanded;
 
     const displayPrice = price != undefined ? price : `$${formatPrice(normalized_price)}`;
+    const estimatedPrice = `$${formatPrice(currentIndexPrice + normalized_price)}`;
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -124,7 +125,7 @@ export default class SolutionDisplayWrapper extends React.Component {
               </MediaQuery>
             </h4>
             <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">{auctionType == 'formula_related' ? "+" : ""}{displayPrice} {auctionType == 'formula_related' ? <span className="has-text-gray-3">(Est: ${formatPrice(currentIndexPrice)})</span> : ""}</span>
+              <span className="has-text-weight-bold has-padding-right-xs">{auctionType == 'formula_related' ? "+" : ""}{displayPrice} {auctionType == 'formula_related' && displayPrice ? <span className="has-text-gray-3">(Est: {estimatedPrice})</span> : ""}</span>
               {latest_time_entered &&
                 `(${formatTime(latest_time_entered)})`
               }
