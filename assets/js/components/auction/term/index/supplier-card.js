@@ -18,6 +18,7 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const vessels = _.get(auction, 'vessels');
   const fuel = _.get(auction, 'fuel');
   const fuelQuantity = _.get(auction, 'fuel_quantity');
+  const fuelIndex = _.get(auction, 'fuel_index');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
 
@@ -66,8 +67,12 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
             <AuctionTitle auction={auction} />
           </h3>
-          <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
+          <p className="has-family-header">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{vesselNameDisplay}</span> ({formatMonthYear(startDate)}<span className="is-hidden-mobile"> &ndash; {formatMonthYear(endDate)}</span>)</p>
+          {auctionType == "formula_related" ?
+            <p className="has-family-header"><span className="has-text-weight-bold">Index</span> <span className="is-hidden-mobile">{fuelIndex.code}</span></p> :
+            ""
+          }
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
