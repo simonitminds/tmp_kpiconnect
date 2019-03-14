@@ -10,6 +10,8 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
   const {id: fuelId, name} = fuel;
   const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity');
 
+  const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price', 0.00);
+
   const lowestBid = _.get(auctionPayload, `product_bids['${fuelId}'].lowest_bids[0]`)
 
   const hasLowestBid = lowestBid && supplierId && (lowestBid.supplier_id == supplierId);
@@ -21,6 +23,11 @@ const BiddingFormProduct = ({fuel, auctionPayload, onRevoke, onUpdate, supplierI
         <div className="column is-one-quarter-desktop">
           <strong>{name}</strong><br/>
           <span className="has-text-gray-3">&times; {fuelQuantity} MT </span><br/>
+          { currentIndexPrice &&
+            <div className="control control--flex-limit has-margin-top-sm">
+              <BidTag bid={currentIndexPrice} indexPrice="true" title="Index Price" />
+            </div>
+          }
           <div className="control control--flex-limit has-margin-top-sm">
             <BidTag bid={lowestBid} title="Bid to Beat" highlightOwn={hasLowestBid} />
           </div>
