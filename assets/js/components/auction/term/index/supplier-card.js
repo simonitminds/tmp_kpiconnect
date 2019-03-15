@@ -21,13 +21,12 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const fuelIndex = _.get(auction, 'fuel_index');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
-  const lowestOffer = _.chain(auctionPayload)
-    .get('solutions.best_overall')
-    .value();
-  const lowestOfferBids = _.get(lowestOffer, 'bids', [])
-  const lowestBid = lowestOfferBids[0] || '';
 
   const bidStatusDisplay = () => {
+    const lowestOffer = _.chain(auctionPayload)
+      .get('solutions.best_overall')
+      .value();
+
     if (lowestOffer && auctionStatus != 'pending') {
       return (
         <div>
@@ -46,7 +45,11 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const vesselNameDisplay = _.chain(vessels).map('name').join(", ").value();
 
   const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: lowestBid}]
+  const productBid = _.chain(solution)
+    .get('bids', [])
+    .nth(0)
+    .value() || '';
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}]
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">

@@ -42,7 +42,11 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
 
   console.log(auctionPayload.solutions)
   const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: ""}];
+  const productBid = _.chain(solution)
+    .get('bids', [])
+    .nth(0)
+    .value() || '';
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}];
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
