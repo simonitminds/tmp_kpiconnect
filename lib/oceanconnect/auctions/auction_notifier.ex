@@ -7,12 +7,26 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-  def notify_participants(%state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
+
+
+  def notify_participants(auction = %struct{}, state = %state_struct{}) when is_auction_state(state_struct) and is_auction(struct) do
+    participants = Auctions.auction_participant_ids(auction)
+    Enum.map(participants, fn user_id ->
+      payload =
+        auction
+        |> AuctionPayload.get_auction_payload!(user_id, state)
+      send_notification_to_participants("user_auctions", payload, [user_id])
+    end)
+
+    notify_admin(auction, state)
+  end
+
+
+  def notify_participants(state = %state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
     auction =
       Auctions.get_auction!(auction_id)
-      |> Auctions.fully_loaded()
 
-    notify_participants(auction)
+    notify_participants(auction, state)
   end
 
   def notify_participants(auction = %struct{}) when is_auction(struct) do
@@ -36,15 +50,15 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def send_notification_to_participants(channel, payload, participants) do
-    {:ok, pid} = Task.Supervisor.start_link()
-
-    @task_supervisor.async_nolink(pid, fn ->
+    Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
       Enum.map(participants, fn id ->
-        OceanconnectWeb.Endpoint.broadcast("#{channel}:#{id}", "auctions_update", payload)
+        IO.inspect(payload, label: "CHANNEL PUSH EMMENENT, #{channel}: #{id}")
+        OceanconnectWeb.Endpoint.broadcast!("#{channel}:#{id}", "auctions_update", payload)
       end)
     end)
   end
 
+  # TODO move to new style of passing in auction state
   def notify_updated_bid(auction, _bid, _supplier_id) do
     notify_admin(auction)
 
@@ -69,6 +83,17 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
       admin_payload =
         auction
         |> AuctionPayload.get_admin_auction_payload!()
+
+      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
+    end)
+  end
+
+  defp notify_admin(auction = %struct{}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+    Enum.map(Accounts.list_admin_users(), & &1.id)
+    |> Enum.map(fn admin_id ->
+      admin_payload =
+        auction
+        |> AuctionPayload.get_admin_auction_payload!(state)
 
       send_notification_to_participants("user_auctions", admin_payload, [admin_id])
     end)

@@ -147,9 +147,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Enum.reverse()
     |> Enum.reduce(initial_state, fn(event, state) ->
       {:ok, state} = Aggregate.apply(state, event)
-      Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
-        {:ok, _notified} = EventNotifier.emit(state, event)
-      end)
+      {:ok, _notified} = EventNotifier.emit(state, event)
       state
     end)
   end

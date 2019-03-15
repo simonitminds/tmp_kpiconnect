@@ -4,6 +4,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     AuctionBid,
     AuctionEvent,
@@ -32,15 +33,19 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:ok, auction_id}
   end
 
-  def handle_info(%AuctionEvent{type: type}, state) when type == :auction_state_rebuilt do
+  def handle_info({%AuctionEvent{type: type}, _aggregate_state}, state)
+      when type == :auction_state_rebuilt do
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          auction_id: auction_id,
-          type: _type,
-          data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}
+        {
+          %AuctionEvent{
+            auction_id: auction_id,
+            type: _type,
+            data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}
+          },
+          _aggregate_state
         },
         state
       ) do
@@ -52,22 +57,26 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{
-          auction_id: auction_id,
-          type: :bids_revoked,
-          data: %{supplier_id: _supplier_id}
+        {
+          %AuctionEvent{
+            auction_id: auction_id,
+            type: :bids_revoked,
+            data: %{supplier_id: _supplier_id}
+          },
+          aggregate_state
         },
         state
       ) do
     auction_id
     |> Auctions.get_auction!()
-    |> AuctionNotifier.notify_participants()
+    |> AuctionNotifier.notify_participants(aggregate_state)
 
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_created, data: %struct{scheduled_start: nil}},
+        {%AuctionEvent{type: :auction_created, data: %struct{scheduled_start: nil}},
+         _aggregate_state},
         state
       )
       when is_auction(struct) do
@@ -75,135 +84,179 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        %AuctionEvent{type: :auction_created, data: auction = %struct{}},
+        {%AuctionEvent{type: :auction_created, data: auction = %struct{}}, aggregate_state},
         state
       )
       when is_auction(struct) do
-    AuctionNotifier.notify_participants(auction)
+    AuctionNotifier.notify_participants(auction, aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: :auction_started,
-          data: %{state: auction_state = %state_struct{}}
+        {
+          %AuctionEvent{
+            type: :auction_started,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
         },
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: :auction_ended,
-          data: %{state: auction_state = %state_struct{}}
+        {
+          %AuctionEvent{
+            type: :auction_ended,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
         },
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: type,
-          data: %{state: auction_state = %state_struct{}}
+        {
+          %AuctionEvent{
+            type: type,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
         },
         state
       )
       when is_auction_state(state_struct) and
              type in [:auction_expired, :auction_canceled, :auction_closed] do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
-  def handle_info(%AuctionEvent{type: :auction_finalized, data: %{auction: auction = %struct{}}}, state) when is_auction(struct) do
-    AuctionNotifier.notify_participants(auction)
+  def handle_info(
+        {%AuctionEvent{type: :auction_finalized, data: %{auction: auction = %struct{}}},
+         aggregate_state},
+        state
+      )
+      when is_auction(struct) do
+    AuctionNotifier.notify_participants(auction, aggregate_state)
     {:noreply, state}
   end
 
-  def handle_info(%AuctionEvent{type: _, data: auction = %struct{scheduled_start: start}}, state)
+  def handle_info(
+        {%AuctionEvent{type: _, data: auction = %struct{scheduled_start: start}},
+         aggregate_state},
+        state
+      )
       when is_auction(struct) and not is_nil(start) do
-    AuctionNotifier.notify_participants(auction)
-    {:noreply, state}
-  end
-
-  def handle_info(%AuctionEvent{type: _type, data: auction_state = %state_struct{}}, state)
-      when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(auction, aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: _type, data: %{state: auction_state = %state_struct{}}},
+        {%AuctionEvent{type: _type, data: auction_state = %state_struct{}}, aggregate_state},
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-    %AuctionEvent{
-      type: :comment_submitted,
-      data: %{state: auction_state = %state_struct{}}
-    },
-    state
-  ) when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+        {%AuctionEvent{type: _type, data: %{state: auction_state = %state_struct{}}},
+         aggregate_state},
+        state
+      )
+      when is_auction_state(state_struct) do
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-    %AuctionEvent{
-      type: :comment_unsubmitted,
-      data: %{state: auction_state = %state_struct{}}
-    },
-    state
-  ) when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
-    {:noreply, state}
-  end
-
-  def handle_info(
-        %AuctionEvent{
-          type: :barge_submitted,
-          data: %{state: auction_state = %state_struct{}}
+        {
+          %AuctionEvent{
+            type: :comment_submitted,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
         },
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{
-          type: :barge_unsubmitted,
-          data: %{state: auction_state = %state_struct{}}
+        {
+          %AuctionEvent{
+            type: :comment_unsubmitted,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
         },
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
   def handle_info(
-        %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %state_struct{}}},
+        {
+          %AuctionEvent{
+            type: :barge_submitted,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
+        },
         state
       )
       when is_auction_state(state_struct) do
-    AuctionNotifier.notify_participants(auction_state)
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
 
-  def handle_info(_event, state) do
+  def handle_info(
+        {
+          %AuctionEvent{
+            type: :barge_unsubmitted,
+            data: %{state: auction_state = %state_struct{}}
+          },
+          aggregate_state
+        },
+        state
+      )
+      when is_auction_state(state_struct) do
+    AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end
+
+  def handle_info(
+        {
+          %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %state_struct{}}},
+          aggregate_state
+        },
+        state
+      )
+      when is_auction_state(state_struct) do
+    AuctionNotifier.notify_participants(aggregate_state)
+    {:noreply, state}
+  end
+
+  def handle_info({_event, _aggregate_state}, state) do
+    {:noreply, state}
+  end
+
+  def handle_info(_msg, state) do
+    {:noreply, state}
+  end
+
 
   # Private
 
