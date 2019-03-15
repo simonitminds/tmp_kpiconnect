@@ -23,6 +23,7 @@ defmodule Oceanconnect.Application do
         {Registry, keys: :unique, name: :auction_scheduler_registry},
         {Registry, keys: :unique, name: :auction_timers_registry},
         {Registry, keys: :unique, name: :delayed_notifications_registry},
+        {Task.Supervisor, name: Oceanconnect.Notifications.TaskSupervisor},
         worker(NotificationsSupervisor, [], restart: :permanent),
         worker(AuctionsSupervisor, [], restart: :permanent)
         # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)

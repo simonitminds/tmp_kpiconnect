@@ -604,8 +604,8 @@ auctions_params = [
     scheduled_start: date_time,
     po: "1234567",
     buyer_id: nigeria.id,
-    duration: 1 * 60_000,
-    decision_duration: 1 * 60_000,
+    duration: 1 * 5_000,
+    decision_duration: 1 * 5_000,
     anonymous_bidding: true,
     type: "spot"
   },

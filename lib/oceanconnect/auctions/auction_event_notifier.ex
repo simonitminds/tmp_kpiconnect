@@ -76,12 +76,13 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
   end
 
-  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, _state) do
+  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, state) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
     update_cache(auction)
 
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
+    Oceanconnect.Auctions.AuctionNotifier.notify_participants(state)
   end
 
   def react_to(%AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at}, _state) do

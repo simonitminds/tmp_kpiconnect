@@ -20,6 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   }
 
   @registry_name :auctions_registry
+  require Logger
 
   def find_pid(auction_id) do
     with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
@@ -123,6 +124,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     {:noreply, new_state}
   end
 
+  # This is here because right now we receive DOWN messages from the task supervisor spawning the EventNotifier
+  def handle_info(msg, current_state  = %{auction_id: auction_id}) do
+    # Logger.debug("AUCTION STORE: #{auction_id} RECIEVED UNEXPECTED MESSGAGE #{inspect(msg)}")
+    {:noreply, current_state}
+  end
+
   defp persist_and_apply(events, current_state) do
     events
     |> Enum.map(&AuctionEventStore.persist/1)
@@ -140,7 +147,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Enum.reverse()
     |> Enum.reduce(initial_state, fn(event, state) ->
       {:ok, state} = Aggregate.apply(state, event)
-      {:ok, _notified} = EventNotifier.emit(state, event)
+      Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
+        {:ok, _notified} = EventNotifier.emit(state, event)
+      end)
       state
     end)
   end
