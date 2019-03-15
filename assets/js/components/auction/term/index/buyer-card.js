@@ -86,7 +86,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{vesselNameDisplay}</span> ({formatMonthYear(startDate)}<span className="is-hidden-mobile"> &ndash; {formatMonthYear(endDate)}</span>)</p>
           {auctionType == "formula_related" ?
-            <p className="has-family-header"><span className="has-text-weight-bold">Index</span> <span className="is-hidden-mobile">{fuelIndex.code}</span></p> :
+            <p className="has-family-header"><span className="has-text-weight-bold">Index</span> <span className="is-hidden-mobile">{fuelIndex.name}</span></p> :
             ""
           }
         </div>
