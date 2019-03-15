@@ -91,7 +91,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         state
       )
     when is_auction_state(state_struct) do
-    IO.inspect(auction_state.solutions, label: "AUCTION EVENT HANDLER SOLUTIONS -----------------------------> 3")
     AuctionNotifier.notify_participants(auction_state)
     {:noreply, state}
   end

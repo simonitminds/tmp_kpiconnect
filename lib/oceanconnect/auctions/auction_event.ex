@@ -70,7 +70,6 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
         user
       )
       when is_auction(struct) and is_auction_state(state_struct) do
-    IO.inspect(new_state.solutions, label: "AUCTION EVENT SOLUTIONS ------------------------> 2")
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :auction_started,

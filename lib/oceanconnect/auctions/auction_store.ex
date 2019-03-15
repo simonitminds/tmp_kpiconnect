@@ -105,7 +105,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def handle_call(:get_current_state, _from, current_state) do
-    IO.inspect(current_state.solutions, label: "AUCTION STORE CURRENT STATE SOLUTIONS ------------------------------>")
     {:reply, current_state, current_state}
   end
 
