@@ -70,7 +70,7 @@ class BiddingFormProduct extends React.Component {
             <span className="has-text-gray-3">&times; {fuelQuantity} MT </span><br/>
             { currentIndexPrice &&
               <div className="control control--flex-limit has-margin-top-sm">
-                <BidTag bid={currentIndexPrice} indexPrice="true" title="Index Price" />
+                <BidTag bid={currentIndexPrice} indexPrice="true" title="Latest Index Price" />
               </div>
             }
             <div className="control control--flex-limit has-margin-top-sm">

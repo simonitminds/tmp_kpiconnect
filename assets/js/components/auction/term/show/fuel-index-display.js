@@ -17,7 +17,7 @@ const FuelIndexDisplay = ({auction}) => {
         <span className="qa-auction-fuel_index_code">{fuelIndex.code}</span>
       </li>
       <li className="is-not-flex">
-        <strong>Current Index Price</strong>
+        <strong>Latest Index Price</strong>
         <span className="qa-auction-current_index_price">${formatPrice(currentIndexPrice)}</span>
       </li>
     </ul>

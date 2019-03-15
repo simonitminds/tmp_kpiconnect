@@ -49,7 +49,7 @@ const TermFuelIndexFormSection = (props) => {
         <InputField
           model={'auction'}
           field={'current_index_price'}
-          labelText={'Current Index Price'}
+          labelText={'Latest Index Price'}
           value={current_index_price}
           errors={errors.current_index_price}
           isHorizontal={true}
