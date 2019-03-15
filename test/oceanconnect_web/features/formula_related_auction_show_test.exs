@@ -104,11 +104,17 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       bid_list_expectations =
         Enum.map(stored_bid_list, fn bid ->
           is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
-
+          amount =
+            cond do
+              bid.amount > 0 ->
+                "+$#{bid.amount}"
+              bid.amount < 0 ->
+                "-$#{bid.amount * -1}"
+            end
           %{
             "id" => bid.id,
             "data" => %{
-              "amount" => "$#{bid.amount}",
+              "amount" => amount,
               "supplier" => bid.supplier,
               "is_traded_bid" => is_traded_bid
             }
@@ -212,7 +218,14 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
 
       bid_list_params =
         Enum.map(stored_bid_list, fn bid ->
-          %{"id" => bid.id, "data" => %{"amount" => "$#{bid.amount}"}}
+          amount =
+            cond do
+              bid.amount > 0 ->
+                "+$#{bid.amount}"
+              bid.amount < 0 ->
+                "-$#{bid.amount * -1}"
+            end
+          %{"id" => bid.id, "data" => %{"amount" => amount}}
         end)
 
       assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_params)
@@ -246,10 +259,16 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
           is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
-
+          amount =
+            cond do
+              bid.amount > 0 ->
+                "+$#{bid.amount}"
+              bid.amount < 0 ->
+                "-$#{bid.amount * -1}"
+            end
           %{
             "id" => bid.id,
-            "data" => %{"amount" => "$#{bid.amount}", "is_traded_bid" => is_traded_bid}
+            "data" => %{"amount" => amount, "is_traded_bid" => is_traded_bid}
           }
         end)
 
