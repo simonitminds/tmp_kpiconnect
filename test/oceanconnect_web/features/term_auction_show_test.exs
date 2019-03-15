@@ -272,11 +272,11 @@ defmodule Oceanconnect.TermAuctionShowTest do
         :timer.sleep(500)
         AuctionShowPage.enter_bid(%{amount: 9.50})
         AuctionShowPage.force_submit_bid!()
-        :timer.sleep(500)
         assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
       end)
 
       change_session_to(:default)
+
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"
 
