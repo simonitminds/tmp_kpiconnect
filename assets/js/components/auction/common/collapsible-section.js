@@ -186,7 +186,7 @@ class CollapsibleSection extends Component {
 
         {this.renderNonClickableTriggerElement()}
 
-        <div className="container is-fullhd"
+        <div className="container container--content-pane is-fullhd"
           ref="outer"
           style={dropdownStyle}
           onTransitionEnd={this.handleTransitionEnd}
@@ -253,7 +253,7 @@ CollapsibleSection.defaultProps = {
   classParentString: 'Collapsible',
   triggerDisabled: false,
   lazyRender: false,
-  overflowWhenOpen: 'hidden',
+  overflowWhenOpen: 'auto',
   openedClassName: '',
   triggerStyle: null,
   triggerClassName: '',

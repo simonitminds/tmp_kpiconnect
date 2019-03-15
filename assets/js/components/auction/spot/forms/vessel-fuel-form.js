@@ -114,7 +114,8 @@ export default class VesselFuelForm extends React.Component {
           field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
           value={initialQuantity}
           isHorizontal={true}
-          opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
+          fuelUnitInput={true}
+          opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `input--fuel-vol qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
         />
       );
     }

@@ -384,7 +384,14 @@ fieldset {
   }
 }
 
-// Term Auction Calculated Price Differential
+// Input Adaptations
+
+.input__fuel-unit-container {
+  display: flex;
+  align-items: center;
+}
+
+// Formula-Related Latest Price Calculator
 
 .control.has-input-add-right .input {
   padding-right: 7rem;

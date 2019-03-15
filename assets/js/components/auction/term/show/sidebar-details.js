@@ -27,8 +27,8 @@ const SidebarDetails = (props) => {
           <li className="is-not-flex">
             <strong className="is-block">Organization</strong> {auction.buyer.name}
           </li>
-          <li><strong>Buyer</strong> Buyer Name</li>
-          <li><strong>Buyer Reference Number</strong> BRN</li>
+          <li><strong>Buyer</strong> {auction.buyer.contact_name}</li>
+          <li><strong>Buyer Reference Number</strong> &mdash;</li>
         </ul>
       </div>
       <div className="box__subsection">
@@ -66,4 +66,3 @@ const SidebarDetails = (props) => {
 };
 
 export default SidebarDetails;
-

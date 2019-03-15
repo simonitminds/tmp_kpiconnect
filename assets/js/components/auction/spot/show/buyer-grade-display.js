@@ -26,6 +26,7 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
     .flatten()
     .orderBy(['amount', 'time_entered'], ['asc', 'desc'])
     .value();
+  const { status } = auctionPayload;
 
   if(bidList.length > 0) {
     return(
@@ -52,7 +53,10 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
       <div className="box">
         <h3 className="box__header box__header--bordered">Grade Display</h3>
         <div className="auction-table-placeholder">
+          { status == 'pending' ?
+          <i>Any bids placed during the pending period will display upon auction start</i> :
           <i>No bids have been placed on this auction</i>
+          }
         </div>
       </div>
     );

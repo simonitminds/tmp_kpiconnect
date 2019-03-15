@@ -2,7 +2,8 @@ import React from 'react';
 import _ from 'lodash';
 import InputErrors from './input-errors';
 
-const InputField = ({model, field, labelText, value, errors, opts, onChange, expandedInput, isHorizontal, additionalClasses}) => {
+const InputField = ({model, field, labelText, value, errors, opts, onChange, expandedInput, isHorizontal, fuelUnitInput, additionalClasses}) => {
+
   const labelClass = _.has(opts, 'labelClass') ? opts.labelClass : 'label';
   const labelDisplay = _.has(opts, 'label') ? opts.label : labelText;
   const type = _.has(opts, 'type') ? opts.type : 'text';
@@ -17,7 +18,7 @@ const InputField = ({model, field, labelText, value, errors, opts, onChange, exp
         </label>
       </div>
       <div className="field-body">
-        <div className={`control has-margin-right-sm ${expandedInput ? 'is-expanded' : ''}`}>
+        <div className={`control has-margin-right-sm ${expandedInput ? 'is-expanded' : ''}${fuelUnitInput ? ' input__fuel-unit-container' : ''}`}>
           <input
             type={type}
             step={step}
@@ -28,6 +29,7 @@ const InputField = ({model, field, labelText, value, errors, opts, onChange, exp
             autoComplete="off"
             onChange={onChange}
           />
+          { fuelUnitInput && <span className="has-text-gray-3 has-margin-left-sm">MT</span> }
         </div>
         <InputErrors errors={errors} />
       </div>
