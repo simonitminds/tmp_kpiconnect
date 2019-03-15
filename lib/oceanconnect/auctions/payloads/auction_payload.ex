@@ -35,7 +35,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   def get_auction_payload!(auction = %struct{}, supplier_id) when is_auction(struct) do
     auction_state = Auctions.get_auction_state!(auction)
-    IO.inspect(auction_state.solutions, label: "AUCTION PAYLOAD SOLUTIONS")
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 

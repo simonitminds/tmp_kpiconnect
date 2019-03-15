@@ -410,9 +410,10 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction_state!(auction = %struct{}) when is_auction(struct) do
-    case AuctionStore.get_current_state(auction) |> IO.inspect(label: "CURRENT STATE ----------->") do
+    case AuctionStore.get_current_state(auction) do
       {:error, "Auction Store Not Started"} ->
-        state = AuctionEventStorage.most_recent_state(auction)
+        AuctionEventStorage.most_recent_state(auction)
+
       state ->
         state
     end
