@@ -13,7 +13,6 @@ import FuelPriceDisplay from '../../common/index/fuel-price-display';
 const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
   const auctionType = _.get(auction, 'type')
-  console.log(auctionType);
   const vessels = _.get(auction, 'vessels');
   const startDate = _.get(auction, 'start_date');
   const endDate = _.get(auction, 'end_date');
@@ -41,8 +40,9 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
 
   const vesselNameDisplay = _.chain(vessels).map('name').join(", ").value();
 
+  console.log(auctionPayload.solutions)
   const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: solution && solution.bids[fuel.id]}];
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: ""}];
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
