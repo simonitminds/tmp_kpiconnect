@@ -10,8 +10,8 @@ class BiddingFormProduct extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      bidEstimate: 0.00,
-      minBidEstimate: 0.00
+      bidEstimate: '—',
+      minBidEstimate: '—'
     }
   }
 
@@ -24,9 +24,9 @@ class BiddingFormProduct extends React.Component {
   calculateBidEstimate(ev) {
     let estimate;
     if (ev.target.value) {
-      estimate = parseFloat(ev.target.value) + this.props.currentIndexPrice;
+      estimate = `$${formatPrice(parseFloat(ev.target.value) + this.props.currentIndexPrice)}`;
     } else {
-      estimate = 0.00;
+      estimate = '—';
     }
     switch(ev.target.name) {
       case "amount":
@@ -95,7 +95,7 @@ class BiddingFormProduct extends React.Component {
                       data-fuel={fuelId}
                     />
                     { currentIndexPrice &&
-                      <span className="input-add is-right has-text-gray-3">(Est: ${formatPrice(this.state.bidEstimate)})</span>
+                      <span className="input-add is-right has-text-gray-3">(Est: {this.state.bidEstimate})</span>
                     }
                   </div>
                 </div>
@@ -115,7 +115,7 @@ class BiddingFormProduct extends React.Component {
                       data-fuel={fuelId}
                     />
                     { currentIndexPrice &&
-                      <span className="input-add is-right has-text-gray-3">(Est: ${formatPrice(this.state.minBidEstimate)})</span>
+                      <span className="input-add is-right has-text-gray-3">(Est: {this.state.minBidEstimate})</span>
                     }
                     <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                   </div>
