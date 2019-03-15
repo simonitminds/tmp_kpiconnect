@@ -4,7 +4,7 @@ defmodule Oceanconnect.Auctions.FuelIndex do
 
   alias Oceanconnect.Auctions.{Fuel, Port}
 
-  @derive {Poison.Encoder, except: [:__meta__, :fuel, :port]}
+  @derive {Poison.Encoder, except: [:__meta__]}
 
   schema "fuel_index_entries" do
     field :code, :string

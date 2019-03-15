@@ -7,6 +7,7 @@ const TermFuelIndexFormSection = (props) => {
   const {
     auction,
     errors,
+    fuels,
     fuel_indexes,
     current_index_price,
     updateInformation
@@ -35,7 +36,7 @@ const TermFuelIndexFormSection = (props) => {
                   </option>
                   {_.map(fuel_indexes, fuelIndex => (
                     <option key={fuelIndex.id} value={fuelIndex.id}>
-                      {fuelIndex.name} [{fuelIndex.code}]
+                      {fuelIndex.port.name} | {fuelIndex.name} | {fuelIndex.fuel.name}
                     </option>
                   ))}
                 </select>

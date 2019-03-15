@@ -692,7 +692,7 @@ defmodule Oceanconnect.Auctions do
         :port,
         :vessels,
         :fuel,
-        :fuel_index,
+        [fuel_index: [:fuel, :port]],
         :auction_suppliers,
         [buyer: :users],
         [suppliers: :users]
@@ -1538,6 +1538,8 @@ defmodule Oceanconnect.Auctions do
     |> Repo.paginate()
   end
 
+  def list_fuel_index_entries_with_preloads, do: Repo.all(FuelIndex) |> Repo.preload([:fuel, :port])
+
   def list_active_fuel_index_entries do
     FuelIndex.select_active()
     |> Repo.all()
@@ -1565,6 +1567,16 @@ defmodule Oceanconnect.Auctions do
   def get_active_fuel_index!(id) do
     FuelIndex.select_active()
     |> Repo.get!(id)
+  end
+
+  def fully_loaded_index(fuel_index = %FuelIndex{}) do
+    fuel_index
+    |> Repo.preload([:fuel, :port])
+  end
+
+  def fully_loaded_index(fuel_indexes) when is_list(fuel_indexes) do
+    fuel_indexes
+    |> Enum.map(&(Repo.preload(&1, [:fuel, :port])))
   end
 
   @doc """
