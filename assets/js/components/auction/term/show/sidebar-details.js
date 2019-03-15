@@ -4,12 +4,14 @@ import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import LogLink from './log-link';
 import FuelRequirementsDisplay from './fuel-requirements-display';
+import FuelIndexDisplay from './fuel-index-display';
 import ArrivalInformationDisplay from './arrival-information-display';
 import InvitedSuppliers from '../../common/invited-suppliers';
 
 const SidebarDetails = (props) => {
   const { auctionPayload, isEditable } = props;
   const { auction, status } = auctionPayload;
+  const auctionType = _.get(auction, 'type');
 
   return(
     <div className="box has-margin-bottom-md">
@@ -33,6 +35,12 @@ const SidebarDetails = (props) => {
         <h3 className="box__header">Fuel Requirements</h3>
         <FuelRequirementsDisplay auction={auction} />
       </div>
+      { auctionType == "formula_related" &&
+        <div className="box__subsection">
+          <h3 className="box__header">Fuel Index</h3>
+          <FuelIndexDisplay auction={auction} />
+        </div>
+      }
       <div className="box__subsection">
         <h3 className="box__header">Arrival Information</h3>
         <ArrivalInformationDisplay auction={auction} />

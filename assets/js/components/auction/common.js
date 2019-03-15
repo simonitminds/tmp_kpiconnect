@@ -8,6 +8,6 @@ export function componentsForAuction(type) {
     case 'forward_fixed':
       return Term;
     case 'formula_related':
-      return null;
+      return Term;
   }
 }

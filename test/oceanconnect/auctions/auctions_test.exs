@@ -1568,7 +1568,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
 
     test "list_fuel_index_entries/0 returns all fuel_index_entries", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do
-      assert Auctions.list_fuel_index_entries().entries == [fuel_index, inactive_fuel_index]
+      assert Enum.map(Auctions.list_fuel_index_entries(), &(&1.id)) == [fuel_index.id, inactive_fuel_index.id]
     end
 
     test "list_active_fuel_index_entries/0 returns all active fuel_index_entires", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do

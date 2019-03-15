@@ -3,7 +3,17 @@ import React from 'react';
 import { formatPrice } from '../../../../utilities';
 
 const FuelPriceDisplay = ({products, auctionType}) => {
-  console.log(auctionType);
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
+
+  const isFormulaRelated = auctionType == 'formula_related';
+
   return (
     <React.Fragment>
       { _.map(products, ({fuel, quantity, bid}) => {
@@ -16,7 +26,7 @@ const FuelPriceDisplay = ({products, auctionType}) => {
               }
               <span className="card-content__best-price">
                 { bid
-                  ? `$${formatPrice(bid.amount)}`
+                    ? `${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
                   : "No bid"
                 }
               </span>

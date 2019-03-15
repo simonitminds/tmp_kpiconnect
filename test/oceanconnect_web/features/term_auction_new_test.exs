@@ -7,10 +7,13 @@ defmodule Oceanconnect.TermAuctionNewTest do
   setup do
     buyer_company = insert(:company, credit_margin_amount: 5.40)
     buyer = insert(:user, company: buyer_company)
+    admin_as_buyer = insert(:user, company: buyer_company, is_admin: true)
     buyer_company_with_no_credit = insert(:company, credit_margin_amount: nil)
     buyer_with_no_credit = insert(:user, company: buyer_company_with_no_credit)
     login_user(buyer)
     fuels = insert_list(2, :fuel)
+    fuel_indexes = insert_list(2, :fuel_index)
+    selected_fuel_index = hd(fuel_indexes)
     selected_fuel = hd(fuels)
     buyer_vessels = insert_list(3, :vessel, company: buyer_company)
     supplier_companies = insert_list(3, :company, is_supplier: true)
@@ -61,6 +64,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
 
     {:ok,
      %{
+       admin_as_buyer: admin_as_buyer,
        buyer: buyer,
        buyer_with_no_credit: buyer_with_no_credit,
        buyer_vessels: buyer_vessels,
@@ -70,7 +74,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
        suppliers: suppliers,
        port: port,
        fuels: fuels,
+       fuel_indexes: fuel_indexes,
        selected_fuel: selected_fuel,
+       selected_fuel_index: selected_fuel_index,
        selected_vessel: selected_vessel,
        date_time: date_time
      }}
@@ -150,51 +156,116 @@ defmodule Oceanconnect.TermAuctionNewTest do
            )
   end
 
-  # test "creating a term auction with multiple vessels", %{
-  #   params: params,
-  #   show_params: show_params,
-  #   port: port,
-  #   selected_fuel: selected_fuel,
-  #   buyer_company: buyer_company,
-  #   buyer_vessels: buyer_vessels
-  # } do
-  #   AuctionNewPage.visit()
-  #   AuctionNewPage.select_auction_type(:forward_fixed)
-  #   AuctionNewPage.select_port(port.id)
-  #   AuctionNewPage.fill_form(params)
-  #   AuctionNewPage.add_vessels(buyer_vessels)
-  #   AuctionNewPage.add_fuel(selected_fuel.id)
+  test "creating a forward-fixed auction with multiple vessels", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    selected_fuel: selected_fuel,
+    buyer_company: buyer_company,
+    buyer_vessels: buyer_vessels
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:forward_fixed)
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_fuel(selected_fuel.id)
 
-  #   assert AuctionNewPage.credit_margin_amount() ==
-  #            :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
-  #   AuctionNewPage.submit()
+    AuctionNewPage.submit()
 
-  #   assert current_path() =~ ~r/auctions\/\d/
-  #   assert AuctionShowPage.has_values_from_params?(show_params)
-  # end
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(show_params)
+  end
 
-  # test "creating a term auction with no vessels", %{
-  #   params: params,
-  #   show_params: show_params,
-  #   port: port,
-  #   selected_fuel: selected_fuel,
-  #   buyer_company: buyer_company
-  # } do
-  #   AuctionNewPage.visit()
-  #   AuctionNewPage.select_auction_type(:forward_fixed)
-  #   AuctionNewPage.select_port(port.id)
-  #   AuctionNewPage.fill_form(params)
-  #   AuctionNewPage.add_fuel(selected_fuel.id)
+  test "creating a forward-fixed auction with no vessels", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    selected_fuel: selected_fuel,
+    buyer_company: buyer_company
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:forward_fixed)
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_fuel(selected_fuel.id)
 
-  #   assert AuctionNewPage.credit_margin_amount() ==
-  #            :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
-  #   AuctionNewPage.submit()
+    AuctionNewPage.submit()
 
-  #   assert current_path() =~ ~r/auctions\/\d/
-  #   assert AuctionShowPage.has_values_from_params?(show_params)
-  # end
+    assert current_path() =~ ~r/auctions\/\d/
+    assert AuctionShowPage.has_values_from_params?(show_params)
+  end
+
+  test "creating a formula-related auction with multiple vessels", %{
+    params: params,
+    show_params: show_params,
+    port: port,
+    selected_fuel: selected_fuel,
+    selected_fuel_index: selected_fuel_index,
+    buyer_company: buyer_company,
+    buyer_vessels: buyer_vessels
+  } do
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:formula_related)
+    AuctionNewPage.select_port(port.id)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_fuel(selected_fuel.id)
+    AuctionNewPage.add_fuel_index(selected_fuel_index.id)
+
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
+    AuctionNewPage.submit()
+
+    assert current_path() =~ ~r/auctions\/\d/
+    show_params =
+      show_params
+      |> Map.put(:fuel_index, selected_fuel_index.name)
+    assert AuctionShowPage.has_values_from_params?(show_params)
+  end
+
+  test "only an admin impersonating a buyer can set the current index price when creating a formula-related auction", %{
+    admin_as_buyer: admin_as_buyer,
+    params: params,
+    show_params: show_params,
+    port: port,
+    selected_fuel: selected_fuel,
+    selected_fuel_index: selected_fuel_index,
+    buyer_company: buyer_company,
+    buyer_vessels: buyer_vessels
+  } do
+    login_user(admin_as_buyer)
+    AuctionNewPage.visit()
+    AuctionNewPage.select_auction_type(:formula_related)
+    AuctionNewPage.select_port(port.id)
+
+    current_index_price = 750.00
+    params =
+      params
+      |> Map.put(:current_index_price, current_index_price)
+    AuctionNewPage.fill_form(params)
+    AuctionNewPage.add_vessels(buyer_vessels)
+    AuctionNewPage.add_fuel(selected_fuel.id)
+    AuctionNewPage.add_fuel_index(selected_fuel_index.id)
+
+    assert AuctionNewPage.credit_margin_amount() ==
+             :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
+
+    AuctionNewPage.submit()
+
+    assert current_path() =~ ~r/auctions\/\d/
+    show_params =
+      show_params
+      |> Map.merge(%{fuel_index: selected_fuel_index.name, current_index_price: "$750.00"})
+    assert AuctionShowPage.has_values_from_params?(show_params)
+  end
 
   test "a buyer should not be able to create a traded bid auction with no credit margin amount",
        %{
@@ -226,7 +297,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.submit()
 
     refute current_path() =~ ~r/auctions\/\d/
-    assert AuctionNewPage.has_content?("Can't be blank")
+    assert AuctionNewPage.has_content?("This field is required.")
   end
 
   test "a buyer can see the total fuel volume over the term when they chose to purchase by lot", %{params: params, port: port, selected_fuel: selected_fuel} do

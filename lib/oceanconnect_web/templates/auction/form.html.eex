@@ -18,6 +18,7 @@
       data-auction="<%= auction_json_for_form(@auction) %>"
       data-suppliers="<%= @suppliers %>"
       data-fuels="<%= @fuels %>"
+      data-fuel_indexes="<%= @fuel_indexes %>"
       data-ports="<%= @ports %>"
       data-vessels="<%= @vessels %>"
       data-credit_margin_amount="<%= @credit_margin_amount %>"

@@ -306,12 +306,13 @@ export function receiveSuppliers(port, suppliers) {
           suppliers: suppliers};
 }
 
-export function receiveAuctionFormData(auction, suppliers, fuels, ports, vessels, credit_margin_amount) {
+export function receiveAuctionFormData(auction, suppliers, fuels, fuel_indexes, ports, vessels, credit_margin_amount) {
   return {type: RECEIVE_AUCTION_FORM_DATA,
           data: {
             auction,
             suppliers,
             fuels,
+            fuel_indexes,
             ports,
             vessels,
             credit_margin_amount
