@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
   import Ecto.Query
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oceanconnect.Auctions.{TermAuction, Fuel, Port, Vessel, TermAuctionVessel}
+  alias Oceanconnect.Auctions.{TermAuction, Fuel, FuelIndex, Port, Vessel, TermAuctionVessel}
 
   @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers, :term_auction_vessels]}
   schema "auctions" do
@@ -25,6 +25,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:port, Port)
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Fuel)
+    belongs_to(:fuel_index, FuelIndex)
+    field(:current_index_price, :float)
     field(:fuel_quantity, :integer)
     field(:total_fuel_volume, :integer)
     field(:show_total_fuel_volume, :boolean, default: true);
@@ -70,9 +72,11 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :auction_closed_time,
     :auction_started,
     :buyer_id,
+    :current_index_price,
     :duration,
     :end_date,
     :fuel_id,
+    :fuel_index_id,
     :fuel_quantity,
     :total_fuel_volume,
     :show_total_fuel_volume,
@@ -102,16 +106,31 @@ defmodule Oceanconnect.Auctions.TermAuction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(
-      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date]
+      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date],
+      message: "This field is required."
     )
+    |> maybe_require_fuel_index()
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> cast_assoc(:fuel)
+    |> cast_assoc(:fuel_index)
     |> validate_scheduled_start(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
     |> add_total_fuel_volume()
   end
+
+  def maybe_require_fuel_index(
+    %Ecto.Changeset{
+      valid?: true,
+      changes: %{type: "formula_related"}
+    } = changeset
+  ) do
+    changeset
+    |> validate_required(:fuel_index_id, message: "This field is required.")
+  end
+
+  def maybe_require_fuel_index(changeset), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)

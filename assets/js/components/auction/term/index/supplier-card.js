@@ -18,15 +18,16 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const vessels = _.get(auction, 'vessels');
   const fuel = _.get(auction, 'fuel');
   const fuelQuantity = _.get(auction, 'fuel_quantity');
+  const fuelIndex = _.get(auction, 'fuel_index');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
 
   const bidStatusDisplay = () => {
-    const lowestBid = _.chain(auctionPayload)
+    const lowestOffer = _.chain(auctionPayload)
       .get('solutions.best_overall')
       .value();
 
-    if (lowestBid && auctionStatus != 'pending') {
+    if (lowestOffer && auctionStatus != 'pending') {
       return (
         <div>
           <div className="card-content__bid-status">
@@ -44,7 +45,11 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const vesselNameDisplay = _.chain(vessels).map('name').join(", ").value();
 
   const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: solution && solution.bids[fuel.id]}];
+  const productBid = _.chain(solution)
+    .get('bids', [])
+    .nth(0)
+    .value() || '';
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}]
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -66,8 +71,12 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
             <AuctionTitle auction={auction} />
           </h3>
-          <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
+          <p className="has-family-header">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{vesselNameDisplay}</span> ({formatMonthYear(startDate)}<span className="is-hidden-mobile"> &ndash; {formatMonthYear(endDate)}</span>)</p>
+          {auctionType == "formula_related" ?
+            <p className="has-family-header"><span className="has-text-weight-bold">Index</span> <span className="is-hidden-mobile">{fuelIndex.name}</span></p> :
+            ""
+          }
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>

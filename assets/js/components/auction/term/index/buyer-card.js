@@ -17,6 +17,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const startDate = _.get(auction, 'start_date');
   const endDate = _.get(auction, 'end_date');
   const fuel = _.get(auction, 'fuel');
+  const fuelIndex = _.get(auction, 'fuel_index');
   const fuelQuantity = _.get(auction, 'fuel_quantity');
   const auctionStatus = _.get(auctionPayload, 'status');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
@@ -39,8 +40,13 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
 
   const vesselNameDisplay = _.chain(vessels).map('name').join(", ").value();
 
+  console.log(auctionPayload.solutions)
   const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: solution && solution.bids[fuel.id]}];
+  const productBid = _.chain(solution)
+    .get('bids', [])
+    .nth(0)
+    .value() || '';
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}];
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -83,6 +89,10 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{vesselNameDisplay}</span> ({formatMonthYear(startDate)}<span className="is-hidden-mobile"> &ndash; {formatMonthYear(endDate)}</span>)</p>
+          {auctionType == "formula_related" ?
+            <p className="has-family-header"><span className="has-text-weight-bold">Index</span> <span className="is-hidden-mobile">{fuelIndex.name}</span></p> :
+            ""
+          }
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>

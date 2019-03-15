@@ -373,7 +373,7 @@
 
 .control--flex-limit > .auction-bidding__best-price {
   .tag:first-child { // Label
-    max-width: 115px;
+    max-width: 116px;
   }
 }
 
@@ -392,7 +392,7 @@
   }
   .tag:last-child { // Price
     border-radius: 0 !important;
-    border-bottom-left-radius: $border-radius !important;
+    border-top-right-radius: $border-radius !important;
     border-bottom-right-radius: $border-radius !important;
   }
 

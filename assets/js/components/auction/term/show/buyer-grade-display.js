@@ -8,6 +8,8 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
   const fuel = _.get(auctionPayload, 'auction.fuel');
   const fuelQuantity = _.get(auctionPayload, 'auction.fuel_quantity');
 
+  const auctionType = _.get(auctionPayload, 'auction.type');
+
   const productBids = _.get(auctionPayload, 'product_bids');
   const products = _.keys(productBids);
 
@@ -28,6 +30,7 @@ const BuyerGradeDisplay = ({auctionPayload, buyer}) => {
           const productName = `${_.get(fuel, 'name')} × ${fuelQuantity} MT/month`
 
             return <BidTable
+              isFormulaRelated={auctionType == "formula_related"}
               key={fuelId}
               className="table--grade-display"
               bids={lowestBids}
