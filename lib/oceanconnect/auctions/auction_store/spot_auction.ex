@@ -56,7 +56,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {new_state, events} =
       %AuctionState{state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
-    new_state = SolutionCalculator.process(new_state, auction)
+      new_state = SolutionCalculator.process(new_state, auction)
     {:ok, [
       AuctionEvent.auction_started(auction, new_state, started_at, user)
     ] ++ events}
