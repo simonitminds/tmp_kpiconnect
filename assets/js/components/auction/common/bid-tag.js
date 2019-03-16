@@ -24,7 +24,11 @@ const BidTag = ({bid, title, highlightOwn, indexPrice, auctionType}) => {
     if (indexPrice) {
       return `$${formatPrice(bid)}`
     } else {
-      return`${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+      if (isFormulaRelated) {
+        return`${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+      } else {
+        return`$${formatPrice(normalizeValue(bid.amount))}`
+      }
     }
   }
 

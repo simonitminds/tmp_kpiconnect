@@ -24,12 +24,22 @@ const FuelPriceDisplay = ({products, auctionType}) => {
                 <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT)</span>
                 : <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT/mo)</span>
               }
-              <span className="card-content__best-price">
-                { bid
-                    ? `${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
-                  : "No bid"
-                }
-              </span>
+              { isFormulaRelated ?
+                <span className="card-content__best-price">
+                  { bid
+                      ? `${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+                    : "No bid"
+                  }
+                </span>:
+                <span className="card-content__best-price">
+                  { bid
+                      ? `$${formatPrice(normalizeValue(bid.amount))}`
+                    : "No bid"
+                  }
+                </span>
+
+              }
+
             </div>
           );
         })

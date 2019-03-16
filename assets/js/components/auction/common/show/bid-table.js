@@ -44,9 +44,19 @@ const BidTable = ({isFormulaRelated, bids, columns, headers, showMinAmounts=fals
 
         return (
           <React.Fragment>
-            <span className="auction__bid-amount">{value > 0 && isFormulaRelated ? "+" : "-"}${formatPrice(normalizeValue(value))}</span>
-            { showMinAmounts && minAmount &&
-              <i className="has-text-gray-4"> (Min: {value > 0 && isFormulaRelated ? "+" : "-"}${formatPrice(normalizeValue(minAmount))})</i>
+            { isFormulaRelated ?
+              <React.Fragment>
+                <span className="auction__bid-amount">{value > 0 ? "+" : "-"}${formatPrice(normalizeValue(value))}</span>
+                { showMinAmounts && minAmount &&
+                <i className="has-text-gray-4"> (Min: {value > 0 ? "+" : "-"}${formatPrice(normalizeValue(minAmount))})</i>
+                }
+              </React.Fragment> :
+              <React.Fragment>
+                <span className="auction__bid-amount">${formatPrice(normalizeValue(value))}</span>
+                { showMinAmounts && minAmount &&
+                  <i className="has-text-gray-4"> (Min: ${formatPrice(normalizeValue(minAmount))})</i>
+                }
+              </React.Fragment>
             }
             <span className="qa-auction-bid-is_traded_bid">
               { isTradedBid &&
