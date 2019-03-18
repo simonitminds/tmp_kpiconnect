@@ -83,7 +83,6 @@ defmodule OceanconnectWeb.AuctionController do
     |> Map.put(:errors, %{})
     [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 
-    IO.inspect(fuel_indexes)
 
     render(
       conn,
