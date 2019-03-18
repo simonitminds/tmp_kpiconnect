@@ -62,6 +62,17 @@ const SupplierBody = (props) => {
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );
+  } else if (status == 'closed' || status == 'expired') {
+    return (
+      <div>
+        { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
+        <SupplierBidStatus auctionPayload={auctionPayload}
+          connection={connection}
+          supplierId={currentUserCompanyId} />
+        <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+      </div>
+    );
   } else if (status != 'pending') {
     return (
       <div>
