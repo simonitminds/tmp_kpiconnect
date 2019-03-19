@@ -97,7 +97,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
 
       Auctions.expire_auction(auction)
-      IO.inspect(supplier_id, label: "SUPPLIER ID IS: ")
+
       event = "auctions_update"
 
       receive do

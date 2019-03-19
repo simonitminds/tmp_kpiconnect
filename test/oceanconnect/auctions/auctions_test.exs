@@ -513,13 +513,13 @@ defmodule Oceanconnect.AuctionsTest do
       |> Auctions.start_auction()
       |> Auctions.end_auction()
 
-      assert_receive %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
+      assert_receive {%AuctionEvent{type: :auction_started, auction_id: ^auction_id}, _state}
 
-      assert_receive %AuctionEvent{
+      assert_receive {%AuctionEvent{
         type: :auction_ended,
         auction_id: ^auction_id,
         time_entered: time_entered
-      }
+      }, _state}
 
       {:ok, %Auction{auction_ended: auction_ended}} = AuctionCache.read(auction_id)
 
