@@ -21,7 +21,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def broadcast(event = %AuctionEvent{auction_id: auction_id}, state) do
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{auction_id}", event)
+    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{auction_id}", {event, state})
     :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {event, state})
   end
 
@@ -76,7 +76,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
   end
 
-  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, _state) do
+  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, state) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
     update_cache(auction)
@@ -108,6 +108,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   def react_to(%AuctionEvent{type: :auction_finalized, data: %{auction: auction}}, state) do
     with  {:ok, _snapshot_event} <- Aggregate.snapshot(state),
           {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
+
       Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else
       {:error, _msg} ->

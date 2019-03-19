@@ -20,6 +20,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   }
 
   @registry_name :auctions_registry
+  require Logger
 
   def find_pid(auction_id) do
     with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
@@ -67,6 +68,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
         #TODO: This should be picked up by a reaction on the notifier
         active_participants = Auctions.active_participants(auction_id)
+        Auctions.AuctionNotifier.notify_participants(new_state)
         AuctionEmailNotifier.notify_auction_completed(
           solution.bids,
           current_state.submitted_barges,
@@ -120,6 +122,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   def handle_continue(events, current_state) do
     new_state = persist_and_apply(events, current_state)
     {:noreply, new_state}
+  end
+
+  # This is here because right now we receive DOWN messages from the task supervisor spawning the EventNotifier
+  def handle_info(msg, current_state  = %{auction_id: auction_id}) do
+    # Logger.debug("AUCTION STORE: #{auction_id} RECIEVED UNEXPECTED MESSGAGE #{inspect(msg)}")
+    {:noreply, current_state}
   end
 
   defp persist_and_apply(events, current_state) do

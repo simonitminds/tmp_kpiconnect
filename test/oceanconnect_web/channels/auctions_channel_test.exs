@@ -65,6 +65,58 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
      }}
   end
 
+  describe "auction timers expire" do
+    test "user recieves a payload  update after the final duration timer expires", %{
+      auction: auction,
+      supplier_id: supplier_id
+    } do
+      auction_id = auction.id
+      channel = "user_auctions:#{Integer.to_string(supplier_id)}"
+      @endpoint.subscribe(channel)
+
+      auction_attrs =
+        auction
+        |> Map.take([
+          :scheduled_start,
+          :fuel_id,
+          :fuel_quantity,
+          :port_id,
+          :vessel_id,
+          :auction_vessel_fuels,
+          :suppliers,
+          :buyer_id
+        ])
+
+      {:ok, %Auction{id: auction_id}} = Auctions.create_auction(auction_attrs)
+
+      receive do
+        _ -> assert true, "Received an update for create auction"
+      after
+        1000 ->
+          assert false, "Never recieved the initial payload on create"
+      end
+
+      Auctions.expire_auction(auction)
+
+      event = "auctions_update"
+
+      receive do
+         %Phoenix.Socket.Broadcast{
+           event: ^event,
+           payload: %{
+             status: :expired,
+             time_remaining: 0
+           },
+           topic: ^channel
+         } ->
+          assert true
+      after
+        5000 ->
+          assert false, "Expected message after the timer expired received nothing."
+      end
+    end
+  end
+
   describe "auction create/update" do
     test "supplier does not get notified for draft auction", %{
       auction: auction,

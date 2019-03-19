@@ -24,6 +24,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             submitted_barges: [],
             submitted_comments: []
 
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+    get_auction_payload!(auction, buyer_id, state)
+  end
+
   def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
     get_auction_payload!(auction, buyer_id)
   end

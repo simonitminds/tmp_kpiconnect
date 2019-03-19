@@ -44,7 +44,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Oceanconnect.Auctions.EventNotifier.emit(%{}, %AuctionEvent{type: :auction_started, auction_id: auction_id, data: %{}})
 
-      assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}
+      assert_received {%AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: %{}}, _state}
     end
 
     test "creating an auction adds an auction_created event to the event store", %{
@@ -75,7 +75,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.update_auction(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
     end
 
     test "update_auction!/3 adds an auction_updated event to the event store and cache is updated",
@@ -83,7 +83,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
 
       {:ok, cached_auction} = Auctions.AuctionCache.read(auction_id)
       assert cached_auction.anonymous_bidding == updated_auction.anonymous_bidding
@@ -101,8 +101,8 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.update_auction(auction, %{scheduled_start: new_start_time}, nil)
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :auction_updated, auction_id: ^auction_id}
-      assert_received %AuctionEvent{type: :auction_rescheduled, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
+      assert_received {%AuctionEvent{type: :auction_rescheduled, auction_id: ^auction_id}, _state}
     end
 
     test "starting an auction adds an auction_started event to the event store", %{
@@ -111,7 +111,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
       :timer.sleep(400)
-      assert_received %AuctionEvent{type: :auction_started, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :auction_started, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :auction_started, auction_id: ^auction_id, data: _}
@@ -129,7 +129,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       |> Auctions.place_bid()
 
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :bid_placed, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
@@ -149,7 +149,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       |> Auctions.place_bid()
 
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :bid_placed, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :duration_extended, auction_id: ^auction_id, data: _},
@@ -178,7 +178,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_id)
 
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :bid_placed, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :bid_placed, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :bids_revoked, auction_id: ^auction_id, data: _},
@@ -196,7 +196,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.end_auction(auction)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :auction_ended, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :auction_ended, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :auction_ended, auction_id: ^auction_id, data: _},
@@ -229,7 +229,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :winning_solution_selected, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :auction_state_snapshotted, auction_id: ^auction_id},
@@ -277,7 +277,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.submit_barge(auction, barge, supplier.id)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :barge_submitted, auction_id: ^auction_id}
@@ -295,7 +295,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.unsubmit_barge(auction, barge, supplier.id)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :barge_unsubmitted, auction_id: ^auction_id},
@@ -311,7 +311,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.approve_barge(auction, barge, supplier.id)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :barge_approved, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :barge_approved, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :barge_approved, auction_id: ^auction_id},
@@ -327,7 +327,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.reject_barge(auction, barge, supplier.id)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :barge_rejected, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :barge_rejected, auction_id: ^auction_id},
@@ -362,7 +362,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
       :timer.sleep(200)
 
-      assert_received %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
@@ -374,11 +374,11 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
       {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :comment_submitted, auction_id: ^auction_id}, _state}
 
       assert :ok = Auctions.unsubmit_comment(auction, comment.id, supplier.id)
       :timer.sleep(200)
-      assert_received %AuctionEvent{type: :comment_unsubmitted, auction_id: ^auction_id}
+      assert_received {%AuctionEvent{type: :comment_unsubmitted, auction_id: ^auction_id}, _state}
 
       assert [
                %AuctionEvent{type: :comment_unsubmitted, auction_id: ^auction_id},
