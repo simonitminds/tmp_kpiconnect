@@ -22,6 +22,8 @@ const initialState = {
   etd_date: null,
   etd_time: null,
   fuels: null,
+  fuel_indexes: null,
+  current_index_price: null,
   fuel_quantity: null,
   loading: true,
   ports: null,
@@ -58,6 +60,7 @@ export default function(state, action) {
         return state;
       } else {
         const supplierList = _.map(action.data.auction.suppliers, 'id');
+        console.log(action.data);
         return {
           ...state,
           auction: action.data.auction,
@@ -69,6 +72,8 @@ export default function(state, action) {
           etd_date: setUTCDateTime(action.data.auction.etd),
           etd_time: setUTCDateTime(action.data.auction.etd),
           fuels: action.data.fuels,
+          fuel_indexes: action.data.fuel_indexes,
+          current_index_price: _.get(action, 'data.auction.current_index_price', 0),
           loading: false,
           ports: action.data.ports,
           scheduled_start_date: setUTCDateTime(action.data.auction.scheduled_start),

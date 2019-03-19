@@ -7,6 +7,7 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const bestSingleSupplier = _.get(auctionPayload, 'solutions.best_single_supplier');
   const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
+  const { status } = auctionPayload;
 
   return(
     <div className="auction-solution__container">
@@ -22,7 +23,10 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
           }
           { !(bestSolution || bestSingleSupplier) &&
             <div className="auction-table-placeholder">
+              { status == 'pending' ?
+              <i>Any bids placed during the pending period will display upon auction start</i> :
               <i>No bids have been placed on this auction</i>
+              }
             </div>
           }
         </div>

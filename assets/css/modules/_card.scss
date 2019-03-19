@@ -50,6 +50,10 @@
     font-size: 1.25rem;
   }
 
+  &> p:not(last-child) {
+    margin-bottom: 0.25rem !important;
+  }
+
   @media (max-width: 768px) {
     margin: 0.5rem 0;
   }

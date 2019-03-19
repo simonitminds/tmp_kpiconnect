@@ -10,6 +10,7 @@ import CommentsDisplay from './comments-display';
 const SolutionDisplay = (props) => {
   const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, unsubmitComment, highlightOwn, best, className} = props;
   const auctionId = _.get(auctionPayload, 'auction.id');
+  const auctionType = _.get(auctionPayload, 'auction.type');
   const isSupplier = !!supplierId;
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');
@@ -27,9 +28,18 @@ const SolutionDisplay = (props) => {
     .uniq()
     .value();
 
+  const isFormulaRelated = auctionType == 'formula_related';
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
 
   const hasTradedBid = _.some(bids, 'is_traded_bid');
-  const price = `$${formatPrice(normalized_price)}`;
+  const price = `${normalized_price > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(normalized_price))}`;
   const priceSection = hasTradedBid
       ? <span>
           <TradedBidTag className="has-margin-right-sm qa-auction-bid-is_traded_bid" />

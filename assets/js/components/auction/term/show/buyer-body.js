@@ -21,7 +21,7 @@ const BuyerBody = (props) => {
     .sortBy('normalized_price')
     .value();
 
-  if (status == 'open') {
+  if (status == 'open' || status == 'decision') {
     return (
       <div>
         { currentUser.isAdmin
@@ -39,20 +39,27 @@ const BuyerBody = (props) => {
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
-  } else if (status == 'pending') {
+  } else if (status == 'expired') {
     return (
       <div>
         <WinningSolution auctionPayload={auctionPayload} />
-        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+        { currentUser.isAdmin
+          ? <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} acceptSolution={acceptSolution} />
+          : <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        }
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   } else {
     return (
-      <div className="auction-notification is-gray-0" >
-        <h3 className="has-text-weight-bold">
-        <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
-        </h3>
+      <div>
+        <div className="auction-notification is-gray-0" >
+          <h3 className="has-text-weight-bold">
+          <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
+          </h3>
+        </div>
+        <RankedOffers auctionPayload={auctionPayload} solutions={rankedOffers} />
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
   }

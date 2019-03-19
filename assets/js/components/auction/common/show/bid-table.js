@@ -19,11 +19,21 @@ import { formatTime, formatPrice } from '../../../../utilities';
  * `Unsplittable` tags if they apply. If `showMinAmounts` is true, any
  * `amount` display will also include the `min_amount` value if present.
  */
-const BidTable = ({bids, columns, headers, showMinAmounts=false, className}) => {
+const BidTable = ({isFormulaRelated, bids, columns, headers, showMinAmounts=false, className}) => {
   // If `headers` is given, it will be used for the header row of the table.
   // Otherwise, the `columns` names will be used instead.
-  const tableHeaders = headers || _.map(columns, (c) => _.startCase(_.toLower(c)));
 
+
+  const normalizeValue = (value) => {
+    if (value < 0) {
+      const newValue = value * -1;
+      return newValue;
+    } else {
+      return value;
+    }
+  }
+
+  const tableHeaders = headers || _.map(columns, (c) => _.startCase(_.toLower(c)));
   const columnContent = (bid, column) => {
     const value = bid[column];
 
@@ -31,11 +41,22 @@ const BidTable = ({bids, columns, headers, showMinAmounts=false, className}) => 
       case 'amount':
         const minAmount = bid.min_amount;
         const isTradedBid = bid.is_traded_bid;
+
         return (
           <React.Fragment>
-            <span className="auction__bid-amount">${formatPrice(value)}</span>
-            { showMinAmounts && minAmount &&
-              <i className="has-text-gray-4"> (Min: ${formatPrice(minAmount)})</i>
+            { isFormulaRelated ?
+              <React.Fragment>
+                <span className="auction__bid-amount">{value > 0 ? "+" : "-"}${formatPrice(normalizeValue(value))}</span>
+                { showMinAmounts && minAmount &&
+                <i className="has-text-gray-4"> (Min: {value > 0 ? "+" : "-"}${formatPrice(normalizeValue(minAmount))})</i>
+                }
+              </React.Fragment> :
+              <React.Fragment>
+                <span className="auction__bid-amount">${formatPrice(normalizeValue(value))}</span>
+                { showMinAmounts && minAmount &&
+                  <i className="has-text-gray-4"> (Min: ${formatPrice(normalizeValue(minAmount))})</i>
+                }
+              </React.Fragment>
             }
             <span className="qa-auction-bid-is_traded_bid">
               { isTradedBid &&

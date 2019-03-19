@@ -74,12 +74,15 @@ export default class SolutionDisplayWrapper extends React.Component {
       endButton
     } = this.props;
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
+    const auctionType = _.get(auctionPayload.auction, 'type');
+    const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price', 0.00);
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
     const acceptable = !!acceptSolution;
     const isExpanded = !headerOnly && this.state.expanded;
 
     const displayPrice = price != undefined ? price : `$${formatPrice(normalized_price)}`;
+    const estimatedPrice = `$${formatPrice(currentIndexPrice + normalized_price)}`;
 
     const solutionTitle = () => {
       if(isSingleSupplier) {
@@ -122,7 +125,7 @@ export default class SolutionDisplayWrapper extends React.Component {
               </MediaQuery>
             </h4>
             <div className="auction-solution__content">
-              <span className="has-text-weight-bold has-padding-right-xs">{displayPrice}</span>
+              <span className="has-text-weight-bold has-padding-right-xs">{displayPrice} {auctionType == 'formula_related' && displayPrice ? <span className="has-text-gray-3">(Est: {estimatedPrice})</span> : ""}</span>
               {latest_time_entered &&
                 `(${formatTime(latest_time_entered)})`
               }

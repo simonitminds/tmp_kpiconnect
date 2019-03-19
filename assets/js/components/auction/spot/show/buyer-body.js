@@ -57,25 +57,34 @@ const BuyerBody = (props) => {
   } else if(status == 'expired') {
       return(
       <div>
-        { currentUser.isAdmin
-              ? <div>
-                  <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
-                  <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
-                </div>
-              : <div>
-                  <BuyerGradeDisplay auctionPayload={auctionPayload} />
-                </div>
+        <div className="auction-notification is-gray-0" >
+          <h3 className="has-text-weight-bold">
+          <span className="is-inline-block qa-supplier-bid-status-message">A winning bid was not selected before the decision time expired</span>
+          </h3>
+        </div>
+        { currentUser.isAdmin ?
+          <div>
+            <BuyerBestSolution auctionPayload={auctionPayload} acceptSolution={acceptSolution} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={true} />
+          </div> :
+          <div>
+            <BuyerBestSolution auctionPayload={auctionPayload} />
+            <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
+          </div>
         }
+        <BuyerGradeDisplay auctionPayload={auctionPayload} />
      </div>
     );
   } else if(status == 'pending') {
     return (
       <div>
-        <WinningSolution auctionPayload={auctionPayload} />
-        { currentUser.isAdmin
-          ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
-          : <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} acceptSolution={acceptSolution} showCustom={false} />
-        }
+        <div className="auction-notification is-gray-0" >
+          <h3 className="has-text-weight-bold">
+          <span className="is-inline-block qa-supplier-bid-status-message">The auction has not started yet</span>
+          </h3>
+        </div>
+        <BuyerBestSolution auctionPayload={auctionPayload} />
+        <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
         <BuyerGradeDisplay auctionPayload={auctionPayload} />
       </div>
     );
