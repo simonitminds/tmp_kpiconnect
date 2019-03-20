@@ -131,8 +131,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def make_bids(auction, bids_params, supplier_id, time_entered) do
-    IO.inspect(bids_params)
-    IO.inspect(auction.fuel.id)
     Enum.reduce_while(bids_params, {:ok, []}, fn {product_id, bid_params}, {:ok, acc} ->
       case make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
         {:ok, bid} -> {:cont, {:ok, acc ++ [bid]}}
@@ -702,6 +700,7 @@ defmodule Oceanconnect.Auctions do
 
   def active_participants(auction_id) do
     AuctionEventStore.participants_from_events(auction_id)
+    |> List.flatten
   end
 
   def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct),

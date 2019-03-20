@@ -27,7 +27,9 @@
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= @vessel.name %> (<%= @vessel.imo %>)</p>
+    <%= if(@auction.type == "Spot") do %>
+        <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= @vessel.name %> (<%= @vessel.imo %>)</p>
+    <% end %>
     <%= for deliverable <- @deliverables do %>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>

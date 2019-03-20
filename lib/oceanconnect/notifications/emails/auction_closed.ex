@@ -3,15 +3,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, TermAuction, Solution}
   import Oceanconnect.Auctions.Guards
+
   use Oceanconnect.Notifications.Email
 
-  def generate(
-        _auction_state = %{
-          auction_id: auction_id,
-          winning_solution: solution,
-          submitted_barges: submitted_barges
-        }
-      ) do
+  def generate(_auction_state = %state_struct{
+        auction_id: auction_id,
+        winning_solution: solution,
+        submitted_barges: submitted_barges
+      }) when is_auction_state(state_struct) do
     auction = Auctions.get_auction(auction_id)
     participants = Auctions.active_participants(auction_id)
     %Solution{bids: bids} = solution
@@ -200,11 +199,11 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     end
   end
 
+  # TODO: MOVE THESE TO AUCTIONS Context
   defp users_in_auction_for_company(company, active_participants) do
     active_user_ids =
       active_participants
       |> Enum.map(& &1.id)
-
     Accounts.users_for_companies([company])
     |> Enum.filter(&(&1.id in active_user_ids))
   end
