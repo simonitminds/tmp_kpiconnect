@@ -12,6 +12,30 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     @event_storage.events_by_auction(auction_id)
   end
 
+  def non_barge_events(auction_id) do
+    event_list(auction_id)
+    |> Enum.reject(fn(event) ->
+      event.type in [
+        :barge_submitted,
+        :barge_unsubmitted,
+        :barge_approved,
+        :barge_rejected,
+      ]
+    end)
+  end
+
+  def barge_events(auction_id) do
+    event_list(auction_id)
+    |> Enum.filter(fn(event) ->
+      event.type in [
+        :barge_submitted,
+        :barge_unsubmitted,
+        :barge_approved,
+        :barge_rejected,
+      ]
+    end)
+  end
+
   def participants_from_events(auction_id) do
     event_list(auction_id)
     |> Enum.map(& &1.user)
