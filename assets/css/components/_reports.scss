@@ -89,8 +89,8 @@
   @media print {
     &> div {
       display: block;
-      page-break-inside:avoid;
-      page-break-after:auto;
+      page-break-inside: avoid;
+      break-inside:avoid;
       overflow: hidden;
 
       &> div {
@@ -139,10 +139,13 @@
   }
 
   @media print {
+
     &> div {
       display: block;
+      page-break-before: auto;
       page-break-inside: avoid;
-      page-break-after: auto;
+      break-before: auto;
+      break-inside: avoid;
 
       &> div {
         float: left;
@@ -247,12 +250,13 @@
   @media print {
     display: block;
     page-break-inside: avoid;
+    break-inside: avoid;
     overflow: hidden;
 
     &> div {
       float: left;
-      page-break-inside:avoid;
-      page-break-after:auto;
+      page-break-inside: avoid;
+      break-inside:avoid;
 
       &:first-child { width: 180px; }
       &:nth-child(2):nth-last-child(2) { width: calc(100% - 380px); }
@@ -269,8 +273,8 @@
 
     &> div {
       display: block;
-      page-break-inside:avoid;
-      page-break-after:auto;
+      page-break-inside: avoid;
+      break-inside:avoid;
       overflow: hidden;
 
       &> div {
