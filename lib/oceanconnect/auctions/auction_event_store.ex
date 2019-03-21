@@ -34,6 +34,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
         :barge_rejected,
       ]
     end)
+    |> Enum.reverse
   end
 
   def bid_events(auction_id) do
@@ -47,6 +48,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
         :winning_solution_selected
       ]
     end)
+    |> Enum.reverse
   end
 
   def timing_log_events(auction_id) do
@@ -67,6 +69,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
         :bids_revoked
       ]
     end)
+    |> Enum.reverse
   end
 
   def participants_from_events(auction_id) do

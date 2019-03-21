@@ -103,7 +103,7 @@
         </div>
       </div>
       <div class="report__log__body">
-        <%= for event <- @non_barge_events do %>
+        <%= for event <- @events do %>
           <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
         <% end %>
       </div>
