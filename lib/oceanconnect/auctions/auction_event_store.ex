@@ -36,6 +36,18 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     end)
   end
 
+  def bid_events(auction_id) do
+    event_list(auction_id)
+    |> Enum.filter(fn(event) ->
+      event.type in [
+        :bid_placed,
+        :auto_bid_placed,
+        :auto_bid_triggered,
+        :bids_revoked
+      ]
+    end)
+  end
+
   def participants_from_events(auction_id) do
     event_list(auction_id)
     |> Enum.map(& &1.user)

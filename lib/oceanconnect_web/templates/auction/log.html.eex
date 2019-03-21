@@ -127,6 +127,25 @@
         </div>
     </div>
 
+    <h2>Price Log</h2>
+    <div class="report__log">
+        <div class="report__log__header">
+            <div>
+                <div>Time</div>
+                <div>Event</div>
+                <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                    <div>Impersonator</div>
+                <% end %>
+            </div>
+        </div>
+        <div class="report__log__body">
+            <%= for event <- @bid_events do %>
+                <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
+            <% end %>
+        </div>
+    </div>
+
+
 
     <%= unless Enum.empty?(@messages_by_company) do %>
       <h2>Message Log</h2>
