@@ -25,7 +25,7 @@ const BuyerSidebar = (props) => {
         { (isAdmin && (status == 'closed' || status == 'expired')) &&
           <a className="button is-info has-family-copy has-margin-right-sm qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.auction.id}/fixtures`}>View Fixtures</a>
         }
-        { (isAdmin || (status != 'pending' && status != 'open')) &&
+        { (isAdmin || (status != 'pending')) &&
           <LogLink auction={auction} />
         }
       </div>
@@ -40,4 +40,3 @@ const BuyerSidebar = (props) => {
 };
 
 export default BuyerSidebar;
-
