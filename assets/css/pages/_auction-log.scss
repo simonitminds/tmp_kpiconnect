@@ -3,3 +3,65 @@
 // Auction Log
 // ========================== //
 // ========================== //
+
+.table.report__table--auction-details tbody tr th {
+  width: 150px !important;
+}
+
+.log-section {
+  h2 {
+    margin: 0 -1rem !important;
+    padding: 2rem 1rem;
+    border-top: 1px solid #888;
+  }
+  .report__message-log { display: none; }
+  .report__log { display: none; }
+
+  input[type="checkbox"] {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+
+    &+ label {
+      display: block;
+      float: right;
+      margin-top: 2.25rem;
+      .log-section__show { display: inline; }
+      .log-section__hide { display: none; }
+    }
+  }
+
+  input[type="checkbox"]:checked {
+    &~ .report__message-log, &~ .report__log {
+      display: block;
+    }
+    &+ label {
+      .log-section__show { display: none; }
+      .log-section__hide { display: inline; }
+    }
+  }
+}
+
+@media print {
+  .log-section {
+    input[type="checkbox"] {
+      &~ h2 { display: none; }
+      &~ .report__message-log, &~ .report__log { display: none; }
+    }
+
+    input[type="checkbox"]:checked {
+      &~ h2 {
+        display: block;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem !important
+      }
+
+      &~ .report__message-log, &~ .report__log {
+        display: block;
+      }
+    }
+  }
+  .log-section__toggle { display: none !important; }
+}
+
+// Remember: Check the table in the print version to make sure we're not stacking unnecessarily.
