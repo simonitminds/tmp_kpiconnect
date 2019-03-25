@@ -94,6 +94,14 @@
         max-width: 400px;
         margin-top: 0 !important;
       }
+
+      @media (max-width: 768px) {
+        margin-top: 0.25rem;
+        
+        & > div > .field {
+          flex-basis: 100%;
+        }
+      }
     }
     &.selected-list--fuels {
       max-width: 400px;

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
-import { formatUTCDateTime, formatUTCDate } from '../../../../utilities';
+import moment from 'moment';
+import { formatUTCDateTime, formatUTCDate, formatMonthYear} from '../../../../utilities';
 
 const ArrivalInformationDisplay = (props) => {
   const {
@@ -13,8 +14,8 @@ const ArrivalInformationDisplay = (props) => {
   const portAgent = _.get(auction, 'port_agent');
 
   const terminal = _.get(auction, 'terminal');
-  const startDate = formatUTCDate(_.get(auction, 'start_date'));
-  const endDate = formatUTCDate(_.get(auction, 'end_date'));
+  const startDate = formatMonthYear(_.get(auction, 'start_date'));
+  const endDate = formatMonthYear(_.get(auction, 'end_date'));
   const vesselNames = _.chain(vessels).map('name').join(", ").value();
 
   return (
@@ -42,7 +43,7 @@ const ArrivalInformationDisplay = (props) => {
         <span className="qa-auction-start_date">{startDate}</span>
       </li>
       <li className="is-not-flex">
-        <strong>End Date</strong>
+        <strong>End Month</strong>
         <span className="qa-auction-end_date">{endDate}</span>
       </li>
       { vessels.length > 0

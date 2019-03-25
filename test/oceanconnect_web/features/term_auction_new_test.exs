@@ -34,6 +34,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
+    start_month = "{year: #{date_time.year}, month: #{date_time.month}}"
+    end_month = "{year: #{date_time.year}, month: #{date_time.month + 1}}"
+
     auction_params = %{
       anonymous_bidding: false,
       duration: 10,
@@ -41,8 +44,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
       is_traded_bid_allowed: true,
       scheduled_start_date: valid_start_time,
       scheduled_start_time: valid_start_time,
-      start_date_date: date_time,
-      end_date_date: date_time,
       fuel_quantity: 15000,
       suppliers: [
         %{
@@ -78,6 +79,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
        selected_fuel: selected_fuel,
        selected_fuel_index: selected_fuel_index,
        selected_vessel: selected_vessel,
+       start_month: start_month,
+       end_month: end_month,
        date_time: date_time
      }}
   end
@@ -175,7 +178,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
     AuctionNewPage.submit()
-
     assert current_path() =~ ~r/auctions\/\d/
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
@@ -285,7 +287,7 @@ defmodule Oceanconnect.TermAuctionNewTest do
   } do
     params =
       params
-      |> Map.drop([:start_date_date, :end_date_date])
+      |> Map.drop([:fuel_quantity])
 
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -298,24 +300,5 @@ defmodule Oceanconnect.TermAuctionNewTest do
 
     refute current_path() =~ ~r/auctions\/\d/
     assert AuctionNewPage.has_content?("This field is required.")
-  end
-
-  test "a buyer can see the total fuel volume over the term when they chose to purchase by lot", %{params: params, port: port, selected_fuel: selected_fuel} do
-    params =
-      params
-      |> Map.replace!(:end_date_date,
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.+(5_259_600) # 2 months in seconds
-        |> DateTime.from_unix!()
-      )
-
-    AuctionNewPage.visit()
-    AuctionNewPage.select_auction_type(:forward_fixed)
-    AuctionNewPage.select_port(port.id)
-    AuctionNewPage.fill_form(params)
-    AuctionNewPage.add_fuel(selected_fuel.id)
-
-    assert AuctionNewPage.total_fuel_volume() == "30000"
   end
 end
