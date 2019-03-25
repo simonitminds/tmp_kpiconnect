@@ -57,13 +57,9 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     auction = %{auction | auction_ended: ended_at}
     update_cache(auction)
 
-    case auction do
-      %Auction{} ->
-        auction
-        |> Command.start_decision_duration_timer()
-        |> AuctionTimer.process_command()
-      _ -> :ok
-    end
+    auction
+    |> Command.start_decision_duration_timer()
+    |> AuctionTimer.process_command()
   end
 
   def react_to(%AuctionEvent{type: :auction_closed, auction_id: auction_id, time_entered: closed_at}, _state) do

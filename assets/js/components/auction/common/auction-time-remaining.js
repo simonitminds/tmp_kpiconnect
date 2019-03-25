@@ -37,7 +37,9 @@ class AuctionTimeRemaining extends React.Component {
 
   render() {
     const { auctionPayload } = this.props;
+    console.log(auctionPayload);
     const { timeRemaining } = this.state;
+    console.log(timeRemaining);
     const auctionStatus = _.get(auctionPayload, 'status');
     const auctionStartTime = _.get(auctionPayload, 'auction.scheduled_start');
     const auctionEndTime = _.get(auctionPayload, 'auction.auction_ended');

@@ -117,7 +117,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         },
         state
       )
-      when is_auction_state(state_struct) do
+    when is_auction_state(state_struct) do
     AuctionNotifier.notify_participants(aggregate_state)
     {:noreply, state}
   end

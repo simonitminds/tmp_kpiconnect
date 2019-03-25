@@ -649,7 +649,8 @@ auctions_params = [
     scheduled_start: date_time,
     po: "214215",
     buyer_id: qatargas.id,
-    duration: 10 * 60_000,
+    duration: 4 * 60_000,
+    decision_duration: 4 * 60_000,
     is_traded_bid_allowed: true,
     start_date: date_time,
     end_date: date_time

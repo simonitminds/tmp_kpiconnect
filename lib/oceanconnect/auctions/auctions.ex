@@ -161,15 +161,29 @@ defmodule Oceanconnect.Auctions do
   end
 
   def revoke_supplier_bids_for_product(auction, product_id, supplier_id, user \\ nil) do
-    with :ok <- duration_time_remaining?(auction) do
-      auction
-      |> Command.revoke_supplier_bids(product_id, supplier_id, user)
-      |> AuctionStore.process_command()
+    case auction do
+      %Auction{} ->
+        with :ok <- duration_time_remaining?(auction) do
+          auction
+          |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+          |> AuctionStore.process_command()
 
-      :ok
-    else
-      {:error, :late_bid} -> {:error, :late_bid}
-      _ -> {:error, "error while revoking bid"}
+          :ok
+        else
+          {:error, :late_bid} -> {:error, :late_bid}
+          _ -> {:error, "error while revoking bid"}
+        end
+      %TermAuction{} ->
+        with :ok <- decision_duration_time_remaining?(auction) do
+          auction
+          |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+          |> AuctionStore.process_command()
+
+          :ok
+        else
+          {:error, :late_bid} -> {:error, :late_bid}
+          _ -> {:error, "error while revoking bid"}
+        end
     end
   end
 
@@ -219,6 +233,12 @@ defmodule Oceanconnect.Auctions do
 
   defp duration_time_remaining?(auction = %struct{id: auction_id}) when is_auction(struct) do
     case AuctionTimer.read_timer(auction_id, :duration) do
+      false -> maybe_pending(get_auction_state!(auction))
+      _ -> :ok
+    end
+  end
+  defp decision_duration_time_remaining?(auction = %struct{id: auction_id}) when is_auction(struct) do
+    case AuctionTimer.read_timer(auction_id, :decision_duration) do
       false -> maybe_pending(get_auction_state!(auction))
       _ -> :ok
     end
