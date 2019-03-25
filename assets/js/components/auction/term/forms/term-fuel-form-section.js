@@ -29,6 +29,13 @@ const TermFuelFormSection = (props) => {
     return totalFuelVolume;
   }
 
+  const totalFuelVolumeForInput = (totalFuelVolume) => {
+    if (totalFuelVolume == "—") {
+      return 0;
+    } else {
+      return totalFuelVolume;
+    }
+  }
 
   return (
     <section className="auction-info is-gray-1"> {/* Fuel info */}
@@ -93,7 +100,7 @@ const TermFuelFormSection = (props) => {
                 <InputErrors errors={errors.show_total_fuel_volume} />
                   <div className="field-body__note" style={{display: auction.show_total_fuel_volume === true ? `inline-block` : `none`}}>
                     <strong>Your Total Volume: </strong>
-                    <input type="hidden" name="auction[total_fuel_volume]" className="qa-auction-total_fuel_volume" value={auction.total_fuel_volume ? aucton.tota_fuel_volume : calculateTotalFuelVolume()} />
+                    <input type="hidden" name="auction[total_fuel_volume]" className="qa-auction-total_fuel_volume" value={auction.total_fuel_volume ? aucton.total_fuel_volume : totalFuelVolumeForInput(calculateTotalFuelVolume())} />
                     <span className="qa-auction-total_fuel_volume">{auction.total_fuel_volume ? auction.total_fuel_volume : calculateTotalFuelVolume()}</span> MT
                   </div>
               </div>
