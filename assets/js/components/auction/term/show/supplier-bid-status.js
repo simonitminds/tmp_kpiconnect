@@ -11,7 +11,6 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
 
   const bestOverallSolution = _.get(auctionPayload, 'solutions.best_overall');
-  console.log(bestOverallSolution);
   const bestOverallSolutionBids = _.get(bestOverallSolution, 'bids');
 
   const bestSolutionSupplierIds = _.map(bestOverallSolutionBids, 'supplier_id');
