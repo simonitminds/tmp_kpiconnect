@@ -40,20 +40,53 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             unsubmitComment={unsubmitComment}
         />
       : <div key="supplier" className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
-  const competitorSection = nextBestSolution
-      ? <SolutionDisplay
+
+  const competitorSection = () => {
+    if (!!bestSolution) {
+      return(
+        <SolutionDisplay
             key="other"
             auctionPayload={auctionPayload}
-            solution={nextBestSolution}
+            solution={bestSolution}
             isExpanded={false}
             headerOnly={true}
             title="Competitor"
         />
-      : <div key="other" className="auction-table-placeholder"><i>No other bids have been placed on this auction</i></div>;
+      );
+    } else if (!!nextBestSolution) {
+      return(
+        <SolutionDisplay
+          key="other"
+          auctionPayload={auctionPayload}
+          solution={nextBestSolution}
+          isExpanded={false}
+          headerOnly={true}
+          title="Competitor"
+        />
+      );
+    } else {
+      return(
+        <div key="other" className="auction-table-placeholder">
+          <i>No other bids have been placed on this auction</i>
+        </div>
+      );
+    }
+  }
+  console.log(competitorSection);
+  // const competitorSection = nextBestSolution
+  //     ? <SolutionDisplay
+  //           key="other"
+  //           auctionPayload={auctionPayload}
+  //           solution={nextBestSolution}
+  //           isExpanded={false}
+  //           headerOnly={true}
+  //           title="Competitor"
+  //       />
+  //   : <div key="other" className="auction-table-placeholder"><i>No other bids have been placed on this auction</i></div>;
 
   const orderedSections = suppliersPrice <= nextBestPrice
-      ? [supplierSection, competitorSection]
-      : [competitorSection, supplierSection];
+      ? [supplierSection, competitorSection()]
+      : [competitorSection(), supplierSection];
 
 
   return(
