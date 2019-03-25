@@ -2,6 +2,8 @@ defmodule Oceanconnect.AuctionNewPage do
   @page_path "/auctions/new"
   use Oceanconnect.Page
 
+  alias Hound.Helpers.{Element, Mouse}
+
   def visit do
     navigate_to(@page_path)
   end
@@ -158,6 +160,22 @@ defmodule Oceanconnect.AuctionNewPage do
 
     find_element(:css, ".qa-auction-total_fuel_volume")
     |> inner_text()
+  end
+
+  def select_start_month(start_month) do
+    # execute_script("document.getElementsByClassName('qa-auction-start_date')[0].value = #{start_month}")
+    Element.move_to({:css, ".qa-auction-start_date"}, 10, 10)
+    Mouse.mouse_down()
+    Element.move_to({:css, ".qa-month-input"}, 10, 10)
+    Mouse.mouse_down()
+  end
+
+  def select_end_month(end_month) do
+    # execute_script("document.getElementsByClassName('qa-auction-end_date')[0].value = #{end_month}")
+    Element.move_to({:css, ".qa-auction-end_date"}, 10, 10)
+    Mouse.mouse_down()
+    Element.move_to({:css, ".qa-month-input"}, 10, 10)
+    Mouse.mouse_down()
   end
 
   def submit do

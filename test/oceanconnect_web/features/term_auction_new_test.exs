@@ -34,6 +34,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
+    start_month = "{year: #{date_time.year}, month: #{date_time.month}}"
+    end_month = "{year: #{date_time.year}, month: #{date_time.month + 1}}"
+
     auction_params = %{
       anonymous_bidding: false,
       duration: 10,
@@ -76,6 +79,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
        selected_fuel: selected_fuel,
        selected_fuel_index: selected_fuel_index,
        selected_vessel: selected_vessel,
+       start_month: start_month,
+       end_month: end_month,
        date_time: date_time
      }}
   end
@@ -128,7 +133,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
     assert AuctionNewPage.supplier_count(suppliers) == 2
   end
 
-<<<<<<< HEAD
   test "creating a term auction", %{
     params: params,
     show_params: show_params,
@@ -174,7 +178,6 @@ defmodule Oceanconnect.TermAuctionNewTest do
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
 
     AuctionNewPage.submit()
-
     assert current_path() =~ ~r/auctions\/\d/
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
