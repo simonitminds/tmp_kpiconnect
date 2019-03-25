@@ -24,10 +24,8 @@ export default class DateMonthInput extends React.Component {
   handleClickInput(e) {
     this.refs.monthPicker.show()
   }
-  handleMonthChange(value, text) {
-    //
-  }
-  handleMonthDismiss(value, onChange) {
+  handleMonthChange(year, month) {
+    const value = {year: year, month: month};
     if (value) {
       const newValue = {year: value.year, month: value.month - 1}
       this.props.onChange(newValue);
@@ -68,7 +66,7 @@ export default class DateMonthInput extends React.Component {
             value={{year: mvalue.year, month: mvalue.month + 1}}
             defaultValue={value}
             onChange={this.handleMonthChange.bind(this)}
-            onDismiss={this.handleMonthDismiss.bind(this)}
+            // onDismiss={this.handleMonthDismiss.bind(this)}
           />
           <input
             className={`input`}
