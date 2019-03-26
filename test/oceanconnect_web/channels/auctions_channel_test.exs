@@ -101,14 +101,14 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       event = "auctions_update"
 
       receive do
-         %Phoenix.Socket.Broadcast{
-           event: ^event,
-           payload: %{
-             status: :expired,
-             time_remaining: 0
-           },
-           topic: ^channel
-         } ->
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{
+            status: :expired,
+            time_remaining: 0
+          },
+          topic: ^channel
+        } ->
           assert true
       after
         5000 ->

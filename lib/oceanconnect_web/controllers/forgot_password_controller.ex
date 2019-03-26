@@ -13,6 +13,7 @@ defmodule OceanconnectWeb.ForgotPasswordController do
         conn
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))
+
       user ->
         {:ok, token, _claims} =
           Guardian.encode_and_sign(user, %{user_id: user.id, email: true}, ttl: {1, :hours})
@@ -33,7 +34,12 @@ defmodule OceanconnectWeb.ForgotPasswordController do
 
     case Guardian.decode_and_verify(token, %{user_id: user.id, email: true}) do
       {:ok, _claims} ->
-        render(conn, "reset_password.html", token: token, user: user, action: forgot_password_path(conn, :update))
+        render(conn, "reset_password.html",
+          token: token,
+          user: user,
+          action: forgot_password_path(conn, :update)
+        )
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Please try resetting your password again")
@@ -42,21 +48,33 @@ defmodule OceanconnectWeb.ForgotPasswordController do
     end
   end
 
-  def update(conn, %{"password" => password, "password_confirmation" => password_confirmation, "token" => token}) do
+  def update(conn, %{
+        "password" => password,
+        "password_confirmation" => password_confirmation,
+        "token" => token
+      }) do
     %{claims: %{"user_id" => user_id}} = Guardian.peek(token)
     user = Accounts.get_user!(user_id)
 
-    case Accounts.reset_password(user, %{"password" => password, "password_confirmation" => password_confirmation}) do
+    case Accounts.reset_password(user, %{
+           "password" => password,
+           "password_confirmation" => password_confirmation
+         }) do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "Password updated successfully")
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Passwords do not match")
         |> put_status(401)
-        |> render("reset_password.html", token: token, user: user, action: forgot_password_path(conn, :update))
+        |> render("reset_password.html",
+          token: token,
+          user: user,
+          action: forgot_password_path(conn, :update)
+        )
     end
   end
 end

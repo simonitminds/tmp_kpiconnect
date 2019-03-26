@@ -10,10 +10,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionRescheduled do
   end
 
   defp emails(
-    %{buyer: buyer,
-      port: port,
-      suppliers: supplier_companies,
-      vessels: vessels} = auction
+         %{buyer: buyer, port: port, suppliers: supplier_companies, vessels: vessels} = auction
        ) do
     suppliers = Accounts.users_for_companies(supplier_companies)
 

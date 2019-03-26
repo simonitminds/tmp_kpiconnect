@@ -18,8 +18,10 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     |> Enum.reject(&is_nil(&1))
   end
 
-  def create_auction_snapshot(event = %AuctionEvent{type: :auction_state_snapshotted, auction_id: auction_id}) do
+  def create_auction_snapshot(
+        event = %AuctionEvent{type: :auction_state_snapshotted, auction_id: auction_id}
+      ) do
     {:ok, %AuctionEventStorage{event: _persisted_event}} =
-        @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
+      @event_storage.persist(%AuctionEventStorage{event: event, auction_id: auction_id})
   end
 end

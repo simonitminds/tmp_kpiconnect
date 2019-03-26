@@ -31,10 +31,11 @@ defmodule Oceanconnect.FakeEventStorage do
     def handle_cast({:add_event, event}, %{events: events, next_id: next_id}) do
       event = %{event | id: next_id}
 
-      {:noreply, %{
-        events: [event | events],
-        next_id: next_id + 1
-      }}
+      {:noreply,
+       %{
+         events: [event | events],
+         next_id: next_id + 1
+       }}
     end
 
     def handle_call(:read_cache, _from, state), do: {:reply, state, state}

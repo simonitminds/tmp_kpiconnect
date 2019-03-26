@@ -7,12 +7,12 @@ defmodule Oceanconnect.Auctions.FuelIndex do
   @derive {Poison.Encoder, except: [:__meta__]}
 
   schema "fuel_index_entries" do
-    field :code, :string
-    field :name, :string
-    field :is_active, :boolean, default: true
+    field(:code, :string)
+    field(:name, :string)
+    field(:is_active, :boolean, default: true)
 
-    belongs_to :fuel, Fuel
-    belongs_to :port, Port
+    belongs_to(:fuel, Fuel)
+    belongs_to(:port, Port)
 
     timestamps()
   end

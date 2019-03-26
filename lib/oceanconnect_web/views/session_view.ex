@@ -57,7 +57,9 @@ defmodule OceanconnectWeb.SessionView do
 
   def current_company(conn) do
     case Auth.current_user(conn) do
-      nil -> ""
+      nil ->
+        ""
+
       user ->
         user.company.name
     end

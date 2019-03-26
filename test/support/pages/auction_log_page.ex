@@ -13,17 +13,17 @@ defmodule Oceanconnect.AuctionLogPage do
       element = find_element(:class, "qa-event-#{event.id}")
 
       assert find_within_element(element, :class, "qa-event-type") |> inner_text =~
-        AuctionView.convert_event_type(event.type)
+               AuctionView.convert_event_type(event.type)
     end)
   end
 
-  def event_of_type_logged?(event_type) when is_atom(event_type)  do
+  def event_of_type_logged?(event_type) when is_atom(event_type) do
     has_content?(Atom.to_string(event_type))
   end
-  def event_of_type_logged?(event_type) when is_binary(event_type)  do
+
+  def event_of_type_logged?(event_type) when is_binary(event_type) do
     has_content?(event_type)
   end
-
 
   def bid_has_supplier_as_user?(events, supplier) do
     bid_event =

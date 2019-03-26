@@ -45,4 +45,3 @@ defmodule Oceanconnect.Admin.FuelIndex.EditPage do
     fill_field(element, value)
   end
 end
-

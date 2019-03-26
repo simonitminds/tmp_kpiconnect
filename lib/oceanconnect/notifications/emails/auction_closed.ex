@@ -5,11 +5,13 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   import Oceanconnect.Auctions.Guards
   use Oceanconnect.Notifications.Email
 
-  def generate(_auction_state = %{
-        auction_id: auction_id,
-        winning_solution: solution,
-        submitted_barges: submitted_barges
-      }) do
+  def generate(
+        _auction_state = %{
+          auction_id: auction_id,
+          winning_solution: solution,
+          submitted_barges: submitted_barges
+        }
+      ) do
     auction = Auctions.get_auction(auction_id)
     participants = Auctions.active_participants(auction_id)
     %Solution{bids: bids} = solution
@@ -19,11 +21,12 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   end
 
   defp emails(
-        auction = %struct{},
-        active_participants,
-        bids,
-        approved_barges
-      ) when is_auction(struct) do
+         auction = %struct{},
+         active_participants,
+         bids,
+         approved_barges
+       )
+       when is_auction(struct) do
     %{
       buyer_id: buyer_id,
       auction_vessel_fuels: vessel_fuels,
@@ -45,6 +48,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     bids_by_vessel =
       Enum.reduce(bids, %{}, fn bid, acc ->
         vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+
         if vessel_fuel do
           case acc[vessel_fuel.vessel] do
             nil ->
@@ -100,8 +104,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
               vessel: vessel,
               buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
               deliverables: deliverables,
-              approved_barges:
-                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
               is_buyer: false
             )
           end)
@@ -121,8 +124,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
               vessel: vessel,
               buyer_company: buyer_company,
               deliverables: deliverables,
-              approved_barges:
-                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
               is_buyer: true
             )
           end)

@@ -9,13 +9,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionStartingSoon do
     |> emails()
   end
 
-  defp emails(%{
-      suppliers: supplier_companies,
-      buyer: buyer_company,
-      vessels: vessels,
-      port: port
-    } = auction
-    ) do
+  defp emails(
+         %{
+           suppliers: supplier_companies,
+           buyer: buyer_company,
+           vessels: vessels,
+           port: port
+         } = auction
+       ) do
     buyers = buyer_company.users
 
     vessel_name =

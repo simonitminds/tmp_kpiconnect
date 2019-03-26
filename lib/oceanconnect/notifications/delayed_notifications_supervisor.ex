@@ -30,7 +30,8 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsSupervisor do
   end
 
   def stop_child(notification_name) do
-    with {:ok, pid} <- Oceanconnect.Notifications.DelayedNotifications.find_pid(notification_name),
+    with {:ok, pid} <-
+           Oceanconnect.Notifications.DelayedNotifications.find_pid(notification_name),
          :ok <- DynamicSupervisor.terminate_child(__MODULE__, pid) do
       Logger.info("Delayed Notification: #{notification_name} Services Stopped")
       {:ok, "Delayed Notification: #{notification_name} Services Stopped"}

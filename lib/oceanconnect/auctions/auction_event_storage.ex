@@ -56,8 +56,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
 
   defp state_for_events(auction, events) do
     events
-    |> Enum.reverse
-    |> Enum.reduce(state_for_type(auction), fn(event, state) ->
+    |> Enum.reverse()
+    |> Enum.reduce(state_for_type(auction), fn event, state ->
       {:ok, state} = Aggregate.apply(state, event)
       state
     end)

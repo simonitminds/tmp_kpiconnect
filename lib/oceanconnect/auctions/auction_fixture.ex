@@ -38,22 +38,22 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   def update_changeset(%AuctionFixture{} = auction_fixture, attrs) do
     auction_fixture
     |> cast(attrs, [
-          :auction_id,
-          :supplier_id,
-          :vessel_id,
-          :fuel_id,
-          :price,
-          :quantity,
-          :eta,
-          :etd,
-        ])
-        |> validate_required([
+      :auction_id,
+      :supplier_id,
+      :vessel_id,
+      :fuel_id,
+      :price,
+      :quantity,
+      :eta,
+      :etd
+    ])
+    |> validate_required([
       :auction_id,
       :supplier_id,
       :fuel_id,
       :price,
       :quantity,
-      :eta,
+      :eta
     ])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:supplier_id)
@@ -93,7 +93,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       :original_fuel_id,
       :original_price,
       :original_quantity,
-      :original_eta,
+      :original_eta
     ])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:supplier_id)
@@ -127,7 +127,13 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
           supplier_id: supplier_id,
           auction_id: auction_id
         },
-        %AuctionVesselFuel{vessel_id: vessel_id, fuel_id: fuel_id, eta: eta, etd: etd, quantity: quantity}
+        %AuctionVesselFuel{
+          vessel_id: vessel_id,
+          fuel_id: fuel_id,
+          eta: eta,
+          etd: etd,
+          quantity: quantity
+        }
       ) do
     %AuctionFixture{}
     |> changeset(%{

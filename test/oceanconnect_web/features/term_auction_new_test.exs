@@ -227,31 +227,36 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
+
     show_params =
       show_params
       |> Map.put(:fuel_index, selected_fuel_index.name)
+
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
 
-  test "only an admin impersonating a buyer can set the current index price when creating a formula-related auction", %{
-    admin_as_buyer: admin_as_buyer,
-    params: params,
-    show_params: show_params,
-    port: port,
-    selected_fuel: selected_fuel,
-    selected_fuel_index: selected_fuel_index,
-    buyer_company: buyer_company,
-    buyer_vessels: buyer_vessels
-  } do
+  test "only an admin impersonating a buyer can set the current index price when creating a formula-related auction",
+       %{
+         admin_as_buyer: admin_as_buyer,
+         params: params,
+         show_params: show_params,
+         port: port,
+         selected_fuel: selected_fuel,
+         selected_fuel_index: selected_fuel_index,
+         buyer_company: buyer_company,
+         buyer_vessels: buyer_vessels
+       } do
     login_user(admin_as_buyer)
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:formula_related)
     AuctionNewPage.select_port(port.id)
 
     current_index_price = 750.00
+
     params =
       params
       |> Map.put(:current_index_price, current_index_price)
+
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
     AuctionNewPage.add_fuel(selected_fuel.id)
@@ -263,9 +268,11 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.submit()
 
     assert current_path() =~ ~r/auctions\/\d/
+
     show_params =
       show_params
       |> Map.merge(%{fuel_index: selected_fuel_index.name, current_index_price: "$750.00"})
+
     assert AuctionShowPage.has_values_from_params?(show_params)
   end
 

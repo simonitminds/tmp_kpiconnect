@@ -24,7 +24,6 @@ defmodule OceanconnectWeb.Router do
     plug(OceanconnectWeb.Plugs.CheckAdmin)
   end
 
-
   scope "/api", OceanconnectWeb.Api do
     pipe_through(:api)
     # Routes requiring authentication
@@ -153,11 +152,25 @@ defmodule OceanconnectWeb.Router do
       as: :admin_stop_impersonating_session
     )
 
-    get("/auctions/:auction_id/fixtures", AuctionFixtureController, :index, as: :admin_auction_fixtures)
-    post("/auctions/:auction_id/fixtures", AuctionFixtureController, :create, as: :admin_auction_fixture)
-    put("/auctions/:auction_id/fixtures/:fixture_id", AuctionFixtureController, :update, as: :admin_auction_fixture)
-    get("/auctions/:auction_id/fixtures/new", AuctionFixtureController, :new, as: :admin_auction_fixture)
-    get("/auctions/:auction_id/fixtures/:fixture_id/edit", AuctionFixtureController, :edit, as: :admin_auction_fixture)
+    get("/auctions/:auction_id/fixtures", AuctionFixtureController, :index,
+      as: :admin_auction_fixtures
+    )
+
+    post("/auctions/:auction_id/fixtures", AuctionFixtureController, :create,
+      as: :admin_auction_fixture
+    )
+
+    put("/auctions/:auction_id/fixtures/:fixture_id", AuctionFixtureController, :update,
+      as: :admin_auction_fixture
+    )
+
+    get("/auctions/:auction_id/fixtures/new", AuctionFixtureController, :new,
+      as: :admin_auction_fixture
+    )
+
+    get("/auctions/:auction_id/fixtures/:fixture_id/edit", AuctionFixtureController, :edit,
+      as: :admin_auction_fixture
+    )
 
     resources("/vessels", VesselController, as: :admin_vessel)
     post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)
@@ -181,8 +194,14 @@ defmodule OceanconnectWeb.Router do
     post("/fuels/:fuel_id/activate", FuelController, :activate, as: :admin_fuel)
 
     resources("/fuel_index_entries", FuelIndexController, as: :admin_fuel_index)
-    post("/fuel_index_entries/:fuel_index_id/deactivate", FuelIndexController, :deactivate, as: :admin_fuel_index)
-    post("/fuel_index_entries/:fuel_index_id/activate", FuelIndexController, :activate, as: :admin_fuel_index)
+
+    post("/fuel_index_entries/:fuel_index_id/deactivate", FuelIndexController, :deactivate,
+      as: :admin_fuel_index
+    )
+
+    post("/fuel_index_entries/:fuel_index_id/activate", FuelIndexController, :activate,
+      as: :admin_fuel_index
+    )
 
     resources("/ports", PortController, as: :admin_port)
     post("/ports/:port_id/deactivate", PortController, :deactivate, as: :admin_port)

@@ -10,7 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
   end
 
   test "fixtures_for_auction", %{auction: auction, fixtures: _fixtures} do
-    assert fixtures = AuctionFixture.from_auction(auction) |> Repo.all
+    assert fixtures = AuctionFixture.from_auction(auction) |> Repo.all()
   end
 
   describe "create_fixtures_snapshot/1" do

@@ -1,5 +1,6 @@
 defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore.TermAuctionState do
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     TermAuction,
     AuctionBarge,
@@ -17,8 +18,8 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   }
 
   defp is_suppliers_first_bid?(%TermAuctionState{product_bids: product_bids}, %AuctionBid{
-        supplier_id: supplier_id
-      }) do
+         supplier_id: supplier_id
+       }) do
     !Enum.any?(
       product_bids,
       fn {_product_key, %ProductBidState{bids: bids}} ->
@@ -28,38 +29,40 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   end
 
   defp is_lowest_bid?(
-        product_bids = %ProductBidState{},
-        bid = %AuctionBid{}
-      ) do
+         product_bids = %ProductBidState{},
+         bid = %AuctionBid{}
+       ) do
     length(product_bids.lowest_bids) == 0 ||
       hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
   end
-
-
 
   ###
   # Commands
   ###
 
   def process(
-    %TermAuctionState{},
-    %Command{command: :create_auction, data: %{auction: auction, user: user}}
-  ) do
+        %TermAuctionState{},
+        %Command{command: :create_auction, data: %{auction: auction, user: user}}
+      ) do
     {:ok, [AuctionEvent.auction_created(auction, user)]}
   end
 
-
   def process(
         state = %TermAuctionState{status: status},
-        %Command{command: :start_auction, data: %{auction: auction, user: user, started_at: started_at}}
-      ) when status in [:pending] do
+        %Command{
+          command: :start_auction,
+          data: %{auction: auction, user: user, started_at: started_at}
+        }
+      )
+      when status in [:pending] do
     {_new_state, events} =
       %TermAuctionState{state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
 
-    {:ok, [
-      AuctionEvent.auction_started(auction, state, started_at, user)
-    ] ++ events}
+    {:ok,
+     [
+       AuctionEvent.auction_started(auction, state, started_at, user)
+     ] ++ events}
   end
 
   def process(
@@ -73,36 +76,43 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         _state = %TermAuctionState{},
         %Command{command: :update_auction, data: %{auction: auction, user: user}}
       ) do
-    {:ok, [
-      AuctionEvent.auction_updated(auction, user)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.auction_updated(auction, user)
+     ]}
   end
 
   def process(
         _state = %TermAuctionState{},
         %Command{command: :reschedule_auction, data: %{auction: auction, user: user}}
       ) do
-    {:ok, [
-      AuctionEvent.auction_rescheduled(auction, user)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.auction_rescheduled(auction, user)
+     ]}
   end
 
   def process(
         state = %TermAuctionState{},
-        %Command{command: :cancel_auction, data: %{auction: auction, canceled_at: canceled_at, user: user}}
+        %Command{
+          command: :cancel_auction,
+          data: %{auction: auction, canceled_at: canceled_at, user: user}
+        }
       ) do
-    {:ok, [
-      AuctionEvent.auction_canceled(auction, canceled_at, state, user)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.auction_canceled(auction, canceled_at, state, user)
+     ]}
   end
 
   def process(
         state = %TermAuctionState{status: :open},
         %Command{command: :end_auction, data: %{auction: auction, ended_at: ended_at}}
       ) do
-    {:ok, [
-      AuctionEvent.auction_ended(auction, ended_at, state)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.auction_ended(auction, ended_at, state)
+     ]}
   end
 
   def process(
@@ -114,12 +124,16 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def process(
         state = %TermAuctionState{},
-        %Command{command: :end_auction_decision_period, data: %{auction: auction, expired_at: expired_at}}
+        %Command{
+          command: :end_auction_decision_period,
+          data: %{auction: auction, expired_at: expired_at}
+        }
       ) do
-    {:ok, [
-      AuctionEvent.auction_expired(auction, expired_at, state),
-      AuctionEvent.auction_finalized(auction)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.auction_expired(auction, expired_at, state),
+       AuctionEvent.auction_finalized(auction)
+     ]}
   end
 
   def process(
@@ -142,9 +156,11 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         _ -> []
       end
 
-    {:ok, events ++ [
-      AuctionEvent.bid_placed(bid, new_product_state, user)
-    ] ++ extension_events}
+    {:ok,
+     events ++
+       [
+         AuctionEvent.bid_placed(bid, new_product_state, user)
+       ] ++ extension_events}
   end
 
   def process(
@@ -167,152 +183,223 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         _ -> []
       end
 
-    {:ok, [
-      AuctionEvent.auto_bid_placed(bid, new_product_state, user)
-    ] ++ events ++ extension_events}
+    {:ok,
+     [
+       AuctionEvent.auto_bid_placed(bid, new_product_state, user)
+     ] ++ events ++ extension_events}
   end
 
   def process(
         state = %TermAuctionState{auction_id: auction_id},
-        %Command{command: :revoke_supplier_bids, data: %{product: product, supplier_id: supplier_id, user: user}}
+        %Command{
+          command: :revoke_supplier_bids,
+          data: %{product: product, supplier_id: supplier_id, user: user}
+        }
       ) do
-    {:ok, [
-      AuctionEvent.bids_revoked(auction_id, product, supplier_id, state, user)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.bids_revoked(auction_id, product, supplier_id, state, user)
+     ]}
   end
 
   def process(
         state = %TermAuctionState{},
-        %Command{command: :select_winning_solution, data: %{
-          solution: solution = %Solution{},
-          auction: auction = %TermAuction{},
-          closed_at: closed_at,
-          port_agent: port_agent,
-          user: user
-        }}
+        %Command{
+          command: :select_winning_solution,
+          data: %{
+            solution: solution = %Solution{},
+            auction: auction = %TermAuction{},
+            closed_at: closed_at,
+            port_agent: port_agent,
+            user: user
+          }
+        }
       ) do
-    {:ok, [
-      AuctionEvent.winning_solution_selected(auction.id, solution, closed_at, port_agent, state, user),
-      AuctionEvent.auction_closed(auction, closed_at, state),
-      AuctionEvent.auction_finalized(auction)
-    ]}
+    {:ok,
+     [
+       AuctionEvent.winning_solution_selected(
+         auction.id,
+         solution,
+         closed_at,
+         port_agent,
+         state,
+         user
+       ),
+       AuctionEvent.auction_closed(auction, closed_at, state),
+       AuctionEvent.auction_finalized(auction)
+     ]}
   end
 
   def process(
         state = %TermAuctionState{auction_id: auction_id, submitted_barges: submitted_barges},
-        %Command{command: :submit_barge, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
-          },
-          user: user
-        }}
+        %Command{
+          command: :submit_barge,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              },
+            user: user
+          }
+        }
       ) do
     barge_is_submitted =
-      Enum.any?(submitted_barges, fn barge -> match?(
-        %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
-        barge
-      ) end)
-
-    events =
-      if barge_is_submitted, do: [], else: [AuctionEvent.barge_submitted(auction_barge, state, user)]
-
-    {:ok, events}
-  end
-
-
-  def process(
-        state = %TermAuctionState{auction_id: auction_id, submitted_barges: submitted_barges},
-        %Command{command: :unsubmit_barge, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
-          },
-          user: user
-        }}
-      ) do
-    barge_is_submitted =
-      Enum.any?(submitted_barges, fn barge -> match?(
+      Enum.any?(submitted_barges, fn barge ->
+        match?(
           %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
           barge
-      ) end)
+        )
+      end)
 
     events =
-      if barge_is_submitted, do: [AuctionEvent.barge_unsubmitted(auction_barge, state, user)], else: []
+      if barge_is_submitted,
+        do: [],
+        else: [AuctionEvent.barge_submitted(auction_barge, state, user)]
 
     {:ok, events}
   end
 
   def process(
         state = %TermAuctionState{auction_id: auction_id, submitted_barges: submitted_barges},
-        %Command{command: :approve_barge, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
-          },
-          user: user
-        }}
+        %Command{
+          command: :unsubmit_barge,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              },
+            user: user
+          }
+        }
+      ) do
+    barge_is_submitted =
+      Enum.any?(submitted_barges, fn barge ->
+        match?(
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
+          barge
+        )
+      end)
+
+    events =
+      if barge_is_submitted,
+        do: [AuctionEvent.barge_unsubmitted(auction_barge, state, user)],
+        else: []
+
+    {:ok, events}
+  end
+
+  def process(
+        state = %TermAuctionState{auction_id: auction_id, submitted_barges: submitted_barges},
+        %Command{
+          command: :approve_barge,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              },
+            user: user
+          }
+        }
       ) do
     barge_is_approved =
-      Enum.any?(submitted_barges, fn barge -> match?(
-          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id, approval_status: "APPROVED"},
+      Enum.any?(submitted_barges, fn barge ->
+        match?(
+          %AuctionBarge{
+            auction_id: ^auction_id,
+            barge_id: ^barge_id,
+            supplier_id: ^supplier_id,
+            approval_status: "APPROVED"
+          },
           barge
-      ) end)
+        )
+      end)
 
     events =
-      if barge_is_approved, do: [], else: [AuctionEvent.barge_approved(auction_barge, state, user)]
+      if barge_is_approved,
+        do: [],
+        else: [AuctionEvent.barge_approved(auction_barge, state, user)]
 
     {:ok, events}
   end
 
   def process(
         state = %TermAuctionState{auction_id: auction_id, submitted_barges: submitted_barges},
-        %Command{command: :reject_barge, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
-          },
-          user: user
-        }}
+        %Command{
+          command: :reject_barge,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              },
+            user: user
+          }
+        }
       ) do
     barge_is_rejected =
-      Enum.any?(submitted_barges, fn barge -> match?(
-          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id, approval_status: "REJECTED"},
+      Enum.any?(submitted_barges, fn barge ->
+        match?(
+          %AuctionBarge{
+            auction_id: ^auction_id,
+            barge_id: ^barge_id,
+            supplier_id: ^supplier_id,
+            approval_status: "REJECTED"
+          },
           barge
-      ) end)
+        )
+      end)
 
     events =
-      if barge_is_rejected, do: [], else: [AuctionEvent.barge_rejected(auction_barge, state, user)]
+      if barge_is_rejected,
+        do: [],
+        else: [AuctionEvent.barge_rejected(auction_barge, state, user)]
 
     {:ok, events}
   end
 
   def process(
         state = %TermAuctionState{submitted_comments: submitted_comments},
-        %Command{command: :submit_comment, data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}}
+        %Command{
+          command: :submit_comment,
+          data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}
+        }
       ) do
     comment_already_submitted =
-      Enum.any?(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+      Enum.any?(submitted_comments, fn comment ->
+        match?(%AuctionComment{id: ^comment_id}, comment)
+      end)
 
     events =
-      if comment_already_submitted, do: [], else: [AuctionEvent.comment_submitted(comment, state, user)]
+      if comment_already_submitted,
+        do: [],
+        else: [AuctionEvent.comment_submitted(comment, state, user)]
 
     {:ok, events}
   end
 
   def process(
         state = %TermAuctionState{submitted_comments: submitted_comments},
-        %Command{command: :unsubmit_comment, data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}}
+        %Command{
+          command: :unsubmit_comment,
+          data: %{comment: comment = %AuctionComment{id: comment_id}, user: user}
+        }
       ) do
     comment_already_submitted =
-      Enum.any?(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+      Enum.any?(submitted_comments, fn comment ->
+        match?(%AuctionComment{id: ^comment_id}, comment)
+      end)
 
     events =
-      if comment_already_submitted, do: [AuctionEvent.comment_unsubmitted(comment, state, user)], else: []
+      if comment_already_submitted,
+        do: [AuctionEvent.comment_unsubmitted(comment, state, user)],
+        else: []
 
     {:ok, events}
   end
@@ -320,7 +407,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   # TODO: Move to Notifications context and fire as a reaction to `auction_rescheduled` or similar.
   def process(
         %TermAuctionState{},
-        %Command{command: :notify_upcoming_auction, data: %{ auction: auction}}
+        %Command{command: :notify_upcoming_auction, data: %{auction: auction}}
       ) do
     {:ok, [AuctionEvent.upcoming_auction_notified(auction)]}
   end
@@ -334,44 +421,51 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {:error, command}
   end
 
-
   ###
   # Snapshot
   ###
 
   def snapshot(state = %TermAuctionState{}, adapter \\ AuctionEventStore) do
     event = AuctionEvent.auction_state_snapshotted(state)
+
     event
     |> adapter.persist()
 
     {:ok, event}
   end
 
-
-
   ###
   # Applications
   ###
 
-  def apply(_state,
+  def apply(
+        _state,
         %AuctionEvent{type: :auction_created, data: auction = %TermAuction{}}
-       ) do
+      ) do
     auction = Auctions.fully_loaded(auction)
     {:ok, TermAuctionState.from_auction(auction)}
   end
 
   def apply(
-        state = %TermAuctionState{auction_id: auction_id, status: status, product_bids: product_bids},
-        %AuctionEvent{type: :auction_updated, data: %TermAuction{
-          scheduled_start: scheduled_start,
-          fuel: fuel
-        }}
-       ) do
-    updated_product_bids = if Map.has_key?(product_bids, "#{fuel.id}") do
-      product_bids
-    else
-      %{"#{fuel.id}" => ProductBidState.for_product(fuel.id, auction_id)}
-    end
+        state = %TermAuctionState{
+          auction_id: auction_id,
+          status: status,
+          product_bids: product_bids
+        },
+        %AuctionEvent{
+          type: :auction_updated,
+          data: %TermAuction{
+            scheduled_start: scheduled_start,
+            fuel: fuel
+          }
+        }
+      ) do
+    updated_product_bids =
+      if Map.has_key?(product_bids, "#{fuel.id}") do
+        product_bids
+      else
+        %{"#{fuel.id}" => ProductBidState.for_product(fuel.id, auction_id)}
+      end
 
     new_status =
       case {status, scheduled_start} do
@@ -379,10 +473,12 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         {:draft, _} -> :pending
         _ -> status
       end
+
     new_state =
       state
       |> Map.put(:product_bids, updated_product_bids)
       |> Map.put(:status, new_status)
+
     {:ok, new_state}
   end
 
@@ -443,7 +539,10 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def apply(
         state = %TermAuctionState{auction_id: auction_id},
-        %AuctionEvent{type: :auto_bid_placed, data: %{bid: bid = %AuctionBid{vessel_fuel_id: fuel_id}}}
+        %AuctionEvent{
+          type: :auto_bid_placed,
+          data: %{bid: bid = %AuctionBid{vessel_fuel_id: fuel_id}}
+        }
       ) do
     {new_product_state, _events} = process_bid(state, bid)
     new_state = TermAuctionState.update_product_bids(state, fuel_id, new_product_state)
@@ -506,38 +605,50 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def apply(
         state = %TermAuctionState{submitted_barges: submitted_barges},
-        %AuctionEvent{type: :barge_unsubmitted, data: %{
-          auction_barge: %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
+        %AuctionEvent{
+          type: :barge_unsubmitted,
+          data: %{
+            auction_barge: %AuctionBarge{
+              auction_id: auction_id,
+              barge_id: barge_id,
+              supplier_id: supplier_id
+            }
           }
-        }}
+        }
       ) do
     new_submitted_barges =
-      Enum.reject(submitted_barges, fn barge -> match?(
+      Enum.reject(submitted_barges, fn barge ->
+        match?(
           %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id},
           barge
-      ) end)
+        )
+      end)
 
     {:ok, %TermAuctionState{state | submitted_barges: new_submitted_barges}}
   end
 
   def apply(
         state = %TermAuctionState{submitted_barges: submitted_barges},
-        %AuctionEvent{type: :barge_approved, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
+        %AuctionEvent{
+          type: :barge_approved,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              }
           }
-        }}
+        }
       ) do
     new_submitted_barges =
       Enum.map(submitted_barges, fn barge ->
         case barge do
-          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
-          _ -> barge
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} ->
+            auction_barge
+
+          _ ->
+            barge
         end
       end)
 
@@ -546,19 +657,26 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def apply(
         state = %TermAuctionState{submitted_barges: submitted_barges},
-        %AuctionEvent{type: :barge_rejected, data: %{
-          auction_barge: auction_barge = %AuctionBarge{
-            auction_id: auction_id,
-            barge_id: barge_id,
-            supplier_id: supplier_id
+        %AuctionEvent{
+          type: :barge_rejected,
+          data: %{
+            auction_barge:
+              auction_barge = %AuctionBarge{
+                auction_id: auction_id,
+                barge_id: barge_id,
+                supplier_id: supplier_id
+              }
           }
-        }}
+        }
       ) do
     new_submitted_barges =
       Enum.map(submitted_barges, fn barge ->
         case barge do
-          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} -> auction_barge
-          _ -> barge
+          %AuctionBarge{auction_id: ^auction_id, barge_id: ^barge_id, supplier_id: ^supplier_id} ->
+            auction_barge
+
+          _ ->
+            barge
         end
       end)
 
@@ -574,15 +692,18 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def apply(
         state = %TermAuctionState{submitted_comments: submitted_comments},
-        %AuctionEvent{type: :comment_unsubmitted, data: %{comment: %AuctionComment{id: comment_id}}}
+        %AuctionEvent{
+          type: :comment_unsubmitted,
+          data: %{comment: %AuctionComment{id: comment_id}}
+        }
       ) do
     new_submitted_comments =
-      Enum.reject(submitted_comments, fn comment -> match?(%AuctionComment{id: ^comment_id}, comment) end)
+      Enum.reject(submitted_comments, fn comment ->
+        match?(%AuctionComment{id: ^comment_id}, comment)
+      end)
 
     {:ok, %TermAuctionState{state | submitted_comments: new_submitted_comments}}
   end
-
-
 
   @nop_events [
     :upcoming_auction_notified,
@@ -593,7 +714,8 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   def apply(
         state = %TermAuctionState{},
         %AuctionEvent{type: type}
-      ) when type in @nop_events do
+      )
+      when type in @nop_events do
     {:ok, state}
   end
 
@@ -606,21 +728,24 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {:ok, state}
   end
 
-
-
   ###
   # Utilities
   ###
 
-  def process_bid(state = %TermAuctionState{status: status, auction_id: auction_id}, bid = %AuctionBid{vessel_fuel_id: fuel_id}) do
+  def process_bid(
+        state = %TermAuctionState{status: status, auction_id: auction_id},
+        bid = %AuctionBid{vessel_fuel_id: fuel_id}
+      ) do
     product_state =
       TermAuctionState.get_state_for_product(state, fuel_id) ||
         ProductBidState.for_product(fuel_id, auction_id)
+
     AuctionBidCalculator.process(product_state, bid, status)
   end
 
   def auction_will_extend(state = %TermAuctionState{auction_id: auction_id}, product_state, bid) do
     should_extend = is_lowest_bid?(product_state, bid) or is_suppliers_first_bid?(state, bid)
+
     case should_extend do
       true -> AuctionTimer.should_extend?(auction_id)
       _ -> {false, 0}

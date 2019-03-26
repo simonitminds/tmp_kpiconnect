@@ -82,6 +82,7 @@ defmodule Oceanconnect.Auctions.AuctionVesselFuel do
   defp parse_date(""), do: ""
   defp parse_date(nil), do: ""
   defp parse_date(date = %DateTime{}), do: date
+
   defp parse_date(epoch) do
     epoch
     |> String.to_integer()

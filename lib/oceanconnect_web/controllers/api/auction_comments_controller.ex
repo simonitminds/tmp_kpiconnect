@@ -12,7 +12,8 @@ defmodule OceanconnectWeb.Api.AuctionCommentsController do
 
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
-         {:ok, _comment} = Auctions.submit_comment(auction, comment_params, supplier_id, time_entered, user) do
+         {:ok, _comment} =
+           Auctions.submit_comment(auction, comment_params, supplier_id, time_entered, user) do
       conn
       |> render("show.json", %{success: true, message: "Comment created successfully"})
     else

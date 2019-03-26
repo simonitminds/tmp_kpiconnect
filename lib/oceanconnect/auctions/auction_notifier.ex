@@ -7,30 +7,31 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
 
-
-
-  def notify_participants(auction = %struct{}, state = %state_struct{}) when is_auction_state(state_struct) and is_auction(struct) do
+  def notify_participants(auction = %struct{}, state = %state_struct{})
+      when is_auction_state(state_struct) and is_auction(struct) do
     participants = Auctions.auction_participant_ids(auction)
+
     Enum.map(participants, fn user_id ->
       payload =
         auction
         |> AuctionPayload.get_auction_payload!(user_id, state)
+
       send_notification_to_participants("user_auctions", payload, [user_id])
     end)
 
     notify_admin(auction, state)
   end
 
-
-  def notify_participants(state = %state_struct{auction_id: auction_id}) when is_auction_state(state_struct) do
-    auction =
-      Auctions.get_auction!(auction_id)
+  def notify_participants(state = %state_struct{auction_id: auction_id})
+      when is_auction_state(state_struct) do
+    auction = Auctions.get_auction!(auction_id)
 
     notify_participants(auction, state)
   end
 
   def notify_participants(auction = %struct{}) when is_auction(struct) do
     participants = Auctions.auction_participant_ids(auction)
+
     Enum.map(participants, fn user_id ->
       payload =
         auction
@@ -87,7 +88,8 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  defp notify_admin(auction = %struct{}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+  defp notify_admin(auction = %struct{}, state = %state_struct{})
+       when is_auction(struct) and is_auction_state(state_struct) do
     Enum.map(Accounts.list_admin_users(), & &1.id)
     |> Enum.map(fn admin_id ->
       admin_payload =

@@ -327,7 +327,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction/1 with valid term data creates a term auction", %{
       term_auction_attrs: term_auction_attrs
-   } do
+    } do
       assert {:ok, %TermAuction{id: auction_id}} = Auctions.create_auction(term_auction_attrs)
       assert %TermAuction{} = Auctions.get_auction!(auction_id)
     end
@@ -516,10 +516,10 @@ defmodule Oceanconnect.AuctionsTest do
       assert_receive {%AuctionEvent{type: :auction_started, auction_id: ^auction_id}, _state}
 
       assert_receive {%AuctionEvent{
-        type: :auction_ended,
-        auction_id: ^auction_id,
-        time_entered: time_entered
-      }, _state}
+                        type: :auction_ended,
+                        auction_id: ^auction_id,
+                        time_entered: time_entered
+                      }, _state}
 
       {:ok, %Auction{auction_ended: auction_ended}} = AuctionCache.read(auction_id)
 
@@ -1175,7 +1175,6 @@ defmodule Oceanconnect.AuctionsTest do
              } = hd(auction_state.submitted_barges)
     end
 
-
     test "submit_barge/3 allows multiple suppliers to submit the same barge", %{
       auction: auction,
       supplier: supplier,
@@ -1348,13 +1347,22 @@ defmodule Oceanconnect.AuctionsTest do
       %{auction: auction, fixtures: fixtures}
     end
 
-    test "from_bid_and_vessel_fuel", %{auction: auction = %Auction{auction_vessel_fuels: [vessel_fuel | _rest], suppliers: [supplier]}} do
+    test "from_bid_and_vessel_fuel", %{
+      auction:
+        auction = %Auction{auction_vessel_fuels: [vessel_fuel | _rest], suppliers: [supplier]}
+    } do
       bid = create_bid(3.50, 3.50, supplier.id, vessel_fuel.id, auction)
       assert %AuctionFixture{} = Auctions.fixture_from_bid(bid)
     end
 
-    test "fixtures_for_auction", %{auction: auction = %Auction{id: auction_id}, fixtures: [%AuctionFixture{id: fixture1_id}, %AuctionFixture{id: fixture2_id}]} do
-      assert [%AuctionFixture{auction_id: ^auction_id, id: ^fixture1_id}, %AuctionFixture{auction_id: ^auction_id, id: ^fixture2_id}] = Auctions.fixtures_for_auction(auction)
+    test "fixtures_for_auction", %{
+      auction: auction = %Auction{id: auction_id},
+      fixtures: [%AuctionFixture{id: fixture1_id}, %AuctionFixture{id: fixture2_id}]
+    } do
+      assert [
+               %AuctionFixture{auction_id: ^auction_id, id: ^fixture1_id},
+               %AuctionFixture{auction_id: ^auction_id, id: ^fixture2_id}
+             ] = Auctions.fixtures_for_auction(auction)
     end
 
     test "creating fixtures for an auction_state" do
@@ -1365,18 +1373,22 @@ defmodule Oceanconnect.AuctionsTest do
       solution = %Solution{bids: [bid]}
 
       initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
-      state = [
-        Command.start_auction(auction, DateTime.utc_now(), nil),
-        Command.process_new_bid(bid, nil),
-        Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
-      ] |> Enum.reduce(initial_state, fn(command, state) ->
-        {:ok, events} = Aggregate.process(state, command)
-        events
-        |> Enum.reduce(state, fn(event, state) ->
-          {:ok, state} = Aggregate.apply(state, event)
-          state
+
+      state =
+        [
+          Command.start_auction(auction, DateTime.utc_now(), nil),
+          Command.process_new_bid(bid, nil),
+          Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
+        ]
+        |> Enum.reduce(initial_state, fn command, state ->
+          {:ok, events} = Aggregate.process(state, command)
+
+          events
+          |> Enum.reduce(state, fn event, state ->
+            {:ok, state} = Aggregate.apply(state, event)
+            state
+          end)
         end)
-      end)
 
       Oceanconnect.Auctions.create_fixtures_from_state(state)
 
@@ -1546,7 +1558,6 @@ defmodule Oceanconnect.AuctionsTest do
 
       assert barge.companies == companies
     end
-
   end
 
   describe "fuel_index_entries" do
@@ -1562,16 +1573,39 @@ defmodule Oceanconnect.AuctionsTest do
       fuel = insert(:fuel)
       port = insert(:port)
 
-      valid_attrs = %{name: "some name", code: "1234", is_active: true, fuel_id: fuel.id, port_id: port.id}
+      valid_attrs = %{
+        name: "some name",
+        code: "1234",
+        is_active: true,
+        fuel_id: fuel.id,
+        port_id: port.id
+      }
 
-      {:ok, %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index, valid_attrs: valid_attrs, update_attrs: update_attrs, fuel: fuel, port: port}}
+      {:ok,
+       %{
+         fuel_index: fuel_index,
+         inactive_fuel_index: inactive_fuel_index,
+         valid_attrs: valid_attrs,
+         update_attrs: update_attrs,
+         fuel: fuel,
+         port: port
+       }}
     end
 
-    test "list_fuel_index_entries/0 returns all fuel_index_entries", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do
-      assert Enum.map(Auctions.list_fuel_index_entries(), &(&1.id)) == [fuel_index.id, inactive_fuel_index.id]
+    test "list_fuel_index_entries/0 returns all fuel_index_entries", %{
+      fuel_index: fuel_index,
+      inactive_fuel_index: inactive_fuel_index
+    } do
+      assert Enum.map(Auctions.list_fuel_index_entries(), & &1.id) == [
+               fuel_index.id,
+               inactive_fuel_index.id
+             ]
     end
 
-    test "list_active_fuel_index_entries/0 returns all active fuel_index_entires", %{fuel_index: fuel_index, inactive_fuel_index: inactive_fuel_index} do
+    test "list_active_fuel_index_entries/0 returns all active fuel_index_entires", %{
+      fuel_index: fuel_index,
+      inactive_fuel_index: inactive_fuel_index
+    } do
       refute Auctions.list_active_fuel_index_entries() == [fuel_index, inactive_fuel_index]
     end
 
@@ -1589,13 +1623,18 @@ defmodule Oceanconnect.AuctionsTest do
       assert {:error, %Ecto.Changeset{}} = Auctions.create_fuel_index(@invalid_attrs)
     end
 
-    test "update_fuel_index/2 with valid data updates the fuel_index", %{fuel_index: fuel_index, update_attrs: update_attrs} do
+    test "update_fuel_index/2 with valid data updates the fuel_index", %{
+      fuel_index: fuel_index,
+      update_attrs: update_attrs
+    } do
       assert {:ok, fuel_index} = Auctions.update_fuel_index(fuel_index, update_attrs)
       assert %FuelIndex{} = fuel_index
       assert fuel_index.name == "some new name"
     end
 
-    test "update_fuel_index/2 with invalid data returns error changeset", %{fuel_index: fuel_index} do
+    test "update_fuel_index/2 with invalid data returns error changeset", %{
+      fuel_index: fuel_index
+    } do
       assert {:error, %Ecto.Changeset{}} = Auctions.update_fuel_index(fuel_index, @invalid_attrs)
       assert fuel_index.id == Auctions.get_fuel_index!(fuel_index.id).id
     end
@@ -1609,8 +1648,11 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Ecto.Changeset{} = Auctions.change_fuel_index(fuel_index)
     end
 
-    test "activate_fuel_index/1 marks the port as active", %{inactive_fuel_index: inactive_fuel_index} do
-      assert {:ok, %FuelIndex{is_active: true}} = Auctions.activate_fuel_index(inactive_fuel_index)
+    test "activate_fuel_index/1 marks the port as active", %{
+      inactive_fuel_index: inactive_fuel_index
+    } do
+      assert {:ok, %FuelIndex{is_active: true}} =
+               Auctions.activate_fuel_index(inactive_fuel_index)
     end
 
     test "deactivate_fuel_index/1 marks the port as inactive", %{fuel_index: fuel_index} do

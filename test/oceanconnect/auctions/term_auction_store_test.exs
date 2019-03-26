@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     AuctionPayload,
     AuctionStore,
@@ -40,16 +41,16 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     }
 
     valid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.+(60_000)
-        |> DateTime.from_unix!()
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> Kernel.+(60_000)
+      |> DateTime.from_unix!()
 
     invalid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.-(60_000)
-        |> DateTime.from_unix!()
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> Kernel.-(60_000)
+      |> DateTime.from_unix!()
 
     {:ok,
      %{
@@ -74,7 +75,10 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     assert :draft == Auctions.get_auction_state!(auction).status
   end
 
-  test "pending status of schedulable auction", %{draft_auction_attrs: draft_auction_attrs, valid_start_time: valid_start_time} do
+  test "pending status of schedulable auction", %{
+    draft_auction_attrs: draft_auction_attrs,
+    valid_start_time: valid_start_time
+  } do
     pending_attrs =
       draft_auction_attrs
       |> Map.put(:scheduled_start, valid_start_time)
@@ -342,13 +346,13 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
       bid: bid,
       fuel: fuel
     } do
-
       auction_id = auction.id
       fuel_id = "#{fuel.id}"
       bid_id = bid.id
       auction_state = Auctions.get_auction_state!(auction)
 
       Auctions.end_auction(auction)
+
       Auctions.select_winning_solution(
         [bid],
         auction_state.product_bids,

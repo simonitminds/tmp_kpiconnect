@@ -9,4 +9,3 @@ defmodule Oceanconnect.Admin.FuelIndex.NewPage do
     current_path() == "/admin/fuel_index_entries/new"
   end
 end
-

@@ -15,7 +15,9 @@ defmodule OceanconnectWeb.Session.ForgotPasswordTest do
     ForgotPasswordPage.submit()
 
     assert NewPage.is_current_path?()
-    assert NewPage.visible_text() =~ "An email has been sent with instructions to reset your password"
+
+    assert NewPage.visible_text() =~
+             "An email has been sent with instructions to reset your password"
   end
 
   test "submitting an invalid email address" do

@@ -30,7 +30,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     field(:current_index_price, :float)
     field(:fuel_quantity, :integer)
     field(:total_fuel_volume, :integer)
-    field(:show_total_fuel_volume, :boolean, default: true);
+    field(:show_total_fuel_volume, :boolean, default: true)
 
     has_many(:term_auction_vessels, TermAuctionVessel,
       foreign_key: :auction_id,
@@ -121,11 +121,11 @@ defmodule Oceanconnect.Auctions.TermAuction do
   end
 
   def maybe_require_fuel_index(
-    %Ecto.Changeset{
-      valid?: true,
-      changes: %{type: "formula_related"}
-    } = changeset
-  ) do
+        %Ecto.Changeset{
+          valid?: true,
+          changes: %{type: "formula_related"}
+        } = changeset
+      ) do
     changeset
     |> validate_required(:fuel_index_id, message: "This field is required.")
   end

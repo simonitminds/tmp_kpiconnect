@@ -38,7 +38,8 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     Repo.get(Company, buyer_id).name
   end
 
-  def get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers}) when is_auction(struct) do
+  def get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers})
+      when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
 
@@ -47,6 +48,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
   end
 
   def get_name_or_alias(supplier_id, %{suppliers: []}), do: ""
+
   def get_name_or_alias(supplier_id, %{suppliers: suppliers}) when is_list(suppliers) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name
   end
@@ -55,14 +57,22 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     Repo.get(Company, supplier_id).name
   end
 
-
   defp validate_belongs_to_an_auction(changeset) do
-    case Ecto.Changeset.get_field(changeset, :auction_id) || Ecto.Changeset.get_field(changeset, :term_auction_id) do
+    case Ecto.Changeset.get_field(changeset, :auction_id) ||
+           Ecto.Changeset.get_field(changeset, :term_auction_id) do
       nil ->
         changeset
-        |> Ecto.Changeset.add_error(:auction_id, "at least one of auction_id or term_auction_id must be given")
-        |> Ecto.Changeset.add_error(:term_auction_id, "at least one of auction_id or term_auction_id must be given")
-      _ -> changeset
+        |> Ecto.Changeset.add_error(
+          :auction_id,
+          "at least one of auction_id or term_auction_id must be given"
+        )
+        |> Ecto.Changeset.add_error(
+          :term_auction_id,
+          "at least one of auction_id or term_auction_id must be given"
+        )
+
+      _ ->
+        changeset
     end
   end
 end

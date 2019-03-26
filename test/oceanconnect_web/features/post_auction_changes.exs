@@ -26,7 +26,7 @@ defmodule Oceanconnect.PostAuctionFixtureChanges do
       )
       |> Auctions.fully_loaded()
 
-    #TODO END THE AUCTION WITH A WINNING SUPPLIER SET THE PRICE AND THE QUANTITY
+    # TODO END THE AUCTION WITH A WINNING SUPPLIER SET THE PRICE AND THE QUANTITY
 
     {:ok, %{}}
   end

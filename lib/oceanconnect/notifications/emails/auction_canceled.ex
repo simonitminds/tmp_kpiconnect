@@ -10,13 +10,13 @@ defmodule Oceanconnect.Notifications.Emails.AuctionCanceled do
   end
 
   defp emails(
-        %{
-      suppliers: supplier_companies,
-      buyer_id: buyer_id,
-      vessels: vessels,
-      port: port
-    } = auction) do
-
+         %{
+           suppliers: supplier_companies,
+           buyer_id: buyer_id,
+           vessels: vessels,
+           port: port
+         } = auction
+       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = Accounts.users_for_companies([buyer_company])
     suppliers = Accounts.users_for_companies(supplier_companies)

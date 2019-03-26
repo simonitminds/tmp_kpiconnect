@@ -29,11 +29,11 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
 
     receive do
       {%AuctionEvent{
-        type: :auction_started,
-        auction_id: ^auction_id,
-        data: %{},
-        time_entered: start_time
-      }, _state} ->
+         type: :auction_started,
+         auction_id: ^auction_id,
+         data: %{},
+         time_entered: start_time
+       }, _state} ->
         gt_start =
           start |> DateTime.to_naive() |> NaiveDateTime.add(1) |> DateTime.from_naive!("Etc/UTC")
 
@@ -51,11 +51,11 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
 
     receive do
       {%AuctionEvent{
-        type: :auction_started,
-        auction_id: ^auction_id,
-        data: %{},
-        time_entered: start_time
-      }, _state} ->
+         type: :auction_started,
+         auction_id: ^auction_id,
+         data: %{},
+         time_entered: start_time
+       }, _state} ->
         gt_start =
           now |> DateTime.to_naive() |> NaiveDateTime.add(1) |> DateTime.from_naive!("Etc/UTC")
 
@@ -84,11 +84,11 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
     {:ok, scheduler_pid} = Oceanconnect.Auctions.AuctionScheduler.find_pid(auction_id)
 
     receive do
-       {%AuctionEvent{
-        type: :auction_updated,
-        auction_id: ^auction_id,
-        time_entered: start_time
-      }, _state} ->
+      {%AuctionEvent{
+         type: :auction_updated,
+         auction_id: ^auction_id,
+         time_entered: start_time
+       }, _state} ->
         gt_start =
           now |> DateTime.to_naive() |> NaiveDateTime.add(1) |> DateTime.from_naive!("Etc/UTC")
 

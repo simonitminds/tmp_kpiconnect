@@ -26,7 +26,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
     fuel = auction.fuel
 
     bid_params = %{
-      amount: 1.25,
+      amount: 1.25
       # comment: "Screw you!"
     }
 
@@ -159,7 +159,10 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.winning_solution_has_bids?([bid])
     end
 
-    test "buyer can see supplier's comments on ranked offers", %{auction: auction, supplier: supplier} do
+    test "buyer can see supplier's comments on ranked offers", %{
+      auction: auction,
+      supplier: supplier
+    } do
       in_browser_session(:supplier, fn ->
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
@@ -173,6 +176,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
         assert AuctionShowPage.has_content?("Hi")
       end)
+
       AuctionShowPage.visit(auction.id)
       :timer.sleep(100)
       Hound.Helpers.Screenshot.take_screenshot()
@@ -276,6 +280,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
       end)
 
       change_session_to(:default)
+
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"
 
@@ -323,7 +328,9 @@ defmodule Oceanconnect.TermAuctionShowTest do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(200)
-      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+
+      assert AuctionShowPage.auction_bid_status() =~
+               "You have the best overall offer for this auction"
 
       AuctionShowPage.enter_comment("You have to buy this!")
       AuctionShowPage.submit_comment()
@@ -336,7 +343,8 @@ defmodule Oceanconnect.TermAuctionShowTest do
       AuctionShowPage.submit_bid()
       :timer.sleep(100)
 
-      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+      assert AuctionShowPage.auction_bid_status() =~
+               "You have the best overall offer for this auction"
 
       AuctionShowPage.enter_comment("You have to buy this!")
       AuctionShowPage.submit_comment()
@@ -361,15 +369,18 @@ defmodule Oceanconnect.TermAuctionShowTest do
       supplier1_bid1 =
         create_bid(1.25, nil, supplier.company_id, fuel_id, auction)
         |> Auctions.place_bid()
+
       supplier2_bid1 =
         create_bid(1.50, nil, supplier2.company_id, fuel_id, auction)
         |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
-      {:ok, %{
-        supplier1_bid1: supplier1_bid1,
-        supplier2_bid1: supplier2_bid1
-      }}
+
+      {:ok,
+       %{
+         supplier1_bid1: supplier1_bid1,
+         supplier2_bid1: supplier2_bid1
+       }}
     end
 
     test "supplier view of decision period", %{auction: auction, supplier: supplier} do
@@ -379,7 +390,12 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
     end
 
-    test "buyer view of decision period", %{auction: auction, supplier1_bid1: supplier1_bid1, supplier2_bid1: supplier2_bid1, buyer: buyer} do
+    test "buyer view of decision period", %{
+      auction: auction,
+      supplier1_bid1: supplier1_bid1,
+      supplier2_bid1: supplier2_bid1,
+      buyer: buyer
+    } do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.solution_has_bids?(0, [supplier1_bid1])
@@ -466,7 +482,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
       end)
     end
   end
-
 
   describe "barges" do
     test "supplier cannot submit a barge for approval once an auction has expired", %{

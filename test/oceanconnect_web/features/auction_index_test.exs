@@ -13,7 +13,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
   end
 
-
   describe "buyer login" do
     setup %{auctions: auctions, buyer: buyer} do
       auction = auctions |> hd |> Oceanconnect.Auctions.fully_loaded()
@@ -48,7 +47,6 @@ defmodule Oceanconnect.AuctionIndexTest do
 
     #   assert has_content?("Auction state snapshotted")
     # end
-
 
     test "renders the default auction index page", %{auctions: auctions} do
       assert AuctionIndexPage.is_current_path?()

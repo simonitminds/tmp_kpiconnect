@@ -105,7 +105,8 @@ defmodule OceanconnectWeb.AuctionView do
         auction_started: started,
         auction_ended: ended,
         auction_closed_time: closed
-      }) when is_auction(struct) do
+      })
+      when is_auction(struct) do
     cond do
       started && ended -> "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
       started && closed -> "#{trunc(DateTime.diff(closed, started) / 60)} minutes"
@@ -114,10 +115,12 @@ defmodule OceanconnectWeb.AuctionView do
     end
   end
 
-  def additional_information(%struct{additional_information: nil}) when is_auction(struct), do: "—"
+  def additional_information(%struct{additional_information: nil}) when is_auction(struct),
+    do: "—"
 
-  def additional_information(%struct{additional_information: additional_information}) when is_auction(struct),
-    do: additional_information
+  def additional_information(%struct{additional_information: additional_information})
+      when is_auction(struct),
+      do: additional_information
 
   def auction_log_suppliers(%{winning_solution: %{bids: bids}}) do
     Enum.map(bids, fn bid ->
@@ -228,6 +231,7 @@ defmodule OceanconnectWeb.AuctionView do
     date = "#{leftpad(date_time.day)}/#{leftpad(date_time.month)}/#{date_time.year}"
     "#{date} #{time}"
   end
+
   def convert_event_date_time?(date) do
     date
   end

@@ -43,42 +43,55 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.call(pid, :get_current_state)
   end
+
   def get_current_state(auction_id) when is_integer(auction_id) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.call(pid, :get_current_state)
   end
 
-  def process_command(command = %Command{
-        command: :select_winning_solution,
-        data: %{solution: solution = %Solution{auction_id: auction_id}, auction: auction, port_agent: port_agent, user: user}
-      }) do
+  def process_command(
+        command = %Command{
+          command: :select_winning_solution,
+          data: %{
+            solution: solution = %Solution{auction_id: auction_id},
+            auction: auction,
+            port_agent: port_agent,
+            user: user
+          }
+        }
+      ) do
     with {:ok, pid} <- find_pid(auction_id) do
       GenServer.call(pid, {:process, command})
     else
       {:error, msg} ->
-      if %{is_admin: true} = user do
-        closed_at = DateTime.utc_now()
-        current_state = Auctions.get_auction_state!(auction)
-        new_state = [
-          Command.select_winning_solution(solution, auction, closed_at, port_agent, user)
-        ] |> Enum.reduce(current_state, fn(command, state) ->
-          {:ok, events} = Aggregate.process(state, command)
-          persist_and_apply(events, state)
-        end)
+        if %{is_admin: true} = user do
+          closed_at = DateTime.utc_now()
+          current_state = Auctions.get_auction_state!(auction)
 
-        #TODO: This should be picked up by a reaction on the notifier
-        active_participants = Auctions.active_participants(auction_id)
-        Auctions.AuctionNotifier.notify_participants(new_state)
-        AuctionEmailNotifier.notify_auction_completed(
-          solution.bids,
-          current_state.submitted_barges,
-          auction_id,
-          active_participants
-        )
-        {:ok, new_state}
-      else
-        {:error, msg}
-      end
+          new_state =
+            [
+              Command.select_winning_solution(solution, auction, closed_at, port_agent, user)
+            ]
+            |> Enum.reduce(current_state, fn command, state ->
+              {:ok, events} = Aggregate.process(state, command)
+              persist_and_apply(events, state)
+            end)
+
+          # TODO: This should be picked up by a reaction on the notifier
+          active_participants = Auctions.active_participants(auction_id)
+          Auctions.AuctionNotifier.notify_participants(new_state)
+
+          AuctionEmailNotifier.notify_auction_completed(
+            solution.bids,
+            current_state.submitted_barges,
+            auction_id,
+            active_participants
+          )
+
+          {:ok, new_state}
+        else
+          {:error, msg}
+        end
     end
   end
 
@@ -90,6 +103,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   # Server
   def init(auction = %Auction{id: auction_id}) do
     AuctionCache.make_cache_available(auction_id)
+
     state =
       AuctionState.from_auction(auction)
       |> replay_events(auction)
@@ -99,6 +113,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def init(auction = %TermAuction{id: auction_id}) do
     AuctionCache.make_cache_available(auction_id)
+
     state =
       TermAuctionState.from_auction(auction)
       |> replay_events(auction)
@@ -125,7 +140,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   # This is here because right now we receive DOWN messages from the task supervisor spawning the EventNotifier
-  def handle_info(msg, current_state  = %{auction_id: auction_id}) do
+  def handle_info(msg, current_state = %{auction_id: auction_id}) do
     # Logger.debug("AUCTION STORE: #{auction_id} RECIEVED UNEXPECTED MESSGAGE #{inspect(msg)}")
     {:noreply, current_state}
   end
@@ -134,18 +149,19 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     events
     |> Enum.map(&AuctionEventStore.persist/1)
 
-    Enum.reduce(events, current_state, fn(event, state) ->
+    Enum.reduce(events, current_state, fn event, state ->
       {:ok, state} = Aggregate.apply(state, event)
       {:ok, _notified} = EventNotifier.emit(state, event)
       state
     end)
   end
 
-  defp replay_events(initial_state = %state_struct{}, %struct{id: auction_id}) when is_auction_state(state_struct) and is_auction(struct) do
+  defp replay_events(initial_state = %state_struct{}, %struct{id: auction_id})
+       when is_auction_state(state_struct) and is_auction(struct) do
     auction_id
     |> AuctionEventStore.event_list()
     |> Enum.reverse()
-    |> Enum.reduce(initial_state, fn(event, state) ->
+    |> Enum.reduce(initial_state, fn event, state ->
       {:ok, state} = Aggregate.apply(state, event)
       {:ok, _notified} = EventNotifier.emit(state, event)
       state

@@ -5,15 +5,18 @@ defmodule OceanconnectWeb.Session.ResetPasswordTest do
   alias Oceanconnect.Guardian
 
   hound_session()
+
   setup do
     user = insert(:user)
     {:ok, token, _claims} = Guardian.encode_and_sign(user, %{user_id: user.id, email: true})
 
-
     {:ok, %{user: user, token: token}}
   end
 
-  test "user can reset there password and log in with new credentials", %{user: user, token: token} do
+  test "user can reset there password and log in with new credentials", %{
+    user: user,
+    token: token
+  } do
     ResetPasswordPage.visit(token)
     assert ResetPasswordPage.is_current_path?()
     ResetPasswordPage.enter_credentials("newpass", "newpass")
@@ -25,4 +28,4 @@ defmodule OceanconnectWeb.Session.ResetPasswordTest do
     NewPage.submit()
     assert AuctionIndexPage.is_current_path?()
   end
-  end
+end

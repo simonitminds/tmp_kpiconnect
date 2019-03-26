@@ -20,21 +20,29 @@ defmodule OceanconnectWeb.Admin.FuelIndex.EditTest do
       EditPage.visit(fuel_index.id)
 
       assert EditPage.is_current_path?(fuel_index.id)
+
       assert EditPage.has_fields?([
-        "code",
-        "name",
-        "fuel_id",
-        "port_id"
-      ])
+               "code",
+               "name",
+               "fuel_id",
+               "port_id"
+             ])
     end
 
-    test "normal users cannot visit admin edit fuel_index page", %{user: user, fuel_index: fuel_index} do
+    test "normal users cannot visit admin edit fuel_index page", %{
+      user: user,
+      fuel_index: fuel_index
+    } do
       login_user(user)
       EditPage.visit(fuel_index.id)
       refute EditPage.is_current_path?(fuel_index.id)
     end
 
-    test "admin can edit a fuel_index and submit the changes", %{fuel_index: fuel_index, fuel: fuel, port: port} do
+    test "admin can edit a fuel_index and submit the changes", %{
+      fuel_index: fuel_index,
+      fuel: fuel,
+      port: port
+    } do
       EditPage.visit(fuel_index.id)
 
       EditPage.fill_form(%{

@@ -9,23 +9,24 @@ defmodule OceanconnectWeb.EmailView do
     |> Enum.join(", ")
   end
 
-
   def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
-    Enum.map(vessels, fn(vessel) ->
+    Enum.map(vessels, fn vessel ->
       eta =
         vessel_fuels
-        |> Enum.map(fn(vessel_fuel) -> vessel_fuel.eta end)
-        |> Enum.filter(&(&1))
+        |> Enum.map(fn vessel_fuel -> vessel_fuel.eta end)
+        |> Enum.filter(& &1)
         |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
+
       etd =
         vessel_fuels
-        |> Enum.map(fn(vessel_fuel) -> vessel_fuel.etd end)
-        |> Enum.filter(&(&1))
+        |> Enum.map(fn vessel_fuel -> vessel_fuel.etd end)
+        |> Enum.filter(& &1)
         |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
 
       {vessel, eta, etd}
     end)
   end
+
   def auction_log_vessel_etas(auction) do
     []
   end
@@ -35,6 +36,7 @@ defmodule OceanconnectWeb.EmailView do
   end
 
   def convert_date?(datetime, default \\ "—")
+
   def convert_date?(date_time = %{}, _default) do
     time = "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)} GMT"
     date = "#{leftpad(date_time.day)} #{month_abbreviation(date_time.month)} #{date_time.year}"
