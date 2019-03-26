@@ -13,6 +13,8 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
   const anySolutionExists = bestSolution || bestSingleSupplier || suppliersBestSolution;
 
   const isPartialSolution = suppliersBestSolutionBids.length < vesselFuels.length ? true : false;
+  const noSolutionBids = suppliersBestSolutionBids.length == 0;
+  console.log(noSolutionBids);
 
   return(
     <div className="auction-lowest-bid">
@@ -37,7 +39,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
               { suppliersBestSolution && isPartialSolution && vesselFuels && vesselFuels.length > 1 &&
                 <SolutionDisplay auctionPayload={auctionPayload} solution={suppliersBestSolution} isExpanded={false} supplierId={supplierId} highlightOwn={true} title={`Partial Offer`} revokeBid={revokeBid} />
               }
-              { !bestSolution && !isPartialSolution &&
+              { (!bestSolution && !isPartialSolution) || (!bestSolution && noSolutionBids) &&
                 <div className="auction-table-placeholder"><i>No bids have been placed on this auction</i></div>
               }
             </div>

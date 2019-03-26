@@ -443,7 +443,7 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       :timer.sleep(500)
       Hound.Helpers.Screenshot.take_screenshot()
-      assert AuctionShowPage.auction_bid_status() =~ "Your bid is not the best offer"
+      assert AuctionShowPage.auction_bid_status() =~ "You have no bids for this auction"
     end
 
     test "buyer view of decision period", %{

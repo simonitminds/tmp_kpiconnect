@@ -13,10 +13,11 @@ const OtherSolutions = ({auctionPayload, solutions, showCustom, acceptSolution})
           <div className="box__subsection has-padding-bottom-none">
             <h3 className="box__header box__header--bordered has-margin-bottom-md">Other Solutions</h3>
             { _.map(solutions, (solution, index) => {
+              if (solution.valid) {
                 return (
                   <SolutionDisplay key={index} auctionPayload={auctionPayload} solution={solution} acceptSolution={acceptSolution} best={false} className="qa-auction-other-solution" />
                 );
-              })
+              }})
             }
             { showCustom &&
               <CustomSolutionDisplay auctionPayload={auctionPayload} acceptSolution={acceptSolution} className="qa-auction-solution-custom" />
