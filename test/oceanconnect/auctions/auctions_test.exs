@@ -637,7 +637,7 @@ defmodule Oceanconnect.AuctionsTest do
       assert length(product_payload.lowest_bids) == 0
     end
 
-    test "revoke_supplier_bids_for_product/4 fails when auction is in decision", %{
+    test "revoke_supplier_bids_for_product/4 succeeds when auction is in decision", %{
       auction: auction,
       vessel_fuel_id: vessel_fuel_id,
       supplier_company: supplier_company
@@ -651,7 +651,7 @@ defmodule Oceanconnect.AuctionsTest do
       result =
         Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
 
-      assert {:error, :late_bid} = result
+      assert :ok = result
     end
   end
 
