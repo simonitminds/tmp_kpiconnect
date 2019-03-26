@@ -355,6 +355,7 @@ defmodule Oceanconnect.AuctionShowTest do
                "You have the best overall offer for this auction"
 
       AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
+      :timer.sleep(500)
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
