@@ -344,9 +344,9 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
 
       conn = revoke_post(conn, auction, %{"product" => vessel_fuel1.id})
 
-      assert json_response(conn, 409) == %{
-               "success" => false,
-               "message" => "Auction moved to decision before request was received"
+      assert json_response(conn, 200) == %{
+               "success" => true,
+               "message" => "Bid successfully revoked"
              }
     end
   end
