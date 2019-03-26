@@ -116,7 +116,7 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     assert Process.alive?(new_pid)
   end
 
-  test "auction status is expired after duration timeout", %{auction: auction} do
+  test "auction status goes to decision after duration timeout", %{auction: auction} do
     Auctions.start_auction(auction)
     :timer.sleep(300)
 
@@ -127,7 +127,7 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     expected_state =
       auction
       |> TermAuctionState.from_auction()
-      |> Map.merge(%{status: :expired, auction_id: auction.id})
+      |> Map.merge(%{status: :decision, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
 

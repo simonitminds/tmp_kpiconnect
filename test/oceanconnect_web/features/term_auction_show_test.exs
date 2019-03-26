@@ -276,7 +276,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
       end)
 
       change_session_to(:default)
-
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer for this auction"
 
@@ -323,8 +322,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
     test "supplier can add comments to offers" do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
-      :timer.sleep(100)
-
+      :timer.sleep(200)
       assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
 
       AuctionShowPage.enter_comment("You have to buy this!")
@@ -398,10 +396,9 @@ defmodule Oceanconnect.TermAuctionShowTest do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
-      :timer.sleep(100)
+      :timer.sleep(200)
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
-      take_screenshot()
       assert AuctionShowPage.auction_status() == "CLOSED"
       assert AuctionShowPage.winning_solution_has_bids?([supplier1_bid1])
 

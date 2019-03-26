@@ -39,10 +39,11 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             endButton={endButton}
             unsubmitComment={unsubmitComment}
         />
-      : <div key="supplier" className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
+    : <div key="supplier" className="auction-table-placeholder"><i>You have not bid on this auction</i></div>;
+
 
   const competitorSection = () => {
-    if (!!bestSolution) {
+    if (!!bestSolution && !_.isEqual(bestSolution, suppliersBestSolution)) {
       return(
         <SolutionDisplay
             key="other"
@@ -53,7 +54,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             title="Competitor"
         />
       );
-    } else if (!!nextBestSolution) {
+    } else if (!!nextBestSolution && !_.isEqual(nextBestSolution, suppliersBestSolution)) {
       return(
         <SolutionDisplay
           key="other"
@@ -72,17 +73,6 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
       );
     }
   }
-  console.log(competitorSection);
-  // const competitorSection = nextBestSolution
-  //     ? <SolutionDisplay
-  //           key="other"
-  //           auctionPayload={auctionPayload}
-  //           solution={nextBestSolution}
-  //           isExpanded={false}
-  //           headerOnly={true}
-  //           title="Competitor"
-  //       />
-  //   : <div key="other" className="auction-table-placeholder"><i>No other bids have been placed on this auction</i></div>;
 
   const orderedSections = suppliersPrice <= nextBestPrice
       ? [supplierSection, competitorSection()]

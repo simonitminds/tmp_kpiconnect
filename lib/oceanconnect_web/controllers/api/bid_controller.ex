@@ -55,11 +55,9 @@ defmodule OceanconnectWeb.Api.BidController do
     user = OceanconnectWeb.Plugs.Auth.current_user(conn)
     supplier_id = user.company_id
 
-    IO.inspect("HERE")
-
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction(auction_id),
          true <- supplier_id in Auctions.auction_supplier_ids(auction),
-         :ok <- Auctions.revoke_supplier_bids_for_product(auction, product_id, supplier_id, user) |> IO.inspect do
+         :ok <- Auctions.revoke_supplier_bids_for_product(auction, product_id, supplier_id, user) do
       render(conn, "show.json", %{success: true, message: "Bid successfully revoked"})
     else
       {:error, :late_bid} ->

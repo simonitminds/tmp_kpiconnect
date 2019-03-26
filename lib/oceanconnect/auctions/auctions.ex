@@ -174,15 +174,15 @@ defmodule Oceanconnect.Auctions do
           _ -> {:error, "error while revoking bid"}
         end
       %TermAuction{} ->
-        with :ok <- decision_duration_time_remaining?(auction) do
-          auction
-          |> Command.revoke_supplier_bids(product_id, supplier_id, user)
-          |> AuctionStore.process_command()
+        cond do
+          duration_time_remaining?(auction) == :ok or decision_duration_time_remaining?(auction) == :ok ->
+            auction
+            |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+            |> AuctionStore.process_command()
 
-          :ok
-        else
-          {:error, :late_bid} -> {:error, :late_bid}
-          _ -> {:error, "error while revoking bid"}
+            :ok
+          true ->
+            {:error, "error while revoking bid"}
         end
     end
   end
