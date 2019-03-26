@@ -62,13 +62,13 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   defp process(event = %AuctionEvent{type: :auction_rescheduled, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
-
     case DelayedNotificationsSupervisor.start_child(notification_name) do
       {:ok, pid} ->
         emails = Notifications.emails_for_event(event, state)
 
         case calculate_upcoming_reminder_send_time(auction_id) do
           false ->
+            IO.inspect("HERE")
             {:ok, :nothing_to_schedule}
 
           send_time ->
@@ -87,15 +87,14 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   defp process(event = %AuctionEvent{type: :auction_canceled, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
-
-    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder")
+    emails = Notifications.emails_for_event(event, state)
+    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder", emails)
     |> DelayedNotifications.process_command()
   end
 
   defp process(event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
-
-    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder")
+    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder", [])
     |> DelayedNotifications.process_command()
   end
 
@@ -120,8 +119,9 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     %{scheduled_start: start_time} = Oceanconnect.Auctions.get_auction!(auction_id)
 
     if start_time do
-      (DateTime.to_unix(start_time, :millisecond) - 3_600_000)
-      |> DateTime.from_unix()
+      DateTime.to_unix(start_time, :millisecond)
+      |> Kernel.-(3_600_000)
+      |> DateTime.from_unix!(:millisecond)
     else
       false
     end

@@ -14,10 +14,14 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   @registry_name :delayed_notifications_registry
 
   def find_pid(notification_name) do
+    IO.inspect(notification_name)
     with [{pid, _}] <- Registry.lookup(@registry_name, notification_name) do
+      IO.inspect("OK PID FOUND ------------------>")
       {:ok, pid}
     else
-      [] -> {:error, "Notification Timer for #{notification_name}"}
+      [] ->
+        IO.inspect("PID NOT FOUND ------------->")
+        {:error, "Notification Timer for #{notification_name}"}
     end
   end
 
@@ -29,8 +33,8 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     GenServer.start_link(__MODULE__, name, name: get_delayed_notification_name(name))
   end
 
-  def process_command(command = %Command{command: name}) do
-    with {:ok, pid} <- find_pid(name),
+  def process_command(command = %Command{notification_name: notification_name}) do
+    with {:ok, pid} <- find_pid(notification_name),
          do: GenServer.cast(pid, {:process, command})
   end
 
@@ -49,7 +53,7 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     {:noreply, new_state}
   end
 
-  def handle_cast(:send_now, state = %{timer_ref: ref, emails: emails}) do
+  def handle_info(:send_now, state = %{timer_ref: ref, emails: emails}) do
     cancel_timer(ref)
     send(emails)
 
@@ -57,9 +61,9 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   end
 
   defp process(
-         %Command{command: :schedule_notification, data: %{send_time: send_time, emails: emails}},
-         state = %{timer_ref: nil}
-       ) do
+        %Command{command: :schedule_notification, data: %{send_time: send_time, emails: emails}},
+        state = %{timer_ref: nil}
+    ) do
     delay = time_until(send_time)
     ref = Process.send_after(self(), :send_now, delay)
 
@@ -84,15 +88,17 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   end
 
   defp process(
-         %Command{command: :cancel_notification, data: %{}},
-         state = %{timer_ref: ref}
-       ) do
+        %Command{command: :cancel_notification, data: %{emails: emails}},
+        state = %{timer_ref: ref}
+  ) do
+    IO.inspect("HERE")
     cancel_timer(ref)
-    {:ok, %{state | timer_ref: nil}}
+    ref = Process.send_after(self(), :send_now, 0)
+    {:ok, %{state | timer_ref: nil, emails: emails}}
   end
 
   defp send(emails) do
-    Enum.map(emails, fn email ->
+    Enum.map(emails, fn(email) ->
       Mailer.deliver_later(email)
     end)
   end
