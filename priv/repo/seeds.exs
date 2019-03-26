@@ -28,6 +28,7 @@ alias Oceanconnect.Auctions.{
   Command,
   Barge,
   Fuel,
+  FuelIndex,
   Port,
   Vessel
 }
@@ -594,6 +595,11 @@ date_time =
   |> DateTime.to_naive()
   |> NaiveDateTime.add(5 * 60)
   |> DateTime.from_naive!("Etc/UTC")
+
+fuel_index =
+  %{code: "PFT134", name: "Fuel Index", port_id: port1.id, fuel_id: fuel1.id}
+
+Repo.get_or_insert!(FuelIndex, fuel_index)
 
 auctions_params = [
   %Auction{

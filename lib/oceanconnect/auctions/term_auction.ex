@@ -27,7 +27,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     belongs_to(:buyer, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Fuel)
     belongs_to(:fuel_index, FuelIndex)
-    field(:current_index_price, :float)
+    field(:current_index_price, :float, default: nil)
     field(:fuel_quantity, :integer)
     field(:total_fuel_volume, :integer)
     field(:show_total_fuel_volume, :boolean, default: true)
