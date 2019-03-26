@@ -597,7 +597,7 @@ date_time =
   |> DateTime.from_naive!("Etc/UTC")
 
 fuel_index =
-  %{code: "PFT134", name: "Fuel Index", port_id: port1.id, fuel_id: fuel1.id}
+  %{code: "PUAFT00", name: "Platts Oilgram Bunkerwire", port_id: port1.id, fuel_id: fuel1.id}
 
 Repo.get_or_insert!(FuelIndex, fuel_index)
 
