@@ -20,16 +20,23 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitation do
     suppliers = Accounts.users_for_companies(supplier_companies)
 
     vessel_name_list =
-      vessels
-      |> Enum.map(& &1.name)
-      |> Enum.join(", ")
+      case vessels do
+        [] -> nil
+        vessels ->
+          name_list =
+            vessels
+            |> Enum.map(& &1.name)
+            |> Enum.join(", ")
+
+          "for " <> name_list <> " "
+      end
 
     port_name = port.name
 
     Enum.map(suppliers, fn supplier ->
       base_email(supplier)
       |> subject(
-        "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{port_name}"
+        "You have been invited to Auction #{auction.id} #{vessel_name_list}at #{port_name}"
       )
       |> render(
         "auction_invitation.html",
