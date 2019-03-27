@@ -93,7 +93,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
                     }
                     </span></td>
                   <td className="auction-solution__product-table__bid-time"><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
-                  { revokable &&
+                  { bid.supplier_id == supplierId &&
                     <td className="auction-solution__product-table__revoke">
                       <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
                         <FontAwesomeIcon icon="times" />
