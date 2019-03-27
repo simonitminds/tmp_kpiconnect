@@ -6,11 +6,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
 
   use Oceanconnect.Notifications.Email
 
-  def generate(_auction_state = %state_struct{
-        auction_id: auction_id,
-        winning_solution: solution,
-        submitted_barges: submitted_barges
-      }) when is_auction_state(state_struct) do
+  def generate(
+        _auction_state = %state_struct{
+          auction_id: auction_id,
+          winning_solution: solution,
+          submitted_barges: submitted_barges
+        }
+      )
+      when is_auction_state(state_struct) do
     auction = Auctions.get_auction(auction_id)
     participants = Auctions.active_participants(auction_id)
     %Solution{bids: bids} = solution
@@ -20,23 +23,32 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   end
 
   defp emails(
-        auction = %struct{},
-        active_participants,
-        bids,
-        approved_barges
-      ) when is_auction(struct) do
+         auction = %struct{},
+         active_participants,
+         bids,
+         approved_barges
+       )
+       when is_auction(struct) do
+    supplier_emails =
+      emails_for_users(auction, bids, active_participants, approved_barges, :supplier_emails)
 
-    supplier_emails = emails_for_users(auction, bids, active_participants, approved_barges, :supplier_emails)
-    buyer_emails = emails_for_users(auction, bids, active_participants, approved_barges, :buyer_emails)
+    buyer_emails =
+      emails_for_users(auction, bids, active_participants, approved_barges, :buyer_emails)
 
     List.flatten(buyer_emails ++ supplier_emails)
   end
 
-  defp emails_for_users(auction = %Auction{buyer_id: buyer_id}, bids, active_participants, approved_barges, email_type) do
+  defp emails_for_users(
+         auction = %Auction{buyer_id: buyer_id},
+         bids,
+         active_participants,
+         approved_barges,
+         email_type
+       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = users_in_auction_for_company(buyer_company, active_participants)
 
-    bids_by_vessel =  bids_by_vessel(auction, bids)
+    bids_by_vessel = bids_by_vessel(auction, bids)
 
     Enum.flat_map(bids_by_vessel, fn {vessel, bids} ->
       bids_by_supplier = bids_by_supplier(bids)
@@ -59,7 +71,13 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     end)
   end
 
-  defp emails_for_users(auction = %TermAuction{buyer_id: buyer_id}, bids, active_participants, approved_barges, email_type) do
+  defp emails_for_users(
+         auction = %TermAuction{buyer_id: buyer_id},
+         bids,
+         active_participants,
+         approved_barges,
+         email_type
+       ) do
     buyer_company = Accounts.get_company!(buyer_id)
     buyers = users_in_auction_for_company(buyer_company, active_participants)
 
@@ -83,22 +101,24 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   end
 
   defp generate_email_templates(
-    auction = %Auction{port: port},
-    _email_content = %{
-      is_traded_bid: is_traded_bid,
-      buyer_company: buyer_company,
-      supplier_company: supplier_company,
-      deliverables: deliverables,
-      approved_barges: approved_barges
-    },
-    active_participants,
-    vessel,
-    email_type
-  ) do
+         auction = %Auction{port: port},
+         _email_content = %{
+           is_traded_bid: is_traded_bid,
+           buyer_company: buyer_company,
+           supplier_company: supplier_company,
+           deliverables: deliverables,
+           approved_barges: approved_barges
+         },
+         active_participants,
+         vessel,
+         email_type
+       ) do
     port_name = port.name
+
     case email_type do
       :supplier_emails ->
         suppliers = users_in_auction_for_company(supplier_company, active_participants)
+
         Enum.map(suppliers, fn supplier ->
           base_email(supplier)
           |> subject("You have won Auction #{auction.id} for #{vessel.name} at #{port_name}!")
@@ -112,13 +132,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
             vessel: vessel,
             buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
             deliverables: deliverables,
-            approved_barges:
-              approved_barges_for_supplier(approved_barges, supplier_company.id),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: false
           )
         end)
+
       :buyer_emails ->
         buyers = users_in_auction_for_company(buyer_company, active_participants)
+
         Enum.map(buyers, fn buyer ->
           base_email(buyer)
           |> subject("Auction #{auction.id} for #{vessel.name} at #{port_name} has closed.")
@@ -133,8 +154,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
             vessel: vessel,
             buyer_company: buyer_company,
             deliverables: deliverables,
-            approved_barges:
-              approved_barges_for_supplier(approved_barges, supplier_company.id),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: true
           )
         end)
@@ -142,21 +162,23 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   end
 
   defp generate_email_templates(
-    auction = %TermAuction{port: port, vessels: vessels},
-    _email_content = %{
-      is_traded_bid: is_traded_bid,
-      buyer_company: buyer_company,
-      supplier_company: supplier_company,
-      deliverables: deliverables,
-      approved_barges: approved_barges
-    },
-    active_participants,
-    email_type
-  ) do
+         auction = %TermAuction{port: port, vessels: vessels},
+         _email_content = %{
+           is_traded_bid: is_traded_bid,
+           buyer_company: buyer_company,
+           supplier_company: supplier_company,
+           deliverables: deliverables,
+           approved_barges: approved_barges
+         },
+         active_participants,
+         email_type
+       ) do
     port_name = port.name
+
     case email_type do
       :supplier_emails ->
         suppliers = users_in_auction_for_company(supplier_company, active_participants)
+
         Enum.map(suppliers, fn supplier ->
           base_email(supplier)
           |> subject("You have won Auction #{auction.id} at #{port_name}!")
@@ -170,13 +192,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
             vessels: vessels,
             buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
             deliverables: deliverables,
-            approved_barges:
-              approved_barges_for_supplier(approved_barges, supplier_company.id),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: false
           )
         end)
+
       :buyer_emails ->
         buyers = users_in_auction_for_company(buyer_company, active_participants)
+
         Enum.map(buyers, fn buyer ->
           base_email(buyer)
           |> subject("Auction #{auction.id} at #{port_name} has closed.")
@@ -191,8 +214,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
             vessels: vessels,
             buyer_company: buyer_company,
             deliverables: deliverables,
-            approved_barges:
-              approved_barges_for_supplier(approved_barges, supplier_company.id),
+            approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
             is_buyer: true
           )
         end)
@@ -204,18 +226,22 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     active_user_ids =
       active_participants
       |> Enum.map(& &1.id)
+
     Accounts.users_for_companies([company])
     |> Enum.filter(&(&1.id in active_user_ids))
   end
 
-  defp auction_deliverables(%TermAuction{vessels: vessels, fuel: fuel, fuel_quantity: fuel_quantity}, bids) do
+  defp auction_deliverables(
+         %TermAuction{vessels: vessels, fuel: fuel, fuel_quantity: fuel_quantity},
+         bids
+       ) do
     bids
-    |> Enum.map(fn bid -> (
+    |> Enum.map(fn bid ->
       %{
         fuel: fuel,
         quantity: fuel_quantity
       }
-      |> Map.put(:bid, bid))
+      |> Map.put(:bid, bid)
     end)
   end
 
@@ -230,6 +256,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
   defp bids_by_vessel(%Auction{auction_vessel_fuels: vessel_fuels}, bids) do
     Enum.reduce(bids, %{}, fn bid, acc ->
       vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+
       if vessel_fuel do
         case acc[vessel_fuel.vessel] do
           nil ->

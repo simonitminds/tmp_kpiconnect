@@ -14,13 +14,10 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   @registry_name :delayed_notifications_registry
 
   def find_pid(notification_name) do
-    IO.inspect(notification_name)
     with [{pid, _}] <- Registry.lookup(@registry_name, notification_name) do
-      IO.inspect("OK PID FOUND ------------------>")
       {:ok, pid}
     else
       [] ->
-        IO.inspect("PID NOT FOUND ------------->")
         {:error, "Notification Timer for #{notification_name}"}
     end
   end
@@ -61,9 +58,9 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   end
 
   defp process(
-        %Command{command: :schedule_notification, data: %{send_time: send_time, emails: emails}},
-        state = %{timer_ref: nil}
-    ) do
+         %Command{command: :schedule_notification, data: %{send_time: send_time, emails: emails}},
+         state = %{timer_ref: nil}
+       ) do
     delay = time_until(send_time)
     ref = Process.send_after(self(), :send_now, delay)
 
@@ -77,7 +74,7 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
          },
          state = %{timer_ref: ref, send_time: send_time}
        ) do
-    if send_time == new_send_time do
+    if send_time != new_send_time do
       cancel_timer(ref)
       delay = time_until(new_send_time)
       ref = Process.send_after(self(), :send_now, delay)
@@ -88,17 +85,16 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
   end
 
   defp process(
-        %Command{command: :cancel_notification, data: %{emails: emails}},
-        state = %{timer_ref: ref}
-  ) do
-    IO.inspect("HERE")
+         %Command{command: :cancel_notification, data: %{emails: emails}},
+         state = %{timer_ref: ref}
+       ) do
     cancel_timer(ref)
-    ref = Process.send_after(self(), :send_now, 0)
-    {:ok, %{state | timer_ref: nil, emails: emails}}
+    # ref = Process.send_after(self(), :send_now, 0)
+    {:ok, %{state | timer_ref: nil}}
   end
 
   defp send(emails) do
-    Enum.map(emails, fn(email) ->
+    Enum.map(emails, fn email ->
       Mailer.deliver_later(email)
     end)
   end

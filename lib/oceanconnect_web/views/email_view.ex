@@ -78,6 +78,7 @@ defmodule OceanconnectWeb.EmailView do
 
   def partial_name_for_type(%struct{type: type}, partial_type) when is_auction(struct) do
     "_#{type}_#{partial_type}.html"
+
     case type in ["forward_fixed", "formula_related"] do
       true -> "_term_#{partial_type}.html"
       _ -> "_spot_#{partial_type}.html"

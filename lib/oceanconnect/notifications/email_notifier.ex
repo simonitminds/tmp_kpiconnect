@@ -2,6 +2,7 @@ defmodule Oceanconnect.Auctions.AuctionEmailNotifier do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Notifications.Emails.{
     AuctionInvitation,
     AuctionRescheduled,

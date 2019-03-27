@@ -122,7 +122,12 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
     end
 
     test "auction closed email builds for winning suppliers and buyer who participated in a spot auction",
-      %{auction_state: auction_state, winning_suppliers: winning_suppliers, buyers: buyers, vessels: [vessel1, vessel2]} do
+         %{
+           auction_state: auction_state,
+           winning_suppliers: winning_suppliers,
+           buyers: buyers,
+           vessels: [vessel1, vessel2]
+         } do
       auction = Auctions.get_auction!(auction_state.auction_id)
       emails = AuctionClosed.generate(auction_state)
       sent_to_ids = Enum.map(emails, fn email -> email.to.id end)
@@ -133,7 +138,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
 
       # Only 1 buyer participated by generating events in the system
       assert Enum.any?(buyer_ids, &(&1 in sent_to_ids))
-
 
       sent_emails = Enum.map(emails, & &1.to)
 
@@ -148,10 +152,9 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
 
       for buyer <- buyers do
         assert Enum.any?(buyer_emails, fn buyer_email ->
-          buyer_email.html_body =~ "Physical Supplier"
-        end)
+                 buyer_email.html_body =~ "Physical Supplier"
+               end)
       end
-
     end
   end
 
@@ -242,7 +245,12 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
     end
 
     test "auction closed email builds for winning suppliers and buyer who participated in a term auction",
-        %{auction_state: auction_state, winning_suppliers: winning_suppliers, buyers: buyers, vessels: [vessel1, vessel2]} do
+         %{
+           auction_state: auction_state,
+           winning_suppliers: winning_suppliers,
+           buyers: buyers,
+           vessels: [vessel1, vessel2]
+         } do
       emails = AuctionClosed.generate(auction_state)
       sent_to_ids = Enum.map(emails, fn email -> email.to.id end)
       winning_supplier_ids = Enum.map(winning_suppliers, & &1.id)

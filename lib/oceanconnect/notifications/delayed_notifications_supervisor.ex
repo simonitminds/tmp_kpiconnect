@@ -18,7 +18,6 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsSupervisor do
              __MODULE__,
              {Oceanconnect.Notifications.DelayedNotifications, notification_name}
            ) do
-
       IO.inspect(notification_name, label: "OKAY ------------>")
       {:ok, {notification_pid}}
     else

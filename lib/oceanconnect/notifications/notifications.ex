@@ -16,7 +16,8 @@ defmodule Oceanconnect.Notifications do
   def emails_for_event(
         %AuctionEvent{type: :auction_closed},
         auction_state = %state_struct{auction_id: _auction_id}
-  ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     Emails.AuctionClosed.generate(auction_state)
   end
 
@@ -31,7 +32,8 @@ defmodule Oceanconnect.Notifications do
   def emails_for_event(
         %AuctionEvent{type: :upcoming_auction_notified},
         auction_state = %state_struct{auction_id: _auction_id}
-  ) when is_auction_state(state_struct) do
+      )
+      when is_auction_state(state_struct) do
     Emails.AuctionStartingSoon.generate(auction_state)
   end
 

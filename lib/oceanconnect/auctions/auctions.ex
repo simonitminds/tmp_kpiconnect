@@ -700,7 +700,7 @@ defmodule Oceanconnect.Auctions do
 
   def active_participants(auction_id) do
     AuctionEventStore.participants_from_events(auction_id)
-    |> List.flatten
+    |> List.flatten()
   end
 
   def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct),

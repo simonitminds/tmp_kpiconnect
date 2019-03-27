@@ -358,6 +358,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
     end
   end
 
+<<<<<<< HEAD
   describe "decision period" do
     setup %{
       auction: auction,
