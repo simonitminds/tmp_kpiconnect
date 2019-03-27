@@ -18,6 +18,19 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
+  const nextBestSolution =_.get(auctionPayload, 'solutions.next_best_solution');
+  const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution')
+  const otherSolution = () => {
+    if (nextBestSolution && suppliersBestSolution) {
+      return nextBestSolution.normalized_price < suppliersBestSolution.normalized_price ? nextBestSolution : suppliersBestSolution;
+    } else if (nextBestSolution) {
+      return nextBestSolution;
+    } else if (suppliersBestSolution) {
+      return suppliersBestSolution;
+    } else {
+      return null;
+    }
+  }
   const { eta, etd } = etaAndEtdForAuction(auction);
 
 
@@ -64,9 +77,17 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
     }, {})
     .value();
 
-  const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
+  const solution = () => {
+    if (auctionStatus === 'closed') {
+      return winningSolution;
+    } else if (!!bestSolution) {
+      return bestSolution;
+    } else {
+      return otherSolution();
+    }
+  }
 
-  const solutionBidsByFuel =  _.chain(solution)
+  const solutionBidsByFuel =  _.chain(solution())
     .get('bids', [])
     .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
     .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())

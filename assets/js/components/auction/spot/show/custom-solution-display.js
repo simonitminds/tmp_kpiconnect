@@ -69,7 +69,8 @@ export default class CustomSolutionDisplay extends React.Component {
     const subtitle = "Assemble offer based on all valid product offerings"
 
     const solution = {
-      bids: selectedBids
+      bids: selectedBids,
+      normalized_price: normalizedPrice
     }
 
     return (

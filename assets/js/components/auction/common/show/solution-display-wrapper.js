@@ -91,8 +91,10 @@ export default class SolutionDisplayWrapper extends React.Component {
         return `-$${formatPrice(price)}`;
       } else if (auctionType == "formula_related" && normalized_price > 0) {
         return `+$${formatPrice(normalized_price)}`;
-      } else {
+      } else if (normalized_price) {
         return `$${formatPrice(normalized_price)}`;
+      } else {
+        return "$ —";
       }
     }
 

@@ -62,6 +62,19 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
     }
   }
 
+  const nextBestSolution =_.get(auctionPayload, 'solutions.next_best_solution');
+  const otherSolution = () => {
+    if (nextBestSolution && suppliersBestSolution) {
+      return nextBestSolution.normalized_price < suppliersBestSolution.normalized_price ? nextBestSolution : suppliersBestSolution;
+    } else if (nextBestSolution) {
+      return nextBestSolution;
+    } else if (suppliersBestSolution) {
+      return suppliersBestSolution;
+    } else {
+      return null;
+    }
+  }
+
   const productNameString = (products) => {
     const fuelNames = _.chain(products)
       .map('fuel.name')
@@ -164,9 +177,20 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
       </div>
     );
+  } else if (isPartialSolution && !_.isEqual(otherSolution(), suppliersBestSolution)) {
+    return (
+      <div className="auction-notification is-danger">
+        <div className="auction-notification__show-message">
+          {messageDisplay("Your bid is not the best partial offer for this auction")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("Your bid is not the best partial offer")}
+        </div>
+      </div>
+    );
   } else if (isPartialSolution && !noSolutionBids) {
     return (
-      <div className="auction-notification is-success">
+      <div className="auction-notification is-warning">
         <div className="auction-notification__show-message">
           {messageDisplay("You only have a partial offer for this auction")}
         </div>

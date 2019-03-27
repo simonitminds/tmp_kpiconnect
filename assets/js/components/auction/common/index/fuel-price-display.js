@@ -11,7 +11,6 @@ const FuelPriceDisplay = ({products, auctionType}) => {
       return value;
     }
   }
-
   const isFormulaRelated = auctionType == 'formula_related';
 
   return (
