@@ -68,7 +68,7 @@ class BiddingFormProduct extends React.Component {
           <div className="column is-one-quarter-desktop">
             <strong>{name}</strong><br/>
             <span className="has-text-gray-3">&times; {fuelQuantity} MT </span><br/>
-            { currentIndexPrice != 0.00 &&
+            { auctionType == "formula_related" && currentIndexPrice != 0.00 &&
               <div className="control control--flex-limit has-margin-top-sm">
                 <BidTag bid={currentIndexPrice} indexPrice="true" title="Latest Index Price" />
               </div>
@@ -82,7 +82,7 @@ class BiddingFormProduct extends React.Component {
               <div className="column">
                 <div className="field">
                   <label className="label" htmlFor="bid">Bid Amount</label>
-                  <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice!= 0.00 ? 'has-input-add-right' : ''}`}>
+                  <div className={`control auction-bidding__input has-icons-left ${auctionType == "formula_related" && currentIndexPrice != 0.00 ? 'has-input-add-right' : ''}`}>
                     <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                     <input
                       type="number"
