@@ -6,6 +6,7 @@ import TradedBidTag from '../../../common/show/traded-bid-tag';
 import NonSplittableBidTag from '../../../common/show/non-splittable-bid-tag';
 
 const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, highlightOwn, revokable, revokeBid, auctionPayload}) => {
+  const isAdmin = window.isAdmin;
   const sortedBids = _.sortBy(bids, [
       ({vessel_fuel_id}) => _.find(vesselFuels, (vf) => vf.id == vessel_fuel_id).vessel_id
     ]);
@@ -93,7 +94,7 @@ const SolutionDisplayProductSection = ({bids, fuel, vesselFuels, supplierId, hig
                     }
                     </span></td>
                   <td className="auction-solution__product-table__bid-time"><span className="qa-auction-bid-time_entered">({ formatTime(bid.time_entered) })</span></td>
-                  { bid.supplier_id == supplierId &&
+                  { bid.supplier_id == supplierId && !isAdmin &&
                     <td className="auction-solution__product-table__revoke">
                       <span className={`tag revoke-bid__button qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
                         <FontAwesomeIcon icon="times" />
