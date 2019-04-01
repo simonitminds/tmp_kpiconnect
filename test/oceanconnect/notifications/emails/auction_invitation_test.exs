@@ -71,9 +71,17 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
       assert Enum.all?(supplier_ids, &(&1 in sent_to_ids))
           refute Enum.any?(buyer_ids, &(&1 in sent_to_ids))
 
+
+      auction_type =
+        case auction.type do
+          "spot" -> ""
+          "formula_related" -> "Formula-Related "
+          "forward-fixed" -> "Forward-Fixed "
+        end
+
       for supplier_email <- emails do
         assert supplier_email.subject ==
-                 "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{
+                 "You have been invited to #{auction_type}Auction #{auction.id} for #{vessel_name_list} at #{
                    auction.port.name
                  }"
 
