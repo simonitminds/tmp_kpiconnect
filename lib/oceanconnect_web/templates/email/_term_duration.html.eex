@@ -1,3 +1,3 @@
-<p style="margin-top: 0.25rem;"><b>Terminal:</b> <%= @auction.terminal %></p>
-<p style="margin-top: 0.25rem;"><b>Start Month:</b> <%= @auction.start_date %></p>
-<p style="margin-top: 0.25rem;"><b>End Month:</b> <%= @auction.end_date %></p>
+<p style="margin-top: 0.25rem;"><b>Terminal:</b> <%= if @auction.terminal, do: @auction.terminal, else: "—" %></p>
+<p style="margin-top: 0.25rem;"><b>Start Month:</b> <%= format_month(@auction.start_date) %></p>
+<p style="margin-top: 0.25rem;"><b>End Month:</b> <%= format_month(@auction.end_date) %></p>

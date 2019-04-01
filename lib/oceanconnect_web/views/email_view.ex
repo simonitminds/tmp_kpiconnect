@@ -10,6 +10,14 @@ defmodule OceanconnectWeb.EmailView do
     |> Enum.join(", ")
   end
 
+  def auction_type(%{type: type}) do
+    case type do
+      "formula_related" -> "Formula-Related"
+      "forward_fixed" -> "Forward-Fixed"
+      "spot" -> "Spot"
+    end
+  end
+
   def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
     Enum.map(vessels, fn vessel ->
       eta =
@@ -85,8 +93,21 @@ defmodule OceanconnectWeb.EmailView do
     end
   end
 
-  def term_length(%{start_date: %{month: start_month}, end_date: %{month: end_month}}) do
-    end_month - start_month
+  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume}) when is_nil(monthly_fuel_volume) or is_nil(total_fuel_volume) do
+    "—"
+  end
+
+  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume}) do
+    months = floor(total_fuel_volume / monthly_fuel_volume)
+    "#{months} months"
+  end
+
+  def format_month(%{month: month, year: year}) do
+    month =
+      ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      |> Enum.at(month + 1)
+
+    "#{month} #{year}"
   end
 
   defp leftpad(integer) do

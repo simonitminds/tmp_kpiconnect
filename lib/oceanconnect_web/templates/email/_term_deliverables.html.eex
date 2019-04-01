@@ -2,7 +2,12 @@
 <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
 <p style="margin-top: 0.25rem;"><b>Fuel Grade:</b> <%= @auction.fuel.name %></p>
 <p style="margin-top: 0.25rem;"><b>Monthly Quantity:</b> <%= @auction.fuel_quantity %> MT/month</p>
-<p style="margin-top: 0.25rem;"><b>Term Length:</b> <%= term_length(@auction) %> months</p>
-<%= if @auction.show_total_fuel_volume do %>
-  <p style="margin-top: 0.25rem;"><b>Total Volume:</b> <%= @auction.total_fuel_volume %> MT</p>
+<%= if @auction.type == "formula_related" do %>
+  <p style="margin-top: 0.25rem;"><b>Reference Fuel Index:</b> <%= @auction.fuel_index.name %></p>
+  <p style="margin-top: 0.25rem;"><b>Current Index Price:</b> <%= if @auction.current_index_price, do: format_price(@auction.current_index_price), else: "—" %></p>
 <% end %>
+<p style="margin-top: 0.25rem;"><b>Term Length:</b> <%= term_length(@auction) %></p>
+<%= if @auction.show_total_fuel_volume do %>
+  <p style="margin-top: 0.25rem;"><b>Total Volume:</b> <%= if @auction.total_fuel_volume, do: "#{@auction.total_fuel_volume} MT", else: "—" %></p>
+<% end %>
+<p style="margin-top: 0.25rem;"><b>Vessel(s):</b> <%= if @auction.vessels, do: vessel_name_list(@auction.vessels), else: "—" %>

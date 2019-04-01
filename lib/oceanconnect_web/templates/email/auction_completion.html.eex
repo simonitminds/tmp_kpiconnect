@@ -12,18 +12,22 @@
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Auction Details</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel:</b> <%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel(s):</b> <%= if @auction.vessels, do: vessel_name_list(@auction.vessels), else: "—" %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port:</b> <%= @auction.port.name %></p>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port Agent:</b> <%= @auction.port_agent %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port Agent:</b> <%= if @auction.port_agent, do: @auction.port_agent, else: "—" %></p>
     <%= render partial_name_for_type(@auction, "duration"), Map.put(assigns, :auction, @auction) %>
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Approved Barges</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <ul style="padding-left: 0.5rem;">
-      <%= for auction_barge <- @approved_barges do %>
-        <li style="margin-top: 0.25rem;"><%= auction_barge.barge.name %></span> <span style="color: #888">(<%= auction_barge.barge.imo_number %>)</span></li>
-      <% end %>
-    </ul>
+    <%= if @approved_barges do %>
+      <ul style="padding-left: 0.5rem;">
+        <%= for auction_barge <- @approved_barges do %>
+          <li style="margin-top: 0.25rem;"><%= auction_barge.barge.name %></span> <span style="color: #888">(<%= auction_barge.barge.imo_number %>)</span></li>
+        <% end %>
+      </ul>
+    <% else %>
+      None
+    <% end %>
     <br>
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Deliverables</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
@@ -34,7 +38,7 @@
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>
       <%= if price = deliverable.bid.amount do %>
-        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> <%= format_price(price) %></p>
+        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b><%= if @auction.type == "formula_related", do: "Price Differential per Unit:", else: "Price:" %></b> <%= format_price(price) %></p>
       <% else %>
         <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> No bid was selected for this deliverable</p>
       <% end %>
