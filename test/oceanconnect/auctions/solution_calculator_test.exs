@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
 
   def quick_bid(amount, vfid, supplier_id, auction_id, opts \\ []) do
     now = DateTime.utc_now()
+
     %AuctionBid{
       amount: amount,
       supplier_id: supplier_id,
@@ -153,12 +154,23 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       supplier2: %{id: supplier2_id},
       supplier3: %{id: supplier3_id}
     } do
-      vf1_supplier2 = quick_bid(2.00, vf1_id, supplier2_id, auction_id, time_entered: DateTime.utc_now())
-      vf2_supplier2 = quick_bid(2.50, vf2_id, supplier2_id, auction_id, time_entered: DateTime.utc_now())
-      vf1_supplier1 = quick_bid(2.00, vf1_id, supplier1_id, auction_id, time_entered: DateTime.utc_now())
-      vf2_supplier1 = quick_bid(2.50, vf2_id, supplier1_id, auction_id, time_entered: DateTime.utc_now())
-      vf1_supplier3 = quick_bid(2.00, vf1_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
-      vf2_supplier3 = quick_bid(3.00, vf2_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
+      vf1_supplier2 =
+        quick_bid(2.00, vf1_id, supplier2_id, auction_id, time_entered: DateTime.utc_now())
+
+      vf2_supplier2 =
+        quick_bid(2.50, vf2_id, supplier2_id, auction_id, time_entered: DateTime.utc_now())
+
+      vf1_supplier1 =
+        quick_bid(2.00, vf1_id, supplier1_id, auction_id, time_entered: DateTime.utc_now())
+
+      vf2_supplier1 =
+        quick_bid(2.50, vf2_id, supplier1_id, auction_id, time_entered: DateTime.utc_now())
+
+      vf1_supplier3 =
+        quick_bid(2.00, vf1_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
+
+      vf2_supplier3 =
+        quick_bid(3.00, vf2_id, supplier3_id, auction_id, time_entered: DateTime.utc_now())
 
       current_state = %AuctionState{
         auction_id: auction_id,
@@ -222,14 +234,15 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
              } = solution
     end
 
-    test "considers allow_split when calculating best overall with a single supplier beating remaining bids", %{
-      auction: auction = %Auction{id: auction_id},
-      vessel_fuel1: %AuctionVesselFuel{id: vf1_id},
-      vessel_fuel2: %AuctionVesselFuel{id: vf2_id},
-      supplier1: %{id: supplier1_id},
-      supplier2: %{id: supplier2_id},
-      supplier3: %{id: supplier3_id}
-    } do
+    test "considers allow_split when calculating best overall with a single supplier beating remaining bids",
+         %{
+           auction: auction = %Auction{id: auction_id},
+           vessel_fuel1: %AuctionVesselFuel{id: vf1_id},
+           vessel_fuel2: %AuctionVesselFuel{id: vf2_id},
+           supplier1: %{id: supplier1_id},
+           supplier2: %{id: supplier2_id},
+           supplier3: %{id: supplier3_id}
+         } do
       # supplier2's vessel_fuel1 bid is the best for that product, but they do not
       # want to split. Because their vessel_fuel2 bid is still low enough to have a
       # lower normalized price than the remaining bids, they are considered the
@@ -289,26 +302,25 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       # - Supplier E
       #   :a  6 no split
       #   :f 12 no split
-      vf1_s1 = quick_bid( 5.00, vf1.id, s1.id, auction.id, allow_split: true)
-      vf2_s1 = quick_bid( 5.00, vf2.id, s1.id, auction.id, allow_split: true)
+      vf1_s1 = quick_bid(5.00, vf1.id, s1.id, auction.id, allow_split: true)
+      vf2_s1 = quick_bid(5.00, vf2.id, s1.id, auction.id, allow_split: true)
       vf3_s1 = quick_bid(25.00, vf3.id, s1.id, auction.id, allow_split: false)
       vf5_s1 = quick_bid(12.00, vf5.id, s1.id, auction.id, allow_split: true)
 
-      vf1_s2 = quick_bid( 4.00, vf1.id, s2.id, auction.id, allow_split: false)
-      vf2_s2 = quick_bid( 7.00, vf2.id, s2.id, auction.id, allow_split: true)
-      vf3_s2 = quick_bid( 7.00, vf3.id, s2.id, auction.id, allow_split: true)
-      vf4_s2 = quick_bid( 5.00, vf4.id, s2.id, auction.id, allow_split: false)
+      vf1_s2 = quick_bid(4.00, vf1.id, s2.id, auction.id, allow_split: false)
+      vf2_s2 = quick_bid(7.00, vf2.id, s2.id, auction.id, allow_split: true)
+      vf3_s2 = quick_bid(7.00, vf3.id, s2.id, auction.id, allow_split: true)
+      vf4_s2 = quick_bid(5.00, vf4.id, s2.id, auction.id, allow_split: false)
 
-      vf1_s3 = quick_bid( 6.00, vf1.id, s3.id, auction.id, allow_split: false)
-      vf2_s3 = quick_bid( 6.00, vf2.id, s3.id, auction.id, allow_split: true)
-      vf5_s3 = quick_bid( 6.00, vf5.id, s3.id, auction.id, allow_split: false)
+      vf1_s3 = quick_bid(6.00, vf1.id, s3.id, auction.id, allow_split: false)
+      vf2_s3 = quick_bid(6.00, vf2.id, s3.id, auction.id, allow_split: true)
+      vf5_s3 = quick_bid(6.00, vf5.id, s3.id, auction.id, allow_split: false)
 
       vf3_s4 = quick_bid(10.00, vf3.id, s4.id, auction.id, allow_split: true)
       vf4_s4 = quick_bid(15.00, vf4.id, s4.id, auction.id, allow_split: false)
 
-      vf1_s5 = quick_bid( 6.00, vf1.id, s5.id, auction.id, allow_split: false)
+      vf1_s5 = quick_bid(6.00, vf1.id, s5.id, auction.id, allow_split: false)
       vf6_s5 = quick_bid(12.00, vf6.id, s5.id, auction.id, allow_split: false)
-
 
       current_state = %AuctionState{
         auction_id: auction.id,
@@ -326,7 +338,9 @@ defmodule Oceanconnect.Auctions.SolutionCalculatorTest do
       %{solutions: %{best_overall: solution}} = SolutionCalculator.process(current_state, auction)
 
       %{valid: true, bids: bids} = solution
-      assert [^vf1_s5, ^vf2_s1, ^vf3_s4, ^vf4_s4, ^vf5_s1, ^vf6_s5] = Enum.sort_by(bids, &(&1.vessel_fuel_id))
+
+      assert [^vf1_s5, ^vf2_s1, ^vf3_s4, ^vf4_s4, ^vf5_s1, ^vf6_s5] =
+               Enum.sort_by(bids, & &1.vessel_fuel_id)
     end
   end
 end

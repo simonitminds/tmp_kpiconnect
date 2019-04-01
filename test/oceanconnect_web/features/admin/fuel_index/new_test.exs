@@ -19,12 +19,13 @@ defmodule Oceanconnect.Admin.FuelIndex.NewTest do
       NewPage.visit()
 
       assert NewPage.is_current_path?()
+
       assert EditPage.has_fields?([
-        "code",
-        "name",
-        "fuel_id",
-        "port_id"
-      ])
+               "code",
+               "name",
+               "fuel_id",
+               "port_id"
+             ])
     end
 
     test "normal users cannot visit admin new fuel index page", %{user: user} do

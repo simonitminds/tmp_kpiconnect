@@ -14,6 +14,7 @@ defmodule OceanconnectWeb.TwoFactorAuthController do
         |> put_flash(:error, "Page not found")
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))
+
       _ ->
         render(conn, "two_factor_auth.html", action: two_factor_auth_path(conn, :create))
     end
@@ -42,8 +43,7 @@ defmodule OceanconnectWeb.TwoFactorAuthController do
   end
 
   def resend_email(conn, _) do
-    user_id =
-      Kernel.get_in(conn.private[:plug_session], ["user_data", "user_id"])
+    user_id = Kernel.get_in(conn.private[:plug_session], ["user_data", "user_id"])
 
     user = Accounts.get_user!(user_id)
     {token, one_time_pass} = Auth.generate_one_time_pass(user)

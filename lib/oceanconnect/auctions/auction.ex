@@ -249,6 +249,7 @@ defmodule Oceanconnect.Auctions.Auction do
   def parse_date(dt = %DateTime{}), do: dt
   def parse_date(""), do: ""
   def parse_date(nil), do: ""
+
   def parse_date(epoch) do
     epoch
     |> String.to_integer()
@@ -304,7 +305,10 @@ defmodule Oceanconnect.Auctions.Auction do
     scheduled_start
   end
 
-  def validate_vessel_fuels(%Ecto.Changeset{data: %{auction_vessel_fuels: vessel_fuels}} = changeset) when is_nil(vessel_fuels) or vessel_fuels < 1 do
+  def validate_vessel_fuels(
+        %Ecto.Changeset{data: %{auction_vessel_fuels: vessel_fuels}} = changeset
+      )
+      when is_nil(vessel_fuels) or vessel_fuels < 1 do
     add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
   end
 

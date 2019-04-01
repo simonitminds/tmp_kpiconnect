@@ -44,7 +44,7 @@ defmodule Oceanconnect.AccountsTest do
       inactive_user: inactive_user
     } do
       page = Accounts.list_users(%{})
-      entries = Enum.map(page.entries, &(&1.id))
+      entries = Enum.map(page.entries, & &1.id)
       assert entries == [user.id, admin_user.id, inactive_user.id]
     end
 
@@ -91,8 +91,7 @@ defmodule Oceanconnect.AccountsTest do
     end
 
     test "create_user/1 with valid data creates a user" do
-      assert {:ok, %User{} = user} =
-               Accounts.create_user(@valid_attrs)
+      assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
 
       assert user.email == "SOME EMAIL"
     end
@@ -114,7 +113,9 @@ defmodule Oceanconnect.AccountsTest do
 
     test "reset_password/2 with valid data updates the user's password", %{user: user} do
       assert {:ok, %User{} = user} = Accounts.reset_password(user, %{"password" => "password"})
-      assert {:ok, user} = Accounts.verify_login(%{"email" => user.email, "password" => "password"})
+
+      assert {:ok, user} =
+               Accounts.verify_login(%{"email" => user.email, "password" => "password"})
     end
 
     test "delete_user/1 deletes the user", %{user: user} do

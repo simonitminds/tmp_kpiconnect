@@ -47,7 +47,8 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   def process_command(%Command{
         command: :start_duration_timer,
         data: auction = %struct{id: auction_id}
-      }) when is_auction(struct) do
+      })
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:start_duration_timer, auction, pid})
   end
@@ -55,7 +56,8 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   def process_command(%Command{
         command: :start_decision_duration_timer,
         data: auction = %struct{id: auction_id}
-      }) when is_auction(struct) do
+      })
+      when is_auction(struct) do
     with {:ok, pid} <- find_pid(auction_id),
          do: GenServer.cast(pid, {:start_decision_duration_timer, auction, pid})
   end
@@ -142,7 +144,8 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
     {:reply, new_state, new_state}
   end
 
-  def handle_cast({:start_duration_timer, %struct{duration: duration}, pid}, current_state) when is_auction(struct) do
+  def handle_cast({:start_duration_timer, %struct{duration: duration}, pid}, current_state)
+      when is_auction(struct) do
     new_timer = create_timer(pid, duration, :duration)
     new_state = Map.put(current_state, :duration_timer, new_timer)
     {:noreply, new_state}
@@ -151,7 +154,8 @@ defmodule Oceanconnect.Auctions.AuctionTimer do
   def handle_cast(
         {:start_decision_duration_timer, %struct{decision_duration: decision_duration}, pid},
         current_state = %{duration_timer: duration_timer}
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     if duration_timer do
       Process.cancel_timer(duration_timer)
     end

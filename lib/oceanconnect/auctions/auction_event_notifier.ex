@@ -2,6 +2,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     Auction,
     AuctionCache,
@@ -25,7 +26,6 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {event, state})
   end
 
-
   def react_to(%AuctionEvent{type: :auction_updated, data: auction}, _state) do
     update_cache(auction)
 
@@ -35,13 +35,15 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def react_to(%AuctionEvent{type: :upcoming_auction_notified}, _state) do
-    #noop
+    # noop
   end
 
-  def react_to(%AuctionEvent{type: :auction_started, auction_id: auction_id, time_entered: started_at}, _state) do
+  def react_to(
+        %AuctionEvent{type: :auction_started, auction_id: auction_id, time_entered: started_at},
+        _state
+      ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_started: started_at}
-
     update_cache(auction)
 
     auction
@@ -53,30 +55,34 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     |> AuctionScheduler.process_command(nil)
   end
 
-  def react_to(%AuctionEvent{type: :auction_ended, auction_id: auction_id, time_entered: ended_at}, _state) do
+  def react_to(
+        %AuctionEvent{type: :auction_ended, auction_id: auction_id, time_entered: ended_at},
+        _state
+      ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_ended: ended_at}
-
     update_cache(auction)
 
-    case auction do
-      %Auction{} ->
-        auction
-        |> Command.start_decision_duration_timer()
-        |> AuctionTimer.process_command()
-      _ -> :ok
-    end
+    auction
+    |> Command.start_decision_duration_timer()
+    |> AuctionTimer.process_command()
   end
 
-  def react_to(%AuctionEvent{type: :auction_closed, auction_id: auction_id, time_entered: closed_at}, _state) do
+  def react_to(
+        %AuctionEvent{type: :auction_closed, auction_id: auction_id, time_entered: closed_at},
+        _state
+      ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: closed_at}
-
     update_cache(auction)
+
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
   end
 
-  def react_to(%AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at}, state) do
+  def react_to(
+        %AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at},
+        state
+      ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
     update_cache(auction)
@@ -84,7 +90,10 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     AuctionTimer.cancel_timer(auction_id, :decision_duration)
   end
 
-  def react_to(%AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at}, _state) do
+  def react_to(
+        %AuctionEvent{type: :auction_canceled, auction_id: auction_id, time_entered: canceled_at},
+        _state
+      ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: canceled_at}
     update_cache(auction)
@@ -99,21 +108,29 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     |> AuctionTimer.process_command()
   end
 
-  def react_to(%AuctionEvent{type: :winning_solution_selected, auction_id: auction_id, data: %{port_agent: port_agent}}, _state) do
+  def react_to(
+        %AuctionEvent{
+          type: :winning_solution_selected,
+          auction_id: auction_id,
+          data: %{port_agent: port_agent}
+        },
+        _state
+      ) do
     auction = Auctions.get_auction!(auction_id)
+
     %{auction | port_agent: port_agent}
     |> update_cache()
   end
 
-  def react_to(%AuctionEvent{type: :auction_finalized, data: %{auction: auction}}, state) do
-    with  {:ok, _snapshot_event} <- Aggregate.snapshot(state),
-          {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
-
+  def react_to(%AuctionEvent{type: :auction_finalized, auction_id: auction_id}, state) do
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
+         {:ok, _snapshot_event} <- Aggregate.snapshot(state),
+         {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
       Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else
       {:error, _msg} ->
         require Logger
-        Logger.error("Could not finalize auction detail records for auction #{auction.id}")
+        Logger.error("Could not finalize auction detail records for auction #{auction_id}")
     end
   end
 

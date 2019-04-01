@@ -80,7 +80,9 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
       assert Auth.valid_otp?(token, one_time_pass)
     end
 
-    test "assigning and fetching otp data to and from session's private storage", %{user_with_2fa: user_with_2fa} do
+    test "assigning and fetching otp data to and from session's private storage", %{
+      user_with_2fa: user_with_2fa
+    } do
       {token, _one_time_pass} = Auth.generate_one_time_pass(user_with_2fa)
       user_id = user_with_2fa.id
 
@@ -92,7 +94,8 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
         conn
         |> Auth.assign_otp_data_to_session(token, user_id)
 
-      assert %{"otp_token" => token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(updated_conn)
+      assert %{"otp_token" => token, "user_id" => user_id} =
+               Auth.fetch_otp_data_from_session(updated_conn)
     end
 
     test "invalidating one time password", %{user_with_2fa: user_with_2fa} do
@@ -107,13 +110,16 @@ defmodule OceanconnectWeb.Plugs.AuthTest do
         conn
         |> Auth.assign_otp_data_to_session(token, user_id)
 
-      assert %{"otp_token" => token, "user_id" => user_id} = Auth.fetch_otp_data_from_session(updated_conn)
+      assert %{"otp_token" => token, "user_id" => user_id} =
+               Auth.fetch_otp_data_from_session(updated_conn)
 
       invalid_conn =
         updated_conn
         |> Auth.invalidate_otp(user_id)
 
-      %{"otp_token" => invalid_token, "user_id" => _user_id} = Auth.fetch_otp_data_from_session(invalid_conn)
+      %{"otp_token" => invalid_token, "user_id" => _user_id} =
+        Auth.fetch_otp_data_from_session(invalid_conn)
+
       refute Auth.valid_otp?(invalid_token, one_time_pass)
     end
   end

@@ -6,7 +6,9 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
 
   def index(conn, params) do
     page = Auctions.list_fuel_index_entries(params)
-    render(conn,
+
+    render(
+      conn,
       "index.html",
       fuel_index_entries: page.entries,
       page_number: page.page_number,
@@ -33,6 +35,7 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
         |> put_flash(:info, "Fuel index created successfully.")
         |> put_status(302)
         |> redirect(to: admin_fuel_index_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset, fuels: fuels, ports: ports)
     end
@@ -43,7 +46,13 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
     ports = Auctions.list_active_ports()
     fuel_index = Auctions.get_fuel_index!(id)
     changeset = Auctions.change_fuel_index(fuel_index)
-    render(conn, "edit.html", fuel_index: fuel_index, changeset: changeset, fuels: fuels, ports: ports)
+
+    render(conn, "edit.html",
+      fuel_index: fuel_index,
+      changeset: changeset,
+      fuels: fuels,
+      ports: ports
+    )
   end
 
   def update(conn, %{"id" => id, "fuel_index" => fuel_index_params}) do
@@ -56,8 +65,14 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
         conn
         |> put_flash(:info, "Fuel index updated successfully.")
         |> redirect(to: admin_fuel_index_path(conn, :index))
+
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", fuel_index: fuel_index, changeset: changeset, fuels: fuels, ports: ports)
+        render(conn, "edit.html",
+          fuel_index: fuel_index,
+          changeset: changeset,
+          fuels: fuels,
+          ports: ports
+        )
     end
   end
 

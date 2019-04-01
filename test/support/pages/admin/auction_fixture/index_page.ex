@@ -6,7 +6,6 @@ defmodule Oceanconnect.Admin.Fixture.IndexPage do
     navigate_to("#{@page_path}/#{auction_id}/fixtures")
   end
 
-
   def is_current_path?(auction_id) do
     current_path() == "#{@page_path}/#{auction_id}/fixtures"
   end

@@ -36,8 +36,8 @@ defmodule Oceanconnect.Notifications.Email do
       end
 
       defp buyer_company_for_email(_is_traded_bid = true, %Company{
-      broker_entity_id: broker_id
-    }) do
+             broker_entity_id: broker_id
+           }) do
         Accounts.get_company!(broker_id)
       end
 
@@ -45,21 +45,21 @@ defmodule Oceanconnect.Notifications.Email do
         do: buyer_company
 
       defp supplier_company_for_email(
-        _is_traded_bid = true,
-        %Company{
-          broker_entity_id: broker_id
-        },
-        _supplier_company
-      ) do
+             _is_traded_bid = true,
+             %Company{
+               broker_entity_id: broker_id
+             },
+             _supplier_company
+           ) do
         Accounts.get_company!(broker_id)
       end
 
       defp supplier_company_for_email(
-        _is_traded_bid = false,
-        _buyer_company,
-        supplier_company = %Company{}
-      ),
-        do: supplier_company
+             _is_traded_bid = false,
+             _buyer_company,
+             supplier_company = %Company{}
+           ),
+           do: supplier_company
     end
   end
 end

@@ -57,7 +57,10 @@ defmodule Oceanconnect.Admin.User.EditTest do
       EditPage.visit(user.id)
       assert EditPage.is_current_path?(user.id)
       EditPage.send_password_reset_email()
-      assert EditPage.has_content?("An email has been sent to the user with instructions to reset their password")
+
+      assert EditPage.has_content?(
+               "An email has been sent to the user with instructions to reset their password"
+             )
     end
   end
 end

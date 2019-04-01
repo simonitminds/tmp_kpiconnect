@@ -28,7 +28,7 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
     fuel_index = auction.fuel_index
 
     bid_params = %{
-      amount: -1.25,
+      amount: -1.25
       # comment: "Screw you!"
     }
 
@@ -104,13 +104,16 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       bid_list_expectations =
         Enum.map(stored_bid_list, fn bid ->
           is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
+
           amount =
             cond do
               bid.amount > 0 ->
                 "+$#{bid.amount}"
+
               bid.amount < 0 ->
                 "-$#{bid.amount * -1}"
             end
+
           %{
             "id" => bid.id,
             "data" => %{
@@ -167,7 +170,10 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       assert AuctionShowPage.winning_solution_has_bids?([bid])
     end
 
-    test "buyer can see supplier's comments on ranked offers", %{auction: auction, supplier: supplier} do
+    test "buyer can see supplier's comments on ranked offers", %{
+      auction: auction,
+      supplier: supplier
+    } do
       in_browser_session(:supplier, fn ->
         login_user(supplier)
         AuctionShowPage.visit(auction.id)
@@ -181,6 +187,7 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
 
         assert AuctionShowPage.has_content?("Hi")
       end)
+
       AuctionShowPage.visit(auction.id)
       :timer.sleep(100)
       Hound.Helpers.Screenshot.take_screenshot()
@@ -222,9 +229,11 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
             cond do
               bid.amount > 0 ->
                 "+$#{bid.amount}"
+
               bid.amount < 0 ->
                 "-$#{bid.amount * -1}"
             end
+
           %{"id" => bid.id, "data" => %{"amount" => amount}}
         end)
 
@@ -259,13 +268,16 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       bid_list_card_expectations =
         Enum.map(stored_bid_list, fn bid ->
           is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
+
           amount =
             cond do
               bid.amount > 0 ->
                 "+$#{bid.amount}"
+
               bid.amount < 0 ->
                 "-$#{bid.amount * -1}"
             end
+
           %{
             "id" => bid.id,
             "data" => %{"amount" => amount, "is_traded_bid" => is_traded_bid}
@@ -346,7 +358,8 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       AuctionShowPage.submit_bid()
       :timer.sleep(100)
 
-      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+      assert AuctionShowPage.auction_bid_status() =~
+               "You have the best overall offer for this auction"
 
       AuctionShowPage.enter_comment("You have to buy this!")
       AuctionShowPage.submit_comment()
@@ -359,7 +372,8 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       AuctionShowPage.submit_bid()
       :timer.sleep(100)
 
-      assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer for this auction"
+      assert AuctionShowPage.auction_bid_status() =~
+               "You have the best overall offer for this auction"
 
       AuctionShowPage.enter_comment("You have to buy this!")
       AuctionShowPage.submit_comment()
@@ -371,7 +385,6 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       refute AuctionShowPage.has_content?("You have to buy this!")
     end
   end
-
 
   describe "barges" do
     test "supplier cannot submit a barge for approval once an auction has expired", %{
@@ -500,4 +513,3 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
     end
   end
 end
-

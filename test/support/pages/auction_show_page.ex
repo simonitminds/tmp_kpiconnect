@@ -130,10 +130,9 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def force_submit_bid!() do
-    #TODO FIGURE OUT HOW TO SET WINDOW SIZE IN SECOND BROWSER SESSION
+    # TODO FIGURE OUT HOW TO SET WINDOW SIZE IN SECOND BROWSER SESSION
     execute_script("document.getElementsByClassName(`qa-auction-bid-submit`)[0].click()")
   end
-
 
   def revoke_bid_for_product(product_id) do
     execute_script(
@@ -410,7 +409,9 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def delete_comment(index) when is_integer(index) do
-    execute_script("document.getElementsByClassName('qa-auction-solution-comment-delete')[#{index}].click()")
+    execute_script(
+      "document.getElementsByClassName('qa-auction-solution-comment-delete')[#{index}].click()"
+    )
   end
 
   def solution_has_comment?(index, comment) do
@@ -426,7 +427,8 @@ defmodule Oceanconnect.AuctionShowPage do
     text =~ comment
   end
 
-  defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers}) when is_auction(struct) do
+  defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers})
+       when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name
   end
 

@@ -28,6 +28,7 @@ alias Oceanconnect.Auctions.{
   Command,
   Barge,
   Fuel,
+  FuelIndex,
   Port,
   Vessel
 }
@@ -595,6 +596,11 @@ date_time =
   |> NaiveDateTime.add(5 * 60)
   |> DateTime.from_naive!("Etc/UTC")
 
+fuel_index =
+  %{code: "PUAFT00", name: "Platts Oilgram Bunkerwire", port_id: port1.id, fuel_id: fuel1.id}
+
+Repo.get_or_insert!(FuelIndex, fuel_index)
+
 auctions_params = [
   %Auction{
     auction_vessel_fuels: [
@@ -649,7 +655,8 @@ auctions_params = [
     scheduled_start: date_time,
     po: "214215",
     buyer_id: qatargas.id,
-    duration: 10 * 60_000,
+    duration: 4 * 60_000,
+    decision_duration: 4 * 60_000,
     is_traded_bid_allowed: true,
     start_date: date_time,
     end_date: date_time

@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     AuctionPayload,
     AuctionStore,
@@ -40,16 +41,16 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     }
 
     valid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.+(60_000)
-        |> DateTime.from_unix!()
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> Kernel.+(60_000)
+      |> DateTime.from_unix!()
 
     invalid_start_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.-(60_000)
-        |> DateTime.from_unix!()
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> Kernel.-(60_000)
+      |> DateTime.from_unix!()
 
     {:ok,
      %{
@@ -74,7 +75,10 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     assert :draft == Auctions.get_auction_state!(auction).status
   end
 
-  test "pending status of schedulable auction", %{draft_auction_attrs: draft_auction_attrs, valid_start_time: valid_start_time} do
+  test "pending status of schedulable auction", %{
+    draft_auction_attrs: draft_auction_attrs,
+    valid_start_time: valid_start_time
+  } do
     pending_attrs =
       draft_auction_attrs
       |> Map.put(:scheduled_start, valid_start_time)
@@ -116,7 +120,7 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     assert Process.alive?(new_pid)
   end
 
-  test "auction status is expired after duration timeout", %{auction: auction} do
+  test "auction status goes to decision after duration timeout", %{auction: auction} do
     Auctions.start_auction(auction)
     :timer.sleep(300)
 
@@ -127,7 +131,7 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
     expected_state =
       auction
       |> TermAuctionState.from_auction()
-      |> Map.merge(%{status: :expired, auction_id: auction.id})
+      |> Map.merge(%{status: :decision, auction_id: auction.id})
 
     actual_state = AuctionStore.get_current_state(auction)
 
@@ -303,12 +307,11 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
         |> Auctions.place_bid(supplier2)
 
       :timer.sleep(200)
-      Auctions.end_auction(auction)
 
       {:ok, %{bid: bid, bid2: bid2}}
     end
 
-    test "winning solution can be selected", %{
+    test "winning solution can be selected while auction is open", %{
       auction: auction,
       bid: bid,
       fuel: fuel
@@ -318,6 +321,37 @@ defmodule Oceanconnect.Auctions.TermAuctionStoreTest do
       bid_id = bid.id
 
       auction_state = Auctions.get_auction_state!(auction)
+
+      Auctions.select_winning_solution(
+        [bid],
+        auction_state.product_bids,
+        auction,
+        "you win",
+        "Agent 9"
+      )
+
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      assert %Solution{
+               auction_id: ^auction_id,
+               bids: [
+                 %{id: ^bid_id, amount: 1.25, vessel_fuel_id: ^fuel_id}
+               ],
+               comment: "you win"
+             } = auction_payload.solutions.winning_solution
+    end
+
+    test "winning solution can be selected while auction is in decision", %{
+      auction: auction,
+      bid: bid,
+      fuel: fuel
+    } do
+      auction_id = auction.id
+      fuel_id = "#{fuel.id}"
+      bid_id = bid.id
+      auction_state = Auctions.get_auction_state!(auction)
+
+      Auctions.end_auction(auction)
 
       Auctions.select_winning_solution(
         [bid],

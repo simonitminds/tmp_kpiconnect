@@ -4,6 +4,7 @@ defmodule OceanconnectWeb.AuctionController do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.{Auctions, Messages}
+
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
@@ -11,6 +12,7 @@ defmodule OceanconnectWeb.AuctionController do
     AuctionPayload,
     Payloads
   }
+
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -79,10 +81,12 @@ defmodule OceanconnectWeb.AuctionController do
   def new(conn, _params) do
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
-    changeset = Auctions.change_auction(%Auction{})
-    |> Map.put(:errors, %{})
-    [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 
+    changeset =
+      Auctions.change_auction(%Auction{})
+      |> Map.put(:errors, %{})
+
+    [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 
     render(
       conn,
@@ -147,7 +151,8 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    with auction = %struct{} when is_auction(struct) <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <-
+           id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == Auth.current_user(conn).company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       changeset = Auctions.change_auction(auction)
@@ -181,7 +186,8 @@ defmodule OceanconnectWeb.AuctionController do
     user = Auth.current_user(conn)
     credit_margin_amount = user.company.credit_margin_amount
 
-    with auction = %struct{} when is_auction(struct) <- id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <-
+           id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       updated_params =
@@ -218,7 +224,8 @@ defmodule OceanconnectWeb.AuctionController do
     end
   end
 
-  defp normalize_auction_params(params = %{"type" => type}) when type in ["forward_fixed", "formula_related"] do
+  defp normalize_auction_params(params = %{"type" => type})
+       when type in ["forward_fixed", "formula_related"] do
     params
     |> TermAuction.from_params()
   end
@@ -235,9 +242,11 @@ defmodule OceanconnectWeb.AuctionController do
     buyer = Auth.current_user(conn)
     buyer_company = buyer.company
     fuels = Auctions.list_fuels()
+
     fuel_indexes =
       Auctions.list_fuel_index_entries()
       |> Auctions.fully_loaded_index()
+
     ports = Auctions.ports_for_company(buyer_company)
     vessels = Auctions.vessels_for_buyer(buyer_company)
 

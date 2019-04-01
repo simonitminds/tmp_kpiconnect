@@ -8,7 +8,7 @@ defmodule Oceanconnect.Auctions.AuctionSupervisor do
     AuctionEventHandler,
     AuctionScheduler,
     AuctionStore,
-    AuctionTimer,
+    AuctionTimer
   }
 
   @registry_name :auction_supervisor_registry

@@ -111,7 +111,8 @@ defmodule OceanconnectWeb.Api.BidController do
     end
   end
 
-  defp validate_traded_bids(is_traded_bid, %struct{is_traded_bid_allowed: is_traded_bid_allowed}) when is_auction(struct) do
+  defp validate_traded_bids(is_traded_bid, %struct{is_traded_bid_allowed: is_traded_bid_allowed})
+       when is_auction(struct) do
     case (is_traded_bid && is_traded_bid_allowed) || !is_traded_bid do
       true -> :ok
       false -> {:invalid_traded_bid, "Auction not accepting traded bids"}

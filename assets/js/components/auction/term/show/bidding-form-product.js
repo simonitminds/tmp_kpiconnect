@@ -56,7 +56,7 @@ class BiddingFormProduct extends React.Component {
 
     const auctionType = _.get(auctionPayload.auction, 'type');
 
-    const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price', 0.00);
+    const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price');
 
     const lowestBid = _.get(auctionPayload, `product_bids['${fuelId}'].lowest_bids[0]`)
 
@@ -68,7 +68,7 @@ class BiddingFormProduct extends React.Component {
           <div className="column is-one-quarter-desktop">
             <strong>{name}</strong><br/>
             <span className="has-text-gray-3">&times; {fuelQuantity} MT </span><br/>
-            { currentIndexPrice &&
+            { auctionType == "formula_related" && currentIndexPrice != 0.00 &&
               <div className="control control--flex-limit has-margin-top-sm">
                 <BidTag bid={currentIndexPrice} indexPrice="true" title="Latest Index Price" />
               </div>
@@ -82,7 +82,7 @@ class BiddingFormProduct extends React.Component {
               <div className="column">
                 <div className="field">
                   <label className="label" htmlFor="bid">Bid Amount</label>
-                  <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice ? 'has-input-add-right' : ''}`}>
+                  <div className={`control auction-bidding__input has-icons-left ${auctionType == "formula_related" && currentIndexPrice != 0.00 ? 'has-input-add-right' : ''}`}>
                     <span className="icon is-small is-left"><FontAwesomeIcon icon="dollar-sign" /></span>
                     <input
                       type="number"
@@ -103,7 +103,7 @@ class BiddingFormProduct extends React.Component {
               <div className="column">
                 <div className="field">
                   <label className="label" htmlFor="bid">Minimum Bid {auctionPayload.type}</label>
-                  <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice ? 'has-input-add-right' : ''}`}>
+                  <div className={`control auction-bidding__input has-icons-left ${currentIndexPrice != 0.00 ? 'has-input-add-right' : ''}`}>
                     <input
                       type="number"
                       step="0.25"

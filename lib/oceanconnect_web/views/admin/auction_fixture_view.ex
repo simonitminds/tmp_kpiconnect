@@ -7,7 +7,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureView do
     "auction - #{auction.id}"
   end
 
- def supplier_name(%AuctionFixture{supplier: %Company{name: supplier_name}}) do
+  def supplier_name(%AuctionFixture{supplier: %Company{name: supplier_name}}) do
     supplier_name
   end
 

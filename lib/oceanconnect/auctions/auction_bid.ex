@@ -28,7 +28,8 @@ defmodule Oceanconnect.Auctions.AuctionBid do
           "time_entered" => time_entered
         },
         auction = %struct{}
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     %__MODULE__{
       id: UUID.uuid4(:hex),
       auction_id: auction.id,

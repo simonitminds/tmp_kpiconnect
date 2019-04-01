@@ -26,16 +26,21 @@ defmodule OceanconnectWeb.Api.AuctionCommentsControllerTest do
 
     authed_conn = OceanconnectWeb.Plugs.Auth.api_login(build_conn(), supplier)
 
-    {:ok,
-     conn: authed_conn, auction: auction, supplier: supplier}
+    {:ok, conn: authed_conn, auction: auction, supplier: supplier}
   end
 
   describe "submit" do
     test "supplier can submit a comment", %{auction: auction, conn: conn} do
       response =
-        post(conn, "/api/auctions/#{auction.id}/comments", %{auction_id: auction.id, comment: "Hi"})
+        post(conn, "/api/auctions/#{auction.id}/comments", %{
+          auction_id: auction.id,
+          comment: "Hi"
+        })
 
-      assert json_response(response, 200) == %{"success" => true, "message" => "Comment created successfully"}
+      assert json_response(response, 200) == %{
+               "success" => true,
+               "message" => "Comment created successfully"
+             }
     end
 
     test "supplier can delete a comment", %{auction: auction, conn: conn, supplier: supplier} do
@@ -43,13 +48,19 @@ defmodule OceanconnectWeb.Api.AuctionCommentsControllerTest do
         id: UUID.uuid4(:hex),
         auction_id: auction.id,
         supplier_id: supplier.id,
-        comment: "Hi",
+        comment: "Hi"
       }
 
       response =
-        delete(conn, "/api/auctions/#{auction.id}/comments/#{comment.id}", %{auction_id: auction.id, comment_id: comment.id })
+        delete(conn, "/api/auctions/#{auction.id}/comments/#{comment.id}", %{
+          auction_id: auction.id,
+          comment_id: comment.id
+        })
 
-      assert json_response(response, 200) == %{"success" => true, "message" => "Comment deleted successfully"}
+      assert json_response(response, 200) == %{
+               "success" => true,
+               "message" => "Comment deleted successfully"
+             }
     end
   end
 end

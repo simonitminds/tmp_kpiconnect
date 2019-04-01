@@ -86,7 +86,7 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
       </div>
     );
-  } else if (isBestOverallSolution) {
+  } else if (isBestOverallSolution && bestOverallSolution) {
     return (
       <div className="auction-notification is-success">
         <div className="auction-notification__show-message">

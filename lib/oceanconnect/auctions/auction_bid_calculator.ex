@@ -7,11 +7,13 @@ defmodule Oceanconnect.Auctions.AuctionBidCalculator do
     AuctionStore.ProductBidState
   }
 
-  def process_all(auction_state = %state_struct{}, :pending) when is_auction_state(state_struct) do
+  def process_all(auction_state = %state_struct{}, :pending)
+      when is_auction_state(state_struct) do
     {auction_state, []}
   end
 
-  def process_all(auction_state = %state_struct{product_bids: product_bids}, status) when is_auction_state(state_struct) do
+  def process_all(auction_state = %state_struct{product_bids: product_bids}, status)
+      when is_auction_state(state_struct) do
     {new_auction_state, events} =
       product_bids
       |> Enum.reduce({auction_state, []}, fn {product_key, product_bid_state},

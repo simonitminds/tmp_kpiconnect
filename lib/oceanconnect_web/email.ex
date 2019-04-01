@@ -133,7 +133,8 @@ defmodule OceanconnectWeb.Email do
         approved_barges,
         auction = %struct{},
         active_participants
-      ) when is_auction(struct) do
+      )
+      when is_auction(struct) do
     auction = Auctions.fully_loaded(auction)
 
     %{
@@ -157,6 +158,7 @@ defmodule OceanconnectWeb.Email do
     bids_by_vessel =
       Enum.reduce(bids, %{}, fn bid, acc ->
         vessel_fuel = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+
         if vessel_fuel do
           case acc[vessel_fuel.vessel] do
             nil ->
@@ -212,8 +214,7 @@ defmodule OceanconnectWeb.Email do
               vessel: vessel,
               buyer_company: buyer_company_for_email(is_traded_bid, buyer_company),
               deliverables: deliverables,
-              approved_barges:
-                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
               is_buyer: false
             )
           end)
@@ -233,8 +234,7 @@ defmodule OceanconnectWeb.Email do
               vessel: vessel,
               buyer_company: buyer_company,
               deliverables: deliverables,
-              approved_barges:
-                approved_barges_for_supplier(approved_barges, supplier_company.id),
+              approved_barges: approved_barges_for_supplier(approved_barges, supplier_company.id),
               is_buyer: true
             )
           end)

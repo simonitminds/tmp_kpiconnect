@@ -20,6 +20,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auctionStatus = _.get(auctionPayload, 'status');
   const bestSolution = _.get(auctionPayload, 'solutions.best_overall');
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
+  const otherSolutions = _.get(auctionPayload, 'solutions.other_solutions');
 
   const confirmCancellation = (e) => { event.preventDefault();
                                        return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
@@ -59,9 +60,18 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
     }, {})
     .value();
 
-  const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
+  // const solution = auctionStatus == 'closed' ? winningSolution : bestSolution;
+  const solution = () => {
+    if (auctionStatus === 'closed') {
+      return winningSolution;
+    } else if (!!bestSolution) {
+      return bestSolution;
+    } else {
+      return otherSolutions[0];
+    }
+  }
 
-  const solutionBidsByFuel =  _.chain(solution)
+  const solutionBidsByFuel =  _.chain(solution())
     .get('bids', [])
     .groupBy((bid) => fuelForVesselFuels[bid.vessel_fuel_id])
     .mapValues((bids) => _.chain(bids).filter().minBy('amount').value())

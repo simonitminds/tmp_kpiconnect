@@ -6,8 +6,7 @@ defmodule OceanconnectWeb.ForgotPasswordControllerTest do
   setup do
     user = insert(:user, %{email: "FOO@EXAMPLE.COM", password: "password"})
 
-    {:ok, token, _claims} =
-      Guardian.encode_and_sign(user, %{user_id: user.id, email: true})
+    {:ok, token, _claims} = Guardian.encode_and_sign(user, %{user_id: user.id, email: true})
 
     {:ok, %{user: user, conn: build_conn(), token: token}}
   end
@@ -34,12 +33,24 @@ defmodule OceanconnectWeb.ForgotPasswordControllerTest do
   end
 
   test "submitting a new password with valid credentials", %{conn: conn, token: token} do
-    response = post(conn, "/reset_password", %{password: "password", password_confirmation: "password", token: token})
+    response =
+      post(conn, "/reset_password", %{
+        password: "password",
+        password_confirmation: "password",
+        token: token
+      })
+
     assert html_response(response, 302) =~ "/sessions/new"
   end
 
   test "submitting a new password with invalid credentials", %{conn: conn, token: token} do
-    response = post(conn, "/reset_password", %{password: "password", password_confirmation: "notpassword", token: token})
+    response =
+      post(conn, "/reset_password", %{
+        password: "password",
+        password_confirmation: "notpassword",
+        token: token
+      })
+
     assert html_response(response, 401) =~ "Passwords do not match"
   end
 end

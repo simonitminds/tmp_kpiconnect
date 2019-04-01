@@ -6,8 +6,9 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
   def index(conn, %{"auction_id" => auction_id}) do
     auction = Auctions.get_auction!(auction_id)
     status = Auctions.get_auction_status!(auction)
+
     if status in [:closed, :expired] do
-       auction_fixtures = Auctions.fixtures_for_auction(auction)
+      auction_fixtures = Auctions.fixtures_for_auction(auction)
       render(conn, "index.html", %{fixtures: auction_fixtures, auction: auction})
     else
       redirect(conn, to: auction_path(conn, :index))
@@ -44,6 +45,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     %Auction{port: port, buyer_id: buyer_id, vessels: vessels} = auction
 
     status = Auctions.get_auction_status!(auction)
+
     unless status in [:closed, :expired] do
       redirect(conn, to: auction_path(conn, :index))
     end
@@ -78,8 +80,8 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     fuels = Auctions.list_all_fuels()
 
     changeset = Auctions.change_fixture(fixture)
-    if status in [:closed, :expired] do
 
+    if status in [:closed, :expired] do
       render(conn, "edit.html", %{
         auction: auction,
         fixture: fixture,
@@ -102,12 +104,15 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     %Auction{port: port, buyer_id: buyer_id, vessels: vessels} = auction
 
     status = Auctions.get_auction_status!(auction)
+
     unless status in [:closed, :expired] do
       redirect(conn, to: auction_path(conn, :index))
     end
+
     fixture = Auctions.get_fixture!(fixture_id)
     suppliers = Auctions.supplier_list_for_port(port, buyer_id)
     fuels = Auctions.list_all_fuels()
+
     case Auctions.update_fixture(fixture, fixture_params) do
       {:ok, _fixture} ->
         conn

@@ -11,6 +11,9 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
   const vesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
 
   const suppliersBestSolution = _.get(auctionPayload, 'solutions.suppliers_best_solution');
+  const suppliersBestSolutionBids = _.get(suppliersBestSolution, 'bids', []);
+  const isPartialSolution = suppliersBestSolutionBids.length < vesselFuels.length ? true : false;
+  const noSolutionBids = suppliersBestSolutionBids.length == 0;
   const bestSingleSolution = _.get(auctionPayload, 'solutions.best_single_supplier');
 
   const bestSingleSolutionBids = _.get(bestSingleSolution, 'bids');
@@ -56,6 +59,19 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
       return `${products.length} of ${vesselFuels.length} deliverables`;
     } else {
       return "no deliverables";
+    }
+  }
+
+  const nextBestSolution =_.get(auctionPayload, 'solutions.next_best_solution');
+  const otherSolution = () => {
+    if (nextBestSolution && suppliersBestSolution) {
+      return nextBestSolution.normalized_price < suppliersBestSolution.normalized_price ? nextBestSolution : suppliersBestSolution;
+    } else if (nextBestSolution) {
+      return nextBestSolution;
+    } else if (suppliersBestSolution) {
+      return suppliersBestSolution;
+    } else {
+      return null;
     }
   }
 
@@ -147,6 +163,39 @@ const SupplierBidStatus = ({auctionPayload, connection, supplierId}) => {
         </div>
         <div className="auction-notification__card-message">
           {messageDisplay("You have not bid yet")}
+        </div>
+      </div>
+    );
+  } else if (auctionStatus == "decision" && noSolutionBids) {
+    return (
+      <div className="auction-notification is-warning">
+        <div className="auction-notification__show-message">
+          {messageDisplay("You have no bids for this auction")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("You have no bids")}
+        </div>
+      </div>
+    );
+  } else if (isPartialSolution && !_.isEqual(otherSolution(), suppliersBestSolution)) {
+    return (
+      <div className="auction-notification is-danger">
+        <div className="auction-notification__show-message">
+          {messageDisplay("Your bid is not the best partial offer for this auction")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("Your bid is not the best partial offer")}
+        </div>
+      </div>
+    );
+  } else if (isPartialSolution && !noSolutionBids) {
+    return (
+      <div className="auction-notification is-warning">
+        <div className="auction-notification__show-message">
+          {messageDisplay("You only have a partial offer for this auction")}
+        </div>
+        <div className="auction-notification__card-message">
+          {messageDisplay("You only have a partial offer")}
         </div>
       </div>
     );

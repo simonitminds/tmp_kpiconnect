@@ -257,7 +257,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
     {:noreply, state}
   end
 
-
   # Private
 
   defp get_event_handler_name(auction_id) do

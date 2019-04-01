@@ -3,6 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   alias __MODULE__
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
@@ -24,7 +25,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             submitted_barges: [],
             submitted_comments: []
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{})
+      when is_auction(struct) and is_auction_state(state_struct) do
     get_auction_payload!(auction, buyer_id, state)
   end
 
@@ -32,7 +34,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     get_auction_payload!(auction, buyer_id)
   end
 
-  def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct) do
+  def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id)
+      when is_auction(struct) do
     auction_state = Auctions.get_auction_state!(auction)
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
@@ -46,11 +49,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         auction = %struct{buyer_id: buyer_id},
         buyer_id,
         auction_state = %state_struct{}
-      ) when is_auction(struct) and is_auction_state(state_struct) do
+      )
+      when is_auction(struct) and is_auction_state(state_struct) do
     get_buyer_auction_payload(auction, buyer_id, auction_state)
   end
 
-  def get_auction_payload!(auction = %struct{}, supplier_id, auction_state = %state_struct{}) when is_auction(struct) and is_auction_state(state_struct) do
+  def get_auction_payload!(auction = %struct{}, supplier_id, auction_state = %state_struct{})
+      when is_auction(struct) and is_auction_state(state_struct) do
     get_supplier_auction_payload(auction, supplier_id, auction_state)
   end
 
@@ -62,7 +67,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           status: status,
           submitted_comments: submitted_comments
         }
-      ) when is_auction(struct) and is_auction_state(state_struct) do
+      )
+      when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -99,7 +105,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           status: status,
           submitted_comments: submitted_comments
         }
-      ) when is_auction(struct) and is_auction_state(state_struct) do
+      )
+      when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -126,7 +133,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction) when is_auction_state(state_struct) do
+  defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction)
+       when is_auction_state(state_struct) do
     Enum.map(product_bids, fn {_vessel_fuel_id, product_state} ->
       Enum.filter(product_state.bids, fn bid -> bid.supplier_id == supplier_id end)
     end)
@@ -135,7 +143,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Enum.reverse()
     |> Enum.map(&scrub_bid_for_supplier(&1, supplier_id, auction))
   end
-
 
   defp get_supplier_participation(auction_suppliers, supplier_id) do
     with %AuctionSuppliers{participation: participation} <-
@@ -148,24 +155,30 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   defp get_participations(%struct{anonymous_bidding: true}) when is_auction(struct), do: %{}
 
-  defp get_participations(%struct{auction_suppliers: auction_suppliers}) when is_auction(struct) do
+  defp get_participations(%struct{auction_suppliers: auction_suppliers})
+       when is_auction(struct) do
     auction_suppliers
     |> Enum.reduce(%{}, fn auction_supplier, acc ->
       Map.put(acc, auction_supplier.supplier_id, auction_supplier.participation)
     end)
   end
 
-  defp get_time_remaining(auction = %struct{}, %state_struct{status: :open}) when is_auction(struct) and is_auction_state(state_struct) do
+  defp get_time_remaining(auction = %struct{}, %state_struct{status: :open})
+       when is_auction(struct) and is_auction_state(state_struct) do
     AuctionTimer.read_timer(auction.id, :duration)
   end
 
-  defp get_time_remaining(auction = %struct{}, %state_struct{status: :decision}) when is_auction(struct) and is_auction_state(state_struct) do
+  defp get_time_remaining(auction = %struct{}, %state_struct{status: :decision})
+       when is_auction(struct) and is_auction_state(state_struct) do
     AuctionTimer.read_timer(auction.id, :decision_duration)
   end
 
-  defp get_time_remaining(_auction = %struct{}, %state_struct{}) when is_auction(struct) and is_auction_state(state_struct), do: 0
+  defp get_time_remaining(_auction = %struct{}, %state_struct{})
+       when is_auction(struct) and is_auction_state(state_struct),
+       do: 0
 
-  defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct), do: auction
+  defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct),
+    do: auction
 
   defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
     Map.delete(auction, :suppliers)
@@ -177,13 +190,15 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
          bid = %AuctionBid{supplier_id: supplier_id},
          supplier_id,
          auction = %struct{}
-       ) when is_auction(struct) do
-    %{bid | min_amount: bid.min_amount, comment: bid.comment }
+       )
+       when is_auction(struct) do
+    %{bid | min_amount: bid.min_amount, comment: bid.comment}
     |> Map.put(:product, product_for_bid(bid, auction))
     |> Map.from_struct()
   end
 
-  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, auction = %struct{}) when is_auction(struct) do
+  defp scrub_bid_for_supplier(bid = %AuctionBid{}, _supplier_id, auction = %struct{})
+       when is_auction(struct) do
     %{bid | min_amount: nil, comment: nil, is_traded_bid: false}
     |> Map.from_struct()
     |> Map.put(:product, product_for_bid(bid, auction))
@@ -192,7 +207,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
 
-  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{}) when is_auction(struct) do
+  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{})
+       when is_auction(struct) do
     supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
 
     %{bid | supplier_id: nil, min_amount: nil}

@@ -37,7 +37,7 @@ const SupplierBody = (props) => {
   } else if (status == 'decision') {
     return (
       <div>
-        <SupplierBestSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
+        <SupplierBestSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} revokeBid={revokeSupplierBid} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId}  />
       </div>
     );

@@ -22,7 +22,8 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
 
   alias __MODULE__
 
-  def auction_state_snapshotted(new_state = %auction_state{auction_id: auction_id}) when is_auction_state(auction_state) do
+  def auction_state_snapshotted(new_state = %auction_state{auction_id: auction_id})
+      when is_auction_state(auction_state) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :auction_state_snapshotted,
@@ -128,7 +129,12 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
-  def auction_canceled(auction = %struct{id: auction_id}, canceled_at, new_state = %state_struct{}, user)
+  def auction_canceled(
+        auction = %struct{id: auction_id},
+        canceled_at,
+        new_state = %state_struct{},
+        user
+      )
       when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
@@ -254,10 +260,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def comment_submitted(
-    comment = %AuctionComment{auction_id: auction_id},
-    state = %state_struct{},
-    user
-  ) when is_auction_state(state_struct) do
+        comment = %AuctionComment{auction_id: auction_id},
+        state = %state_struct{},
+        user
+      )
+      when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :comment_submitted,
       auction_id: auction_id,
@@ -268,10 +275,11 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
   end
 
   def comment_unsubmitted(
-    comment = %AuctionComment{auction_id: auction_id},
-    state = %state_struct{},
-    user
-  ) when is_auction_state(state_struct) do
+        comment = %AuctionComment{auction_id: auction_id},
+        state = %state_struct{},
+        user
+      )
+      when is_auction_state(state_struct) do
     %AuctionEvent{
       type: :comment_unsubmitted,
       auction_id: auction_id,

@@ -58,4 +58,3 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexPage do
     |> search_within_element(:css, ".qa-admin-fuel_index-activate")
   end
 end
-

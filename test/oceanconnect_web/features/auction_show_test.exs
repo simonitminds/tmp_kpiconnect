@@ -355,6 +355,7 @@ defmodule Oceanconnect.AuctionShowTest do
                "You have the best overall offer for this auction"
 
       AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
+      :timer.sleep(500)
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       :timer.sleep(500)
       assert AuctionShowPage.auction_bid_status() =~ "You have not bid on this auction"
@@ -392,6 +393,7 @@ defmodule Oceanconnect.AuctionShowTest do
       supplier1_bid1 =
         create_bid(1.25, nil, supplier.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
+
       supplier1_bid2 =
         create_bid(1.25, nil, supplier.company_id, vessel_fuel2, auction)
         |> Auctions.place_bid()
@@ -399,17 +401,22 @@ defmodule Oceanconnect.AuctionShowTest do
       supplier2_bid1 =
         create_bid(1.50, nil, supplier2.company_id, vessel_fuel1, auction)
         |> Auctions.place_bid()
+
       supplier2_bid2 =
         create_bid(1.50, nil, supplier2.company_id, vessel_fuel2, auction)
         |> Auctions.place_bid()
 
       Auctions.end_auction(auction)
-      {:ok, %{
-        supplier1_bid1: supplier1_bid1,
-        supplier1_bid2: supplier1_bid2,
-        supplier2_bid1: supplier2_bid1,
-        supplier2_bid2: supplier2_bid2
-      }}
+
+      {:ok,
+       %{
+         supplier1_bid1: supplier1_bid1,
+         supplier1_bid2: supplier1_bid2,
+         supplier2_bid1: supplier2_bid1,
+         supplier2_bid2: supplier2_bid2,
+         vessel_fuel1: vessel_fuel1,
+         vessel_fuel2: vessel_fuel2
+       }}
     end
 
     test "supplier view of decision period", %{auction: auction, supplier: supplier} do
@@ -419,7 +426,32 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
     end
 
-    test "buyer view of decision period", %{auction: auction, supplier1_bid1: supplier1_bid1, supplier2_bid1: supplier2_bid1, buyer: buyer} do
+    test "supplier can revoke their bid for a product during decision period", %{
+      auction: auction,
+      supplier: supplier,
+      vessel_fuel1: vessel_fuel1,
+      vessel_fuel2: vessel_fuel2
+    } do
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.auction_status() == "DECISION"
+      assert AuctionShowPage.auction_bid_status() =~
+               "You have the best overall offer"
+
+      AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
+      :timer.sleep(500)
+      AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
+      :timer.sleep(500)
+      Hound.Helpers.Screenshot.take_screenshot()
+      assert AuctionShowPage.auction_bid_status() =~ "You have no bids for this auction"
+    end
+
+    test "buyer view of decision period", %{
+      auction: auction,
+      supplier1_bid1: supplier1_bid1,
+      supplier2_bid1: supplier2_bid1,
+      buyer: buyer
+    } do
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.solution_has_bids?(:best_overall, [supplier1_bid1])
@@ -518,7 +550,6 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.accept_bid()
       :timer.sleep(500)
 
-
       AuctionShowPage.visit(auction.id)
 
       assert AuctionShowPage.port_agent() == "Test Agent"
@@ -562,7 +593,10 @@ defmodule Oceanconnect.AuctionShowTest do
       in_browser_session(:supplier2, fn ->
         login_user(supplier2)
         AuctionShowPage.visit(auction.id)
-        assert AuctionShowPage.auction_bid_status() =~ "You won bids for #{fuel.name} in this auction"
+
+        assert AuctionShowPage.auction_bid_status() =~
+                 "You won bids for #{fuel.name} in this auction"
+
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
 

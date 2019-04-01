@@ -1,6 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionStoreTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
+
   alias Oceanconnect.Auctions.{
     AuctionPayload,
     AuctionStore,

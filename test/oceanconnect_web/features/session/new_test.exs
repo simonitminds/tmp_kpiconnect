@@ -27,7 +27,9 @@ defmodule OceanconnectWeb.Session.NewTest do
     assert ForgotPasswordPage.is_current_path?()
   end
 
-  test "a user with 2fa enabled logs in and is redirected to the two factor auth page", %{user_2fa: user_2fa} do
+  test "a user with 2fa enabled logs in and is redirected to the two factor auth page", %{
+    user_2fa: user_2fa
+  } do
     NewPage.visit()
     NewPage.enter_credentials(user_2fa.email, "password")
     NewPage.submit()
@@ -42,7 +44,10 @@ defmodule OceanconnectWeb.Session.NewTest do
 
     assert TwoFactorAuthPage.is_current_path?()
     TwoFactorAuthPage.resend_2fa_email()
-    assert TwoFactorAuthPage.has_content?("A new two-factor authentication code has been sent to your email")
+
+    assert TwoFactorAuthPage.has_content?(
+             "A new two-factor authentication code has been sent to your email"
+           )
   end
 
   test "a user can express interest in registering for the application", %{user: user} do
@@ -50,10 +55,22 @@ defmodule OceanconnectWeb.Session.NewTest do
     NewPage.register()
 
     assert RegistrationPage.is_current_path?()
-    RegistrationPage.enter_credentials(user.first_name, user.last_name, user.company.name, user.office_phone, user.mobile_phone, user.email)
+
+    RegistrationPage.enter_credentials(
+      user.first_name,
+      user.last_name,
+      user.company.name,
+      user.office_phone,
+      user.mobile_phone,
+      user.email
+    )
+
     RegistrationPage.submit()
 
     assert NewPage.is_current_path?()
-    assert NewPage.has_content?("Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator.")
+
+    assert NewPage.has_content?(
+             "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator."
+           )
   end
 end

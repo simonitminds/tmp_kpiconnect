@@ -17,7 +17,7 @@ const SolutionDisplay = (props) => {
   const {bids} = solution;
   const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
   const isSingleSupplier = (solutionSuppliers.length == 1);
-  const revokable = isSupplier && revokeBid;
+  const revokable = isSupplier && !!revokeBid;
 
   const bidsByFuel = _.chain(fuels)
     .reduce((acc, fuel) => {

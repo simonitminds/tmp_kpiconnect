@@ -9,13 +9,14 @@ defmodule Oceanconnect.Auctions.AuctionComment do
             time_entered: DateTime.utc_now()
 
   def from_params_to_auction_comment(
-    _params = %{
-      "comment" => comment,
-      "supplier_id" => supplier_id,
-      "time_entered" => time_entered
-    },
-    auction = %struct{}
-  ) when is_auction(struct) do
+        _params = %{
+          "comment" => comment,
+          "supplier_id" => supplier_id,
+          "time_entered" => time_entered
+        },
+        auction = %struct{}
+      )
+      when is_auction(struct) do
     %__MODULE__{
       id: UUID.uuid4(:hex),
       auction_id: auction.id,

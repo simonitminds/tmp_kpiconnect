@@ -11,10 +11,15 @@ defmodule OceanconnectWeb.RegistrationController do
         |> put_flash(:error, "Please make sure to include your email address!")
         |> put_status(401)
         |> render("user_interest.html")
+
       _ ->
         OceanconnectWeb.Mailer.deliver_user_interest_email(new_user_information)
+
         conn
-        |> put_flash(:info, "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator.")
+        |> put_flash(
+          :info,
+          "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator."
+        )
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))
     end
