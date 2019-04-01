@@ -17,14 +17,14 @@
 <%= if @auction_payload.auction.type == "formula_related" do %>
   <tr>
     <th>Reference Fuel Index</th>
+    <td>
+      <span class="qa-auction-fuel_index"><%= @auction_payload.auction.fuel_index.name %></span>
+    </td>
   </tr>
-  <td>
-    <span class="qa-auction-fuel_index"><%= @auction_payload.auction.fuel_index.name %></span>
-  </td>
   <tr>
     <th>Current Index Price</th>
+    <td>
+      <span class="qa-auction-current_index_price"><%= format_price(@auction_payload.auction.current_index_price) %></span>
+    </td>
   </tr>
-  <td>
-    <span class="qa-auction-current_index_price"><%= format_price(@auction_payload.auction.current_index_price) %></span>
-  </td>
 <% end %>
