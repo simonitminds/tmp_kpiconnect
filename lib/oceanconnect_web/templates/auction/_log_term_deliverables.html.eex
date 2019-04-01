@@ -14,7 +14,7 @@
     <% end %>
   </td>
 </tr>
-<%= @auction_payload.auction.type == "formula_related" do %>
+<%= if @auction_payload.auction.type == "formula_related" do %>
   <tr>
     <th>Reference Fuel Index</th>
   </tr>

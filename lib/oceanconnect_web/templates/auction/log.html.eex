@@ -43,7 +43,7 @@
             <th>Port Agent</th>
             <td><%= @auction_payload.auction.port_agent || "—" %></td>
           </tr>
-          <%= render @template_partial_name(@auction_payload.auction, "deliverables") %>
+          <%= render template_partial_name(@auction_payload.auction, "deliverables"), Map.put(assigns, :auction_payload, @auction_payload) %>
           <tr>
             <th>Additional Information</th>
             <td><%= additional_information(@auction_payload.auction) %></td>

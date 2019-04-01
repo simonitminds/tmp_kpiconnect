@@ -399,6 +399,7 @@ defmodule OceanconnectWeb.AuctionView do
     case auction_type do
       "spot" -> "_log_#{auction_type}_#{partial_type}.html"
       _ -> "_log_term_#{partial_type}.html"
+    end
   end
 
   def auction_type(%{type: type}) do
