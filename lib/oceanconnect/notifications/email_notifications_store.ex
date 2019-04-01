@@ -22,17 +22,17 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   # Bamboo sends this message back on successful deliver from `deliver_later`.
-  def handle_info({:delivered_email, _email}, state) do
+  def handle_info({:delivered_email, email}, state) do
     {:noreply, state}
   end
 
-  def handle_info({event, event_state}, state) do
-    if needs_processed?(event) do
-      process(event, event_state)
-    end
+  # def handle_info({event, event_state}, state) do
+  #   if needs_processed?(event) do
+  #     process(event, event_state)
+  #   end
 
-    {:noreply, state}
-  end
+  #   {:noreply, state}
+  # end
 
   def handle_info(msg, state) do
     Logger.warn("EmailNotificationStore received an unexpected message: #{inspect(msg)}")
