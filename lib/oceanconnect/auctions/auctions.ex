@@ -395,8 +395,11 @@ defmodule Oceanconnect.Auctions do
     else
       _ ->
         if auction_type = get_auction_type(id) do
-          Repo.get(auction_type, id)
-          |> fully_loaded
+          auction = Repo.get(auction_type, id)
+                    |> fully_loaded
+
+        IO.inspect(auction.auction_vessel_fuels |> Enum.count())
+          auction
         end
     end
   end

@@ -178,7 +178,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_add_vessel_fuels(changeset, _auction = %{}, %{
         auction_vessel_fuels: auction_vessel_fuels
-      }) do
+    }) do
     put_assoc(changeset, :auction_vessel_fuels, auction_vessel_fuels)
   end
 

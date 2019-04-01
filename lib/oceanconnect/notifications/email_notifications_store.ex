@@ -26,13 +26,13 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-  # def handle_info({event, event_state}, state) do
-  #   if needs_processed?(event) do
-  #     process(event, event_state)
-  #   end
+  def handle_info({event, event_state}, state) do
+    if needs_processed?(event) do
+      process(event, event_state)
+    end
 
-  #   {:noreply, state}
-  # end
+    {:noreply, state}
+  end
 
   def handle_info(msg, state) do
     Logger.warn("EmailNotificationStore received an unexpected message: #{inspect(msg)}")
