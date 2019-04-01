@@ -24,7 +24,7 @@
           </tr>
           <tr>
             <th>Auction Completed</th>
-            <td class="qa-auction-detail-auction_ended"><%= convert_date?(@auction_payload.auction.auction_ended) %></td>
+            <td class="qa-auction-detail-auction_ended"><%= convert_date?(@auction_payload.auction.auction_ended || @auction_payload.auction.auction_closed_time) %></td>
           </tr>
           <tr>
             <th>Scheduled Duration</th>

@@ -22,7 +22,7 @@
         <% else %>
           <span class="qa-auction-detail-winning-solution-entry-fuel"><%= @auction_payload.auction.fuel.name %></span>
           from
-          <span><%= auction_log_supplier_from_id(@auction, bid.supplier.id) %></span>
+          <span><%= auction_log_supplier_from_id(@auction_payload.auction, bid.supplier_id) %></span>
           <%= if bid_is_traded?(bid) do %>
             &nbsp;
             <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>
