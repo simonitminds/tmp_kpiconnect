@@ -55,6 +55,9 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
             {:ok, :nothing_to_schedule}
 
           send_time ->
+          IO.inspect(send_time, label: "SEND TIME ------------->")
+          IO.inspect(DateTime.utc_now(), label: "CURRENT TIME ------------------>")
+
             Command.schedule_notification(notification_name, send_time, starting_soon_emails)
             |> DelayedNotifications.process_command()
         end
@@ -129,6 +132,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   defp calculate_upcoming_reminder_send_time(auction_id) do
     %{scheduled_start: start_time} = Oceanconnect.Auctions.get_auction!(auction_id)
+    IO.inspect(start_time, label: "START TIME ----------->")
 
     if start_time do
       DateTime.to_unix(start_time, :millisecond)
