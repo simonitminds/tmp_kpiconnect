@@ -101,10 +101,28 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> validate_scheduled_start(attrs)
-    |> validate_vessel_fuels()
+    |> validate_vessel_fuels(attrs)
     |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
+    |> validate_suppliers(attrs)
   end
+
+  def validate_suppliers(changeset, attrs) do
+    cond do
+      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
+        changeset
+      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
+        changeset
+        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
+    end
+  end
+
+  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) when is_nil(vessel_fuels) or length(vessel_fuels) == 0 do
+    changeset
+    |> add_error(:auction_vessel_fuels, "No auction vessel fuels set")
+  end
+
+  def validate_vessel_fuels(changeset, _attrs), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
@@ -304,13 +322,4 @@ defmodule Oceanconnect.Auctions.Auction do
   defp maybe_convert_start_time(scheduled_start) do
     scheduled_start
   end
-
-  def validate_vessel_fuels(
-        %Ecto.Changeset{data: %{auction_vessel_fuels: vessel_fuels}} = changeset
-      )
-      when is_nil(vessel_fuels) or vessel_fuels < 1 do
-    add_error(changeset, :auction_vessel_fuels, "No auction vessel fuels set")
-  end
-
-  def validate_vessel_fuels(changeset), do: changeset
 end

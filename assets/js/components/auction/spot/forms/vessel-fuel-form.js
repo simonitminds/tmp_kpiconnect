@@ -62,8 +62,6 @@ export default class VesselFuelForm extends React.Component {
       return vesselFuel ? vesselFuel.quantity : 0;
     };
 
-    const hasErrors = _.some(errors.auction_vessel_fuels, (error) => !_.isEmpty(error))
-
     const renderVessel = (vessel_id) => {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       const initialVesselFuels = _.filter(vesselFuels, {vessel_id: vessel_id});
@@ -127,11 +125,7 @@ export default class VesselFuelForm extends React.Component {
             <div className="content">
               <fieldset>
                 <legend className="subtitle is-4" >Vessels</legend>
-                { hasErrors &&
-                  <div className="alert alert-danger alert--inline">
-                    <p className="help is-danger">All vessels must have an ETA when the auction is scheduled.</p>
-                  </div>
-                }
+                <InputErrors errors={errors.auction_vessel_fuels} />
                 <div className="field is-horizontal">
                   <div className="field-label">
                     <label htmlFor="auction_vessel_id" className="label">

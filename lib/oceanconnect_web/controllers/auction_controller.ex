@@ -263,7 +263,7 @@ defmodule OceanconnectWeb.AuctionController do
     suppliers =
       case auction.port do
         nil ->
-          []
+          Poison.encode!([])
 
         _ ->
           auction.port
