@@ -21,9 +21,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
       Enum.each(supplier_companies, &insert(:user, company: &1))
       suppliers = Accounts.users_for_companies(supplier_companies)
 
-      suppliers
-      |> Enum.count()
-
       [winning_supplier_company] = Enum.take_random(supplier_companies, 1)
       winning_suppliers = Accounts.users_for_companies([winning_supplier_company])
 

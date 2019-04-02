@@ -19,7 +19,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitation do
          } = auction
        ) do
     suppliers = Accounts.users_for_companies(supplier_companies)
-
     vessel_name_list =
       case vessels do
         [] -> nil

@@ -8,7 +8,7 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
   server: true
 
 # Print only warnings and errors during test
-config :logger, level: :debug
+config :logger, level: :warn
 
 # Configure your database
 config :oceanconnect, Oceanconnect.Repo,

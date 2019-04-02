@@ -81,12 +81,12 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           active_participants = Auctions.active_participants(auction_id)
           Auctions.AuctionNotifier.notify_participants(new_state)
 
-          AuctionEmailNotifier.notify_auction_completed(
-            solution.bids,
-            current_state.submitted_barges,
-            auction_id,
-            active_participants
-          )
+          # AuctionEmailNotifier.notify_auction_completed(
+          #   solution.bids,
+          #   current_state.submitted_barges,
+          #   auction_id,
+          #   active_participants
+          # )
 
           {:ok, new_state}
         else
