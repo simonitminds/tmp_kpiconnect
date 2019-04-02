@@ -89,7 +89,17 @@ defmodule Oceanconnect.AuctionLogTest do
     vessel_fuel: vessel_fuel,
     supplier: supplier
   } do
+
+    type =
+      case auction.type do
+        "spot" -> "Spot"
+        "forward_fixed" -> "Forward-Fixed"
+        "formula_related" -> "Formula-Related"
+      end
+
     expected_details = %{
+      "id" => "#{auction.id}",
+      "type" => type,
       "created" => AuctionView.convert_date?(auction.inserted_at),
       "buyer-name" => auction.buyer.name,
       "auction_started" => AuctionView.convert_date?(auction.auction_started),

@@ -7,8 +7,12 @@
       <table class="table report__table--auction-details">
         <tbody>
           <tr>
+            <th>Auction ID</th>
+            <td class="qa-auction-detail-id"><%= @auction_payload.auction.id %></td>
+          </tr>
+          <tr>
             <th>Auction Type</th>
-            <td><%= auction_type(@auction_payload.auction) %></td>
+            <td class="qa-auction-detail-type"><%= auction_type(@auction_payload.auction) %></td>
           </tr>
           <tr>
             <th>Auction Created</th>
