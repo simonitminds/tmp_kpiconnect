@@ -8,6 +8,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
     Solution,
     TermAuction
   }
+
   alias Oceanconnect.Auctions.AuctionStore.{
     AuctionState,
     TermAuctionState
@@ -41,8 +42,10 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
         |> Enum.join(", ")
 
       auction_state = Auctions.get_auction_state!(auction)
-      created_event = Oceanconnect.Auctions.AuctionEvent.auction_created(auction, hd(buyers))
-                      |> Oceanconnect.Auctions.AuctionEventStore.persist()
+
+      created_event =
+        Oceanconnect.Auctions.AuctionEvent.auction_created(auction, hd(buyers))
+        |> Oceanconnect.Auctions.AuctionEventStore.persist()
 
       {:ok,
        %{
@@ -56,12 +59,12 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
     end
 
     test "auction invitation email builds for all suppliers",
-        %{
-          auction_state: auction_state,
-          buyers: buyers,
-          suppliers: suppliers,
-          vessel_name_list: vessel_name_list
-        } do
+         %{
+           auction_state: auction_state,
+           buyers: buyers,
+           suppliers: suppliers,
+           vessel_name_list: vessel_name_list
+         } do
       auction = Auctions.get_auction!(auction_state.auction_id)
       emails = Emails.AuctionInvitation.generate(auction_state)
       sent_to_ids = Enum.map(emails, fn email -> email.to.id end)
@@ -69,8 +72,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
       buyer_ids = Enum.map(buyers, & &1.id)
 
       assert Enum.all?(supplier_ids, &(&1 in sent_to_ids))
-          refute Enum.any?(buyer_ids, &(&1 in sent_to_ids))
-
+      refute Enum.any?(buyer_ids, &(&1 in sent_to_ids))
 
       auction_type =
         case auction.type do
@@ -81,9 +83,9 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
 
       for supplier_email <- emails do
         assert supplier_email.subject ==
-                 "You have been invited to #{auction_type}Auction #{auction.id} for #{vessel_name_list} at #{
-                   auction.port.name
-                 }"
+                 "You have been invited to #{auction_type}Auction #{auction.id} for #{
+                   vessel_name_list
+                 } at #{auction.port.name}"
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
       end
@@ -105,28 +107,29 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
         :term_auction
         |> insert(
           buyer: buyer_company,
-          suppliers: supplier_companies,
+          suppliers: supplier_companies
         )
 
       auction_state = Auctions.get_auction_state!(auction)
-      created_event = Oceanconnect.Auctions.AuctionEvent.auction_created(auction, hd(buyers))
-                      |> Oceanconnect.Auctions.AuctionEventStore.persist()
+
+      created_event =
+        Oceanconnect.Auctions.AuctionEvent.auction_created(auction, hd(buyers))
+        |> Oceanconnect.Auctions.AuctionEventStore.persist()
 
       {:ok,
        %{
          auction_state: auction_state,
          buyers: buyers,
-         suppliers: suppliers,
+         suppliers: suppliers
        }}
-
     end
 
     test "auction invitation email builds for all suppliers",
-    %{
-      auction_state: auction_state,
-      buyers: buyers,
-      suppliers: suppliers
-    }do
+         %{
+           auction_state: auction_state,
+           buyers: buyers,
+           suppliers: suppliers
+         } do
       emails = Emails.AuctionInvitation.generate(auction_state)
       sent_to_ids = Enum.map(emails, fn email -> email.to.id end)
       buyer_ids = Enum.map(buyers, & &1.id)
@@ -134,13 +137,11 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
       auction = Auctions.get_auction!(auction_state.auction_id)
 
       assert Enum.all?(supplier_ids, &(&1 in sent_to_ids))
-          refute Enum.any?(buyer_ids, &(&1 in sent_to_ids))
+      refute Enum.any?(buyer_ids, &(&1 in sent_to_ids))
 
       for supplier_email <- emails do
         assert supplier_email.subject ==
-                 "You have been invited to Auction #{auction.id} at #{
-                   auction.port.name
-                 }"
+                 "You have been invited to Auction #{auction.id} at #{auction.port.name}"
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
       end

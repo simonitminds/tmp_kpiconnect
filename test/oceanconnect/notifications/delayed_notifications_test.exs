@@ -5,7 +5,13 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
   alias Oceanconnect.Notifications.{Emails}
-  alias Oceanconnect.Auctions.{AuctionEvent, AuctionSupervisor, EventNotifier, AuctionStore.AuctionState}
+
+  alias Oceanconnect.Auctions.{
+    AuctionEvent,
+    AuctionSupervisor,
+    EventNotifier,
+    AuctionStore.AuctionState
+  }
 
   setup do
     buyer_company = insert(:company)
@@ -22,16 +28,23 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
     port = insert(:port)
     fuel = insert(:fuel)
-    auction_attrs =
-      %{
-        "port_id" => port.id,
-        "type" => "spot",
-        "scheduled_start" => start_time,
-        "suppliers" => supplier_companies
-      }
+
+    auction_attrs = %{
+      "port_id" => port.id,
+      "type" => "spot",
+      "scheduled_start" => start_time,
+      "suppliers" => supplier_companies
+    }
 
     vessel_fuels = insert_list(2, :vessel_fuel)
-    {:ok, %{auction_attrs: auction_attrs, buyers: buyers, vessel_fuels: vessel_fuels, buyer_company: buyer_company}}
+
+    {:ok,
+     %{
+       auction_attrs: auction_attrs,
+       buyers: buyers,
+       vessel_fuels: vessel_fuels,
+       buyer_company: buyer_company
+     }}
   end
 
   describe "auction starting soon notification" do

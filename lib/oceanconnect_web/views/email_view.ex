@@ -93,7 +93,8 @@ defmodule OceanconnectWeb.EmailView do
     end
   end
 
-  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume}) when is_nil(monthly_fuel_volume) or is_nil(total_fuel_volume) do
+  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume})
+      when is_nil(monthly_fuel_volume) or is_nil(total_fuel_volume) do
     "—"
   end
 
@@ -104,7 +105,20 @@ defmodule OceanconnectWeb.EmailView do
 
   def format_month(%{month: month, year: year}) do
     month =
-      ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      [
+        "January",
+        "Febuary",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
       |> Enum.at(month + 1)
 
     "#{month} #{year}"

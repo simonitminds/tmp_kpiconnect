@@ -55,8 +55,8 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
             {:ok, :nothing_to_schedule}
 
           send_time ->
-          IO.inspect(send_time, label: "SEND TIME ------------->")
-          IO.inspect(DateTime.utc_now(), label: "CURRENT TIME ------------------>")
+            IO.inspect(send_time, label: "SEND TIME ------------->")
+            IO.inspect(DateTime.utc_now(), label: "CURRENT TIME ------------------>")
 
             Command.schedule_notification(notification_name, send_time, starting_soon_emails)
             |> DelayedNotifications.process_command()
