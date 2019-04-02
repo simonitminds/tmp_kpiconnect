@@ -37,6 +37,11 @@
     font-family: $family-header;
     font-weight: bold;
 
+    &> div {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
     &__imo { // Auction Vessel IMO number
       color: $gray-3;
     }

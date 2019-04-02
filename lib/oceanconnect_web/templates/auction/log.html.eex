@@ -7,8 +7,12 @@
       <table class="table report__table--auction-details">
         <tbody>
           <tr>
+            <th>Auction ID</th>
+            <td class="qa-auction-detail-id"><%= @auction_payload.auction.id %></td>
+          </tr>
+          <tr>
             <th>Auction Type</th>
-            <td>Reverse Auction</td>
+            <td class="qa-auction-detail-type"><%= auction_type(@auction_payload.auction) %></td>
           </tr>
           <tr>
             <th>Auction Created</th>
@@ -24,7 +28,7 @@
           </tr>
           <tr>
             <th>Auction Completed</th>
-            <td class="qa-auction-detail-auction_ended"><%= convert_date?(@auction_payload.auction.auction_ended) %></td>
+            <td class="qa-auction-detail-auction_ended"><%= convert_date?(@auction_payload.auction.auction_ended || @auction_payload.auction.auction_closed_time) %></td>
           </tr>
           <tr>
             <th>Scheduled Duration</th>
@@ -43,53 +47,7 @@
             <th>Port Agent</th>
             <td><%= @auction_payload.auction.port_agent || "—" %></td>
           </tr>
-          <%= if @auction_payload.auction.type == "spot" do %>
-            <tr>
-              <th>ETA/ETD</th>
-              <td>
-                <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction_payload.auction) do %>
-                  <p class="qa-auction-etas-<%= vessel.id %> has-margin-bottom-sm">
-                    <span class="qa-auction-etas-<%= vessel.id %>-vessel"><%= vessel.name %></span>
-                    (<span class="qa-auction-etas-<%= vessel.id %>-eta"><%= convert_date?(eta, "Not Specified") %></span>
-                    &ndash;
-                    <span class="qa-auction-etas-<%= vessel.id %>-etd"><%= convert_date?(etd, "Not Specified") %></span>)
-                  </p>
-                <% end %>
-            </tr>
-            <tr>
-              <th>Deliverables</th>
-              <td>
-                  <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
-                          vessel_fuel <- vessel_fuels do %>
-                    <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
-                      <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
-                      <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
-                      <span class="qa-auction-deliverable-vessel">
-                        <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
-                      </span>
-                    </p>
-                  <% end %>
-                </ul>
-              </td>
-            </tr>
-          <% else %>
-            <tr>
-              <th>Term Period</th>
-              <td>
-                <span class="qa-auction-start_date"><%= convert_date?(@auction_payload.auction.start_date) %></span> — <span class="qa-auction-end_date"><%= convert_date?(@auction_payload.auction.end_date) %></span>
-              </td>
-            </tr>
-            <tr>
-              <th>Deliverables</th>
-              <td>
-                <span class="qa-auction-fuel_quantity"><%= @auction_payload.auction.fuel_quantity %></span> MT of
-                <span class="qa-auction-fuel"><%= @auction_payload.auction.fuel.name %></span>
-                <%= for vessel <- @auction_payload.auction.vessels do %>
-                  <span class="qa-auction-vessel"><%= vessel.name %> (<%= vessel.imo %>)</span>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
+          <%= render template_partial_name(@auction_payload.auction, "deliverables"), Map.put(assigns, :auction_payload, @auction_payload) %>
           <tr>
             <th>Additional Information</th>
             <td><%= additional_information(@auction_payload.auction) %></td>

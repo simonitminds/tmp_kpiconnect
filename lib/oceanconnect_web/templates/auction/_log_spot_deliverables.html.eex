@@ -1,0 +1,28 @@
+<tr>
+  <th>ETA/ETD</th>
+  <td>
+    <%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction_payload.auction) do %>
+      <p class="qa-auction-etas-<%= vessel.id %> has-margin-bottom-sm">
+        <span class="qa-auction-etas-<%= vessel.id %>-vessel"><%= vessel.name %></span>
+        (<span class="qa-auction-etas-<%= vessel.id %>-eta"><%= convert_date?(eta, "Not Specified") %></span>
+        &ndash;
+        <span class="qa-auction-etas-<%= vessel.id %>-etd"><%= convert_date?(etd, "Not Specified") %></span>)
+      </p>
+    <% end %>
+</tr>
+<tr>
+  <th>Deliverables</th>
+  <td>
+      <%= for {fuel, vessel_fuels} <- auction_log_vessel_fuels_by_fuel(@auction_payload.auction),
+              vessel_fuel <- vessel_fuels do %>
+        <p class="qa-auction-deliverable-<%= vessel_fuel.id %> has-margin-bottom-sm">
+          <span class="qa-auction-deliverable-quantity"><%= vessel_fuel.quantity %></span> MT of
+          <span class="qa-auction-deliverable-fuel"><%= fuel.name %></span> to
+          <span class="qa-auction-deliverable-vessel">
+            <%= vessel_fuel.vessel.name %> (<%= vessel_fuel.vessel.imo %>)
+          </span>
+        </p>
+      <% end %>
+    </ul>
+  </td>
+</tr>

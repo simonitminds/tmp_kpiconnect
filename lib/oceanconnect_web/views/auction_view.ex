@@ -212,6 +212,14 @@ defmodule OceanconnectWeb.AuctionView do
 
   def convert_date?(_, default), do: default
 
+  def format_month(%{month: month, year: year}) do
+    month =
+      ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      |> Enum.at(month + 1)
+
+    "#{month} #{year}"
+  end
+
   def convert_date_time?(date_time = %{}) do
     time =
       "#{leftpad(date_time.hour)}:#{leftpad(date_time.minute)}:#{leftpad(date_time.second)}.#{
@@ -384,6 +392,22 @@ defmodule OceanconnectWeb.AuctionView do
       event.type in @events_with_product_data -> "_log_product_event.html"
       event.type in @events_for_barges -> "_log_barge_event.html"
       true -> "_log_normal_event.html"
+    end
+  end
+
+  def template_partial_name(%{type: auction_type}, partial_type) do
+    case auction_type do
+      "spot" -> "_log_#{auction_type}_#{partial_type}.html"
+      _ -> "_log_term_#{partial_type}.html"
+    end
+  end
+
+  def auction_type(%{type: type}) do
+    case type do
+      "spot" -> "Spot"
+      "formula_related" -> "Formula-Related"
+      "forward_fixed" -> "Foward-Fixed"
+      _ -> ""
     end
   end
 

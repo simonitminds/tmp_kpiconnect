@@ -42,7 +42,6 @@ main {
   overflow-y: scroll;
 
   @media (max-width: 768px) {
-    overflow-y: hidden;
     height: calc(100vh - 3.25rem);
 
     .body--admin > & {
