@@ -17,7 +17,7 @@ const InputField = ({model, field, labelText, value, errors, opts, onChange, exp
         {labelDisplay}
         </label>
       </div>
-      <div className="field-body">
+      <div className="field-body items-start">
         <div className={`control has-margin-right-sm ${expandedInput ? 'is-expanded' : ''}${fuelUnitInput ? ' input__fuel-unit-container' : ''}`}>
           <input
             type={type}
