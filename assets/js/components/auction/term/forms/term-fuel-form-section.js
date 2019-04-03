@@ -56,7 +56,7 @@ const TermFuelFormSection = (props) => {
                       id="auction_fuel_id"
                       name="auction[fuel_id]"
                       className="qa-auction-select-fuel"
-                      value={auction.fuel_id}
+                      value={auction.fuel_id || ""}
                       onChange={updateInformation.bind(this, 'auction.fuel_id')}
                     >
                       <option disabled value="">

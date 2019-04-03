@@ -242,9 +242,8 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.submit()
 
     refute current_path() =~ ~r/auctions\/\d/
-
     assert AuctionNewPage.has_content?(
-             "All vessels must have an ETA when the auction is scheduled."
+             "This field is required."
            )
   end
 end

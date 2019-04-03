@@ -103,19 +103,21 @@ defmodule Oceanconnect.Auctions.Auction do
     |> validate_scheduled_start(attrs)
     |> validate_vessel_fuels(attrs)
     |> maybe_add_vessel_fuels(auction, attrs)
+    |> validate_suppliers(auction, attrs)
     |> maybe_add_suppliers(attrs)
-    |> validate_suppliers(attrs)
   end
 
-  def validate_suppliers(changeset, attrs) do
+  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %Auction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
     cond do
-      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
+      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers")->
         changeset
       !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
         changeset
         |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
     end
   end
+
+  def validate_suppliers(changeset, _auction, _attrs), do: changeset
 
   def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) when is_nil(vessel_fuels) or length(vessel_fuels) == 0 do
     changeset

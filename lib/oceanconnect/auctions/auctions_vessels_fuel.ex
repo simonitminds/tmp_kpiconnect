@@ -25,7 +25,7 @@ defmodule Oceanconnect.Auctions.AuctionVesselFuel do
 
     auction_vessel_fuel
     |> cast(attrs, [:vessel_id, :fuel_id, :auction_id, :quantity, :eta, :etd])
-    |> validate_required([:fuel_id, :auction_id, :vessel_id, :quantity, :eta])
+    |> validate_required([:fuel_id, :auction_id, :vessel_id, :quantity, :eta], message: "This field is required.")
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:vessel_id)
     |> foreign_key_constraint(:fuel_id)
@@ -39,7 +39,7 @@ defmodule Oceanconnect.Auctions.AuctionVesselFuel do
 
     auction_vessel_fuel
     |> cast(attrs, [:vessel_id, :fuel_id, :auction_id, :quantity, :eta, :etd])
-    |> validate_required([:fuel_id, :vessel_id, :quantity, :eta])
+    |> validate_required([:fuel_id, :vessel_id, :quantity, :eta], message: "This field is required.")
     |> foreign_key_constraint(:vessel_id)
     |> foreign_key_constraint(:fuel_id)
   end

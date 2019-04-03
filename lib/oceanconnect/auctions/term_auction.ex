@@ -120,7 +120,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> validate_term_period(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
-    |> validate_suppliers(attrs)
+    |> validate_suppliers(auction, attrs)
   end
 
   def maybe_require_fuel_index(
@@ -135,7 +135,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(changeset, attrs) do
+  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
     cond do
       Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
         changeset
@@ -145,17 +145,17 @@ defmodule Oceanconnect.Auctions.TermAuction do
     end
   end
 
+  def validate_suppliers(changeset, _auction, _attrs), do: changeset
+
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
-    IO.inspect(suppliers)
     put_assoc(changeset, :suppliers, suppliers)
   end
 
   def maybe_add_suppliers(changeset, %{suppliers: suppliers}) do
-    IO.inspect(suppliers)
     put_assoc(changeset, :suppliers, suppliers)
   end
 
-  def maybe_add_suppliers(changeset, _attrs), do: changeset |> IO.inspect
+  def maybe_add_suppliers(changeset, _attrs), do: changeset
 
   def maybe_add_vessels(changeset, %{"vessels" => vessels}) do
     put_assoc(changeset, :vessels, vessels)

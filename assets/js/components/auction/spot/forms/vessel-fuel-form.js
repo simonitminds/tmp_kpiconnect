@@ -67,7 +67,6 @@ export default class VesselFuelForm extends React.Component {
       const initialVesselFuels = _.filter(vesselFuels, {vessel_id: vessel_id});
       const initialETA = _.chain(initialVesselFuels).map('eta').min().value() || auction.eta;
       const initialETD = _.chain(initialVesselFuels).map('etd').min().value() || auction.etd;
-
       return (
         <div className={`is-flex is-flex-wrapped qa-auction-vessel-${vessel.id}`} key={vessel.id}>
           <span className="selected-list__item-title">{vessel.name}, {vessel.imo}</span>
@@ -79,7 +78,9 @@ export default class VesselFuelForm extends React.Component {
           </span>
           <input type="hidden" name={`auction[vessels][${vessel.id}][selected]`} value={true} />
           <DateTimeInput label="ETA" value={initialETA} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][eta]`} model="vessel" field="eta" />
+          <InputErrors errors={errors.auction_vessel_fuels && errors.auction_vessel_fuels[0] ? errors.auction_vessel_fuels[0].eta : ""} />
           <DateTimeInput label="ETD" value={initialETD} portId={portId} ports={ports} fieldName={`auction[vessels][${vessel.id}][etd]`} model="vessel" field="etd" />
+          <InputErrors errors={errors.auction_vessel_fuels && errors.auction_vessel_fuels[0] ? errors.auction_vessel_fuels[0].etd : ""} />
         </div>
       );
     }
@@ -106,15 +107,18 @@ export default class VesselFuelForm extends React.Component {
       const vessel = _.find(vessels, (v) => v.id == vessel_id);
       const initialQuantity = initialQuantityForVesselFuel(vessel.id, fuel_id);
       return(
-        <InputField
-          key={`${fuel_id}-${vessel_id}`}
-          model={'auction'}
-          field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
-          value={initialQuantity}
-          isHorizontal={true}
-          fuelUnitInput={true}
-          opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `input--fuel-vol qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
-        />
+        <React.Fragment>
+          <InputField
+            key={`${fuel_id}-${vessel_id}`}
+            model={'auction'}
+            field={`auction_vessel_fuels][${fuel_id}][${vessel.id}`}
+            value={initialQuantity}
+            isHorizontal={true}
+            fuelUnitInput={true}
+            opts={{type: 'number', label: `${vessel.name}`, name: `vessel_fuel-${fuel_id}-quantity`, className: `input--fuel-vol qa-auction-vessel-${vessel.id}-fuel-${fuel_id}-quantity`}}
+          />
+          <InputErrors errors={errors.auction_vessel_fuels && errors.auction_vessel_fuels[0] ? errors.auction_vessel_fuels[0].quantity : ""} />
+        </React.Fragment>
       );
     }
 
@@ -125,7 +129,6 @@ export default class VesselFuelForm extends React.Component {
             <div className="content">
               <fieldset>
                 <legend className="subtitle is-4" >Vessels</legend>
-                <InputErrors errors={errors.auction_vessel_fuels} />
                 <div className="field is-horizontal">
                   <div className="field-label">
                     <label htmlFor="auction_vessel_id" className="label">
@@ -159,6 +162,11 @@ export default class VesselFuelForm extends React.Component {
                     </div>
                   </div>
                 </div>
+                { errors.auction_vessel_fuels && errors.auction_vessel_fuels[0] == "No auction vessel fuels set" ?
+                    <InputErrors errors={errors.auction_vessel_fuels} />
+                    :
+                    ""
+                }
               </fieldset>
             </div>
           </div>
@@ -171,7 +179,8 @@ export default class VesselFuelForm extends React.Component {
                 <legend className="subtitle is-4" >Fuels</legend>
                 {this.state.selectedVessels.length === 0 ?
                  <i className="qa-auction-select-fuel"> Select Vessels to add Fuels</i>
-                :
+                    :
+                <React.Fragment>
                 <div className="field is-horizontal">
                   <div className="field-label">
                     <label htmlFor="auction_fuel_id" className="label">
@@ -205,6 +214,8 @@ export default class VesselFuelForm extends React.Component {
                     </div>
                   </div>
                 </div>
+                    <InputErrors errors={errors.auction_vessel_fuels ? errors.auction_vessel_fuels[0].fuel_id : ""} />
+                </React.Fragment>
                 }
               </fieldset>
             </div>

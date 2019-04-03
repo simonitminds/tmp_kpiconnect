@@ -274,8 +274,13 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Edit Auction"
     end
 
-    test "redirects when data is valid", %{conn: conn, auction: auction} do
-      conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
+    test "redirects when data is valid", %{conn: conn, auction: auction, valid_auction_params: valid_auction_params} do
+      attrs =
+        valid_auction_params
+        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+        |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+        |> Map.merge(@update_attrs)
+      conn = put(conn, auction_path(conn, :update, auction), auction: attrs)
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
       conn = get(conn, auction_path(conn, :show, auction))

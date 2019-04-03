@@ -45,17 +45,6 @@ export default class DateMonthInput extends React.Component {
     }
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const mvalue = {year: this.state.date.year(), month: this.state.date.month()};
-
-    const makeText = (date) => {
-      let text;
-      if (date && date.year && date.month) {
-        text = months[date.month] + ' ' + date.year;
-      } else {
-        text = "";
-      }
-      return text;
-    }
-
     return(
       <div className="has-margin-right-sm">
         <div className={`control`}>
@@ -64,9 +53,7 @@ export default class DateMonthInput extends React.Component {
             years={years()}
             lang={months}
             value={{year: mvalue.year, month: mvalue.month + 1}}
-            defaultValue={value}
             onChange={this.handleMonthChange.bind(this)}
-            // onDismiss={this.handleMonthDismiss.bind(this)}
           />
           <input
             className={`input`}
