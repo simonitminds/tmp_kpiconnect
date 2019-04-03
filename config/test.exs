@@ -29,7 +29,7 @@ config :oceanconnect, :store_starter, true
 config :hound,
   driver: "chrome_driver"
 
-config :bamboo, :refute_timeout, 10
+config :bamboo, :refute_timeout, 5_000
 
 # browser: "chrome_headless"
 
