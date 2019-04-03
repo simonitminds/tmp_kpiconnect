@@ -78,7 +78,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
         case auction.type do
           "spot" -> ""
           "formula_related" -> "Formula-Related "
-          "forward-fixed" -> "Forward-Fixed "
+          "forward_fixed" -> "Forward-Fixed "
         end
 
       for supplier_email <- emails do
@@ -116,11 +116,19 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
         Oceanconnect.Auctions.AuctionEvent.auction_created(auction, hd(buyers))
         |> Oceanconnect.Auctions.AuctionEventStore.persist()
 
+      auction_type =
+        case auction.type do
+          "spot" -> ""
+          "formula_related" -> "Formula-Related "
+          "forward_fixed" -> "Forward-Fixed "
+        end
+
       {:ok,
        %{
          auction_state: auction_state,
          buyers: buyers,
-         suppliers: suppliers
+         suppliers: suppliers,
+         auction_type: auction_type
        }}
     end
 
@@ -128,7 +136,8 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
          %{
            auction_state: auction_state,
            buyers: buyers,
-           suppliers: suppliers
+           suppliers: suppliers,
+           auction_type: auction_type
          } do
       emails = Emails.AuctionInvitation.generate(auction_state)
       sent_to_ids = Enum.map(emails, fn email -> email.to.id end)
@@ -141,7 +150,9 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
 
       for supplier_email <- emails do
         assert supplier_email.subject ==
-                 "You have been invited to Auction #{auction.id} at #{auction.port.name}"
+                 "You have been invited to #{auction_type}Auction #{auction.id} at #{
+                   auction.port.name
+                 }"
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
       end
