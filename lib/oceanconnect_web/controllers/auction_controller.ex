@@ -84,7 +84,7 @@ defmodule OceanconnectWeb.AuctionController do
 
     changeset =
       Auctions.change_auction(%Auction{})
-      |> Map.put(:action, :create)
+      |> Map.merge(%{action: :create, errors: []})
 
     [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 

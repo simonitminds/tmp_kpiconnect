@@ -54,9 +54,11 @@ export const formatDate = (date) => {
   }
 }
 
-export const formatMonthYear = (date) => {
+export const formatMonthYear = (dateTime) => {
+  const date = {year: dateTime.year, month: dateTime.month}
   if (date) {
-    return moment(date).format("MMM YYYY");
+    const newDate = moment(date).format("MMM YYYY");
+    return newDate;
   } else {
     return "";
   }
