@@ -33,7 +33,8 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
       "port_id" => port.id,
       "type" => "spot",
       "scheduled_start" => start_time,
-      "suppliers" => supplier_companies
+      "suppliers" => supplier_companies,
+      "buyer_id" => buyer_company.id
     }
 
     vessel_fuels = insert_list(2, :vessel_fuel)
@@ -48,43 +49,44 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
   end
 
   describe "auction starting soon notification" do
-    # test "auction creation with start over an hour in the future doesn't send upcoming notification", %{auction_attrs: auction_attrs, buyers: buyers, vessel_fuels: vessel_fuels, buyer_company: buyer_company} do
-    #   {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
-    #   auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
-    #   auction_state = AuctionState.from_auction(auction)
+    test "auction creation with start over an hour in the future doesn't send upcoming notification", %{auction_attrs: auction_attrs, buyers: buyers, vessel_fuels: vessel_fuels, buyer_company: buyer_company} do
+      {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
+      auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
+      auction_state = AuctionState.from_auction(auction)
 
-    #   emails = Emails.AuctionStartingSoon.generate(auction_state)
+      emails = Emails.AuctionStartingSoon.generate(auction_state)
 
-    #   :timer.sleep(500)
+      :timer.sleep(500)
 
-    #   for email <- emails do
-    #     refute_delivered_email(email)
-    #   end
-    # end
+      for email <- emails do
+        refute_delivered_email(email)
+      end
+    end
 
-    # test "rescheduling an creation with start time greater than an hour from now doesn't trigger upcoming auction emails", %{auction: auction, buyers: buyers} do
-    #   new_start_time =
-    #     DateTime.utc_now()
-    #     |> DateTime.to_unix(:second)
-    #     |> Kernel.+(4_000) # add number of seconds > hour
-    #     |> DateTime.from_unix!(:second)
+    test "rescheduling an creation with start time greater than an hour from now doesn't trigger upcoming auction emails", %{auction_attrs: auction_attrs, vessel_fuels: vessel_fuels, buyer_company: buyer_company, buyers: buyers} do
+      {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
+      auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
 
-    #   {:ok, auction} = Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
+      new_start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix(:second)
+        |> Kernel.+(4_000) # add number of seconds > hour
+        |> DateTime.from_unix!(:second)
 
-    #   IO.inspect(DateTime.diff(auction.scheduled_start, DateTime.utc_now()), label: "HERE -------------->")
+      {:ok, auction} = Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
 
-    #   auction_state = AuctionState.from_auction(auction)
+      auction_state = AuctionState.from_auction(auction)
 
-    #   AuctionEvent.auction_created(auction, hd(buyers))
-    #   |> EventNotifier.broadcast(auction_state)
+      AuctionEvent.auction_created(auction, hd(buyers))
+      |> EventNotifier.broadcast(auction_state)
 
-    #   emails = Emails.AuctionStartingSoon.generate(auction_state)
+      emails = Emails.AuctionStartingSoon.generate(auction_state)
 
-    #   :timer.sleep(500)
+      :timer.sleep(500)
 
-    #   for email <- emails do
-    #     refute_delivered_email(email)
-    #   end
-    # end
+      for email <- emails do
+        refute_delivered_email(email)
+      end
+    end
   end
 end
