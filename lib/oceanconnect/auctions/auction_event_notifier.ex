@@ -122,14 +122,9 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     |> update_cache()
   end
 
-<<<<<<< HEAD
   def react_to(%AuctionEvent{type: :auction_finalized, auction_id: auction_id}, state) do
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
          {:ok, _snapshot_event} <- Aggregate.snapshot(state),
-=======
-  def react_to(%AuctionEvent{type: :auction_finalized, data: %{auction: auction}}, state) do
-    with {:ok, _snapshot_event} <- Aggregate.snapshot(state),
->>>>>>> Emails are shredding and mix formatted. Shoulda broke that into a separate commit, but whatevs
          {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
       Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else

@@ -55,7 +55,6 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
             {:ok, :nothing_to_schedule}
 
           send_time ->
-
             Command.schedule_notification(notification_name, send_time, starting_soon_emails)
             |> DelayedNotifications.process_command()
         end

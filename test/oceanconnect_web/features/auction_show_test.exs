@@ -434,6 +434,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
+
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer"
 

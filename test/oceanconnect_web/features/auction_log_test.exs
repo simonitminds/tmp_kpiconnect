@@ -89,7 +89,6 @@ defmodule Oceanconnect.AuctionLogTest do
     vessel_fuel: vessel_fuel,
     supplier: supplier
   } do
-
     type =
       case auction.type do
         "spot" -> "Spot"

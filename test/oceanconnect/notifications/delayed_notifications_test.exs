@@ -49,7 +49,13 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
   end
 
   describe "auction starting soon notification" do
-    test "auction creation with start over an hour in the future doesn't send upcoming notification", %{auction_attrs: auction_attrs, buyers: buyers, vessel_fuels: vessel_fuels, buyer_company: buyer_company} do
+    test "auction creation with start over an hour in the future doesn't send upcoming notification",
+         %{
+           auction_attrs: auction_attrs,
+           buyers: buyers,
+           vessel_fuels: vessel_fuels,
+           buyer_company: buyer_company
+         } do
       {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
       auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
       auction_state = AuctionState.from_auction(auction)
@@ -63,17 +69,25 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
       end
     end
 
-    test "rescheduling an creation with start time greater than an hour from now doesn't trigger upcoming auction emails", %{auction_attrs: auction_attrs, vessel_fuels: vessel_fuels, buyer_company: buyer_company, buyers: buyers} do
+    test "rescheduling an creation with start time greater than an hour from now doesn't trigger upcoming auction emails",
+         %{
+           auction_attrs: auction_attrs,
+           vessel_fuels: vessel_fuels,
+           buyer_company: buyer_company,
+           buyers: buyers
+         } do
       {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
       auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
 
       new_start_time =
         DateTime.utc_now()
         |> DateTime.to_unix(:second)
-        |> Kernel.+(4_000) # add number of seconds > hour
+        # add number of seconds > hour
+        |> Kernel.+(4_000)
         |> DateTime.from_unix!(:second)
 
-      {:ok, auction} = Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
+      {:ok, auction} =
+        Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
 
       auction_state = AuctionState.from_auction(auction)
 

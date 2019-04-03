@@ -169,6 +169,7 @@ defmodule Oceanconnect.Auctions do
         |> AuctionStore.process_command()
 
         :ok
+
       true ->
         {:error, "error while revoking bid"}
     end

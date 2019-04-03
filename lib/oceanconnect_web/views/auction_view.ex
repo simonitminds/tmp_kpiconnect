@@ -214,7 +214,20 @@ defmodule OceanconnectWeb.AuctionView do
 
   def format_month(%{month: month, year: year}) do
     month =
-      ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      [
+        "January",
+        "Febuary",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
       |> Enum.at(month + 1)
 
     "#{month} #{year}"
