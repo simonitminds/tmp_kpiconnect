@@ -1,0 +1,6 @@
+<p style="margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessels (ETA/ETD):</b>
+<%= for {vessel, eta, etd} <- auction_log_vessel_etas(@auction) do %>
+  <p style="margin-top: 0.25rem;">
+    <%= vessel.name %> (<%= convert_date?(eta, "Not Specified") %> &ndash; <%= convert_date?(etd, "Not Specified") %>)
+  </p>
+<% end %>

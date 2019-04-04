@@ -2,7 +2,6 @@ defmodule Oceanconnect.AuctionShowTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Auctions
-  #  import Hound.Helpers.Session
 
   hound_session()
 
@@ -435,6 +434,7 @@ defmodule Oceanconnect.AuctionShowTest do
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.auction_status() == "DECISION"
+
       assert AuctionShowPage.auction_bid_status() =~
                "You have the best overall offer"
 

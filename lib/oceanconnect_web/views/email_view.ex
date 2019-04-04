@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.EmailView do
   use OceanconnectWeb, :view
+  import Oceanconnect.Auctions.Guards
 
   def full_name(user), do: Oceanconnect.Accounts.get_user_name!(user)
 
@@ -7,6 +8,14 @@ defmodule OceanconnectWeb.EmailView do
     vessels
     |> Enum.map(& &1.name)
     |> Enum.join(", ")
+  end
+
+  def auction_type(%{type: type}) do
+    case type do
+      "formula_related" -> "Formula-Related"
+      "forward_fixed" -> "Forward-Fixed"
+      "spot" -> "Spot"
+    end
   end
 
   def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
@@ -73,6 +82,46 @@ defmodule OceanconnectWeb.EmailView do
       nil -> nil
       _ -> Enum.map(winning_solution_bids[vessel_fuel_id], & &1.amount)
     end
+  end
+
+  def partial_name_for_type(%struct{type: type}, partial_type) when is_auction(struct) do
+    "_#{type}_#{partial_type}.html"
+
+    case type in ["forward_fixed", "formula_related"] do
+      true -> "_term_#{partial_type}.html"
+      _ -> "_spot_#{partial_type}.html"
+    end
+  end
+
+  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume})
+      when is_nil(monthly_fuel_volume) or is_nil(total_fuel_volume) do
+    "—"
+  end
+
+  def term_length(%{fuel_quantity: monthly_fuel_volume, total_fuel_volume: total_fuel_volume}) do
+    months = floor(total_fuel_volume / monthly_fuel_volume)
+    "#{months} months"
+  end
+
+  def format_month(%{month: month, year: year}) do
+    month =
+      [
+        "January",
+        "Febuary",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
+      |> Enum.at(month + 1)
+
+    "#{month} #{year}"
   end
 
   defp leftpad(integer) do

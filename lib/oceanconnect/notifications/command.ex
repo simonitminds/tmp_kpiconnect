@@ -22,7 +22,7 @@ defmodule Oceanconnect.Notifications.Command do
     }
   end
 
-  def cancel_notification(name) do
-    %Command{command: :cancel_notification, notification_name: name, data: %{}}
+  def cancel_notification(name, emails) do
+    %Command{command: :cancel_notification, notification_name: name, data: %{emails: emails}}
   end
 end

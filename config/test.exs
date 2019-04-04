@@ -29,6 +29,8 @@ config :oceanconnect, :store_starter, true
 config :hound,
   driver: "chrome_driver"
 
+config :bamboo, :refute_timeout, 1_000
+
 # browser: "chrome_headless"
 
 config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.TestAdapter

@@ -169,6 +169,7 @@ defmodule Oceanconnect.Auctions do
         |> AuctionStore.process_command()
 
         :ok
+
       true ->
         {:error, "error while revoking bid"}
     end
@@ -700,6 +701,7 @@ defmodule Oceanconnect.Auctions do
 
   def active_participants(auction_id) do
     AuctionEventStore.participants_from_events(auction_id)
+    |> List.flatten()
   end
 
   def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct),

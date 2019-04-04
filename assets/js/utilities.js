@@ -87,9 +87,11 @@ export const portLocalTime = (gmtTime, portId, ports) => {
 
 export function timeRemainingCountdown(auctionPayload, clientTime) {
   const status = _.get(auctionPayload, 'status');
-  if ((status === "open" || status === "decision") && auctionPayload.time_remaining) {
+  const timeRemaining = _.get(auctionPayload, 'time_remaining');
+  if ((status === "open" || status === "decision") && timeRemaining) {
     const serverTime = moment(auctionPayload.current_server_time);
-    const timeLeft = auctionPayload.time_remaining - clientTime.diff(serverTime);
+    const clientServerDiff = clientTime.diff(serverTime);
+    const timeLeft = timeRemaining - clientServerDiff;
     return timeLeft;
   } else if (status === "closed") {
     return 0;

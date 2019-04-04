@@ -4,8 +4,9 @@ defmodule Oceanconnect.Notifications.Emails.AuctionRescheduled do
   use Oceanconnect.Notifications.Email
 
   def generate(_auction_state = %{auction_id: auction_id}) do
-    auction_id
-    |> Auctions.get_auction()
+    auction = auction_id |> Auctions.get_auction()
+
+    auction
     |> emails()
   end
 
