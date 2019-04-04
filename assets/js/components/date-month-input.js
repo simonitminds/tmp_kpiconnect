@@ -27,7 +27,7 @@ export default class DateMonthInput extends React.Component {
   handleMonthChange(year, month) {
     const value = {year: year, month: month - 1};
     if (value) {
-      const newValue = {year: value.year, month: value.month - 1}
+      const newValue = {year: value.year, month: value.month + 1}
       this.props.onChange(newValue);
     }
     this.setState({ date: moment(value).utc() });

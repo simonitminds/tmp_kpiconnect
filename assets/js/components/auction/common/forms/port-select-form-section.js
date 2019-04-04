@@ -114,7 +114,7 @@ const PortSelectFormSection = (props) => {
                       value={""}
                       model={'auction'}
                       field={'end_date'}
-                      labelText={'Start Month'}
+                      labelText={'End Month'}
                       onChange={updateMonth.bind(this, 'end_date_date')}
                       className={'has-margin-right-sm'} />
                     <InputErrors errors={errors.end_date} />
