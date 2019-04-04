@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.AuctionRsvpController do
   use OceanconnectWeb, :controller
+  import Oceanconnect.Auctions.Guards
   alias OceanconnectWeb.Plugs.Auth
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{AuctionSuppliers, AuctionNotifier}
@@ -7,16 +8,15 @@ defmodule OceanconnectWeb.AuctionRsvpController do
 
   def update(conn, %{"id" => auction_id, "response" => response}) do
     with %User{company: %Company{id: company_id}} <- Auth.current_user(conn),
+         %struct{} = auction when is_auction(struct) <-
+           Auctions.get_auction(auction_id),
          %AuctionSuppliers{supplier_id: ^company_id} <-
-           Auctions.get_auction_supplier(auction_id, company_id),
+           Auctions.get_auction_supplier(auction, company_id),
          true <- response in ["yes", "no", "maybe"] do
-      Auctions.update_participation_for_supplier(auction_id, company_id, response)
+      Auctions.update_participation_for_supplier(auction, company_id, response)
 
-      auction =
-        Auctions.get_auction!(auction_id)
-        |> Auctions.fully_loaded()
-
-      AuctionNotifier.notify_buyer_participants(auction)
+      Auctions.get_auction!(auction_id)
+      |> AuctionNotifier.notify_buyer_participants()
 
       conn
       |> redirect(to: auction_path(conn, :show, auction_id))
