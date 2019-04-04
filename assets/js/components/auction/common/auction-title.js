@@ -38,7 +38,7 @@ const AuctionTitle = ({auction, detailed}) => {
           <span className="auction-header__auction-id">{auction.id}</span>
           <span className="auction-header__port-name qa-auction-port">{portName}</span>
           { showDetail &&
-            <span className="auction-header__vessel-imo has-text-gray-3 has-margin-left-xs">(Term)</span>
+            <span className="auction-header__vessel-imo has-text-gray-3 has-margin-left-xs qa-auction-term">(Term)</span>
           }
           { is_traded_bid_allowed &&
             <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker has-margin-left-sm"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
