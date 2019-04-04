@@ -47,7 +47,7 @@ export default class DateMonthInput extends React.Component {
     const mvalue = this.state.date ? {year: this.state.date.year(), month: this.state.date.month()} : null;
     return(
       <div className="has-margin-right-sm">
-        <div className={`control`}>
+        <div className={`control qa-auction-${field}-picker`}>
           <Picker
             ref='monthPicker'
             years={years()}
@@ -56,7 +56,7 @@ export default class DateMonthInput extends React.Component {
             onChange={this.handleMonthChange.bind(this)}
           />
           <input
-            className={`input`}
+            className={`input qa-auction-${field}`}
             value={mvalue ? formatMonthYear(mvalue) : ""}
             onClick={this.handleClickInput.bind(this)}
             readOnly
