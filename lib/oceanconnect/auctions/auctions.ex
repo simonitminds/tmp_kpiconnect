@@ -450,12 +450,22 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
+  def get_auction_supplier(auction = %Auction{id: nil}, supplier_id) do
+    nil
+  end
+  def get_auction_supplier(auction = %TermAuction{id: nil}, supplier_id) do
+    nil
+  end
 
-  def get_auction_supplier(auction_id, supplier_id) do
+  def get_auction_supplier(%Auction{id: auction_id}, supplier_id) when not is_nil(auction_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
-  def update_participation_for_supplier(auction_id, supplier_id, response)
+  def get_auction_supplier(%TermAuction{id: term_auction_id}, supplier_id) when not is_nil(term_auction_id) do
+    Repo.get_by(AuctionSuppliers, %{term_auction_id: term_auction_id, supplier_id: supplier_id})
+  end
+
+  def update_participation_for_supplier(%Auction{id: auction_id}, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
     from(auction_supplier in AuctionSuppliers,
       where:
@@ -463,7 +473,18 @@ defmodule Oceanconnect.Auctions do
           auction_supplier.supplier_id == ^supplier_id
     )
     |> Repo.update_all(set: [participation: response])
+      end
+
+  def update_participation_for_supplier(%TermAuction{id: term_auction_id}, supplier_id, response)
+      when response in ["yes", "no", "maybe"] do
+    from(auction_supplier in AuctionSuppliers,
+      where:
+        auction_supplier.term_auction_id == ^term_auction_id and
+          auction_supplier.supplier_id == ^supplier_id
+    )
+    |> Repo.update_all(set: [participation: response])
   end
+
 
   def start_auction(auction = %struct{}, user \\ nil, started_at \\ DateTime.utc_now())
       when is_auction(struct) do
@@ -711,7 +732,7 @@ defmodule Oceanconnect.Auctions do
       when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
-        case get_auction_supplier(auction.id, supplier.id) do
+        case get_auction_supplier(auction, supplier.id) do
           %{alias_name: alias_name} -> alias_name
           _ -> nil
         end
