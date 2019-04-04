@@ -117,6 +117,16 @@ defmodule Oceanconnect.Auctions.Auction do
     end
   end
 
+  def validate_suppliers(changeset, _auction, attrs) do
+    cond do
+      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
+        changeset
+      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
+        changeset
+        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
+    end
+  end
+
   def validate_suppliers(changeset, _auction, _attrs), do: changeset
 
   def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels}) when is_nil(vessel_fuels) or length(vessel_fuels) == 0 do
