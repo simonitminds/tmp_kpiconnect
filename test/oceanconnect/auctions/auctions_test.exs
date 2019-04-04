@@ -91,9 +91,9 @@ defmodule Oceanconnect.AuctionsTest do
       supplier = insert(:company, is_supplier: true)
       auction = insert(:auction, suppliers: [supplier])
 
-      assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == nil
-      Auctions.update_participation_for_supplier(auction.id, supplier.id, "yes")
-      assert Auctions.get_auction_supplier(auction.id, supplier.id).participation == "yes"
+      assert Auctions.get_auction_supplier(auction, supplier.id).participation == nil
+      Auctions.update_participation_for_supplier(auction, supplier.id, "yes")
+      assert Auctions.get_auction_supplier(auction, supplier.id).participation == "yes"
     end
 
     test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{

@@ -450,12 +450,18 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
+  def get_auction_supplier(auction = %Auction{id: nil}, supplier_id) do
+    nil
+  end
+  def get_auction_supplier(auction = %TermAuction{id: nil}, supplier_id) do
+    nil
+  end
 
-  def get_auction_supplier(%Auction{id: auction_id}, supplier_id) do
+  def get_auction_supplier(%Auction{id: auction_id}, supplier_id) when not is_nil(auction_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
-  def get_auction_supplier(%TermAuction{id: term_auction_id}, supplier_id) do
+  def get_auction_supplier(%TermAuction{id: term_auction_id}, supplier_id) when not is_nil(term_auction_id) do
     Repo.get_by(AuctionSuppliers, %{term_auction_id: term_auction_id, supplier_id: supplier_id})
   end
 
