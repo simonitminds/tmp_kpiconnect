@@ -34,8 +34,10 @@ defmodule Oceanconnect.TermAuctionNewTest do
     date_time = DateTime.utc_now()
     suppliers = [selected_company1, selected_company2]
 
-    start_month = "{year: #{date_time.year}, month: #{date_time.month}}"
-    end_month = "{year: #{date_time.year}, month: #{date_time.month + 1}}"
+    %{month: start_month} =
+      DateTime.utc_now()
+    %{month: end_month} =
+      DateTime.utc_now()
 
     auction_params = %{
       anonymous_bidding: false,
@@ -139,7 +141,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     port: port,
     selected_fuel: selected_fuel,
     buyer_company: buyer_company,
-    buyer_vessels: [selected_vessel | _reset]
+    buyer_vessels: [selected_vessel | _reset],
+    start_month: start_month,
+    end_month: end_month
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -147,6 +151,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels([selected_vessel])
     AuctionNewPage.add_fuel(selected_fuel.id)
+    AuctionNewPage.select_month(start_month, :start_date)
+    AuctionNewPage.select_month(end_month + 2, :end_date)
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
@@ -165,7 +171,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     port: port,
     selected_fuel: selected_fuel,
     buyer_company: buyer_company,
-    buyer_vessels: buyer_vessels
+    buyer_vessels: buyer_vessels,
+    start_month: start_month,
+    end_month: end_month
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
@@ -173,6 +181,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_vessels(buyer_vessels)
     AuctionNewPage.add_fuel(selected_fuel.id)
+    AuctionNewPage.select_month(start_month, :start_date)
+    AuctionNewPage.select_month(end_month + 2, :end_date)
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
@@ -187,13 +197,17 @@ defmodule Oceanconnect.TermAuctionNewTest do
     show_params: show_params,
     port: port,
     selected_fuel: selected_fuel,
-    buyer_company: buyer_company
+    buyer_company: buyer_company,
+    start_month: start_month,
+    end_month: end_month
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:forward_fixed)
     AuctionNewPage.select_port(port.id)
     AuctionNewPage.fill_form(params)
     AuctionNewPage.add_fuel(selected_fuel.id)
+    AuctionNewPage.select_month(start_month, :start_date)
+    AuctionNewPage.select_month(end_month + 2, :end_date)
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
@@ -211,7 +225,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
     selected_fuel: selected_fuel,
     selected_fuel_index: selected_fuel_index,
     buyer_company: buyer_company,
-    buyer_vessels: buyer_vessels
+    buyer_vessels: buyer_vessels,
+    start_month: start_month,
+    end_month: end_month
   } do
     AuctionNewPage.visit()
     AuctionNewPage.select_auction_type(:formula_related)
@@ -220,6 +236,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.add_vessels(buyer_vessels)
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_fuel_index(selected_fuel_index.id)
+    AuctionNewPage.select_month(start_month, :start_date)
+    AuctionNewPage.select_month(end_month + 2, :end_date)
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)
@@ -244,7 +262,9 @@ defmodule Oceanconnect.TermAuctionNewTest do
          selected_fuel: selected_fuel,
          selected_fuel_index: selected_fuel_index,
          buyer_company: buyer_company,
-         buyer_vessels: buyer_vessels
+         buyer_vessels: buyer_vessels,
+         start_month: start_month,
+         end_month: end_month
        } do
     login_user(admin_as_buyer)
     AuctionNewPage.visit()
@@ -261,6 +281,8 @@ defmodule Oceanconnect.TermAuctionNewTest do
     AuctionNewPage.add_vessels(buyer_vessels)
     AuctionNewPage.add_fuel(selected_fuel.id)
     AuctionNewPage.add_fuel_index(selected_fuel_index.id)
+    AuctionNewPage.select_month(start_month, :start_date)
+    AuctionNewPage.select_month(end_month + 2, :end_date)
 
     assert AuctionNewPage.credit_margin_amount() ==
              :erlang.float_to_binary(buyer_company.credit_margin_amount, decimals: 2)

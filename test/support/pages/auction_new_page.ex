@@ -162,20 +162,15 @@ defmodule Oceanconnect.AuctionNewPage do
     |> inner_text()
   end
 
-  def select_start_month(start_month) do
-    # execute_script("document.getElementsByClassName('qa-auction-start_date')[0].value = #{start_month}")
-    Element.move_to({:css, ".qa-auction-start_date"}, 10, 10)
-    Mouse.mouse_down()
-    Element.move_to({:css, ".qa-month-input"}, 10, 10)
-    Mouse.mouse_down()
-  end
+  def select_month(month, field_name) do
+    Hound.Helpers.Screenshot.take_screenshot()
+    execute_script("document.getElementsByClassName('qa-auction-#{field_name}')[0].click()")
+    Hound.Helpers.Screenshot.take_screenshot()
+    :timer.sleep(500)
 
-  def select_end_month(end_month) do
-    # execute_script("document.getElementsByClassName('qa-auction-end_date')[0].value = #{end_month}")
-    Element.move_to({:css, ".qa-auction-end_date"}, 10, 10)
-    Mouse.mouse_down()
-    Element.move_to({:css, ".qa-month-input"}, 10, 10)
-    Mouse.mouse_down()
+    find_all_elements(:css, ".qa-auction-#{field_name}-picker li.rmp-btn")
+    |> Enum.at(month + 2)
+    |> click()
   end
 
   def submit do

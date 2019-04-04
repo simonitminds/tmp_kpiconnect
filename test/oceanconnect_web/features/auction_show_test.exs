@@ -442,7 +442,6 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       :timer.sleep(500)
-      Hound.Helpers.Screenshot.take_screenshot()
       assert AuctionShowPage.auction_bid_status() =~ "You have no bids for this auction"
     end
 
