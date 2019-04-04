@@ -31,3 +31,5 @@ config :hound,
   browser: "chrome_headless"
 
 config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.TestAdapter
+
+config :bamboo, :refute_timeout, 5_000
