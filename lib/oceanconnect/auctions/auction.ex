@@ -107,7 +107,7 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_add_suppliers(attrs)
   end
 
-  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %Auction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
+  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %Auction{suppliers: suppliers}, attrs) when length(suppliers) == 0 and action == :update do
     cond do
       Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers")->
         changeset
