@@ -58,3 +58,4 @@ config :oceanconnect, Oceanconnect.Repo,
   pool_size: 10
 
 config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.LocalAdapter
+config :bamboo, :refute_timeout, 5_000
