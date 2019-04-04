@@ -99,6 +99,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:port)
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
+    |> validate_term_period(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
   end
@@ -116,8 +117,10 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel)
     |> cast_assoc(:fuel_index)
     |> validate_scheduled_start(attrs)
+    |> validate_term_period(attrs)
     |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> validate_suppliers(auction, attrs)
   end
 
   def maybe_require_fuel_index(
@@ -131,6 +134,18 @@ defmodule Oceanconnect.Auctions.TermAuction do
   end
 
   def maybe_require_fuel_index(changeset), do: changeset
+
+  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
+    cond do
+      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
+        changeset
+      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
+        changeset
+        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
+    end
+  end
+
+  def validate_suppliers(changeset, _auction, _attrs), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
@@ -265,20 +280,35 @@ defmodule Oceanconnect.Auctions.TermAuction do
   end
 
   defp validate_scheduled_start(changeset, %{scheduled_start: scheduled_start}) do
-    scheduled_start = maybe_convert_start_time(scheduled_start)
-    compare_start_time(changeset, scheduled_start)
+    scheduled_start = maybe_convert_time(scheduled_start)
+    compare_time(changeset, scheduled_start)
   end
 
   defp validate_scheduled_start(changeset, %{"scheduled_start" => scheduled_start}) do
-    scheduled_start = maybe_convert_start_time(scheduled_start)
-    compare_start_time(changeset, scheduled_start)
+    scheduled_start = maybe_convert_time(scheduled_start)
+    compare_time(changeset, scheduled_start)
   end
 
   defp validate_scheduled_start(changeset, _attrs), do: changeset
 
-  defp compare_start_time(changeset, nil), do: changeset
+  defp validate_term_period(changeset, %{start_date: start_date, end_date: end_date}) do
+    start_date = maybe_convert_time(start_date)
+    end_date = maybe_convert_time(end_date)
+    compare_time(changeset, start_date, end_date)
+  end
 
-  defp compare_start_time(changeset, start_time) do
+  defp validate_term_period(changeset, %{"start_date" => start_date, "end_date" => end_date}) do
+    start_date = maybe_convert_time(start_date)
+    end_date = maybe_convert_time(end_date)
+    compare_time(changeset, start_date, end_date)
+  end
+
+  defp validate_term_period(changeset, _attrs), do: changeset
+
+  defp compare_time(changeset, nil), do: changeset
+  defp compare_time(changeset, nil, nil), do: changeset
+
+  defp compare_time(changeset, start_time) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     case DateTime.compare(start_time, now) do
@@ -290,14 +320,24 @@ defmodule Oceanconnect.Auctions.TermAuction do
     end
   end
 
-  defp maybe_convert_start_time(""), do: nil
-
-  defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
-    {_, scheduled_start, _} = DateTime.from_iso8601(scheduled_start)
-    scheduled_start
+  defp compare_time(changeset, start_date, end_date) do
+    case DateTime.compare(end_date, start_date) do
+      :lt ->
+        changeset
+        |> add_error(:end_date, "End month cannot be before the start month")
+      _ ->
+        changeset
+    end
   end
 
-  defp maybe_convert_start_time(scheduled_start) do
-    scheduled_start
+  defp maybe_convert_time(""), do: nil
+
+  defp maybe_convert_time(time) when is_binary(time) do
+    {_, time, _} = DateTime.from_iso8601(time)
+    time
+  end
+
+  defp maybe_convert_time(time) do
+    time
   end
 end

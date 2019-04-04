@@ -120,10 +120,12 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
-        <div className="card-content__products">
-          <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-          <FuelPriceDisplay products={products} auctionType={auctionType} />
-        </div>
+        { auctionStatus != 'pending' &&
+          <div className="card-content__products">
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
+            <FuelPriceDisplay products={products} auctionType={auctionType} />
+          </div>
+        }
         { bidStatusDisplay() }
       </div>
     </div>

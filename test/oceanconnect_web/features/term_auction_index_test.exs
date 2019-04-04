@@ -34,7 +34,7 @@ defmodule Oceanconnect.TermAuctionIndexTest do
 
     test "term auction buyer card shows correct information", %{auction: auction} do
       assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "forward_fixed")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "term")
       assert AuctionIndexPage.has_field_in_auction?(auction.id, "port")
     end
 
@@ -69,7 +69,7 @@ defmodule Oceanconnect.TermAuctionIndexTest do
     test "supplier can see his view of the auction card", %{auction: auction} do
       # Temporarily removed parameter "invitation-controls"
       assert AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card")
-      assert AuctionIndexPage.has_field_in_auction?(auction.id, "forward_fixed")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "term")
       assert AuctionIndexPage.has_field_in_auction?(auction.id, "port")
       # Temporarily removed parameter "suppliers"
       refute AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")

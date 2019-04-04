@@ -123,10 +123,12 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
-        <div className="card-content__products">
-          <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-          <FuelPriceDisplay products={products} auctionType={auctionType} />
-        </div>
+        { auctionStatus != 'pending' && auctionStatus != 'draft' &&
+          <div className="card-content__products">
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
+            <FuelPriceDisplay products={products} auctionType={auctionType} />
+          </div>
+        }
         { auctionStatus == 'pending'
           ? <div className="card-content__products">
               { window.isAdmin &&
@@ -135,17 +137,14 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
                 </a>
               }
             </div>
-          : <div className="is-none"></div>
+          : ""
         }
-
-        <div>
-          { auctionStatus == 'pending' || auctionStatus == 'open'
-              ? <div className="card-content__auction-status">
-                <SuppliersParticipating auctionPayload={auctionPayload} />
-              </div>
-            : <div className="is-none"></div>
-          }
-        </div>
+        { auctionStatus == 'pending' || auctionStatus == 'open'
+            ? <div className="card-content__auction-status">
+              <SuppliersParticipating auctionPayload={auctionPayload} />
+            </div>
+          : ""
+        }
         { bidStatusDisplay() }
     {/* ADMIN ONLY */}
         {/* <div className="card-content__bid-status">

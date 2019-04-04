@@ -16,6 +16,10 @@ const AuctionDetailsFormSection = (props) => {
     updateInformationFromCheckbox,
     updateDate
   } = props;
+
+  const auctionDurationDefault = auction.duration ? auction.duration / 60000 : "";
+  const auctionDecisionDurationDefault = auction.decision_duration ? auction.decision_duration / 6000 : "";
+
   return (
     <section className="auction-info is-gray-1"> {/* Auction details */}
       <div className="container">
@@ -62,7 +66,7 @@ const AuctionDetailsFormSection = (props) => {
               <div className="field-body">
                 <div className="control has-margin-right-sm">
                   <div className="select">
-                    <select id="auction_duration" name="auction[duration]" defaultValue={auction.duration / 60000} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
+                    <select id="auction_duration" name="auction[duration]" defaultValue={auctionDurationDefault} className="qa-auction-duration" onChange={updateInformation.bind(this, 'auction.duration')}>
                       <option disabled value="">
                         Please select
                       </option>
@@ -86,7 +90,7 @@ const AuctionDetailsFormSection = (props) => {
               <div className="field-body">
                 <div className="control has-margin-right-sm">
                   <div className="select">
-                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auction.decision_duration / 60000} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
+                    <select id="auction_decision_duration" name="auction[decision_duration]" defaultValue={auctionDecisionDurationDefault} className="qa-auction-decision_duration" onChange={updateInformation.bind(this, 'auction.decision_duration')}>
                       <option disabled value="">
                         Please select
                       </option>

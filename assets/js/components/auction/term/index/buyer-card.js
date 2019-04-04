@@ -93,29 +93,26 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
             ""
           }
         </div>
-        <div className="card-content__products">
-          <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
-          <FuelPriceDisplay products={products} auctionType={auctionType} />
-        </div>
-        { auctionStatus == 'pending'
-          ? <div className="card-content__products">
-              { window.isAdmin &&
-                <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small has-margin-left-sm qa-auction-start">
-                  <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
-                </a>
-              }
-            </div>
-          : <div className="is-none"></div>
+        { auctionStatus != 'pending' && auctionStatus != 'draft' &&
+          <div className="card-content__products">
+            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
+            <FuelPriceDisplay products={products} auctionType={auctionType} />
+          </div>
+        }
+        { auctionStatus == 'pending' && window.isAdmin &&
+          <div className="card-content__products">
+            <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small has-margin-left-sm qa-auction-start">
+              <span className="icon"><FontAwesomeIcon icon="play" /></span> Start Auction
+            </a>
+          </div>
         }
 
-        <div>
-          { auctionStatus == 'pending' || auctionStatus == 'open'
+        { auctionStatus == 'pending' || auctionStatus == 'open'
             ? <div className="card-content__auction-status">
-                <SuppliersParticipating auctionPayload={auctionPayload} />
-              </div>
-            : <div className="is-none"></div>
-          }
-        </div>
+              <SuppliersParticipating auctionPayload={auctionPayload} />
+            </div>
+          : ""
+        }
         { bidStatusDisplay() }
       </div>
     </div>

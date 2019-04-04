@@ -1,7 +1,7 @@
 <div class="form auction-app__body">
 <%= form_for @changeset, @action, [class: "control", onsubmit: "debouncedSubmit()"], fn _f -> %>
 
-  <%= if @changeset.action do %>
+  <%= if length(@changeset.errors) > 0 do %>
     <section class="auction-info has-margin-top-none has-padding-top-none">
       <div class="container has-padding-none">
         <div class="content">

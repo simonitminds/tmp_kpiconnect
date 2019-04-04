@@ -61,7 +61,6 @@ export default function(state, action) {
         return state;
       } else {
         const supplierList = _.map(action.data.auction.suppliers, 'id');
-        console.log(action.data);
         return {
           ...state,
           auction: action.data.auction,

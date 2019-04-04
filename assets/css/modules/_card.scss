@@ -57,6 +57,10 @@
   @media (max-width: 768px) {
     margin: 0.5rem 0;
   }
+
+  &:last-child {
+    padding-bottom: 1rem;
+  }
 }
 
 .card-content__bid-status {

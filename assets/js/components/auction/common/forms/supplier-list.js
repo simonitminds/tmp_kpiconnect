@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
+import InputErrors from '../../../input-errors';
 
 
 const SupplierList = (props) => {
@@ -9,7 +10,8 @@ const SupplierList = (props) => {
           selectedPort,
           onToggleSupplier,
           onSelectAllSuppliers,
-          onDeSelectAllSuppliers
+          onDeSelectAllSuppliers,
+          errors
         } = props;
 
   const portLabel = () => {
@@ -56,6 +58,7 @@ const SupplierList = (props) => {
                   })
                 }
               </div>
+              <InputErrors errors={errors.suppliers} />
               <div className="field has-addons">
                 <div className="control">
                   <a id="selectAllSellers" className="button" onClick={onSelectAllSuppliers}>

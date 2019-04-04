@@ -54,3 +54,19 @@ $positions: (
 // Just Because
 
 .has-padding-right-nudge { padding-right: 2px; }
+
+
+// FLEX
+// (Borrowed from Tailwind CSS)
+
+.items-stretch	{ align-items: stretch; }
+.items-start	{ align-items: flex-start; }
+.items-center	{ align-items: center; }
+.items-end	{ align-items: flex-end; }
+.items-baseline	{ align-items: baseline };
+
+.justify-start	{ justify-content: flex-start; }
+.justify-center	{ justify-content: center; }
+.justify-end	{ justify-content: flex-end; }
+.justify-between	{ justify-content: space-between; }
+.justify-around	{ justify-content: space-around; }

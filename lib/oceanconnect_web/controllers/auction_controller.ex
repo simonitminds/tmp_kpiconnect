@@ -84,7 +84,7 @@ defmodule OceanconnectWeb.AuctionController do
 
     changeset =
       Auctions.change_auction(%Auction{})
-      |> Map.put(:errors, %{})
+      |> Map.merge(%{action: :create, errors: []})
 
     [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 
@@ -155,7 +155,9 @@ defmodule OceanconnectWeb.AuctionController do
            id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == Auth.current_user(conn).company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
-      changeset = Auctions.change_auction(auction)
+      changeset =
+        Auctions.change_auction(auction)
+        |> Map.put(:action, :update)
 
       [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
       [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
@@ -190,6 +192,7 @@ defmodule OceanconnectWeb.AuctionController do
            id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
+
       updated_params =
         auction_params
         |> normalize_auction_params()
@@ -263,7 +266,7 @@ defmodule OceanconnectWeb.AuctionController do
     suppliers =
       case auction.port do
         nil ->
-          []
+          Poison.encode!([])
 
         _ ->
           auction.port

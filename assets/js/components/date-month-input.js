@@ -8,7 +8,7 @@ export default class DateMonthInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: props.value ? moment(props.value).utc() : null,
+      date: props.value ? moment(props.value) : null,
       focused: false
     }
   }
@@ -25,7 +25,7 @@ export default class DateMonthInput extends React.Component {
     this.refs.monthPicker.show()
   }
   handleMonthChange(year, month) {
-    const value = {year: year, month: month};
+    const value = {year: year, month: month - 1};
     if (value) {
       const newValue = {year: value.year, month: value.month - 1}
       this.props.onChange(newValue);
@@ -37,25 +37,14 @@ export default class DateMonthInput extends React.Component {
     const {
       model, field, labelText, value, name, onChange, defaultValue
     } = this.props;
-    const fieldName = name === false ? "" : name || `${model}_${field}`;
+
     const years = () => {
       let firstYear = moment().year();
       let lastYear = firstYear + 5;
       return _.range(firstYear, lastYear);
     }
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const mvalue = {year: this.state.date.year(), month: this.state.date.month()};
-
-    const makeText = (date) => {
-      let text;
-      if (date && date.year && date.month) {
-        text = months[date.month] + ' ' + date.year;
-      } else {
-        text = "";
-      }
-      return text;
-    }
-
+    const mvalue = this.state.date ? {year: this.state.date.year(), month: this.state.date.month()} : null;
     return(
       <div className="has-margin-right-sm">
         <div className={`control`}>
@@ -63,15 +52,14 @@ export default class DateMonthInput extends React.Component {
             ref='monthPicker'
             years={years()}
             lang={months}
-            value={{year: mvalue.year, month: mvalue.month + 1}}
-            defaultValue={value}
+            value={ mvalue ? {year: mvalue.year, month: mvalue.month + 1} : {year: moment().year(), month: moment().month() + 1}}
             onChange={this.handleMonthChange.bind(this)}
-            // onDismiss={this.handleMonthDismiss.bind(this)}
           />
           <input
             className={`input`}
-            value={formatMonthYear(mvalue)}
+            value={mvalue ? formatMonthYear(mvalue) : ""}
             onClick={this.handleClickInput.bind(this)}
+            readOnly
              />
         </div>
       </div>
