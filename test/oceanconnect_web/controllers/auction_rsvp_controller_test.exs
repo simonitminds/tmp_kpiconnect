@@ -45,34 +45,34 @@ defmodule OceanconnectWeb.AuctionRsvpControllerTest do
 
   test "responding via query param sets response", %{
     conn: conn,
-    auction: %Auction{id: auction_id},
+    auction: auction = %Auction{id: auction_id},
     supplier_company_id: supplier_company_id
   } do
     updated_conn = get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "yes"}))
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
-    assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "yes"
+    assert Auctions.get_auction_supplier(auction, supplier_company_id).participation == "yes"
 
     updated_conn = get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "no"}))
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
-    assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "no"
+    assert Auctions.get_auction_supplier(auction, supplier_company_id).participation == "no"
 
     updated_conn =
       get(conn, auction_rsvp_path(conn, :update, auction_id, %{"response" => "maybe"}))
 
     assert redirected_to(updated_conn) == auction_path(conn, :show, auction_id)
-    assert Auctions.get_auction_supplier(auction_id, supplier_company_id).participation == "maybe"
+    assert Auctions.get_auction_supplier(auction, supplier_company_id).participation == "maybe"
   end
 
   test "responding to an auction you're not invited to does nothing", %{
     conn: conn,
     supplier_company_id: supplier_company_id,
-    other_auction: %Auction{id: other_auction_id}
+    other_auction: auction = %Auction{id: other_auction_id}
   } do
     updated_conn =
       get(conn, auction_rsvp_path(conn, :update, other_auction_id, %{"response" => "yes"}))
 
     assert html_response(updated_conn, 302)
     assert redirected_to(updated_conn) == auction_path(conn, :index)
-    refute Auctions.get_auction_supplier(other_auction_id, supplier_company_id)
+    refute Auctions.get_auction_supplier(auction, supplier_company_id)
   end
 end
