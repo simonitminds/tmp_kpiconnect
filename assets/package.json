@@ -31,6 +31,7 @@
     "react-responsive": "^4.1.0",
     "react-router": "^4.2.0",
     "react-tabs": "^2.2.2",
+    "react-textarea-autosize": "^7.1.0",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "serverdate": "^3.1.0",

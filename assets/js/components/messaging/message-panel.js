@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const MAX_MESSAGE_LENGTH = 1024;
 
@@ -26,24 +27,6 @@ export default class MessagePanel extends React.Component {
       () => this.tick(),
       1200
     );
-
-    // Resize text area based on content (reference: https://www.impressivewebs.com/textarea-auto-resize/)
-
-    let txt = document.querySelector('.messaging__input textarea'),
-    hiddenDiv = document.createElement('div'),
-    content = null;
-
-    hiddenDiv.classList.add('hiddendiv', 'common');
-
-    document.body.appendChild(hiddenDiv);
-
-    txt.addEventListener('keyup', function () {
-
-      content = this.value;
-      hiddenDiv.innerHTML = content + '\n\n';
-      this.style.height = (hiddenDiv.getBoundingClientRect().height - 15) + 'px';
-
-    }, false);
   }
 
   componentWillUnmount() {
@@ -133,7 +116,7 @@ export default class MessagePanel extends React.Component {
           <div className="messaging__input">
             <div className="field is-grouped has-margin-bottom-xs">
               <div className="control">
-                <textarea className="textarea" rows="1" placeholder='Type message here' value={newMessage} onChange={this.handleMessageChange.bind(this)} />
+                <TextareaAutosize className="textarea" rows="1" placeholder='Type message here' value={newMessage} onChange={this.handleMessageChange.bind(this)} />
               </div>
 
               <div className="control">
