@@ -31,7 +31,7 @@ main {
   padding: 0 1rem;
 
   &--auction-log { // Main Container on Auction Log Page
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 

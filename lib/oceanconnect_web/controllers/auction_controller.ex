@@ -39,6 +39,10 @@ defmodule OceanconnectWeb.AuctionController do
         "log.html",
         auction_payload: AuctionPayload.get_auction_payload!(auction, auction.buyer_id),
         events: AuctionEventStore.event_list(auction.id),
+        non_barge_events: AuctionEventStore.non_barge_events(auction.id),
+        barge_events: AuctionEventStore.barge_events(auction.id),
+        bid_events: AuctionEventStore.bid_events(auction.id),
+        timing_log_events: AuctionEventStore.timing_log_events(auction.id),
         messages_by_company: Messages.messages_by_thread(auction),
         solutions_payload:
           Payloads.SolutionsPayload.get_solutions_payload!(

@@ -90,26 +90,110 @@
       </table>
     </div>
 
-
-    <h2>Activity Log</h2>
-    <div class="report__log">
-      <div class="report__log__header">
-        <div>
-          <div>Time</div>
-          <div>Event</div>
-          <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
-            <div>Impersonator</div>
+    <div class="log-section">
+      <input id="auctionLogToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="auctionLogToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
+      <h2>Activity Log</h2>
+      <div class="report__log">
+        <div class="report__log__header">
+          <div>
+            <div>Time</div>
+            <div>Event</div>
+            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+              <div>Impersonator</div>
+            <% end %>
+          </div>
+        </div>
+        <div class="report__log__body">
+          <%= for event <- @events do %>
+            <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
           <% end %>
         </div>
       </div>
-      <div class="report__log__body">
-        <%= for event <- @events do %>
-          <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
-        <% end %>
+    </div>
+    <div class="log-section">
+      <input id="auctionLogBargingToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="auctionLogBargingToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
+      <h2>Barging Log</h2>
+      <div class="report__log">
+          <div class="report__log__header">
+              <div>
+                  <div>Time</div>
+                  <div>Event</div>
+                  <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                      <div>Impersonator</div>
+                  <% end %>
+              </div>
+          </div>
+          <div class="report__log__body">
+          <%= for event <- @barge_events do %>
+              <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
+          <% end %>
+          </div>
+      </div>
+    </div>
+    <div class="log-section">
+      <input id="auctionLogPricingToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="auctionLogPricingToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
+      <h2>Price Log</h2>
+      <div class="report__log">
+          <div class="report__log__header">
+              <div>
+                  <div>Time</div>
+                  <div>Event</div>
+                  <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                      <div>Impersonator</div>
+                  <% end %>
+              </div>
+          </div>
+          <div class="report__log__body">
+              <%= for event <- @bid_events do %>
+                  <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
+              <% end %>
+          </div>
+      </div>
+    </div>
+    <div class="log-section">
+      <input id="auctionLogTimingToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="auctionLogTimingToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
+      <h2>Timing Log</h2>
+      <div class="report__log">
+          <div class="report__log__header">
+              <div>
+                  <div>Time</div>
+                  <div>Event</div>
+                  <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+                      <div>Impersonator</div>
+                  <% end %>
+              </div>
+          </div>
+          <div class="report__log__body">
+              <%= for event <- @timing_log_events do %>
+                  <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
+              <% end %>
+          </div>
       </div>
     </div>
 
     <%= unless Enum.empty?(@messages_by_company) do %>
+    <div class="log-section">
+      <input id="auctionLogMessagingToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="auctionLogMessagingToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
       <h2>Message Log</h2>
       <div class="report__message-log">
         <%= for {supplier_company, thread} <- @messages_by_company do %>
@@ -140,5 +224,6 @@
           </div>
         <% end %>
       </div>
+    </div>
     <% end %>
 </div>
