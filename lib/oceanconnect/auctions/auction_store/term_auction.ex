@@ -491,7 +491,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   end
 
   def apply(
-        state,
+        state = %TermAuctionState{auction_id: auction_id},
         %AuctionEvent{type: :auction_started}
       ) do
     {next_state, _} =
