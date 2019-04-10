@@ -12,7 +12,7 @@
     <h1 style="font-weight: bold; font-size: 12pt; margin: 0;">Auction Details</h1>
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
-    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel(s):</b> <%= if @auction.vessels, do: vessel_name_list(@auction.vessels), else: "To be nominated" %></p>
+    <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Vessel(s):</b> <%= if String.length(vessel_name_list(@auction.vessels)) != 0, do: vessel_name_list(@auction.vessels), else: "To be nominated" %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port:</b> <%= @auction.port.name %></p>
     <p style="font-family: 'Arial'; margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Port Agent:</b> <%= if @auction.port_agent, do: @auction.port_agent, else: "—" %></p>
     <%= render partial_name_for_type(@auction, "duration"), Map.put(assigns, :auction, @auction) %>
@@ -36,7 +36,7 @@
     <% end %>
     <%= for deliverable <- @deliverables do %>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
-      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>
+      <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT <%= if(@auction.type == "Term" && !@auction.show_total_fuel_volume) do %>per month<% end %></p>
       <%= if price = deliverable.bid.amount do %>
         <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b><%= if @auction.type == "formula_related", do: "Discount/Premium Applied:", else: "Price:" %></b> <%= format_price(price) %></p>
       <% else %>
