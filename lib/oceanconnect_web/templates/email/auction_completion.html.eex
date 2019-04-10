@@ -38,7 +38,7 @@
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT</p>
       <%= if price = deliverable.bid.amount do %>
-        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b><%= if @auction.type == "formula_related", do: "Discount/Premium applied:", else: "Price:" %></b> <%= format_price(price) %></p>
+        <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b><%= if @auction.type == "formula_related", do: "Discount/Premium Applied:", else: "Price:" %></b> <%= format_price(price) %></p>
       <% else %>
         <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> No bid was selected for this deliverable</p>
       <% end %>
