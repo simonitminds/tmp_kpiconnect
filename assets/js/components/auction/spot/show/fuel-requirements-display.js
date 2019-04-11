@@ -12,7 +12,7 @@ const FuelRequirementsDisplay = (props) => {
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const fuels = vesselFuels && _.chain(vesselFuels).map('fuel').uniqBy('id').value();
 
-  if(fuels) {
+  if(fuels.length == 0) {
     return (
       <i>No fuels have been specified for this auction</i>
     );
