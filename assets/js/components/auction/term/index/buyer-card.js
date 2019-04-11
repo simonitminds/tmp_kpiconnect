@@ -46,6 +46,8 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
     .nth(0)
     .value() || '';
   const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}];
+  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -93,12 +95,10 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
             ""
           }
         </div>
-        { auctionStatus != 'pending' && auctionStatus != 'draft' &&
-          <div className="card-content__products">
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
-            <FuelPriceDisplay products={products} auctionType={auctionType} />
-          </div>
-        }
+        <div className="card-content__products">
+          <span className="card-content__product-header">{preAuctionStatus ? 'Products' : productLabel() } <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
+          <FuelPriceDisplay products={products} auctionType={auctionType} auctionStatus={auctionStatus} />
+        </div>
         { auctionStatus == 'pending' && window.isAdmin &&
           <div className="card-content__products">
             <a href={`/auctions/${auction.id}/start`} className="card__start-auction button is-link is-small has-margin-left-sm qa-auction-start">
