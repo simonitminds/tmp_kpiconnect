@@ -135,17 +135,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 and action == :update do
-    cond do
-      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
-        changeset
-      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
-        changeset
-        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
-    end
-  end
-
-  def validate_suppliers(changeset, _auction, attrs) do
+  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
     cond do
       Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
         changeset
