@@ -27,7 +27,7 @@ export default class DateMonthInput extends React.Component {
   handleMonthChange(year, month) {
     const value = {year: year, month: month - 1};
     if (value) {
-      const newValue = {year: value.year, month: value.month + 1}
+      const newValue = {year: value.year, month: value.month}
       this.props.onChange(newValue);
     }
     this.setState({ date: moment(value).utc() });
@@ -52,7 +52,7 @@ export default class DateMonthInput extends React.Component {
             ref='monthPicker'
             years={years()}
             lang={months}
-            value={ mvalue ? {year: mvalue.year, month: mvalue.month + 1} : {year: moment().year(), month: moment().month() + 1}}
+            value={ mvalue ? {year: mvalue.year, month: mvalue.month} : {year: moment().year(), month: moment().month()}}
             onChange={this.handleMonthChange.bind(this)}
           />
           <input

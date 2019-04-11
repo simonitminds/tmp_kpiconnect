@@ -119,7 +119,7 @@ defmodule OceanconnectWeb.EmailView do
         "November",
         "December"
       ]
-      |> Enum.at(month + 1)
+      |> Enum.at(month - 1)
 
     "#{month} #{year}"
   end

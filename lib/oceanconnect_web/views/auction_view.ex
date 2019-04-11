@@ -228,7 +228,7 @@ defmodule OceanconnectWeb.AuctionView do
         "November",
         "December"
       ]
-      |> Enum.at(month + 1)
+      |> Enum.at(month - 1)
 
     "#{month} #{year}"
   end
