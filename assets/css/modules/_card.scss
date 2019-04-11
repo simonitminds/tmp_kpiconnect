@@ -151,6 +151,15 @@
   }
 }
 
+.card-content__no-products {
+  display: block;
+  padding: 0.25rem 1rem;
+
+  .card-content__product + & {
+    display: none;
+  }
+}
+
 .card-content__bid {
   background-color: $gray-2;
   margin: 0 0;

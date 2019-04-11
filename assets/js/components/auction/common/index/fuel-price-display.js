@@ -45,6 +45,7 @@ const FuelPriceDisplay = ({products, auctionType, auctionStatus}) => {
           );
         })
       }
+      <div className="card-content__product card-content__no-products"><i>No products specified</i></div>
     </React.Fragment>
   );
 };
