@@ -133,12 +133,13 @@
 
   .fuel-name {
     max-width: calc(100% - 124px);
+    padding: 0.25rem 0;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
   }
   .fuel-amount {
-    padding: 0 0.5rem 0 0.25rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.25rem;
   }
 
   @media (max-width: 768px) {
@@ -147,6 +148,15 @@
     &+ .card-content__product {
       margin-top: 0.75rem;
     }
+  }
+}
+
+.card-content__no-products {
+  display: block;
+  padding: 0.25rem 1rem;
+
+  .card-content__product + & {
+    display: none;
   }
 }
 

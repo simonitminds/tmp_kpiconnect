@@ -79,7 +79,10 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
 
   const products = _.map(uniqueFuels, (fuel) => {
     return {fuel: fuel, quantity: fuelQuantities[fuel.id], bid: solutionBidsByFuel[fuel.id]};
-  })
+  });
+
+  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -123,12 +126,10 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
         </div>
-        { auctionStatus != 'pending' && auctionStatus != 'draft' &&
-          <div className="card-content__products">
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices</span>
-            <FuelPriceDisplay products={products} auctionType={auctionType} />
-          </div>
-        }
+        <div className="card-content__products">
+          <span className="card-content__product-header">{preAuctionStatus ? 'Products' : productLabel() }</span>
+          <FuelPriceDisplay products={products} auctionType={auctionType} auctionStatus={auctionStatus} />
+        </div>
         { auctionStatus == 'pending'
           ? <div className="card-content__products">
               { window.isAdmin &&

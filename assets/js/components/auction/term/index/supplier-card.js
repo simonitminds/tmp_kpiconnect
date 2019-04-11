@@ -49,7 +49,9 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
     .get('bids', [])
     .nth(0)
     .value() || '';
-  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}]
+  const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}];
+  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
@@ -78,12 +80,10 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
             ""
           }
         </div>
-        { auctionStatus != 'pending' &&
-          <div className="card-content__products">
-            <span className="card-content__product-header">{auctionStatus == 'closed' ? 'Winning' : 'Leading Offer'} Prices <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
-            <FuelPriceDisplay products={products} auctionType={auctionType} />
-          </div>
-        }
+        <div className="card-content__products">
+          <span className="card-content__product-header">{preAuctionStatus ? 'Products' : productLabel() } <span className={`qa-auction-${auctionType}`}>({_.startCase(auctionType)})</span></span>
+          <FuelPriceDisplay products={products} auctionType={auctionType} auctionStatus={auctionStatus} />
+        </div>
 
         { bidStatusDisplay() }
       </div>
