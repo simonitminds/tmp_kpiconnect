@@ -50,7 +50,7 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
     .nth(0)
     .value() || '';
   const products = [{fuel: fuel, quantity: fuelQuantity, bid: productBid}];
-  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const preAuctionStatus = auctionStatus == "pending";
   const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (

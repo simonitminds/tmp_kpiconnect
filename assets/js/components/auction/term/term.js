@@ -5,6 +5,7 @@ import BuyerSidebar from './show/buyer-sidebar';
 import SupplierSidebar from './show/supplier-sidebar';
 import BuyerCard from './index/buyer-card';
 import SupplierCard from './index/supplier-card';
+import BuyerDraftCard from './index/buyer-draft-card';
 
 export default {
   Header,
@@ -13,5 +14,6 @@ export default {
   BuyerSidebar,
   SupplierSidebar,
   BuyerCard,
-  SupplierCard
+  SupplierCard,
+  BuyerDraftCard
 };

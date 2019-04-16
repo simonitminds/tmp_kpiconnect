@@ -97,7 +97,7 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
     return {fuel: fuel, quantity: fuelQuantities[fuel.id], bid: solutionBidsByFuel[fuel.id]};
   });
 
-  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const preAuctionStatus = auctionStatus == "pending";
   const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (
