@@ -63,8 +63,23 @@ defmodule Oceanconnect.Factory do
   end
 
   def draft_term_auction_factory() do
+    start_date =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(20)
+      |> DateTime.from_naive!("Etc/UTC")
+
+    end_date =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.add(80)
+      |> DateTime.from_naive!("Etc/UTC")
+
     %Oceanconnect.Auctions.TermAuction{
-      port: build(:port)
+      port: build(:port),
+      fuel: build(:fuel),
+      start_date: start_date,
+      end_date: end_date
     }
   end
 
@@ -75,20 +90,11 @@ defmodule Oceanconnect.Factory do
       |> NaiveDateTime.add(20)
       |> DateTime.from_naive!("Etc/UTC")
 
-    end_time =
-      DateTime.utc_now()
-      |> DateTime.to_naive()
-      |> NaiveDateTime.add(80)
-      |> DateTime.from_naive!("Etc/UTC")
-
     struct!(
       draft_term_auction_factory(),
       %{
         type: "forward_fixed",
         scheduled_start: start_time,
-        start_date: start_time,
-        end_date: end_time,
-        fuel: build(:fuel),
         fuel_quantity: 1500,
         terminal: "TERMINAL",
         duration: 10 * 60_000,
@@ -106,21 +112,12 @@ defmodule Oceanconnect.Factory do
       |> NaiveDateTime.add(20)
       |> DateTime.from_naive!("Etc/UTC")
 
-    end_time =
-      DateTime.utc_now()
-      |> DateTime.to_naive()
-      |> NaiveDateTime.add(80)
-      |> DateTime.from_naive!("Etc/UTC")
-
     struct!(
       draft_term_auction_factory(),
       %{
         type: "formula_related",
         current_index_price: 750.00,
         scheduled_start: start_time,
-        start_date: start_time,
-        end_date: end_time,
-        fuel: build(:fuel),
         fuel_index: build(:fuel_index),
         fuel_quantity: 1500,
         terminal: "TERMINAL",

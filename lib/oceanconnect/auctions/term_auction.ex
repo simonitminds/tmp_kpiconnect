@@ -63,7 +63,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   @required_fields [
     :type,
-    :port_id
+    :port_id,
+    :fuel_id
   ]
 
   @optional_fields [
@@ -77,7 +78,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :duration,
     :decision_duration,
     :end_date,
-    :fuel_id,
     :fuel_index_id,
     :fuel_quantity,
     :total_fuel_volume,
@@ -108,7 +108,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(
-      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date],
+      @required_fields ++ [:scheduled_start, :fuel_quantity, :start_date, :end_date],
       message: "This field is required."
     )
     |> maybe_require_fuel_index()
@@ -135,10 +135,16 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
+  def validate_suppliers(
+        %Ecto.Changeset{action: action} = changeset,
+        %TermAuction{suppliers: suppliers},
+        attrs
+      )
+      when length(suppliers) == 0 do
     cond do
       Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
         changeset
+
       !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
         changeset
         |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
@@ -325,6 +331,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
       :lt ->
         changeset
         |> add_error(:end_date, "End month cannot be before the start month")
+
       _ ->
         changeset
     end
