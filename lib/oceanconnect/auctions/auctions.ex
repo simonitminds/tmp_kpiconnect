@@ -443,6 +443,15 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def get_auction_status!(auction_id) when is_integer(auction_id) do
+    with {:ok, auction} <- AuctionCache.read(auction_id),
+         %{status: status} <- get_auction_state!(auction) do
+      status
+    else
+      {:error, msg} -> {:error, msg}
+    end
+  end
+
   def get_auction_status!(auction) do
     %{status: status} = get_auction_state!(auction)
     status
@@ -450,9 +459,11 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
+
   def get_auction_supplier(auction = %Auction{id: nil}, supplier_id) do
     nil
   end
+
   def get_auction_supplier(auction = %TermAuction{id: nil}, supplier_id) do
     nil
   end
@@ -461,7 +472,8 @@ defmodule Oceanconnect.Auctions do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
   end
 
-  def get_auction_supplier(%TermAuction{id: term_auction_id}, supplier_id) when not is_nil(term_auction_id) do
+  def get_auction_supplier(%TermAuction{id: term_auction_id}, supplier_id)
+      when not is_nil(term_auction_id) do
     Repo.get_by(AuctionSuppliers, %{term_auction_id: term_auction_id, supplier_id: supplier_id})
   end
 
@@ -473,7 +485,7 @@ defmodule Oceanconnect.Auctions do
           auction_supplier.supplier_id == ^supplier_id
     )
     |> Repo.update_all(set: [participation: response])
-      end
+  end
 
   def update_participation_for_supplier(%TermAuction{id: term_auction_id}, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
@@ -484,7 +496,6 @@ defmodule Oceanconnect.Auctions do
     )
     |> Repo.update_all(set: [participation: response])
   end
-
 
   def start_auction(auction = %struct{}, user \\ nil, started_at \\ DateTime.utc_now())
       when is_auction(struct) do
@@ -677,8 +688,8 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def update_auction(%struct{} = auction, %{"scheduled_start" => nil} = attrs, user)
-      when is_auction(struct) do
+  def update_auction(%struct{} = auction, %{"scheduled_start" => value} = attrs, user)
+      when is_auction(struct) and (is_nil(value) or value == "") do
     auction
     |> struct.changeset(attrs)
     |> Repo.update()
@@ -692,8 +703,8 @@ defmodule Oceanconnect.Auctions do
     |> auction_update_command(user)
   end
 
-  def update_auction!(%struct{} = auction, %{"scheduled_start" => nil} = attrs, user)
-      when is_auction(struct) do
+  def update_auction!(%struct{} = auction, %{"scheduled_start" => value} = attrs, user)
+      when is_auction(struct) and (is_nil(value) or value == "") do
     auction
     |> struct.changeset(attrs)
     |> Repo.update!()
