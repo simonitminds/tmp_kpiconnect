@@ -55,6 +55,7 @@ defmodule Oceanconnect.Factory do
         duration: 10 * 60_000,
         decision_duration: 15 * 60_000,
         auction_vessel_fuels: [build(:vessel_fuel)],
+        additional_information: "",
         buyer: build(:company),
         suppliers: [build(:company, is_supplier: true)]
       }
@@ -92,6 +93,7 @@ defmodule Oceanconnect.Factory do
         terminal: "TERMINAL",
         duration: 10 * 60_000,
         buyer: build(:company),
+        additional_information: "",
         suppliers: [build(:company, is_supplier: true)]
       }
     )

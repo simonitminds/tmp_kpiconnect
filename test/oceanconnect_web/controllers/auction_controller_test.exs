@@ -152,6 +152,43 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert redirected_to(conn) == auction_path(conn, :show, id)
     end
 
+    test "draft auctions can be updated and remain draft if pending requirements aren't met", %{
+      conn: conn,
+      valid_auction_params: valid_auction_params
+    } do
+      draft_attrs =
+        Map.merge(valid_auction_params, %{
+          "scheduled_start" => nil,
+          "duration" => 0,
+          "decision_duration" => 0
+        })
+
+      conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
+
+      auction =
+        Oceanconnect.Repo.all(Auctions.Auction)
+        |> Enum.reverse()
+        |> hd()
+
+      assert Auctions.get_auction_status!(auction) == :draft
+      updated_info = "This is should be allowed to be updated."
+
+      conn =
+        put(conn, auction_path(conn, :update, auction.id),
+          auction: %{draft_attrs | "additional_information" => updated_info}
+        )
+
+      assert html_response(conn, 302)
+      assert redirected_to(conn) == auction_path(conn, :show, auction.id)
+
+      :timer.sleep(500)
+
+      auction = Auctions.get_auction(auction.id)
+
+      assert Auctions.get_auction(auction.id).additional_information == updated_info
+      assert Auctions.get_auction_status!(auction) == :draft
+    end
+
     test "renders errors when adding scheduled_start without fuel details", %{
       conn: conn,
       valid_auction_params: valid_auction_params
@@ -274,12 +311,17 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Edit Auction"
     end
 
-    test "redirects when data is valid", %{conn: conn, auction: auction, valid_auction_params: valid_auction_params} do
+    test "redirects when data is valid", %{
+      conn: conn,
+      auction: auction,
+      valid_auction_params: valid_auction_params
+    } do
       attrs =
         valid_auction_params
         |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
         |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
         |> Map.merge(@update_attrs)
+
       conn = put(conn, auction_path(conn, :update, auction), auction: attrs)
       assert redirected_to(conn) == auction_path(conn, :show, auction)
 
