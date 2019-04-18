@@ -60,7 +60,7 @@ defmodule Oceanconnect.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.2"},
       {:hackney, "~> 1.14"},
-      {:hound, "~> 1.0", only: :test},
+      {:hound, "~> 1.1", only: :test},
       {:guardian, "~> 1.2.1"},
       {:gettext, "~> 0.16"},
       {:scrivener_ecto, "~> 2.0"},

@@ -179,7 +179,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
 
       AuctionShowPage.visit(auction.id)
       :timer.sleep(100)
-      Hound.Helpers.Screenshot.take_screenshot()
       AuctionShowPage.select_solution(0)
       :timer.sleep(100)
       assert AuctionShowPage.has_content?("Hi")
