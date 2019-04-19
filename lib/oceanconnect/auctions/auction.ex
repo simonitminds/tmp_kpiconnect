@@ -90,7 +90,6 @@ defmodule Oceanconnect.Auctions.Auction do
     |> cast_assoc(:buyer)
     |> cast_assoc(:port)
     |> validate_scheduled_start(attrs)
-    |> validate_suppliers(attrs)
     |> maybe_add_vessel_fuels(auction, attrs)
     |> maybe_add_suppliers(attrs)
   end

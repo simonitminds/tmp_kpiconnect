@@ -100,7 +100,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
     |> validate_term_period(attrs)
-    |> validate_suppliers(attrs)
     |> maybe_add_vessels(attrs)
     |> maybe_add_suppliers(attrs)
   end
