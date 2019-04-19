@@ -10,10 +10,10 @@ const FuelPriceDisplay = ({products, auctionType, auctionStatus}) => {
     } else {
       return value;
     }
-  }
+  };
   const isFormulaRelated = auctionType == 'formula_related';
   const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
-  const hasValidFuel = products[0].fuel != null;
+  const hasValidFuel = products[0] && products[0].fuel != null;
 
   if(hasValidFuel) {
     return (
