@@ -232,18 +232,26 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   defp normalize_auction_params(params = %{"type" => type})
-       when type in ["forward_fixed", "formula_related"] do
+    when type in ["forward_fixed", "formula_related"] do
+
+    suppliers = invited_suppliers_from_params(params)
+
     params
     |> TermAuction.from_params()
+    |> Map.put("suppliers", suppliers)
   end
 
   defp normalize_auction_params(params) do
     auction_vessel_fuels = vessel_fuels_from_params(params)
+    suppliers = invited_suppliers_from_params(params)
 
     params
     |> Auction.from_params()
-    |> Map.put("auction_vessel_fuels", auction_vessel_fuels)
+    |> Map.merge(%{"auction_vessel_fuels" => auction_vessel_fuels, "suppliers" => suppliers})
   end
+
+  defp invited_suppliers_from_params(%{"suppliers" => ""}), do: []
+  defp invited_suppliers_from_params(%{"suppliers" => suppliers}), do: suppliers
 
   defp auction_inputs_by_buyer(conn) do
     buyer = Auth.current_user(conn)

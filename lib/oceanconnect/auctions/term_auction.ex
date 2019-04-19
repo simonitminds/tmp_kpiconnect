@@ -100,8 +100,9 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
     |> validate_term_period(attrs)
-    |> maybe_add_suppliers(attrs)
+    |> validate_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> maybe_add_suppliers(attrs)
   end
 
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
@@ -118,9 +119,9 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel_index)
     |> validate_scheduled_start(attrs)
     |> validate_term_period(attrs)
-    |> maybe_add_suppliers(attrs)
+    |> validate_suppliers(attrs)
     |> maybe_add_vessels(attrs)
-    |> validate_suppliers(auction, attrs)
+    |> maybe_add_suppliers(attrs)
   end
 
   def maybe_require_fuel_index(
@@ -135,23 +136,12 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(
-        %Ecto.Changeset{action: action} = changeset,
-        %TermAuction{suppliers: suppliers},
-        attrs
-      )
-      when length(suppliers) == 0 do
-    cond do
-      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
-        changeset
-
-      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
-        changeset
-        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
-    end
+  def validate_suppliers(changeset, %{"suppliers" => suppliers}) when is_nil(suppliers) or length(suppliers) == 0 do
+    changeset
+    |> add_error(:suppliers, "Must invite suppliers to create an auction")
   end
 
-  def validate_suppliers(changeset, _auction, _attrs), do: changeset
+  def validate_suppliers(changeset, _attrs), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
@@ -225,6 +215,9 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_load_suppliers(params, "suppliers") do
     case params do
+      %{"suppliers" => ""} ->
+        params
+
       %{"suppliers" => suppliers} ->
         supplier_ids =
           Enum.map(suppliers, fn {_key, supplier_id} -> String.to_integer(supplier_id) end)
