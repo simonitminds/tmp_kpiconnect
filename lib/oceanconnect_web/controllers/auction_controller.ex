@@ -232,8 +232,7 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   defp normalize_auction_params(params = %{"type" => type})
-    when type in ["forward_fixed", "formula_related"] do
-
+       when type in ["forward_fixed", "formula_related"] do
     params
     |> TermAuction.from_params()
   end

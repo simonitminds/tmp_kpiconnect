@@ -59,7 +59,8 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
       %TermAuctionState{state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
 
-      new_state = SolutionCalculator.process(new_state, auction)
+    new_state = SolutionCalculator.process(new_state, auction)
+
     {:ok,
      [
        AuctionEvent.auction_started(auction, new_state, started_at, user)
@@ -497,8 +498,9 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {next_state, _} =
       %TermAuctionState{state | status: :open}
       |> AuctionBidCalculator.process_all(:open)
-      auction = Auctions.get_auction!(auction_id)
-      next_state = SolutionCalculator.process(next_state, auction)
+
+    auction = Auctions.get_auction!(auction_id)
+    next_state = SolutionCalculator.process(next_state, auction)
     {:ok, next_state}
   end
 

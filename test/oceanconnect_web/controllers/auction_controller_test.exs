@@ -140,7 +140,10 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "New Auction"
     end
 
-    test "renders errors when creating a scheduled auction without inviting suppliers", %{conn: conn, valid_auction_params: valid_auction_params} do
+    test "renders errors when creating a scheduled auction without inviting suppliers", %{
+      conn: conn,
+      valid_auction_params: valid_auction_params
+    } do
       updated_params =
         valid_auction_params
         |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
@@ -201,7 +204,10 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert Auctions.get_auction_status!(auction) == :draft
     end
 
-    test "updating a draft auction with a scheduled start and valid params sets it to pending", %{conn: conn, valid_auction_params: valid_auction_params} do
+    test "updating a draft auction with a scheduled start and valid params sets it to pending", %{
+      conn: conn,
+      valid_auction_params: valid_auction_params
+    } do
       draft_attrs =
         Map.merge(valid_auction_params, %{
           "scheduled_start" => "",

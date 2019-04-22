@@ -135,7 +135,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(changeset, %{"suppliers" => suppliers}) when is_nil(suppliers) or suppliers == [] do
+  def validate_suppliers(changeset, %{"suppliers" => suppliers})
+      when is_nil(suppliers) or suppliers == [] do
     changeset
     |> add_error(:suppliers, "Must invite suppliers to create a pending auction")
   end

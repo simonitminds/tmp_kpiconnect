@@ -242,8 +242,6 @@ defmodule Oceanconnect.AuctionNewTest do
     AuctionNewPage.submit()
 
     refute current_path() =~ ~r/auctions\/\d/
-    assert AuctionNewPage.has_content?(
-             "This field is required."
-           )
+    assert AuctionNewPage.has_content?("This field is required.")
   end
 end
