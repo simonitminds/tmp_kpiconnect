@@ -427,6 +427,15 @@ defmodule Oceanconnect.AuctionShowPage do
     text =~ comment
   end
 
+  def submit_participation_status(auction_id, response) do
+    click({:css, ".qa-auction-#{auction_id}-rsvp-response-#{response}"})
+  end
+
+  def supplier_participation do
+    find_element(:css, ".qa-auction-supplier-participation")
+    |> inner_text()
+  end
+
   defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers})
        when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name

@@ -51,10 +51,12 @@ const AuctionInvitation = ({auctionPayload, supplierId}) => {
         <div className="auction-invitation__status__form">
           <h3 className="auction-invitation__status__copy">
             {styleStatusContainer()}
-            {suppliersParticipationStatus == "yes" && "You are participating in this auction"}
-            {suppliersParticipationStatus == "no" && "You are not participating in this auction"}
-            {suppliersParticipationStatus == "maybe" && "You might participate in this auction"}
-            {!suppliersParticipationStatus && "Do you intend to participate in this auction?"}
+            <div className="qa-auction-supplier-participation">
+              {suppliersParticipationStatus == "yes" && "You are participating in this auction"}
+              {suppliersParticipationStatus == "no" && "You are not participating in this auction"}
+              {suppliersParticipationStatus == "maybe" && "You might participate in this auction"}
+              {!suppliersParticipationStatus && "Do you intend to participate in this auction?"}
+            </div>
           </h3>
           <div className="field has-addons has-margin-right-md">
             <p className="control">
