@@ -201,6 +201,34 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert Auctions.get_auction_status!(auction) == :draft
     end
 
+    test "updating a draft auction with a scheduled start and valid params sets it to pending", %{conn: conn, valid_auction_params: valid_auction_params} do
+      draft_attrs =
+        Map.merge(valid_auction_params, %{
+          "scheduled_start" => "",
+          "duration" => 0,
+          "decision_duration" => 0
+        })
+
+      conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
+
+      auction =
+        Oceanconnect.Repo.all(Auctions.Auction)
+        |> Enum.reverse()
+        |> hd()
+
+      assert Auctions.get_auction_status!(auction) == :draft
+
+      updated_attrs =
+        draft_attrs
+        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+        |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+        |> Map.put("scheduled_start", valid_auction_params["scheduled_start"])
+
+      conn = put(conn, auction_path(conn, :update, auction), auction: updated_attrs)
+
+      assert Auctions.get_auction_status!(auction) == :pending
+    end
+
     test "renders errors when adding scheduled_start without fuel details", %{
       conn: conn,
       valid_auction_params: valid_auction_params
