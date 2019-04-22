@@ -242,10 +242,10 @@ defmodule Oceanconnect.Auctions.Auction do
   def maybe_load_suppliers(params, "suppliers") do
     case params do
       %{"suppliers" => ""} ->
-        params
+        Map.put(params, "suppliers", [])
 
       %{"suppliers" => suppliers} when is_nil(suppliers) or suppliers == [] ->
-        params
+        Map.put(params, "suppliers", [])
 
       %{"suppliers" => suppliers} ->
         supplier_ids =

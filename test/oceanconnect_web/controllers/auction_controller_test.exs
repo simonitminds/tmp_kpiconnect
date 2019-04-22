@@ -140,6 +140,18 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "New Auction"
     end
 
+    test "renders errors when creating a scheduled auction without inviting suppliers", %{conn: conn, valid_auction_params: valid_auction_params} do
+      updated_params =
+        valid_auction_params
+        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+        |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+        |> Map.put("suppliers", "")
+
+      conn = post(conn, auction_path(conn, :create), auction: updated_params)
+
+      assert html_response(conn, 200) =~ "Must invite suppliers to create a pending auction"
+    end
+
     test "redirects to show when creating a draft auction", %{
       conn: conn,
       valid_auction_params: valid_auction_params
