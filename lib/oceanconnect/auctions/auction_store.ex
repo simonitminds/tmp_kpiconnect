@@ -81,13 +81,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
           active_participants = Auctions.active_participants(auction_id)
           Auctions.AuctionNotifier.notify_participants(new_state)
 
-          # AuctionEmailNotifier.notify_auction_completed(
-          #   solution.bids,
-          #   current_state.submitted_barges,
-          #   auction_id,
-          #   active_participants
-          # )
-
           {:ok, new_state}
         else
           {:error, msg}
@@ -150,9 +143,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> Enum.map(&AuctionEventStore.persist/1)
 
     Enum.reduce(events, current_state, fn event, state ->
-      {:ok, state} = Aggregate.apply(state, event)
-      {:ok, _notified} = EventNotifier.emit(state, event)
-      state
+      {:ok, new_state} = Aggregate.apply(state, event)
+      {:ok, _notified} = EventNotifier.emit(new_state, event)
+      new_state
     end)
   end
 
@@ -162,9 +155,9 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     |> AuctionEventStore.event_list()
     |> Enum.reverse()
     |> Enum.reduce(initial_state, fn event, state ->
-      {:ok, state} = Aggregate.apply(state, event)
-      {:ok, _notified} = EventNotifier.emit(state, event)
-      state
+      {:ok, new_state} = Aggregate.apply(state, event)
+      {:ok, _notified} = EventNotifier.emit(new_state, event)
+      new_state
     end)
   end
 end

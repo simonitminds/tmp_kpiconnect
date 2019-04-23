@@ -63,6 +63,21 @@ export default class AuctionsIndex extends React.Component {
           <div className="empty-list">
             <em>You have no {status} auctions</em>
           </div>);
+      } else if(status == "draft") {
+        return(
+          <div className="columns is-multiline">
+            { _.map(filteredPayloads, (auctionPayload) => {
+              const auctionType = _.get(auctionPayload, 'auction.type');
+              const { BuyerDraftCard } = componentsForAuction(auctionType);
+              if (currentUserIsBuyer(auctionPayload.auction)) {
+                return <BuyerDraftCard
+                  key={auctionPayload.auction.id}
+                  auctionPayload={auctionPayload}
+                  timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
+                />;
+              }
+            }) }
+          </div>);
       } else {
         return(
           <div className="columns is-multiline">

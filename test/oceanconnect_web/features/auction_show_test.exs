@@ -442,7 +442,6 @@ defmodule Oceanconnect.AuctionShowTest do
       :timer.sleep(500)
       AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
       :timer.sleep(500)
-      Hound.Helpers.Screenshot.take_screenshot()
       assert AuctionShowPage.auction_bid_status() =~ "You have no bids for this auction"
     end
 
@@ -605,6 +604,63 @@ defmodule Oceanconnect.AuctionShowTest do
         AuctionShowPage.visit(auction.id)
         assert AuctionShowPage.auction_status() == "CLOSED"
       end)
+    end
+  end
+
+  describe "supplier participation" do
+    test "supplier can accept an invitation for an auction", %{auction: auction, supplier: supplier} do
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+
+      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+
+      AuctionShowPage.submit_participation_status(auction.id, :yes)
+
+      assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
+    end
+
+    test "supplier can decline an invitation for an auction", %{auction: auction, supplier: supplier} do
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+
+      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+
+      AuctionShowPage.submit_participation_status(auction.id, :no)
+
+      assert AuctionShowPage.supplier_participation() == "You are not participating in this auction"
+    end
+
+    test "if a supplier hasn't accepted an auction invitation but bids on that auction, their participation is updated", %{auction: auction, supplier: supplier} do
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+
+      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+
+      AuctionShowPage.enter_bid(%{amount: 9.50})
+      AuctionShowPage.submit_bid()
+      :timer.sleep(500)
+
+      assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
+    end
+
+    test "submitting a barge for approval does not affect supplier participation", %{auction: auction, supplier: supplier} do
+      barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
+
+      Auctions.start_auction(auction)
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+
+      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+      AuctionShowPage.submit_participation_status(auction.id, :yes)
+      assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
+
+      AuctionShowPage.submit_barge(barge)
+      :timer.sleep(500)
+      assert AuctionShowPage.has_submitted_barge?(barge)
+      assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
     end
   end
 

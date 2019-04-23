@@ -81,12 +81,12 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
     return {fuel: fuel, quantity: fuelQuantities[fuel.id], bid: solutionBidsByFuel[fuel.id]};
   });
 
-  const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const preAuctionStatus = auctionStatus == "pending";
   const productLabel = () => { if(auctionStatus == 'closed'){ return 'Winning Prices'} else { return 'Leading Offer Prices'} };
 
   return (
     <div className="column is-one-third-desktop is-half-tablet">
-      <div className={`card card--auction ${auctionStatus == 'draft' ? 'card--draft' : ''} qa-auction-${auction.id}`}>
+      <div className={`card card--auction qa-auction-${auction.id}`}>
         <div className="card-content qa-auction-buyer-card">
           <div className="is-clearfix is-flex">
             {/* Start Status/Time Bubble */}
@@ -97,7 +97,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
             {/* End Status/Time Bubble */}
             {/* Start Link to Auction Edit/Delete */}
             <div className="auction-card__buttons">
-              { (auctionStatus == 'draft' || auctionStatus == 'pending') &&
+              { (auctionStatus == 'pending') &&
                 <a href={`/auctions/${auction.id}/edit`} action-label="Edit Auction" className="auction-card__link-to-auction-edit is-hidden-420">
                   <span className="icon is-medium has-text-right">
                     <FontAwesomeIcon icon="edit" size="lg" />

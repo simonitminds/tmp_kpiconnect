@@ -12,7 +12,7 @@ import FuelPriceDisplay from '../../common/index/fuel-price-display';
 
 const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const auctionType = _.get(auction, 'type')
+  const auctionType = _.get(auction, 'type');
   const vessels = _.get(auction, 'vessels');
   const startDate = _.get(auction, 'start_date');
   const endDate = _.get(auction, 'end_date');

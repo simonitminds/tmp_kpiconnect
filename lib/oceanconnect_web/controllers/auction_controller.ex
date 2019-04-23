@@ -123,6 +123,7 @@ defmodule OceanconnectWeb.AuctionController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
+
         [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
 
         render(
@@ -196,7 +197,6 @@ defmodule OceanconnectWeb.AuctionController do
            id |> Auctions.get_auction() |> Auctions.fully_loaded(),
          true <- auction.buyer_id == user.company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
-
       updated_params =
         auction_params
         |> normalize_auction_params()

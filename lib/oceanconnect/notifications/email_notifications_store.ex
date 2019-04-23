@@ -3,8 +3,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   require Logger
 
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.Auctions.AuctionEvent
-  alias Oceanconnect.Notifications
+  alias Oceanconnect.{Notifications, Auctions, Auctions.AuctionEvent}
 
   alias Oceanconnect.Notifications.{
     Command,
@@ -123,8 +122,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   # TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
-  def needs_processed?(_event) do
-    true
+  def needs_processed?(event = %{auction_id: auction_id}) do
+    if Auctions.get_auction_status!(auction_id) == :draft do
+      false
+    else
+      true
+    end
   end
 
   defp calculate_upcoming_reminder_send_time(auction_id) do

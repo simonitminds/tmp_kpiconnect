@@ -63,7 +63,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   @required_fields [
     :type,
-    :port_id
+    :port_id,
+    :fuel_id
   ]
 
   @optional_fields [
@@ -77,7 +78,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :duration,
     :decision_duration,
     :end_date,
-    :fuel_id,
     :fuel_index_id,
     :fuel_quantity,
     :total_fuel_volume,
@@ -100,15 +100,15 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel)
     |> validate_scheduled_start(attrs)
     |> validate_term_period(attrs)
-    |> maybe_add_suppliers(attrs)
     |> maybe_add_vessels(attrs)
+    |> maybe_add_suppliers(attrs)
   end
 
   def changeset_for_scheduled_auction(%TermAuction{} = auction, attrs) do
     auction
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(
-      @required_fields ++ [:scheduled_start, :fuel_id, :fuel_quantity, :start_date, :end_date],
+      @required_fields ++ [:scheduled_start, :fuel_quantity, :start_date, :end_date],
       message: "This field is required."
     )
     |> maybe_require_fuel_index()
@@ -118,9 +118,9 @@ defmodule Oceanconnect.Auctions.TermAuction do
     |> cast_assoc(:fuel_index)
     |> validate_scheduled_start(attrs)
     |> validate_term_period(attrs)
-    |> maybe_add_suppliers(attrs)
+    |> validate_suppliers(attrs)
     |> maybe_add_vessels(attrs)
-    |> validate_suppliers(auction, attrs)
+    |> maybe_add_suppliers(attrs)
   end
 
   def maybe_require_fuel_index(
@@ -135,17 +135,13 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_require_fuel_index(changeset), do: changeset
 
-  def validate_suppliers(%Ecto.Changeset{action: action} = changeset, %TermAuction{suppliers: suppliers}, attrs) when length(suppliers) == 0 do
-    cond do
-      Map.has_key?(attrs, :suppliers) or Map.has_key?(attrs, "suppliers") ->
-        changeset
-      !Map.has_key?(attrs, :suppliers) and !Map.has_key?(attrs, "suppliers") ->
-        changeset
-        |> add_error(:suppliers, "Must invite suppliers to schedule a pending auction")
-    end
+  def validate_suppliers(changeset, %{"suppliers" => suppliers})
+      when is_nil(suppliers) or suppliers == [] do
+    changeset
+    |> add_error(:suppliers, "Must invite suppliers to create a pending auction")
   end
 
-  def validate_suppliers(changeset, _auction, _attrs), do: changeset
+  def validate_suppliers(changeset, _attrs), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
@@ -219,6 +215,12 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
   def maybe_load_suppliers(params, "suppliers") do
     case params do
+      %{"suppliers" => ""} ->
+        Map.put(params, "suppliers", [])
+
+      %{"suppliers" => suppliers} when is_nil(suppliers) or suppliers == [] ->
+        Map.put(params, "suppliers", [])
+
       %{"suppliers" => suppliers} ->
         supplier_ids =
           Enum.map(suppliers, fn {_key, supplier_id} -> String.to_integer(supplier_id) end)
@@ -325,6 +327,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
       :lt ->
         changeset
         |> add_error(:end_date, "End month cannot be before the start month")
+
       _ ->
         changeset
     end

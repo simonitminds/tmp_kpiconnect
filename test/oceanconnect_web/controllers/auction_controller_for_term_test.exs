@@ -1,10 +1,6 @@
-defmodule OceanconnectWeb.AuctionControllerTest do
+defmodule OceanconnectWeb.AuctionControllerForTermTest do
   use OceanconnectWeb.ConnCase
-
   alias Oceanconnect.Auctions
-
-  @update_attrs %{"duration" => 15}
-  @invalid_attrs %{"port_id" => nil}
 
   setup do
     buyer_company = insert(:company, is_supplier: true)
@@ -17,10 +13,8 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     supplier = insert(:user, company: supplier_company)
     port = insert(:port, companies: [buyer_company, supplier_company])
 
-    auction_vessel_fuels = [
-      build(:vessel_fuel, vessel: selected_vessel, fuel: selected_fuel, quantity: 1500),
-      build(:vessel_fuel, vessel: List.last(buyer_vessels), fuel: selected_fuel, quantity: 1500)
-    ]
+    update_attrs = %{"duration" => 15, "type" => "forward_fixed"}
+    invalid_attrs = %{"type" => "forward_fixed", "port_id" => nil, "buyer_id" => buyer.id}
 
     valid_start_time =
       DateTime.utc_now()
@@ -30,10 +24,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
     auction_params =
       string_params_for(
-        :auction,
-        auction_vessel_fuels: auction_vessel_fuels,
+        :term_auction,
         port: port,
-        is_traded_bid_allowed: true
+        is_traded_bid_allowed: true,
+        start_date: valid_start_time,
+        end_date: valid_start_time,
+        fuel: selected_fuel
       )
       |> Oceanconnect.Utilities.maybe_convert_date_times()
       |> Map.put("suppliers", %{"supplier-#{supplier_company.id}" => "#{supplier_company.id}"})
@@ -41,26 +37,18 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       |> Map.put(
         "vessels",
         Enum.reduce(buyer_vessels, %{}, fn vessel, acc ->
-          Map.put(acc, "#{vessel.id}", %{"eta" => valid_start_time})
+          Map.put_new(acc, "#{vessel.id}", %{"selected" => true})
         end)
       )
-      |> Map.put("auction_vessel_fuels", %{
-        "#{selected_fuel.id}" => %{
-          "#{selected_vessel.id}" => 1500,
-          "#{List.last(buyer_vessels).id}" => 1500
-        }
-      })
 
     authed_conn = login_user(build_conn(), buyer)
 
     auction =
       insert(
-        :auction,
+        :term_auction,
         port: port,
         buyer: buyer_company,
-        auction_vessel_fuels: auction_vessel_fuels,
-        suppliers: [supplier_company],
-        is_traded_bid_allowed: true
+        suppliers: [supplier_company]
       )
       |> Auctions.fully_loaded()
 
@@ -72,39 +60,12 @@ defmodule OceanconnectWeb.AuctionControllerTest do
      supplier: supplier,
      supplier_company: supplier_company,
      selected_vessel: selected_vessel,
-     selected_fuel: selected_fuel}
+     selected_fuel: selected_fuel,
+     update_attrs: update_attrs,
+     invalid_attrs: invalid_attrs}
   end
 
-  describe "index" do
-    test "lists all auctions", %{conn: conn} do
-      conn = get(conn, auction_path(conn, :index))
-      assert html_response(conn, 200)
-    end
-  end
-
-  describe "new auction" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, auction_path(conn, :new))
-      assert html_response(conn, 200) =~ "New Auction"
-    end
-
-    test "vessels are filtered by logged in buyers company", %{conn: conn, buyer: buyer} do
-      conn = get(conn, auction_path(conn, :new))
-
-      assert conn.assigns[:vessels] ==
-               buyer
-               |> Auctions.vessels_for_buyer()
-               |> Auctions.strip_non_loaded()
-               |> Poison.encode!()
-    end
-  end
-
-  describe "create auction" do
-    setup(%{buyer: buyer}) do
-      invalid_attrs = Map.merge(@invalid_attrs, %{buyer_id: buyer.id})
-      {:ok, %{invalid_attrs: invalid_attrs}}
-    end
-
+  describe "create term auction" do
     test "redirects to show when data is valid", %{
       conn: conn,
       valid_auction_params: valid_auction_params,
@@ -122,27 +83,29 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction = Oceanconnect.Repo.get(Auctions.Auction, id) |> Auctions.fully_loaded()
+      auction = Oceanconnect.Repo.get(Auctions.TermAuction, id) |> Auctions.fully_loaded()
       conn = get(conn, auction_path(conn, :show, id))
       assert html_response(conn, 200) =~ "window.userToken"
       assert auction.buyer_id == buyer.id
       assert hd(auction.suppliers).id == supplier_company.id
-      assert hd(auction.auction_vessel_fuels).vessel.id == selected_vessel.id
-      assert hd(auction.auction_vessel_fuels).fuel.id == selected_fuel.id
     end
 
     test "renders errors when data is invalid", %{conn: conn, invalid_attrs: invalid_attrs} do
       conn = post(conn, auction_path(conn, :create), auction: invalid_attrs)
+      assert Enum.any?(conn.assigns[:changeset].errors), "expected errors but got none"
 
-      assert conn.assigns[:auction] ==
-               struct(Auctions.Auction, invalid_attrs) |> Auctions.fully_loaded()
+      assert conn.assigns[:changeset].errors == [
+               port_id: {"can't be blank", [validation: :required]},
+               fuel_id: {"can't be blank", [validation: :required]}
+             ]
 
       assert html_response(conn, 200) =~ "New Auction"
     end
 
-    test "renders errors when creating a scheduled auction without inviting suppliers", %{
+    test "renders errors when creating a scheduled term auction without inviting suppliers", %{
       conn: conn,
-      valid_auction_params: valid_auction_params
+      valid_auction_params: valid_auction_params,
+      supplier_company: supplier_company
     } do
       updated_params =
         valid_auction_params
@@ -165,6 +128,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
+      auction = Oceanconnect.Repo.get(Auctions.TermAuction, id)
+      status = Auctions.get_auction_status!(auction)
+      assert status == :draft
     end
 
     test "draft auctions can be updated and remain draft if pending requirements aren't met", %{
@@ -172,6 +138,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       valid_auction_params: valid_auction_params
     } do
       draft_attrs =
+        draft_attrs =
         Map.merge(valid_auction_params, %{
           "scheduled_start" => nil,
           "duration" => 0,
@@ -179,14 +146,13 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         })
 
       conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction =
-        Oceanconnect.Repo.all(Auctions.Auction)
-        |> Enum.reverse()
-        |> hd()
-
-      assert Auctions.get_auction_status!(auction) == :draft
-      updated_info = "This is should be allowed to be updated."
+      auction = Oceanconnect.Repo.get(Auctions.TermAuction, id)
+      status = Auctions.get_auction_status!(auction)
+      assert status == :draft
+      updated_info = "This should be allowed to be updated."
 
       conn =
         put(conn, auction_path(conn, :update, auction.id),
@@ -218,7 +184,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
 
       auction =
-        Oceanconnect.Repo.all(Auctions.Auction)
+        Oceanconnect.Repo.all(Auctions.TermAuction)
         |> Enum.reverse()
         |> hd()
 
@@ -241,19 +207,19 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     } do
       invalid_attrs =
         valid_auction_params
-        |> Map.drop(["duration", "decision_duration", "auction_vessel_fuels"])
-        |> Map.put(
-          "scheduled_start",
-          DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string()
-        )
+        |> Map.merge(%{"fuel_id" => nil})
 
       conn = post(conn, auction_path(conn, :create), auction: invalid_attrs)
 
       assert html_response(conn, 200) =~ "New Auction"
+
+      assert conn.assigns.changeset.errors == [
+               fuel_id: {"This field is required.", [validation: :required]}
+             ]
     end
   end
 
-  describe "cancel auction" do
+  describe "cancel term auction" do
     test "manually canceling an auction", %{conn: conn, auction: auction} do
       new_conn = get(conn, auction_path(conn, :cancel, auction.id))
 
@@ -261,15 +227,31 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
-  describe "start auction" do
-    test "manually starting an auction", %{auction: auction, conn: conn} do
-      new_conn = get(conn, auction_path(conn, :start, auction.id))
+  describe "start term auction" do
+    test "manually starting an auction", %{auction: auction} do
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {auction,
+            %{
+              exclude_children: [
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
+        )
+
+      admin = insert(:user, is_admin: true)
+      authed_conn = login_user(build_conn(), admin)
+      new_conn = get(authed_conn, auction_path(authed_conn, :start, auction.id))
 
       assert redirected_to(new_conn, 302) == "/auctions"
+      :timer.sleep(500)
+      assert Auctions.get_auction_status!(auction) == :open
     end
   end
 
-  describe "show auction" do
+  describe "show term auction" do
     test "redirects to index unless user is a participant", %{auction: auction} do
       user = insert(:user)
       non_participant_conn = login_user(build_conn(), user)
@@ -279,7 +261,7 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
-  describe "edit auction" do
+  describe "edit term auction" do
     test "redirects if current user is not buyer", %{supplier: supplier, auction: auction} do
       supplier_conn = login_user(build_conn(), supplier)
       conn = get(supplier_conn, auction_path(supplier_conn, :edit, auction))
@@ -298,7 +280,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
            {auction,
             %{
               exclude_children: [
-                :auction_reminder_timer,
                 :auction_event_handler,
                 :auction_scheduler
               ]
@@ -320,23 +301,30 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
   end
 
-  describe "update auction" do
-    test "redirects if current user is not buyer", %{supplier: supplier, auction: auction} do
+  describe "update term auction" do
+    test "redirects if current user is not buyer", %{
+      supplier: supplier,
+      auction: auction,
+      update_attrs: update_attrs
+    } do
       supplier_conn =
         login_user(build_conn(), supplier)
-        |> put(auction_path(build_conn(), :update, auction), auction: @update_attrs)
+        |> put(auction_path(build_conn(), :update, auction), auction: update_attrs)
 
       assert redirected_to(supplier_conn, 302) == "/auctions"
     end
 
-    test "redirects if auction in open or decision state", %{conn: conn, auction: auction} do
+    test "redirects if auction in open or decision state", %{
+      conn: conn,
+      auction: auction,
+      update_attrs: update_attrs
+    } do
       {:ok, _pid} =
         start_supervised(
           {Oceanconnect.Auctions.AuctionSupervisor,
            {auction,
             %{
               exclude_children: [
-                :auction_reminder_timer,
                 :auction_event_handler,
                 :auction_scheduler
               ]
@@ -344,11 +332,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
         )
 
       Auctions.start_auction(auction)
-      conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
+      conn = put(conn, auction_path(conn, :update, auction), auction: update_attrs)
       assert redirected_to(conn, 302) == "/auctions"
 
       Auctions.end_auction(auction)
-      conn = put(conn, auction_path(conn, :update, auction), auction: @update_attrs)
+      conn = put(conn, auction_path(conn, :update, auction), auction: update_attrs)
       assert redirected_to(conn, 302) == "/auctions"
     end
 
@@ -360,13 +348,14 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     test "redirects when data is valid", %{
       conn: conn,
       auction: auction,
-      valid_auction_params: valid_auction_params
+      valid_auction_params: valid_auction_params,
+      update_attrs: update_attrs
     } do
       attrs =
         valid_auction_params
         |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
         |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
-        |> Map.merge(@update_attrs)
+        |> Map.merge(update_attrs)
 
       conn = put(conn, auction_path(conn, :update, auction), auction: attrs)
       assert redirected_to(conn) == auction_path(conn, :show, auction)
@@ -375,13 +364,17 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "window.userToken"
     end
 
-    test "renders errors when data is invalid", %{conn: conn, auction: auction} do
-      conn = put(conn, auction_path(conn, :update, auction), auction: @invalid_attrs)
+    test "renders errors when data is invalid", %{
+      conn: conn,
+      auction: auction,
+      invalid_attrs: invalid_attrs
+    } do
+      conn = put(conn, auction_path(conn, :update, auction), auction: invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Auction"
     end
   end
 
-  describe "auction log" do
+  describe "term auction log" do
     setup(%{auction: auction}) do
       {:ok, _pid} =
         start_supervised(
@@ -442,6 +435,11 @@ defmodule OceanconnectWeb.AuctionControllerTest do
     end
 
     test "the log includes messages", %{auction: auction, conn: authed_conn} do
+      # THIS IS GROSS but MESSAGES DOESN't KNOW ABOUT TERM
+      auction =
+        Oceanconnect.Repo.get(Auctions.Auction, auction.id)
+        |> Auctions.fully_loaded()
+
       insert_list(4, :message, auction: auction, author_company: auction.buyer)
 
       auction

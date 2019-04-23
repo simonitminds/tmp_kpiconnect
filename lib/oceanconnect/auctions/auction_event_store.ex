@@ -14,32 +14,32 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
   def non_barge_events(auction_id) do
     event_list(auction_id)
-    |> Enum.reject(fn(event) ->
+    |> Enum.reject(fn event ->
       event.type in [
         :barge_submitted,
         :barge_unsubmitted,
         :barge_approved,
-        :barge_rejected,
+        :barge_rejected
       ]
     end)
   end
 
   def barge_events(auction_id) do
     event_list(auction_id)
-    |> Enum.filter(fn(event) ->
+    |> Enum.filter(fn event ->
       event.type in [
         :barge_submitted,
         :barge_unsubmitted,
         :barge_approved,
-        :barge_rejected,
+        :barge_rejected
       ]
     end)
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   def bid_events(auction_id) do
     event_list(auction_id)
-    |> Enum.filter(fn(event) ->
+    |> Enum.filter(fn event ->
       event.type in [
         :bid_placed,
         :auto_bid_placed,
@@ -48,12 +48,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
         :winning_solution_selected
       ]
     end)
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   def timing_log_events(auction_id) do
     event_list(auction_id)
-    |> Enum.filter(fn(event) ->
+    |> Enum.filter(fn event ->
       event.type in [
         :auction_started,
         :auction_rescheduled,
@@ -69,7 +69,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
         :bids_revoked
       ]
     end)
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   def participants_from_events(auction_id) do

@@ -77,6 +77,7 @@ const SupplierList = (props) => {
                   </a>
                 </div>
               </div>
+              <input type="hidden" name="auction[suppliers]" value={selectedSuppliers || []} />
             </fieldset>
           </div>
         </div>
@@ -90,6 +91,7 @@ const SupplierList = (props) => {
             <fieldset>
               <legend className="subtitle is-4">Invited Suppliers</legend>
               <i className="qa-auction-select-port"> Select Port to invite Suppliers</i>
+              <input type="hidden" name="auction[suppliers]" value={selectedSuppliers || []} />
             </fieldset>
           </div>
         </div>

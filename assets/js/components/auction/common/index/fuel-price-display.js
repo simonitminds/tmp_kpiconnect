@@ -10,44 +10,53 @@ const FuelPriceDisplay = ({products, auctionType, auctionStatus}) => {
     } else {
       return value;
     }
-  }
+  };
   const isFormulaRelated = auctionType == 'formula_related';
   const preAuctionStatus = auctionStatus == "pending" || auctionStatus == "draft";
+  const hasValidFuel = products[0] && products[0].fuel != null;
 
-
-  return (
-    <React.Fragment>
-      { _.map(products, ({fuel, quantity, bid}) => {
-          return(
-            <div className="card-content__product" key={fuel.id}>
-              <span className="fuel-name">{fuel.name}</span>
-              { auctionType == "spot" ?
-                <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT)</span>
-                : <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT/mo)</span>
-              }
-              { !preAuctionStatus && isFormulaRelated &&
+  if(hasValidFuel) {
+    return (
+      <React.Fragment>
+        { _.map(products, ({fuel, quantity, bid}) => {
+            return(
+              <div className="card-content__product" key={fuel.id}>
+                <span className="fuel-name">{fuel.name}</span>
+                { auctionType == "spot" ?
+                  <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT)</span>
+                  : <span className="fuel-amount has-text-gray-3">({quantity}&nbsp;MT/mo)</span>
+                }
+                { !preAuctionStatus && isFormulaRelated &&
+                    <span className="card-content__best-price">
+                      { bid
+                          ? `${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+                        : "No bid"
+                      }
+                    </span>
+                }
+                { !preAuctionStatus && !isFormulaRelated &&
                   <span className="card-content__best-price">
                     { bid
-                        ? `${bid.amount > 0 && isFormulaRelated ? "+" : "-"}$${formatPrice(normalizeValue(bid.amount))}`
+                        ? `$${formatPrice(normalizeValue(bid.amount))}`
                       : "No bid"
                     }
                   </span>
-              }
-              { !preAuctionStatus && !isFormulaRelated &&
-                <span className="card-content__best-price">
-                  { bid
-                      ? `$${formatPrice(normalizeValue(bid.amount))}`
-                    : "No bid"
-                  }
-                </span>
-              }
-            </div>
-          );
-        })
-      }
-      <div className="card-content__product card-content__no-products"><i>No products specified</i></div>
-    </React.Fragment>
-  );
+                }
+              </div>
+            );
+          })
+        }
+        <div className="card-content__product card-content__no-products"><i>No products specified</i></div>
+      </React.Fragment>
+    );
+  } else {
+    return (
+      <React.Fragment>
+        <div className="card-content__product card-content__no-products"><i>No products specified</i></div>
+      </React.Fragment>
+    );
+  }
+
 };
 
 export default FuelPriceDisplay;
