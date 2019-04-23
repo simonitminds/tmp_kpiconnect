@@ -138,6 +138,55 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       end
     end
 
+    test "auction pending event produces email", %{
+      auction: auction,
+      vessel_name_list: vessel_name_list,
+      port_name: port_name
+    } do
+      auction_state = AuctionState.from_auction(auction)
+
+      AuctionEvent.auction_pending(auction, DateTime.utc_now(), auction_state)
+      |> EventNotifier.broadcast(auction_state)
+
+      :timer.sleep(2000)
+
+      emails = Emails.AuctionInvitation.generate(auction_state)
+
+      for email <- emails do
+        assert_email_delivered_with(
+          subject:
+            "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{
+              port_name
+            }"
+        )
+      end
+    end
+
+    test "auction created event with a draft auction does not produce emails", %{
+      auction: auction,
+      vessel_name_list: vessel_name_list,
+      port_name: port_name
+    } do
+      auction = Map.put(auction, :scheduled_start, nil)
+      auction_state = AuctionState.from_auction(auction)
+
+      AuctionEvent.auction_created(auction, nil)
+      |> EventNotifier.broadcast(auction_state)
+
+      :timer.sleep(1000)
+
+      emails = Emails.AuctionInvitation.generate(auction_state)
+
+      for email <- emails do
+        refute_email_delivered_with(
+          subject:
+            "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{
+              port_name
+            }"
+        )
+      end
+    end
+
     test "auction rescheduled event produces email", %{
       auction: auction,
       vessel_name_list: vessel_name_list,

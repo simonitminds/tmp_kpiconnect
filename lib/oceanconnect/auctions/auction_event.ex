@@ -81,6 +81,19 @@ defmodule Oceanconnect.Auctions.AuctionEvent do
     }
   end
 
+  def auction_transitioned_from_draft_to_pending(
+        auction = %struct{id: auction_id},
+        new_state = %state_struct{}
+      ) do
+    %AuctionEvent{
+      id: UUID.uuid4(:hex),
+      type: :auction_transitioned_from_draft_to_pending,
+      auction_id: auction_id,
+      data: %{state: new_state, auction: auction},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
   def auction_updated(auction = %struct{id: auction_id}, user) when is_auction(struct) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),

@@ -63,6 +63,31 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     end
   end
 
+  defp process(event = %AuctionEvent{type: :auction_transitioned_from_draft_to_pending, auction_id: auction_id}, state) do
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+
+    Notifications.emails_for_event(event, state)
+    |> send()
+
+    case DelayedNotificationsSupervisor.start_child(notification_name) do
+      {:ok, pid} ->
+        starting_soon_emails =
+          Notifications.emails_for_event(%AuctionEvent{type: :upcoming_auction_notified}, state)
+
+        case calculate_upcoming_reminder_send_time(auction_id) do
+          false ->
+            {:ok, :nothing_to_schedule}
+
+          send_time ->
+            Command.schedule_notification(notification_name, send_time, starting_soon_emails)
+            |> DelayedNotifications.process_command()
+        end
+
+      _ ->
+        {:ok, :nothing_to_schedule}
+    end
+  end
+
   defp process(event = %AuctionEvent{type: :auction_rescheduled, auction_id: auction_id}, state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
 
