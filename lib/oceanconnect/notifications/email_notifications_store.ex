@@ -63,7 +63,13 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     end
   end
 
-  defp process(event = %AuctionEvent{type: :auction_transitioned_from_draft_to_pending, auction_id: auction_id}, state) do
+  defp process(
+         event = %AuctionEvent{
+           type: :auction_transitioned_from_draft_to_pending,
+           auction_id: auction_id
+         },
+         state
+       ) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
 
     Notifications.emails_for_event(event, state)
@@ -148,7 +154,9 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   # TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
   def needs_processed?(event = %{auction_id: auction_id}) do
-    if Auctions.get_auction_status!(auction_id) == :draft do
+    result = Auctions.get_auction_status!(auction_id) == :draft
+
+    if result not in [:open, :pending, :canceled, :expired, :closed] do
       false
     else
       true

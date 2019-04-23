@@ -155,6 +155,34 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert html_response(conn, 200) =~ "Must invite suppliers to create a pending auction"
     end
 
+    test "renders errors when updating a scheduled auction and removing scheduled_start", %{
+      conn: conn,
+      valid_auction_params: valid_auction_params
+    } do
+      actual_valid_params =
+        valid_auction_params
+        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+        |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+
+      conn = post(conn, auction_path(conn, :create), auction: actual_valid_params)
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == auction_path(conn, :show, id)
+
+      updated_params =
+        actual_valid_params
+        |> Map.put("scheduled_start", "")
+
+      conn = put(conn, auction_path(conn, :update, id), auction: updated_params)
+
+      assert html_response(conn, 200)
+      expected_error = [scheduled_start: {"can't be blank", [validation: :required]}]
+
+      assert conn.assigns.changeset.errors == expected_error,
+             "expected errors `#{inspect(expected_error)}` but got `#{
+               inspect(conn.assigns.changeset.errors)
+             }`"
+    end
+
     test "redirects to show when creating a draft auction", %{
       conn: conn,
       valid_auction_params: valid_auction_params
@@ -198,9 +226,9 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
       :timer.sleep(500)
 
-      auction = Auctions.get_auction(auction.id)
+      auction = Oceanconnect.Repo.get(Auctions.Auction, auction.id)
 
-      assert Auctions.get_auction(auction.id).additional_information == updated_info
+      assert auction.additional_information == updated_info
       assert Auctions.get_auction_status!(auction) == :draft
     end
 
@@ -226,11 +254,10 @@ defmodule OceanconnectWeb.AuctionControllerTest do
 
       updated_attrs =
         draft_attrs
-        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
         |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
         |> Map.put("scheduled_start", valid_auction_params["scheduled_start"])
 
-      conn = put(conn, auction_path(conn, :update, auction), auction: updated_attrs)
+      put(conn, auction_path(conn, :update, auction), auction: updated_attrs)
 
       assert Auctions.get_auction_status!(auction) == :pending
     end

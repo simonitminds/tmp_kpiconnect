@@ -698,7 +698,11 @@ defmodule Oceanconnect.Auctions do
     auction
   end
 
-  def update_auction(%struct{} = auction, %{"scheduled_start" => value} = attrs, user)
+  def update_auction(
+        %struct{scheduled_start: nil} = auction,
+        %{"scheduled_start" => value} = attrs,
+        user
+      )
       when is_auction(struct) and (is_nil(value) or value == "") do
     auction
     |> struct.changeset(attrs)
@@ -713,7 +717,11 @@ defmodule Oceanconnect.Auctions do
     |> auction_update_command(user)
   end
 
-  def update_auction!(%struct{} = auction, %{"scheduled_start" => value} = attrs, user)
+  def update_auction!(
+        %struct{scheduled_start: nil} = auction,
+        %{"scheduled_start" => value} = attrs,
+        user
+      )
       when is_auction(struct) and (is_nil(value) or value == "") do
     auction
     |> struct.changeset(attrs)

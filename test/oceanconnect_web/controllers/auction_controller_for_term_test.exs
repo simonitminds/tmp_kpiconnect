@@ -133,12 +133,39 @@ defmodule OceanconnectWeb.AuctionControllerForTermTest do
       assert status == :draft
     end
 
+    test "renders errors when updating a scheduled auction and removing scheduled_start", %{
+      conn: conn,
+      valid_auction_params: valid_auction_params
+    } do
+      actual_valid_params =
+        valid_auction_params
+        |> Map.put("duration", round(valid_auction_params["duration"] / 60_000))
+        |> Map.put("decision_duration", round(valid_auction_params["decision_duration"] / 60_000))
+
+      conn = post(conn, auction_path(conn, :create), auction: actual_valid_params)
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == auction_path(conn, :show, id)
+
+      updated_params =
+        actual_valid_params
+        |> Map.put("scheduled_start", "")
+
+      conn = put(conn, auction_path(conn, :update, id), auction: updated_params)
+
+      assert html_response(conn, 200)
+      expected_error = [scheduled_start: {"This field is required.", [validation: :required]}]
+
+      assert conn.assigns.changeset.errors == expected_error,
+             "expected errors `#{inspect(expected_error)}` but got `#{
+               inspect(conn.assigns.changeset.errors)
+             }`"
+    end
+
     test "draft auctions can be updated and remain draft if pending requirements aren't met", %{
       conn: conn,
       valid_auction_params: valid_auction_params
     } do
       draft_attrs =
-        draft_attrs =
         Map.merge(valid_auction_params, %{
           "scheduled_start" => nil,
           "duration" => 0,
@@ -146,13 +173,17 @@ defmodule OceanconnectWeb.AuctionControllerForTermTest do
         })
 
       conn = post(conn, auction_path(conn, :create), auction: draft_attrs)
+
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == auction_path(conn, :show, id)
 
-      auction = Oceanconnect.Repo.get(Auctions.TermAuction, id)
-      status = Auctions.get_auction_status!(auction)
-      assert status == :draft
-      updated_info = "This should be allowed to be updated."
+      auction =
+        Oceanconnect.Repo.all(Auctions.Auction)
+        |> Enum.reverse()
+        |> hd()
+
+      assert Auctions.get_auction_status!(auction) == :draft
+      updated_info = "This is should be allowed to be updated."
 
       conn =
         put(conn, auction_path(conn, :update, auction.id),
@@ -161,12 +192,11 @@ defmodule OceanconnectWeb.AuctionControllerForTermTest do
 
       assert html_response(conn, 302)
       assert redirected_to(conn) == auction_path(conn, :show, auction.id)
-
       :timer.sleep(500)
 
-      auction = Auctions.get_auction(auction.id)
+      auction = Oceanconnect.Repo.get(Auctions.Auction, auction.id)
 
-      assert Auctions.get_auction(auction.id).additional_information == updated_info
+      assert auction.additional_information == updated_info
       assert Auctions.get_auction_status!(auction) == :draft
     end
 
