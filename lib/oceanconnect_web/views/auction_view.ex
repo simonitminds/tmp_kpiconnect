@@ -106,7 +106,6 @@ defmodule OceanconnectWeb.AuctionView do
       }) do
     vessel_fuel_errors =
       Enum.flat_map(vessel_fuel_changesets, & &1.errors)
-      |> IO.inspect()
       |> Enum.any?()
   end
 
