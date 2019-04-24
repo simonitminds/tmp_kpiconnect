@@ -6,7 +6,8 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
   hound_session()
 
   setup do
-    buyer_company = insert(:company, credit_margin_amount: 5.00)
+    broker = insert(:company)
+    buyer_company = insert(:company, credit_margin_amount: 5.00, broker_entity_id: broker.id)
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
     supplier_company2 = insert(:company, is_supplier: true)
@@ -25,7 +26,6 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       |> Auctions.fully_loaded()
 
     fuel = auction.fuel
-    fuel_index = auction.fuel_index
 
     bid_params = %{
       amount: -1.25

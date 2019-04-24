@@ -9,7 +9,8 @@ defmodule Oceanconnect.Notifications do
         %AuctionEvent{type: type},
         auction_state = %state_struct{auction_id: _auction_id}
       )
-      when is_auction_state(state_struct) and type in [:auction_created, :auction_transitioned_from_draft_to_pending] do
+      when is_auction_state(state_struct) and
+             type in [:auction_created, :auction_transitioned_from_draft_to_pending] do
     Emails.AuctionInvitation.generate(auction_state)
   end
 

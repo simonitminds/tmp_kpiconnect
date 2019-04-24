@@ -101,6 +101,17 @@ defmodule OceanconnectWeb.AuctionView do
     |> Poison.encode!()
   end
 
+  def auction_vessel_fuel_errors?(%Ecto.Changeset{
+        changes: %{auction_vessel_fuels: vessel_fuel_changesets}
+      }) do
+    vessel_fuel_errors =
+      Enum.flat_map(vessel_fuel_changesets, & &1.errors)
+      |> IO.inspect()
+      |> Enum.any?()
+  end
+
+  def auction_vessel_fuel_errors?(_changeset), do: false
+
   def actual_duration(%struct{
         auction_started: started,
         auction_ended: ended,

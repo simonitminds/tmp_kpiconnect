@@ -74,6 +74,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
         auction
         |> Auctions.fully_loaded()
         |> Map.put(:vessels, Enum.map(vessel_fuels, & &1.vessel))
+
       Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
       EmailNotificationStore.init([])
 
