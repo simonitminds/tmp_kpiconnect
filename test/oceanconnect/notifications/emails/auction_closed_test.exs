@@ -142,9 +142,15 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
 
       for supplier_email <- supplier_emails do
         assert supplier_email.subject ==
-                 "You have won Auction #{auction.id} for #{vessel1.name} at #{auction.port.name}!"
+          "You have won Auction #{auction.id} for #{vessel1.name} at #{auction.port.name}!"
+
+        email_vessel_ids = Enum.map(supplier_email.assigns.auction.vessels, & &1.id)
+        assert email_vessel_ids == [vessel1.id, vessel2.id]
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
+        assert supplier_email.html_body =~ vessel1.name
+        assert supplier_email.html_body =~ vessel2.name
+        IO.inspect(supplier_email.html_body)
       end
 
       for buyer <- buyers do
