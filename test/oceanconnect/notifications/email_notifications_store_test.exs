@@ -40,6 +40,15 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
           auction_vessel_fuels: vessel_fuels
         )
 
+      draft_auction =
+        insert(:draft_auction,
+          buyer: buyer_company,
+          port: port,
+          suppliers: supplier_companies,
+          auction_vessel_fuels: vessel_fuels,
+          scheduled_start: nil
+        )
+
       solution_bids = [
         bid1 =
           create_bid(
@@ -60,6 +69,13 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
             false
           )
       ]
+
+      auction =
+        auction
+        |> Auctions.fully_loaded()
+        |> Map.put(:vessels, Enum.map(vessel_fuels, & &1.vessel))
+      Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
+      EmailNotificationStore.init([])
 
       auction_state =
         %AuctionState{product_bids: product_bids} = Auctions.get_auction_state!(auction)
@@ -107,6 +123,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       {:ok,
        %{
          auction: auction,
+         draft_auction: draft_auction,
          vessel_name_list: vessel_name_list,
          port_name: port_name,
          buyer: buyer,
@@ -135,6 +152,56 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
               port_name
             }"
         )
+      end
+    end
+
+    test "auction transitioned from draft to pending event produces email", %{
+      auction: auction,
+      vessel_name_list: vessel_name_list,
+      port_name: port_name
+    } do
+      auction_state = AuctionState.from_auction(auction)
+
+      AuctionEvent.auction_transitioned_from_draft_to_pending(
+        auction,
+        auction_state
+      )
+      |> EventNotifier.broadcast(auction_state)
+
+      :timer.sleep(2000)
+
+      emails = Emails.AuctionInvitation.generate(auction_state)
+
+      for email <- emails do
+        assert_email_delivered_with(
+          subject:
+            "You have been invited to Auction #{auction.id} for #{vessel_name_list} at #{
+              port_name
+            }"
+        )
+      end
+    end
+
+    test "auction created event with a draft auction does not produce emails", %{
+      draft_auction: auction,
+      vessel_name_list: vessel_name_list,
+      port_name: port_name
+    } do
+      auction =
+        auction
+        |> Auctions.fully_loaded()
+
+      auction_state = AuctionState.from_auction(auction)
+
+      AuctionEvent.auction_created(auction, nil)
+      |> EventNotifier.broadcast(auction_state)
+
+      :timer.sleep(2000)
+
+      emails = Emails.AuctionInvitation.generate(auction_state)
+
+      for email <- emails do
+        refute_delivered_email(email)
       end
     end
 

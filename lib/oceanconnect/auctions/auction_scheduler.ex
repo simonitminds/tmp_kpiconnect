@@ -116,10 +116,6 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
     timer_ref = Process.send_after(self(), :start_auction, delay)
     new_state = %{state | scheduled_start: scheduled_start, timer_ref: timer_ref}
 
-    auction
-    |> Command.reschedule_auction(nil)
-    |> AuctionStore.process_command()
-
     {:noreply, new_state}
   end
 
