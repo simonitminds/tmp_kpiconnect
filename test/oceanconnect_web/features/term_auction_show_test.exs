@@ -484,36 +484,47 @@ defmodule Oceanconnect.TermAuctionShowTest do
   end
 
   describe "supplier participation" do
-    test "supplier can accept an invitation for an auction", %{auction: auction, supplier: supplier} do
+    test "supplier can accept an invitation for an auction", %{
+      auction: auction,
+      supplier: supplier
+    } do
       Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
 
-      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+      assert AuctionShowPage.supplier_participation() ==
+               "Do you intend to participate in this auction?"
 
       AuctionShowPage.submit_participation_status(auction.id, :yes)
 
       assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
     end
 
-    test "supplier can decline an invitation for an auction", %{auction: auction, supplier: supplier} do
+    test "supplier can decline an invitation for an auction", %{
+      auction: auction,
+      supplier: supplier
+    } do
       Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
 
-      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+      assert AuctionShowPage.supplier_participation() ==
+               "Do you intend to participate in this auction?"
 
       AuctionShowPage.submit_participation_status(auction.id, :no)
 
-      assert AuctionShowPage.supplier_participation() == "You are not participating in this auction"
+      assert AuctionShowPage.supplier_participation() ==
+               "You are not participating in this auction"
     end
 
-    test "if a supplier hasn't accepted an auction invitation but bids on that auction, their participation is updated", %{auction: auction, supplier: supplier} do
+    test "if a supplier hasn't accepted an auction invitation but bids on that auction, their participation is updated",
+         %{auction: auction, supplier: supplier} do
       Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
 
-      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+      assert AuctionShowPage.supplier_participation() ==
+               "Do you intend to participate in this auction?"
 
       AuctionShowPage.enter_bid(%{amount: 9.50})
       AuctionShowPage.submit_bid()
@@ -522,14 +533,19 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
     end
 
-    test "submitting a barge for approval does not affect supplier participation", %{auction: auction, supplier: supplier} do
+    test "submitting a barge for approval does not affect supplier participation", %{
+      auction: auction,
+      supplier: supplier
+    } do
       barge = insert(:barge, companies: [supplier.company], imo_number: "1234567")
 
       Auctions.start_auction(auction)
       login_user(supplier)
       AuctionShowPage.visit(auction.id)
 
-      assert AuctionShowPage.supplier_participation() == "Do you intend to participate in this auction?"
+      assert AuctionShowPage.supplier_participation() ==
+               "Do you intend to participate in this auction?"
+
       AuctionShowPage.submit_participation_status(auction.id, :yes)
       assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
 
@@ -539,7 +555,6 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.supplier_participation() == "You are participating in this auction"
     end
   end
-
 
   describe "barges" do
     test "supplier cannot submit a barge for approval once an auction has expired", %{

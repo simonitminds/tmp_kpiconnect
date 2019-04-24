@@ -74,6 +74,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
         auction
         |> Auctions.fully_loaded()
         |> Map.put(:vessels, Enum.map(vessel_fuels, & &1.vessel))
+
       Oceanconnect.Auctions.AuctionsSupervisor.start_child(auction)
       EmailNotificationStore.init([])
 
@@ -245,11 +246,11 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       supplier_emails = Enum.filter(emails, &(&1.to.id != buyer.id))
 
       for email <- buyer_emails do
-        assert_delivered_email(email)
+        assert_receive({:delivered_email, email}, 100, Bamboo.Test.flunk_no_emails_received())
       end
 
       for email <- supplier_emails do
-        assert_delivered_email(email)
+        assert_receive({:delivered_email, email}, 100, Bamboo.Test.flunk_no_emails_received())
       end
 
       AuctionsSupervisor.stop_child(auction)

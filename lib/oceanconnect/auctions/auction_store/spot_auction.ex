@@ -76,8 +76,12 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def process(
         state = %AuctionState{status: :draft},
-        %Command{command: :update_auction, data: %{auction: auction = %{scheduled_start: value}, user: user}}
-  ) when not is_nil(value) and value != "" do
+        %Command{
+          command: :update_auction,
+          data: %{auction: auction = %{scheduled_start: value}, user: user}
+        }
+      )
+      when not is_nil(value) and value != "" do
     {:ok,
      [
        AuctionEvent.auction_updated(auction, user),
@@ -88,7 +92,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   def process(
         _state = %AuctionState{},
         %Command{command: :update_auction, data: %{auction: auction, user: user}}
-  ) do
+      ) do
     {:ok,
      [
        AuctionEvent.auction_updated(auction, user)

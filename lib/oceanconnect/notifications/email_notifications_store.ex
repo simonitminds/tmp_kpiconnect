@@ -29,6 +29,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     if needs_processed?(event) do
       process(event, event_state)
     end
+
     {:noreply, state}
   end
 
@@ -70,6 +71,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
          state
        ) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
+
     Notifications.emails_for_event(event, state)
     |> send()
 
