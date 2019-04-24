@@ -148,9 +148,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
         assert email_vessel_ids == [vessel1.id, vessel2.id]
 
         assert supplier_email.html_body =~ Integer.to_string(auction.id)
-        assert supplier_email.html_body =~ vessel1.name
-        assert supplier_email.html_body =~ vessel2.name
-        IO.inspect(supplier_email.html_body)
+        assert supplier_email.html_body =~ "<b>Vessel:</b> #{vessel1.name} (#{vessel1.imo})"
       end
 
       for buyer <- buyers do
