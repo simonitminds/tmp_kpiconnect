@@ -33,7 +33,7 @@
     <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
     <%= for deliverable <- @deliverables do %>
       <%= if(@auction.type == "spot") do %>
-          <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= deliverable.vessel.name %> (<%= deliverable.vessel.imo %>)</p>
+        <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Vessel:</b> <%= deliverable.vessel.name %> (<%= deliverable.vessel.imo %>)</p>
       <% end %>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Grade:</b> <%= deliverable.fuel.name %></p>
       <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Quantity:</b> <%= deliverable.quantity %> MT <%= if(@auction.type == "Term" && !@auction.show_total_fuel_volume) do %>per month<% end %></p>
@@ -41,6 +41,9 @@
         <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b><%= if @auction.type == "formula_related", do: "Discount/Premium Applied:", else: "Price:" %></b> <%= format_price(price) %></p>
       <% else %>
         <p style="margin-top: 0.25rem; margin-bottom: 1rem;"><b>Price:</b> No bid was selected for this deliverable</p>
+      <% end %>
+      <%= if(@auction.type == "formula_related") do %>
+        <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Fuel Index:</b> <%= @auction.fuel_index.name %> (<%= @auction.fuel_index.code %>)</p>
       <% end %>
     <% end %>
     <br>

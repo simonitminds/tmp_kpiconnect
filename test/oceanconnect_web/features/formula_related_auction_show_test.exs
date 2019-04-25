@@ -1,7 +1,9 @@
 defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
   use Oceanconnect.FeatureCase
+  use Bamboo.Test, shared: true
   alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Notifications.Emails
 
   hound_session()
 
@@ -78,10 +80,10 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
 
   describe "buyer login" do
     setup %{auction: auction, buyer: buyer} do
-      Auctions.start_auction(auction)
+      auction = Auctions.start_auction(auction)
       login_user(buyer)
       AuctionShowPage.visit(auction.id)
-      :ok
+      {:ok, %{auction: auction}}
     end
 
     test "buyer can see the bid list", %{auction: auction, fuel_id: fuel_id} do
@@ -128,9 +130,10 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_expectations)
     end
 
-    test "buyer selects solution", %{
+    test "buyer selects solution while auction is open", %{
       auction: auction,
-      fuel_id: fuel_id
+      fuel_id: fuel_id,
+      buyer: buyer
     } do
       supplier = hd(auction.suppliers)
 

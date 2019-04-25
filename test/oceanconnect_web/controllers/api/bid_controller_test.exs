@@ -1,6 +1,8 @@
 defmodule OceanconnectWeb.Api.BidControllerTest do
   use OceanconnectWeb.ConnCase
+  use Bamboo.Test, shared: true
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Notifications.Emails
 
   setup do
     supplier_company = insert(:company, is_supplier: true)
@@ -391,6 +393,14 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       assert Enum.all?(bids, fn bid -> bid in auction_state.winning_solution.bids end)
       assert auction_state.winning_solution.comment == "test"
       assert auction_state.status == :closed
+
+      emails = Emails.AuctionClosed.generate(auction_state)
+
+      :timer.sleep(1000)
+
+      for email <- emails do
+        assert_delivered_email(email)
+      end
     end
   end
 

@@ -40,13 +40,23 @@ defmodule Oceanconnect.Auctions.AuctionStore do
   end
 
   def get_current_state(%struct{id: auction_id}) when is_auction(struct) do
-    with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.call(pid, :get_current_state)
+    with {:ok, pid} <- find_pid(auction_id) do
+      try do
+        GenServer.call(pid, :get_current_state)
+      catch
+        :exit, _ -> {:error, "Auction Store Not Started"}
+      end
+    end
   end
 
   def get_current_state(auction_id) when is_integer(auction_id) do
-    with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.call(pid, :get_current_state)
+    with {:ok, pid} <- find_pid(auction_id) do
+      try do
+        GenServer.call(pid, :get_current_state)
+      catch
+        :exit, _ -> {:error, "Auction Store Not Started"}
+      end
+    end
   end
 
   def process_command(
