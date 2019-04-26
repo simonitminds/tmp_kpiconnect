@@ -444,7 +444,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction_status!(auction_id) when is_integer(auction_id) do
-    with {:ok, auction} <- AuctionCache.read(auction_id),
+    with auction = %struct{} when is_auction(struct) <- get_auction!(auction_id),
          %{status: status} <- get_auction_state!(auction) do
       status
     else

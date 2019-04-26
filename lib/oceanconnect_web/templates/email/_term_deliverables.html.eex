@@ -3,7 +3,7 @@
 <p style="margin-top: 0.25rem;"><b>Fuel Grade:</b> <%= @auction.fuel.name %></p>
 <p style="margin-top: 0.25rem;"><b>Monthly Quantity:</b> <%= @auction.fuel_quantity %> MT per month</p>
 <%= if @auction.type == "formula_related" do %>
-  <p style="margin-top: 0.25rem;"><b>Reference Fuel Index:</b> <%= @auction.fuel_index.name %></p>
+  <p style="margin-top: 0.25rem;"><b>Reference Fuel Index:</b> <%= @auction.fuel_index.name %> (<%= @auction.fuel_index.code %>)</p>
   <p style="margin-top: 0.25rem;"><b>Current Index Price:</b> <%= if @auction.current_index_price, do: format_price(@auction.current_index_price), else: "—" %></p>
 <% end %>
 <p style="margin-top: 0.25rem;"><b>Term Length:</b> <%= term_length(@auction) %></p>
