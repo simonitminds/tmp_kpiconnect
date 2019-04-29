@@ -26,7 +26,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     with [{pid, _}] <- Registry.lookup(@registry_name, auction_id) do
       {:ok, pid}
     else
-      [] -> {:error, "Auction Store Not Started"}
+      _ -> {:error, "Auction Store Not Started"}
     end
   end
 
