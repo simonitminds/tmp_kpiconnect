@@ -9,6 +9,7 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
+    AuctionEvent,
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState,
     Aggregate
@@ -55,12 +56,18 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   end
 
   defp state_for_events(auction, events) do
-    events
-    |> Enum.reverse()
-    |> Enum.reduce(state_for_type(auction), fn event, state ->
-      {:ok, state} = Aggregate.apply(state, event)
-      state
-    end)
+    if snapshot = get_latest_snapshot(events) do
+      snapshot_state = snapshot.data.state
+      %snapshot_type{} = snapshot_state
+      snapshot_type.from_state(snapshot_state)
+    else
+      events
+      |> Enum.reverse()
+      |> Enum.reduce(state_for_type(auction), fn event, state ->
+        {:ok, state} = Aggregate.apply(state, event)
+        state
+      end)
+    end
   end
 
   defp state_for_type(auction = %Auction{}), do: AuctionState.from_auction(auction)
@@ -70,5 +77,37 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
 
   def hydrate_event(event) do
     :erlang.binary_to_term(event)
+  end
+
+  def get_latest_snapshot(event_list) when is_list(event_list) do
+    events =
+      event_list
+      |> Enum.filter(fn event -> event.type == :auction_state_snapshotted end)
+
+    cond do
+      length(events) >= 1 ->
+        events
+        |> Enum.reverse()
+        |> hd()
+
+      events = [] ->
+        nil
+    end
+  end
+
+  def get_latest_snapshot(auction_id) do
+    events =
+      events_by_auction(auction_id)
+      |> Enum.filter(fn event -> event.type == :auction_state_snapshotted end)
+
+    cond do
+      length(events) >= 1 ->
+        events
+        |> Enum.reverse()
+        |> hd
+
+      events = [] ->
+        nil
+    end
   end
 end
