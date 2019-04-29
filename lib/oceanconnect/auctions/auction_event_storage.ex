@@ -12,7 +12,8 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     AuctionEvent,
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState,
-    Aggregate
+    Aggregate,
+    FinalizedStateCache
   }
 
   schema "auction_events" do
@@ -51,8 +52,13 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   end
 
   def most_recent_state(auction = %struct{id: auction_id}) when is_auction(struct) do
-    events = events_by_auction(auction_id)
-    state_for_events(auction, events)
+    with {:ok, state} <- FinalizedStateCache.by_auction_id(auction_id) do
+      state
+    else
+      {:error, _} ->
+        events = events_by_auction(auction_id)
+        state_for_events(auction, events)
+    end
   end
 
   defp state_for_events(auction, events) do
