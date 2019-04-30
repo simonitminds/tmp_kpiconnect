@@ -29,8 +29,13 @@ defmodule Oceanconnect.Auctions.AuctionCache do
   end
 
   def read(auction_id) do
-    with {:ok, pid} <- find_pid(auction_id),
-         do: GenServer.call(pid, :read_cache)
+    with {:ok, pid} <- find_pid(auction_id) do
+      try do
+        GenServer.call(pid, :read_cache)
+      catch
+        :exit, _ -> {:error, "Auction Cache Not Started"}
+      end
+    end
   end
 
   def find_pid(auction_id) do

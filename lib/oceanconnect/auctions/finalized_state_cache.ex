@@ -43,7 +43,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
         state = %state_struct{status: status}
       )
       when is_auction(auction_struct) and is_auction_state(state_struct) and
-             status in [:closed, :cancelled, :expired] do
+             status in [:closed, :canceled, :expired] do
     try do
       GenServer.call(__MODULE__, {:add_auction, auction_id, state})
     catch
