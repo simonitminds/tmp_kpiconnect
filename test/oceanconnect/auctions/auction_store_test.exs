@@ -121,14 +121,15 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> Auctions.end_auction()
     |> Auctions.expire_auction()
 
+    :timer.sleep(1000)
+
     expected_state =
       auction
       |> AuctionState.from_auction()
       |> Map.merge(%{status: :expired, auction_id: auction.id})
 
-    actual_state = AuctionStore.get_current_state(auction)
-
-    assert expected_state == actual_state
+    assert {:ok, %{status: :expired}} = Auctions.FinalizedStateCache.for_auction(auction)
+    assert expected_state == Auctions.AuctionEventStorage.most_recent_state(auction)
   end
 
   test "expired auctions create an entry in the finalized state cache", %{auction: auction} do

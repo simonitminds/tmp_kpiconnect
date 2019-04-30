@@ -53,7 +53,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
 
   def add_auction(_auction, _state), do: {:error, "Cannot Add Non Finalized Auction"}
 
-  def by_auction_id(auction_id) do
+  def by_auction_id(auction_id) when is_integer(auction_id) do
     case :ets.lookup(:finalized_state_cache, auction_id) do
       [{^auction_id, state}] -> {:ok, state}
       _ -> {:error, "No Entry for Auction"}
