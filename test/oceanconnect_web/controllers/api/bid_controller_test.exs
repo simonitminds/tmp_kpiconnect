@@ -361,6 +361,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
       vessel_fuel1: vessel_fuel1,
       vessel_fuel2: vessel_fuel2
     } do
+      {:ok, pid} = Oceanconnect.Notifications.NotificationsSupervisor.start_link()
       Auctions.start_auction(auction)
 
       bids = [

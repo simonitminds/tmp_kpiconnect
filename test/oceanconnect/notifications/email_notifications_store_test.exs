@@ -16,6 +16,8 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
 
   describe "email notifications store" do
     setup do
+      {:ok, pid} = Oceanconnect.Notifications.NotificationsSupervisor.start_link()
+
       port = insert(:port)
       port_name = port.name
       fuel = insert(:fuel)
@@ -228,7 +230,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionsSupervisor.stop_child(auction)
     end
 
-    test "auction cancellation event produces enail", %{
+    test "auction cancellation event produces email", %{
       auction: auction,
       vessel_name_list: vessel_name_list,
       port_name: port_name,

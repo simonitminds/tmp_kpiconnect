@@ -30,7 +30,6 @@ defmodule Oceanconnect.Application do
         {Registry, keys: :unique, name: :auction_timers_registry},
         {Registry, keys: :unique, name: :delayed_notifications_registry},
         {Task.Supervisor, name: Oceanconnect.Notifications.TaskSupervisor},
-        worker(NotificationsSupervisor, [], restart: :permanent),
         worker(AuctionsSupervisor, [], restart: :permanent),
         worker(FinalizedStateCacheSupervisor, [], restart: :permanent)
         # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
@@ -54,7 +53,11 @@ defmodule Oceanconnect.Application do
     if(Application.get_env(:oceanconnect, :store_starter)) do
       children
     else
-      children ++ [worker(AuctionStoreStarter, [])]
+      children ++
+        [
+          worker(AuctionStoreStarter, []),
+          worker(NotificationsSupervisor, [], restart: :permanent)
+        ]
     end
   end
 end
