@@ -31,7 +31,24 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       )
       |> Auctions.fully_loaded()
 
-    {:ok, _pid} = Auctions.AuctionsSupervisor.start_child(auction)
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+      )
+
+    on_exit(fn ->
+      case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+        [] ->
+          nil
+
+        children ->
+          Enum.map(children, fn {_, pid, _, _} ->
+            Process.unlink(pid)
+            Process.exit(pid, :shutdown)
+          end)
+      end
+    end)
 
     {:ok,
      %{
@@ -130,32 +147,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
 
     assert {:ok, %{status: :expired}} = Auctions.FinalizedStateCache.for_auction(auction)
     assert expected_state == Auctions.AuctionEventStorage.most_recent_state(auction)
-  end
-
-  test "expired auctions create an entry in the finalized state cache", %{auction: auction} do
-    auction
-    |> Auctions.start_auction()
-    |> Auctions.end_auction()
-    |> Auctions.expire_auction()
-
-    :timer.sleep(500)
-
-    assert {:error, "Auction Store Not Started"} = Auctions.AuctionStore.find_pid(auction.id)
-    assert {:ok, %{status: :expired}} = Auctions.FinalizedStateCache.for_auction(auction)
-  end
-
-  test "canceled auctions auctions create an entry in the finalized state cache", %{
-    auction: auction,
-    buyer: buyer
-  } do
-    auction
-    |> Auctions.start_auction()
-    |> Auctions.cancel_auction(buyer)
-
-    :timer.sleep(500)
-
-    assert {:error, "Auction Store Not Started"} = Auctions.AuctionStore.find_pid(auction.id)
-    assert {:ok, %{status: :canceled}} = Auctions.FinalizedStateCache.for_auction(auction)
   end
 
   describe "lowest bid list" do
@@ -360,32 +351,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
                ],
                comment: "you win"
              } = auction_payload.solutions.winning_solution
-    end
-
-    test "selecting a winning_solution finalizes the auction and creates an entry in the finalized state cache",
-         %{
-           auction: auction,
-           bid: bid,
-           vessel_fuel: vessel_fuel
-         } do
-      auction_id = auction.id
-      vessel_fuel_id = "#{vessel_fuel.id}"
-      bid_id = bid.id
-
-      auction_state = Auctions.get_auction_state!(auction)
-
-      Auctions.select_winning_solution(
-        [bid],
-        auction_state.product_bids,
-        auction,
-        "you win",
-        "Agent 9"
-      )
-
-      :timer.sleep(1000)
-
-      assert {:error, "Auction Store Not Started"} = Auctions.AuctionStore.find_pid(auction_id)
-      assert {:ok, state} = Auctions.FinalizedStateCache.for_auction(auction)
     end
   end
 end
