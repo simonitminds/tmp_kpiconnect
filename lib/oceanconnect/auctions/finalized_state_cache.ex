@@ -60,7 +60,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
         _ -> {:error, "No Entry for Auction"}
       end
     rescue
-      e in ArgumentError -> {:error, "#{inspect(e)}"}
+      e in ArgumentError -> {:error, "Finalized State Cache Not Started"}
     end
   end
 
@@ -71,7 +71,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
         _ -> {:error, "No Entry for Auction"}
       end
     rescue
-      e in ArgumentError -> {:error, "#{inspect(e)}"}
+      e in ArgumentError -> {:error, "Finalized State Cache Not Started"}
     end
   end
 
