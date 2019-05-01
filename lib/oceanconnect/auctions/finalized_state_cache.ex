@@ -65,9 +65,13 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
   end
 
   def for_auction(%auction_struct{id: auction_id}) when is_auction(auction_struct) do
-    case :ets.lookup(:finalized_state_cache, auction_id) do
-      [{^auction_id, state}] -> {:ok, state}
-      _ -> {:error, "No Entry for Auction"}
+    try do
+      case :ets.lookup(:finalized_state_cache, auction_id) do
+        [{^auction_id, state}] -> {:ok, state}
+        _ -> {:error, "No Entry for Auction"}
+      end
+    rescue
+      e in ArgumentError -> {:error, "#{inspect(e)}"}
     end
   end
 
