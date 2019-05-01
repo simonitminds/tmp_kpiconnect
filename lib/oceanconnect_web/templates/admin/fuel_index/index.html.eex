@@ -46,12 +46,12 @@
 				<div class="is-flex">
 					<div class="has-margin-left-auto">
 						<%= if @page_number > 1 do %>
-							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number - 1), class: "button is-inline-block" do %>
+							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number - 1), class: "button is-inline-block qa-prev-page" do %>
 								<i class="fas fa-chevron-left is-inline-block has-margin-right-sm"></i> Previous Page
 							<% end %>
 						<% end %>
 						<%= if @page_number < @total_pages do %>
-							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number + 1), class: "button is-inline-block" do %>
+							<%= link to: admin_fuel_index_path(@conn, :index, page: @page_number + 1), class: "button is-inline-block qa-next-page" do %>
 								Next Page <i class="fas fa-chevron-right is-inline-block has-margin-left-sm"></i>
 							<% end %>
 						<% end %>
