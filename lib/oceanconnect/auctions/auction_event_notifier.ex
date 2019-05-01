@@ -10,7 +10,8 @@ defmodule Oceanconnect.Auctions.EventNotifier do
     AuctionTimer,
     AuctionEvent,
     Command,
-    Aggregate
+    Aggregate,
+    FinalizedStateCache
   }
 
   def emit(state, event = %AuctionEvent{}) do
@@ -125,12 +126,17 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   def react_to(%AuctionEvent{type: :auction_finalized, auction_id: auction_id}, state) do
     with auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
          {:ok, _snapshot_event} <- Aggregate.snapshot(state),
-         {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state) do
+         {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state),
+         true <-
+           Auctions.FinalizedStateCache.add_auction(finalized_auction, state) do
       Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else
-      {:error, _msg} ->
+      {:error, msg} ->
         require Logger
-        Logger.error("Could not finalize auction detail records for auction #{auction_id}")
+
+        Logger.error(
+          "Could not finalize auction detail records for auction #{auction_id}: #{inspect(msg)}"
+        )
     end
   end
 

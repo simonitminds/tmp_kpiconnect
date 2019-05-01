@@ -1,6 +1,12 @@
 defmodule Oceanconnect.Application do
   use Application
-  alias Oceanconnect.Auctions.{AuctionsSupervisor, AuctionStoreStarter}
+
+  alias Oceanconnect.Auctions.{
+    AuctionsSupervisor,
+    AuctionStoreStarter,
+    FinalizedStateCacheSupervisor
+  }
+
   alias Oceanconnect.Notifications.NotificationsSupervisor
   import Supervisor.Spec
 
@@ -25,7 +31,8 @@ defmodule Oceanconnect.Application do
         {Registry, keys: :unique, name: :delayed_notifications_registry},
         {Task.Supervisor, name: Oceanconnect.Notifications.TaskSupervisor},
         worker(NotificationsSupervisor, [], restart: :permanent),
-        worker(AuctionsSupervisor, [], restart: :permanent)
+        worker(AuctionsSupervisor, [], restart: :permanent),
+        worker(FinalizedStateCacheSupervisor, [], restart: :permanent)
         # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
       ]
       |> maybe_start_store()

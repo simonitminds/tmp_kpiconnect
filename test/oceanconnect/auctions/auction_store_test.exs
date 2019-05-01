@@ -14,6 +14,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     supplier_company = insert(:company)
     supplier2_company = insert(:company)
     buyer_company = insert(:company, is_supplier: false)
+    buyer = insert(:user, company: buyer_company)
     supplier = insert(:user, company: supplier_company)
     supplier2 = insert(:user, company: supplier2_company)
 
@@ -52,6 +53,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     {:ok,
      %{
        auction: auction,
+       buyer: buyer,
        supplier_company: supplier_company,
        supplier2_company: supplier2_company,
        vessel_fuel: vessel_fuel,
@@ -136,14 +138,14 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
     |> Auctions.end_auction()
     |> Auctions.expire_auction()
 
+    :timer.sleep(1000)
+
     expected_state =
       auction
       |> AuctionState.from_auction()
       |> Map.merge(%{status: :expired, auction_id: auction.id})
 
-    actual_state = AuctionStore.get_current_state(auction)
-
-    assert expected_state == actual_state
+    assert expected_state == Auctions.AuctionEventStorage.most_recent_state(auction)
   end
 
   describe "lowest bid list" do
