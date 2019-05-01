@@ -50,7 +50,7 @@ defmodule Oceanconnect.Application do
   end
 
   defp maybe_start_store(children) do
-    if(Application.get_env(:oceanconnect, :store_starter)) do
+    if(Application.get_env(:oceanconnect, :exclude_optional_services)) do
       children
     else
       children ++
