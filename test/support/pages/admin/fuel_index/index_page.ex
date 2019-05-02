@@ -57,4 +57,12 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexPage do
     find_element(:css, ".qa-admin-fuel_index-#{fuel_index.id}")
     |> search_within_element(:css, ".qa-admin-fuel_index-activate")
   end
+
+  def next_page do
+    click({:css, ".qa-next-page"})
+  end
+
+  def previous_page do
+    click({:css, ".qa-prev-page"})
+  end
 end
