@@ -93,7 +93,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     cond do
       length(events) >= 1 ->
         events
-        |> Enum.reverse()
         |> hd()
 
       events = [] ->
@@ -109,7 +108,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     cond do
       length(events) >= 1 ->
         events
-        |> Enum.reverse()
         |> hd
 
       events = [] ->
