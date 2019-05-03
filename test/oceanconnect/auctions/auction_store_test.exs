@@ -400,6 +400,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
         Auctions.AuctionEventStorage.most_recent_state(auction)
 
       assert %{status: :expired} = state
+      :timer.sleep(1000)
       assert {:error, msg} = AuctionStore.find_pid(auction.id)
 
       solution
