@@ -364,9 +364,9 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       supplier_company = insert(:company)
       supplier2_company = insert(:company)
       buyer_company = insert(:company, is_supplier: false)
-      buyer = insert(:user, company: buyer_company)
-      supplier = insert(:user, company: supplier_company)
-      supplier2 = insert(:user, company: supplier2_company)
+      insert(:user, company: buyer_company)
+      insert(:user, company: supplier_company)
+      insert(:user, company: supplier2_company)
       vessel = insert(:vessel, company: buyer_company)
       vessel_fuel = insert(:vessel_fuel, vessel: vessel)
 
@@ -396,7 +396,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       :timer.sleep(1_000)
 
       state =
-        %{product_bids: product_bids, solutions: %{best_overall: solution}} =
+        %{product_bids: _product_bids, solutions: %{best_overall: solution}} =
         Auctions.AuctionEventStorage.most_recent_state(auction)
 
       assert %{status: :expired} = state
@@ -409,8 +409,6 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
       |> AuctionStore.process_command()
 
       Auctions.AuctionEventStore.event_list(auction.id) |> Enum.map(& &1.type)
-
-      :timer.sleep(1000)
 
       Auctions.FinalizedStateCache.stop()
       :timer.sleep(1000)
