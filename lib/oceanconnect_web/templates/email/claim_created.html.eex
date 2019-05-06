@@ -1,38 +1,32 @@
-<p style='font-family: "Arial";'><b>Dear <%= OceanconnectWeb.EmailView.full_name(@supplier) %>,</b></p>
+<p style='font-family: "Arial";'><b>Dear <%= full_name(@user) %>,</b></p>
 <br/>
-<p style='font-family: "Arial";'>We would like to inform you that the start time for Auction <%= @auction.id %> has been changed.</p>
-<br/>
-<table style="background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: 'Arial';">
-  <tr>
-    <td style="padding: 1rem;">
-    <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Auction Details</h1>
-    <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <p style="margin-top: 0.25rem;"><b>Auction ID:</b> <%= @auction.id %></p>
-    <p style="margin-top: 0.25rem;"><b>Auction Type:</b> <%= auction_type(@auction) %></p>
-    <p style="margin-top: 0.25rem;"><b>Auction Start Time:</b> <%= convert_date?(@auction.scheduled_start) %></p>
-    <p style="margin-top: 0.25rem;"><b>Transaction Duration:</b> <%= duration_minute_string(@auction.duration)%></p>
-    <p style="margin-top: 0.25rem;"><b>Buyer:</b> <%= @buyer_company.name %></p>
-    <p style="margin-top: 0.25rem;"><b>Port:</b> <%= @auction.port.name %></p>
-    <%= render partial_name_for_type(@auction, "duration"), Map.put(assigns, :auction, @auction) %>
-    <br>
-    <%= render partial_name_for_type(@auction, "deliverables"), Map.put(assigns, :auction, @auction) %>
-    <br>
-    <h1 style="font-weight: bold; font-size: 14pt; margin: 0;">Buyer Information</h1>
-    <hr style="margin-top: 0.25rem; margin-bottom: 1rem;"/>
-    <p style="margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer Name:</b> <%= @buyer_company.contact_name %></p>
-    <p style="margin-top: 0.25rem; margin-bottom: 0.5rem;"><b>Buyer Ref Number:</b> (To be sent by email)</p>
-    <p style='font-family: "Arial"; margin-top: 0.25rem; margin-bottom: 0.5rem;'><b>Address:</b></p>
-    <p style='font-family: "Arial";'><%= @buyer_company.address1 %></p>
-    <p style='font-family: "Arial";'><%= @buyer_company.address2 %></p>
-    <p style='font-family: "Arial";'><%= @buyer_company.city %>, <%= @buyer_company.country %></p>
-    <p style='font-family: "Arial";'><%= @buyer_company.main_phone %></p>
-    <p style='font-family: "Arial";'><%= @buyer_company.email %></p>
-    </td>
-  </tr>
-</table>
+<p style='font-family: "Arial";'>As per <%= @claim.buyer.name %> standard procedure on claims, they formally place <%= @claim.supplier.name %> on notice for the alleged shortage while the matter is investigated.</p>
 <br/>
 
-<p style='font-family: "Arial";'>To view this auction listing, please click the following link: <a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>"><%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %></a></p>
+<p style="font-family: 'Arial';"><b>Supply:</b> <%= @fixture.vessel.name %> at <%= @claim.auction.port.name %> on <%= convert_date?(@fixture.etd) %></p>
+<p style="font-family: 'Arial';"><b>Alleged Difference:</b> <%= @claim.quantity_missing %> M/T with a value of <%= format_price(@claim.total_fuel_value) %> </p>
+<br>
+<br/>
+<p style="font-family: 'Arial';">WITHOUT PREJUDICE, WE HEREBY PLACE <span style="text-transform: uppercase;"><%= @claim.supplier.name %></span> ON NOTICE FOR ANY/ALL CLAIMS, COSTS, DETENTION, DELAYS, DEMURRAGE, DEVIATION, FINES, CONSEQUENCES, OR EXPENSES WHICH MAY ARISE FROM THIS ALLEGED QUANTITY SHORTAGE.</p>
+<br>
+<p style="font-family: 'Arial';">IN THE MEANTIME, PLEASE BE ADVISED THAT <span style="text-transform: uppercase;"><%= @claim.buyer.name %></span> WILL MITIGATE ITS LOSSES AND WILL KEEP YOU ADVISED OF ITS INTENTIONS WITH REGARD TO THIS CLAIM.  <span style="text-transform: uppercase;"><%= @claim.buyer.name %></span>'S RIGHTS REMAIN RESERVED.</p>
+<br>
+<p style="font-family: 'Arial';"><b>Please arrange to present documentational evidence of the quantity supplied, including, but not limited to, the following:</b></p>
+<ul style="font-family: 'Arial';">
+  <li>Barge loading document showing ROB before and after loading</li>
+  <li>Supply documents to any vessel supplied from the load prior to supplying <%= @fixture.vessel.name %></li>
+  <li>Ullage tables for supply to <%= @fixture.vessel.name %></li>
+  <li>Supply documents to any vessel supplied from the load after supply to <%= @fixture.vessel.name %></li>
+</ul>
+<br>
+<p style="font-family: 'Arial';">We will continue to gather information and revert to you with any news or questions.</p>
+<br><br>
+<p style="font-family: 'Arial';">Best Regards,</p>
+<br>
+<p style="font-family: 'Arial';"><b><%= @claim.buyer.contact_name %></b></p>
+<p style="font-family: 'Arial';"><%= @claim.buyer.name %></p>
+
+<p style='font-family: "Arial";'>To view this auction claim, please click the following link: <a href="<%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %>"><%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %></a></p>
 <br/>
 <br/>
 
@@ -56,3 +50,4 @@ lrXAmEEDZgiXy4zWC4w2D4HW9+Dfc0Crf+B3YPc2Cv/HyvBv/N4WrbDw0iQKVsWCqAPDS9aGZQs2hCCM
 </table>
 <hr style="margin-top: 2rem;">
 <p style='font-family: "Arial";'><b>OceanConnect Marine</b> offers complete bunker service. Visit us at <a href="http://www.oceanconnectmarine.com">http://www.oceanconnectmarine.com</a></p>
+

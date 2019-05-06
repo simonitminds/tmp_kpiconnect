@@ -10,16 +10,24 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexTest do
     admin_user = insert(:user, %{is_admin: true})
     user = insert(:user)
     insert_list(20, :fuel_index)
+
     {fuel_index_page1, fuel_index_page2} =
       FuelIndex.alphabetical()
       |> Repo.all()
       |> Enum.split(10)
 
-    {:ok, admin_user: admin_user, user: user, fuel_index_page1: fuel_index_page1, fuel_index_page2: fuel_index_page2}
+    {:ok,
+     admin_user: admin_user,
+     user: user,
+     fuel_index_page1: fuel_index_page1,
+     fuel_index_page2: fuel_index_page2}
   end
 
   describe "fuel index entries" do
-    test "renders the company index page for admins", %{admin_user: admin_user, fuel_index_page1: fuel_index_page1} do
+    test "renders the company index page for admins", %{
+      admin_user: admin_user,
+      fuel_index_page1: fuel_index_page1
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
@@ -32,7 +40,10 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexTest do
       refute IndexPage.is_current_path?()
     end
 
-    test "admin can deactivate a fuel grade", %{admin_user: admin_user, fuel_index_page1: fuel_index_page1} do
+    test "admin can deactivate a fuel grade", %{
+      admin_user: admin_user,
+      fuel_index_page1: fuel_index_page1
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
@@ -43,7 +54,10 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexTest do
       assert IndexPage.is_fuel_index_inactive?(fuel)
     end
 
-    test "admin can activate a fuel grade", %{admin_user: admin_user, fuel_index_page1: fuel_index_page1} do
+    test "admin can activate a fuel grade", %{
+      admin_user: admin_user,
+      fuel_index_page1: fuel_index_page1
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
@@ -54,7 +68,11 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexTest do
       assert IndexPage.is_fuel_index_active?(fuel)
     end
 
-    test "admin can navigate in pagination", %{admin_user: admin_user, fuel_index_page1: fuel_index_page1, fuel_index_page2: fuel_index_page2} do
+    test "admin can navigate in pagination", %{
+      admin_user: admin_user,
+      fuel_index_page1: fuel_index_page1,
+      fuel_index_page2: fuel_index_page2
+    } do
       login_user(admin_user)
       IndexPage.visit()
       assert IndexPage.is_current_path?()
@@ -69,4 +87,3 @@ defmodule Oceanconnect.Admin.FuelIndex.IndexTest do
     end
   end
 end
-

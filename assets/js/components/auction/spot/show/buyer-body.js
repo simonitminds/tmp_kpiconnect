@@ -8,7 +8,7 @@ import BuyerBestSolution from './buyer-best-solution';
 import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
-
+import FullfillmentOptions from './fullfillment-options';
 
 const BuyerBody = (props) => {
   const {
@@ -46,6 +46,10 @@ const BuyerBody = (props) => {
   } else if(status ==  'closed') {
       return(
       <div>
+        <div>
+          <a href={`/auctions/${_.get(auctionPayload, 'auction.id')}/claims/new`} className="is-button qa-auction-claims-place_claim">Place Claim</a>
+        </div>
+        <FixtureDisplay auctionPayload={auctionPayload} />
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />

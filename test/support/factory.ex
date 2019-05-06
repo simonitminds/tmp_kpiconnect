@@ -217,6 +217,27 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def quantity_claim_factory() do
+    supplier = build(:company, is_supplier: true)
+
+    %Oceanconnect.Deliveries.QuantityClaim{
+      type: "quantity",
+      closed: false,
+      quantity_missing: 100,
+      price_per_unit: 100,
+      total_fuel_value: 10_000,
+      additional_information: "Your fuel sucked!",
+      notice_recipient_type: "supplier",
+      notice_recipient: supplier,
+      auction: build(:auction),
+      supplier: supplier,
+      receiving_vessel: build(:vessel),
+      delivered_fuel: build(:fuel),
+      delivering_barge: build(:barge),
+      fixture: build(:auction_fixture)
+    }
+  end
+
   def create_bid(amount, min_amount, supplier_id, vessel_fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,

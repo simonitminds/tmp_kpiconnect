@@ -12,7 +12,8 @@ defmodule Oceanconnect.AuctionsTest do
     AuctionStore.AuctionState,
     Aggregate,
     Command,
-    Solution
+    Solution,
+    QuantityClaim
   }
 
   describe "auctions" do
@@ -1131,6 +1132,36 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier2_id} = second
     end
 
+    test "approved_barges_for_winning_suppliers/2 lists all approved barges submitted to an auction by the winning suppliers",
+         %{auction: auction, supplier: supplier, supplier2: supplier2} do
+      winning_suppliers = [supplier, supplier2]
+      barge = insert(:barge, companies: winning_suppliers)
+      barge_id = barge.id
+      supplier_id = supplier.id
+
+      insert(:auction_barge,
+        auction: auction,
+        barge: barge,
+        supplier: supplier,
+        approval_status: "APPROVED"
+      )
+
+      insert(:auction_barge,
+        auction: auction,
+        barge: barge,
+        supplier: supplier2,
+        approval_status: "PENDING"
+      )
+
+      assert [
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier_id,
+                 approval_status: "APPROVED"
+               }
+             ] = Auctions.approved_barges_for_winning_suppliers(winning_suppliers, auction)
+    end
+
     test "submit_comment/3", %{auction: auction, supplier: supplier} do
       assert {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
 
@@ -1657,6 +1688,53 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "deactivate_fuel_index/1 marks the port as inactive", %{fuel_index: fuel_index} do
       assert {:ok, %FuelIndex{is_active: false}} = Auctions.deactivate_fuel_index(fuel_index)
+    end
+  end
+
+  describe "quantity claims" do
+    setup do
+      buyer_company = insert(:company)
+      _buyer = insert(:user, company: buyer_company)
+      supplier_company = insert(:company, is_supplier: true)
+      _supplier = insert(:user)
+
+      auction =
+        insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
+        |> Auctions.fully_loaded()
+
+      delivering_barge =
+        insert(:auction_barge,
+          auction: auction,
+          supplier: supplier_company,
+          approval_status: "APPROVED"
+        )
+
+      auction_state = close_auction!(auction)
+      _auction_fixtures = Auctions.create_fixtures_from_state(auction_state)
+
+      claim_params = %{
+        "type" => "quantity",
+        "supplier_id" => supplier_company.id,
+        "receiving_vessel_id" => hd(auction.vessels).id,
+        "delivered_fuel_id" => hd(auction.auction_vessel_fuels).fuel.id,
+        "notice_recipient_type" => "supplier",
+        "delivering_barge_id" => delivering_barge.barge.id,
+        "quantity_missing" => 100,
+        "price_per_unit" => 100,
+        "total_fuel_value" => 100 * 100,
+        "additional_information" => "Your fuel sucked!"
+      }
+
+      {:ok, %{claim_params: claim_params}}
+    end
+
+    test "change_quantity_claim/1 returns a claim changeset" do
+      assert %Ecto.Changeset{} = Auctions.change_claim(%QuantityClaim{})
+    end
+
+    test "create_quantity_claim/1 with valid attrs creates a quantity claim", %{
+      claim_params: claim_params
+    } do
     end
   end
 end

@@ -436,6 +436,17 @@ defmodule Oceanconnect.AuctionShowPage do
     |> inner_text()
   end
 
+  def has_place_claim_button? do
+    case search_element(:css, ".qa-auction-claims-place_claim") do
+      {:ok, _} -> true
+      {:error, _} -> false
+    end
+  end
+
+  def place_claim do
+    click({:css, ".qa-auction-claims-place_claim"})
+  end
+
   defp get_name_or_alias(supplier_id, %struct{anonymous_bidding: true, suppliers: suppliers})
        when is_auction(struct) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).alias_name

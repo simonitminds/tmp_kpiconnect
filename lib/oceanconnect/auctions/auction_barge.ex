@@ -29,4 +29,18 @@ defmodule Oceanconnect.Auctions.AuctionBarge do
       where: ab.auction_id == ^auction_id
     )
   end
+
+  def by_approval_status(status, query \\ AuctionBarge) do
+    from(
+      q in query,
+      where: q.approval_status == ^String.upcase(status)
+    )
+  end
+
+  def by_supplier(supplier_id, query \\ AuctionBarge) do
+    from(
+      q in query,
+      where: q.supplier_id == ^supplier_id
+    )
+  end
 end

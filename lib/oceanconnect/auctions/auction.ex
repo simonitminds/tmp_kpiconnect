@@ -58,6 +58,7 @@ defmodule Oceanconnect.Auctions.Auction do
     )
 
     has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
+    has_many(:auction_fixtures, Oceanconnect.Auctions.AuctionFixture)
 
     timestamps()
   end

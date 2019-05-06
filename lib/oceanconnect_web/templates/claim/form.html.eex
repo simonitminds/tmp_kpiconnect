@@ -1,0 +1,195 @@
+<%= form_for @changeset, claim_path(@conn, :create, @auction.id), fn f -> %>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <fieldset>
+          <legend class="subtitle is-4">Auction Details</legend>
+          <div class="box">
+            <ul class="list has-no-bullets">
+              <li><strong>Auction Number</strong> <%= @auction.id %></li>
+              <li><strong>Vessel(s)</strong> <%= vessel_name_list(@auction.vessels) %></li>
+              <li><strong>Port</strong> <%= @auction.port.name %></li>
+            </ul>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="control">
+        <label class="radio">
+          <%= radio_button(f, :type, "quantity", class: "qa-claim-type-quantity") %>
+          <span class="is-inline-block has-margin-left-xs">Quantity Claim</span>
+        </label>
+        <fieldset class="box is-gray-1 has-margin-top-sm has-margin-bottom-md">
+          <label class="class label--group">Quantity Claim</label>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Supplier</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <%= select f, :supplier_id, options_for_supplier_select(@fixtures), class: "qa-claim-supplier_id" %>
+                    <%= error_tag f, :supplier_id %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Receiving Vessel</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <%= select f, :receiving_vessel_id, options_for_vessel_select(@fixtures), class: "qa-claim-receiving_vessel_id" %>
+                    <%= error_tag f, :receiving_vessel_id %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Delivered Fuel</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <%= select f, :delivered_fuel_id, options_for_fuel_select(@fixtures), class: "qa-claim-delivered_fuel_id" %>
+                    <%= error_tag f, :delivered_fuel_id %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Quantity Missing</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <%= text_input(f, :quantity_missing, placeholder: "Units of Fuel", class: "input qa-claim-quantity_missing") %>
+                  <%= error_tag f, :quantity_missing %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Price</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <%= text_input(f, :price_per_unit, placeholder: "Price per Unit", class: "input qa-claim-price_per_unit") %>
+                  <%= error_tag f, :price_per_unit %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Total Fuel Value</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <%= text_input(f, :total_fuel_value, placeholder: "Total Fuel Value", class: "input qa-claim-total_fuel_value") %>
+                  <%= error_tag f, :total_fuel_value %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Delivering Barge</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <%= select f, :delivering_barge_id, options_for_barge_select(@fixtures, @auction), class: "qa-claim-delivering_barge_id" %>
+                    <%= error_tag f, :delivering_barge_id %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <fieldset>
+          <legend class="subtitle is-4"></legend>
+          <label class="label" for=""></label>
+          <div class="field-body">
+            <div class="field div control">
+              <label class="radio is-flex has-margin-left-none has-margin-bottom-sm" for="">
+                <%= radio_button(f, :notice_recipient_type, "supplier", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-supplier") %>
+                <%= error_tag f, :notice_recipient_type %>
+                <div>
+                  Supplier
+                  <p class="help has-margin-bottom-md has-text-gray-3">
+                    Last Correspondence Sent: <%= if @claim, do: @claim.supplier_last_correspondence, else: "—" %>
+                  </p>
+                </div>
+              </label>
+              <label class="radio is-flex has-margin-left-none has-margin-bottom-sm" for="">
+                <%= radio_button(f, :notice_recipient_type, "admin", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-admin") %>
+                <%= error_tag f, :notice_recipient_type %>
+                <div>
+                  OceanConnect Marine
+                  <p class="help has-margin-bottom-md has-text-gray-3">
+                    Last Correspondence Sent: <%= if @claim, do: @claim.admin_last_correspondence, else: "—" %>
+                  </p>
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <section class="auction-claim">
+    <div class="container div content">
+      <fieldset>
+        <legend class="subtitle is-4">Addition Information</legend>
+        <div class="field">
+          <p class="help">Include any addition information that is relevant to the claim.</p>
+          <%= textarea(f, :textarea, class: "textarea qa-claim-additional_information", rows: "10") %>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <div class="field">
+          <%= link "Back", to: auction_path(@conn, :show, @auction.id), class: "button has-margin-right-sm" %>
+          <%= submit "Submit Claim", class: "button is-link qa-claim-submit" %>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>

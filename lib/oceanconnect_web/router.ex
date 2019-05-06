@@ -128,6 +128,8 @@ defmodule OceanconnectWeb.Router do
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
 
+    resources("/auctions/:auction_id/claims", ClaimController, except: [:delete])
+
     resources("/users", UserController)
     post("/users/:user_id/reset_password", UserController, :reset_password)
 

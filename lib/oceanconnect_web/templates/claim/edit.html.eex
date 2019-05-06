@@ -1,0 +1,144 @@
+  <div class="auction-app">
+    <div class="auction-app__header container">
+      <div class="content has-margin-top-lg">
+        <h1 class="title is-3 has-text-weight-bold">Update Claim</h1>
+      </div>
+    </div>
+    <div class="form auction-app__body">
+      <%= form_for @changeset, claim_path(@conn, :update, @auction.id, @claim.id), fn f -> %>
+        <%# <div id="auctions-app"> %>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <fieldset>
+                  <legend class="subtitle is-4">Auction Details</legend>
+                  <div class="box">
+                    <ul class="list has-no-bullets">
+                      <li><strong>Auction Number</strong> <span class="qa-claim-auction-auction_id"><%= @auction.id %></span></li>
+                      <li><strong>Vessel(s)</strong> <span class="qa-claim-auction-vessels"><%= vessel_name_list(@auction.vessels) %></span></li>
+                      <li><strong>Port</strong> <span class="qa-claim-auction-port"><%= @auction.port.name %></span></li>
+                      <li><strong>Date of Delivery</strong> <span class="qa-claim-fixture-etd"><%= convert_date?(@claim.fixture.etd) %></span></li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <fieldset>
+                  <legend class="subtitle is-4">Claim Details</legend>
+                  <div class="box">
+                    <ul class="list has-no-bullets">
+                      <li><strong>Claim Type</strong> <span class="qa-claim-type"><%= String.capitalize(@claim.type) %> Claim</span></li>
+                      <li><strong>Receiving Vessel</strong> <span class="qa-claim-receiving_vessel"><%= @fixture.vessel.name %></span></li>
+                      <li><strong>Delivered Fuel</strong> <span class="qa-claim-delivered_fuel"><%= @fixture.fuel.name %></span></li>
+                      <li><strong>Quantity Missing</strong> <span class="qa-claim-quantity_missing"><%= @claim.quantity_missing %> M/T</span></li>
+                      <li><strong>Price</strong> <span class="qa-claim-price_per_unit"><%= format_price(@claim.price_per_unit) %></span></li>
+                      <li><strong>Value</strong> <span class="qa-claim-total_fuel_value"><%= format_price(@claim.total_fuel_value) %></span></li>
+                      <li><strong>Delivering Barge</strong> <span class="qa-claim-delivering_barge"><%= @claim.delivering_barge.name %></span></li>
+                      <li><strong>Time Submitted</strong>  <span class="qa-claim-time_submitted"><%= convert_date?(@claim.inserted_at) %></span></li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <fieldset>
+                  <legend class="subtitle is-4">Place Supplier on Notice</legend>
+                    <label class="label">Send Email To:</label>
+                  <div class="field-body">
+                    <div class="field">
+                      <div class="control">
+                        <label class="radio is-flex has-margin-left-none has-margin-bottom-sm">
+                          <%= radio_button(f, :notice_recipient_type, "supplier", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-supplier", disabled: "") %>
+                          <div>
+                            Supplier
+                            <p class="help has-margin-bottom-md has-text-gray-3">Last Correspondence Sent: <span class="qa-claim-supplier_last_correspondence"><%= if @claim.supplier_last_correspondence, do: convert_date?(@claim.supplier_last_correspondence), else: "—" %></span></p>
+                          </div>
+                        </label>
+                        <label class="radio is-flex has-margin-left-none has-margin-bottom-sm">
+                          <%= radio_button(f, :notice_recipient_type, "admin", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-admin readonly", disabled: "") %>
+                          <div>
+                            OceanConnect Marine
+                            <p class="help has-margin-bottom-md has-text-gray-3">Last Correspondence Sent: <span class="qa-claim-admin_last_correspondence"><%= if @claim.admin_last_correspondence, do: convert_date?(@claim.admin_last_correspondence), else: "—" %></span></p>
+                          </div>
+                        </label>
+                        <%= error_tag f, :notice_recipient_type %>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <fieldset>
+                  <legend class="subtitle is-4">Responses</legend>
+                  <%= if @claim.responses do %>
+                    <%= for response <- @claim.responses do %>
+                      <div class="box qa-claim-response-<%= "#{response.id}" %>">
+                        <p class="qa-response-content"><%= response.content %></p>
+                        <p><strong><span class="qa-response-author"><%= Oceanconnect.Accounts.User.full_name(response.author) %></span> (<%= response.author.company.name %>)</strong><span class="has-text-gray-3"> <%= convert_date?(response.inserted_at) %></span></p>
+                      </div>
+                    <% end %>
+                  <% end %>
+                  <div class="field">
+                    <p class="help">Include any additional information that is relevant to the claim.</p>
+                    <div class="control">
+                         <%= textarea(f, :response, placeholder: "Additional Details", rows: "10", class: "textarea qa-claim-response") %>
+                         <%= error_tag f, :content %>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <fieldset>
+                  <legend class="subtitle is-4">Close Claim</legend>
+                  <div class="field">
+
+                    <div class="control">
+                      <label class="checkbox">
+                        <%= checkbox f, :closed, class: "checkbox qa-claim-closed" %>
+                        Close Claim
+                      </label>
+                    </div>
+
+                    <fieldset class="has-margin-top-md is-hidden" id="closeClaimFieldset">
+                      <div class="field">
+                        <p class="help">Detail how the claim was resolved.</p>
+                        <div class="control">
+                          <%# <%= textarea(f, :claim_resolution, placeholder: "Additional Details", rows: "10") %1> %>
+                        </div>
+                      </div>
+                    </fieldset>
+
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+          <section class="auction-claim">
+            <div class="container">
+              <div class="content">
+                <div class="field">
+                  <%= link "Back", to: auction_path(@conn, :show, @auction.id), class: "button has-margin-right-sm" %>
+                  <%= submit "Update Claim", class: "button is-link qa-claim-update" %>
+                </div>
+              </div>
+            </div>
+          </section>
+        <%# </div> %>
+      <% end %>
+    </div>
+  </div>
