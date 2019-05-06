@@ -76,7 +76,11 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
   end
 
   def stop(reason \\ :normal, timeout \\ :infinity) do
-    GenServer.stop(__MODULE__, reason, timeout)
+    try do
+      GenServer.stop(__MODULE__, reason, timeout)
+    catch
+      :exit, msg -> {:error, "Finalized State Cache Failed to Stop because: #{inspect(msg)}"}
+    end
   end
 
   defp add_entry_to_cache(auction_id, state),

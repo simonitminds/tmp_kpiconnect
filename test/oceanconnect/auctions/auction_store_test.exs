@@ -347,9 +347,73 @@ defmodule Oceanconnect.Auctions.AuctionStoreTest do
                auction_id: ^auction_id,
                bids: [
                  %{id: ^bid_id, amount: 1.25, vessel_fuel_id: ^vessel_fuel_id}
-               ],
-               comment: "you win"
+               ]
              } = auction_payload.solutions.winning_solution
+    end
+  end
+
+  describe "moving an auction from expired to closed" do
+    setup do
+      admin = insert(:user, is_admin: true)
+      {:ok, %{admin: admin}}
+    end
+
+    test "has the correct status when state is rebuilt", %{
+      admin: admin
+    } do
+      supplier_company = insert(:company)
+      supplier2_company = insert(:company)
+      buyer_company = insert(:company, is_supplier: false)
+      insert(:user, company: buyer_company)
+      insert(:user, company: supplier_company)
+      insert(:user, company: supplier2_company)
+      vessel = insert(:vessel, company: buyer_company)
+      vessel_fuel = insert(:vessel_fuel, vessel: vessel)
+
+      auction =
+        insert(
+          :auction,
+          duration: 1_000,
+          decision_duration: 1_000,
+          suppliers: [supplier_company, supplier2_company],
+          buyer: buyer_company,
+          auction_vessel_fuels: [vessel_fuel]
+        )
+        |> Auctions.fully_loaded()
+
+      Auctions.AuctionsSupervisor.start_child(auction)
+      supplier_id = hd(auction.suppliers).id
+      vessel_fuel_id = hd(auction.auction_vessel_fuels).id
+
+      bid = create_bid(3.50, 3.50, supplier_id, vessel_fuel_id, auction)
+      Auctions.place_bid(bid)
+
+      auction
+      |> Auctions.start_auction()
+      |> Auctions.end_auction()
+      |> Auctions.expire_auction()
+
+      :timer.sleep(1_000)
+
+      state =
+        %{product_bids: _product_bids, solutions: %{best_overall: solution}} =
+        Auctions.AuctionEventStorage.most_recent_state(auction)
+
+      assert %{status: :expired} = state
+      Auctions.AuctionsSupervisor.stop_child(auction)
+      :timer.sleep(1000)
+      assert {:error, msg} = AuctionStore.find_pid(auction.id)
+
+      solution
+      |> Auctions.Command.select_winning_solution(auction, DateTime.utc_now(), "PO", admin)
+      |> AuctionStore.process_command()
+
+      Auctions.AuctionEventStore.event_list(auction.id) |> Enum.map(& &1.type)
+
+      Auctions.FinalizedStateCache.stop()
+      :timer.sleep(1000)
+      Auctions.FinalizedStateCache.start_link()
+      assert %{status: :closed} = Auctions.AuctionEventStorage.most_recent_state(auction)
     end
   end
 end
