@@ -9,7 +9,6 @@ defmodule Oceanconnect.Notifications.Email do
       defp base_email(user) do
         new_email()
         |> cc("nbolton@oceanconnectmarine.com")
-        |> bcc("lauren@gaslight.co")
         |> from("bunkers@oceanconnectmarine.com")
         |> to(user)
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
@@ -24,7 +23,6 @@ defmodule Oceanconnect.Notifications.Email do
 
       defp user_interest_email do
         new_email()
-        |> bcc("lauren@gaslight.co")
         |> from("bunkers@oceanconnectmarine.com")
         |> to("nbolton@oceanconnectmarine.com")
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
