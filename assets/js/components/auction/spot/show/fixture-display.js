@@ -4,7 +4,7 @@ import { formatPrice, formatUTCDateTime } from '../../../../utilities';
 
 const FixtureDisplay = ({auctionPayload}) => {
   const auction = _.get(auctionPayload, 'auction');
-  const fixtures = _.get(auction, 'fixtures', []);
+  const fixtures = _.get(auction, 'auction_fixtures', []);
 
   return(
     <div class="fulfillment-options__history">
@@ -16,15 +16,15 @@ const FixtureDisplay = ({auctionPayload}) => {
           { _.map(fixtures, (fixture) => {
               const vessel = _.get(fixture, 'vessel.name', "—");
               const fuel = _.get(fixture, 'fuel.name', "—");
-              const quantity = _.get(fixture, 'quantity', "—");
-              quantity == "—" ? quantity : quantity.concat(" M/T")
-              const price = _.get(fixture, 'price', "—");
-              price == "—" ? price : formatPrice(price);
+              let quantity = _.get(fixture, 'quantity', "—");
+              quantity = quantity == "—" ? quantity : `${quantity} M/T`;
+              let price = _.get(fixture, 'price', "—");
+              price = price == "—" ? price : formatPrice(price);
               const supplier = _.get(fixture, 'supplier.name', "—");
-              const eta = _.get(fixture, 'eta', "—");
-              eta == "—" ? eta : formatUTCDateTime(eta);
-              const etd = _.get(fixture, 'etd', "—");
-              etd == "—" ? etd : formatUTCDateTime(etd);
+              let eta = _.get(fixture, 'eta', "—");
+              eta = eta == "—" ? eta : formatUTCDateTime(eta);
+              let etd = _.get(fixture, 'etd', "—");
+              etd = etd == "—" ? etd : formatUTCDateTime(etd);
               return(
                 <tr className={`qa-auction-fixture-${fixture.id}`}>
                   <td className="qa-auction-fixture-vessel">{vessel}</td>

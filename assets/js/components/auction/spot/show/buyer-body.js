@@ -49,7 +49,7 @@ const BuyerBody = (props) => {
         <div>
           <a href={`/auctions/${_.get(auctionPayload, 'auction.id')}/claims/new`} className="is-button qa-auction-claims-place_claim">Place Claim</a>
         </div>
-        <FixtureDisplay auctionPayload={auctionPayload} />
+        <FullfillmentOptions auctionPayload={auctionPayload} />
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />

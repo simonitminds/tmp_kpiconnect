@@ -1,0 +1,107 @@
+// ========================== //
+// ========================== //
+// CLAIMS
+// ========================== //
+// ========================== //
+
+
+// Associated Variables
+
+
+// Blocks
+
+.fulfillment-options {
+  background-color: $gray-1 !important;
+  padding-bottom: 0 !important;
+
+  h2 {
+    margin-bottom: 1rem;
+    font-family: $family-header;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    &:last-child {
+      padding-bottom: 1rem;
+    }
+  }
+
+  .fulfillment-options__actions {
+    display: flex;
+    align-items: center;
+    background-color: $gray-2;
+
+    h3 { font-weight: bold; }
+    padding: 1rem;
+    margin: 0 -1.25rem;
+  }
+}
+
+// _forms.scss
+
+.label--group {
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem !important;
+  border-bottom: 1px solid $gray-2;
+}
+
+// _layout.scss
+
+section.auction-info { // Form divisions for Auction Create/Edit
+  padding: 2rem 1rem;
+
+  &:nth-child(even) {
+    background-color: $gray-0;
+
+    .empty-list {
+      background-color: white;
+    }
+  }
+
+  @media (max-width: 768px) { // Tighten up spacing for mobile.
+    padding: 1.25rem 0.5rem;
+  }
+
+  // Final Section with Submission Buttons
+
+  .auction-app__body > form >& {
+    margin-top: 2rem;
+
+    .container {
+      padding: 2rem 0 4rem 0;
+
+      @media (max-width: 768px) { // Tighten up spacing for mobile.
+        padding: 1.25rem 0.5rem;
+      }
+    }
+  }
+}
+
+section.auction-claim { // Form divisions for Auction Create/Edit
+  padding: 2rem 1rem;
+
+  &:nth-child(odd) {
+    background-color: $gray-0;
+
+    .empty-list {
+      background-color: white;
+    }
+  }
+
+  @media (max-width: 768px) { // Tighten up spacing for mobile.
+    padding: 1.25rem 0.5rem;
+  }
+
+  // Final Section with Submission Buttons
+
+  .auction-app__body > form >& {
+    margin-top: 2rem;
+
+    .container {
+      padding: 2rem 0 4rem 0;
+
+      @media (max-width: 768px) { // Tighten up spacing for mobile.
+        padding: 1.25rem 0.5rem;
+      }
+    }
+  }
+}
