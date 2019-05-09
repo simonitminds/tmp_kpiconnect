@@ -1,4 +1,4 @@
-<%= form_for @changeset, claim_path(@conn, :create, @auction.id),[class: "control"], fn f -> %>
+<%= form_for @changeset, claim_path(@conn, :create, @auction.id), fn f -> %>
   <section class="auction-claim">
     <div class="container">
       <div class="content">

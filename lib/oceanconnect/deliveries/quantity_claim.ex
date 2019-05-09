@@ -17,6 +17,7 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
     AuctionFixture
   }
 
+  @derive {Poison.Encoder, except: [:__meta__, :auction, :buyer, :notice_recipient, :fixture, :responses]}
   schema "claims" do
     field(:type, :string)
     field(:closed, :boolean, default: false)

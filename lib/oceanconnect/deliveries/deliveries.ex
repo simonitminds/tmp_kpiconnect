@@ -3,7 +3,7 @@ defmodule Oceanconnect.Deliveries do
   import Oceanconnect.Deliveries.Guards
 
   alias Oceanconnect.Deliveries.{QuantityClaim, DeliveryEvent, EventNotifier, ClaimResponse}
-  alias Oceanconnect.Auctions.Auction
+  alias Oceanconnect.Auctions.{Auction, TermAuction}
 
   def change_quantity_claim(%QuantityClaim{} = claim) do
     QuantityClaim.changeset(claim, %{})
@@ -52,8 +52,10 @@ defmodule Oceanconnect.Deliveries do
     auction_id
     |> QuantityClaim.by_auction()
     |> Repo.all()
-    |> Repo.preload([:supplier, :delivered_fuel, :receiving_vessel, :delivering_barge])
+    |> Repo.preload([:supplier, :delivered_fuel, :receiving_vessel, delivering_barge: [:port]])
   end
+
+  def claims_for_auction(%TermAuction{}), do: []
 
   def create_claim_response(attrs \\ %{}) do
     %ClaimResponse{}

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { formatPrice, formatUTCDateTime } from '../../../../utilities';
 
-const FixtureDisplay = ({auctionPayload}) => {
+const FixturesDisplay = ({auctionPayload}) => {
   const auction = _.get(auctionPayload, 'auction');
   const fixtures = _.get(auction, 'auction_fixtures', []);
 
@@ -44,4 +44,4 @@ const FixtureDisplay = ({auctionPayload}) => {
   );
 };
 
-export default FixtureDisplay;
+export default FixturesDisplay;

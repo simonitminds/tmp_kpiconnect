@@ -46,9 +46,6 @@ const BuyerBody = (props) => {
   } else if(status ==  'closed') {
       return(
       <div>
-        <div>
-          <a href={`/auctions/${_.get(auctionPayload, 'auction.id')}/claims/new`} className="is-button qa-auction-claims-place_claim">Place Claim</a>
-        </div>
         <FullfillmentOptions auctionPayload={auctionPayload} />
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
