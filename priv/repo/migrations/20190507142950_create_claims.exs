@@ -9,6 +9,7 @@ defmodule Oceanconnect.Repo.Migrations.CreateClaims do
       add(:price_per_unit, :float)
       add(:total_fuel_value, :float)
       add(:additional_information, :string)
+      add(:claim_resolution, :string)
       add(:notice_recipient_type, :string)
       add(:supplier_last_correspondence, :utc_datetime_usec)
       add(:admin_last_correspondence, :utc_datetime_usec)

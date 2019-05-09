@@ -46,7 +46,7 @@ const BuyerBody = (props) => {
   } else if(status ==  'closed') {
       return(
       <div>
-        <FullfillmentOptions auctionPayload={auctionPayload} />
+        <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={false} />
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />

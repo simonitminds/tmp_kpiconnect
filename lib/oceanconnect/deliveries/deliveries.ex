@@ -57,6 +57,10 @@ defmodule Oceanconnect.Deliveries do
 
   def claims_for_auction(%TermAuction{}), do: []
 
+  def change_claim_response(%ClaimResponse{} = response) do
+    ClaimResponse.changeset(response, %{})
+  end
+
   def create_claim_response(attrs \\ %{}) do
     %ClaimResponse{}
     |> ClaimResponse.changeset(attrs)

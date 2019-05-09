@@ -78,15 +78,29 @@ defmodule Oceanconnect.Claims.ShowPage do
   end
 
   def has_last_correspondence_sent?(type, last_correspondence) do
-    inner_text({:css, ".qa-claim-supplier_last_correspondence"}) ==
+    inner_text({:css, ".qa-claim-#{type}_last_correspondence"}) ==
       OceanconnectWeb.ClaimView.convert_date?(last_correspondence)
   end
 
   def has_response?(response, content, author) do
     cond do
-      inner_text({:css, ".qa-claim-response-#{response.id} .qa-response-content"}) != content -> false
-      inner_text({:css, ".qa-claim-response-#{response.id} .qa-response-author"}) != Oceanconnect.Accounts.User.full_name(author) -> false
-      true -> true
+      inner_text({:css, ".qa-claim-response-#{response.id} .qa-response-content"}) != content ->
+        false
+
+      inner_text({:css, ".qa-claim-response-#{response.id} .qa-response-author"}) !=
+          Oceanconnect.Accounts.User.full_name(author) ->
+        false
+
+      true ->
+        true
     end
+  end
+
+  def claim_resolved? do
+    inner_text({:css, ".qa-claim-status"}) == "Resolved"
+  end
+
+  def has_claim_resolution?(resolution) do
+    inner_text({:css, ".qa-claim-claim_resolution"}) == resolution
   end
 end

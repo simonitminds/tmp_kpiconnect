@@ -26,7 +26,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             solutions: %{},
             submitted_barges: [],
             submitted_comments: [],
-            claims: []
+            claims: [],
+            fixtures: []
 
   def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
@@ -97,7 +98,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       submitted_barges:
         BargesPayload.get_barges_payload!(state.submitted_barges, supplier: supplier_id),
       submitted_comments: Enum.filter(submitted_comments, &(&1.supplier_id == supplier_id)),
-      claims: Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id))
+      claims:
+        Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id)),
+      fixtures:
+        Enum.filter(Auctions.fixtures_for_auction(auction), &(&1.supplier_id == supplier_id))
     }
   end
 
@@ -134,7 +138,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       submitted_barges:
         BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
       submitted_comments: submitted_comments,
-      claims: Deliveries.claims_for_auction(auction)
+      claims: Deliveries.claims_for_auction(auction),
+      fixtures: Auctions.fixtures_for_auction(auction)
     }
   end
 
@@ -244,7 +249,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         solutions: solutions,
         submitted_barges: submitted_barges,
         submitted_comments: submitted_comments,
-        claims: claims
+        claims: claims,
+        fixtures: fixtures
       }) do
     %{
       time_remaining: time_remaining,
@@ -257,7 +263,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       solutions: solutions,
       submitted_barges: submitted_barges,
       submitted_comments: submitted_comments,
-      claims: claims
+      claims: claims,
+      fixtures: fixtures
     }
   end
 end

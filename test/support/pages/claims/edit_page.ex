@@ -25,7 +25,7 @@ defmodule Oceanconnect.Claims.EditPage do
   end
 
   def close_claim(claim_resolution) do
-    click({:css, ".qa-claim-close"})
-    fill_field({:css, ".qa-claim-claim_resolution"})
+    click({:css, ".qa-claim-closed"})
+    fill_field({:css, ".qa-claim-claim_resolution"}, claim_resolution)
   end
 end

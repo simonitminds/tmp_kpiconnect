@@ -3,14 +3,13 @@ import React from 'react';
 import { formatPrice, formatUTCDateTime } from '../../../../utilities';
 
 const FixturesDisplay = ({auctionPayload}) => {
-  const auction = _.get(auctionPayload, 'auction');
-  const fixtures = _.get(auction, 'auction_fixtures', []);
+  const fixtures = _.get(auctionPayload, 'fixtures', []);
 
   return(
-    <div class="fulfillment-options__history">
-      <table class="table is-striped">
+    <div className="fulfillment-options__history">
+      <table className="table is-striped">
         <thead>
-          <tr><th colspan="7">Fixtures</th></tr>
+          <tr><th colSpan="7">Fixtures</th></tr>
         </thead>
         <tbody>
           { _.map(fixtures, (fixture) => {
@@ -26,7 +25,7 @@ const FixturesDisplay = ({auctionPayload}) => {
               let etd = _.get(fixture, 'etd', "—");
               etd = etd == "—" ? etd : formatUTCDateTime(etd);
               return(
-                <tr className={`qa-auction-fixture-${fixture.id}`}>
+                <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
                   <td className="qa-auction-fixture-vessel">{vessel}</td>
                   <td className="qa-auction-fixture-fuel">{fuel}</td>
                   <td className="qa-auction-fixture-quantity">{quantity}</td>

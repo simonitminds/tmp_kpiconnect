@@ -17,7 +17,8 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
     AuctionFixture
   }
 
-  @derive {Poison.Encoder, except: [:__meta__, :auction, :buyer, :notice_recipient, :fixture, :responses]}
+  @derive {Poison.Encoder,
+           except: [:__meta__, :auction, :buyer, :notice_recipient, :fixture, :responses]}
   schema "claims" do
     field(:type, :string)
     field(:closed, :boolean, default: false)
@@ -26,6 +27,7 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
     field(:total_fuel_value, :float)
     field(:response, :string, virtual: true)
     field(:additional_information, :string)
+    field(:claim_resolution, :string)
     field(:notice_recipient_type, :string)
     field(:supplier_last_correspondence, :utc_datetime_usec)
     field(:admin_last_correspondence, :utc_datetime_usec)
@@ -63,7 +65,11 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
 
   def changeset(%__MODULE__{} = claim, attrs) do
     claim
-    |> cast(attrs, @required_fields ++ [:closed, :response, :auction_id, :additional_information])
+    |> cast(
+      attrs,
+      @required_fields ++
+        [:closed, :response, :auction_id, :additional_information, :claim_resolution]
+    )
     |> maybe_add_fixture()
     |> maybe_add_notice_recipient()
     |> maybe_add_last_correspondence()
@@ -143,6 +149,21 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
   end
 
   defp maybe_add_last_correspondence(changeset), do: changeset
+
+  defp validate_claim_resolution(
+         %Ecto.Changeset{changes: %{closed: true, claim_resolution: claim_resolution}} = changeset
+       )
+       when is_nil(claim_resolution) or claim_resolution == "" do
+    changeset
+    |> add_error(
+      :claim_resolution,
+      "Must add resolution details when attempting to close a claim."
+    )
+  end
+
+  defp validate_claim_resolution(changeset), do: changeset
+
+  # QUERIES
 
   def by_auction(auction_id, query \\ __MODULE__) do
     from(

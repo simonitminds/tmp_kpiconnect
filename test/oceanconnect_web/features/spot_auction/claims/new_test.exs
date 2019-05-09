@@ -100,7 +100,7 @@ defmodule OceanconnectWeb.SpotAuction.Claims.NewTest do
       :timer.sleep(500)
 
       claims = Deliveries.claims_for_auction(auction)
-      assert Claims.ShowPage.is_current_path?(auction.id, hd(claims).id)
+      assert Claims.EditPage.is_current_path?(auction.id, hd(claims).id)
       assert Claims.ShowPage.has_success_message?("Claim successfully made.")
     end
 

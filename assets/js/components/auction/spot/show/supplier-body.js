@@ -10,6 +10,7 @@ import SupplierBestSolution from './supplier-best-solution';
 import SupplierBidList from './supplier-bid-list';
 import SupplierBidStatus from './supplier-bid-status';
 import WinningSolution from './winning-solution';
+import FullfillmentOptions from './fullfillment-options';
 
 
 const SupplierBody = (props) => {
@@ -46,6 +47,7 @@ const SupplierBody = (props) => {
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
+        <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={true} />
         <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>

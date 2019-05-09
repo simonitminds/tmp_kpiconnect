@@ -12,10 +12,76 @@ defmodule OceanconnectWeb.ClaimController do
   action_fallback(OceanconnectWeb.ErrorController)
 
   def show(conn, %{"auction_id" => auction_id, "id" => claim_id}) do
-    with %struct{} = auction when is_auction(struct) <- Auctions.get_auction!(auction_id),
-         %QuantityClaim{} = claim <- Deliveries.get_quantity_claim(claim_id) do
-      conn
-      |> render("show.html", auction: auction, claim: claim)
+    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+      Auth.current_user(conn)
+
+    with %Auction{buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
+         %QuantityClaim{fixture: fixture} = claim <- Deliveries.get_quantity_claim(claim_id) do
+      case (current_user_company_id == buyer_id or is_admin) and !claim.closed do
+        true ->
+          conn
+          |> redirect(to: claim_path(conn, :edit, auction.id, claim.id))
+
+        false ->
+          changeset = Deliveries.change_claim_response(%ClaimResponse{})
+
+          conn
+          |> render("show.html",
+            changeset: changeset,
+            auction: auction,
+            claim: claim,
+            fixture: fixture
+          )
+      end
+    end
+  end
+
+  def create_response(conn, %{
+        "auction_id" => auction_id,
+        "id" => claim_id,
+        "claim_response" => %{"content" => content} = response_params
+      }) do
+    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+      Auth.current_user(conn)
+
+    with %Auction{suppliers: suppliers, buyer_id: buyer_id} = auction <-
+           Auctions.get_auction!(auction_id),
+         %QuantityClaim{fixture: fixture} = claim <- Deliveries.get_quantity_claim(claim_id),
+         true <-
+           current_user_company_id == buyer_id or
+             current_user_company_id in Enum.map(suppliers, & &1.id) or is_admin do
+      response_params =
+        Map.merge(response_params, %{
+          "author_id" => current_user_id,
+          "quantity_claim_id" => claim_id,
+          "content" => content
+        })
+
+      case Deliveries.create_claim_response(response_params) do
+        {:ok, _response} ->
+          changeset = Deliveries.change_claim_response(%ClaimResponse{})
+
+          conn
+          |> put_flash(:info, "Response successfully added.")
+          |> put_status(200)
+          |> render("show.html",
+            changeset: changeset,
+            auction: auction,
+            claim: claim,
+            fixture: fixture
+          )
+
+          {:error, %Ecto.Changeset{} = changeset}
+
+          conn
+          |> put_flash(:error, "Response was not added.")
+          |> render("show.html",
+            changeset: changeset,
+            auction: auction,
+            claim: claim,
+            fixture: fixture
+          )
+      end
     end
   end
 
@@ -58,7 +124,7 @@ defmodule OceanconnectWeb.ClaimController do
         {:ok, claim} ->
           conn
           |> put_flash(:info, "Claim successfully made.")
-          |> redirect(to: claim_path(conn, :show, auction.id, claim.id))
+          |> redirect(to: claim_path(conn, :edit, auction.id, claim.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "new.html",
@@ -118,13 +184,14 @@ defmodule OceanconnectWeb.ClaimController do
 
           false ->
             changeset = Deliveries.change_quantity_claim(claim)
+
             conn
             |> put_flash(:info, "Claim successfully updated.")
             |> redirect(to: claim_path(conn, :edit, auction.id, claim.id))
         end
       else
         {:error, %Ecto.Changeset{data: %Oceanconnect.Deliveries.QuantityClaim{}} = changeset} ->
-          render(conn, "new.html",
+          render(conn, "edit.html",
             changeset: changeset,
             auction: auction,
             claim: claim,
@@ -134,7 +201,7 @@ defmodule OceanconnectWeb.ClaimController do
         {:error, %Ecto.Changeset{data: %Oceanconnect.Deliveries.ClaimResponse{}, errors: errors}} ->
           changeset = Deliveries.change_quantity_claim(claim)
 
-          render(conn, "new.html",
+          render(conn, "edit.html",
             changeset: %{changeset | errors: errors},
             auction: auction,
             claim: claim,

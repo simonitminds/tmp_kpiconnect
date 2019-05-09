@@ -14,15 +14,15 @@ defmodule Oceanconnect.Deliveries.ClaimResponse do
     timestamps()
   end
 
-  @required_fields [
+  @fields [
     :author_id,
-    :content
+    :content,
+    :quantity_claim_id
   ]
 
   def changeset(%__MODULE__{} = response, attrs) do
     response
-    |> cast(attrs, @required_fields ++ [:quantity_claim_id])
-    |> validate_required(@required_fields)
+    |> cast(attrs, @fields)
     |> validate_claim()
     |> foreign_key_constraint(:quantity_claim_id)
     |> foreign_key_constraint(:author_id)

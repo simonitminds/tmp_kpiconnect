@@ -38,7 +38,8 @@ defmodule Oceanconnect.DeliveriesTest do
         "price_per_unit" => 100,
         "total_fuel_value" => 100 * 100,
         "additional_information" => "Your fuel sucked!",
-        "auction_id" => auction.id
+        "auction_id" => auction.id,
+        "buyer_id" => buyer_company.id
       }
 
       quantity_claim =
@@ -60,7 +61,12 @@ defmodule Oceanconnect.DeliveriesTest do
       update_params = %{quantity_missing: 200}
 
       {:ok,
-       %{claim_params: claim_params, quantity_claim: quantity_claim, update_params: update_params, buyer: buyer}}
+       %{
+         claim_params: claim_params,
+         quantity_claim: quantity_claim,
+         update_params: update_params,
+         buyer: buyer
+       }}
     end
 
     test "change_quantity_claim/1 returns a claim changeset" do
@@ -88,8 +94,8 @@ defmodule Oceanconnect.DeliveriesTest do
       assert updated_claim.quantity_missing == 200
     end
 
-    test "create_claim_response/1 with valid attrs creates a claim response", %{buyer: buyer, claim: claim} do
-      assert %{:ok, %ClaimResponse{id: claim_response_id}} = Deliveries.create_claim_response(%{author_id: buyer.id, quantity_claim_id: claim.id, content: "Your fuel sucked!"})
+    test "create_claim_response/1 with valid attrs creates a claim response", %{buyer: buyer, quantity_claim: claim} do
+      assert {:ok, %ClaimResponse{id: claim_response_id}} = Deliveries.create_claim_response(%{author_id: buyer.id, quantity_claim_id: claim.id, content: "Your fuel sucked!"})
       assert %ClaimResponse{content: "Your fuel sucked!"} = Deliveries.get_claim_response(claim_response_id)
     end
   end

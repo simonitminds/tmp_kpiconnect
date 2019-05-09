@@ -1,0 +1,86 @@
+<div class="auction-app">
+  <div class="auction-app__header container">
+    <div class="content has-margin-top-lg">
+      <h1 class="title is-3 has-text-weight-bold"><%= String.capitalize(@claim.type) %> Claim: <span class="qa-claim-status"><%= if @claim.closed, do: "Resolved", else: "Placed" %></span></h1>
+    </div>
+  </div>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <legend class="subtitle is-4">Auction Details</legend>
+        <div class="box">
+          <ul class="list has-no-bullets">
+            <li><strong>Auction Number</strong> <span class="qa-claim-auction-auction_id"><%= @auction.id %></span></li>
+            <li><strong>Vessel(s)</strong> <span class="qa-claim-auction-vessels"><%= vessel_name_list(@auction.vessels) %></span></li>
+            <li><strong>Port</strong> <span class="qa-claim-auction-port"><%= @auction.port.name %></span></li>
+            <li><strong>Date of Delivery</strong> <span class="qa-claim-fixture-etd"><%= convert_date?(@claim.fixture.etd) %></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <legend class="subtitle is-4">Claim Details</legend>
+        <div class="box">
+          <ul class="list has-no-bullets">
+            <li><strong>Claim Type</strong> <span class="qa-claim-type"><%= String.capitalize(@claim.type) %> Claim</span></li>
+            <li><strong>Receiving Vessel</strong> <span class="qa-claim-receiving_vessel"><%= @fixture.vessel.name %></span></li>
+            <li><strong>Delivered Fuel</strong> <span class="qa-claim-delivered_fuel"><%= @fixture.fuel.name %></span></li>
+            <li><strong>Quantity Missing</strong> <span class="qa-claim-quantity_missing"><%= @claim.quantity_missing %> M/T</span></li>
+            <li><strong>Price</strong> <span class="qa-claim-price_per_unit"><%= format_price(@claim.price_per_unit) %></span></li>
+            <li><strong>Value</strong> <span class="qa-claim-total_fuel_value"><%= format_price(@claim.total_fuel_value) %></span></li>
+            <li><strong>Delivering Barge</strong> <span class="qa-claim-delivering_barge"><%= @claim.delivering_barge.name %></span></li>
+            <li><strong>Time Submitted</strong>  <span class="qa-claim-time_submitted"><%= convert_date?(@claim.inserted_at) %></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <legend class="subtitle is-4">Responses</legend>
+        <%= if @claim.responses do %>
+          <%= for response <- @claim.responses do %>
+            <div class="box qa-claim-response-<%= "#{response.id}" %>">
+              <p class="qa-response-content"><%= response.content %></p>
+              <p><strong><span class="qa-response-author"><%= Oceanconnect.Accounts.User.full_name(response.author) %></span> (<%= response.author.company.name %>)</strong><span class="has-text-gray-3"> <%= convert_date?(response.inserted_at) %></span></p>
+            </div>
+          <% end %>
+        <% end %>
+        <%= if !@claim.closed do %>
+          <%= form_for @changeset, claim_path(@conn, :create_response, @auction.id, @claim.id), fn f -> %>
+            <fieldset>
+              <div class="field">
+                <p class="help">Include any additional information that is relevant to the claim.</p>
+                <div class="control">
+                     <%= textarea(f, :content, placeholder: "Additional Details", rows: "10", class: "textarea qa-claim-response") %>
+                     <%= error_tag f, :content %>
+                </div>
+              </div>
+            </fieldset>
+            <%= submit "Add Response" ,class: "button is-link qa-claim-update" %>
+          <% end %>
+        <% else %>
+            <i>The claim is resolved. No more responses can be added.</i>
+        <% end %>
+      </div>
+    </div>
+  </section>
+  <section class="auction-claim">
+    <div class="container">
+      <div class="content">
+        <legend class="subtitle is-4">Claim Resolution</legend>
+        <div class="box">
+          <strong>Resolution Details</strong>
+          <p class="has-margin-top-sm qa-claim-claim_resolution"><%= @claim.claim_resolution %></p>
+        </div>
+        <div class="field">
+          <%= link "Back", to: auction_path(@conn, :show, @auction.id), class: "button has-margin-right-sm" %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

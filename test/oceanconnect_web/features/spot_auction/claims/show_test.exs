@@ -12,7 +12,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
     buyer_company = insert(:company)
     buyer = insert(:user, company: buyer_company)
 
-    supplier_company = isnert(:company)
+    supplier_company = insert(:company)
     supplier = insert(:user, company: supplier_company)
 
     auction =
@@ -21,21 +21,25 @@ defmodule OceanconnectWeb.Claims.ShowTest do
         buyer: buyer_company,
         suppliers: [supplier_company]
       )
+      |> Auctions.fully_loaded()
 
     # claim = insert(:auction_claim, auction: auction)
-    delivering_barge =
+    _delivering_barge =
       insert(:auction_barge,
         auction: auction,
         supplier: supplier_company,
         approval_status: "APPROVED"
       )
 
-    vessel_fuels = auction.auction_vessel_fuels
+    _vessel_fuels = auction.auction_vessel_fuels
 
-    fixture =
+    {:ok, fixtures} =
       close_auction!(auction)
       |> Auctions.create_fixtures_from_state()
-      |> hd()
+
+    fixture =
+      hd(fixtures)
+      |> Oceanconnect.Repo.preload([:vessel, :fuel, :supplier])
 
     claim =
       insert(
@@ -48,7 +52,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
         auction: auction,
         fixture: fixture,
         receiving_vessel: fixture.vessel,
-        delivered_fuel: fixture.vessel,
+        delivered_fuel: fixture.fuel,
         supplier: fixture.supplier,
         buyer: buyer_company,
         notice_recipient_type: "supplier",
@@ -61,19 +65,21 @@ defmodule OceanconnectWeb.Claims.ShowTest do
      %{
        buyer: buyer,
        supplier: supplier,
-       claim: claim
+       claim: claim,
+       auction: auction
      }}
   end
 
   describe "buyer" do
-    test "can visit a quantity claim's show page and see claim details", %{
+    test "can visit cannot visit a closed quantity claim's show page", %{
       buyer: buyer,
       claim: claim,
       auction: auction
     } do
+      claim = Deliveries.get_quantity_claim(claim.id)
       login_user(buyer)
       Claims.ShowPage.visit(auction.id, claim.id)
-      assert Claims.ShowPage.is_current_path?(auction.id, claim.id)
+      assert Claims.EditPage.is_current_path?(auction.id, claim.id)
       assert Claims.ShowPage.has_auction_details?(auction, claim.fixture)
 
       assert Claims.ShowPage.has_claim_type?(:quantity)
@@ -83,7 +89,30 @@ defmodule OceanconnectWeb.Claims.ShowTest do
 
       assert Claims.ShowPage.has_claims_details?(claim)
       assert Claims.ShowPage.has_notice_recipient_type?(:supplier)
-      assert Claims.ShowPage.has_last_correspondence_sent?(claim.last_correspondence)
+
+      assert Claims.ShowPage.has_last_correspondence_sent?(
+               :supplier,
+               claim.supplier_last_correspondence
+             )
+    end
+
+    test "can visit a claim's show page after it is closed", %{
+      buyer: buyer,
+      claim: claim,
+      auction: auction
+    } do
+      claim = Deliveries.get_quantity_claim(claim.id)
+      login_user(buyer)
+      Claims.EditPage.visit(auction.id, claim.id)
+      assert Claims.EditPage.is_current_path?(auction.id, claim.id)
+      Claims.EditPage.close_claim("Thanks, dog")
+      Claims.EditPage.update_claim()
+
+      assert AuctionShowPage.is_current_path?(auction.id)
+      AuctionShowPage.view_claim(claim.id)
+      assert Claims.ShowPage.is_current_path?(auction.id, claim.id)
+      assert Claims.ShowPage.claim_resolved?()
+      assert Claims.ShowPage.has_claim_resolution?("Thanks, dog")
     end
   end
 end

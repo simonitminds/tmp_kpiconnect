@@ -12,8 +12,7 @@ defmodule Oceanconnect.AuctionsTest do
     AuctionStore.AuctionState,
     Aggregate,
     Command,
-    Solution,
-    QuantityClaim
+    Solution
   }
 
   describe "auctions" do
@@ -1688,53 +1687,6 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "deactivate_fuel_index/1 marks the port as inactive", %{fuel_index: fuel_index} do
       assert {:ok, %FuelIndex{is_active: false}} = Auctions.deactivate_fuel_index(fuel_index)
-    end
-  end
-
-  describe "quantity claims" do
-    setup do
-      buyer_company = insert(:company)
-      _buyer = insert(:user, company: buyer_company)
-      supplier_company = insert(:company, is_supplier: true)
-      _supplier = insert(:user)
-
-      auction =
-        insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
-        |> Auctions.fully_loaded()
-
-      delivering_barge =
-        insert(:auction_barge,
-          auction: auction,
-          supplier: supplier_company,
-          approval_status: "APPROVED"
-        )
-
-      auction_state = close_auction!(auction)
-      _auction_fixtures = Auctions.create_fixtures_from_state(auction_state)
-
-      claim_params = %{
-        "type" => "quantity",
-        "supplier_id" => supplier_company.id,
-        "receiving_vessel_id" => hd(auction.vessels).id,
-        "delivered_fuel_id" => hd(auction.auction_vessel_fuels).fuel.id,
-        "notice_recipient_type" => "supplier",
-        "delivering_barge_id" => delivering_barge.barge.id,
-        "quantity_missing" => 100,
-        "price_per_unit" => 100,
-        "total_fuel_value" => 100 * 100,
-        "additional_information" => "Your fuel sucked!"
-      }
-
-      {:ok, %{claim_params: claim_params}}
-    end
-
-    test "change_quantity_claim/1 returns a claim changeset" do
-      assert %Ecto.Changeset{} = Auctions.change_claim(%QuantityClaim{})
-    end
-
-    test "create_quantity_claim/1 with valid attrs creates a quantity claim", %{
-      claim_params: claim_params
-    } do
     end
   end
 end

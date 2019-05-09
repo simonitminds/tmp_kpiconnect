@@ -122,8 +122,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
 
     test "can update a claim", %{conn: conn, auction: auction, quantity_claim: claim} do
       update_params = %{
-        "notice_recipient_type" => "admin",
-        "response" => %{"content" => "hello"}
+        "response" => "hello"
       }
 
       conn =
@@ -132,7 +131,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
           claim_path(conn, :update, auction.id, claim.id, %{"quantity_claim" => update_params})
         )
 
-      assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
+      assert html_response(conn, 302) =~ "/auctions/#{auction.id}"
     end
   end
 

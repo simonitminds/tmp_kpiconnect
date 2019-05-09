@@ -20,7 +20,8 @@ defmodule OceanconnectWeb.Claims.EditTest do
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company]
-      ) |> Auctions.fully_loaded()
+      )
+      |> Auctions.fully_loaded()
 
     # claim = insert(:auction_claim, auction: auction)
     delivering_barge =
@@ -70,14 +71,18 @@ defmodule OceanconnectWeb.Claims.EditTest do
   end
 
   describe "buyer" do
-    test "can visit a quantity claim's edit page throught the auction show page", %{buyer: buyer, claim: claim, auction: auction} do
+    test "can visit a quantity claim's edit page throught the auction show page", %{
+      buyer: buyer,
+      claim: claim,
+      auction: auction
+    } do
       claim = Deliveries.get_quantity_claim(claim.id)
       login_user(buyer)
 
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.update_claim(claim.id)
 
-      assert Claims.EditPage.is_current_path(auction.id, claim.id)
+      assert Claims.EditPage.is_current_path?(auction.id, claim.id)
       assert Claims.ShowPage.has_auction_details?(auction, claim.fixture)
     end
 
@@ -123,23 +128,8 @@ defmodule OceanconnectWeb.Claims.EditTest do
       Claims.EditPage.close_claim("Thanks, dog")
       Claims.EditPage.update_claim()
       assert AuctionShowPage.is_current_path?(auction.id)
-      assert AuctionShowPage.claim_resolved?(claim.id)
-    end
-
-    test "can visit a claim's show page after it has been closed", %{buyer: buyer, claim: claim, auction: auction} do
-      login_user(buyer)
-
-      Claims.EditPage.visit(auction.id, claim.id)
-      assert Claims.EditPage.is_current_path?(auction.id, claim.id)
-      Claims.EditPage.close_claim("Thanks, dog")
-      Claims.EditPage.update_claim()
-
-      assert AuctionShowPage.is_current_path?(auction.id)
-      assert AuctionShowPage.claim_resolved?(claim.id)
-
       AuctionShowPage.view_claim(claim.id)
-      claim = Deliveries.get_quantity_claim(claim.id)
-      assert Claims.ShowPage.has_auction_details?(auction, claim.fixture)
+      assert Claims.ShowPage.claim_resolved?()
       assert Claims.ShowPage.has_claim_resolution?("Thanks, dog")
     end
   end

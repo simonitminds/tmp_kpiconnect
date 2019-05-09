@@ -795,8 +795,7 @@ defmodule Oceanconnect.Auctions do
         :auction_suppliers,
         [auction_vessel_fuels: [:vessel, :fuel]],
         [buyer: :users],
-        [suppliers: :users],
-        [auction_fixtures: [:vessel, :fuel, :supplier]]
+        [suppliers: :users]
       ])
 
     fully_loaded_auction
