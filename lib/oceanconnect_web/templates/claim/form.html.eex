@@ -22,10 +22,10 @@
         <div class="control">
           <legend class="has-margin-bottom-xs"><strong>Claim Type</strong></legend>
           <label class="radio">
-            <%= radio_button(f, :type, "quantity", class: "qa-claim-type-quantity") %>
+            <%= radio_button(f, :type, "quantity", class: "qa-claim-type-quantity", id: "quantityClaimCheck") %>
             <span class="is-inline-block has-margin-left-xs">Quantity Claim</span>
           </label>
-          <fieldset class="box is-gray-1 has-margin-top-sm has-margin-bottom-md">
+          <fieldset id="quantityClaimFieldset" class="is-hidden box is-gray-1 has-margin-top-sm has-margin-bottom-md">
             <label class="label label--group">Quantity Claim</label>
 
             <div class="field is-horizontal">
@@ -197,3 +197,19 @@
     </div>
   </section>
 <% end %>
+
+<script>
+  const quantityClaimCheck = document.querySelector("#quantityClaimCheck")
+  const claimTypeRadio = [quantityClaimCheck]
+
+  function toggleVisibility() {
+    claimTypeRadio.forEach((input) => {
+      console.log(input)
+      var inputClassSet = input.parentElement.parentElement.lastElementChild.classList;
+      console.log(input.checked)
+      if(!input.checked) { inputClassSet.add("is-hidden") }
+      else { inputClassSet.remove("is-hidden") }
+    })
+  }
+  quantityClaimCheck.addEventListener('change', toggleVisibility, false);
+</script>
