@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.Claims.EditTest do
   use Oceanconnect.FeatureCase
+  use Bamboo.Test, shared: true
 
   hound_session()
 
@@ -43,14 +44,13 @@ defmodule OceanconnectWeb.Claims.EditTest do
 
     claim =
       insert(
-        :quantity_claim,
+        :claim,
         type: "quantity",
+        fixture: fixture,
         quantity_missing: 100,
         price_per_unit: 100,
-        total_fuel_value: 10_000,
         additional_information: "Your fuel sucked!",
         auction: auction,
-        fixture: fixture,
         receiving_vessel: fixture.vessel,
         delivered_fuel: fixture.fuel,
         supplier: fixture.supplier,
@@ -71,15 +71,16 @@ defmodule OceanconnectWeb.Claims.EditTest do
   end
 
   describe "buyer" do
-    test "can visit a quantity claim's edit page throught the auction show page", %{
+    test "can visit a quantity claim's edit page through the auction show page", %{
       buyer: buyer,
       claim: claim,
       auction: auction
     } do
-      claim = Deliveries.get_quantity_claim(claim.id)
+      claim = Deliveries.get_claim(claim.id)
       login_user(buyer)
 
       AuctionShowPage.visit(auction.id)
+      :timer.sleep(200)
       AuctionShowPage.update_claim(claim.id)
 
       assert Claims.EditPage.is_current_path?(auction.id, claim.id)
@@ -91,7 +92,7 @@ defmodule OceanconnectWeb.Claims.EditTest do
       claim: claim,
       auction: auction
     } do
-      claim = Deliveries.get_quantity_claim(claim.id)
+      claim = Deliveries.get_claim(claim.id)
       login_user(buyer)
       Claims.EditPage.visit(auction.id, claim.id)
       assert Claims.EditPage.is_current_path?(auction.id, claim.id)
@@ -102,7 +103,7 @@ defmodule OceanconnectWeb.Claims.EditTest do
       assert Claims.ShowPage.has_delivered_fuel?(claim.delivered_fuel.name)
       assert Claims.ShowPage.has_delivering_barge?(claim.delivering_barge.name)
 
-      assert Claims.ShowPage.has_claims_details?(claim)
+      assert Claims.ShowPage.has_claims_details?(claim, :quantity)
       assert Claims.ShowPage.has_notice_recipient_type?(:supplier)
 
       assert Claims.ShowPage.has_last_correspondence_sent?(
@@ -115,9 +116,20 @@ defmodule OceanconnectWeb.Claims.EditTest do
       Claims.EditPage.update_claim()
 
       assert Claims.EditPage.is_current_path?(auction.id, claim.id)
-      %{responses: responses} = Deliveries.get_quantity_claim(claim.id)
+      %{responses: responses} = Deliveries.get_claim(claim.id)
       response = hd(responses)
       assert Claims.ShowPage.has_response?(response, "Hey", buyer)
+
+      :timer.sleep(1_000)
+
+      buyer_name = Oceanconnect.Accounts.User.full_name(buyer)
+
+      assert_email_delivered_with(
+        subject:
+          "#{buyer_name} from #{claim.buyer.name} added a response to the claim against #{
+            claim.supplier.name
+          }"
+      )
     end
 
     test "can close a claim", %{buyer: buyer, claim: claim, auction: auction} do
@@ -127,6 +139,8 @@ defmodule OceanconnectWeb.Claims.EditTest do
 
       Claims.EditPage.close_claim("Thanks, dog")
       Claims.EditPage.update_claim()
+      claim = Deliveries.get_claim(claim.id)
+
       assert AuctionShowPage.is_current_path?(auction.id)
       AuctionShowPage.view_claim(claim.id)
       assert Claims.ShowPage.claim_resolved?()

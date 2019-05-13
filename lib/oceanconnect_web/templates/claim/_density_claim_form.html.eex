@@ -1,0 +1,52 @@
+<fieldset id="densityClaimFieldset" class="is-hidden box is-gray-1 has-margin-top-sm has-margin-bottom-md qa-claim-density-fieldset">
+  <label class="label label--group">Quantity Claim</label>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Fixture</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <div class="select">
+            <%= select @form, :density_fixture_id, options_for_fixture_select(@fixtures), class: "qa-claim-fixture_id" %>
+            <%= error_tag @form, :fixture_id %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Quantity Difference</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <%= text_input(@form, :density_quantity_difference, placeholder: "Units of Fuel", class: "input qa-claim-quantity_difference") %>
+          <%= error_tag @form, :quantity_difference %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Delivering Barge</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <div class="select">
+            <%= select @form, :density_delivering_barge_id, options_for_barge_select(@fixtures, @auction), class: "qa-claim-delivering_barge_id" %>
+            <%= error_tag @form, :delivering_barge_id %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+
+

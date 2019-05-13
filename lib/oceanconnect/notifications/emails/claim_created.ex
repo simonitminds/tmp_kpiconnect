@@ -1,13 +1,16 @@
 defmodule Oceanconnect.Notifications.Emails.ClaimCreated do
-  import Oceanconnect.Deliveries.Guards
   use Oceanconnect.Notifications.Email
 
   alias Oceanconnect.Deliveries
+  alias Oceanconnect.Deliveries.Claim
 
-  def generate(%struct{id: claim_id}) when is_claim(struct) do
-    case Deliveries.get_quantity_claim(claim_id) do
-      nil -> []
-      claim -> emails(claim)
+  def generate(%Claim{id: claim_id}) do
+    case Deliveries.get_claim(claim_id) do
+      nil ->
+        []
+
+      claim ->
+        emails(claim)
     end
   end
 

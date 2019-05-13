@@ -1,8 +1,7 @@
 <p style='font-family: "Arial";'><b>Dear <%= full_name(@user) %>,</b></p>
 <br/>
-<p style='font-family: "Arial";'>As per <%= @claim.buyer.name %> standard procedure on claims, they formally place <%= @claim.supplier.name %> on notice for the alleged shortage while the matter is investigated.</p>
+<p style='font-family: "Arial";'><%= @author_name %> from <%= @supplier.name %> has responded to the claim that <%= @buyer.name %> made against them.</p>
 <br/>
-
 
 <p style="font-family: 'Arial';"><b>Supply:</b> <%= @claim.receiving_vessel.name %> at <%= @claim.auction.port.name %> on <%= convert_date?(@claim.fixture.etd) %></p>
 
@@ -23,25 +22,6 @@
 <% end %>
 <br>
 <br/>
-<p style="font-family: 'Arial';">WITHOUT PREJUDICE, WE HEREBY PLACE <span style="text-transform: uppercase;"><%= @claim.supplier.name %></span> ON NOTICE FOR ANY/ALL CLAIMS, COSTS, DETENTION, DELAYS, DEMURRAGE, DEVIATION, FINES, CONSEQUENCES, OR EXPENSES WHICH MAY ARISE FROM THIS ALLEGED QUANTITY SHORTAGE.</p>
-<br>
-<p style="font-family: 'Arial';">IN THE MEANTIME, PLEASE BE ADVISED THAT <span style="text-transform: uppercase;"><%= @claim.buyer.name %></span> WILL MITIGATE ITS LOSSES AND WILL KEEP YOU ADVISED OF ITS INTENTIONS WITH REGARD TO THIS CLAIM.  <span style="text-transform: uppercase;"><%= @claim.buyer.name %></span>'S RIGHTS REMAIN RESERVED.</p>
-<br>
-<p style="font-family: 'Arial';"><b>Please arrange to present documentational evidence of the quantity supplied, including, but not limited to, the following:</b></p>
-<ul style="font-family: 'Arial';">
-  <li>Barge loading document showing ROB before and after loading</li>
-  <li>Supply documents to any vessel supplied from the load prior to supplying <%= @fixture.vessel.name %></li>
-  <li>Ullage tables for supply to <%= @fixture.vessel.name %></li>
-  <li>Supply documents to any vessel supplied from the load after supply to <%= @fixture.vessel.name %></li>
-</ul>
-<br>
-<p style="font-family: 'Arial';">We will continue to gather information and revert to you with any news or questions.</p>
-<br><br>
-<p style="font-family: 'Arial';">Best Regards,</p>
-<br>
-<p style="font-family: 'Arial';"><b><%= @claim.buyer.contact_name %></b></p>
-<p style="font-family: 'Arial';"><%= @claim.buyer.name %></p>
-
 <p style='font-family: "Arial";'>To view this auction claim, please click the following link: <a href="<%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %>"><%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %></a></p>
 <br/>
 <br/>

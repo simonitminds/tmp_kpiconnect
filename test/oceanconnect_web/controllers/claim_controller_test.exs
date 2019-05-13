@@ -2,7 +2,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
   use OceanconnectWeb.ConnCase
 
   alias Oceanconnect.Deliveries
-  alias Oceanconnect.Deliveries.QuantityClaim
+  alias Oceanconnect.Deliveries.Claim
 
   alias Oceanconnect.Auctions
 
@@ -26,27 +26,40 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       )
 
     auction_state = close_auction!(auction)
-    _auction_fixtures = Auctions.create_fixtures_from_state(auction_state)
+    {:ok, auction_fixtures} = Auctions.create_fixtures_from_state(auction_state)
 
     claim_params = %{
       "type" => "quantity",
-      "supplier_id" => supplier_company.id,
-      "receiving_vessel_id" => hd(auction.vessels).id,
-      "delivered_fuel_id" => hd(auction.auction_vessel_fuels).fuel.id,
+      "quantity_fixture_id" => hd(auction_fixtures).id,
       "notice_recipient_type" => "supplier",
-      "delivering_barge_id" => delivering_barge.barge.id,
-      "quantity_missing" => 100,
-      "price_per_unit" => 100,
-      "total_fuel_value" => 100 * 100,
+      "quantity_delivering_barge_id" => delivering_barge.barge.id,
+      "quantity_quantity_missing" => 100,
       "additional_information" => "Your fuel sucked!"
     }
 
-    quantity_claim =
-      insert(:quantity_claim,
+    density_claim_params = %{
+      "type" => "density",
+      "density_fixture_id" => hd(auction_fixtures).id,
+      "notice_recipient_type" => "supplier",
+      "density_delivering_barge_id" => delivering_barge.barge.id,
+      "density_quantity_difference" => 100,
+      "additional_information" => "Your fuel sucked!"
+    }
+
+    quality_claim_params = %{
+      "type" => "quality",
+      "quality_fixture_id" => hd(auction_fixtures).id,
+      "notice_recipient_type" => "supplier",
+      "quality_delivering_barge_id" => delivering_barge.barge.id,
+      "quality_quality_description" => "This fuel sucked a whole lot.",
+      "additional_information" => "Your fuel sucked!"
+    }
+
+    claim =
+      insert(:claim,
         type: "quantity",
         quantity_missing: 100,
-        price_per_unit: 100.00,
-        total_fuel_value: 100.00,
+        fixture: hd(auction_fixtures),
         auction: auction,
         supplier: supplier_company,
         buyer: buyer_company,
@@ -63,7 +76,9 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
        buyer: buyer,
        supplier: supplier,
        claim_params: claim_params,
-       quantity_claim: quantity_claim
+       density_claim_params: density_claim_params,
+       quality_claim_params: quality_claim_params,
+       claim: claim
      }}
   end
 
@@ -79,7 +94,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
     test "can visit new claim action", %{conn: conn, auction: auction} do
       conn = get(conn, claim_path(conn, :new, auction.id))
 
-      changeset = Deliveries.change_quantity_claim(%QuantityClaim{})
+      changeset = Deliveries.change_claim(%Claim{})
       fixtures = Auctions.fixtures_for_auction(auction)
 
       assert %{
@@ -96,16 +111,43 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       assert html_response(conn, 200) =~ "Make Claim"
     end
 
-    test "can create a new claim", %{conn: conn, auction: auction, claim_params: claim_params} do
-      conn =
-        post(conn, claim_path(conn, :create, auction.id, %{"quantity_claim" => claim_params}))
+    test "can create a new quantity claim", %{
+      conn: conn,
+      auction: auction,
+      claim_params: claim_params
+    } do
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => claim_params}))
 
       claims = Deliveries.claims_for_auction(auction)
       [claim] = tl(claims)
       assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
     end
 
-    test "can visit edit claim action", %{conn: conn, auction: auction, quantity_claim: claim} do
+    test "can create a new density claim", %{
+      conn: conn,
+      auction: auction,
+      density_claim_params: claim_params
+    } do
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => claim_params}))
+
+      claims = Deliveries.claims_for_auction(auction)
+      [claim] = tl(claims)
+      assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
+    end
+
+    test "can create a new quality claim", %{
+      conn: conn,
+      auction: auction,
+      quality_claim_params: claim_params
+    } do
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => claim_params}))
+
+      claims = Deliveries.claims_for_auction(auction)
+      [claim] = tl(claims)
+      assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
+    end
+
+    test "can visit edit claim action", %{conn: conn, auction: auction, claim: claim} do
       conn = get(conn, claim_path(conn, :edit, auction.id, claim.id))
 
       assert %{
@@ -120,7 +162,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       assert html_response(conn, 200) =~ "Update Claim"
     end
 
-    test "can update a claim", %{conn: conn, auction: auction, quantity_claim: claim} do
+    test "can update a claim", %{conn: conn, auction: auction, claim: claim} do
       update_params = %{
         "response" => "hello"
       }
@@ -128,7 +170,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       conn =
         put(
           conn,
-          claim_path(conn, :update, auction.id, claim.id, %{"quantity_claim" => update_params})
+          claim_path(conn, :update, auction.id, claim.id, %{"claim" => update_params})
         )
 
       assert html_response(conn, 302) =~ "/auctions/#{auction.id}"
@@ -149,7 +191,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       assert html_response(conn, 404) =~ "/auctions"
     end
 
-    test "cannot visit edit claim action", %{conn: conn, auction: auction, quantity_claim: claim} do
+    test "cannot visit edit claim action", %{conn: conn, auction: auction, claim: claim} do
       conn = get(conn, claim_path(conn, :edit, auction.id, claim.id))
       assert html_response(conn, 404) =~ "/auctions"
     end
