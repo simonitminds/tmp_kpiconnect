@@ -20,7 +20,7 @@ const ClaimsDisplay = ({auctionPayload, isSupplier}) => {
           <tr><th colSpan="3">Activity Log</th></tr>
         </thead>
         <tbody>
-            { openClaims && closedClaims && _.map(claims, (claim) => {
+            { !_.isEmpty(openClaims) && _.map(claims, (claim) => {
                 const isClosed = _.get(claim, 'closed', false);
                 const timeSubmitted = formatUTCDateTime(_.get(claim, 'inserted_at'));
                 const timeClosed = _.get(claim, 'updated_at');
@@ -47,7 +47,7 @@ const ClaimsDisplay = ({auctionPayload, isSupplier}) => {
                 );
               })
             }
-            { _.map(closedClaims, (claim) => {
+            { !_.isEmpty(closedClaims) && _.map(closedClaims, (claim) => {
                 const timeClosed = formatUTCDateTime(_.get(claim, 'updated_at'));
                 const claimType = _.get(claim, 'type');
                 const vessel = _.get(claim, 'receiving_vessel.name');
@@ -64,7 +64,7 @@ const ClaimsDisplay = ({auctionPayload, isSupplier}) => {
                 );
               })
             }
-          { !openClaims && !openClaims &&
+          { _.isEmpty(claims) &&
             <tr className="fulfillment-options__history__empty-table"><td colSpan="3"><i>No activities have been logged for this auction.</i></td></tr>
           }
         </tbody>

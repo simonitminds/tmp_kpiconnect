@@ -58,16 +58,64 @@ defmodule Oceanconnect.Claims.ShowPage do
     inner_text({:css, ".qa-claim-delivering_barge"}) == barge_name
   end
 
-  def has_claims_details?(claim) do
-    price_per_unit = OceanconnectWeb.ClaimView.format_price(claim.price_per_unit)
-    total_fuel_value = OceanconnectWeb.ClaimView.format_price(claim.total_fuel_value)
-    quantity_missing = "#{claim.quantity_missing} M/T"
+  def has_claims_details?(claim, :quantity) do
+    price_per_unit =
+      claim.price_per_unit
+      |> OceanconnectWeb.ClaimView.format_price()
+
+    total_fuel_value =
+      claim.total_fuel_value
+      |> OceanconnectWeb.ClaimView.format_price()
+
+    quantity_missing =
+      claim.quantity_missing
+      |> Decimal.to_integer()
+
+    quantity_missing = "#{quantity_missing} M/T"
+
     time_submitted = OceanconnectWeb.ClaimView.convert_date?(claim.inserted_at)
 
     cond do
       inner_text({:css, ".qa-claim-price_per_unit"}) != price_per_unit -> false
       inner_text({:css, ".qa-claim-total_fuel_value"}) != total_fuel_value -> false
       inner_text({:css, ".qa-claim-quantity_missing"}) != quantity_missing -> false
+      inner_text({:css, ".qa-claim-time_submitted"}) != time_submitted -> false
+      true -> true
+    end
+  end
+
+  def has_claims_details?(claim, :density) do
+    price_per_unit =
+      claim.price_per_unit
+      |> OceanconnectWeb.ClaimView.format_price()
+
+    total_fuel_value =
+      claim.total_fuel_value
+      |> OceanconnectWeb.ClaimView.format_price()
+
+    quantity_difference =
+      claim.quantity_difference
+      |> Decimal.to_integer()
+
+    quantity_difference = "#{quantity_difference} M/T"
+
+    time_submitted = OceanconnectWeb.ClaimView.convert_date?(claim.inserted_at)
+
+    cond do
+      inner_text({:css, ".qa-claim-price_per_unit"}) != price_per_unit -> false
+      inner_text({:css, ".qa-claim-total_fuel_value"}) != total_fuel_value -> false
+      inner_text({:css, ".qa-claim-quantity_difference"}) != quantity_difference -> false
+      inner_text({:css, ".qa-claim-time_submitted"}) != time_submitted -> false
+      true -> true
+    end
+  end
+
+  def has_claims_details?(claim, :quality) do
+    quality_description = claim.quality_description
+    time_submitted = OceanconnectWeb.ClaimView.convert_date?(claim.inserted_at)
+
+    cond do
+      inner_text({:css, ".qa-claim-quality_description"}) != quality_description -> false
       inner_text({:css, ".qa-claim-time_submitted"}) != time_submitted -> false
       true -> true
     end

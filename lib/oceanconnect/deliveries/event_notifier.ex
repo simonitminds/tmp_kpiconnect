@@ -1,6 +1,4 @@
 defmodule Oceanconnect.Deliveries.EventNotifier do
-  import Oceanconnect.Deliveries.Guards
-
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
 

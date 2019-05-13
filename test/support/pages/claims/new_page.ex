@@ -13,16 +13,11 @@ defmodule Oceanconnect.Claims.NewPage do
     click({:css, ".qa-claim-type-#{type}"})
   end
 
-  def select_supplier(supplier_id) do
-    click({:css, ".qa-claim-supplier_id option[value='#{supplier_id}']"})
-  end
-
-  def select_receiving_vessel(vessel_id) do
-    click({:css, ".qa-claim-receiving_vessel_id option[value='#{vessel_id}']"})
-  end
-
-  def select_delivered_fuel(fuel_id) do
-    click({:css, ".qa-claim-delivered_fuel_id option[value='#{fuel_id}']"})
+  def select_fixture(fixture_id, claim_type) do
+    click(
+      {:css,
+       ".qa-claim-#{claim_type}-fieldset .qa-claim-fixture_id option[value='#{fixture_id}']"}
+    )
   end
 
   def enter_quantity_missing(quantity_missing) do
@@ -39,22 +34,25 @@ defmodule Oceanconnect.Claims.NewPage do
     )
   end
 
-  def enter_price_per_unit(price_per_unit) do
+  def enter_price_per_unit(price_per_unit, claim_type) do
     fill_field(
-      {:css, ".qa-claim-price_per_unit"},
+      {:css, ".qa-claim-#{claim_type}-fieldset .qa-claim-price_per_unit"},
       price_per_unit
     )
   end
 
-  def enter_total_fuel_value(total_fuel_value) do
+  def enter_total_fuel_value(total_fuel_value, claim_type) do
     fill_field(
-      {:css, ".qa-claim-total_fuel_value"},
+      {:css, ".qa-claim-#{claim_type}-fieldset .qa-claim-total_fuel_value"},
       total_fuel_value
     )
   end
 
-  def select_delivering_barge(barge_id) do
-    click({:css, ".qa-claim-delivering_barge_id option[value='#{barge_id}']"})
+  def select_delivering_barge(barge_id, claim_type) do
+    click(
+      {:css,
+       ".qa-claim-#{claim_type}-fieldset .qa-claim-delivering_barge_id option[value='#{barge_id}']"}
+    )
   end
 
   def place_notice(recipient) do

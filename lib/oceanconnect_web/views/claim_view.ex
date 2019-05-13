@@ -3,6 +3,16 @@ defmodule OceanconnectWeb.ClaimView do
 
   alias Oceanconnect.Auctions
 
+  def options_for_fixture_select(fixtures) do
+    fixture_options =
+      fixtures
+      |> Enum.map(fn f ->
+        {"#{f.supplier.name} | #{f.vessel.name} | #{f.fuel.name}", f.id}
+      end)
+
+    [{"Select a fixture to claim against", nil}] ++ fixture_options
+  end
+
   def options_for_supplier_select(fixtures) do
     suppliers =
       Enum.map(fixtures, & &1.supplier)
@@ -49,6 +59,14 @@ defmodule OceanconnectWeb.ClaimView do
     |> Enum.join(", ")
   end
 
+  def format_decimal(decimal) do
+    decimal
+    |> Decimal.to_float()
+    |> :erlang.float_to_binary(decimals: 3)
+
+    "#{decimal}"
+  end
+
   def format_price(amounts) when is_list(amounts) do
     Enum.map(amounts, &format_price/1)
     |> Enum.join(", ")
@@ -58,6 +76,14 @@ defmodule OceanconnectWeb.ClaimView do
     case amount do
       amount when is_float(amount) ->
         amount = :erlang.float_to_binary(amount, decimals: 2)
+        "$#{amount}"
+
+      %Decimal{} = amount ->
+        amount =
+          amount
+          |> Decimal.to_float()
+          |> :erlang.float_to_binary(decimals: 2)
+
         "$#{amount}"
 
       _ ->
