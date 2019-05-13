@@ -14,6 +14,13 @@ defmodule Oceanconnect.Notifications.Email do
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
       end
 
+      defp admin_email(user) do
+        new_email()
+        |> from("bunkers@oceanconnectmarine.com")
+        |> to(user)
+        |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
+      end
+
       defp two_factor_email(user) do
         new_email()
         |> from("bunkers@oceanconnectmarine.com")

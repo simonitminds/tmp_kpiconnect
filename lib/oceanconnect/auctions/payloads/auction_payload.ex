@@ -12,6 +12,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     AuctionSuppliers
   }
 
+  alias Oceanconnect.Deliveries
+
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
 
   defstruct time_remaining: nil,
@@ -23,7 +25,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             product_bids: %{},
             solutions: %{},
             submitted_barges: [],
-            submitted_comments: []
+            submitted_comments: [],
+            claims: [],
+            fixtures: []
 
   def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
@@ -93,7 +97,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         end),
       submitted_barges:
         BargesPayload.get_barges_payload!(state.submitted_barges, supplier: supplier_id),
-      submitted_comments: Enum.filter(submitted_comments, &(&1.supplier_id == supplier_id))
+      submitted_comments: Enum.filter(submitted_comments, &(&1.supplier_id == supplier_id)),
+      claims:
+        Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id)),
+      fixtures:
+        Enum.filter(Auctions.fixtures_for_auction(auction), &(&1.supplier_id == supplier_id))
     }
   end
 
@@ -129,7 +137,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         end),
       submitted_barges:
         BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
-      submitted_comments: submitted_comments
+      submitted_comments: submitted_comments,
+      claims: Deliveries.claims_for_auction(auction),
+      fixtures: Auctions.fixtures_for_auction(auction)
     }
   end
 
@@ -238,7 +248,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         participations: participations,
         solutions: solutions,
         submitted_barges: submitted_barges,
-        submitted_comments: submitted_comments
+        submitted_comments: submitted_comments,
+        claims: claims,
+        fixtures: fixtures
       }) do
     %{
       time_remaining: time_remaining,
@@ -250,7 +262,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       participations: participations,
       solutions: solutions,
       submitted_barges: submitted_barges,
-      submitted_comments: submitted_comments
+      submitted_comments: submitted_comments,
+      claims: claims,
+      fixtures: fixtures
     }
   end
 end

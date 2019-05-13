@@ -1131,6 +1131,36 @@ defmodule Oceanconnect.AuctionsTest do
       assert %Auctions.AuctionBarge{barge_id: ^barge_id, supplier_id: ^supplier2_id} = second
     end
 
+    test "approved_barges_for_winning_suppliers/2 lists all approved barges submitted to an auction by the winning suppliers",
+         %{auction: auction, supplier: supplier, supplier2: supplier2} do
+      winning_suppliers = [supplier, supplier2]
+      barge = insert(:barge, companies: winning_suppliers)
+      barge_id = barge.id
+      supplier_id = supplier.id
+
+      insert(:auction_barge,
+        auction: auction,
+        barge: barge,
+        supplier: supplier,
+        approval_status: "APPROVED"
+      )
+
+      insert(:auction_barge,
+        auction: auction,
+        barge: barge,
+        supplier: supplier2,
+        approval_status: "PENDING"
+      )
+
+      assert [
+               %Auctions.AuctionBarge{
+                 barge_id: ^barge_id,
+                 supplier_id: ^supplier_id,
+                 approval_status: "APPROVED"
+               }
+             ] = Auctions.approved_barges_for_winning_suppliers(winning_suppliers, auction)
+    end
+
     test "submit_comment/3", %{auction: auction, supplier: supplier} do
       assert {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
 

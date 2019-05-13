@@ -3,7 +3,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   require Logger
 
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.{Notifications, Auctions, Auctions.AuctionEvent}
+  alias Oceanconnect.{Deliveries.DeliveryEvent, Notifications, Auctions, Auctions.AuctionEvent}
 
   alias Oceanconnect.Notifications.{
     Command,
@@ -22,6 +22,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   # Bamboo sends this message back on successful deliver from `deliver_later`.
   def handle_info({:delivered_email, email}, state) do
+    {:noreply, state}
+  end
+
+  def handle_info({%DeliveryEvent{} = event, claim}, state) do
+    process(event, claim)
+
     {:noreply, state}
   end
 

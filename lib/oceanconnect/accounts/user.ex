@@ -2,6 +2,7 @@ defmodule Oceanconnect.Accounts.User do
   use Ecto.Schema
   import Ecto.{Changeset, Query}
   alias Oceanconnect.Accounts.{User, Company}
+  alias Oceanconnect.Deliveries.ClaimResponse
 
   @derive {Poison.Encoder, only: [:email, :company]}
 
@@ -18,6 +19,7 @@ defmodule Oceanconnect.Accounts.User do
     field(:is_active, :boolean, default: true)
     field(:impersonated_by, :integer, virtual: true)
     belongs_to(:company, Oceanconnect.Accounts.Company)
+    has_many(:claim_responses, ClaimResponse)
 
     timestamps()
   end

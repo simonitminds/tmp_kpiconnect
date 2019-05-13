@@ -1436,6 +1436,28 @@ defmodule Oceanconnect.Auctions do
     |> Repo.preload(barge: [:port])
   end
 
+  def approved_barges_for_winning_suppliers(winning_suppliers, %struct{} = auction)
+      when is_auction(struct) do
+    query =
+      auction.id
+      |> AuctionBarge.by_auction()
+
+    query =
+      "APPROVED"
+      |> AuctionBarge.by_approval_status(query)
+
+    queries =
+      Enum.reduce(winning_suppliers, [], fn supplier, acc ->
+        acc ++ [AuctionBarge.by_supplier(supplier.id, query)]
+      end)
+
+    Enum.flat_map(queries, fn query ->
+      query
+      |> Repo.all()
+      |> Repo.preload(:barge)
+    end)
+  end
+
   def submit_barge(
         %struct{id: auction_id},
         barge = %Barge{id: barge_id},

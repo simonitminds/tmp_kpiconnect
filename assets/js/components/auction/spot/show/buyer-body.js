@@ -8,7 +8,7 @@ import BuyerBestSolution from './buyer-best-solution';
 import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';
 import WinningSolution from './winning-solution';
-
+import FullfillmentOptions from './fullfillment-options';
 
 const BuyerBody = (props) => {
   const {
@@ -46,6 +46,7 @@ const BuyerBody = (props) => {
   } else if(status ==  'closed') {
       return(
       <div>
+        <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={false} />
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />
