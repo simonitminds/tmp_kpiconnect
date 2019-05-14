@@ -4,6 +4,7 @@ defmodule Oceanconnect.Notifications do
 
   alias Oceanconnect.Notifications.Emails
   alias Oceanconnect.Deliveries.{Claim, ClaimResponse, DeliveryEvent}
+
   alias Oceanconnect.Auctions.AuctionEvent
 
   def emails_for_event(

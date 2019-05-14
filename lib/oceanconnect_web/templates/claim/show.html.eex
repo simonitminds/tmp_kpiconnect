@@ -85,6 +85,7 @@
               </div>
             </fieldset>
             <%= submit "Add Response" ,class: "button is-link qa-claim-add_response has-margin-top-md" %>
+
           <% end %>
         <% else %>
             <i>The claim is resolved. No more responses can be added.</i>
