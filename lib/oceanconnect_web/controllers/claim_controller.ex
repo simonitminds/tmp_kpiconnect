@@ -41,7 +41,7 @@ defmodule OceanconnectWeb.ClaimController do
         "id" => claim_id,
         "claim_response" => %{"content" => content} = response_params
       }) do
-    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{suppliers: suppliers, buyer_id: buyer_id} = auction <-
@@ -49,7 +49,7 @@ defmodule OceanconnectWeb.ClaimController do
          %Claim{fixture: fixture} = claim <- Deliveries.get_claim(claim_id),
          true <-
            current_user_company_id == buyer_id or
-             current_user_company_id in Enum.map(suppliers, & &1.id) or is_admin do
+         current_user_company_id in Enum.map(suppliers, & &1.id) or is_admin do
       response_params =
         Map.merge(response_params, %{
           "author_id" => current_user_id,
@@ -57,7 +57,7 @@ defmodule OceanconnectWeb.ClaimController do
           "content" => content
         })
 
-      case Deliveries.create_claim_response(response_params) do
+      case Deliveries.create_claim_response(response_params, current_user) do
         {:ok, _response} ->
           changeset = Deliveries.change_claim_response(%ClaimResponse{})
           claim = Deliveries.get_claim(claim.id)
@@ -72,10 +72,11 @@ defmodule OceanconnectWeb.ClaimController do
             fixture: fixture
           )
 
-          {:error, %Ecto.Changeset{} = changeset}
+        {:error, %Ecto.Changeset{} = changeset} ->
 
           conn
           |> put_flash(:error, "Response was not added.")
+          |> put_status(400)
           |> render("show.html",
             changeset: changeset,
             auction: auction,
@@ -131,7 +132,10 @@ defmodule OceanconnectWeb.ClaimController do
           |> redirect(to: claim_path(conn, :edit, auction.id, claim.id))
 
         {:error, changeset} ->
-          render(conn, "new.html",
+          conn
+          |> put_flash(:error, "Oops, something went wrong! Please check the errors below.")
+          |> put_status(400)
+          |> render("new.html",
             changeset: changeset,
             auction: auction,
             fixtures: fixtures,
@@ -208,7 +212,7 @@ defmodule OceanconnectWeb.ClaimController do
         "id" => claim_id,
         "claim" => %{"response" => response} = update_params
       }) do
-    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction
@@ -222,7 +226,7 @@ defmodule OceanconnectWeb.ClaimController do
       }
 
       with {:ok, claim} <- Deliveries.update_claim(claim, update_params),
-           {:ok, claim_reponse} <- Deliveries.create_claim_response(response_params) do
+           {:ok, claim_reponse} <- Deliveries.create_claim_response(response_params, current_user) do
         case claim.closed do
           true ->
             conn

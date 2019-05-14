@@ -23,6 +23,14 @@ defmodule Oceanconnect.Deliveries.ClaimResponse do
   def changeset(%__MODULE__{} = response, attrs) do
     response
     |> cast(attrs, @fields)
+    |> validate_required([:author_id, :claim_id, :content])
+    |> foreign_key_constraint(:claim_id)
+    |> foreign_key_constraint(:author_id)
+  end
+
+  def buyer_changeset(%__MODULE__{} = response, attrs) do
+    response
+    |> cast(attrs, @fields)
     |> validate_required([:author_id, :claim_id])
     |> foreign_key_constraint(:claim_id)
     |> foreign_key_constraint(:author_id)
