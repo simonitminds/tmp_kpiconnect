@@ -1,0 +1,45 @@
+<fieldset id="qualityClaimFieldset" class="is-hidden box is-gray-1 has-margin-top-sm has-margin-bottom-md qa-claim-quality-fieldset">
+  <label class="label label--group">Quantity Claim</label>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Fixture</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <div class="select">
+            <%= select @form, :quality_fixture_id, options_for_fixture_select(@fixtures), class: "qa-claim-fixture_id" %>
+            <%= error_tag @form, :fixture_id %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Description</label>
+    <div class="control">
+      <%= textarea @form, :quality_quality_description, rows: "10", class: "textarea qa-claim-quality_description", placeholder: "Write a description of the off-spec delivered fuel." %>
+      <%= error_tag @form, :quality_description %>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Delivering Barge</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <div class="select">
+            <%= select @form, :quality_delivering_barge_id, options_for_barge_select(@fixtures, @auction), class: "qa-claim-delivering_barge_id" %>
+            <%= error_tag @form, :delivering_barge_id %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+

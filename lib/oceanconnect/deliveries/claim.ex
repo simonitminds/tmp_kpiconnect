@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Deliveries.QuantityClaim do
+defmodule Oceanconnect.Deliveries.Claim do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
@@ -21,10 +21,19 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
            except: [:__meta__, :auction, :buyer, :notice_recipient, :fixture, :responses]}
   schema "claims" do
     field(:type, :string)
+
+    field(:quantity_missing, :decimal)
+    field(:quantity_difference, :decimal)
+    field(:quality_description, :string)
+    field(:price_per_unit, :decimal)
+    field(:total_fuel_value, :decimal)
+
+    belongs_to(:supplier, Company)
+    belongs_to(:receiving_vessel, Vessel)
+    belongs_to(:delivered_fuel, Fuel)
+    belongs_to(:delivering_barge, Barge)
+
     field(:closed, :boolean, default: false)
-    field(:quantity_missing, :integer)
-    field(:price_per_unit, :float)
-    field(:total_fuel_value, :float)
     field(:response, :string, virtual: true)
     field(:additional_information, :string)
     field(:claim_resolution, :string)
@@ -34,25 +43,17 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
 
     has_many(:responses, ClaimResponse)
 
-    belongs_to(:supplier, Company)
     belongs_to(:buyer, Company)
     belongs_to(:notice_recipient, Company)
 
-    belongs_to(:receiving_vessel, Vessel)
-    belongs_to(:delivered_fuel, Fuel)
-    belongs_to(:delivering_barge, Barge)
-
-    belongs_to(:fixture, AuctionFixture)
     belongs_to(:auction, Auction)
+    belongs_to(:fixture, AuctionFixture)
 
     timestamps()
   end
 
   @required_fields [
     :type,
-    :quantity_missing,
-    :price_per_unit,
-    :total_fuel_value,
     :receiving_vessel_id,
     :delivered_fuel_id,
     :delivering_barge_id,
@@ -60,20 +61,39 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
     :notice_recipient_type,
     :buyer_id,
     :supplier_id,
-    :fixture_id
+    :fixture_id,
+    :price_per_unit
   ]
+
+  @optional_fields [
+    :closed,
+    :response,
+    :auction_id,
+    :additional_information,
+    :claim_resolution
+  ]
+
+  @quantity_fields [:quantity_missing]
+
+  @density_fields [:quantity_difference]
+
+  @quality_fields [:quality_description]
 
   def changeset(%__MODULE__{} = claim, attrs) do
     claim
     |> cast(
       attrs,
-      @required_fields ++
-        [:closed, :response, :auction_id, :additional_information, :claim_resolution]
+      @quantity_fields ++
+        @density_fields ++
+        @quality_fields ++
+        @required_fields ++
+        @optional_fields
     )
-    |> maybe_add_fixture()
     |> maybe_add_notice_recipient()
     |> maybe_add_last_correspondence()
-    |> validate_required(@required_fields)
+    |> maybe_add_total_fuel_value()
+    |> maybe_validate_claim_by_type()
+    |> validate_required(@required_fields, message: "This field is required.")
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:receiving_vessel_id)
     |> foreign_key_constraint(:delivered_fuel_id)
@@ -83,6 +103,28 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:fixture_id)
   end
+
+  defp maybe_validate_claim_by_type(%Ecto.Changeset{changes: %{type: type}} = changeset) do
+    case type do
+      "quantity" ->
+        changeset
+        |> validate_required(@quantity_fields, message: "This field is required.")
+
+      "density" ->
+        changeset
+        |> validate_required(@density_fields, message: "This field is required.")
+
+      "quality" ->
+        changeset
+        |> validate_required(@quality_fields, message: "This field is required.")
+
+      _ ->
+        changeset
+        |> add_error(:type, "Not a valid claim type: #{type}")
+    end
+  end
+
+  defp maybe_validate_claim_by_type(changeset), do: changeset
 
   defp maybe_add_fixture(
          %Ecto.Changeset{
@@ -162,6 +204,27 @@ defmodule Oceanconnect.Deliveries.QuantityClaim do
   end
 
   defp validate_claim_resolution(changeset), do: changeset
+
+  defp maybe_add_total_fuel_value(
+         %Ecto.Changeset{changes: %{quantity_missing: quantity_missing, price_per_unit: price}} =
+           changeset
+       )
+       when quantity_missing != "" or quantity_missing != 0 do
+    changeset
+    |> change(total_fuel_value: Decimal.mult(quantity_missing, price))
+  end
+
+  defp maybe_add_total_fuel_value(
+         %Ecto.Changeset{
+           changes: %{quantity_difference: quantity_difference, price_per_unit: price}
+         } = changeset
+       )
+       when quantity_difference != "" or quantity_difference != 0 do
+    changeset
+    |> change(total_fuel_value: Decimal.mult(quantity_difference, price))
+  end
+
+  defp maybe_add_total_fuel_value(changeset), do: changeset
 
   # QUERIES
 

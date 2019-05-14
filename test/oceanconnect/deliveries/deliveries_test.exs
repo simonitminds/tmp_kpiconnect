@@ -2,11 +2,11 @@ defmodule Oceanconnect.DeliveriesTest do
   use Oceanconnect.DataCase
 
   alias Oceanconnect.Deliveries
-  alias Oceanconnect.Deliveries.{QuantityClaim, ClaimResponse}
+  alias Oceanconnect.Deliveries.{Claim, ClaimResponse}
 
   alias Oceanconnect.Auctions
 
-  describe "quantity claims" do
+  describe "claims" do
     setup do
       buyer_company = insert(:company)
       buyer = insert(:user, company: buyer_company)
@@ -25,10 +25,11 @@ defmodule Oceanconnect.DeliveriesTest do
         )
 
       auction_state = close_auction!(auction)
-      _auction_fixtures = Auctions.create_fixtures_from_state(auction_state)
+      {:ok, auction_fixtures} = Auctions.create_fixtures_from_state(auction_state)
 
       claim_params = %{
         "type" => "quantity",
+        "fixture_id" => hd(auction_fixtures).id,
         "supplier_id" => supplier_company.id,
         "receiving_vessel_id" => hd(auction.vessels).id,
         "delivered_fuel_id" => hd(auction.auction_vessel_fuels).fuel.id,
@@ -42,12 +43,10 @@ defmodule Oceanconnect.DeliveriesTest do
         "buyer_id" => buyer_company.id
       }
 
-      quantity_claim =
-        insert(:quantity_claim,
+      claim =
+        insert(:claim,
           type: "quantity",
-          quantity_missing: 100,
-          price_per_unit: 100.00,
-          total_fuel_value: 100.00,
+          quantity_missing: 100.0,
           auction: auction,
           supplier: supplier_company,
           buyer: buyer_company,
@@ -63,40 +62,48 @@ defmodule Oceanconnect.DeliveriesTest do
       {:ok,
        %{
          claim_params: claim_params,
-         quantity_claim: quantity_claim,
+         claim: claim,
          update_params: update_params,
          buyer: buyer
        }}
     end
 
-    test "change_quantity_claim/1 returns a claim changeset" do
-      assert %Ecto.Changeset{} = Deliveries.change_quantity_claim(%QuantityClaim{})
+    test "change_claim/1 returns a claim changeset" do
+      assert %Ecto.Changeset{} = Deliveries.change_claim(%Claim{})
     end
 
-    test "create_quantity_claim/1 with valid attrs creates a quantity claim", %{
+    test "create_claim/1 with valid attrs creates a claim", %{
       claim_params: claim_params
     } do
-      assert {:ok, %QuantityClaim{id: claim_id} = claim} =
-               Deliveries.create_quantity_claim(claim_params)
+      assert {:ok, %Claim{id: claim_id} = claim} = Deliveries.create_claim(claim_params)
 
-      assert %QuantityClaim{type: "quantity"} = Deliveries.get_quantity_claim(claim_id)
+      assert %Claim{type: "quantity"} = Deliveries.get_claim(claim_id)
     end
 
-    test "update_quantity_claim/2 with valid attrs creates a quantity claim", %{
+    test "update_claim/2 with valid attrs creates a claim", %{
       update_params: update_params,
-      quantity_claim: claim
+      claim: claim
     } do
-      assert {:ok, %QuantityClaim{id: claim_id}} =
-               Deliveries.update_quantity_claim(claim, update_params)
+      assert {:ok, %Claim{id: claim_id}} = Deliveries.update_claim(claim, update_params)
 
-      updated_claim = Deliveries.get_quantity_claim(claim_id)
+      updated_claim = Deliveries.get_claim(claim_id)
       assert updated_claim.id == claim.id
-      assert updated_claim.quantity_missing == 200
+      assert updated_claim.quantity_missing |> Decimal.to_integer() == 200
     end
 
-    test "create_claim_response/1 with valid attrs creates a claim response", %{buyer: buyer, quantity_claim: claim} do
-      assert {:ok, %ClaimResponse{id: claim_response_id}} = Deliveries.create_claim_response(%{author_id: buyer.id, quantity_claim_id: claim.id, content: "Your fuel sucked!"})
-      assert %ClaimResponse{content: "Your fuel sucked!"} = Deliveries.get_claim_response(claim_response_id)
+    test "create_claim_response/1 with valid attrs creates a claim response", %{
+      buyer: buyer,
+      claim: claim
+    } do
+      assert {:ok, %ClaimResponse{id: claim_response_id}} =
+               Deliveries.create_claim_response(%{
+                 author_id: buyer.id,
+                 claim_id: claim.id,
+                 content: "Your fuel sucked!"
+               })
+
+      assert %ClaimResponse{content: "Your fuel sucked!"} =
+               Deliveries.get_claim_response(claim_response_id)
     end
   end
 end

@@ -1,10 +1,9 @@
 defmodule Oceanconnect.Notifications do
   import Ecto.Query, warn: false
   import Oceanconnect.Auctions.Guards
-  import Oceanconnect.Deliveries.Guards
 
   alias Oceanconnect.Notifications.Emails
-  alias Oceanconnect.Deliveries.DeliveryEvent
+  alias Oceanconnect.Deliveries.{Claim, DeliveryEvent}
   alias Oceanconnect.Auctions.AuctionEvent
 
   def emails_for_event(
@@ -50,9 +49,8 @@ defmodule Oceanconnect.Notifications do
 
   def emails_for_event(
         %DeliveryEvent{type: :claim_created},
-        %struct{} = claim
-      )
-      when is_claim(struct) do
+        %Claim{} = claim
+      ) do
     Emails.ClaimCreated.generate(claim)
   end
 

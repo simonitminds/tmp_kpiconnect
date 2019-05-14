@@ -28,9 +28,32 @@
             <li><strong>Claim Type</strong> <span class="qa-claim-type"><%= String.capitalize(@claim.type) %> Claim</span></li>
             <li><strong>Receiving Vessel</strong> <span class="qa-claim-receiving_vessel"><%= @fixture.vessel.name %></span></li>
             <li><strong>Delivered Fuel</strong> <span class="qa-claim-delivered_fuel"><%= @fixture.fuel.name %></span></li>
-            <li><strong>Quantity Missing</strong> <span class="qa-claim-quantity_missing"><%= @claim.quantity_missing %> M/T</span></li>
-            <li><strong>Price</strong> <span class="qa-claim-price_per_unit"><%= format_price(@claim.price_per_unit) %></span></li>
-            <li><strong>Value</strong> <span class="qa-claim-total_fuel_value"><%= format_price(@claim.total_fuel_value) %></span></li>
+            <%= if @claim.type in ["quantity", "density"] do %>
+              <%= if @claim.type == "quantity" do %>
+                <li>
+                  <strong>Quantity Missing</strong>
+                  <span class="qa-claim-quantity_missing">
+                    <%= format_decimal(@claim.quantity_missing) %> M/T
+                  </span>
+                </li>
+              <% else %>
+                <li>
+                  <strong>Quantity Difference</strong>
+                  <span class="qa-claim-quantity_difference">
+                    <%= format_decimal(@claim.quantity_difference) %> M/T
+                  </span>
+                </li>
+              <% end %>
+              <li><strong>Price</strong> <span class="qa-claim-price_per_unit"><%= format_price(@claim.price_per_unit) %></span></li>
+              <li><strong>Value</strong> <span class="qa-claim-total_fuel_value"><%= format_price(@claim.total_fuel_value) %></span></li>
+            <% else %>
+              <li>
+                <strong>Quality Description</strong>
+                <p class="qa-claim-quality_description">
+                  <%= @claim.quality_description %>
+                </p>
+              </li>
+            <% end %>
             <li><strong>Delivering Barge</strong> <span class="qa-claim-delivering_barge"><%= @claim.delivering_barge.name %></span></li>
             <li><strong>Time Submitted</strong>  <span class="qa-claim-time_submitted"><%= convert_date?(@claim.inserted_at) %></span></li>
           </ul>
@@ -61,7 +84,7 @@
                 </div>
               </div>
             </fieldset>
-            <%= submit "Add Response" ,class: "button is-link qa-claim-update" %>
+            <%= submit "Add Response" ,class: "button is-link qa-claim-update has-margin-top-md" %>
           <% end %>
         <% else %>
             <i>The claim is resolved. No more responses can be added.</i>
@@ -69,18 +92,20 @@
       </div>
     </div>
   </section>
-  <section class="auction-claim">
-    <div class="container">
-      <div class="content">
-        <legend class="subtitle is-4">Claim Resolution</legend>
-        <div class="box">
-          <strong>Resolution Details</strong>
-          <p class="has-margin-top-sm qa-claim-claim_resolution"><%= @claim.claim_resolution %></p>
-        </div>
-        <div class="field">
-          <%= link "Back", to: auction_path(@conn, :show, @auction.id), class: "button has-margin-right-sm" %>
+    <section class="auction-claim">
+      <div class="container">
+        <div class="content">
+          <%= if @claim.closed do %>
+          <legend class="subtitle is-4">Claim Resolution</legend>
+            <div class="box">
+              <strong>Resolution Details</strong>
+              <p class="has-margin-top-sm qa-claim-claim_resolution"><%= @claim.claim_resolution %></p>
+            </div>
+          <% end %>
+          <div class="field">
+            <%= link "Back", to: auction_path(@conn, :show, @auction.id), class: "button has-margin-right-sm" %>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 </div>

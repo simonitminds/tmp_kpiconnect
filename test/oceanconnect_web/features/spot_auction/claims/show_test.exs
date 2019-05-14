@@ -43,7 +43,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
 
     claim =
       insert(
-        :quantity_claim,
+        :claim,
         type: "quantity",
         quantity_missing: 100,
         price_per_unit: 100,
@@ -76,7 +76,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       claim: claim,
       auction: auction
     } do
-      claim = Deliveries.get_quantity_claim(claim.id)
+      claim = Deliveries.get_claim(claim.id)
       login_user(buyer)
       Claims.ShowPage.visit(auction.id, claim.id)
       assert Claims.EditPage.is_current_path?(auction.id, claim.id)
@@ -87,7 +87,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       assert Claims.ShowPage.has_delivered_fuel?(claim.delivered_fuel.name)
       assert Claims.ShowPage.has_delivering_barge?(claim.delivering_barge.name)
 
-      assert Claims.ShowPage.has_claims_details?(claim)
+      assert Claims.ShowPage.has_claims_details?(claim, :quantity)
       assert Claims.ShowPage.has_notice_recipient_type?(:supplier)
 
       assert Claims.ShowPage.has_last_correspondence_sent?(
@@ -101,7 +101,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       claim: claim,
       auction: auction
     } do
-      claim = Deliveries.get_quantity_claim(claim.id)
+      claim = Deliveries.get_claim(claim.id)
       login_user(buyer)
       Claims.EditPage.visit(auction.id, claim.id)
       assert Claims.EditPage.is_current_path?(auction.id, claim.id)

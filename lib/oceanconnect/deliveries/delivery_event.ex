@@ -1,7 +1,5 @@
 defmodule Oceanconnect.Deliveries.DeliveryEvent do
-  import Oceanconnect.Deliveries.Guards
-
-  alias Oceanconnect.Delivers.QuantityClaim
+  alias Oceanconnect.Deliveries.Claim
 
   defstruct id: nil,
             type: nil,
@@ -10,7 +8,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
             data: nil,
             time_entered: nil
 
-  def claim_created(%struct{id: claim_id} = claim) when is_claim(struct) do
+  def claim_created(%Claim{id: claim_id} = claim) do
     %__MODULE__{
       id: UUID.uuid4(:hex),
       type: :claim_created,

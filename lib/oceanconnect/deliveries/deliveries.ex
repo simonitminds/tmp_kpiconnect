@@ -1,40 +1,37 @@
 defmodule Oceanconnect.Deliveries do
   alias Oceanconnect.Repo
-  import Oceanconnect.Deliveries.Guards
 
-  alias Oceanconnect.Deliveries.{QuantityClaim, DeliveryEvent, EventNotifier, ClaimResponse}
+  alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
   alias Oceanconnect.Auctions.{Auction, TermAuction}
 
-  def change_quantity_claim(%QuantityClaim{} = claim) do
-    QuantityClaim.changeset(claim, %{})
+  def change_claim(%Claim{} = claim) do
+    Claim.changeset(claim, %{})
   end
 
-  def create_quantity_claim(attrs \\ %{}) do
-    with {:ok, claim} <- create_claim(%QuantityClaim{}, attrs) do
-      claim
-      |> DeliveryEvent.claim_created()
-      |> EventNotifier.emit(claim)
+  def create_claim(attrs \\ %{}) do
+    case %Claim{}
+         |> Claim.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, claim} ->
+        claim
+        |> DeliveryEvent.claim_created()
+        |> EventNotifier.emit(claim)
 
-      {:ok, claim}
-    else
-      error -> error
+        {:ok, claim}
+
+      {:error, changeset} ->
+        {:error, changeset}
     end
   end
 
-  defp create_claim(%struct{} = claim, attrs) when is_claim(struct) do
+  def update_claim(%Claim{} = claim, attrs) do
     claim
-    |> struct.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def update_quantity_claim(%QuantityClaim{} = claim, attrs) do
-    claim
-    |> QuantityClaim.changeset(attrs)
+    |> Claim.changeset(attrs)
     |> Repo.update()
   end
 
-  def get_quantity_claim(id) do
-    Repo.get(QuantityClaim, id)
+  def get_claim(id) do
+    Repo.get(Claim, id)
     |> Repo.preload([
       :delivered_fuel,
       :receiving_vessel,
@@ -50,7 +47,7 @@ defmodule Oceanconnect.Deliveries do
 
   def claims_for_auction(%Auction{id: auction_id}) do
     auction_id
-    |> QuantityClaim.by_auction()
+    |> Claim.by_auction()
     |> Repo.all()
     |> Repo.preload([:supplier, :delivered_fuel, :receiving_vessel, delivering_barge: [:port]])
   end
