@@ -1,5 +1,5 @@
 defmodule Oceanconnect.Deliveries.DeliveryEvent do
-  alias Oceanconnect.Deliveries.Claim
+  alias Oceanconnect.Deliveries.{Claim, ClaimResponse}
 
   defstruct id: nil,
             type: nil,
@@ -14,6 +14,16 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
       type: :claim_created,
       claim_id: claim_id,
       data: %{claim: claim},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
+  def claim_response_created(%ClaimResponse{claim_id: claim_id} = response) do
+    %__MODULE__{
+      id: UUID.uuid4(:hex),
+      type: :claim_response_created,
+      claim_id: claim_id,
+      data: %{response: response},
       time_entered: DateTime.utc_now()
     }
   end

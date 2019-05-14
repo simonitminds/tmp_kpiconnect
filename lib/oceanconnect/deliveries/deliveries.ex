@@ -59,12 +59,26 @@ defmodule Oceanconnect.Deliveries do
   end
 
   def create_claim_response(attrs \\ %{}) do
-    %ClaimResponse{}
-    |> ClaimResponse.changeset(attrs)
-    |> Repo.insert()
+    case %ClaimResponse{}
+         |> ClaimResponse.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, response} ->
+        response
+        |> DeliveryEvent.claim_response_created()
+        |> EventNotifier.emit(response)
+
+        {:ok, response}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   def get_claim_response(id) do
     Repo.get(ClaimResponse, id)
+    |> Repo.preload(
+      claim: [:fixture, :receiving_vessel, :delivered_fuel, :buyer, :supplier, auction: :port],
+      author: :company
+    )
   end
 end

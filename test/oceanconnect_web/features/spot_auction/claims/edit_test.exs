@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.Claims.EditTest do
   use Oceanconnect.FeatureCase
+  use Bamboo.Test, shared: true
 
   hound_session()
 
@@ -118,6 +119,17 @@ defmodule OceanconnectWeb.Claims.EditTest do
       %{responses: responses} = Deliveries.get_claim(claim.id)
       response = hd(responses)
       assert Claims.ShowPage.has_response?(response, "Hey", buyer)
+
+      :timer.sleep(1_000)
+
+      buyer_name = Oceanconnect.Accounts.User.full_name(buyer)
+
+      assert_email_delivered_with(
+        subject:
+          "#{buyer_name} from #{claim.buyer.name} added a response to the claim against #{
+            claim.supplier.name
+          }"
+      )
     end
 
     test "can close a claim", %{buyer: buyer, claim: claim, auction: auction} do

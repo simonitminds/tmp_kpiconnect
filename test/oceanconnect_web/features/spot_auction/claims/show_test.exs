@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.Claims.ShowTest do
   use Oceanconnect.FeatureCase
+  use Bamboo.Test, shared: true
 
   hound_session()
 
@@ -64,7 +65,9 @@ defmodule OceanconnectWeb.Claims.ShowTest do
     {:ok,
      %{
        buyer: buyer,
+       buyer_company: buyer_company,
        supplier: supplier,
+       supplier_company: supplier_company,
        claim: claim,
        auction: auction
      }}
@@ -109,10 +112,50 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       Claims.EditPage.update_claim()
 
       assert AuctionShowPage.is_current_path?(auction.id)
+      :timer.sleep(500)
       AuctionShowPage.view_claim(claim.id)
       assert Claims.ShowPage.is_current_path?(auction.id, claim.id)
       assert Claims.ShowPage.claim_resolved?()
       assert Claims.ShowPage.has_claim_resolution?("Thanks, dog")
+    end
+  end
+
+  describe "supplier" do
+    test "can visit claim show page through auction show page and post a new response", %{
+      buyer_company: buyer_company,
+      supplier: supplier,
+      supplier_company: supplier_company,
+      auction: auction,
+      claim: claim
+    } do
+      login_user(supplier)
+      AuctionShowPage.visit(auction.id)
+      assert AuctionShowPage.is_current_path?(auction.id)
+      assert AuctionShowPage.auction_status() == "CLOSED"
+
+      AuctionShowPage.view_claim(claim.id)
+      assert Claims.ShowPage.is_current_path?(auction.id, claim.id)
+      Claims.EditPage.enter_response("I'm sorry our fuel sucked so much")
+      Claims.ShowPage.add_response()
+
+      %{responses: responses} = Deliveries.get_claim(claim.id)
+      response = hd(responses)
+
+      assert Claims.ShowPage.has_response?(
+               response,
+               "I'm sorry our fuel sucked so much",
+               supplier
+             )
+
+      :timer.sleep(1_000)
+      supplier_name = Oceanconnect.Accounts.User.full_name(supplier)
+
+      assert_email_delivered_with(
+        subject:
+          "#{supplier_name} from #{supplier_company.name} responded to the claim made by #{
+            buyer_company.name
+          }"
+      )
     end
   end
 end

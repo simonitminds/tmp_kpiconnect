@@ -3,7 +3,7 @@ defmodule Oceanconnect.Deliveries.ClaimResponse do
   import Ecto.Changeset
 
   alias Oceanconnect.Accounts.User
-  alias Oceanconnect.Auctions.Claim
+  alias Oceanconnect.Deliveries.Claim
 
   schema "claim_responses" do
     field(:content, :string)

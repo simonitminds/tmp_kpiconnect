@@ -17,20 +17,19 @@
     </div>
   </div>
 
-
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Quantity Missing</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <%= text_input(@form, :quantity_quantity_missing, placeholder: "Units of Fuel", class: "input qa-claim-quantity_missing") %>
-            <%= error_tag @form, :quantity_missing %>
-          </div>
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Quantity Missing</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <%= text_input(@form, :quantity_quantity_missing, placeholder: "Units of Fuel", class: "input qa-claim-quantity_missing") %>
+          <%= error_tag @form, :quantity_missing %>
         </div>
       </div>
     </div>
+  </div>
 
   <div class="field is-horizontal">
     <div class="field-label is-normal">

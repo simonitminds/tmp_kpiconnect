@@ -60,6 +60,7 @@ defmodule OceanconnectWeb.ClaimController do
       case Deliveries.create_claim_response(response_params) do
         {:ok, _response} ->
           changeset = Deliveries.change_claim_response(%ClaimResponse{})
+          claim = Deliveries.get_claim(claim.id)
 
           conn
           |> put_flash(:info, "Response successfully added.")

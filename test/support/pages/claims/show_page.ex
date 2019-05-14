@@ -130,6 +130,10 @@ defmodule Oceanconnect.Claims.ShowPage do
       OceanconnectWeb.ClaimView.convert_date?(last_correspondence)
   end
 
+  def add_response do
+    click({:css, ".qa-claim-add_response"})
+  end
+
   def has_response?(response, content, author) do
     cond do
       inner_text({:css, ".qa-claim-response-#{response.id} .qa-response-content"}) != content ->
