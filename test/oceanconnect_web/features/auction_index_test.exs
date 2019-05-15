@@ -31,7 +31,7 @@ defmodule Oceanconnect.AuctionIndexTest do
       AuctionIndexPage.visit()
       AuctionIndexPage.cancel_auction(auction)
 
-      assert AuctionIndexPage.auction_is_status?(auction, "canceled")
+      refute AuctionIndexPage.has_auctions?([auction])
     end
 
     # TODO: Something with event propogating isn't working? Works locally but not

@@ -11,6 +11,7 @@ import {
   MESSAGE_CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
+  RECEIVE_FINALIZED_AUCTION_PAYLOADS,
   RECEIVE_COMPANY_BARGES,
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
@@ -126,6 +127,21 @@ export function getAllAuctionPayloads() {
         return dispatch(receiveAuctionPayloads(response.data));
       });
   };
+}
+
+export function getAllFinalizedAuctionPayloads() {
+  return dispatch => {
+    fetch('/api/historical_auctions', { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveFinalizedAuctionPayloads(response.data));
+      });
+  };
+}
+
+export function filterAuctionPayloads() {
+
 }
 
 export function getAuctionPayload(auctionId) {
@@ -301,10 +317,20 @@ export function receiveAuctionPayloads(auctionPayloads) {
           auctionPayloads: auctionPayloads};
 }
 
+export function receiveFinalizedAuctionPayloads(auctionPayloads) {
+  return {type: RECEIVE_FINALIZED_AUCTION_PAYLOADS,
+          auctionPayloads: auctionPayloads};
+}
+
 export function receiveSuppliers(port, suppliers) {
   return {type: RECEIVE_SUPPLIERS,
           port: port,
           suppliers: suppliers};
+}
+
+export function receiveFilteredPayloads(payloads) {
+  return {type: RECEIVE_FILTERED_PAYLOADS,
+          auctionPayloads: payloads};
 }
 
 export function receiveAuctionFormData(auction, suppliers, fuels, fuel_indexes, ports, vessels, credit_margin_amount) {

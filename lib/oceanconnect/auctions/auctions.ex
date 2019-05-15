@@ -1,3 +1,4 @@
+
 defmodule Oceanconnect.Auctions do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
@@ -310,6 +311,14 @@ defmodule Oceanconnect.Auctions do
       |> fully_loaded
 
     regular_auctions ++ term_auctions
+  end
+
+  def list_finalized_auctions do
+    list_auctions()
+    |> Enum.map(& get_auction_state!(&1))
+    |> Enum.filter(& &1.status in [:closed, :canceled, :expired])
+    |> Enum.map(& &1.auction_id)
+    |> Enum.map(& get_auction!(&1))
   end
 
   def list_participating_auctions(company_id) do

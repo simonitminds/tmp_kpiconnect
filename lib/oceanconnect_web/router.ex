@@ -29,6 +29,14 @@ defmodule OceanconnectWeb.Router do
     # Routes requiring authentication
     pipe_through(:authenticated)
     get("/auctions", AuctionController, :index, as: :auction_api)
+
+    get(
+      "/historical_auctions",
+      FinalizedAuctionController,
+      :index,
+      as: :finalized_auction_api
+    )
+
     get("/auctions/:auction_id", AuctionController, :show, as: :auction_api)
     post("/auctions/:auction_id/bids", BidController, :create, as: :auction_bid_api)
     post("/auctions/:auction_id/revoke_bid", BidController, :revoke, as: :auction_bid_api)
@@ -120,6 +128,7 @@ defmodule OceanconnectWeb.Router do
     get("/auctions/t:id", TermAuctionController, :show)
     # post("/auctions", TermAuctionController, :create)
     resources("/auctions", AuctionController, except: [:delete])
+    get("/historical_auctions", AuctionController, :historical_index)
     get("/auctions/:id/log", AuctionController, :log)
     get("/auctions/:id/start", AuctionController, :start)
     get("/auctions/:id/cancel", AuctionController, :cancel)

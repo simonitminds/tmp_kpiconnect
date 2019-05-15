@@ -1,0 +1,2 @@
+<script> window.container = "historical_index";</script>
+<div id="auctions-app"></div>

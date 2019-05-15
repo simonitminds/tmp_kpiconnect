@@ -29,6 +29,7 @@ import rootReducer from './reducers/index';
 import { receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
+import HistoricalAuctionsContainer from './containers/historical-auctions-container';
 import AuctionContainer from './containers/auction-container';
 import MessagesContainer from './containers/messages-container';
 
@@ -71,6 +72,12 @@ if (document.getElementById('auctions-app')) {
       case "index": { return (
         <div>
           <AuctionsContainer currentUserCompanyId={currentUserCompanyId} />
+          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+        </div>
+      )}
+      case "historical_index" : { return (
+        <div>
+          <HistoricalAuctionsContainer currentUserCompanyId={currentUserCompanyId} />
           <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
         </div>
       )}

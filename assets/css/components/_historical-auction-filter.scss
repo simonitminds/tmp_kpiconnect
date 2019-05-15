@@ -1,0 +1,44 @@
+.historical-auctions__form {
+// Widescreen
+  form {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .field:not(:last-child) {
+    margin-right: 1rem;
+  }
+  .field:last-child {
+    margin-bottom: 1.25rem;
+  }
+
+  .field-body {
+    align-items: center;
+  }
+
+  .field-group {
+    display: flex;
+  }
+}
+
+// Tablet
+@media (min-width: 480px) and (max-width: 1024px) {
+  .historical-auctions__form form {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .historical-auctions__form .field--has-horizontal {
+    .field-body { display: flex; }
+  }
+}
+
+// Phone
+@media (max-width: 480px) {
+  .historical-auctions__form form {
+    display: block;
+
+    .select, select {
+      width: 100%;
+    }
+  }
+}
