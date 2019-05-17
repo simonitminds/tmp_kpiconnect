@@ -6,7 +6,7 @@ defmodule Oceanconnect.Repo.Migrations.CreateClaimResponses do
       add(:content, :string)
 
       add(:author_id, references(:users))
-      add(:claim_id, references(:claims))
+      add(:quantity_claim_id, references(:claims))
 
       timestamps()
     end
