@@ -3,6 +3,7 @@ defmodule Oceanconnect.Deliveries do
 
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
   alias Oceanconnect.Auctions.{Auction, TermAuction}
+  alias Oceanconnect.Accounts
 
   def change_claim(%Claim{} = claim) do
     Claim.changeset(claim, %{})
@@ -58,10 +59,8 @@ defmodule Oceanconnect.Deliveries do
     ClaimResponse.changeset(response, %{})
   end
 
-  def create_claim_response(attrs \\ %{}) do
-    case %ClaimResponse{}
-         |> ClaimResponse.changeset(attrs)
-         |> Repo.insert() do
+  def create_claim_response(attrs \\ %{}, user) do
+    case handle_response_creation(attrs, user) do
       {:ok, response} ->
         response
         |> DeliveryEvent.claim_response_created()
@@ -72,6 +71,38 @@ defmodule Oceanconnect.Deliveries do
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  defp handle_response_creation(%{"claim_id" => claim_id} = attrs, %Accounts.User{company_id: company_id} = user) do
+    with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
+      %ClaimResponse{}
+      |> ClaimResponse.buyer_changeset(attrs)
+      |> Repo.insert()
+    else
+      _ ->
+        %ClaimResponse{}
+        |> ClaimResponse.changeset(attrs)
+        |> Repo.insert()
+    end
+  end
+
+  defp handle_response_creation(%{claim_id: claim_id} = attrs, %Accounts.User{company_id: company_id} = user) do
+    with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
+      %ClaimResponse{}
+      |> ClaimResponse.buyer_changeset(attrs)
+      |> Repo.insert()
+    else
+      _ ->
+        %ClaimResponse{}
+        |> ClaimResponse.changeset(attrs)
+        |> Repo.insert()
+    end
+  end
+
+  defp handle_response(_, _) do
+    %ClaimResponse{}
+    |> ClaimResponse.changeset(%{})
+    |> Repo.insert()
   end
 
   def get_claim_response(id) do

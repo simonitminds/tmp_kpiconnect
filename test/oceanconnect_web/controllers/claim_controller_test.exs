@@ -12,7 +12,7 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
     buyer_company = insert(:company)
     buyer = insert(:user, company: buyer_company)
     supplier_company = insert(:company, is_supplier: true)
-    supplier = insert(:user)
+    supplier = insert(:user, company: supplier_company)
 
     auction =
       insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
@@ -123,6 +123,20 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
     end
 
+    test "cannot create a new quantity claim with invalid params", %{
+      conn: conn,
+      auction: auction,
+      claim_params: claim_params
+    } do
+      invalid_params =
+        claim_params
+        |> Map.merge(%{"quantity_quantity_missing" => ""})
+
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => invalid_params}))
+      assert html_response(conn, 400) =~ "Oops, something went wrong! Please check the errors below."
+      assert html_response(conn, 400) =~ "This field is required."
+    end
+
     test "can create a new density claim", %{
       conn: conn,
       auction: auction,
@@ -135,6 +149,20 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
     end
 
+    test "cannot create a new density claim with invalid params", %{
+      conn: conn,
+      auction: auction,
+      density_claim_params: density_claim_params
+    } do
+      invalid_params =
+        density_claim_params
+        |> Map.merge(%{"density_quantity_difference" => ""})
+
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => invalid_params}))
+      assert html_response(conn, 400) =~ "Oops, something went wrong! Please check the errors below."
+      assert html_response(conn, 400) =~ "This field is required."
+    end
+
     test "can create a new quality claim", %{
       conn: conn,
       auction: auction,
@@ -145,6 +173,20 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
       claims = Deliveries.claims_for_auction(auction)
       [claim] = tl(claims)
       assert html_response(conn, 302) =~ "/auctions/#{auction.id}/claims/#{claim.id}"
+    end
+
+    test "cannot create a new quality claim with invalid params", %{
+      conn: conn,
+      auction: auction,
+      quality_claim_params: quality_claim_params
+    } do
+      invalid_params =
+        quality_claim_params
+        |> Map.merge(%{"quality_quality_description" => ""})
+
+      conn = post(conn, claim_path(conn, :create, auction.id, %{"claim" => invalid_params}))
+      assert html_response(conn, 400) =~ "Oops, something went wrong! Please check the errors below."
+      assert html_response(conn, 400) =~ "This field is required."
     end
 
     test "can visit edit claim action", %{conn: conn, auction: auction, claim: claim} do
@@ -183,7 +225,8 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
         build_conn()
         |> login_user(supplier)
 
-      {:ok, %{conn: conn}}
+      response_params = %{"content" => "Thanks, dog"}
+      {:ok, %{conn: conn, response_params: response_params}}
     end
 
     test "cannot visit new claim action", %{conn: conn, auction: auction} do
@@ -194,6 +237,17 @@ defmodule OceanconnectWeb.ClaimsControllerTest do
     test "cannot visit edit claim action", %{conn: conn, auction: auction, claim: claim} do
       conn = get(conn, claim_path(conn, :edit, auction.id, claim.id))
       assert html_response(conn, 404) =~ "/auctions"
+    end
+
+    test "can add a response to a claim", %{conn: conn, auction: auction, claim: claim, response_params: response_params} do
+      conn = post(conn, claim_path(conn, :create_response, auction.id, claim.id, %{"claim_response" => response_params}))
+      assert html_response(conn, 200) =~ "Response successfully added."
+      assert html_response(conn, 200) =~ "Thanks, dog"
+    end
+
+    test "cannot add a response without content", %{conn: conn, auction: auction, claim: claim} do
+      conn = post(conn, claim_path(conn, :create_response, auction.id, claim.id, %{"claim_response" => %{"content" => ""}}))
+      assert html_response(conn, 400) =~ "Response was not added."
     end
   end
 end

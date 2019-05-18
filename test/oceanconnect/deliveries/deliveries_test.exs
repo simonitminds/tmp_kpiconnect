@@ -11,7 +11,7 @@ defmodule Oceanconnect.DeliveriesTest do
       buyer_company = insert(:company)
       buyer = insert(:user, company: buyer_company)
       supplier_company = insert(:company, is_supplier: true)
-      _supplier = insert(:user)
+      supplier = insert(:user, company: supplier_company)
 
       auction =
         insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
@@ -64,7 +64,8 @@ defmodule Oceanconnect.DeliveriesTest do
          claim_params: claim_params,
          claim: claim,
          update_params: update_params,
-         buyer: buyer
+         buyer: buyer,
+         supplier: supplier
        }}
     end
 
@@ -80,6 +81,15 @@ defmodule Oceanconnect.DeliveriesTest do
       assert %Claim{type: "quantity"} = Deliveries.get_claim(claim_id)
     end
 
+    test "create_claim/1 with invalid attrs creates a claim", %{
+      claim_params: claim_params
+    } do
+      invalid_params =
+        claim_params
+        |> Map.merge(%{"quantity_missing" => ""})
+      assert {:error, %Ecto.Changeset{}} = Deliveries.create_claim(invalid_params)
+    end
+
     test "update_claim/2 with valid attrs creates a claim", %{
       update_params: update_params,
       claim: claim
@@ -91,7 +101,7 @@ defmodule Oceanconnect.DeliveriesTest do
       assert updated_claim.quantity_missing |> Decimal.to_integer() == 200
     end
 
-    test "create_claim_response/1 with valid attrs creates a claim response", %{
+    test "create_claim_response/2 with valid attrs creates a claim response", %{
       buyer: buyer,
       claim: claim
     } do
@@ -100,10 +110,21 @@ defmodule Oceanconnect.DeliveriesTest do
                  author_id: buyer.id,
                  claim_id: claim.id,
                  content: "Your fuel sucked!"
-               })
+               }, buyer)
 
       assert %ClaimResponse{content: "Your fuel sucked!"} =
                Deliveries.get_claim_response(claim_response_id)
+    end
+
+    test "create_claim_response/2 as a supplier with missing content doesn't create a claim response", %{
+      supplier: supplier,
+      claim: claim
+    } do
+      assert {:error, %Ecto.Changeset{}} =
+               Deliveries.create_claim_response(%{
+                 author_id: supplier.id,
+                 claim_id: claim.id
+               }, supplier)
     end
   end
 end
