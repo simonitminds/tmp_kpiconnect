@@ -1,0 +1,55 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title has-margin-top-xl has-margin-bottom-xl is-flex"><span class="is-inline-block">Auction <%= "#{@auction.id}" %> Fixtures</span>
+				<%= link( to: auction_path(@conn, :show, @auction.id), class: "button is-inline-block has-margin-left-auto has-family-copy") do %>
+	          <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+	      <% end %>
+			</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content">
+			<!-- <%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %> -->
+			<section class="admin-panel__content">
+				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Fixture List</span>
+					<%= link to: admin_auction_fixture_path(@conn, :new, @auction), class: "button is-link is-inline-block has-margin-left-auto" do %>
+						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Fixture
+					<% end %>
+				</h2>
+				<table class="admin-panel__table">
+					<thead>
+						<tr>
+							<th>Fixture ID</th>
+							<th>Vessel</th>
+							<th>Fuel</th>
+              <th>Price</th>
+              <th>Quantity</th>
+							<th>Supplier</th>
+              <th>ETA</th>
+              <th>ETD</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<%= for fixture <- @fixtures do %>
+							<tr class="qa-auction-fixture-<%= fixture.id %>">
+								<td class="qa-auction-fixture-auction-name"><%= fixture.id %></td>
+								<td class="qa-auction-fixture-supplier"><%= vessel_name(fixture) %></td>
+								<td class="qa-auction-fixture-fuel"><%= fuel_name(fixture) %></td>
+								<td class="qa-auction-fixture-price">$<%= fixture.price %></td>
+								<td class="qa-auction-fixture-quantity"><%= fixture.quantity %></td>
+								<td class="qa-auction-fixture-supplier"><%= supplier_name(fixture) %></td>
+                <td class="qa-auction-fixture-eta"><%= fixture.eta %></td>
+                <td class="qa-auction-fixture-etd"><%= fixture.etd %></td>
+								<td class="text-right">
+									<%= link "Edit", to: admin_auction_fixture_path(@conn, :edit, @auction, fixture), class: "button is-small is-primary is-inline-block has-margin-bottom-xs" %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</div>
+</div>

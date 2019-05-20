@@ -60,6 +60,7 @@ defmodule Oceanconnect.Auctions.Auction do
 
     has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
     has_many(:claims, Claim)
+    has_many(:fixtures, Oceanconnect.Auctions.AuctionFixture)
 
     timestamps()
   end
@@ -290,6 +291,33 @@ defmodule Oceanconnect.Auctions.Auction do
       where:
         fragment("? - ?", q.scheduled_start, ^current_time) >= 0 and
           fragment("? - ?", q.sheduled_start, ^current_time) <= ^time_frame
+    )
+  end
+
+  def with_buyer(buyer_id, query \\ Auction) do
+    from(
+      q in query,
+      where: q.buyer_id == ^buyer_id
+    )
+  end
+
+  def with_supplier(supplier_id, query \\ Auction) do
+    from(
+      s in Oceanconnect.Auctions.AuctionSuppliers,
+      join: q in ^query,
+      on: q.id == s.auction_id,
+      where: s.supplier_id == ^supplier_id,
+      select: q
+    )
+  end
+
+  def has_fixtures(query \\ Auction) do
+    from(
+      q in query,
+      join: f in Oceanconnect.Auctions.AuctionFixture,
+      on: q.id == f.auction_id,
+      where: q.type == "spot",
+      select: q
     )
   end
 

@@ -30,6 +30,7 @@ import { receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import HistoricalAuctionsContainer from './containers/historical-auctions-container';
+import FixturesContainer from './containers/fixtures-container';
 import AuctionContainer from './containers/auction-container';
 import MessagesContainer from './containers/messages-container';
 
@@ -81,6 +82,11 @@ if (document.getElementById('auctions-app')) {
           <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
         </div>
       )}
+    case "fixture_index" : { return (
+        <div>
+          <FixturesContainer currentUserCompanyId={currentUserCompanyId} />
+        </div>
+      )}
       case "show": { return (
         <div>
           <AuctionContainer currentUserCompanyId={currentUserCompanyId} />
@@ -89,7 +95,7 @@ if (document.getElementById('auctions-app')) {
       )}
       case "edit": { return getDataForComponent("AuctionFormContainer")}
       case "new": { return getDataForComponent("AuctionFormContainer")}
-      default: {return(<div></div>)}
+      default: { return(<div></div>) }
     }
   };
 

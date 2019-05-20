@@ -36,7 +36,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
     if (auctionStatus == 'closed') {
       if (!_.isEmpty(claims)) {
         return (
-          <span className="tag is-yellow is-flex has-text-centered has-text-weight-bold"><span className="qa-open-claims has-margin-right-xs">{openClaims}</span> {`Open Claim${openClaims > 1 ? "s" : ""}`}</span>
+          <span className="tag is-yellow is-flex has-text-centered has-text-weight-bold"><span className="qa-open-claims has-margin-right-xs">{openClaims}</span> {`Open Claim${openClaims != 1 ? "s" : ""}`}</span>
         );
       } else {
         return <i>No activities have been logged for this auction.</i>;

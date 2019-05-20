@@ -3,13 +3,18 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{AuctionFixture, Auction}
 
-  def index(conn, %{"auction_id" => auction_id}) do
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+
+  def show(conn, %{"auction_id" => auction_id}) do
     auction = Auctions.get_auction!(auction_id)
     status = Auctions.get_auction_status!(auction)
 
     if status in [:closed, :expired] do
       auction_fixtures = Auctions.fixtures_for_auction(auction)
-      render(conn, "index.html", %{fixtures: auction_fixtures, auction: auction})
+      render(conn, "show.html", %{fixtures: auction_fixtures, auction: auction})
     else
       redirect(conn, to: auction_path(conn, :index))
     end

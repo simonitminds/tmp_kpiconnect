@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.Api.FinalizedAuctionController do
               |> AuctionPayload.get_admin_auction_payload!()
             end)
           false ->
-            Auctions.list_finalized_auctions()
+            Auctions.list_participating_finalized_auctions(current_user_company_id)
             |> Enum.map(fn auction ->
               auction
               |> Auctions.fully_loaded()

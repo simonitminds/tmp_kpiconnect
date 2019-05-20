@@ -6,9 +6,6 @@
 
 // ======= CONTAINER ======= //
 
-body {
-}
-
 header {
   position: sticky;
   height: 3.25rem;
@@ -21,10 +18,16 @@ header {
 }
 
 main {
+  min-height: calc(100vh - 3.25rem);
   transition: all 0.2s ease-out;
   overflow-y: scroll;
   position: relative;
   z-index: 1;
+
+
+  .body--admin & {
+    min-height: calc(100vh - 7.25rem);
+  }
 }
 
 .container {
@@ -64,6 +67,12 @@ span.break { // Break for flexbox situations where you kinda wish there was a cl
 }
 
 section {
+  .empty-list {
+    background-color: $gray-0;
+    padding: 1rem;
+    text-align: center;
+  }
+
   &.auction-list { // Bunker list divisions based on auction status.
     padding-bottom: 1.25rem;
 
@@ -80,12 +89,6 @@ section {
       @media (max-width: 768px) { padding-top: 0.5rem !important; }
     }
 
-    .empty-list {
-      background-color: $gray-0;
-      padding: 1rem;
-      text-align: center;
-    }
-
     &:nth-child(odd) {
       background-color: $gray-0;
 
@@ -96,14 +99,6 @@ section {
   }
   &.auction-info { // Form divisions for Auction Create/Edit
     padding: 2rem 1rem;
-
-    // &:nth-child(even) {
-    //   background-color: $gray-0;
-    //
-    //   .empty-list {
-    //     background-color: white;
-    //   }
-    // }
 
     @media (max-width: 768px) { // Tighten up spacing for mobile.
       padding: 1.25rem 0.5rem;

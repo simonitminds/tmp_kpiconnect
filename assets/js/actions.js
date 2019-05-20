@@ -12,6 +12,7 @@ import {
   RECEIVE_AUCTION_FORM_DATA,
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_FINALIZED_AUCTION_PAYLOADS,
+  RECEIVE_FIXTURE_PAYLOADS,
   RECEIVE_COMPANY_BARGES,
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
@@ -140,8 +141,15 @@ export function getAllFinalizedAuctionPayloads() {
   };
 }
 
-export function filterAuctionPayloads() {
-
+export function getAllFixturePayloads() {
+  return dispatch => {
+    fetch('/api/auction_fixtures', { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveFixturePayloads(response.data))
+      });
+  }
 }
 
 export function getAuctionPayload(auctionId) {
@@ -320,6 +328,11 @@ export function receiveAuctionPayloads(auctionPayloads) {
 export function receiveFinalizedAuctionPayloads(auctionPayloads) {
   return {type: RECEIVE_FINALIZED_AUCTION_PAYLOADS,
           auctionPayloads: auctionPayloads};
+}
+
+export function receiveFixturePayloads(fixturePayloads) {
+  return {type: RECEIVE_FIXTURE_PAYLOADS,
+          fixturePayloads: fixturePayloads};
 }
 
 export function receiveSuppliers(port, suppliers) {

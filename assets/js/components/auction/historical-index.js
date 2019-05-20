@@ -8,9 +8,7 @@ import CollapsibleSection from './common/collapsible-section';
 import ChannelConnectionStatus from './common/channel-connection-status';
 import MediaQuery from 'react-responsive';
 import { componentsForAuction } from './common';
-import DateInput from '../date-input';
 import DateRangeInput from '../date-range-input';
-import { DateRangePicker } from 'react-dates';
 
 export default class HistoricalAuctionsIndex extends React.Component {
   constructor(props) {
@@ -34,12 +32,15 @@ export default class HistoricalAuctionsIndex extends React.Component {
   clearFilter(ev) {
     const fields = ev.target.elements;
     _.forEach(fields, field => field.value = "");
+
     let filterParams = this.state.filterParams;
     filterParams = {...filterParams, startTimeRange: "", endTimeRange: ""}
+
     this.setState({
       filterParams,
       auctionPayloads: this.props.auctionPayloads
     });
+
     ev.preventDefault();
   }
 
@@ -64,7 +65,8 @@ export default class HistoricalAuctionsIndex extends React.Component {
   }
 
   filteredPayloads(filterParams) {
-    const filter = _.chain(filterParams)
+    const filter = _
+      .chain(filterParams)
       .toPairs()
       .filter(([_key, value]) => !!value)
       .map(([key, value]) => this.filterByInput(key, value))
@@ -95,31 +97,29 @@ export default class HistoricalAuctionsIndex extends React.Component {
   }
 
   render() {
-    const availablePayloads = this.props.auctionPayloads;
+    const availableAuctions = _.map(this.props.auctionPayloads, (payload) => payload.auction);
 
     const availableAuctionAttributes = (type) => {
       switch (type) {
         case 'vessels':
         case 'suppliers':
           return _
-            .chain(availablePayloads)
-            .map((payload) => payload.auction)
-            .map((auction) => auction[type])
-            .flatten()
+            .chain(availableAuctions)
+            .flatMap((auction) => auction[type])
             .reject((supplier) => supplier == undefined)
             .uniqBy('id')
             .value();
         case 'buyer':
         case 'port':
           return _
-            .chain(availablePayloads)
-            .map((payload) => payload.auction[type])
+            .chain(availableAuctions)
+            .map((auction)=> auction[type])
             .uniqBy('id')
             .value();
       }
     }
     const availableVessels = availableAuctionAttributes('vessels');
-    const availableSuppliers = _.reject(availableAuctionAttributes('suppliers'), (supplier) => supplier == undefined);
+    const availableSuppliers = availableAuctionAttributes('suppliers')
     const availableBuyers = availableAuctionAttributes('buyer');
     const availablePorts = availableAuctionAttributes('port');
 
