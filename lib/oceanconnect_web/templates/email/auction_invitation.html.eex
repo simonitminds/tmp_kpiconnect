@@ -1,6 +1,6 @@
 <p style='font-family: "Arial";'><b>Dear <%= OceanconnectWeb.EmailView.full_name(@supplier) %>,</b></p>
 <br/>
-<p style='font-family: "Arial";'>We have just created a new Reverse Auction with you as the point of contact.</p>
+<p style='font-family: "Arial";'>We have just created a new Bunker Auction with you as the point of contact.</p>
 <br/>
 <table style="background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: 'Arial';">
   <tr>
