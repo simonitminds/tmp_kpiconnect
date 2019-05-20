@@ -19,6 +19,10 @@ defmodule Oceanconnect.Auction.HistoricalIndexPage do
     end)
   end
 
+  def open_claims_for_auction(auction_id) do
+    inner_text({:css, ".qa-auction-#{auction_id} .qa-open-claims"})
+  end
+
   def filter_vessel(vessel_id) do
     click({:css, ".qa-filter-vessel_id .qa-filter-vessel_id-#{vessel_id}"})
   end
@@ -33,5 +37,9 @@ defmodule Oceanconnect.Auction.HistoricalIndexPage do
 
   def enter_end_time_filter(end_time) do
     fill_field({:css, ".qa-filter-endTimeRange_date input"}, end_time)
+  end
+
+  def filter_claim_status(status) do
+    click({:css, ".qa-filter-claims .qa-filter-claims-#{status}"})
   end
 end

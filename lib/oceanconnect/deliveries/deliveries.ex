@@ -73,7 +73,10 @@ defmodule Oceanconnect.Deliveries do
     end
   end
 
-  defp handle_response_creation(%{"claim_id" => claim_id} = attrs, %Accounts.User{company_id: company_id} = user) do
+  defp handle_response_creation(
+         %{"claim_id" => claim_id} = attrs,
+         %Accounts.User{company_id: company_id} = user
+       ) do
     with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
       %ClaimResponse{}
       |> ClaimResponse.buyer_changeset(attrs)
@@ -86,7 +89,10 @@ defmodule Oceanconnect.Deliveries do
     end
   end
 
-  defp handle_response_creation(%{claim_id: claim_id} = attrs, %Accounts.User{company_id: company_id} = user) do
+  defp handle_response_creation(
+         %{claim_id: claim_id} = attrs,
+         %Accounts.User{company_id: company_id} = user
+       ) do
     with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
       %ClaimResponse{}
       |> ClaimResponse.buyer_changeset(attrs)

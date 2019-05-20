@@ -9,6 +9,8 @@ import ChannelConnectionStatus from './common/channel-connection-status';
 import MediaQuery from 'react-responsive';
 import { componentsForAuction } from './common';
 import DateInput from '../date-input';
+import DateRangeInput from '../date-range-input';
+import { DateRangePicker } from 'react-dates';
 
 export default class HistoricalAuctionsIndex extends React.Component {
   constructor(props) {
@@ -22,8 +24,9 @@ export default class HistoricalAuctionsIndex extends React.Component {
         buyer: "",
         supplier: "",
         port: "",
-        startTimeRange: "",
-        endTimeRange: ""
+        startTimeRange: null,
+        endTimeRange: null,
+        claims: ""
       }
     };
   }
@@ -31,7 +34,10 @@ export default class HistoricalAuctionsIndex extends React.Component {
   clearFilter(ev) {
     const fields = ev.target.elements;
     _.forEach(fields, field => field.value = "");
+    let filterParams = this.state.filterParams;
+    filterParams = {...filterParams, startTimeRange: "", endTimeRange: ""}
     this.setState({
+      filterParams,
       auctionPayloads: this.props.auctionPayloads
     });
     ev.preventDefault();
@@ -49,6 +55,9 @@ export default class HistoricalAuctionsIndex extends React.Component {
         return payload => inputValue.isBefore(moment(payload.auction.scheduled_start), 'day') || inputValue.isSame(moment(payload.auction.scheduled_start), 'day')
       case "endTimeRange":
         return payload => inputValue.isAfter(moment(payload.auction.scheduled_start), 'day') || inputValue.isSame(moment(payload.auction.scheduled_start), 'day')
+      case "claims":
+        const claimStatus = inputValue === "true";
+        return payload => _.some(payload.claims, {closed: claimStatus})
       default:
         return payload => true;
     }
@@ -75,19 +84,9 @@ export default class HistoricalAuctionsIndex extends React.Component {
     })
   }
 
-  handleStartTimeRange(value) {
+  handleTimeRange({ startDate, endDate }) {
     let filterParams = this.state.filterParams;
-    filterParams = {...filterParams, startTimeRange: value}
-
-    this.setState({
-      auctionPayloads: this.filteredPayloads(filterParams),
-      filterParams
-    })
-  }
-
-  handleEndTimeRange(value) {
-    let filterParams = this.state.filterParams;
-    filterParams = {...filterParams, endTimeRange: value}
+    filterParams = {...filterParams, startTimeRange: startDate, endTimeRange: endDate}
 
     this.setState({
       auctionPayloads: this.filteredPayloads(filterParams),
@@ -104,8 +103,10 @@ export default class HistoricalAuctionsIndex extends React.Component {
         case 'suppliers':
           return _
             .chain(availablePayloads)
-            .flatMap((payload) => payload.auction)
-            .flatMap((auction) => auction[type])
+            .map((payload) => payload.auction)
+            .map((auction) => auction[type])
+            .flatten()
+            .reject((supplier) => supplier == undefined)
             .uniqBy('id')
             .value();
         case 'buyer':
@@ -260,38 +261,6 @@ export default class HistoricalAuctionsIndex extends React.Component {
 
                     <div className="field">
                       <div className="control">
-                        <label className="label">Buyer</label>
-                        <div className="select">
-                          <select name="buyer" className="qa-filter-buyer_id">
-                            <option value="">Select Buyer</option>
-                            {_.map(availableBuyers, buyer => (
-                              <option key={buyer.id} value={buyer.id} className={`qa-filter-buyer_id-${buyer.id}`}>
-                                {buyer.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Supplier</label>
-                        <div className="select">
-                          <select name="supplier" className="qa-filter-supplier_id">
-                            <option value="">Select Supplier</option>
-                            {_.map(availableSuppliers, supplier => (
-                              <option key={supplier.id} value={supplier.id} className={`qa-filter-supplier_id-${supplier.id}`}>
-                                {supplier.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="field">
-                      <div className="control">
                         <label className="label">Port</label>
                         <div className="select">
                           <select name="port" className="qa-filter-port_id">
@@ -306,27 +275,85 @@ export default class HistoricalAuctionsIndex extends React.Component {
                       </div>
                     </div>
 
-                    <div className="field field--has-horizontal">
-                      <label className="label">Time Period</label>
-                      <div className="is-horizontal">
-                        <div className="field-body">
-                          <div className="control">
-                            <DateInput name="startTimeRange" value={this.state.startTimeRange} onChange={this.handleStartTimeRange.bind(this)} isOutsideRange={() => false}/>
-                          </div>
-                          <div className="control has-margin-right-sm">
-                            &mdash;
-
-                          </div>
-                          <div className="control">
-                            <DateInput name="endTimeRange" value={this.state.endTimeRange} onChange={this.handleEndTimeRange.bind(this)} isOutsideRange={() => false} model={"filter"} field={"endTimeRange"}/>
-
-                          </div>
+                    <div className="field">
+                      <div className="control">
+                        <label className="label">Buyer</label>
+                        <div className="select">
+                          <select name="buyer" className="qa-filter-buyer_id">
+                            <option value="">Select Buyer</option>
+                            {_.map(availableBuyers, buyer => (
+                              <option key={buyer.id} value={buyer.id} className={`qa-filter-buyer_id-${buyer.id}`}>
+                                {buyer.name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>
+
+                    { availableSuppliers.length > 0 &&
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Supplier</label>
+                          <div className="select">
+                            <select name="supplier" className="qa-filter-supplier_id" >
+                              <option value="">Select Supplier</option>
+                                {_.map(availableSuppliers, supplier => (
+                                  <option key={supplier.id} value={supplier.id} className={`qa-filter-supplier_id-${supplier.id}`}>
+                                    {supplier.name}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    }
+
                     <div className="field">
                       <div className="control">
-                        <button className="button is-pulled-right">Clear Filter</button>
+                        <label className="label">Claim Status</label>
+                        <div className="select">
+                          <select name="claims" className="qa-filter-claims">
+                            <option value="">Select Status</option>
+                            <option value={false} className={`qa-filter-claims-open`}>
+                              Open
+                            </option>
+                            <option value={true} className={`qa-filter-claims-closed`}>
+                              Closed
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <MediaQuery query="(max-width: 599px)">
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Time Period</label>
+                          <DateRangeInput
+                            orientation={"vertical"}
+                            startDate={this.state.filterParams.startTimeRange}
+                            endDate={this.state.filterParams.endTimeRange}
+                            onChange={this.handleTimeRange.bind(this)}
+                          />
+                        </div>
+                      </div>
+                    </MediaQuery>
+                    <MediaQuery query="(min-width: 600px)">
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Time Period</label>
+                          <DateRangeInput
+                            startDate={this.state.filterParams.startTimeRange}
+                            endDate={this.state.filterParams.endTimeRange}
+                            onChange={this.handleTimeRange.bind(this)}
+                          />
+                        </div>
+                      </div>
+                    </MediaQuery>
+                    <div className="field">
+                      <div className="control">
+                        <button className="button">Clear Filter</button>
                       </div>
                     </div>
                   </form>

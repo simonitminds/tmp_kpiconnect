@@ -165,7 +165,8 @@
   display: block
 }
 .DateRangePicker_picker {
-  z-index: 1;
+  z-index: 5;
+  top: 45px !important;
   background-color: $white;
   position: absolute
 }
@@ -669,14 +670,13 @@
   color: #cacccd
 }
 .DateRangePickerInput {
-  background-color: $white;
-  display: inline-block
+  display: inline-flex;
 }
 .DateRangePickerInput__disabled {
   background: #f2f2f2
 }
 .DateRangePickerInput__withBorder {
-  border: 1px solid #cacccd
+  border: none;
 }
 .DateRangePickerInput__rtl {
   direction: rtl
@@ -688,8 +688,8 @@
   padding-right: 30px
 }
 .DateRangePickerInput_arrow {
-  display: inline-block;
-  vertical-align: middle
+  display: flex;
+  align-items: center;
 }
 .DateRangePickerInput_arrow_svg {
   vertical-align: middle;

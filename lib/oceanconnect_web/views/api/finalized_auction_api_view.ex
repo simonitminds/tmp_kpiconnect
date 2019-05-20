@@ -10,7 +10,8 @@ defmodule OceanconnectWeb.Api.FinalizedAuctionView do
         end)
     }
   end
+
   def render("auction.json", %{data: auction_payload}) do
-   AuctionPayload.json_from_payload(auction_payload)
+    AuctionPayload.json_from_payload(auction_payload)
   end
 end
