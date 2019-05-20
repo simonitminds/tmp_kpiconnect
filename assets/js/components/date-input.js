@@ -23,7 +23,7 @@ export default class DateInput extends React.Component {
 
   render(){
     const {
-      model, field, labelText, value, name, onChange
+      model, field, labelText, value, name, onChange, isOutsideRange
     } = this.props;
 
     const fieldName = name === false ? "" : name || `${model}_${field}_date`;
@@ -44,6 +44,7 @@ export default class DateInput extends React.Component {
             focused={this.state.focused}
             numberOfMonths={this.state.numberOfMonths}
             onFocusChange={({ focused }) => this.setState({ focused })}
+            isOutsideRange={isOutsideRange}
           />
         </div>
       </div>

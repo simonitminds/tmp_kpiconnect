@@ -39,11 +39,6 @@ export default class AuctionsIndex extends React.Component {
         case 'decision':
           sortField = 'auction_started';
           break;
-        case 'closed':
-        case 'cancelled':
-        case 'expired':
-          sortField = 'auction_closed_time';
-          break;
         default:
           sortField = 'id';
           break;
@@ -122,15 +117,23 @@ export default class AuctionsIndex extends React.Component {
                     </span>&nbsp;GMT
                   </div>
                 </div>
-                <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small">
+                <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md">
                   New Auction
+                </a>
+                <a href="/historical_auctions" className="auction-list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md">
+                  <span>Historical Auctions</span>
+                  <span className="icon"><i className="fas fa-arrow-right is-pulled-right"></i></span>
                 </a>
               </div>
             </MediaQuery>
-            <h1 className="title auction-list__title">Auction Listing</h1>
+            <h1 className="title auction-list__title">Current Auctions</h1>
             <MediaQuery query="(min-width: 600px)">
               <div>
-                <a href="/auctions/new" className="button is-link is-pulled-right">
+                <a href="/historical_auctions" className="button is-link is-pulled-right">
+                  <span>Historical Auctions</span>
+                  <span className="icon"><i className="fas fa-arrow-right is-pulled-right"></i></span>
+                </a>
+                <a href="/auctions/new" className="button is-link is-pulled-right has-margin-right-md">
                   New Auction
                 </a>
                 <div className="auction-list__time-box">
@@ -180,31 +183,6 @@ export default class AuctionsIndex extends React.Component {
             >
             { filteredAuctionsDisplay("draft") }
           </CollapsibleSection>
-          <CollapsibleSection
-            trigger="Closed Auctions"
-            classParentString="qa-closed-auctions-list auction-list"
-            contentChildCount={filteredAuctionsCount("closed")}
-            open={filteredAuctionsCount("closed") > 0}
-            >
-            { filteredAuctionsDisplay("closed") }
-          </CollapsibleSection>
-          <CollapsibleSection
-            trigger="Expired Auctions"
-            classParentString="qa-expired-auctions-list auction-list"
-            contentChildCount={filteredAuctionsCount("expired")}
-            open={filteredAuctionsCount("expired") > 0}
-            >
-            { filteredAuctionsDisplay("expired") }
-          </CollapsibleSection>
-          <CollapsibleSection
-            trigger="Canceled Auctions"
-            classParentString="qa-canceled-auctions-list auction-list"
-            contentChildCount={filteredAuctionsCount("canceled")}
-            open={filteredAuctionsCount("canceled") > 0}
-            >
-            { filteredAuctionsDisplay("canceled") }
-          </CollapsibleSection>
-
         </div>
       </div>
     );

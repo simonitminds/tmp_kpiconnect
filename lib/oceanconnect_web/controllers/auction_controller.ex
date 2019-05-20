@@ -19,6 +19,10 @@ defmodule OceanconnectWeb.AuctionController do
     render(conn, "index.html")
   end
 
+  def historical_index(conn, _params) do
+    render(conn, "historical_index.html")
+  end
+
   def log(conn, %{"id" => id}) do
     current_company_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
 

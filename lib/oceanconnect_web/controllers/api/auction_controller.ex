@@ -1,7 +1,8 @@
 defmodule OceanconnectWeb.Api.AuctionController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload}
+  alias Oceanconnect.Auctions.{AuctionPayload, FinalizedAuctionPayload}
+  alias Oceanconnect.Accounts.User
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
@@ -33,10 +34,13 @@ defmodule OceanconnectWeb.Api.AuctionController do
     user_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
     auction = Auctions.get_auction(auction_id)
 
+    %{status: status} = Auctions.get_auction_state!(auction)
     auction_payload =
       case OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn) do
-        true -> Auctions.AuctionPayload.get_admin_auction_payload!(auction)
-        false -> Auctions.AuctionPayload.get_auction_payload!(auction, user_id)
+        true ->
+          AuctionPayload.get_admin_auction_payload!(auction)
+        false ->
+          AuctionPayload.get_auction_payload!(auction, user_id)
       end
 
     render(conn, "show.json", data: auction_payload)
