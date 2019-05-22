@@ -1,9 +1,9 @@
 <p style='font-family: "Arial";'><b>Dear <%= OceanconnectWeb.EmailView.full_name(@user) %>,</b></p>
 <br/>
 <%= if @is_buyer do %>
-<p style='font-family: "Arial";'>Your reverse auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> is scheduled to start in one hour. The auction details are listed below:</p>
+<p style='font-family: "Arial";'>Your bunker auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> is scheduled to start in one hour. The auction details are listed below:</p>
 <% else %>
-<p style='font-family: "Arial";'>The reverse auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> held by <b><%= @buyer_company.name %></b> is scheduled to start in one hour. The auction details are listed below:</p>
+<p style='font-family: "Arial";'>The bunker auction for <b><%= OceanconnectWeb.EmailView.vessel_name_list(@auction.vessels) %></b> held by <b><%= @buyer_company.name %></b> is scheduled to start in one hour. The auction details are listed below:</p>
 <% end %>
 <br/>
 <table style='background-color: #f3f3f3; border: 0px solid #efefef; border-radius: 5px; font-family: "Arial";'>
