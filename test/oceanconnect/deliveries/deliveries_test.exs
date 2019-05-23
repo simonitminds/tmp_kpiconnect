@@ -87,6 +87,7 @@ defmodule Oceanconnect.DeliveriesTest do
       invalid_params =
         claim_params
         |> Map.merge(%{"quantity_missing" => ""})
+
       assert {:error, %Ecto.Changeset{}} = Deliveries.create_claim(invalid_params)
     end
 
@@ -106,25 +107,32 @@ defmodule Oceanconnect.DeliveriesTest do
       claim: claim
     } do
       assert {:ok, %ClaimResponse{id: claim_response_id}} =
-               Deliveries.create_claim_response(%{
-                 author_id: buyer.id,
-                 claim_id: claim.id,
-                 content: "Your fuel sucked!"
-               }, buyer)
+               Deliveries.create_claim_response(
+                 %{
+                   author_id: buyer.id,
+                   claim_id: claim.id,
+                   content: "Your fuel sucked!"
+                 },
+                 buyer
+               )
 
       assert %ClaimResponse{content: "Your fuel sucked!"} =
                Deliveries.get_claim_response(claim_response_id)
     end
 
-    test "create_claim_response/2 as a supplier with missing content doesn't create a claim response", %{
-      supplier: supplier,
-      claim: claim
-    } do
+    test "create_claim_response/2 as a supplier with missing content doesn't create a claim response",
+         %{
+           supplier: supplier,
+           claim: claim
+         } do
       assert {:error, %Ecto.Changeset{}} =
-               Deliveries.create_claim_response(%{
-                 author_id: supplier.id,
-                 claim_id: claim.id
-               }, supplier)
+               Deliveries.create_claim_response(
+                 %{
+                   author_id: supplier.id,
+                   claim_id: claim.id
+                 },
+                 supplier
+               )
     end
   end
 end

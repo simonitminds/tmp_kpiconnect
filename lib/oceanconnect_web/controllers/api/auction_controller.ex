@@ -35,10 +35,12 @@ defmodule OceanconnectWeb.Api.AuctionController do
     auction = Auctions.get_auction(auction_id)
 
     %{status: status} = Auctions.get_auction_state!(auction)
+
     auction_payload =
       case OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn) do
         true ->
           AuctionPayload.get_admin_auction_payload!(auction)
+
         false ->
           AuctionPayload.get_auction_payload!(auction, user_id)
       end

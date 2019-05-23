@@ -41,7 +41,8 @@ defmodule OceanconnectWeb.ClaimController do
         "id" => claim_id,
         "claim_response" => %{"content" => content} = response_params
       }) do
-    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user =
+      %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{suppliers: suppliers, buyer_id: buyer_id} = auction <-
@@ -49,7 +50,7 @@ defmodule OceanconnectWeb.ClaimController do
          %Claim{fixture: fixture} = claim <- Deliveries.get_claim(claim_id),
          true <-
            current_user_company_id == buyer_id or
-         current_user_company_id in Enum.map(suppliers, & &1.id) or is_admin do
+             current_user_company_id in Enum.map(suppliers, & &1.id) or is_admin do
       response_params =
         Map.merge(response_params, %{
           "author_id" => current_user_id,
@@ -73,7 +74,6 @@ defmodule OceanconnectWeb.ClaimController do
           )
 
         {:error, %Ecto.Changeset{} = changeset} ->
-
           conn
           |> put_flash(:error, "Response was not added.")
           |> put_status(400)
@@ -212,7 +212,8 @@ defmodule OceanconnectWeb.ClaimController do
         "id" => claim_id,
         "claim" => %{"response" => response} = update_params
       }) do
-    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user =
+      %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction

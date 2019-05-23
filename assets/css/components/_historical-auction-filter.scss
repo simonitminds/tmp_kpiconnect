@@ -2,7 +2,12 @@
 // Widescreen
   form {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
+  }
+
+  .field {
+    display: inline-flex;
   }
 
   .field:not(:last-child) {
@@ -24,8 +29,7 @@
 // Tablet
 @media (min-width: 480px) and (max-width: 1024px) {
   .historical-auctions__form form {
-    flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-end;
   }
   .historical-auctions__form .field--has-horizontal {
     .field-body { display: flex; }
@@ -39,6 +43,10 @@
 
     .select, select {
       width: 100%;
+    }
+
+    .field {
+      display: block;
     }
   }
 }

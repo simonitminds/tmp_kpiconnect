@@ -15,10 +15,34 @@ defmodule OceanconnectWeb.HistoricalAuctionIndexTest do
     open_auction = insert(:auction, buyer: buyer_company, suppliers: [supplier_company])
 
     closed_auction1 =
-      insert(:auction, port: port, auction_vessel_fuels: [vessel_fuel1], buyer: buyer_company, suppliers: [supplier_company])
+      insert(:auction,
+        port: port,
+        auction_vessel_fuels: [vessel_fuel1],
+        buyer: buyer_company,
+        suppliers: [supplier_company],
+        claims: [
+          insert(:claim,
+            closed: false,
+            supplier: supplier_company,
+            notice_recipient: supplier_company
+          )
+        ]
+      )
 
     closed_auction2 =
-      insert(:auction, port: port2, auction_vessel_fuels: [vessel_fuel2], buyer: buyer_company, suppliers: [supplier_company2])
+      insert(:auction,
+        port: port2,
+        auction_vessel_fuels: [vessel_fuel2],
+        buyer: buyer_company,
+        suppliers: [supplier_company2],
+        claims: [
+          insert(:claim,
+            closed: true,
+            supplier: supplier_company,
+            notice_recipient: supplier_company
+          )
+        ]
+      )
 
     vessel1 = vessel_fuel1.vessel
     vessel2 = vessel_fuel2.vessel
@@ -116,19 +140,22 @@ defmodule OceanconnectWeb.HistoricalAuctionIndexTest do
       refute HistoricalIndexPage.has_auctions?([closed_auction2])
     end
 
-    test "can filter historical auctions by time range of their scheduled start", %{
-      closed_auctions: closed_auctions
+    test "can filter histoircal auctions by claim status", %{
+      closed_auctions: closed_auctions,
+      closed_auction1: closed_auction1,
+      closed_auction2: closed_auction2
     } do
       HistoricalIndexPage.visit()
-      :timer.sleep(200)
-      end_time =
-        DateTime.utc_now()
-        |> DateTime.to_unix()
-        |> Kernel.-(1_000_000)
-        |> DateTime.from_unix!()
-      HistoricalIndexPage.enter_end_time_filter(end_time)
       assert HistoricalIndexPage.is_current_path?()
-      refute HistoricalIndexPage.has_auctions?(closed_auctions)
+      assert HistoricalIndexPage.has_auctions?(closed_auctions)
+
+      HistoricalIndexPage.filter_claim_status(:open)
+      assert HistoricalIndexPage.has_auctions?([closed_auction1])
+      refute HistoricalIndexPage.has_auctions?([closed_auction2])
+
+      HistoricalIndexPage.filter_claim_status(:closed)
+      assert HistoricalIndexPage.has_auctions?([closed_auction2])
+      refute HistoricalIndexPage.has_auctions?([closed_auction1])
     end
   end
 end

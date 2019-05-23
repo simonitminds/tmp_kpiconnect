@@ -4,7 +4,7 @@ defmodule OceanconnectWeb.Claims.ShowTest do
 
   hound_session()
 
-  alias Oceanconnect.AuctionShowPage
+  alias Oceanconnect.{AuctionShowPage, Auction.HistoricalIndexPage}
   alias Oceanconnect.Claims
   alias Oceanconnect.Auctions
   alias Oceanconnect.Deliveries
@@ -118,6 +118,16 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       assert Claims.ShowPage.claim_resolved?()
       assert Claims.ShowPage.has_claim_resolution?("Thanks, dog")
     end
+
+    test "can see number of open claims on an auction's index card", %{
+      buyer: buyer,
+      claim: claim,
+      auction: auction
+    } do
+      login_user(buyer)
+      HistoricalIndexPage.visit()
+      assert HistoricalIndexPage.open_claims_for_auction(auction.id) == "1"
+    end
   end
 
   describe "supplier" do
@@ -156,6 +166,16 @@ defmodule OceanconnectWeb.Claims.ShowTest do
             buyer_company.name
           }"
       )
+    end
+
+    test "can see number of open claims on an auction's index card", %{
+      supplier: supplier,
+      claim: claim,
+      auction: auction
+    } do
+      login_user(supplier)
+      HistoricalIndexPage.visit()
+      assert HistoricalIndexPage.open_claims_for_auction(auction.id) == "1"
     end
   end
 end

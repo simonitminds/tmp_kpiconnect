@@ -3,8 +3,9 @@ defmodule Oceanconnect.Auctions.Auction do
   use Ecto.Schema
   import Ecto.Changeset
   alias Oceanconnect.Auctions.{Auction, Port, AuctionVesselFuel}
+  alias Oceanconnect.Deliveries.Claim
 
-  @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers]}
+  @derive {Poison.Encoder, except: [:__meta__, :auction_suppliers, :claims]}
   schema "auctions" do
     field(:type, :string, default: "spot")
 
@@ -58,6 +59,7 @@ defmodule Oceanconnect.Auctions.Auction do
     )
 
     has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
+    has_many(:claims, Claim)
 
     timestamps()
   end

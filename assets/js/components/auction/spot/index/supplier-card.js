@@ -11,6 +11,7 @@ import FuelPriceDisplay from '../../common/index/fuel-price-display';
 
 const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCompanyId}) => {
   const auction = _.get(auctionPayload, 'auction');
+  const claims = _.get(auctionPayload, 'claims');
   const auctionType= _.get(auction, 'type');
   const auctionStatus = _.get(auctionPayload, 'status');
   const vessels = _.get(auction, 'vessels');
@@ -33,6 +34,25 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
   }
   const { eta, etd } = etaAndEtdForAuction(auction);
 
+  const claimStatusDisplay = () => {
+    let openClaims = _
+      .chain(claims)
+      .filter((claim) => !claim.closed)
+      .value();
+    openClaims = openClaims.length
+
+    if (auctionStatus == 'closed') {
+      if (!_.isEmpty(claims)) {
+        return (
+          <span className="tag is-yellow is-flex has-text-centered has-text-weight-bold"><span className="qa-open-claims has-margin-right-xs">{openClaims}</span> {`Open Claim${openClaims > 1 ? "s" : ""}`}</span>
+        );
+      } else {
+        return <i>No activities have been logged for this auction.</i>;
+      }
+    } else {
+      return "";
+    }
+  }
 
   const bidStatusDisplay = () => {
     const lowestBid = _.chain(auctionPayload)
@@ -122,6 +142,7 @@ const SupplierCard = ({auctionPayload, timeRemaining, connection, currentUserCom
           </h3>
           <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
+          { claimStatusDisplay() }
         </div>
         <div className="card-content__products">
           <span className="card-content__product-header">{preAuctionStatus ? 'Products' : productLabel() }</span>
