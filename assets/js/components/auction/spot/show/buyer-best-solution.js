@@ -27,7 +27,7 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
             <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall" acceptSolution={acceptSolution} best={true} isExpanded={true} className="qa-auction-solution-best_overall" />
           }
 
-          { vesselFuels && vesselFuels.length > 1 && bestSingleSupplier &&
+          { !_.isEqual(bestSolution, bestSingleSupplier) && vesselFuels && vesselFuels.length > 1 && bestSingleSupplier &&
               <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" acceptSolution={acceptSolution} isExpanded={true} className="qa-auction-solution-best_single_supplier" />
           }
           { !(bestSolution || bestSingleSupplier) &&

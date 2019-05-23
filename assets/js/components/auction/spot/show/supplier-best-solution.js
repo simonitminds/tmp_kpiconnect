@@ -47,7 +47,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
               { bestSolution &&
                 <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" revokeBid={revokeBid} />
               }
-              { bestSingleSupplier && vesselFuels && vesselFuels.length > 1 &&
+              { bestSingleSupplier && !_.isEqual(bestSolution, bestSingleSupplier) && vesselFuels && vesselFuels.length > 1 &&
                 <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={false} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`} revokeBid={revokeBid} />
               }
               { otherSolution() && isPartialSolution && vesselFuels && vesselFuels.length > 1 &&
