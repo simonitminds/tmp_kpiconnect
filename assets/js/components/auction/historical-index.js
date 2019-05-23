@@ -119,7 +119,7 @@ export default class HistoricalAuctionsIndex extends React.Component {
       }
     }
     const availableVessels = availableAuctionAttributes('vessels');
-    const availableSuppliers = availableAuctionAttributes('suppliers');
+    const availableSuppliers = _.reject(availableAuctionAttributes('suppliers'), (supplier) => supplier == undefined);
     const availableBuyers = availableAuctionAttributes('buyer');
     const availablePorts = availableAuctionAttributes('port');
 
