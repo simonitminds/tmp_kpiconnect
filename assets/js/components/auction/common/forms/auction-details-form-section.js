@@ -29,6 +29,17 @@ const AuctionDetailsFormSection = (props) => {
 
             <InputField
               model={'auction'}
+              field={'buyer_reference_number'}
+              labelText={'Buyer Reference Number'}
+              value={auction.buyer_reference_number}
+              errors={errors.buyer_reference_number}
+              isHorizontal={true}
+              opts={{ labelClass: 'label' }}
+              onChange={updateInformation.bind(this, 'auction.buyer_reference_number')}
+            />
+
+            <InputField
+              model={'auction'}
               field={'po'}
               labelText={'po'}
               value={auction.po}

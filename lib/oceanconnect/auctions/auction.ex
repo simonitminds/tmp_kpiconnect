@@ -47,6 +47,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:decision_duration, :integer, default: 15 * 60_000)
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
+    field(:buyer_reference_number, :string)
     field(:additional_information, :string)
 
     many_to_many(
@@ -77,6 +78,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :auction_ended,
     :auction_closed_time,
     :buyer_id,
+    :buyer_reference_number,
     :decision_duration,
     :duration,
     :is_traded_bid_allowed,
