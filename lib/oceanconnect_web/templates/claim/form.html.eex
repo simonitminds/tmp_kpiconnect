@@ -92,7 +92,7 @@
         <legend class="subtitle is-4">Addition Information</legend>
         <div class="field">
           <p class="help">Include any additional information that is relevant to the claim.</p>
-          <%= textarea(f, :textarea, class: "textarea qa-claim-additional_information", rows: "10") %>
+          <%= textarea(f, :additional_information, class: "textarea qa-claim-additional_information", rows: "10") %>
         </div>
       </fieldset>
     </div>

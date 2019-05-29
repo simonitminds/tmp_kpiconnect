@@ -56,6 +56,14 @@
             <% end %>
             <li><strong>Delivering Barge</strong> <span class="qa-claim-delivering_barge"><%= @claim.delivering_barge.name %></span></li>
             <li><strong>Time Submitted</strong>  <span class="qa-claim-time_submitted"><%= convert_date?(@claim.inserted_at) %></span></li>
+            <%= if @claim.additional_information do %>
+              <li class="is-flex-column">
+                <strong>Additional Information</strong>
+                <p class="qa-claim-additional_information">
+                  <%= @claim.additional_information %>
+                </p>
+              </li>
+            <% end %>
           </ul>
         </div>
       </div>
