@@ -1,4 +1,12 @@
 version: 2
+
+install_hex_rebar: &install_hex_rebar
+  run:
+    name: Install hex and rebar
+    command: |
+      mix local.hex --force
+      mix local.rebar --force
+
 jobs:
   build:
     docker:
@@ -11,64 +19,59 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: localhost
 
-    working_directoy: ~/oceanconnect
-
     steps:
+      - checkout
+      - <<: *install_hex_rebar
+
+      - run:
+          name: "ELIXIR_VERSION.lock"
+          command: echo "${ELIXIR_VERSION}"> ELIXIR_VERSION.lock
+
+      - run:
+          name: "OTP_VERSION.lock"
+          command: echo "${OTP_VERSION}"> OTP_VERSION.lock
+
+      - restore_cache:
+          keys:
+            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "oceanconnect/mix.lock" }}
+            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+      - run: cd ../project && ls -la
+      - run:
+          name: Compile Oceanconnect
+          command: mix do deps.get, compile
+          working_directory: ~/project
+      - run:
+          name: Compile assets
+          command: npm install && yarn build
+          working_directory: ~/project/assets
+      - run:
+          name: phx.digest
+          command: mix phx.digest
+          working_directory: ~/project
+
+      - save_cache:
+          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "oceanconnect/mix.lock" }}
+          paths:
+            - oceanconnect/deps
+            - oceanconnect/_build
+            - oceanconnect/priv/static
+      - save_cache:
+          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+          paths:
+            - oceanconnect/deps
+            - oceanconnect/_build
+            - oceanconnect/priv/static
+
       - run:
          name: Start Chrome Driver
          command: /usr/local/bin/chromedriver
          background: true
-
-
-      - checkout
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-
-      - restore_cache:
-          keys:
-            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - v1-mix-cache-{{ .Branch }}
-            - v1-mix-cache
-      - restore_cache:
-          keys:
-            - v1-build-cache-{{ .Branch }}
-            - v1-build-cache
-
-      - run: mix deps.get
-
-      - save_cache:  # generate and store mix cache
-          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-          paths: "deps"
-      - save_cache:  # make another, less specific cache
-          key: v1-mix-cache-{{ .Branch }}
-          paths: "deps"
-      - save_cache:  # you should really save one more cache (just in case)
-          key: v1-mix-cache
-          paths: "deps"
-
       - run:
-          name: Compile assets
-          command: cd assets && npm install && yarn build
-          background: true
-
-      - save_cache:  # generate and store mix cache
-          key: v1-mix-cache-{{ .Branch }}-{{ checksum "package.json" }}
-          paths: "deps"
-
-      - run: mix compile
-
-      - save_cache: # don't forget to save a *build* cache, too
-          key: v1-build-cache-{{ .Branch }}
-          paths: "_build"
-      - save_cache: # and one more build cache for good measure
-          key: v1-build-cache
-          paths: "_build"
-
-      - run: mix phx.digest
-      - run: mix do ecto.create, ecto.migrate
-
+          name: Create Test Database
+          command: mix do ecto.create, ecto.migrate
+          working_directory: ~/project
       - run:  # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
-      - run: mix test  # run all tests in project
+      - run: mix test --trace  # run all tests in project
