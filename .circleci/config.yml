@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image:  circleci/elixir:1.8.0
+      - image:  circleci/elixir:1.8.0-node-browsers
         environment:
           MIX_ENV: test
       - image: circleci/postgres:11.3-alpine
@@ -15,13 +15,9 @@ jobs:
 
     steps:
       - run:
-        name: Install Chromedriver
-        command: |
-          export CHROMEDRIVER_VERSION=`curl -s http://chromedriver.storage.googleapis.com/LATEST_RELEASE`
-          curl -L -O "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo chmod +x chromedriver
-          sudo mv chromedriver /usr/local/bin
+         name: Start Chrome Driver
+         command: /usr/local/bin/chromedriver
+         background: true
 
 
       - checkout
@@ -50,7 +46,10 @@ jobs:
           key: v1-mix-cache
           paths: "deps"
 
-      - run: (cd assets && npm install && yarn build)
+      - run:
+          name: Compile assets
+          command: cd assets && npm install && yarn build
+          background: true
 
       - save_cache:  # generate and store mix cache
           key: v1-mix-cache-{{ .Branch }}-{{ checksum "package.json" }}
@@ -66,20 +65,10 @@ jobs:
           paths: "_build"
 
       - run: mix phx.digest
-
-      - run: export PATH=$PATH:/usr/lib/chromium-browser/
-      - run: export DISPLAY=:99.0
-      - run: sh -e /etc/init.d/xvfb start
-      - run: sleep 3
-      - run: nohup chromedriver &
       - run: mix do ecto.create, ecto.migrate
-
 
       - run:  # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
       - run: mix test  # run all tests in project
-
-      - store_test_results:
-          path: _build/test/lib/oceanconnect
