@@ -52,14 +52,24 @@
                   <li><strong>Value</strong> <span class="qa-claim-total_fuel_value"><%= format_price(@claim.total_fuel_value) %></span></li>
                 <% else %>
                   <li>
-                    <strong>Quality Description</strong>
-                    <p class="qa-claim-quality_description">
-                      <%= @claim.quality_description %>
-                    </p>
+                    <div>
+                      <strong>Quality Description</strong>
+                      <p class="qa-claim-quality_description is-inline-block">
+                        <%= @claim.quality_description %>
+                      </p>
+                    </div>
                   </li>
                 <% end %>
                 <li><strong>Delivering Barge</strong> <span class="qa-claim-delivering_barge"><%= @claim.delivering_barge.name %></span></li>
                 <li><strong>Time Submitted</strong>  <span class="qa-claim-time_submitted"><%= convert_date?(@claim.inserted_at) %></span></li>
+                <%= if @claim.additional_information do %>
+                  <li class="is-flex-column">
+                      <strong>Additional Information</strong>
+                    <p class="qa-claim-additional_information">
+                      <%= @claim.additional_information %>
+                    </p>
+                  </li>
+                <% end %>
               </ul>
             </div>
           </fieldset>
