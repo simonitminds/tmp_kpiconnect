@@ -5,6 +5,7 @@ import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
 import AuctionTitle from './common/auction-title';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
+import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
 export default class AuctionFixturesIndex extends React.Component {
   constructor(props) {
@@ -17,7 +18,8 @@ export default class AuctionFixturesIndex extends React.Component {
         supplier: "",
         port: "",
         startTimeRange: null,
-        endTimeRange: null
+        endTimeRange: null,
+        reportsCSV: parseCSVFromPayloads(this.props.fixturePayloads)
       }
     }
   }
@@ -79,10 +81,29 @@ export default class AuctionFixturesIndex extends React.Component {
     let filterParams = this.state.filterParams;
     filterParams = {...filterParams, startTimeRange: startDate, endTimeRange: endDate}
 
+    const fixturePayloads = this.filteredPayloads(filterParams)
+    const reportsCSV = parseCSVFromPayloads(fixturePayloads);
     this.setState({
-      fixturePayloads: this.filteredPayloads(filterParams),
-      filterParams
+      fixturePayloads,
+      filterParams,
+      repostsCSV
     })
+  }
+
+  handleExportClick(_ev) {
+    const csv = this.state.reportsCSV;
+    const fileName = () => {
+      let startDate = this.state.startTimeRange;
+      let endDate = this.state.endTimeRange;
+      startDate = moment(startDate, 'DD-MM-YYY');
+      endDate = moment(endDate, 'DD-MM-YYY');
+      if (startDate && endDate) {
+        return `benchmark_reports_${startDate}` + '_' + `${endDate}.csv`;
+      } else {
+        return 'benchmark_reports.csv';
+      }
+    }
+    exportCSV(csv, fileName());
   }
 
   render() {
@@ -227,7 +248,6 @@ export default class AuctionFixturesIndex extends React.Component {
         </section>
       );
     }
-
     const connection = this.props.connection;
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
     const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
@@ -240,6 +260,10 @@ export default class AuctionFixturesIndex extends React.Component {
       <section className="admin-panel__content is-three-quarters">
         <h2 className="admin-panel__content__header">
           <span className="is-4 is-inline-block">Fixtures</span>
+          <button className="button is-link is-primary has-margin-left-auto" onClick={this.handleExportClick.bind(this)}>
+            <span>Export Benchmarking Reports</span>
+            <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
+          </button>
         </h2>
         { renderFilterForm() }
         { fixturePayloads.length > 0 ?
