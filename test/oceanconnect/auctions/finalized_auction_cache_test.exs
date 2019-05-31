@@ -1,4 +1,4 @@
-defmodule Oceanconnect.Auctions.AuctionCacheTest do
+defmodule Oceanconnect.Auctions.FinalizedAuctionCacheTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Auctions
 
