@@ -33,7 +33,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "oceanconnect/mix.lock" }}
+            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
             - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
       - run: cd ../project && ls -la
       - run:
@@ -50,17 +50,17 @@ jobs:
           working_directory: ~/project
 
       - save_cache:
-          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "oceanconnect/mix.lock" }}
+          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
           paths:
-            - oceanconnect/deps
-            - oceanconnect/_build
-            - oceanconnect/priv/static
+            - deps
+            - _build
+            - priv/static
       - save_cache:
           key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
           paths:
-            - oceanconnect/deps
-            - oceanconnect/_build
-            - oceanconnect/priv/static
+            - deps
+            - _build
+            - priv/static
 
       - run:
          name: Start Chrome Driver
