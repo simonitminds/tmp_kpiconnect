@@ -312,8 +312,39 @@ defmodule Oceanconnect.Auctions do
     regular_auctions ++ term_auctions
   end
 
+  def list_auctions_with_fixtures do
+    Auction
+    |> Auction.has_fixtures()
+    |> Repo.all()
+    |> Repo.preload([:vessels, :suppliers, :buyer, :port, fixtures: [:supplier, :vessel, :fuel]])
+  end
+
+  def list_participating_auctions_with_fixtures(company_id) do
+    query =
+      company_id
+      |> Auction.with_buyer()
+
+    query =
+      company_id
+      |> Auction.with_supplier(query)
+
+    query
+    |> Auction.has_fixtures()
+    |> Repo.all()
+    |> Repo.preload([:vessels, :port, fixtures: [:supplier, :vessel, :fuel]])
+  end
+
   def list_finalized_auctions do
     list_auctions()
+    |> Enum.map(&get_auction_state!(&1))
+    |> Enum.filter(&(&1.status in [:closed, :canceled, :expired]))
+    |> Enum.map(& &1.auction_id)
+    |> Enum.map(&get_auction!(&1))
+  end
+
+  def list_participating_finalized_auctions(company_id) do
+    company_id
+    |> list_participating_auctions()
     |> Enum.map(&get_auction_state!(&1))
     |> Enum.filter(&(&1.status in [:closed, :canceled, :expired]))
     |> Enum.map(& &1.auction_id)
@@ -323,7 +354,8 @@ defmodule Oceanconnect.Auctions do
   def list_participating_auctions(company_id) do
     (buyer_auctions(company_id) ++
        buyer_term_auctions(company_id) ++
-       supplier_auctions(company_id) ++ supplier_term_auctions(company_id))
+         supplier_auctions(company_id) ++
+           supplier_term_auctions(company_id))
     |> Enum.uniq_by(& &1.id)
   end
 
@@ -1559,6 +1591,15 @@ defmodule Oceanconnect.Auctions do
   end
 
   # Fixtures
+  def list_fixtures() do
+    Repo.all(AuctionFixture)
+    |> Repo.preload([:auction, :supplier, :vessel, :fuel])
+  end
+
+  def auctions_with_fixtures do
+    Repo.all(AuctionFixture)
+    |> Enum.group_by(&(&1.auction_id))
+  end
 
   def get_fixture(fixture_id) do
     Repo.get(AuctionFixture, fixture_id)

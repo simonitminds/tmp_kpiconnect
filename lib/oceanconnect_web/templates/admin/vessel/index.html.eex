@@ -1,4 +1,4 @@
-<div class="auction-app">
+<div class="auctions-app">
 	<div class="admin-panel__header container">
 		<div class="content is-clearfix">
 			<h1 class="title has-margin-top-xl has-margin-bottom-xl">Admin Panel</h1>

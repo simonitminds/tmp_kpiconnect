@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
   use Oceanconnect.FeatureCase
-  alias Oceanconnect.{AuctionShowPage}
-  alias Oceanconnect.Admin, as: Admin
+  alias Oceanconnect.AuctionShowPage
+  alias Oceanconnect.Admin.{Fixture}
 
   alias Oceanconnect.Auctions
 
@@ -23,17 +23,16 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
      }}
   end
 
-  test "visiting the auction fixture index page shows a list fixtures for the auction", %{
+  test "visiting the auction fixture show page shows a list fixtures for the auction", %{
     admin_user: admin_user,
     auction: %{id: auction_id},
     auction_fixtures: [auction_fixture1, auction_fixture2]
   } do
     login_user(admin_user)
-    AuctionShowPage.visit(auction_id)
-    AuctionShowPage.view_auction_fixtures()
-    assert Admin.Fixture.IndexPage.is_current_path?(auction_id)
-    assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture1)
-    assert Admin.Fixture.IndexPage.has_fixture?(auction_fixture2)
+    Fixture.ShowPage.visit(auction_id)
+    assert Fixture.ShowPage.is_current_path?(auction_id)
+    assert Fixture.ShowPage.has_fixture?(auction_fixture1)
+    assert Fixture.ShowPage.has_fixture?(auction_fixture2)
   end
 
   # TODO UMM FINISH THIS TEST
@@ -42,7 +41,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.EditTest do
     vessel_fuel1: _vessel_fuel1,
     auction_fixtures: _fixtures
   } do
-    Admin.Fixture.IndexPage.visit(auction_id)
+    Fixture.ShowPage.visit(auction_id)
   end
 
   def create_closed_auction do

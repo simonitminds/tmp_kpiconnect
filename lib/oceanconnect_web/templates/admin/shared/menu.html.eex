@@ -6,27 +6,19 @@
 			Manage Resources
 		</p>
 		<ul class="menu-list">
-			<li><%= link "Vessels", to: admin_vessel_path(@conn, :index) %></li>
-			<li><%= link "Barges", to: admin_barge_path(@conn, :index) %></li>
-			<li><%= link "Fuel Grades", to: admin_fuel_path(@conn, :index) %></li>
-			<li><%= link "Fuel Index Entries", to: admin_fuel_index_path(@conn, :index) %></li>
-			<li><%= link "Ports", to: admin_port_path(@conn, :index) %></li>
+			<li><%= link "Vessels", to: admin_vessel_path(@conn, :index), class: "qa-admin-menu-item-vessels" %></li>
+			<li><%= link "Barges", to: admin_barge_path(@conn, :index),  class: "qa-admin-menu-item-barges"%></li>
+			<li><%= link "Fuel Grades", to: admin_fuel_path(@conn, :index), class: "qa-admin-menu-item-fuels"%></li>
+			<li><%= link "Fuel Index Entries", to: admin_fuel_index_path(@conn, :index), class: "qa-admin-menu-item-fuel_index_entries"%></li>
+			<li><%= link "Ports", to: admin_port_path(@conn, :index), class: "qa-admin-menu-item-ports"%></li>
+			<li><%= link "Fixtures", to: admin_auction_fixtures_path(@conn, :index), class: "qa-admin-menu-item-auction_fixtures"%></li>
 		</ul>
 		<p class="menu-label">
 			Manage Users
 		</p>
 		<ul class="menu-list">
-			<li><%= link "Users", to: admin_user_path(@conn, :index) %></li>
-			<li><%= link "Companies", to: admin_company_path(@conn, :index) %></li>
-		</ul>
-		<p class="menu-label">
-			View Email Notifications
-		</p>
-		<ul class="menu-list">
-			<li><%= link "Send Invitation Email", to: "/send_email/invitation", method: :post %></li>
-			<li><%= link "Send Starting Soon Email", to: "/send_email/upcoming", method: :post %></li>
-			<li><%= link "Send Cancellation Email", to: "/send_email/cancellation", method: :post %></li>
-			<li><%= link "Send Completion Email", to: "/send_email/completion", method: :post %></li>
+			<li><%= link "Users", to: admin_user_path(@conn, :index), class: "qa-admin-menu-item-users" %></li>
+			<li><%= link "Companies", to: admin_company_path(@conn, :index), class: "qa-admin-menu-item-companies" %></li>
 		</ul>
 	</div>
 </aside>

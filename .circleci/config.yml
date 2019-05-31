@@ -35,7 +35,6 @@ jobs:
           keys:
             - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
             - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
-      - run: cd ../project && ls -la
       - run:
           name: Compile Oceanconnect
           command: mix do deps.get, compile

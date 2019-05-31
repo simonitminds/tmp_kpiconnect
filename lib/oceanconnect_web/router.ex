@@ -31,6 +31,13 @@ defmodule OceanconnectWeb.Router do
     get("/auctions", AuctionController, :index, as: :auction_api)
 
     get(
+      "/auction_fixtures",
+      AuctionFixtureController,
+      :index,
+      as: :auction_fixture_api
+    )
+
+    get(
       "/historical_auctions",
       FinalizedAuctionController,
       :index,
@@ -164,7 +171,11 @@ defmodule OceanconnectWeb.Router do
       as: :admin_stop_impersonating_session
     )
 
-    get("/auctions/:auction_id/fixtures", AuctionFixtureController, :index,
+    get("/auctions/fixtures", AuctionFixtureController, :index,
+      as: :admin_auction_fixtures
+    )
+
+    get("/auctions/:auction_id/fixtures", AuctionFixtureController, :show,
       as: :admin_auction_fixtures
     )
 

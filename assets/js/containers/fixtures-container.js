@@ -1,26 +1,29 @@
+import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AuctionsIndex from '../components/auction/index';
-import { subscribeToAuctionUpdates, getAllAuctionPayloads } from '../actions';
+import AuctionFixturesIndex from '../components/auction/fixture-index';
+import { getAllFixturePayloads } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
-    auctionPayloads: state.auctionsReducer.auctionPayloads,
-    connection: state.auctionsReducer.connection,
-    loading: state.auctionsReducer.loading
+    fixturePayloads: state.fixturesReducer.fixturePayloads,
+    connection: state.fixturesReducer.connection,
+    loading: state.fixturesReducer.loading
   }
-};
+}
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
   ...bindActionCreators(dispatch)
 });
 
-export class AuctionsContainer extends React.Component {
+export class FixturesContainer extends React.Component {
+
   dispatchItem() {
-    this.props.dispatch(subscribeToAuctionUpdates(getAllAuctionPayloads));
+    this.props.dispatch(getAllFixturePayloads());
   }
+
   componentDidMount() {
     this.dispatchItem();
   }
@@ -33,9 +36,10 @@ export class AuctionsContainer extends React.Component {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return <AuctionsIndex {...this.props} />
+      console.log("Here")
+      return <AuctionFixturesIndex {...this.props} />
     }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuctionsContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(FixturesContainer);

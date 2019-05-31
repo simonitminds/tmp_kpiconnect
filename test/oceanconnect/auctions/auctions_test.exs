@@ -1373,8 +1373,18 @@ defmodule Oceanconnect.AuctionsTest do
 
     setup do
       auction = insert(:auction)
+      auction2 = insert(:auction)
       fixtures = insert_list(2, :auction_fixture, auction: auction)
+      fixtures2 = insert_list(2, :auction_fixture, auction: auction2)
       %{auction: auction, fixtures: fixtures}
+    end
+
+    test "auctions_with_fixtures/0", %{auction: auction, fixtures: fixtures} do
+      non_closed_auction = insert(:auction)
+      auction_id = auction.id
+      result = Auctions.auctions_with_fixtures()
+      assert Map.has_key?(result, auction_id)
+      assert Enum.map(fixtures, &(&1.id)) == Enum.map(result[auction_id], &(&1.id))
     end
 
     test "from_bid_and_vessel_fuel", %{

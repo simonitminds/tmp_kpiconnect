@@ -2,6 +2,14 @@ defmodule Oceanconnect.AdminPage do
   use Oceanconnect.Page
   alias Oceanconnect.Accounts.User
 
+  def visit do
+    navigate_to("/admin/vessels")
+  end
+
+  def select_menu_item(keyword) do
+    click({:css, ".qa-admin-menu-item-#{keyword}"})
+  end
+
   def impersonate_user(%User{id: user_id}) do
     find_element(:css, ".qa-admin-act-as-agent")
     |> click

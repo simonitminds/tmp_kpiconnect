@@ -1,13 +1,13 @@
 defmodule Oceanconnect.Admin.Fixture.IndexPage do
   use Oceanconnect.Page
-  @page_path "/admin/auctions"
+  @page_path "/admin/auctions/fixtures"
 
-  def visit(auction_id) do
-    navigate_to("#{@page_path}/#{auction_id}/fixtures")
+  def visit do
+    navigate_to("#{@page_path}")
   end
 
-  def is_current_path?(auction_id) do
-    current_path() == "#{@page_path}/#{auction_id}/fixtures"
+  def is_current_path? do
+    current_path() == "#{@page_path}"
   end
 
   def has_fixture?(%{id: auction_fixture_id}) do
