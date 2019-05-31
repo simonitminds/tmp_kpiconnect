@@ -1,14 +1,16 @@
 import _ from 'lodash';
 import React from 'react';
 import { Parser } from 'json2csv';
-import fileDownload from 'js-file-download';
+import { formatUTCDateTime } from './utilities';
 
 export function exportCSV(csv, fileName) {
-  fileDownload(csv, fileName);
+  const tempLink = document.createElement('a');
+  tempLink.href = csv
+  tempLink.setAttribute('download', fileName);
+  tempLink.click()
 }
 
 export const parseCSVFromPayloads = (fixturePayloads) => {
-
   const dataForCSV = _
     .chain(fixturePayloads)
     .map((payload) => {
@@ -36,8 +38,8 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'vessel': vessel,
             'fuel': fuel,
             'price': price,
-            'closed': closedTime,
-            'eta': eta,
+            'closed': formatUTCDateTime(closedTime),
+            'eta': formatUTCDateTime(eta),
             'quantity': quantity
           }
 
@@ -47,8 +49,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     })
     .flatten()
     .value();
-
-  console.log(dataForCSV);
 
   const fields = [
     {
@@ -93,7 +93,7 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     }
   ];
   const csvParser = new Parser({ fields });
-  const csv = csvParser.parse(dataForCSV);
-  console.log(csv)
+  let csv = csvParser.parse(dataForCSV);
+  csv = encodeURI("data:text/csv;charset=utf-8," + csv);
   return csv;
 }

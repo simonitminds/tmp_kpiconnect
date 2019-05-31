@@ -19,8 +19,8 @@ export default class AuctionFixturesIndex extends React.Component {
         port: "",
         startTimeRange: null,
         endTimeRange: null,
-        reportsCSV: parseCSVFromPayloads(this.props.fixturePayloads)
-      }
+      },
+      reportsCSV: parseCSVFromPayloads(this.props.fixturePayloads)
     }
   }
 
@@ -86,7 +86,7 @@ export default class AuctionFixturesIndex extends React.Component {
     this.setState({
       fixturePayloads,
       filterParams,
-      repostsCSV
+      reportsCSV
     })
   }
 
@@ -95,9 +95,9 @@ export default class AuctionFixturesIndex extends React.Component {
     const fileName = () => {
       let startDate = this.state.startTimeRange;
       let endDate = this.state.endTimeRange;
-      startDate = moment(startDate, 'DD-MM-YYY');
-      endDate = moment(endDate, 'DD-MM-YYY');
-      if (startDate && endDate) {
+      startDate = moment(startDate).format('DD-MM-YYYY');
+      endDate = moment(endDate).format('DD-MM-YYYY');
+      if ((startDate && endDate) && (!moment().isSame(moment(), startDate) && !moment().isSame(moment(), endDate))) {
         return `benchmark_reports_${startDate}` + '_' + `${endDate}.csv`;
       } else {
         return 'benchmark_reports.csv';
@@ -254,7 +254,6 @@ export default class AuctionFixturesIndex extends React.Component {
 
 
     const fixturePayloads = this.state.fixturePayloads;
-    console.log(fixturePayloads)
 
     return(
       <section className="admin-panel__content is-three-quarters">
