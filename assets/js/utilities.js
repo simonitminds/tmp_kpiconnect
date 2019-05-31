@@ -24,7 +24,7 @@ export const convertToMinutes = (milliseconds) => {
 
 export const formatUTCDateTime = (dateTime) => {
   if (dateTime) {
-    return `${formatDateTime(moment(dateTime).utc())} GMT`;
+    return `${formatDateTime(moment(dateTime).utc())}`;
   } else {
     return "Not Scheduled";
   }

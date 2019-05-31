@@ -5,7 +5,6 @@ import InputErrors from '../input-errors';
 import CheckBoxField from '../check-box-field';
 import DateInput from '../date-input';
 import TimeInput from '../time-input';
-import { portLocalTime } from '../../utilities';
 import SupplierList  from './common/forms/supplier-list';
 import VesselFuelForm from './spot/forms/vessel-fuel-form';
 import SpotAuctionForm from './spot/forms/spot-auction-form';
