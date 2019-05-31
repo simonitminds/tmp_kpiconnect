@@ -2,7 +2,6 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import moment from 'moment';
-import { portLocalTime } from '../utilities';
 import DateInput from './date-input';
 import TimeInput from './time-input';
 
@@ -36,12 +35,6 @@ class DateTimeInput extends React.Component {
             <div className="control">
               <TimeInput value={selectedTime} model={model} field={field} onChange={this.updateTime.bind(this)} />
             </div>
-          </div>
-        </div>
-        <div className="field is-horizontal is-full-width">
-          <div className="field-label has-margin-right-md"></div>
-          <div className="field-body">
-            <i className="help">Port Local Time: {portLocalTime(selectedTime, portId, ports)}</i>
           </div>
         </div>
       </React.Fragment>

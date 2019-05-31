@@ -5,7 +5,6 @@ import InputField from '../../../input-field';
 import CheckBoxField from '../../../check-box-field';
 import DateInput from '../../../date-input';
 import TimeInput from '../../../time-input';
-import { portLocalTime } from '../../../../utilities';
 import SupplierList  from '../../common/forms/supplier-list';
 import TermVesselFormSection from './term-vessel-form-section';
 import TermFuelFormSection from './term-fuel-form-section';
