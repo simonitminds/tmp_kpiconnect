@@ -111,6 +111,35 @@ defmodule OceanconnectWeb.AuctionView do
 
   def auction_vessel_fuel_errors?(_changeset), do: false
 
+  def auction_started(events) when is_list(events) do
+    case Enum.filter(events, & &1.type == :auction_started) do
+      [event] -> convert_date?(event.time_entered)
+      _ -> "—"
+    end
+  end
+
+  def auction_started(_), do: "—"
+
+  def actual_duration(
+      events,
+      %struct{
+        auction_ended: ended,
+        auction_closed_time: closed
+      })
+      when is_auction(struct) do
+    started =
+      case Enum.filter(events, & &1.type == :auction_started) do
+        [event] -> event.time_entered
+        _ -> nil
+      end
+    cond do
+      started && ended -> "#{trunc(DateTime.diff(ended, started) / 60)} minutes"
+      started && closed -> "#{trunc(DateTime.diff(closed, started) / 60)} minutes"
+      started -> "In progress"
+      true -> "—"
+    end
+  end
+
   def actual_duration(%struct{
         auction_started: started,
         auction_ended: ended,

@@ -21,6 +21,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
     field(:decision_duration, :integer, default: 15 * 60_000)
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
+    field(:buyer_reference_number, :string)
     field(:additional_information, :string)
 
     belongs_to(:port, Port)

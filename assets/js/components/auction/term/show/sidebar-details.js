@@ -28,7 +28,7 @@ const SidebarDetails = (props) => {
             <strong className="is-block">Organization</strong> {auction.buyer.name}
           </li>
           <li><strong>Buyer</strong> {auction.buyer.contact_name}</li>
-          <li><strong>Buyer Reference Number</strong> &mdash;</li>
+          <li><strong>Buyer Reference Number</strong> { auction.buyer_reference_number ? auction.buyer_reference_number : '—' } </li>
         </ul>
       </div>
       <div className="box__subsection">

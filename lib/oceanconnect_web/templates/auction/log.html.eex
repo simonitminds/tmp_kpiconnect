@@ -24,7 +24,7 @@
           </tr>
           <tr>
             <th>Auction Started</th>
-            <td class="qa-auction-detail-auction_started"><%= convert_date?(@auction_payload.auction.auction_started) %></td>
+            <td class="qa-auction-detail-auction_started"><%= auction_started(@events)%></td>
           </tr>
           <tr>
             <th>Auction Completed</th>
@@ -36,7 +36,7 @@
           </tr>
           <tr>
             <th>Actual Duration</th>
-            <td class="qa-auction-detail-actual-duration"><%= actual_duration(@auction_payload.auction) %></td>
+            <td class="qa-auction-detail-actual-duration"><%= actual_duration(@events, @auction_payload.auction) %></td>
           </tr>
           <tr>
           <tr>
