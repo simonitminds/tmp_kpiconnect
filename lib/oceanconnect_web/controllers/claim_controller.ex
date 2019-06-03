@@ -162,7 +162,7 @@ defmodule OceanconnectWeb.ClaimController do
 
   defp build_params_for_claim(claim_params), do: claim_params
 
-  defp params_from_selected_fixture(%{"fixture_id" => fixture_id} = claim_params) do
+  defp params_from_selected_fixture(%{"fixture_id" => fixture_id} = claim_params) when fixture_id != "" do
     case Auctions.get_fixture(fixture_id) do
       nil ->
         claim_params
