@@ -3,7 +3,6 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const AuctionTitle = ({auction, detailed}) => {
-  console.log(auction)
   const auctionType = _.get(auction, 'type');
   const showDetail = detailed === undefined ? true : detailed;
   const is_traded_bid_allowed = _.get(auction, 'is_traded_bid_allowed')

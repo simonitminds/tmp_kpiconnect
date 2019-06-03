@@ -17,6 +17,7 @@
     "downshift": "^3.1.8",
     "es6-promise": "^4.2.2",
     "isomorphic-fetch": "^2.2.1",
+    "json2csv": "^4.5.1",
     "lodash": "^4.17.4",
     "moment": "^2.19.4",
     "parcel-bundler": "~1.10.3",

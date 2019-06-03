@@ -36,7 +36,6 @@ export class FixturesContainer extends React.Component {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      console.log("Here")
       return <AuctionFixturesIndex {...this.props} />
     }
   }
