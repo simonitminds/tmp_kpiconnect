@@ -30,6 +30,7 @@ import { receiveAuctionFormData, impersonateUser } from './actions';
 import AuctionFormContainer from './containers/auction-form-container';
 import AuctionsContainer from './containers/auctions-container';
 import HistoricalAuctionsContainer from './containers/historical-auctions-container';
+import AdminFixturesContainer from './containers/admin-fixtures-container';
 import FixturesContainer from './containers/fixtures-container';
 import AuctionContainer from './containers/auction-container';
 import MessagesContainer from './containers/messages-container';
@@ -82,9 +83,15 @@ if (document.getElementById('auctions-app')) {
           <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
         </div>
       )}
-    case "fixture_index" : { return (
+      case "admin_fixture_index" : { return (
+        <div>
+          <AdminFixturesContainer currentUserCompanyId={currentUserCompanyId} />
+        </div>
+      )}
+      case "fixture_index" : { return (
         <div>
           <FixturesContainer currentUserCompanyId={currentUserCompanyId} />
+          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
         </div>
       )}
       case "show": { return (

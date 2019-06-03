@@ -1,0 +1,4 @@
+<script type="text/javascript">
+  window.container = "fixture_index";
+</script>
+<div id="auctions-app"></div>

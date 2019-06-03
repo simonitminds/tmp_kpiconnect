@@ -11,9 +11,6 @@ export function exportCSV(csv, fileName) {
   } else {
     const tempLink = document.createElement('a');
     const data = encodeURI("data:text/csv;charset=utf-8," + csv);
-    tempLink.href = data
-    tempLink.setAttribute('download', fileName);
-    tempLink.click()
   }
 }
 
@@ -45,6 +42,8 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'vessel': vessel,
             'fuel': fuel,
             'price': price,
+            'benchmark': null,
+            'savings': null,
             'closed': formatUTCDateTime(closedTime),
             'eta': formatUTCDateTime(eta),
             'quantity': quantity
@@ -85,6 +84,14 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     {
       label: 'Price',
       value: 'price'
+    },
+    {
+      label: 'Benchmark',
+      value: 'benchmark'
+    },
+    {
+      label: 'Savings',
+      value: 'savings'
     },
     {
       label: 'Closed Time',
