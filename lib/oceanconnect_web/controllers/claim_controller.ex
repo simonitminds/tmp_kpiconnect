@@ -58,7 +58,7 @@ defmodule OceanconnectWeb.ClaimController do
           "content" => content
         })
 
-      case Deliveries.create_claim_response(response_params, current_user) do
+      case Deliveries.create_claim_response(response_params, claim, current_user) do
         {:ok, _response} ->
           changeset = Deliveries.change_claim_response(%ClaimResponse{})
           claim = Deliveries.get_claim(claim.id)
@@ -227,7 +227,7 @@ defmodule OceanconnectWeb.ClaimController do
       }
 
       with {:ok, claim} <- Deliveries.update_claim(claim, update_params),
-           {:ok, claim_reponse} <- Deliveries.create_claim_response(response_params, current_user) do
+           {:ok, claim_reponse} <- Deliveries.create_claim_response(response_params, claim, current_user) do
         case claim.closed do
           true ->
             conn

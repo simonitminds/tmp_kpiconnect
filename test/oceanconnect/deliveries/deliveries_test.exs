@@ -113,6 +113,7 @@ defmodule Oceanconnect.DeliveriesTest do
                    claim_id: claim.id,
                    content: "Your fuel sucked!"
                  },
+                 claim,
                  buyer
                )
 
@@ -131,6 +132,7 @@ defmodule Oceanconnect.DeliveriesTest do
                    author_id: supplier.id,
                    claim_id: claim.id
                  },
+                 claim,
                  supplier
                )
     end

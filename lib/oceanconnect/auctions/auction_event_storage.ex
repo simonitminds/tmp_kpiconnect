@@ -31,6 +31,13 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
     |> foreign_key_constraint(:auction_id)
   end
 
+  def persist_event!(%{auction_id: auction_id} = event) do
+    %AuctionEventStorage{event: event, auction_id: auction_id}
+    |> persist
+
+    {:ok, event}
+  end
+
   def persist(event_storage = %AuctionEventStorage{event: event}) do
     persisted_storage = Map.put(event_storage, :event, :erlang.term_to_binary(event))
     {:ok, stored} = Oceanconnect.Repo.insert(persisted_storage)

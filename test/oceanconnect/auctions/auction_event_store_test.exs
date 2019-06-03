@@ -85,11 +85,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStoreTest do
     {:ok, pid} = AuctionStore.find_pid(auction_id)
     Process.exit(pid, :shutdown)
     refute Process.alive?(pid)
-    :timer.sleep(200)
+    :timer.sleep(1_000)
     {:ok, new_pid} = AuctionStore.find_pid(auction_id)
     refute pid == new_pid
 
-    :timer.sleep(200)
+    :timer.sleep(1_000)
     assert {:ok, ^current_cache} = AuctionCache.read(auction_id)
     assert current_state == Auctions.get_auction_state!(auction)
 

@@ -62,7 +62,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
       {:ok, _fixture} ->
         conn
         |> put_flash(:info, "Fixture updated successfully.")
-        |> redirect(to: admin_auction_fixtures_path(conn, :index, auction))
+        |> redirect(to: admin_auction_fixtures_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html",
@@ -122,7 +122,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
       {:ok, _fixture} ->
         conn
         |> put_flash(:info, "Fixture updated successfully.")
-        |> redirect(to: admin_auction_fixtures_path(conn, :index, auction))
+        |> redirect(to: admin_auction_fixtures_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html",

@@ -1,8 +1,8 @@
 defmodule Oceanconnect.Deliveries.EventNotifier do
   alias Oceanconnect.Deliveries
-  alias Oceanconnect.Deliveries.DeliveryEvent
+  alias Oceanconnect.Auctions.AuctionEvent
 
-  def emit(%DeliveryEvent{} = event, claim) do
+  def emit(%AuctionEvent{} = event, claim) do
     broadcast(event, claim)
     {:ok, true}
   end

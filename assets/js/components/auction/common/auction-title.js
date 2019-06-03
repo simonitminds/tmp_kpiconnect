@@ -12,22 +12,24 @@ const AuctionTitle = ({auction, detailed}) => {
       const vessels = _.get(auction, 'vessels');
       return(
         <div>
-          <span className="auction-header__auction-id">{auction.id}</span>
-          { _.map(vessels, (vessel) => {
-              return (
-                <span key={`${parseInt(auction.id)} - ${parseInt(vessel.id)}`} className={`auction-header-item qa-auction-vessel-${vessel.id}`}>
-                  <span className="auction-header__vessel-name has-margin-right-xs">{vessel.name}</span>
-                  { showDetail &&
-                    <span className="auction-header__vessel-imo has-text-gray-3 has-margin-right-xs">({vessel.imo})</span>
-                  }
+          <a href={`/auctions/${auction.id}`}>
+            <span className="auction-header__auction-id">{auction.id}</span>
+            { _.map(vessels, (vessel) => {
+                return (
+                    <span key={`${parseInt(auction.id)} - ${parseInt(vessel.id)}`} className={`auction-header-item qa-auction-vessel-${vessel.id}`}>
+                    <span className="auction-header__vessel-name has-margin-right-xs">{vessel.name}</span>
+                    { showDetail &&
+                        <span className="auction-header__vessel-imo has-text-gray-3 has-margin-right-xs">({vessel.imo})</span>
+                    }
+                    </span>
+                );
+                })
+            }
+            { is_traded_bid_allowed &&
+                <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
                 </span>
-              );
-            })
-          }
-          { is_traded_bid_allowed &&
-            <span action-label="Traded Bids Accepted" className="auction__traded-bid-accepted-marker"> <FontAwesomeIcon icon="exchange-alt" className="has-text-gray-3" />
-            </span>
-          }
+            }
+          </a>
         </div>
       );
 

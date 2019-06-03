@@ -1,0 +1,7 @@
+<div class="is-gray-2 qa-event-<%= @event.id %>">
+  <div><%= convert_event_date_time?(@event.time_entered) %></div>
+  <div>
+    <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
+    <span class="qa-event-type-extras"></span>
+  </div>
+</div>
