@@ -309,7 +309,7 @@ export default class AuctionFixturesIndex extends React.Component {
                               <td className="qa-auction-fixture-supplier">{supplier.name}</td>
                               <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
                               <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
-                              <td class="text-right">
+                              <td className="text-right">
                                 <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
                               </td>
                             </tr>

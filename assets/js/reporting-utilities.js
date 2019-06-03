@@ -4,10 +4,17 @@ import { Parser } from 'json2csv';
 import { formatUTCDateTime } from './utilities';
 
 export function exportCSV(csv, fileName) {
-  const tempLink = document.createElement('a');
-  tempLink.href = csv
-  tempLink.setAttribute('download', fileName);
-  tempLink.click()
+  if (window.navigator.msSaveOrOpenBlob) {
+    const data = [csv];
+    const blob = new Blob(data);
+    window.navigator.msSaveOrOpenBlob(blob, fileName);
+  } else {
+    const tempLink = document.createElement('a');
+    const data = encodeURI("data:text/csv;charset=utf-8," + csv);
+    tempLink.href = data
+    tempLink.setAttribute('download', fileName);
+    tempLink.click()
+  }
 }
 
 export const parseCSVFromPayloads = (fixturePayloads) => {
@@ -93,7 +100,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     }
   ];
   const csvParser = new Parser({ fields });
-  let csv = csvParser.parse(dataForCSV);
-  csv = encodeURI("data:text/csv;charset=utf-8," + csv);
+  const csv = csvParser.parse(dataForCSV);
   return csv;
 }
