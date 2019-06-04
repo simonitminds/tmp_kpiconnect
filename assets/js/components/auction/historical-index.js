@@ -35,7 +35,6 @@ export default class HistoricalAuctionsIndex extends React.Component {
 
     let filterParams = this.state.filterParams;
     filterParams = {...filterParams, startTimeRange: "", endTimeRange: ""}
-
     this.setState({
       filterParams,
       auctionPayloads: this.props.auctionPayloads
@@ -47,8 +46,13 @@ export default class HistoricalAuctionsIndex extends React.Component {
   filterByInput(inputName, inputValue) {
     switch (inputName) {
       case "supplier":
+        return payload => _
+          .chain(payload.solutions)
+          .get('winning_solution.bids')
+          .some({'supplier': inputValue})
+          .value();
       case "vessel":
-        return payload => _.some(_.get(payload.auction, inputName + 's'), {id: parseInt(inputValue)})
+        return payload => _.some(_.get(payload.auction, inputName + 's'), {'id': parseInt(inputValue)})
       case "buyer":
       case "port":
         return payload => _.isMatch(payload.auction[inputName], {'id': parseInt(inputValue)})
@@ -97,18 +101,45 @@ export default class HistoricalAuctionsIndex extends React.Component {
   }
 
   render() {
+    const isWinningSupplier = (auctionPayload, supplierName) => {
+      let winningSolution = _
+        .chain(auctionPayload)
+        .get('solutions.winning_solution')
+        .value();
+      if (winningSolution) {
+        return _.some(winningSolution.bids, {'supplier': supplierName});
+      } else {
+        return false;
+      }
+    }
+
     const availableAuctions = _.map(this.props.auctionPayloads, (payload) => payload.auction);
 
     const availableAuctionAttributes = (type) => {
       switch (type) {
         case 'vessels':
-        case 'suppliers':
           return _
+            .chain(availableAuctions)
+            .flatMap((auction) => auction[type])
+            .reject((vessel) => vessel == undefined)
+            .uniqBy('id')
+            .value();
+        case 'suppliers':
+          const suppliers = _
             .chain(availableAuctions)
             .flatMap((auction) => auction[type])
             .reject((supplier) => supplier == undefined)
             .uniqBy('id')
             .value();
+          const winningSuppliers = _
+            .chain(this.props.auctionPayloads)
+            .flatMap((payload) => {
+              return _.filter(suppliers, (supplier) => isWinningSupplier(payload, supplier.name));
+            })
+            .uniq()
+            .value();
+
+          return winningSuppliers;
         case 'buyer':
         case 'port':
           return _
@@ -294,12 +325,12 @@ export default class HistoricalAuctionsIndex extends React.Component {
                     { availableSuppliers.length > 0 &&
                       <div className="field">
                         <div className="control">
-                          <label className="label">Supplier</label>
+                          <label className="label">Winning Supplier</label>
                           <div className="select">
                             <select name="supplier" className="qa-filter-supplier_id" >
                               <option value="">Select Supplier</option>
                                 {_.map(availableSuppliers, supplier => (
-                                  <option key={supplier.id} value={supplier.id} className={`qa-filter-supplier_id-${supplier.id}`}>
+                                  <option key={supplier.id} value={supplier.name} className={`qa-filter-supplier_id-${supplier.id}`}>
                                     {supplier.name}
                                   </option>
                                 ))}
