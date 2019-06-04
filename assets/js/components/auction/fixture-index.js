@@ -45,6 +45,11 @@ export default class AuctionFixturesIndex extends React.Component {
   filterByInput(inputName, inputValue) {
     switch (inputName) {
       case "supplier":
+        return payload => _
+          .chain(payload.fixtures)
+          .map((fixture) => fixture[inputName])
+          .some({id: parseInt(inputValue)})
+          .value();
       case "vessel":
         return payload => _.some(_.get(payload.auction, inputName + 's'), {id: parseInt(inputValue)})
       case "buyer":
@@ -302,11 +307,11 @@ export default class AuctionFixturesIndex extends React.Component {
           </div>
         </div>
         { renderFilterForm() }
-        <div class="content container">
+        <div className="content container">
           { fixturePayloads.length > 0 ?
             _.map(fixturePayloads, (payload) => {
               const auction = _.get(payload, 'auction');
-              const fixtures = _.get(payload, 'fixtures');
+              const fixtures = _.chain(payload).get('fixtures').uniq().value();
               return (
                 <div key={auction.id}>
                     <h2 className="admin-panel__content__header has-margin-top-lg">
@@ -335,8 +340,8 @@ export default class AuctionFixturesIndex extends React.Component {
                             return (
                               <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
                                 <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
-                                <td className="qa-auction-fixture-vessel">{vessel.name}</td>
-                                <td className="qa-auction-fixture-fuel">{fuel.name}</td>
+                                <td key={vessel.id} className="qa-auction-fixture-vessel">{vessel.name}</td>
+                                <td key={fuel.id} className="qa-auction-fixture-fuel">{fuel.name}</td>
                                 <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
                                 <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
                                 <td className="qa-auction-fixture-supplier">{supplier.name}</td>

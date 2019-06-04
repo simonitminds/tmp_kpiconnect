@@ -42,6 +42,11 @@ export default class AdminAuctionFixturesIndex extends React.Component {
   filterByInput(inputName, inputValue) {
     switch (inputName) {
       case "supplier":
+        return payload => _
+          .chain(payload.fixtures)
+          .map((fixture) => fixture[inputName])
+          .some({id: parseInt(inputValue)})
+          .value();
       case "vessel":
         return payload => _.some(_.get(payload.auction, inputName + 's'), {id: parseInt(inputValue)})
       case "buyer":
@@ -271,7 +276,8 @@ export default class AdminAuctionFixturesIndex extends React.Component {
         { fixturePayloads.length > 0 ?
           _.map(fixturePayloads, (payload) => {
             const auction = _.get(payload, 'auction');
-            const fixtures = _.get(payload, 'fixtures');
+            const fixtures = _.chain(payload).get('fixtures').uniq().value();
+            console.log(fixtures)
             return (
               <div key={auction.id}>
                 <section className="admin-panel__content">

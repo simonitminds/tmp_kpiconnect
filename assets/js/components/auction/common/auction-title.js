@@ -15,7 +15,7 @@ const AuctionTitle = ({auction, detailed}) => {
           <span className="auction-header__auction-id">{auction.id}</span>
           { _.map(vessels, (vessel) => {
               return (
-                <span key={vessel.name} className={`auction-header-item qa-auction-vessel-${vessel.id}`}>
+                <span key={`${parseInt(auction.id)} - ${parseInt(vessel.id)}`} className={`auction-header-item qa-auction-vessel-${vessel.id}`}>
                   <span className="auction-header__vessel-name has-margin-right-xs">{vessel.name}</span>
                   { showDetail &&
                     <span className="auction-header__vessel-imo has-text-gray-3 has-margin-right-xs">({vessel.imo})</span>

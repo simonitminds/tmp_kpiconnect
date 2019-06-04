@@ -11,7 +11,10 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
     fixture_payloads =
       case Auth.current_user_is_admin?(conn) do
         true ->
-          Auctions.list_auctions_with_fixtures()
+          Auctions.list_auctions()
+          |> Enum.reject(& &1.type != "spot")
+          |> Oceanconnect.Repo.preload(:fixtures)
+          |> Enum.reject(& is_nil(&1.fixtures) or &1.fixtures == [])
           |> Enum.map(fn auction ->
             auction
             |> FixturePayload.get_fixture_payload!(current_user)
