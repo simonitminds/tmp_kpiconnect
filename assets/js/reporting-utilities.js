@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import moment from 'moment';
 import { Parser } from 'json2csv';
 import { formatUTCDateTime } from './utilities';
 
@@ -25,7 +26,7 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
       const buyer = _.get(auction, 'buyer.name');
       const port = _.get(auction, 'port.name');
       const auctionId = _.get(auction, 'id');
-      const closedTime = _.get(auction, 'auction_closed_time');
+      const closed = _.get(auction, 'auction_closed_time');
 
       const fixtures = _.get(payload, 'fixtures');
       return (
@@ -34,6 +35,7 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
           const supplier = _.get(fixture, 'supplier.name');
           const fuel = _.get(fixture, 'fuel.name');
           const price = _.get(fixture, 'price');
+          const eta = _.get(fixture, 'eta');
           const quantity = _.get(fixture, 'quantity');
 
           const jsonForCSVParser = {
@@ -46,7 +48,8 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'price': price,
             'benchmark': null,
             'savings': null,
-            'closed': formatUTCDateTime(closedTime),
+            'closed': moment(closed).format('DD-MM-YYYY'),
+            'eta': moment(eta).format('DD-MM-YYYY'),
             'quantity': quantity
           }
 
@@ -95,8 +98,12 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
       value: 'savings'
     },
     {
-      label: 'Closed Time',
+      label: 'Closed',
       value: 'closed'
+    },
+    {
+      label: 'ETA',
+      value: 'eta'
     },
     {
       label: 'Quantity',
