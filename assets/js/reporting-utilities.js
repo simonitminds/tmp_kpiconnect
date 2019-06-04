@@ -11,6 +11,9 @@ export function exportCSV(csv, fileName) {
   } else {
     const tempLink = document.createElement('a');
     const data = encodeURI("data:text/csv;charset=utf-8," + csv);
+    tempLink.href = data
+    tempLink.setAttribute('download', fileName)
+    tempLink.click()
   }
 }
 
@@ -31,7 +34,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
           const supplier = _.get(fixture, 'supplier.name');
           const fuel = _.get(fixture, 'fuel.name');
           const price = _.get(fixture, 'price');
-          const eta = _.get(fixture, 'eta');
           const quantity = _.get(fixture, 'quantity');
 
           const jsonForCSVParser = {
@@ -45,7 +47,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'benchmark': null,
             'savings': null,
             'closed': formatUTCDateTime(closedTime),
-            'eta': formatUTCDateTime(eta),
             'quantity': quantity
           }
 
@@ -96,10 +97,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     {
       label: 'Closed Time',
       value: 'closed'
-    },
-    {
-      label: 'ETA',
-      value: 'eta'
     },
     {
       label: 'Quantity',
