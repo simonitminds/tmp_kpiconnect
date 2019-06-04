@@ -1,19 +1,16 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
-import CollapsibleSection from './common/collapsible-section';
 import AuctionTitle from './common/auction-title';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
-export default class AuctionFixturesIndex extends React.Component {
+export default class AdminAuctionFixturesIndex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      serverTime: moment().utc(),
       fixturePayloads: _.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0),
       filterParams: {
         vessel: "",
@@ -267,105 +264,81 @@ export default class AuctionFixturesIndex extends React.Component {
     const fixturePayloads = this.state.fixturePayloads;
 
     return(
-      <div className="auction-app">
-        <div className="auction-app__header auction-app__header--list container is-fullhd">
-          <div className="content is-clearfix">
-            <MediaQuery query="(max-width: 599px)">
-              <div>
-                <div className="auction-list__time-box">
-                  <div className="auction-list__timer">
-                    <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
-                    <span className="auction-list__timer__clock" id="gmt-time" >
-                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                    </span>&nbsp;GMT
-                  </div>
-                </div>
-                <button className="auction_list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md" onClick={this.handleExportClick.bind(this)}>
-                  <span>Export Benchmarking Reports</span>
-                  <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
-                </button>
-              </div>
-            </MediaQuery>
-            <h1 className="title auction-list__title">Auction Fixtures</h1>
-            <MediaQuery query="(min-width: 600px)">
-              <div>
-                <button className="button is-link is-pulled-right" onClick={this.handleExportClick.bind(this)}>
-                  <span>Export Benchmarking Reports</span>
-                  <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
-                </button>
-                <div className="auction-list__time-box">
-                  <div className="auction-list__timer">
-                    <FontAwesomeIcon icon={["far", "clock"]} className="has-margin-right-xs" />
-                    <span className="auction-list__timer__clock" id="gmt-time" >
-                      {this.state.serverTime.format("DD MMM YYYY, k:mm:ss")}
-                    </span>&nbsp;GMT
-                  </div>
-                    <i className="is-hidden-mobile">Server Time</i>
-                </div>
-              </div>
-            </MediaQuery>
-          </div>
-        </div>
+      <section className="admin-panel__content is-three-quarters">
+        <h2 className="admin-panel__content__header">
+          <span className="is-4 is-inline-block">Auction Fixtures</span>
+          <button className="button is-link is-primary has-margin-left-auto" onClick={this.handleExportClick.bind(this)}>
+            <span>Export Benchmarking Reports</span>
+            <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
+          </button>
+        </h2>
         { renderFilterForm() }
-        <div className="content container">
-          { fixturePayloads.length > 0 ?
-            _.map(fixturePayloads, (payload) => {
-              const auction = _.get(payload, 'auction');
-              const fixtures = _.chain(payload).get('fixtures').uniq().value();
-              return (
-                <div key={auction.id}>
-                    <h2 className="admin-panel__content__header has-margin-top-lg">
-                      <AuctionTitle auction={auction} />
-                    </h2>
-                    <table className="admin-panel__table">
-                      <thead>
-                        <tr>
-                          <th>Fixture ID</th>
-                          <th>Vessel</th>
-                          <th>Fuel</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Supplier</th>
-                          <th>ETA</th>
-                          <th>ETD</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {
-                          _.map(fixtures, (fixture) => {
-                            const vessel = _.get(fixture, 'vessel');
-                            const fuel = _.get(fixture, 'fuel')
-                            const supplier = _.get(fixture, 'supplier');
-                            return (
-                              <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
-                                <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
-                                <td key={vessel.id} className="qa-auction-fixture-vessel">{vessel.name}</td>
-                                <td key={fuel.id} className="qa-auction-fixture-fuel">{fuel.name}</td>
-                                <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
-                                <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
-                                <td className="qa-auction-fixture-supplier">{supplier.name}</td>
-                                <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
-                                <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
-                              </tr>
-                            );
-                          })
-                        }
-                      </tbody>
-                    </table>
-                </div>
-              );
-            })
-          :
-            <section className="admin-panel__content has-margin-top-lg">
-              <div className="empty-list">
-                <em>No results found</em>
+        { fixturePayloads.length > 0 ?
+          _.map(fixturePayloads, (payload) => {
+            const auction = _.get(payload, 'auction');
+            const fixtures = _.chain(payload).get('fixtures').uniq().value();
+            console.log(fixtures)
+            return (
+              <div key={auction.id}>
+                <section className="admin-panel__content">
+                  <h2 className="admin-panel__content__header has-margin-top-lg">
+                    <AuctionTitle auction={auction} />
+                    <a href={`/admin/auctions/${auction.id}/fixtures/new`} className="button is-link is-inline-block has-margin-left-auto">
+                      <i className="fas fa-plus is-inline-block has-margin-right-sm"></i>
+                      Add Fixture
+                    </a>
+                  </h2>
+                  <table className="admin-panel__table">
+                    <thead>
+                      <tr>
+                        <th>Fixture ID</th>
+                        <th>Vessel</th>
+                        <th>Fuel</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Supplier</th>
+                        <th>ETA</th>
+                        <th>ETD</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        _.map(fixtures, (fixture) => {
+                          const vessel = _.get(fixture, 'vessel');
+                          const fuel = _.get(fixture, 'fuel')
+                          const supplier = _.get(fixture, 'supplier');
+                          return (
+                            <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
+                              <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
+                              <td className="qa-auction-fixture-vessel">{vessel.name}</td>
+                              <td className="qa-auction-fixture-fuel">{fuel.name}</td>
+                              <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
+                              <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
+                              <td className="qa-auction-fixture-supplier">{supplier.name}</td>
+                              <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
+                              <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                              <td className="text-right">
+                                <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      }
+                    </tbody>
+                  </table>
+                </section>
               </div>
-            </section>
-          }
-        </div>
-      </div>
+            );
+          })
+        :
+          <section className="admin-panel__content has-margin-top-lg">
+            <div className="empty-list">
+              <em>No results found</em>
+            </div>
+          </section>
+        }
+      </section>
     );
   }
 }
-

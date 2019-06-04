@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  window.container = "fixture_index";
+  window.container = "admin_fixture_index";
 </script>
 <div class="auction-app">
   <div class="admin-panel__header container">

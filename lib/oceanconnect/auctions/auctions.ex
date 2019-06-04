@@ -312,13 +312,6 @@ defmodule Oceanconnect.Auctions do
     regular_auctions ++ term_auctions
   end
 
-  def list_auctions_with_fixtures do
-    Auction
-    |> Auction.has_fixtures()
-    |> Repo.all()
-    |> Repo.preload([:vessels, :suppliers, :buyer, :port, fixtures: [:supplier, :vessel, :fuel]])
-  end
-
   def list_participating_auctions_with_fixtures(company_id) do
     query =
       company_id

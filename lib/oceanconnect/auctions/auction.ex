@@ -305,11 +305,10 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def with_supplier(supplier_id, query \\ Auction) do
     from(
-      s in Oceanconnect.Auctions.AuctionSuppliers,
-      join: q in ^query,
+      q in query,
+      join: s in Oceanconnect.Auctions.AuctionSuppliers,
       on: q.id == s.auction_id,
-      where: s.supplier_id == ^supplier_id,
-      select: q
+      where: s.supplier_id == ^supplier_id
     )
   end
 
@@ -318,8 +317,7 @@ defmodule Oceanconnect.Auctions.Auction do
       q in query,
       join: f in Oceanconnect.Auctions.AuctionFixture,
       on: q.id == f.auction_id,
-      where: q.type == "spot",
-      select: q
+      where: q.type == "spot"
     )
   end
 

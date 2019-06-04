@@ -1,13 +1,21 @@
 import _ from 'lodash';
 import React from 'react';
+import moment from 'moment';
 import { Parser } from 'json2csv';
 import { formatUTCDateTime } from './utilities';
 
 export function exportCSV(csv, fileName) {
-  const tempLink = document.createElement('a');
-  tempLink.href = csv
-  tempLink.setAttribute('download', fileName);
-  tempLink.click()
+  if (window.navigator.msSaveOrOpenBlob) {
+    const data = [csv];
+    const blob = new Blob(data);
+    window.navigator.msSaveOrOpenBlob(blob, fileName);
+  } else {
+    const tempLink = document.createElement('a');
+    const data = encodeURI("data:text/csv;charset=utf-8," + csv);
+    tempLink.href = data
+    tempLink.setAttribute('download', fileName)
+    tempLink.click()
+  }
 }
 
 export const parseCSVFromPayloads = (fixturePayloads) => {
@@ -18,7 +26,7 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
       const buyer = _.get(auction, 'buyer.name');
       const port = _.get(auction, 'port.name');
       const auctionId = _.get(auction, 'id');
-      const closedTime = _.get(auction, 'auction_closed_time');
+      const closed = _.get(auction, 'auction_closed_time');
 
       const fixtures = _.get(payload, 'fixtures');
       return (
@@ -38,8 +46,10 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'vessel': vessel,
             'fuel': fuel,
             'price': price,
-            'closed': formatUTCDateTime(closedTime),
-            'eta': formatUTCDateTime(eta),
+            'benchmark': null,
+            'savings': null,
+            'closed': moment(closed).format('DD-MM-YYYY'),
+            'eta': moment(eta).format('DD-MM-YYYY'),
             'quantity': quantity
           }
 
@@ -80,7 +90,15 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
       value: 'price'
     },
     {
-      label: 'Closed Time',
+      label: 'Benchmark',
+      value: 'benchmark'
+    },
+    {
+      label: 'Savings',
+      value: 'savings'
+    },
+    {
+      label: 'Closed',
       value: 'closed'
     },
     {
@@ -93,7 +111,6 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
     }
   ];
   const csvParser = new Parser({ fields });
-  let csv = csvParser.parse(dataForCSV);
-  csv = encodeURI("data:text/csv;charset=utf-8," + csv);
+  const csv = csvParser.parse(dataForCSV);
   return csv;
 }

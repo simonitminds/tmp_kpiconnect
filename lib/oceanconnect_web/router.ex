@@ -143,6 +143,7 @@ defmodule OceanconnectWeb.Router do
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
+    get("/fixtures", AuctionFixtureController, :index)
 
     resources("/auctions/:auction_id/claims", ClaimController, except: [:delete])
     post("/auctions/:auction_id/claims/:id", ClaimController, :create_response)
