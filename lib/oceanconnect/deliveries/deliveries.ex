@@ -2,7 +2,7 @@ defmodule Oceanconnect.Deliveries do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
-  alias Oceanconnect.Auctions.{Auction, TermAuction}
+  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent}
   alias Oceanconnect.Accounts
 
   def change_claim(%Claim{} = claim) do
@@ -14,8 +14,11 @@ defmodule Oceanconnect.Deliveries do
          |> Claim.changeset(attrs)
          |> Repo.insert() do
       {:ok, claim} ->
-        claim
-        |> DeliveryEvent.claim_created()
+        {:ok, event = %AuctionEvent{}} =
+          DeliveryEvent.claim_created(claim)
+          |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!()
+
+        event
         |> EventNotifier.emit(claim)
 
         {:ok, claim}
@@ -59,11 +62,14 @@ defmodule Oceanconnect.Deliveries do
     ClaimResponse.changeset(response, %{})
   end
 
-  def create_claim_response(attrs \\ %{}, user) do
+  def create_claim_response(attrs, claim, user) do
     case handle_response_creation(attrs, user) do
       {:ok, response} ->
-        response
-        |> DeliveryEvent.claim_response_created()
+        {:ok, event = %AuctionEvent{}} =
+          DeliveryEvent.claim_response_created(response, claim)
+          |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!()
+
+        event
         |> EventNotifier.emit(response)
 
         {:ok, response}

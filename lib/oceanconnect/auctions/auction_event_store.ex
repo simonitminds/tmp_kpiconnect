@@ -72,6 +72,18 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
     |> Enum.reverse()
   end
 
+  def delivery_events(auction_id) do
+    event_list(auction_id)
+    |> Enum.filter(fn event ->
+      event.type in [
+        :fixture_created,
+        :fixture_updated,
+        :claim_created,
+        :claim_response_created
+      ]
+    end)
+  end
+
   def participants_from_events(auction_id) do
     event_list(auction_id)
     |> Enum.map(& &1.user)

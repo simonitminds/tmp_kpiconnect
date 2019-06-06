@@ -3,7 +3,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   require Logger
 
   alias OceanconnectWeb.Mailer
-  alias Oceanconnect.{Deliveries.DeliveryEvent, Notifications, Auctions, Auctions.AuctionEvent}
+  alias Oceanconnect.{Notifications, Auctions, Auctions.AuctionEvent}
 
   alias Oceanconnect.Notifications.{
     Command,
@@ -25,7 +25,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-  def handle_info({%DeliveryEvent{} = event, claim}, state) do
+  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in [:claim_created, :claim_response_created, :fixture_created, :fixture_updated] do
     process(event, claim)
 
     {:noreply, state}

@@ -186,6 +186,31 @@
           </div>
       </div>
     </div>
+    <div class="log-section">
+      <input id="deliveryLogToggle" type="checkbox" checked />
+      <label class="log-section__toggle button is-info" for="deliveryLogToggle">
+        <span class="log-section__show">Show Section</span>
+        <span class="log-section__hide">Hide Section</span>
+      </label>
+      <h2>Delivery Activity Log</h2>
+      <div class="report__log">
+        <div class="report__log__header">
+          <div>
+            <div>Time</div>
+            <div>Event</div>
+            <%= if OceanconnectWeb.SessionView.current_user_is_admin?(@conn) do %>
+              <div>Impersonator</div>
+            <% end %>
+          </div>
+        </div>
+        <div class="report__log__body">
+          <%= for event <- @delivery_events do %>
+            <%= render event_template_partial_name(event), Map.put(assigns, :event, event) %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
 
     <%= unless Enum.empty?(@messages_by_company) do %>
     <div class="log-section">

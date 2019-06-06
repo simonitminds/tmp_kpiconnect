@@ -3,7 +3,7 @@ defmodule Oceanconnect.Notifications do
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Notifications.Emails
-  alias Oceanconnect.Deliveries.{Claim, ClaimResponse, DeliveryEvent}
+  alias Oceanconnect.Deliveries.{Claim, ClaimResponse}
 
   alias Oceanconnect.Auctions.AuctionEvent
 
@@ -49,14 +49,14 @@ defmodule Oceanconnect.Notifications do
   end
 
   def emails_for_event(
-        %DeliveryEvent{type: :claim_created},
+        %AuctionEvent{type: :claim_created},
         %Claim{} = claim
       ) do
     Emails.ClaimCreated.generate(claim)
   end
 
   def emails_for_event(
-        %DeliveryEvent{type: :claim_response_created},
+        %AuctionEvent{type: :claim_response_created},
         %ClaimResponse{} = response
       ) do
     Emails.ClaimResponseCreated.generate(response)

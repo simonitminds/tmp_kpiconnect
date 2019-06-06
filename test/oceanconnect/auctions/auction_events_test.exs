@@ -253,6 +253,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
                        _state}
 
       assert [
+               %AuctionEvent{type: :fixture_created, auction_id: ^auction_id},
                %AuctionEvent{type: :auction_state_snapshotted, auction_id: ^auction_id},
                %AuctionEvent{type: :auction_finalized, auction_id: ^auction_id},
                %AuctionEvent{type: :auction_closed, auction_id: ^auction_id, data: _},
