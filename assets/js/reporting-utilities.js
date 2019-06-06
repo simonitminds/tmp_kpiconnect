@@ -48,8 +48,8 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
             'price': price,
             'benchmark': null,
             'savings': null,
-            'closed': moment(closed).format('DD-MM-YYYY'),
-            'eta': moment(eta).format('DD-MM-YYYY'),
+            'closed': moment(closed).format('DD-MMM-YYYY'),
+            'eta': moment(eta).format('DD-MMM-YYYY'),
             'quantity': quantity
           }
 
