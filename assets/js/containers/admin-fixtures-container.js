@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AdminAuctionFixturesIndex from '../components/auction/fixture-index';
+import AdminAuctionFixturesIndex from '../components/auction/admin-fixture-index';
 import { getAllFixturePayloads } from '../actions';
 
 const mapStateToProps = (state) => {

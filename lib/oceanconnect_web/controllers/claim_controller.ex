@@ -107,7 +107,7 @@ defmodule OceanconnectWeb.ClaimController do
   end
 
   def create(conn, %{"auction_id" => auction_id, "claim" => claim_params}) do
-    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction
@@ -125,7 +125,7 @@ defmodule OceanconnectWeb.ClaimController do
           "author_id" => current_user_id
         })
 
-      case Deliveries.create_claim(claim_params) do
+      case Deliveries.create_claim(claim_params, current_user) do
         {:ok, claim} ->
           conn
           |> put_flash(:info, "Claim successfully made.")
