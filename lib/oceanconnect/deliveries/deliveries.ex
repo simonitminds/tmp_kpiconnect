@@ -9,13 +9,13 @@ defmodule Oceanconnect.Deliveries do
     Claim.changeset(claim, %{})
   end
 
-  def create_claim(attrs \\ %{}) do
+  def create_claim(attrs \\ %{}, user) do
     case %Claim{}
          |> Claim.changeset(attrs)
          |> Repo.insert() do
       {:ok, claim} ->
         {:ok, event = %AuctionEvent{}} =
-          DeliveryEvent.claim_created(claim)
+          DeliveryEvent.claim_created(claim, user)
           |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!()
 
         event
@@ -66,7 +66,7 @@ defmodule Oceanconnect.Deliveries do
     case handle_response_creation(attrs, user) do
       {:ok, response} ->
         {:ok, event = %AuctionEvent{}} =
-          DeliveryEvent.claim_response_created(response, claim)
+          DeliveryEvent.claim_response_created(response, claim, user)
           |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!()
 
         event

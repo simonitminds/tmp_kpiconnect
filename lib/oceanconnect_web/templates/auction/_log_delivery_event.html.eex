@@ -2,6 +2,10 @@
   <div><%= convert_event_date_time?(@event.time_entered) %></div>
   <div>
     <span class="qa-event-type has-text-weight-bold has-padding-right-xs"><%= convert_event_type(@event.type, @event) %></span>
-    <span class="qa-event-type-extras"></span>
+
+    <%= unless event_is_from_system?(@event) do %>
+      <span class="qa-event-company has-padding-right-xs"><%= event_company(@event) %></span>
+      <span class="qa-event-user">(<%= event_user(@event) %>)</span>
+    <% end %>
   </div>
 </div>

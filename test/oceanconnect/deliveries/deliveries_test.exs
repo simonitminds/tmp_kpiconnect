@@ -74,9 +74,10 @@ defmodule Oceanconnect.DeliveriesTest do
     end
 
     test "create_claim/1 with valid attrs creates a claim", %{
-      claim_params: claim_params
+      claim_params: claim_params,
+      buyer: buyer
     } do
-      assert {:ok, %Claim{id: claim_id} = claim} = Deliveries.create_claim(claim_params)
+      assert {:ok, %Claim{id: claim_id} = claim} = Deliveries.create_claim(claim_params, buyer)
 
       assert %Claim{type: "quantity"} = Deliveries.get_claim(claim_id)
     end

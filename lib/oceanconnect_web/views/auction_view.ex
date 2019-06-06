@@ -3,7 +3,9 @@ defmodule OceanconnectWeb.AuctionView do
   import Oceanconnect.Auctions.Guards
   alias Oceanconnect.{Accounts, Auctions}
   alias Oceanconnect.Accounts.User
+  alias Oceanconnect.Deliveries.Claim
 
+  alias Oceanconnect.{Accounts, Accounts.Company}
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
@@ -33,7 +35,13 @@ defmodule OceanconnectWeb.AuctionView do
     :auction_closed,
     :auction_state_snapshotted,
     :auction_finalized,
-    :auction_rescheduled
+    :auction_rescheduled,
+    :fixture_created,
+    :fixture_updated
+  ]
+  @evets_with_delivery_data [
+    :claim_created,
+    :claim_response_created
   ]
   @events_for_barges [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]
 
@@ -372,6 +380,10 @@ defmodule OceanconnectWeb.AuctionView do
     event.type in @events_from_system
   end
 
+  def event_has_delivery_data?(event) do
+    event.type in @events_with_delivery_data
+  end
+
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: nil}}}), do: ""
 
   def event_bid_amount(%AuctionEvent{data: %{bid: %AuctionBid{amount: amount}}}) do
@@ -420,14 +432,21 @@ defmodule OceanconnectWeb.AuctionView do
 
   def event_company(%AuctionEvent{user: user}) when user != nil, do: user.company.name
   def event_company(%AuctionEvent{data: %{supplier: supplier}}), do: supplier
+  def event_company(%AuctionEvent{data: %{claim: %Claim{buyer_id: buyer_id}}}) do
+    %Company{name: name} = Accounts.get_company!(buyer_id)
+    name
+  end
 
-  def event_company(%AuctionEvent{data: %{bid: %{supplier_id: supplier_id}}}),
-    do: Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, supplier_id).name
+  def event_company(%AuctionEvent{data: %{bid: %{supplier_id: supplier_id}}}) do
+    %Company{name: name} = Accounts.get_company!(supplier_id)
+    name
+  end
 
   def event_company(%AuctionEvent{data: %{auction: %Auction{buyer: buyer}}}), do: buyer.name
 
   def event_company(%AuctionEvent{data: %Auction{buyer_id: buyer_id}}) do
-    Oceanconnect.Repo.get(Oceanconnect.Accounts.Company, buyer_id).name
+    %Company{name: name} = Accounts.get_company!(buyer_id)
+    name
   end
 
   def event_company(_), do: "—"

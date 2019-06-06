@@ -61,6 +61,15 @@ export default class AdminAuctionFixturesIndex extends React.Component {
     }
   }
 
+  filterBySupplier(inputName, inputValue) {
+    switch(inputName) {
+      case "supplier":
+        return fixture => _.isMatch(fixture, {supplier_id: parseInt(inputValue)});
+      default:
+        return payload => true;
+    }
+  }
+
   filteredPayloads(filterParams) {
     const filter = _.chain(filterParams)
       .toPairs()
@@ -68,7 +77,26 @@ export default class AdminAuctionFixturesIndex extends React.Component {
       .map(([key, value]) => this.filterByInput(key, value))
       .overEvery()
       .value();
-    const payloads = _.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)
+    const supplierFilter = _
+      .chain(filterParams)
+      .toPairs()
+      .filter(([key, value]) => !!value && key === "supplier")
+      .map(([key, value]) => this.filterBySupplier(key, value))
+      .overEvery()
+      .value();
+    let payloads = _.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)
+    const filteredFixturesForPayload = (payload, filter) => {
+      return _
+        .chain(payload.fixtures)
+        .filter(filter)
+        .value();
+    }
+    payloads = _
+      .chain(payloads)
+      .map((payload) => {
+        return {auction: payload.auction, fixtures: filteredFixturesForPayload(payload, supplierFilter)}
+      })
+      .value();
     return _.filter(payloads, filter);
   }
 
