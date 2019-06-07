@@ -107,9 +107,12 @@ export default class AuctionFixturesIndex extends React.Component {
     let filterParams = this.state.filterParams;
     filterParams = {...filterParams, [ev.target.name]: ev.target.value}
 
+    const fixturePayloads = this.filteredPayloads(filterParams);
+    const reportsCSV = parseCSVFromPayloads(fixturePayloads);
     this.setState({
-      fixturePayloads: this.filteredPayloads(filterParams),
-      filterParams
+      fixturePayloads,
+      filterParams,
+      reportsCSV
     })
   }
 
@@ -117,7 +120,7 @@ export default class AuctionFixturesIndex extends React.Component {
     let filterParams = this.state.filterParams;
     filterParams = {...filterParams, startTimeRange: startDate, endTimeRange: endDate}
 
-    const fixturePayloads = this.filteredPayloads(filterParams)
+    const fixturePayloads = this.filteredPayloads(filterParams);
     const reportsCSV = parseCSVFromPayloads(fixturePayloads);
     this.setState({
       fixturePayloads,
