@@ -37,6 +37,13 @@ defmodule OceanconnectWeb.Router do
       as: :auction_fixture_api
     )
 
+    post(
+      "/auctions/:auction_id/fixtures/:fixture_id/deliver",
+      AuctionFixtureController,
+      :deliver,
+      as: :auction_fixture_api
+    )
+
     get(
       "/historical_auctions",
       FinalizedAuctionController,

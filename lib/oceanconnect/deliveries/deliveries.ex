@@ -2,7 +2,7 @@ defmodule Oceanconnect.Deliveries do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
-  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent, AuctionFixture, AuctionEventStorage}
   alias Oceanconnect.Accounts
 
   def change_claim(%Claim{} = claim) do
@@ -123,5 +123,18 @@ defmodule Oceanconnect.Deliveries do
       claim: [:fixture, :receiving_vessel, :delivered_fuel, :buyer, :supplier, auction: :port],
       author: :company
     )
+  end
+
+  def deliver_fixture(%AuctionFixture{} = fixture, attrs) do
+    {:ok, fixture} =
+      fixture
+      |> AuctionFixture.deliver_changeset(attrs)
+      |> Repo.update()
+
+    fixture
+    |> DeliveryEvent.fixture_delivered()
+    |> AuctionEventStorage.persist_event!()
+
+    {:ok, fixture}
   end
 end

@@ -28,6 +28,16 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
     }
   end
 
+  def fixture_delivered(%AuctionFixture{id: fixture_id, auction_id: auction_id} = fixture) do
+    %AuctionEvent{
+      id: UUID.uuid4(:hex),
+      type: :fixture_delivered,
+      auction_id: auction_id,
+      data: %{fixture: fixture},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
   def claim_created(%Claim{id: claim_id, auction_id: auction_id} = claim, %User{} = user) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
