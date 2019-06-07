@@ -1663,7 +1663,7 @@ defmodule Oceanconnect.Auctions do
       |> Repo.insert()
 
     fixture
-    |> DeliveryEvent.fixture_created(fixture)
+    |> DeliveryEvent.fixture_created()
     |> AuctionEventStorage.persist_event!()
 
     {:ok, fixture}
