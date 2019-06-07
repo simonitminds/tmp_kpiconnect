@@ -70,7 +70,7 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
                                                      auction_id: ^auction_id,
                                                      data: %{
                                                        original: ^fixture,
-                                                       updated: ^updated_fixture}},
+                                                       updated: %Ecto.Changeset{}}},
               %Oceanconnect.Auctions.AuctionEvent{type: :fixture_created, auction_id: ^auction_id}] =
         Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(auction_id)
     end
