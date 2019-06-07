@@ -17,13 +17,13 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
 
   def fixture_updated(
         original = %AuctionFixture{id: fixture_id, auction_id: auction_id},
-        updated = %AuctionFixture{id: fixture_id, auction_id: auction_id}
+        changeset = %Ecto.Changeset{}
       ) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :fixture_updated,
       auction_id: auction_id,
-      data: %{original: original, updated: updated},
+      data: %{original: original, updated: changeset},
       time_entered: DateTime.utc_now()
     }
   end

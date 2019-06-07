@@ -1653,19 +1653,30 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_fixture(auction_id, attrs \\ %{}) do
-    attrs = Map.put(attrs, "auction_id", auction_id)
+    attrs =
+      attrs
+      |> Map.merge(%{"auction_id" => auction_id})
 
-    %AuctionFixture{}
-    |> AuctionFixture.update_changeset(attrs)
-    |> Repo.insert()
+    {:ok, fixture} =
+      %AuctionFixture{}
+      |> AuctionFixture.update_changeset(attrs)
+      |> Repo.insert()
+
+    fixture
+    |> DeliveryEvent.fixture_created(fixture)
+    |> AuctionEventStorage.persist_event!()
+
+    {:ok, fixture}
   end
 
   def update_fixture(%AuctionFixture{} = fixture, attrs) do
-    updated_fixture = fixture
-    |> AuctionFixture.update_changeset(attrs)
-    |> Repo.update()
-    {:ok, updated} = updated_fixture
-    Oceanconnect.Deliveries.DeliveryEvent.fixture_updated(fixture, updated)
+    changeset =
+      fixture
+      |> AuctionFixture.update_changeset(attrs)
+    updated_fixture =
+      changeset
+      |> Repo.update()
+    Oceanconnect.Deliveries.DeliveryEvent.fixture_updated(fixture, changeset)
     |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!
 
     updated_fixture
