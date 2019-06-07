@@ -9,6 +9,9 @@ install_hex_rebar: &install_hex_rebar
 
 jobs:
   build:
+    branches:
+      only:
+        - master
     docker:
       - image:  circleci/elixir:1.8.0-node-browsers
         environment:
