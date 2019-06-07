@@ -308,7 +308,6 @@ export default class AdminAuctionFixturesIndex extends React.Component {
           _.map(fixturePayloads, (payload) => {
             const auction = _.get(payload, 'auction');
             const fixtures = _.chain(payload).get('fixtures').uniq().value();
-            console.log(fixtures)
             return (
               <div key={auction.id}>
                 <section className="admin-panel__content">
