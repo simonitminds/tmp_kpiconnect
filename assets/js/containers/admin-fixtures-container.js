@@ -3,7 +3,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AdminAuctionFixturesIndex from '../components/auction/admin-fixture-index';
-import { getAllFixturePayloads } from '../actions';
+import { getAllFixturePayloads, deliverAuctionFixture } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -15,6 +15,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
+  deliverFixture(ev, fixtureId, auctionId) {
+    const delivered = {'delivered': ev.target.checked};
+    dispatch(deliverAuctionFixture(auctionId, fixtureId, delivered));
+  },
   ...bindActionCreators(dispatch)
 });
 

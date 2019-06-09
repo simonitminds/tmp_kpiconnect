@@ -21,6 +21,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     field(:quantity, :integer)
     field(:eta, :utc_datetime_usec)
     field(:etd, :utc_datetime_usec)
+    field(:delivered, :boolean, default: false)
 
     # original_relationships
     belongs_to(:original_supplier, Oceanconnect.Accounts.Company,
@@ -61,6 +62,11 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:fuel_id)
     |> foreign_key_constraint(:vessel_id)
+  end
+
+  def deliver_changeset(%AuctionFixture{} = fixture, attrs) do
+    fixture
+    |> cast(attrs, [:delivered])
   end
 
   def changeset(%AuctionFixture{} = auction_fixture, attrs) do

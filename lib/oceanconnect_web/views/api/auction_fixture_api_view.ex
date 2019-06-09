@@ -14,4 +14,12 @@ defmodule OceanconnectWeb.Api.AuctionFixtureView do
   def render("fixture.json", %{data: fixture_payload}) do
     FixturePayload.json_from_payload(fixture_payload)
   end
+
+  def render("show.json", %{data: fixture}) do
+    %{data: fixture}
+  end
+
+  def render("show.json", %{success: success, message: message}) do
+    %{success: success, message: message}
+  end
 end

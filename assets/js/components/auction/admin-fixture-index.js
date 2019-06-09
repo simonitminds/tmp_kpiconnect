@@ -3,6 +3,7 @@ import React from 'react';
 import moment from 'moment';
 import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
+import CheckBoxField from '../check-box-field';
 import AuctionTitle from './common/auction-title';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
@@ -140,6 +141,10 @@ export default class AdminAuctionFixturesIndex extends React.Component {
       }
     }
     exportCSV(csv, fileName());
+  }
+
+  handleDeliverFixture(fixtureId, auctionId, ev) {
+    this.props.deliverFixture(ev, fixtureId, auctionId)
   }
 
   render() {
@@ -329,6 +334,7 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                         <th>Supplier</th>
                         <th>ETA</th>
                         <th>ETD</th>
+                        <th>Delivered</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -348,6 +354,14 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                               <td className="qa-auction-fixture-supplier">{supplier.name}</td>
                               <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
                               <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                              <td>
+                                <CheckBoxField
+                                  model={`auction-${auction.id}-fixture-${fixture.id}`}
+                                  field={'delivered'}
+                                  defaultChecked={_.get(fixture, 'delivered', false)}
+                                  onChange={this.handleDeliverFixture.bind(this, fixture.id, auction.id)}
+                                />
+                              </td>
                               <td className="text-right">
                                 <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
                               </td>

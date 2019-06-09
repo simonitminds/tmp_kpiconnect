@@ -13,6 +13,7 @@ import {
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_FINALIZED_AUCTION_PAYLOADS,
   RECEIVE_FIXTURE_PAYLOADS,
+  RECEIVE_DELIVERED_FIXTURE,
   RECEIVE_COMPANY_BARGES,
   RECEIVE_SUPPLIERS,
   SELECT_ALL_SUPPLIERS,
@@ -313,6 +314,21 @@ export function acceptWinningSolution(auctionId, solution) {
   };
 }
 
+export function deliverAuctionFixture(auctionId, fixtureId, delivered) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/fixtures/${fixtureId}/deliver`, {
+      headers: defaultHeaders,
+      method: 'POST',
+      body: JSON.stringify(delivered)
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((fixture) => {
+        return dispatch(receiveDeliveredFixture(fixture));
+      });
+  };
+}
+
 export function updateBidStatus(auctionId, response) {
   return {type: UPDATE_BID_STATUS,
           auctionId,
@@ -333,6 +349,12 @@ export function receiveFinalizedAuctionPayloads(auctionPayloads) {
 export function receiveFixturePayloads(fixturePayloads) {
   return {type: RECEIVE_FIXTURE_PAYLOADS,
           fixturePayloads: fixturePayloads};
+}
+
+export function receiveDeliveredFixture(data) {
+  const {data: fixture} = data;
+  return {type: RECEIVE_DELIVERED_FIXTURE,
+          deliveredFixture: fixture};
 }
 
 export function receiveSuppliers(port, suppliers) {
