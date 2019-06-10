@@ -1,0 +1,4 @@
+<p style='font-family: "Arial";'><b><%= @changed_field %>:</b></p>
+<span style='font-family: "Arial";'>Old Value: <%= @previous_value %></span><br/>
+<span style='font-family: "Arial";'>New Value: <%= @value %></span><br/>
+<br/>

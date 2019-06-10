@@ -22,6 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     field(:eta, :utc_datetime_usec)
     field(:etd, :utc_datetime_usec)
     field(:delivered, :boolean, default: false)
+    field(:comment, :string, virtual: true)
 
     # original_relationships
     belongs_to(:original_supplier, Oceanconnect.Accounts.Company,
@@ -48,7 +49,8 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       :price,
       :quantity,
       :eta,
-      :etd
+      :etd,
+      :comment
     ])
     |> validate_required([
       :auction_id,

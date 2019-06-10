@@ -1,0 +1,4 @@
+<p style='font-family: "Arial";'><b><%= @changed_field %>:</b></p>
+<span style='font-family: "Arial";'>Old Value: <%= convert_date?(@previous_value) %></span><br/>
+<span style='font-family: "Arial";'>New Value: <%= convert_date?(@value) %></span><br/>
+<br/>

@@ -25,8 +25,14 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in [:claim_created, :claim_response_created, :fixture_created, :fixture_updated] do
+  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in [:claim_created, :claim_response_created] do
     process(event, claim)
+
+    {:noreply, state}
+  end
+
+  def handle_info({%AuctionEvent{type: type} = event, fixture}, state) when type in [:fixture_created, :fixture_updated, :fixture_delivered] do
+    process(event, fixture)
 
     {:noreply, state}
   end
