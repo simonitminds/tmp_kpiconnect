@@ -2,6 +2,9 @@ defmodule OceanconnectWeb.EmailView do
   use OceanconnectWeb, :view
   import Oceanconnect.Auctions.Guards
 
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Accounts
+
   def full_name(user), do: Oceanconnect.Accounts.get_user_name!(user)
 
   def vessel_name_list(vessels) do
@@ -123,6 +126,75 @@ defmodule OceanconnectWeb.EmailView do
 
     "#{month} #{year}"
   end
+
+  def render_fixture_changes(fixture, changes, assigns) do
+    Enum.map(changes, fn {key, value} ->
+      {key, value, old_value} = changed_fixture_value_for_key(key, value, fixture)
+      key = format_changed_field_name(key)
+      render_change_partial(key, value, old_value, assigns)
+    end)
+  end
+
+  defp changed_fixture_value_for_key(:vessel_id, new_vessel_id, %{vessel_id: old_vessel_id}) do
+    %{name: old_vessel_name} = Auctions.get_vessel!(old_vessel_id)
+    %{name: vessel_name} = Auctions.get_vessel!(new_vessel_id)
+    {:vessel_id, vessel_name, old_vessel_name}
+  end
+  defp changed_fixture_value_for_key(:supplier_id, new_supplier_id, %{supplier_id: old_supplier_id}) do
+    %{name: old_supplier_name} = Accounts.get_company!(old_supplier_id)
+    %{name: supplier_name} = Accounts.get_company!(new_supplier_id)
+    {:supplier_id, supplier_name, old_supplier_name}
+  end
+  defp changed_fixture_value_for_key(:supplier_id, new_supplier_id, _fixture) do
+    %{name: supplier_name} = Accounts.get_company!(new_supplier_id)
+    {:supplier_id, supplier_name, "PRIVATE INFORMATION"}
+  end
+  defp changed_fixture_value_for_key(:fuel_id, new_fuel_id, %{fuel_id: old_fuel_id}) do
+    %{name: old_fuel_name} = Auctions.get_fuel!(old_fuel_id)
+    %{name: fuel_name} = Auctions.get_fuel!(new_fuel_id)
+    {:fuel_id, fuel_name, old_fuel_name}
+  end
+  defp changed_fixture_value_for_key(key, value, fixture) when key != :comment do
+    fixture = Map.from_struct(fixture)
+    {key, value, fixture[key]}
+  end
+  defp changed_fixture_value_for_key(_, _, _), do: nil
+
+  defp format_changed_field_name(key) do
+    cond do
+      key in [:eta, :etd] ->
+        Atom.to_string(key)
+        |> String.split("_")
+        |> hd()
+        |> String.upcase()
+      true ->
+        Atom.to_string(key)
+        |> String.split("_")
+        |> hd()
+        |> String.capitalize()
+    end
+  end
+
+  defp render_change_partial(key, value, previous_value, assigns) do
+    partial_type =
+      key
+      |> String.downcase()
+      |> get_partial_type_for_key()
+
+    render(
+      partial_type,
+      Map.merge(assigns, %{
+        changed_field: key,
+        value: value,
+        previous_value: previous_value
+      })
+    )
+  end
+
+  defp get_partial_type_for_key(key) when key in ["eta", "etd"], do: "_fixture_change_date.html"
+  defp get_partial_type_for_key("price"), do: "_fixture_change_price.html"
+  defp get_partial_type_for_key("quantity"), do: "_fixture_change_quantity.html"
+  defp get_partial_type_for_key(_), do: "_fixture_change.html"
 
   defp leftpad(integer) do
     String.pad_leading(Integer.to_string(integer), 2, "0")

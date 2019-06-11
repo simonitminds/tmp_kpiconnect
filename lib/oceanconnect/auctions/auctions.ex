@@ -33,6 +33,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.{Company, User}
   alias Oceanconnect.Auctions.AuctionsSupervisor
+  alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
 
   @term_types ["forward_fixed", "formula_related"]
@@ -1669,15 +1670,21 @@ defmodule Oceanconnect.Auctions do
     {:ok, fixture}
   end
 
-  def update_fixture(%AuctionFixture{} = fixture, attrs) do
+  def update_fixture(%AuctionFixture{} = old_fixture, attrs) do
     changeset =
-      fixture
+      old_fixture
       |> AuctionFixture.update_changeset(attrs)
     updated_fixture =
       changeset
       |> Repo.update()
-    Oceanconnect.Deliveries.DeliveryEvent.fixture_updated(fixture, changeset)
-    |> Oceanconnect.Auctions.AuctionEventStorage.persist_event!
+
+    event = Deliveries.DeliveryEvent.fixture_updated(old_fixture, changeset)
+
+    event
+    |>AuctionEventStorage.persist_event!
+
+    event
+    |> Deliveries.EventNotifier.emit(old_fixture)
 
     updated_fixture
   end

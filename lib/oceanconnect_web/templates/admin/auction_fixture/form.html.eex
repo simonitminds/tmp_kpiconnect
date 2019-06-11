@@ -62,15 +62,22 @@
           <%= datetime_select f, :eta, class: "select qa-admin-fixture-eta" %>
         </div>
         <%= error_tag f, :eta %>
-       </div>
+      </div>
 
-       <div class="field">
-           <%= label f, :etd, class: "label is-uppercase" %>
-           <div class="control">
-             <%= datetime_select f, :etd, class: "select qa-admin-fixture-etd" %>
-           </div>
-           <%= error_tag f, :etd %>
+      <div class="field">
+        <%= label f, :etd, class: "label is-uppercase" %>
+        <div class="control">
+          <%= datetime_select f, :etd, class: "select qa-admin-fixture-etd" %>
         </div>
+        <%= error_tag f, :etd %>
+      </div>
+
+      <div class="field">
+        <%= label f, :comment, "Notes", class: "label" %>
+        <div class="control">
+          <%= textarea f, :comment, class: "textarea qa-admin-fixture-comment" %>
+        </div>
+      </div>
 
       <div class="field has-margin-top-lg">
     		<div class="control">

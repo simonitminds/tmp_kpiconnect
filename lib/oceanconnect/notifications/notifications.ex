@@ -5,7 +5,7 @@ defmodule Oceanconnect.Notifications do
   alias Oceanconnect.Notifications.Emails
   alias Oceanconnect.Deliveries.{Claim, ClaimResponse}
 
-  alias Oceanconnect.Auctions.AuctionEvent
+  alias Oceanconnect.Auctions.{AuctionEvent, AuctionFixture}
 
   def emails_for_event(
         %AuctionEvent{type: type},
@@ -60,6 +60,20 @@ defmodule Oceanconnect.Notifications do
         %ClaimResponse{} = response
       ) do
     Emails.ClaimResponseCreated.generate(response)
+  end
+
+  def emails_for_event(
+        %AuctionEvent{type: :fixture_delivered},
+        %AuctionFixture{} = fixture
+      ) do
+    Emails.FixtureDelivered.generate(fixture)
+  end
+
+  def emails_for_event(
+    %AuctionEvent{type: :fixture_updated, data: %{updated: changeset}},
+    %AuctionFixture{} = fixture
+  ) do
+    Emails.FixtureUpdated.generate(fixture, changeset)
   end
 
   def emails_for_event(
