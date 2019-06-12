@@ -1,14 +1,21 @@
 <p style='font-family: "Arial";'><b>Dear <%= full_name(@user) %>,</b></p>
 <br/>
-<p style='font-family: "Arial";'>A change has been made to Auction <%= @fixture.auction_id %> after the auction was closed.</p>
+<p style='font-family: "Arial";'><%= full_name(@proposing_user) %> from <%= @proposing_company.name %> has proposed a change be made to Auction <%= @fixture.auction_id %> after the auction was closed.</p>
 <br/>
 
-<p style='font-family: "Arial";'><b>Fixture Changes</b></p>
+<p style='font-family: "Arial";'><b>Proposed Changes</b></p>
 <br>
 <%= render_fixture_changes(@fixture, @changes, assigns) %>
 
 <p style='font-family: "Arial";'><b>Comment:</b></p>
 <p style='font-family: "Arial";'><%= @comment %></p>
+<br/>
+
+<%= if @is_admin do %>
+  <p style='font-family: "Arial";'>To make changes to this fixture, please click the following link: <a href="<%= admin_auction_fixture_url(OceanconnectWeb.Endpoint, :edit, @auction, @fixture) %>"><%= admin_auction_fixture_url(OceanconnectWeb.Endpoint, :edit, @fixture.auction_id, @fixture.id) %></a></p>
+<% else %>
+  <p style='font-family: "Arial";'>To propose further changes, please click the following link: <a href="<%= auction_fixture_url(OceanconnectWeb.Endpoint, :edit, @auction, @fixture) %>"><%= auction_fixture_url(OceanconnectWeb.Endpoint, :edit, @fixture.auction_id, @fixture.id) %></a></p>
+<% end %>
 <br/>
 
 <p style="margin-bottom: 0.5rem; font-family: 'Arial';"><b>If you need any assistance please contact:</b></p>
@@ -31,5 +38,6 @@ lrXAmEEDZgiXy4zWC4w2D4HW9+Dfc0Crf+B3YPc2Cv/HyvBv/N4WrbDw0iQKVsWCqAPDS9aGZQs2hCCM
 </table>
 <hr style="margin-top: 2rem;">
 <p style='font-family: "Arial";'><b>OceanConnect Marine</b> offers complete bunker service. Visit us at <a href="http://www.oceanconnectmarine.com">http://www.oceanconnectmarine.com</a></p>
+
 
 

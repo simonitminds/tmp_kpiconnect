@@ -28,6 +28,20 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
     }
   end
 
+  def fixture_changes_proposed(
+        %AuctionFixture{id: fixture_id, auction_id: auction_id} = fixture,
+        %Ecto.Changeset{} = changeset,
+        %User{} = user
+      ) do
+    %AuctionEvent{
+      id: UUID.uuid4(:hex),
+      type: :fixture_changes_proposed,
+      auction_id: auction_id,
+      data: %{fixture: fixture, changeset: changeset, user: user},
+      time_entered: DateTime.utc_now()
+    }
+  end
+
   def fixture_delivered(%AuctionFixture{id: fixture_id, auction_id: auction_id} = fixture) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),

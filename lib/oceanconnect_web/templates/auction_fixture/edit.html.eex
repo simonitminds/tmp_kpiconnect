@@ -1,0 +1,20 @@
+<div class="auction-app">
+	<div class="admin-panel__header container">
+		<div class="content is-clearfix">
+			<h1 class="title has-margin-top-xl has-margin-bottom-xl">Auction <%= "#{@auction.id}" %> Fixtures</h1>
+		</div>
+	</div>
+	<div class="admin-panel__body container">
+		<div class="content">
+			<section class="admin-panel__content">
+				<h2 class="admin-panel__content__header"><span class="is-4">Propose Changes to Auction Fixture</span>
+            <%= link( to: auction_fixture_path(@conn, :index), class: "button has-margin-left-auto") do %>
+                <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+            <%  end%>
+				</h2>
+				<%= render "form.html", Map.put(assigns, :action, auction_fixture_path(@conn, :propose_changes, @auction, @fixture)) %>
+			</section>
+		</div>
+	</div>
+</div>
+

@@ -9,8 +9,7 @@ defmodule Oceanconnect.Notifications.Emails.FixtureUpdated do
     emails(fixture, changes)
   end
 
-  defp emails(%{auction_id: auction_id} = fixture, changes) do
-
+  defp emails(fixture, changes) do
     buyer_emails =
       buyer_recipients(fixture)
       |> emails(fixture, changes)
