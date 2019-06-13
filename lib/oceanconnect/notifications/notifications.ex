@@ -77,6 +77,13 @@ defmodule Oceanconnect.Notifications do
   end
 
   def emails_for_event(
+    %AuctionEvent{type: :fixture_changes_proposed, data: %{changeset: changeset, user: user}},
+    %AuctionFixture{} = fixture
+  ) do
+    Emails.FixtureChangesProposed.generate(fixture, changeset, user)
+  end
+
+  def emails_for_event(
         %AuctionEvent{type: _type},
         _auction_state
       ) do

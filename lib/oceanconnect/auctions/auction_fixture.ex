@@ -66,6 +66,25 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:vessel_id)
   end
 
+  def propose_changeset(%AuctionFixture{} = fixture, attrs) do
+    fixture
+    |> cast(attrs, [
+      :auction_id,
+      :supplier_id,
+      :vessel_id,
+      :fuel_id,
+      :price,
+      :quantity,
+      :eta,
+      :etd,
+      :comment
+    ])
+    |> foreign_key_constraint(:auction_id)
+    |> foreign_key_constraint(:supplier_id)
+    |> foreign_key_constraint(:fuel_id)
+    |> foreign_key_constraint(:vessel_id)
+  end
+
   def deliver_changeset(%AuctionFixture{} = fixture, attrs) do
     fixture
     |> cast(attrs, [:delivered])

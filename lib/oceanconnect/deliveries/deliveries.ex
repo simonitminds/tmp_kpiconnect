@@ -111,7 +111,7 @@ defmodule Oceanconnect.Deliveries do
     end
   end
 
-  defp handle_response(_, _) do
+  defp handle_response_creation(_, _) do
     %ClaimResponse{}
     |> ClaimResponse.changeset(%{})
     |> Repo.insert()
@@ -136,5 +136,23 @@ defmodule Oceanconnect.Deliveries do
     |> AuctionEventStorage.persist_event!()
 
     {:ok, fixture}
+  end
+
+  def propose_fixture_changes(%AuctionFixture{} = fixture, attrs, user) do
+    changeset =
+      fixture
+      |> AuctionFixture.propose_changeset(attrs)
+
+    event =
+      fixture
+      |> DeliveryEvent.fixture_changes_proposed(changeset, user)
+
+    event
+    |> AuctionEventStorage.persist_event!()
+
+    event
+    |> EventNotifier.emit(fixture)
+
+    {:ok, changeset}
   end
 end

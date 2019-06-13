@@ -1,0 +1,92 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert is-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+  <div class="columns">
+    <div class="column is-one-third">
+      <div class="field">
+        <%= label f, :vessel_id, class: "label" do %>
+          Vessel
+        <%end%>
+    		<div class="control">
+          <div class="select">
+              <%= select f, :vessel_id, [{nil, nil}] ++ Enum.map(@vessels, &{&1.name, &1.id}), class: "qa-admin-fixture-vessel_id" %>
+              <%= error_tag f, :vessel_id %>
+          </div>
+        </div>
+      </div>
+      <%= if @is_buyer? do %>
+        <div class="field">
+          <%= label f, :supplier_id, class: "label" do %>
+            Supplier
+          <% end %>
+          <div class="control">
+            <div class="select">
+              <%= select f, :supplier_id, [{nil, nil}] ++ Enum.map(@suppliers, &{&1.name, &1.id}), class: "qa-admin-vessel-company_id" %>
+              <%= error_tag f, :supplier_id %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="field">
+          <%= label f, :fuel_id, class: "label" do %>
+              Fuel
+          <% end %>
+          <div class="control">
+              <div class="select">
+                  <%= select f, :fuel_id, [{nil, nil}] ++ Enum.map(@fuels, &{&1.name, &1.id}), class: "qa-admin-fixture-fuel_id" %>
+                  <%= error_tag f, :fuel_id %>
+              </div>
+          </div>
+      </div>
+      <div class="field">
+          <%= label f, :price, "Price Per Unit", class: "label"  %>
+          <div class="control">
+            <%= text_input f, :price, class: "input qa-admin-fixture-price" %>
+          </div>
+          <%= error_tag f, :price %>
+      </div>
+
+      <div class="field">
+          <%= label f, :quantity, "Quantity (MT)", class: "label" %>
+          <div class="control">
+            <%= text_input f, :quantity, class: "input qa-admin-fixture-quantity" %>
+          </div>
+          <%= error_tag f, :quantity %>
+      </div>
+
+      <div class="field">
+        <%= label f, :eta, class: "label is-uppercase" %>
+        <div class="control">
+          <%= datetime_select f, :eta, class: "select qa-admin-fixture-eta" %>
+        </div>
+        <%= error_tag f, :eta %>
+      </div>
+
+      <div class="field">
+        <%= label f, :etd, class: "label is-uppercase" %>
+        <div class="control">
+          <%= datetime_select f, :etd, class: "select qa-admin-fixture-etd" %>
+        </div>
+        <%= error_tag f, :etd %>
+      </div>
+
+      <div class="field">
+        <%= label f, :comment, "Notes", class: "label" %>
+        <div class="control">
+          <%= textarea f, :comment, class: "textarea qa-admin-fixture-comment" %>
+        </div>
+      </div>
+
+      <div class="field has-margin-top-lg">
+    		<div class="control">
+    			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>
+    		</div>
+    	</div>
+    </div>
+  </div>
+<% end %>
+

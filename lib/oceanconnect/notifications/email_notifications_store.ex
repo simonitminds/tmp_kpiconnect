@@ -11,6 +11,18 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     DelayedNotificationsSupervisor
   }
 
+  @claim_events [
+    :claim_created,
+    :claim_response_created
+  ]
+
+  @fixture_events [
+    :fixture_created,
+    :fixture_updated,
+    :fixture_delivered,
+    :fixture_changes_proposed
+  ]
+
   def start_link([]) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -25,13 +37,14 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in [:claim_created, :claim_response_created] do
+  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in @claim_events do
     process(event, claim)
 
     {:noreply, state}
   end
 
-  def handle_info({%AuctionEvent{type: type} = event, fixture}, state) when type in [:fixture_created, :fixture_updated, :fixture_delivered] do
+  def handle_info({%AuctionEvent{type: type} = event, fixture}, state) when type in @fixture_events do
+    IO.inspect(type, label: "EVENT ------------->")
     process(event, fixture)
 
     {:noreply, state}
