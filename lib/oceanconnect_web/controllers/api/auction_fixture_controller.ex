@@ -37,14 +37,14 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
     render(conn, "index.json", data: fixture_payloads)
   end
 
-  def deliver(conn, %{"fixture_id" => fixture_id, "auction_id" => auction_id, "delivered" => delivered}) do
+  def deliver(conn, %{"fixture_id" => fixture_id, "auction_id" => auction_id, "delivery_params" => delivery_params}) do
     fixture_id = String.to_integer(fixture_id)
     auction_id = String.to_integer(auction_id)
-
+    delivery_params = Map.merge(delivery_params, %{"delivered" => true})
     with current_user = %User{is_admin: true} <- Auth.current_user(conn),
          auction = %Auction{} <- Auctions.get_auction!(auction_id),
          fixture = %AuctionFixture{} <- Auctions.get_fixture!(fixture_id),
-         {:ok, delivered_fixture} <- Deliveries.deliver_fixture(fixture, %{"delivered" => delivered}) do
+         {:ok, delivered_fixture} <- Deliveries.deliver_fixture(fixture, delivery_params) do
       conn
       |> put_status(200)
       |> render("show.json", data: delivered_fixture)
@@ -52,7 +52,7 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
       _ ->
         conn
         |> put_status(421)
-        |> render("show.json", %{success: false, message: "Request successful"})
+        |> render("show.json", %{success: false, message: "Request unsuccessful"})
     end
   end
 end

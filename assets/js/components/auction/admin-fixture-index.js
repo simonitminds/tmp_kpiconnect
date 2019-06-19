@@ -5,6 +5,7 @@ import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
 import CheckBoxField from '../check-box-field';
 import AuctionTitle from './common/auction-title';
+import FixtureDeliveryForm from './fixture-delivery-form';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
@@ -21,7 +22,10 @@ export default class AdminAuctionFixturesIndex extends React.Component {
         startTimeRange: null,
         endTimeRange: null,
       },
-      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0))
+      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
+      displayDeliveryForm: false,
+      selectedFixtureForDelivery: "",
+      previsoulySelectedCheckbox: null
     }
   }
 
@@ -143,9 +147,48 @@ export default class AdminAuctionFixturesIndex extends React.Component {
     exportCSV(csv, fileName());
   }
 
-  handleDeliverFixture(fixtureId, auctionId, ev) {
-    this.props.deliverFixture(ev, fixtureId, auctionId)
+  createDeliveryFormData(ev) {
+    const elements = ev.target.elements;
+    const formData = _
+      .chain(elements)
+      .reject((element) => _.endsWith(element.name, 'date') || element.name === "")
+      .reduce((data, element) => {
+        data[element.name] = element.value
+        return data
+      }, {})
+      .value();
+    return formData;
   }
+
+  handleDeliverySubmit(ev) {
+    ev.preventDefault();
+    const fixtureId = this.state.selectedFixtureForDelivery.id;
+    const auctionId = this.state.selectedFixtureForDelivery.auction_id;
+
+    const deliveryParams = this.createDeliveryFormData(ev)
+    this.props.deliverFixture(ev, fixtureId, auctionId, deliveryParams)
+    this.setState({displayDeliveryForm: false});
+  }
+
+  handleDeliveryClick(fixtureId, ev) {
+    const selectedDeliveryCheckbox = this.state.selectedDeliveryCheckbox
+    const previouslySelectedFixture = this.state.selectedFixtureForDelivery;
+    if (previouslySelectedFixture && !previouslySelectedFixture.delivered) {
+      selectedDeliveryCheckbox.checked = false
+    }
+    const selectedFixtureForDelivery = _
+      .chain(this.props.fixturePayloads)
+      .flatMap((payload) => payload.fixtures)
+      .find({ 'id': fixtureId })
+      .value();
+
+    this.setState({
+      selectedFixtureForDelivery,
+      displayDeliveryForm: ev.target.checked,
+      selectedDeliveryCheckbox: ev.target
+    });
+  }
+
 
   render() {
     const availableAuctions = _
@@ -345,32 +388,38 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                           const fuel = _.get(fixture, 'fuel')
                           const supplier = _.get(fixture, 'supplier');
                           return (
-                            <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
-                              <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
-                              <td className="qa-auction-fixture-vessel">{vessel.name}</td>
-                              <td className="qa-auction-fixture-fuel">{fuel.name}</td>
-                              <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
-                              <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
-                              <td className="qa-auction-fixture-supplier">{supplier.name}</td>
-                              <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
-                              <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
-                              <td>
-                                <CheckBoxField
-                                  model={`auction-${auction.id}-fixture-${fixture.id}`}
-                                  field={'delivered'}
-                                  defaultChecked={_.get(fixture, 'delivered', false)}
-                                  onChange={this.handleDeliverFixture.bind(this, fixture.id, auction.id)}
-                                />
-                              </td>
-                              <td className="text-right">
-                                <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
-                              </td>
-                            </tr>
+                            <React.Fragment>
+                              <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
+                                <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
+                                <td className="qa-auction-fixture-vessel">{vessel.name}</td>
+                                <td className="qa-auction-fixture-fuel">{fuel.name}</td>
+                                <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
+                                <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
+                                <td className="qa-auction-fixture-supplier">{supplier.name}</td>
+                                <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
+                                <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                                <td>
+                                  <CheckBoxField
+                                    model={`fixture-${fixture.id}`}
+                                    field={'delivered'}
+                                    defaultChecked={_.get(fixture, 'delivered', false)}
+                                    onChange={this.handleDeliveryClick.bind(this, fixture.id)}
+                                    opts={{ readOnly: _.get(fixture, 'delivered', false) }}
+                                  />
+                                </td>
+                                <td className="text-right">
+                                  <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
+                                </td>
+                              </tr>
+                            </React.Fragment>
                           );
                         })
                       }
                     </tbody>
                   </table>
+                  { this.state.displayDeliveryForm && auction.id === this.state.selectedFixtureForDelivery.auction_id &&
+                    <FixtureDeliveryForm fixture={this.state.selectedFixtureForDelivery} fixturePayloads={this.props.fixturePayloads} handleDeliverySubmit={this.handleDeliverySubmit.bind(this)} />
+                  }
                 </section>
               </div>
             );

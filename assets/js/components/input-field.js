@@ -13,7 +13,7 @@ const InputField = ({model, field, labelText, value, errors, opts, onChange, exp
   return (
     <div className={`field ${isHorizontal ? 'is-horizontal' : ''} ${additionalClasses ? additionalClasses : ''}`}>
       <div className="field-label">
-        <label htmlFor={`${model}_${field}`} className={`${labelClass}`}>
+        <label htmlFor={ !!model ? `${model}_${field}` : name} className={`${labelClass}`}>
         {labelDisplay}
         </label>
       </div>
@@ -22,7 +22,7 @@ const InputField = ({model, field, labelText, value, errors, opts, onChange, exp
           <input
             type={type}
             step={step}
-            name={`${model}[${field}]`}
+            name={ !!model ? `${model}[${field}]` : name}
             id={`${model}_${name}`}
             className={`input ${className}`}
             defaultValue={value}
