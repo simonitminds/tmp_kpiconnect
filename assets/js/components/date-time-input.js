@@ -19,13 +19,14 @@ class DateTimeInput extends React.Component {
 
   render() {
     const { model, field, label, fieldName, portId, ports } = this.props;
+    const isHorizontal = _.get(this.props, 'isHorizontal', true)
     const { selectedTime } = this.state;
 
     return(
       <React.Fragment>
         <input type="hidden" name={`${fieldName}`} value={selectedTime || ""} />
-        <div className="field is-horizontal has-margin-bottom-xs">
-          <div className="field-label">
+        <div className={`field ${isHorizontal ? 'is-horizontal has-margin-bottom-xs' : ''}`}>
+          <div className={isHorizontal ? 'field-label' : 'has-margin-bottom-xs'}>
             <label className="label">{label}</label>
           </div>
           <div className="field-body">

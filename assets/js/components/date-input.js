@@ -45,6 +45,7 @@ export default class DateInput extends React.Component {
             numberOfMonths={this.state.numberOfMonths}
             onFocusChange={({ focused }) => this.setState({ focused })}
             isOutsideRange={isOutsideRange}
+            placeholder={'MM/DD/YYYY'}
           />
         </div>
       </div>

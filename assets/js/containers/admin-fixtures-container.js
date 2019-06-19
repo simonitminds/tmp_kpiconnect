@@ -15,9 +15,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  deliverFixture(ev, fixtureId, auctionId) {
-    const delivered = {'delivered': ev.target.checked};
-    dispatch(deliverAuctionFixture(auctionId, fixtureId, delivered));
+  deliverFixture(ev, fixtureId, auctionId, deliveryParams) {
+    const attrs = { 'delivery_params': deliveryParams }
+    dispatch(deliverAuctionFixture(auctionId, fixtureId, attrs));
   },
   ...bindActionCreators(dispatch)
 });

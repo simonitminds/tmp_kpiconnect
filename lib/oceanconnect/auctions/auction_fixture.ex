@@ -37,6 +37,14 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     field(:original_eta, :utc_datetime_usec)
     field(:original_etd, :utc_datetime_usec)
     field(:original_price, :decimal)
+
+    belongs_to(:delivered_vessel, Oceanconnect.Auctions.Vessel, foreign_key: :delivered_vessel_id)
+    belongs_to(:delivered_fuel, Oceanconnect.Auctions.Fuel, foreign_key: :delivered_fuel_id)
+    belongs_to(:delivered_supplier, Oceanconnect.Accounts.Company, foreign_key: :delivered_supplier_id)
+    field(:delivered_quantity, :integer)
+    field(:delivered_eta, :utc_datetime_usec)
+    field(:delivered_etd, :utc_datetime_usec)
+    field(:delivered_price, :decimal)
   end
 
   def update_changeset(%AuctionFixture{} = auction_fixture, attrs) do
@@ -86,8 +94,24 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   end
 
   def deliver_changeset(%AuctionFixture{} = fixture, attrs) do
+    attrs =
+      attrs
+      |> maybe_parse_date_field()
+
     fixture
-    |> cast(attrs, [:delivered])
+    |> cast(attrs, [
+      :delivered,
+      :delivered_supplier_id,
+      :delivered_vessel_id,
+      :delivered_fuel_id,
+      :delivered_price,
+      :delivered_quantity,
+      :delivered_eta,
+      :delivered_etd
+    ])
+    |> foreign_key_constraint(:delivered_supplier_id)
+    |> foreign_key_constraint(:delivered_fuel_id)
+    |> foreign_key_constraint(:delivered_vessel_id)
   end
 
   def changeset(%AuctionFixture{} = auction_fixture, attrs) do
@@ -148,6 +172,20 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     from(af in AuctionFixture,
       where: af.auction_id == ^auction_id
     )
+  end
+
+  defp maybe_parse_date_field(%{"delivered_eta" => delivered_eta, "delivered_etd" => delivered_etd} = attrs) do
+    Map.merge(attrs, %{"delivered_eta" => parse_date(delivered_eta), "delivered_etd" => parse_date(delivered_etd)})
+  end
+
+  defp parse_date(""), do: ""
+  defp parse_date(nil), do: ""
+  defp parse_date(%DateTime{} = date), do: date
+  defp parse_date(epoch) do
+    epoch
+    |> String.to_integer()
+    |> DateTime.from_unix!(:millisecond)
+    |> DateTime.to_iso8601()
   end
 
   def changeset_from_bid_and_vessel_fuel(
