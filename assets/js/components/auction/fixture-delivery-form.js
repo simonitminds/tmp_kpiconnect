@@ -31,7 +31,7 @@ const FixtureDeliveryForm = (props) => {
             <div className="control">
               <div className="select">
                 <select
-                  name="delivered_vessel"
+                  name="delivered_vessel_id"
                   className="qa-fixture-vessel_id"
                   defaultValue={fixture.vessel_id}>
                   <option value="">Select Vessel</option>
@@ -52,7 +52,7 @@ const FixtureDeliveryForm = (props) => {
             <div className="control">
               <div className="select">
                 <select
-                  name="delivered_fuel"
+                  name="delivered_fuel_id"
                   className="qa-fixture-fuel_id"
                   defaultValue={fixture.fuel_id}>
                   <option value="">Select Fuel</option>
@@ -98,7 +98,7 @@ const FixtureDeliveryForm = (props) => {
             <div className="control">
               <div className="select">
                 <select
-                  name="delivered_supplier"
+                  name="delivered_supplier_id"
                   className="qa-fixture-supplier_id"
                   defaultValue={fixture.supplier_id}>
                   <option value="">Select Supplier</option>

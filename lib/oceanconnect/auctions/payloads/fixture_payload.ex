@@ -44,12 +44,18 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     }
   end
 
-  defp format_fixture_prices(fixtures) do
+  defp format_fixture_prices(fixtures) when is_list(fixtures) do
     fixtures
     |> Enum.map(fn %{price: price} = fixture ->
-      %{fixture | price: Decimal.to_string(price)}
+      %{format_fixture_prices(fixture) | price: Decimal.to_string(price)}
     end)
   end
+
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) do
+    %{fixture | delivered_price: Decimal.to_string(price)}
+  end
+
+  defp format_fixture_prices(fixture), do: fixture
 
   def json_from_payload(%FixturePayload{
     auction: auction,

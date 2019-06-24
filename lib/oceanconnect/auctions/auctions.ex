@@ -1607,19 +1607,19 @@ defmodule Oceanconnect.Auctions do
 
   def get_fixture(fixture_id) do
     Repo.get(AuctionFixture, fixture_id)
-    |> Repo.preload([:supplier, :vessel, :fuel])
+    |> Repo.preload([:supplier, :vessel, :fuel, :delivered_supplier, :delivered_vessel, :delivered_fuel])
   end
 
   def get_fixture!(fixture_id) do
     Repo.get!(AuctionFixture, fixture_id)
-    |> Repo.preload([:supplier, :vessel, :fuel])
+    |> Repo.preload([:supplier, :vessel, :fuel, :delivered_supplier, :delivered_vessel, :delivered_fuel])
   end
 
   def fixtures_for_auction(auction = %struct{}) when is_auction(struct) do
     auction
     |> AuctionFixture.from_auction()
     |> Repo.all()
-    |> Repo.preload([:supplier, :fuel, :vessel])
+    |> Repo.preload([:supplier, :fuel, :vessel, :delivered_supplier, :delivered_fuel, :delivered_vessel])
   end
 
   def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
