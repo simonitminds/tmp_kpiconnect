@@ -109,9 +109,9 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       :delivered_eta,
       :delivered_etd
     ])
-    |> foreign_key_constraint(:delivered_supplier_id)
-    |> foreign_key_constraint(:delivered_fuel_id)
-    |> foreign_key_constraint(:delivered_vessel_id)
+    |> cast_assoc(:delivered_supplier)
+    |> cast_assoc(:delivered_fuel)
+    |> cast_assoc(:delivered_vessel)
   end
 
   def changeset(%AuctionFixture{} = auction_fixture, attrs) do

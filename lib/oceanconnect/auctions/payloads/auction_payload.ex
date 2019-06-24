@@ -101,7 +101,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims:
         Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id)),
       fixtures:
-        Enum.filter(Auctions.fixtures_for_auction(auction), &(&1.supplier_id == supplier_id))
+        Enum.filter(Auctions.fixtures_for_auction(auction), &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id))
+        |> format_fixture_prices()
     }
   end
 
@@ -139,9 +140,24 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
       submitted_comments: submitted_comments,
       claims: Deliveries.claims_for_auction(auction),
-      fixtures: Auctions.fixtures_for_auction(auction)
+      fixtures:
+        Auctions.fixtures_for_auction(auction)
+        |> format_fixture_prices()
     }
   end
+
+  defp format_fixture_prices(fixtures) when is_list(fixtures) do
+    fixtures
+    |> Enum.map(fn %{price: price} = fixture ->
+      %{format_fixture_prices(fixture) | price: Decimal.to_string(price)}
+    end)
+  end
+
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) do
+    %{fixture | delivered_price: Decimal.to_string(price)}
+  end
+
+  defp format_fixture_prices(fixture), do: fixture
 
   defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction)
        when is_auction_state(state_struct) do

@@ -161,13 +161,11 @@ export default class AdminAuctionFixturesIndex extends React.Component {
   }
 
   handleDeliverySubmit(ev) {
-    ev.preventDefault();
     const fixtureId = this.state.selectedFixtureForDelivery.id;
     const auctionId = this.state.selectedFixtureForDelivery.auction_id;
 
     const deliveryParams = this.createDeliveryFormData(ev)
     this.props.deliverFixture(ev, fixtureId, auctionId, deliveryParams)
-    this.setState({displayDeliveryForm: false});
   }
 
   handleDeliveryClick(fixtureId, ev) {
@@ -384,27 +382,36 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                     <tbody>
                       {
                         _.map(fixtures, (fixture) => {
-                          const vessel = _.get(fixture, 'vessel');
-                          const fuel = _.get(fixture, 'fuel')
-                          const supplier = _.get(fixture, 'supplier');
+                          const delivered = _.get(fixture, 'delivered', false);
+                          const vessel = delivered ? _.get(fixture, 'delivered_vessel.name', '—') : _.get(fixture, 'vessel.name', "—");
+                          const fuel = delivered ? _.get(fixture, 'delivered_fuel.name', '—') : _.get(fixture, 'fuel.name', "—");
+                          let quantity = delivered ? _.get(fixture, 'delivered_quantity', "—") : _.get(fixture, 'quantity', '—');
+                          quantity = quantity == "—" ? quantity : `${quantity} M/T`;
+                          let price = delivered ? _.get(fixture, 'delivered_price', '—') : _.get(fixture, 'price', "—");
+                          price = price == "—" ? price : formatPrice(price);
+                          const supplier = delivered ? _.get(fixture, 'delivered_supplier.name', '—') : _.get(fixture, 'supplier.name', "—");
+                          let eta = delivered ? _.get(fixture, 'delivered_eta', '—') : _.get(fixture, 'eta', "—");
+                          eta = eta == "—" ? eta : formatUTCDateTime(eta);
+                          let etd = delivered ? _.get(fixture, 'delivered_etd', '—') : _.get(fixture, 'etd', "—");
+                          etd = etd == "—" ? etd : formatUTCDateTime(etd);
                           return (
                             <React.Fragment>
                               <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
                                 <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
-                                <td className="qa-auction-fixture-vessel">{vessel.name}</td>
-                                <td className="qa-auction-fixture-fuel">{fuel.name}</td>
-                                <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
-                                <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
-                                <td className="qa-auction-fixture-supplier">{supplier.name}</td>
-                                <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
-                                <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                                <td className="qa-auction-fixture-vessel">{vessel}</td>
+                                <td className="qa-auction-fixture-fuel">{fuel}</td>
+                                <td className="qa-auction-fixture-price">{price}</td>
+                                <td className="qa-auction-fixture-quantity">{quantity}</td>
+                                <td className="qa-auction-fixture-supplier">{supplier}</td>
+                                <td className="qa-auction-fixture-eta">{eta}</td>
+                                <td className="qa-auction-fixture-etd">{etd}</td>
                                 <td>
                                   <CheckBoxField
                                     model={`fixture-${fixture.id}`}
                                     field={'delivered'}
-                                    defaultChecked={_.get(fixture, 'delivered', false)}
+                                    defaultChecked={delivered}
                                     onChange={this.handleDeliveryClick.bind(this, fixture.id)}
-                                    opts={{ readOnly: _.get(fixture, 'delivered', false) }}
+                                    opts={{ readOnly: delivered }}
                                   />
                                 </td>
                                 <td className="text-right">

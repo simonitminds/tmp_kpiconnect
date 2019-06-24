@@ -24,22 +24,13 @@ export default function(state, action) {
     }
     case RECEIVE_DELIVERED_FIXTURE: {
       const deliveredFixture = _.get(action, 'deliveredFixture');
-      const newFixtures = _
-        .chain(state.fixturePayloads)
-        .flatMap((payload) => payload.fixtures)
-        .keyBy((fixture) => fixture.id)
-        .assign({[deliveredFixture.id]: deliveredFixture})
-        .toPairs()
-        .map(([_key, fixture]) => fixture)
-        .value();
-
       const fixturePayloads = _
         .chain(state.fixturePayloads)
         .map((payload) => {
           return _.set(
             payload,
             'fixtures',
-            _.intersectionBy(payload.fixtures, newFixtures, 'id'));
+            _.unionBy(payload.fixtures, [deliveredFixture], 'id'));
         })
         .value();
 

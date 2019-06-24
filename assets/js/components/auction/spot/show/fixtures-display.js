@@ -4,7 +4,6 @@ import { formatPrice, formatUTCDateTime } from '../../../../utilities';
 
 const FixturesDisplay = ({auctionPayload}) => {
   const fixtures = _.get(auctionPayload, 'fixtures', []);
-
   return(
     <div className="fulfillment-options__history">
       <table className="table is-striped">
@@ -13,16 +12,17 @@ const FixturesDisplay = ({auctionPayload}) => {
         </thead>
         <tbody>
           { _.map(fixtures, (fixture) => {
-              const vessel = _.get(fixture, 'vessel.name', "—");
-              const fuel = _.get(fixture, 'fuel.name', "—");
-              let quantity = _.get(fixture, 'quantity', "—");
+              const delivered = _.get(fixture, 'delivered', false)
+              const vessel = delivered ? _.get(fixture, 'delivered_vessel.name', '—') : _.get(fixture, 'vessel.name', "—");
+              const fuel = delivered ? _.get(fixture, 'delivered_fuel.name', '—') : _.get(fixture, 'fuel.name', "—");
+              let quantity = delivered ? _.get(fixture, 'delivered_quantity', "—") : _.get(fixture, 'quantity', '—');
               quantity = quantity == "—" ? quantity : `${quantity} M/T`;
-              let price = _.get(fixture, 'price', "—");
+              let price = delivered ? _.get(fixture, 'delivered_price', '—') : _.get(fixture, 'price', "—");
               price = price == "—" ? price : formatPrice(price);
-              const supplier = _.get(fixture, 'supplier.name', "—");
-              let eta = _.get(fixture, 'eta', "—");
+              const supplier = delivered ? _.get(fixture, 'delivered_supplier.name', '—') : _.get(fixture, 'supplier.name', "—");
+              let eta = delivered ? _.get(fixture, 'delivered_eta', '—') : _.get(fixture, 'eta', "—");
               eta = eta == "—" ? eta : formatUTCDateTime(eta);
-              let etd = _.get(fixture, 'etd', "—");
+              let etd = delivered ? _.get(fixture, 'delivered_etd', '—') : _.get(fixture, 'etd', "—");
               etd = etd == "—" ? etd : formatUTCDateTime(etd);
               return(
                 <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
