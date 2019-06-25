@@ -44,7 +44,6 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   def handle_info({%AuctionEvent{type: type} = event, fixture}, state) when type in @fixture_events do
-    IO.inspect(type, label: "EVENT ------------->")
     process(event, fixture)
 
     {:noreply, state}
