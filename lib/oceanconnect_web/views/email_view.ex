@@ -75,6 +75,14 @@ defmodule OceanconnectWeb.EmailView do
         amount = :erlang.float_to_binary(amount, decimals: 2)
         "$#{amount}"
 
+      %Decimal{} = amount ->
+        amount =
+          amount
+          |> Decimal.to_float()
+          |> :erlang.float_to_binary(decimals: 2)
+
+        "$#{amount}"
+
       _ ->
         amount
     end
@@ -195,6 +203,49 @@ defmodule OceanconnectWeb.EmailView do
   defp get_partial_type_for_key("price"), do: "_fixture_change_price.html"
   defp get_partial_type_for_key("quantity"), do: "_fixture_change_quantity.html"
   defp get_partial_type_for_key(_), do: "_fixture_change.html"
+
+  def render_delivered_fixture_values(fixture) do
+    fixture = Map.from_struct(fixture)
+
+    keys =
+      fixture
+      |> Map.keys()
+      |> Enum.reject(fn key ->
+        key =
+          key
+          |> Atom.to_string()
+
+        String.starts_with?(key, "original")
+          or String.starts_with?(key, "delivered")
+            or String.ends_with?(key, "id")
+      end)
+    delivered_fixture =
+      Enum.reduce(keys, %{}, fn (key, acc) ->
+        delivered_key = String.to_atom("delivered_#{key}")
+        value =
+          cond do
+            key in [:vessel, :fuel, :supplier] ->
+              cond do
+                fixture[key].id == fixture[delivered_key].id -> fixture[key]
+                true -> fixture[delivered_key]
+              end
+            true ->
+              cond do
+                fixture[key] == fixture[delivered_key] -> fixture[key]
+                true -> fixture[delivered_key]
+              end
+          end
+        Map.put(acc, key, value)
+      end)
+
+    render_delivered_fixture_partial(delivered_fixture)
+  end
+
+  defp render_delivered_fixture_partial(fixture) do
+    render("_delivered_fixture.html",
+      fixture: fixture
+    )
+  end
 
   defp leftpad(integer) do
     String.pad_leading(Integer.to_string(integer), 2, "0")

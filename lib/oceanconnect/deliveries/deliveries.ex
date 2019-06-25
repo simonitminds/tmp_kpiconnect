@@ -2,6 +2,7 @@ defmodule Oceanconnect.Deliveries do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
+  alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent, AuctionFixture, AuctionEventStorage}
   alias Oceanconnect.Accounts
 
@@ -131,9 +132,17 @@ defmodule Oceanconnect.Deliveries do
       |> AuctionFixture.deliver_changeset(attrs)
       |> Repo.update()
 
-    fixture
-    |> DeliveryEvent.fixture_delivered()
+    fixture = Auctions.get_fixture!(fixture.id)
+
+    event =
+      fixture
+      |> DeliveryEvent.fixture_delivered()
+
+    event
     |> AuctionEventStorage.persist_event!()
+
+    event
+    |> EventNotifier.emit(fixture)
 
     {:ok, fixture}
   end

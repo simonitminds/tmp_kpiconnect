@@ -1,0 +1,8 @@
+<p style='font-family: "Arial";'><b>Supplier: </b><%= @fixture.supplier.name %></p>
+<p style='font-family: "Arial";'><b>Vessel: </b><%= @fixture.vessel.name %></p>
+<p style='font-family: "Arial";'><b>Fuel: </b><%= @fixture.fuel.name %></p>
+<p style='font-family: "Arial";'><b>Price: </b><%= format_price(@fixture.price) %></p>
+<p style='font-family: "Arial";'><b>Quantity: </b><%= format_price(@fixture.quantity) %> M/T</p>
+<p style='font-family: "Arial";'><b>ETA: </b><%= convert_date?(@fixture.eta) %></p>
+<p style='font-family: "Arial";'><b>ETD: </b><%= convert_date?(@fixture.etd) %></p>
+<br/>
