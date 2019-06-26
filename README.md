@@ -91,6 +91,12 @@ We're using Ansible to manage server provisioning and deployments. For the most 
 
 New users will need to add their account information to `ansible/inventory/group_vars/all/users.yml` and have the `manage-users` playbook run before they will be able to access the servers.
 
+# Clearing old releases
+
+If something goes wrong with deploying a release, 9 times out of 10 it's because that particular environment is out storage space for new releases.
+
+You can find all the previous and current releases in `/opt/ocm/oceanconnect/releases`. When removing them, be careful not to delete the most recent release.
+
 
 ### Setting up `yarn`
 
