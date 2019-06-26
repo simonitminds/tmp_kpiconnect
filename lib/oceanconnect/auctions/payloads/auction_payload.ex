@@ -146,18 +146,18 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  def format_fixture_prices(fixtures) when is_list(fixtures) do
+  defp format_fixture_prices(fixtures) when is_list(fixtures) do
     fixtures
     |> Enum.map(fn %{price: price} = fixture ->
       %{format_fixture_prices(fixture) | price: Decimal.to_string(price)}
     end)
   end
 
-  def format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) when not is_nil(price) do
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) when not is_nil(price) do
     %{fixture | delivered_price: Decimal.to_string(price)}
   end
 
-  def format_fixture_prices(fixture), do: fixture
+  defp format_fixture_prices(fixture), do: fixture
 
   defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction)
        when is_auction_state(state_struct) do
