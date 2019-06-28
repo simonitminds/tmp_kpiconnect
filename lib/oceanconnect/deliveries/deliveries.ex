@@ -3,7 +3,15 @@ defmodule Oceanconnect.Deliveries do
 
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, TermAuction, AuctionEvent, AuctionFixture, AuctionEventStorage}
+
+  alias Oceanconnect.Auctions.{
+    Auction,
+    TermAuction,
+    AuctionEvent,
+    AuctionFixture,
+    AuctionEventStorage
+  }
+
   alias Oceanconnect.Accounts
 
   def change_claim(%Claim{} = claim) do

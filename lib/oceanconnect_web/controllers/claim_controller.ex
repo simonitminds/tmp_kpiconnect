@@ -107,7 +107,8 @@ defmodule OceanconnectWeb.ClaimController do
   end
 
   def create(conn, %{"auction_id" => auction_id, "claim" => claim_params}) do
-    current_user = %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    current_user =
+      %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction
@@ -162,7 +163,8 @@ defmodule OceanconnectWeb.ClaimController do
 
   defp build_params_for_claim(claim_params), do: claim_params
 
-  defp params_from_selected_fixture(%{"fixture_id" => fixture_id} = claim_params) when fixture_id != "" do
+  defp params_from_selected_fixture(%{"fixture_id" => fixture_id} = claim_params)
+       when fixture_id != "" do
     case Auctions.get_fixture(fixture_id) do
       nil ->
         claim_params
@@ -227,7 +229,8 @@ defmodule OceanconnectWeb.ClaimController do
       }
 
       with {:ok, claim} <- Deliveries.update_claim(claim, update_params),
-           {:ok, claim_reponse} <- Deliveries.create_claim_response(response_params, claim, current_user) do
+           {:ok, claim_reponse} <-
+             Deliveries.create_claim_response(response_params, claim, current_user) do
         case claim.closed do
           true ->
             conn

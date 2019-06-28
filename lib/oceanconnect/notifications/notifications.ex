@@ -63,31 +63,30 @@ defmodule Oceanconnect.Notifications do
   end
 
   def emails_for_event(
-    %AuctionEvent{type: :fixture_created},
-    %AuctionFixture{} = fixture
-  ) do
+        %AuctionEvent{type: :fixture_created},
+        %AuctionFixture{} = fixture
+      ) do
     Emails.FixtureCreated.generate(fixture)
   end
 
   def emails_for_event(
         %AuctionEvent{type: :fixture_delivered},
         %AuctionFixture{} = fixture
-    ) do
-
+      ) do
     Emails.FixtureDelivered.generate(fixture)
   end
 
   def emails_for_event(
-    %AuctionEvent{type: :fixture_updated, data: %{updated: changeset}},
-    %AuctionFixture{} = fixture
-  ) do
+        %AuctionEvent{type: :fixture_updated, data: %{updated: changeset}},
+        %AuctionFixture{} = fixture
+      ) do
     Emails.FixtureUpdated.generate(fixture, changeset)
   end
 
   def emails_for_event(
-    %AuctionEvent{type: :fixture_changes_proposed, data: %{changeset: changeset, user: user}},
-    %AuctionFixture{} = fixture
-  ) do
+        %AuctionEvent{type: :fixture_changes_proposed, data: %{changeset: changeset, user: user}},
+        %AuctionFixture{} = fixture
+      ) do
     Emails.FixtureChangesProposed.generate(fixture, changeset, user)
   end
 

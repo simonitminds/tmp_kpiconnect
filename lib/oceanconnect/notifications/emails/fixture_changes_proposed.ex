@@ -12,9 +12,9 @@ defmodule Oceanconnect.Notifications.Emails.FixtureChangesProposed do
 
   defp emails(fixture, changes, user) do
     admin_and_buyer_emails =
-      buyer_recipients(fixture) ++
-        Accounts.list_admin_users()
-        |> emails(fixture, changes, user)
+      (buyer_recipients(fixture) ++
+         Accounts.list_admin_users())
+      |> emails(fixture, changes, user)
 
     supplier_emails =
       supplier_recipients(fixture)
@@ -28,6 +28,7 @@ defmodule Oceanconnect.Notifications.Emails.FixtureChangesProposed do
       case changes do
         %{comment: comment} ->
           {Map.drop(changes, [:comment]), comment}
+
         _ ->
           {changes, "No comment was made on this proposition."}
       end
@@ -37,7 +38,9 @@ defmodule Oceanconnect.Notifications.Emails.FixtureChangesProposed do
     recipients
     |> Enum.map(fn %{is_admin: is_admin} = recipient ->
       admin_email(recipient)
-      |> subject("Post-auction changes have been proposed for Auction #{auction_id} on #{vessel.name}")
+      |> subject(
+        "Post-auction changes have been proposed for Auction #{auction_id} on #{vessel.name}"
+      )
       |> render("fixture_changes_proposed.html",
         user: recipient,
         proposing_user: user,

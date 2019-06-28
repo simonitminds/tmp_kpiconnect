@@ -1384,7 +1384,7 @@ defmodule Oceanconnect.AuctionsTest do
       auction_id = auction.id
       result = Auctions.auctions_with_fixtures()
       assert Map.has_key?(result, auction_id)
-      assert Enum.map(fixtures, &(&1.id)) == Enum.map(result[auction_id], &(&1.id))
+      assert Enum.map(fixtures, & &1.id) == Enum.map(result[auction_id], & &1.id)
     end
 
     test "from_bid_and_vessel_fuel", %{

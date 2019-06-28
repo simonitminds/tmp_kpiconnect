@@ -13,9 +13,9 @@ defmodule Oceanconnect.Notifications.Emails.FixtureCreated do
   defp emails(%{auction_id: auction_id, supplier_id: supplier_id} = fixture) do
     auction = %{buyer_id: buyer_id} = Auctions.get_auction!(auction_id)
 
-    recipients(buyer_id)
-      ++ recipients(supplier_id)
-      |> emails(fixture, auction)
+    (recipients(buyer_id) ++
+       recipients(supplier_id))
+    |> emails(fixture, auction)
   end
 
   defp emails(recipients, %{auction_id: auction_id, vessel: vessel} = fixture, auction) do

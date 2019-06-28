@@ -13,9 +13,9 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
       case Auth.current_user_is_admin?(conn) do
         true ->
           Auctions.list_auctions()
-          |> Enum.reject(& &1.type != "spot")
+          |> Enum.reject(&(&1.type != "spot"))
           |> Oceanconnect.Repo.preload(:fixtures)
-          |> Enum.reject(& is_nil(&1.fixtures) or &1.fixtures == [])
+          |> Enum.reject(&(is_nil(&1.fixtures) or &1.fixtures == []))
           |> Enum.map(fn auction ->
             auction
             |> FixturePayload.get_fixture_payload!(current_user)
@@ -24,9 +24,9 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
 
         false ->
           Auctions.list_participating_auctions(company_id)
-          |> Enum.reject(& &1.type != "spot")
+          |> Enum.reject(&(&1.type != "spot"))
           |> Oceanconnect.Repo.preload(:fixtures)
-          |> Enum.reject(& is_nil(&1.fixtures) or &1.fixtures == [])
+          |> Enum.reject(&(is_nil(&1.fixtures) or &1.fixtures == []))
           |> Enum.map(fn auction ->
             auction
             |> FixturePayload.get_fixture_payload!(current_user)
@@ -37,10 +37,15 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
     render(conn, "index.json", data: fixture_payloads)
   end
 
-  def deliver(conn, %{"fixture_id" => fixture_id, "auction_id" => auction_id, "delivery_params" => delivery_params}) do
+  def deliver(conn, %{
+        "fixture_id" => fixture_id,
+        "auction_id" => auction_id,
+        "delivery_params" => delivery_params
+      }) do
     fixture_id = String.to_integer(fixture_id)
     auction_id = String.to_integer(auction_id)
     delivery_params = Map.merge(delivery_params, %{"delivered" => true})
+
     with current_user = %User{is_admin: true} <- Auth.current_user(conn),
          auction = %Auction{} <- Auctions.get_auction!(auction_id),
          fixture = %AuctionFixture{} <- Auctions.get_fixture!(fixture_id),
@@ -56,4 +61,3 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
     end
   end
 end
-
