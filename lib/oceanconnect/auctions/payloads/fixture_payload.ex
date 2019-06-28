@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     end)
   end
 
-  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) do
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) when not is_nil(price) do
     %{fixture | delivered_price: Decimal.to_string(price)}
   end
 
