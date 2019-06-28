@@ -39,7 +39,7 @@ defmodule OceanconnectWeb.AuctionView do
     :fixture_created,
     :fixture_updated
   ]
-  @evets_with_delivery_data [
+  @events_with_delivery_data [
     :claim_created,
     :claim_response_created
   ]

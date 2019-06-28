@@ -63,6 +63,13 @@ defmodule Oceanconnect.Notifications do
   end
 
   def emails_for_event(
+    %AuctionEvent{type: :fixture_created},
+    %AuctionFixture{} = fixture
+  ) do
+    Emails.FixtureCreated.generate(fixture)
+  end
+
+  def emails_for_event(
         %AuctionEvent{type: :fixture_delivered},
         %AuctionFixture{} = fixture
     ) do

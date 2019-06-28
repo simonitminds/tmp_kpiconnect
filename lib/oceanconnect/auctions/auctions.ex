@@ -1642,9 +1642,17 @@ defmodule Oceanconnect.Auctions do
       bids
       |> Enum.map(&fixture_from_bid/1)
 
-    fixtures
-    |> Enum.map(&DeliveryEvent.fixture_created/1)
-    |> Enum.map(&AuctionEventStorage.persist_event!/1)
+    Enum.map(fixtures, fn fixture ->
+      event =
+        fixture
+        |> DeliveryEvent.fixture_created()
+
+      event
+      |> AuctionEventStorage.persist_event!()
+
+      event
+      |> Deliveries.EventNotifier.emit(fixture)
+    end)
 
     {:ok, fixtures}
   end
@@ -1663,9 +1671,13 @@ defmodule Oceanconnect.Auctions do
       |> AuctionFixture.update_changeset(attrs)
       |> Repo.insert()
 
-    fixture
-    |> DeliveryEvent.fixture_created()
+    event =
+      fixture
+      |> DeliveryEvent.fixture_created()
+    event
     |> AuctionEventStorage.persist_event!()
+    event
+    |> Deliveries.EventNotifier.emit(fixture)
 
     {:ok, fixture}
   end
