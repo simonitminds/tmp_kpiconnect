@@ -12,12 +12,12 @@ defmodule OceanconnectWeb.AuctionFixtureController do
 
   def edit(conn, %{"auction_id" => auction_id, "fixture_id" => fixture_id}) do
     current_user = Auth.current_user(conn)
+
     with %Auction{buyer_id: buyer_id} = auction <-
            Auctions.get_auction!(auction_id),
          status when status in [:closed, :expired] <- Auctions.get_auction_status!(auction),
-         %AuctionFixture{supplier_id: supplier_id} = fixture  <- Auctions.get_fixture!(fixture_id),
+         %AuctionFixture{supplier_id: supplier_id} = fixture <- Auctions.get_fixture!(fixture_id),
          true <- current_user.company_id == buyer_id or current_user.company_id == supplier_id do
-
       is_buyer? = current_user.company_id == buyer_id
 
       changeset = Auctions.change_fixture(fixture)
@@ -39,17 +39,16 @@ defmodule OceanconnectWeb.AuctionFixtureController do
   end
 
   def propose_changes(conn, %{
-    "auction_id" => auction_id,
-    "fixture_id" => fixture_id,
-    "auction_fixture" => fixture_params
-  }) do
+        "auction_id" => auction_id,
+        "fixture_id" => fixture_id,
+        "auction_fixture" => fixture_params
+      }) do
     current_user = Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
          status when status in [:closed, :expired] <- Auctions.get_auction_status!(auction),
          %AuctionFixture{supplier_id: supplier_id} = fixture <- Auctions.get_fixture!(fixture_id),
          true <- current_user.company_id == buyer_id or current_user.company_id == supplier_id do
-
       is_buyer? = current_user.company_id == buyer_id
 
       case Deliveries.propose_fixture_changes(fixture, fixture_params, current_user) do

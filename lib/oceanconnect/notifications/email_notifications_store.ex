@@ -43,7 +43,8 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     {:noreply, state}
   end
 
-  def handle_info({%AuctionEvent{type: type} = event, fixture}, state) when type in @fixture_events do
+  def handle_info({%AuctionEvent{type: type} = event, fixture}, state)
+      when type in @fixture_events do
     process(event, fixture)
 
     {:noreply, state}

@@ -18,6 +18,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     cond do
       buyer_id == company_id ->
         get_buyer_fixture_payload!(auction)
+
       true ->
         get_supplier_fixture_payload!(auction, company_id)
     end
@@ -39,7 +40,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
       fixtures:
         auction
         |> Auctions.fixtures_for_auction()
-        |> Enum.reject(& &1.supplier_id != supplier_id)
+        |> Enum.reject(&(&1.supplier_id != supplier_id))
         |> format_fixture_prices()
     }
   end
@@ -51,15 +52,16 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     end)
   end
 
-  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) when not is_nil(price) do
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture)
+       when not is_nil(price) do
     %{fixture | delivered_price: Decimal.to_string(price)}
   end
 
   defp format_fixture_prices(fixture), do: fixture
 
   def json_from_payload(%FixturePayload{
-    auction: auction,
-    fixtures: fixtures
+        auction: auction,
+        fixtures: fixtures
       }) do
     %{
       auction: auction,

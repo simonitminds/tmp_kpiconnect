@@ -148,24 +148,31 @@ defmodule OceanconnectWeb.EmailView do
     %{name: vessel_name} = Auctions.get_vessel!(new_vessel_id)
     {:vessel_id, vessel_name, old_vessel_name}
   end
-  defp changed_fixture_value_for_key(:supplier_id, new_supplier_id, %{supplier_id: old_supplier_id}) do
+
+  defp changed_fixture_value_for_key(:supplier_id, new_supplier_id, %{
+         supplier_id: old_supplier_id
+       }) do
     %{name: old_supplier_name} = Accounts.get_company!(old_supplier_id)
     %{name: supplier_name} = Accounts.get_company!(new_supplier_id)
     {:supplier_id, supplier_name, old_supplier_name}
   end
+
   defp changed_fixture_value_for_key(:supplier_id, new_supplier_id, _fixture) do
     %{name: supplier_name} = Accounts.get_company!(new_supplier_id)
     {:supplier_id, supplier_name, "PRIVATE INFORMATION"}
   end
+
   defp changed_fixture_value_for_key(:fuel_id, new_fuel_id, %{fuel_id: old_fuel_id}) do
     %{name: old_fuel_name} = Auctions.get_fuel!(old_fuel_id)
     %{name: fuel_name} = Auctions.get_fuel!(new_fuel_id)
     {:fuel_id, fuel_name, old_fuel_name}
   end
+
   defp changed_fixture_value_for_key(key, value, fixture) when key != :comment do
     fixture = Map.from_struct(fixture)
     {key, value, fixture[key]}
   end
+
   defp changed_fixture_value_for_key(_, _, _), do: nil
 
   defp format_changed_field_name(key) do
@@ -175,6 +182,7 @@ defmodule OceanconnectWeb.EmailView do
         |> String.split("_")
         |> hd()
         |> String.upcase()
+
       true ->
         Atom.to_string(key)
         |> String.split("_")
@@ -215,13 +223,15 @@ defmodule OceanconnectWeb.EmailView do
           key
           |> Atom.to_string()
 
-        String.starts_with?(key, "original")
-          or String.starts_with?(key, "delivered")
-            or String.ends_with?(key, "id")
+        String.starts_with?(key, "original") or
+          String.starts_with?(key, "delivered") or
+          String.ends_with?(key, "id")
       end)
+
     delivered_fixture =
-      Enum.reduce(keys, %{}, fn (key, acc) ->
+      Enum.reduce(keys, %{}, fn key, acc ->
         delivered_key = String.to_atom("delivered_#{key}")
+
         value =
           cond do
             key in [:vessel, :fuel, :supplier] ->
@@ -229,12 +239,14 @@ defmodule OceanconnectWeb.EmailView do
                 fixture[key].id == fixture[delivered_key].id -> fixture[key]
                 true -> fixture[delivered_key]
               end
+
             true ->
               cond do
                 fixture[key] == fixture[delivered_key] -> fixture[key]
                 true -> fixture[delivered_key]
               end
           end
+
         Map.put(acc, key, value)
       end)
 

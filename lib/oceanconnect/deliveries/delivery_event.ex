@@ -3,9 +3,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
   alias Oceanconnect.Auctions.{AuctionEvent, AuctionFixture}
   alias Oceanconnect.Accounts.User
 
-  def fixture_created(
-        fixture = %AuctionFixture{id: fixture_id, auction_id: auction_id}
-      ) do
+  def fixture_created(fixture = %AuctionFixture{id: fixture_id, auction_id: auction_id}) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :fixture_created,

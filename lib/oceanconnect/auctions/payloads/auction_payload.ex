@@ -101,7 +101,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims:
         Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id)),
       fixtures:
-        Enum.filter(Auctions.fixtures_for_auction(auction), &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id))
+        Enum.filter(
+          Auctions.fixtures_for_auction(auction),
+          &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id)
+        )
         |> format_fixture_prices()
     }
   end
@@ -153,7 +156,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     end)
   end
 
-  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture) when not is_nil(price) do
+  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture)
+       when not is_nil(price) do
     %{fixture | delivered_price: Decimal.to_string(price)}
   end
 

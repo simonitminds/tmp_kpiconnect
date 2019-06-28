@@ -28,18 +28,31 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
     setup do
       auction = insert(:auction, auction_vessel_fuels: [build(:vessel_fuel)])
       state = Auctions.get_auction_state!(auction)
-      %Oceanconnect.Auctions.Auction{id: auction_id, auction_vessel_fuels: [vessel_fuel | _rest], suppliers: [supplier]} = auction
+
+      %Oceanconnect.Auctions.Auction{
+        id: auction_id,
+        auction_vessel_fuels: [vessel_fuel | _rest],
+        suppliers: [supplier]
+      } = auction
+
       bid = create_bid(3.50, 3.50, supplier.id, vessel_fuel.id, auction)
       initial_state = Oceanconnect.Auctions.AuctionStore.AuctionState.from_auction(auction)
       solution = %Oceanconnect.Auctions.Solution{bids: [bid]}
+
       state =
         [
           Oceanconnect.Auctions.Command.start_auction(auction, DateTime.utc_now(), nil),
           Oceanconnect.Auctions.Command.process_new_bid(bid, nil),
-          Oceanconnect.Auctions.Command.select_winning_solution(solution, auction, DateTime.utc_now(), "Smith", nil)
+          Oceanconnect.Auctions.Command.select_winning_solution(
+            solution,
+            auction,
+            DateTime.utc_now(),
+            "Smith",
+            nil
+          )
         ]
         |> Enum.reduce(initial_state, fn command, state ->
-        {:ok, events} = Oceanconnect.Auctions.Aggregate.process(state, command)
+          {:ok, events} = Oceanconnect.Auctions.Aggregate.process(state, command)
 
           events
           |> Enum.reduce(state, fn event, state ->
@@ -54,8 +67,13 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
     test "creating a fixture creates a fixture_created_event", %{auction: auction, state: state} do
       auction_id = auction.id
       {:ok, fixtures} = Auctions.finalize_auction(auction, state)
-      assert [%Oceanconnect.Auctions.AuctionEvent{type: :fixture_created, auction_id: ^auction_id}] =
-        Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(auction_id)
+
+      assert [
+               %Oceanconnect.Auctions.AuctionEvent{
+                 type: :fixture_created,
+                 auction_id: ^auction_id
+               }
+             ] = Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(auction_id)
     end
 
     test "updating a fixture creates a fixture_updated_event", %{auction: auction, state: state} do
@@ -63,16 +81,21 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
       Auctions.finalize_auction(auction, state)
       fixtures = Auctions.fixtures_for_auction(auction)
       fixture = hd(fixtures)
-      {:ok, updated_fixture} = Auctions.update_fixture(fixture, %{quantity: fixture.quantity + 1000})
+
+      {:ok, updated_fixture} =
+        Auctions.update_fixture(fixture, %{quantity: fixture.quantity + 1000})
 
       assert [
-              %Oceanconnect.Auctions.AuctionEvent{type: :fixture_updated,
-                                                     auction_id: ^auction_id,
-                                                     data: %{
-                                                       original: ^fixture,
-                                                       updated: %Ecto.Changeset{}}},
-              %Oceanconnect.Auctions.AuctionEvent{type: :fixture_created, auction_id: ^auction_id}] =
-        Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(auction_id)
+               %Oceanconnect.Auctions.AuctionEvent{
+                 type: :fixture_updated,
+                 auction_id: ^auction_id,
+                 data: %{original: ^fixture, updated: %Ecto.Changeset{}}
+               },
+               %Oceanconnect.Auctions.AuctionEvent{
+                 type: :fixture_created,
+                 auction_id: ^auction_id
+               }
+             ] = Oceanconnect.Auctions.AuctionEventStorage.events_by_auction(auction_id)
     end
   end
 end

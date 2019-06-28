@@ -26,6 +26,7 @@ defmodule Oceanconnect.Notifications.Emails.FixtureUpdated do
       case changes do
         %{comment: comment} ->
           {Map.drop(changes, [:comment]), comment}
+
         _ ->
           {changes, "No comment was made on this change."}
       end
@@ -33,7 +34,9 @@ defmodule Oceanconnect.Notifications.Emails.FixtureUpdated do
     recipients
     |> Enum.map(fn recipient ->
       base_email(recipient)
-      |> subject("Post-auction changes for Auction #{auction_id} on #{vessel.name} have been made")
+      |> subject(
+        "Post-auction changes for Auction #{auction_id} on #{vessel.name} have been made"
+      )
       |> render("fixture_updated.html",
         user: recipient,
         fixture: fixture,

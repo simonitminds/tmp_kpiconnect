@@ -11,6 +11,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
     [auction: auction1, fixtures: fixtures1] = create_auction_with_fixtures
     [auction: auction2, fixtures: fixtures2] = create_auction_with_fixtures
     fixtures = fixtures1 ++ fixtures2
+
     {:ok,
      %{
        auction: auction1,
@@ -28,11 +29,12 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
     test "can navigate to the fixture index from the admin panel" do
       AdminPage.visit()
       AdminPage.select_menu_item(:auction_fixtures)
-      assert Admin.Fixture.IndexPage.is_current_path?
+      assert Admin.Fixture.IndexPage.is_current_path?()
     end
 
     test "can see a list of fixtures grouped by auction", %{fixtures: fixtures} do
       Admin.Fixture.IndexPage.visit()
+
       for fixture <- fixtures do
         assert Admin.Fixture.IndexPage.has_fixture?(fixture)
       end
@@ -52,6 +54,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
         buyer: buyer_company,
         suppliers: [supplier_company]
       )
+
     auction_state = close_auction!(auction)
     {:ok, auction_fixtures} = Auctions.create_fixtures_from_state(auction_state)
     [auction: auction, fixtures: auction_fixtures]

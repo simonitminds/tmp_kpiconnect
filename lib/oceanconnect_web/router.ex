@@ -151,8 +151,18 @@ defmodule OceanconnectWeb.Router do
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
     get("/fixtures", AuctionFixtureController, :index)
-    get("/auctions/:auction_id/fixtures/:fixture_id/propose_changes", AuctionFixtureController, :edit)
-    put("/auctions/:auction_id/fixtures/:fixture_id/propose_changes", AuctionFixtureController, :propose_changes)
+
+    get(
+      "/auctions/:auction_id/fixtures/:fixture_id/propose_changes",
+      AuctionFixtureController,
+      :edit
+    )
+
+    put(
+      "/auctions/:auction_id/fixtures/:fixture_id/propose_changes",
+      AuctionFixtureController,
+      :propose_changes
+    )
 
     resources("/auctions/:auction_id/claims", ClaimController, except: [:delete])
     post("/auctions/:auction_id/claims/:id", ClaimController, :create_response)
@@ -181,9 +191,7 @@ defmodule OceanconnectWeb.Router do
       as: :admin_stop_impersonating_session
     )
 
-    get("/auctions/fixtures", AuctionFixtureController, :index,
-      as: :admin_auction_fixtures
-    )
+    get("/auctions/fixtures", AuctionFixtureController, :index, as: :admin_auction_fixtures)
 
     get("/auctions/:auction_id/fixtures", AuctionFixtureController, :show,
       as: :admin_auction_fixtures

@@ -7,7 +7,6 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     render(conn, "index.html")
   end
 
-
   def show(conn, %{"auction_id" => auction_id}) do
     auction = Auctions.get_auction!(auction_id)
     status = Auctions.get_auction_status!(auction)

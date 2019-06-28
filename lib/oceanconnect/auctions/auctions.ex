@@ -351,8 +351,8 @@ defmodule Oceanconnect.Auctions do
   def list_participating_auctions(company_id) do
     (buyer_auctions(company_id) ++
        buyer_term_auctions(company_id) ++
-         supplier_auctions(company_id) ++
-           supplier_term_auctions(company_id))
+       supplier_auctions(company_id) ++
+       supplier_term_auctions(company_id))
     |> Enum.uniq_by(& &1.id)
   end
 
@@ -1602,24 +1602,45 @@ defmodule Oceanconnect.Auctions do
 
   def auctions_with_fixtures do
     Repo.all(AuctionFixture)
-    |> Enum.group_by(&(&1.auction_id))
+    |> Enum.group_by(& &1.auction_id)
   end
 
   def get_fixture(fixture_id) do
     Repo.get(AuctionFixture, fixture_id)
-    |> Repo.preload([:supplier, :vessel, :fuel, :delivered_supplier, :delivered_vessel, :delivered_fuel])
+    |> Repo.preload([
+      :supplier,
+      :vessel,
+      :fuel,
+      :delivered_supplier,
+      :delivered_vessel,
+      :delivered_fuel
+    ])
   end
 
   def get_fixture!(fixture_id) do
     Repo.get!(AuctionFixture, fixture_id)
-    |> Repo.preload([:supplier, :vessel, :fuel, :delivered_supplier, :delivered_vessel, :delivered_fuel])
+    |> Repo.preload([
+      :supplier,
+      :vessel,
+      :fuel,
+      :delivered_supplier,
+      :delivered_vessel,
+      :delivered_fuel
+    ])
   end
 
   def fixtures_for_auction(auction = %struct{}) when is_auction(struct) do
     auction
     |> AuctionFixture.from_auction()
     |> Repo.all()
-    |> Repo.preload([:supplier, :fuel, :vessel, :delivered_supplier, :delivered_fuel, :delivered_vessel])
+    |> Repo.preload([
+      :supplier,
+      :fuel,
+      :vessel,
+      :delivered_supplier,
+      :delivered_fuel,
+      :delivered_vessel
+    ])
   end
 
   def fixtures_for_vessel_fuel(avf = %AuctionVesselFuel{}) do
@@ -1642,9 +1663,17 @@ defmodule Oceanconnect.Auctions do
       bids
       |> Enum.map(&fixture_from_bid/1)
 
-    fixtures
-    |> Enum.map(&DeliveryEvent.fixture_created/1)
-    |> Enum.map(&AuctionEventStorage.persist_event!/1)
+    Enum.map(fixtures, fn fixture ->
+      event =
+        fixture
+        |> DeliveryEvent.fixture_created()
+
+      event
+      |> AuctionEventStorage.persist_event!()
+
+      event
+      |> Deliveries.EventNotifier.emit(fixture)
+    end)
 
     {:ok, fixtures}
   end
@@ -1663,9 +1692,15 @@ defmodule Oceanconnect.Auctions do
       |> AuctionFixture.update_changeset(attrs)
       |> Repo.insert()
 
-    fixture
-    |> DeliveryEvent.fixture_created()
+    event =
+      fixture
+      |> DeliveryEvent.fixture_created()
+
+    event
     |> AuctionEventStorage.persist_event!()
+
+    event
+    |> Deliveries.EventNotifier.emit(fixture)
 
     {:ok, fixture}
   end
@@ -1674,6 +1709,7 @@ defmodule Oceanconnect.Auctions do
     changeset =
       old_fixture
       |> AuctionFixture.update_changeset(attrs)
+
     updated_fixture =
       changeset
       |> Repo.update()
@@ -1681,7 +1717,7 @@ defmodule Oceanconnect.Auctions do
     event = Deliveries.DeliveryEvent.fixture_updated(old_fixture, changeset)
 
     event
-    |>AuctionEventStorage.persist_event!
+    |> AuctionEventStorage.persist_event!()
 
     event
     |> Deliveries.EventNotifier.emit(old_fixture)

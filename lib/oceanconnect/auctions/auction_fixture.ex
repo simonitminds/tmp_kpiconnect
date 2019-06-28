@@ -40,7 +40,11 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
 
     belongs_to(:delivered_vessel, Oceanconnect.Auctions.Vessel, foreign_key: :delivered_vessel_id)
     belongs_to(:delivered_fuel, Oceanconnect.Auctions.Fuel, foreign_key: :delivered_fuel_id)
-    belongs_to(:delivered_supplier, Oceanconnect.Accounts.Company, foreign_key: :delivered_supplier_id)
+
+    belongs_to(:delivered_supplier, Oceanconnect.Accounts.Company,
+      foreign_key: :delivered_supplier_id
+    )
+
     field(:delivered_quantity, :integer)
     field(:delivered_eta, :utc_datetime_usec)
     field(:delivered_etd, :utc_datetime_usec)
@@ -174,13 +178,19 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     )
   end
 
-  defp maybe_parse_date_field(%{"delivered_eta" => delivered_eta, "delivered_etd" => delivered_etd} = attrs) do
-    Map.merge(attrs, %{"delivered_eta" => parse_date(delivered_eta), "delivered_etd" => parse_date(delivered_etd)})
+  defp maybe_parse_date_field(
+         %{"delivered_eta" => delivered_eta, "delivered_etd" => delivered_etd} = attrs
+       ) do
+    Map.merge(attrs, %{
+      "delivered_eta" => parse_date(delivered_eta),
+      "delivered_etd" => parse_date(delivered_etd)
+    })
   end
 
   defp parse_date(""), do: ""
   defp parse_date(nil), do: ""
   defp parse_date(%DateTime{} = date), do: date
+
   defp parse_date(epoch) do
     epoch
     |> String.to_integer()
