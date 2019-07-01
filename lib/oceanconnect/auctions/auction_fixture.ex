@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   alias Oceanconnect.Auctions.{AuctionVesselFuel, AuctionBid}
 
   @derive {Poison.Encoder,
-           except: [:__meta__, :auction, :original_vessel, :original_fuel, :original_supplier]}
+           except: [:__meta__, :auction, :original_vessel, :original_fuel, :original_supplier, :delivered_supplier, :delivered_fuel, :delivered_vessel]}
   schema "auction_fixtures" do
     # current_relationships
     # TODO: virtualize auction to work with term auctions

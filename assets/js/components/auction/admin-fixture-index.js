@@ -25,7 +25,7 @@ export default class AdminAuctionFixturesIndex extends React.Component {
       reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
       displayDeliveryForm: false,
       selectedFixtureForDelivery: "",
-      previsoulySelectedCheckbox: null
+      selectedDeliveryCheckbox: null
     }
   }
 
@@ -172,7 +172,7 @@ export default class AdminAuctionFixturesIndex extends React.Component {
     const selectedDeliveryCheckbox = this.state.selectedDeliveryCheckbox
     const previouslySelectedFixture = this.state.selectedFixtureForDelivery;
     if (previouslySelectedFixture && !previouslySelectedFixture.delivered) {
-      selectedDeliveryCheckbox.checked = false
+      selectedDeliveryCheckbox.checked = false;
     }
     const selectedFixtureForDelivery = _
       .chain(this.props.fixturePayloads)

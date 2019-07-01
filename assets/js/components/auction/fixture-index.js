@@ -4,8 +4,10 @@ import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
+import CheckBoxField from '../check-box-field';
 import CollapsibleSection from './common/collapsible-section';
 import AuctionTitle from './common/auction-title';
+import FixtureReportContainer from '../../containers/fixture-report-container';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
@@ -23,7 +25,10 @@ export default class AuctionFixturesIndex extends React.Component {
         startTimeRange: null,
         endTimeRange: null,
       },
-      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0))
+      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
+      displayFixtureReport: false,
+      selectedFixtureForReport: null,
+      selectedReportCheckbox: null
     }
   }
 
@@ -143,6 +148,21 @@ export default class AuctionFixturesIndex extends React.Component {
       }
     }
     exportCSV(csv, fileName());
+  }
+
+  handleReportClick(fixture, ev) {
+    const selectedReportCheckbox = this.state.selectedReportCheckbox;
+    const previouslySelectedFixture = this.state.selectedFixtureForReport;
+
+    if (previouslySelectedFixture && !previouslySelectedFixture.delivered && !_.isEqual(selectedReportCheckbox, ev)) {
+      selectedReportCheckbox.checked = false;
+    }
+
+    this.setState({
+      selectedFixtureForReport: fixture,
+      displayFixtureReport: ev.target.checked,
+      selectedReportCheckbox: ev.target
+    })
   }
 
   render() {
@@ -359,6 +379,7 @@ export default class AuctionFixturesIndex extends React.Component {
                           <th>Supplier</th>
                           <th>ETA</th>
                           <th>ETD</th>
+                          <th>Show Report</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -378,6 +399,12 @@ export default class AuctionFixturesIndex extends React.Component {
                                 <td className="qa-auction-fixture-supplier">{supplier.name}</td>
                                 <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
                                 <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                                <td>
+                                  <CheckBoxField
+                                    defaultChecked={false}
+                                    onChange={this.handleReportClick.bind(this, fixture)}
+                                  />
+                                </td>
                                 <td className="text-right">
                                   <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propse_chabges-${fixture.id}`}>Propose Changes</a>
                                 </td>
@@ -387,6 +414,9 @@ export default class AuctionFixturesIndex extends React.Component {
                         }
                       </tbody>
                     </table>
+                    { this.state.displayFixtureReport && auction.id === this.state.selectedFixtureForReport.auction_id &&
+                      <FixtureReportContainer fixture={this.state.selectedFixtureForReport} />
+                    }
                 </div>
               );
             })
