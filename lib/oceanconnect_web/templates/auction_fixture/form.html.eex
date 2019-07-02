@@ -76,6 +76,7 @@
 
       <div class="field">
         <%= label f, :comment, "Notes", class: "label" %>
+        <p class="is-italic has-text-gray-3 has-margin-bottom-md">Please specify the changes made and any additional information necessary.</p>
         <div class="control">
           <%= textarea f, :comment, class: "textarea qa-admin-fixture-comment" %>
         </div>
