@@ -115,7 +115,7 @@
             <%= if @claim.responses do %>
               <%= for response <- @claim.responses do %>
                 <div class="box qa-claim-response-<%= "#{response.id}" %>">
-                  <p class="qa-response-content"><%= response.content %></p>
+                  <p style="word-break: break-word;"class="qa-response-content"><%= response.content %></p>
                   <p><strong><span class="qa-response-author"><%= Oceanconnect.Accounts.User.full_name(response.author) %></span> (<%= response.author.company.name %>)</strong><span class="has-text-gray-3"> <%= convert_date?(response.inserted_at) %></span></p>
                 </div>
               <% end %>
