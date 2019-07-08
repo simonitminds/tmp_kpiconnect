@@ -6,6 +6,7 @@ import DateRangeInput from '../date-range-input';
 import CheckBoxField from '../check-box-field';
 import AuctionTitle from './common/auction-title';
 import FixtureDeliveryForm from './fixture-delivery-form';
+import FixtureReportContainer from '../../containers/fixture-report-container';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
@@ -25,7 +26,9 @@ export default class AdminAuctionFixturesIndex extends React.Component {
       reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
       displayDeliveryForm: false,
       selectedFixtureForDelivery: "",
-      selectedDeliveryCheckbox: null
+      selectedDeliveryCheckbox: null,
+      displayFixtureReport: false,
+      selectedFixtureForReport: null,
     }
   }
 
@@ -187,6 +190,20 @@ export default class AdminAuctionFixturesIndex extends React.Component {
     });
   }
 
+  handleReportClick(fixture, ev) {
+    ev.preventDefault();
+    if (this.state.displayFixtureReport) {
+      this.setState({
+        selectedFixtureForReport: null,
+        displayFixtureReport: false,
+      })
+    } else {
+      this.setState({
+        selectedFixtureForReport: fixture,
+        displayFixtureReport: true,
+      })
+    }
+  }
 
   render() {
     const availableAuctions = _
@@ -377,11 +394,13 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                         <th>ETD</th>
                         <th>Delivered</th>
                         <th></th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       {
                         _.map(fixtures, (fixture) => {
+                          console.log(fixture)
                           const delivered = _.get(fixture, 'delivered', false);
                           const vessel = delivered ? _.get(fixture, 'delivered_vessel.name', '—') : _.get(fixture, 'vessel.name', "—");
                           const fuel = delivered ? _.get(fixture, 'delivered_fuel.name', '—') : _.get(fixture, 'fuel.name', "—");
@@ -414,6 +433,9 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                                     opts={{ readOnly: delivered }}
                                   />
                                 </td>
+                                <td>
+                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-show_report-${fixture.id}`} onClick={this.handleReportClick.bind(this, fixture)}>{ this.state.displayFixtureReport ? 'Hide Report' : 'Show Report'}</button>
+                                </td>
                                 <td className="text-right">
                                   <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>
                                 </td>
@@ -426,6 +448,9 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                   </table>
                   { this.state.displayDeliveryForm && auction.id === this.state.selectedFixtureForDelivery.auction_id &&
                     <FixtureDeliveryForm fixture={this.state.selectedFixtureForDelivery} fixturePayloads={this.props.fixturePayloads} handleDeliverySubmit={this.handleDeliverySubmit.bind(this)} />
+                  }
+                  { this.state.displayFixtureReport && auction.id === this.state.selectedFixtureForReport.auction_id &&
+                    <FixtureReportContainer fixture={this.state.selectedFixtureForReport} />
                   }
                 </section>
               </div>

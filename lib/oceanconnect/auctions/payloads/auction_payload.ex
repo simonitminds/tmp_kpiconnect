@@ -105,7 +105,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           Auctions.fixtures_for_auction(auction),
           &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id)
         )
-        |> format_fixture_prices()
+        |> format_fixtures()
     }
   end
 
@@ -145,23 +145,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims: Deliveries.claims_for_auction(auction),
       fixtures:
         Auctions.fixtures_for_auction(auction)
-        |> format_fixture_prices()
+        |> format_fixtures()
     }
   end
-
-  defp format_fixture_prices(fixtures) when is_list(fixtures) do
-    fixtures
-    |> Enum.map(fn %{price: price} = fixture ->
-      %{format_fixture_prices(fixture) | price: Decimal.to_string(price)}
-    end)
-  end
-
-  defp format_fixture_prices(%{delivered: true, delivered_price: price} = fixture)
-       when not is_nil(price) do
-    %{fixture | delivered_price: Decimal.to_string(price)}
-  end
-
-  defp format_fixture_prices(fixture), do: fixture
 
   defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction)
        when is_auction_state(state_struct) do
@@ -287,4 +273,88 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       fixtures: fixtures
     }
   end
+
+  defp format_fixtures(fixtures) when is_list(fixtures) do
+    fixtures
+    |> Enum.map(fn fixture ->
+      fixture
+      |> format_fixture_prices()
+      |> format_fixture_quantities()
+      |> Auctions.strip_non_loaded()
+    end)
+  end
+
+  defp format_fixture_prices(
+         %{
+           price: %Decimal{} = price,
+           original_price: %Decimal{} = original_price,
+           delivered_price: %Decimal{} = delivered_price
+         } = fixture
+       ) do
+    %{
+      fixture
+      | price: Decimal.to_string(price),
+        original_price: Decimal.to_string(price),
+        delivered_price: Decimal.to_string(delivered_price)
+    }
+  end
+
+  defp format_fixture_prices(%{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture) do
+    %{
+      fixture
+      | price: Decimal.to_string(price),
+        original_price: Decimal.to_string(original_price)
+    }
+  end
+
+  defp format_fixture_prices(%{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture) do
+    %{
+      fixture
+      | price: Decimal.to_string(price),
+        delivered_price: Decimal.to_string(delivered_price)
+    }
+  end
+
+  defp format_fixture_prices(%{price: %Decimal{} = price} = fixture) do
+    %{
+      fixture
+      | price: Decimal.to_string(price)
+    }
+  end
+
+  defp format_fixture_prices(fixture), do: fixture
+
+  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+    %{
+      fixture
+      | quantity: Decimal.to_string(quantity),
+        original_quantity: Decimal.to_string(original_quantity),
+        delivered_quantity: Decimal.to_string(delivered_quantity)
+    }
+  end
+
+  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} = fixture) do
+    %{
+      fixture
+      | quantity: Decimal.to_string(quantity),
+        original_quantity: Decimal.to_string(original_quantity)
+    }
+  end
+
+  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+    %{
+      fixture
+      | quantity: Decimal.to_string(quantity),
+        delivered_quantity: Decimal.to_string(delivered_quantity)
+    }
+  end
+
+  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity} = fixture) do
+    %{
+      fixture
+      | quantity: Decimal.to_string(quantity)
+    }
+  end
+
+  defp format_fixture_quantities(fixture), do: fixture
 end

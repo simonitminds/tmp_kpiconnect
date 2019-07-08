@@ -28,7 +28,6 @@ export default class AuctionFixturesIndex extends React.Component {
       reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
       displayFixtureReport: false,
       selectedFixtureForReport: null,
-      selectedReportCheckbox: null
     }
   }
 
@@ -163,6 +162,21 @@ export default class AuctionFixturesIndex extends React.Component {
       displayFixtureReport: ev.target.checked,
       selectedReportCheckbox: ev.target
     })
+  }
+
+  handleReportClick(fixture, ev) {
+    ev.preventDefault();
+    if (this.state.displayFixtureReport) {
+      this.setState({
+        selectedFixtureForReport: null,
+        displayFixtureReport: false,
+      })
+    } else {
+      this.setState({
+        selectedFixtureForReport: fixture,
+        displayFixtureReport: true,
+      })
+    }
   }
 
   render() {
@@ -379,7 +393,8 @@ export default class AuctionFixturesIndex extends React.Component {
                           <th>Supplier</th>
                           <th>ETA</th>
                           <th>ETD</th>
-                          <th>Show Report</th>
+                          <th>Delivered</th>
+                          <th></th>
                           <th></th>
                         </tr>
                       </thead>
@@ -400,13 +415,13 @@ export default class AuctionFixturesIndex extends React.Component {
                                 <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
                                 <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
                                 <td>
-                                  <CheckBoxField
-                                    defaultChecked={false}
-                                    onChange={this.handleReportClick.bind(this, fixture)}
-                                  />
+                                  <CheckBoxField defaultChecked={fixture.delivered} opts={{ readOnly: true }} />
+                                </td>
+                                <td>
+                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-show_report-${fixture.id}`} onClick={this.handleReportClick.bind(this, fixture)}>{ this.state.displayFixtureReport ? 'Hide Report' : 'Show Report'}</button>
                                 </td>
                                 <td className="text-right">
-                                  <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propse_chabges-${fixture.id}`}>Propose Changes</a>
+                                  <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propose_changes-${fixture.id}`}>Propose Changes</a>
                                 </td>
                               </tr>
                             );

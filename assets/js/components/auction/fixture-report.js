@@ -1,35 +1,57 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
 import FixtureEvent from '../fixtures/fixture-event';
+import FixtureEventChanges from '../fixtures/fixture-event-changes';
 import { formatUTCDateTime } from '../../utilities';
+import { exportCSV, parseCSVFromEvents } from '../../reporting-utilities';
 
-const FixtureReport = ({ fixtureEventPayload }) => {
-  console.log(fixtureEventPayload)
-  const fixture = _.get(fixtureEventPayload, 'fixture');
-  const auction = _.get(fixtureEventPayload, 'auction');
-  const events = _.get(fixtureEventPayload, 'events');
-  console.log(events.length)
-  console.log(auction)
+export default class FixtureReport extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-  return(
-    <>
-      {
-        _.map(events, event => {
-          return(
-            <div key={event.id}>
-              <div>{formatUTCDateTime(event.time_entered)}</div>
+  handleExportClick(_ev) {
+    const fixtureEventPayload = this.props.fixtureEventPayload;
+    const fixture = _.get(fixtureEventPayload, 'fixture');
+    const auction = _.get(fixtureEventPayload, 'auction');
+    const events = _.get(fixtureEventPayload, 'events');
 
-              <div>
-                <span className="has-text-weight-bold has-padding-right-xs">
-                  {event.type}
-                </span>
-              </div>
+    const csv = parseCSVFromEvents(fixture, auction, events);
+    exportCSV(csv, 'fixture_events_report.csv');
+  }
+
+  render () {
+    const fixtureEventPayload = this.props.fixtureEventPayload;
+    const fixture = _.get(fixtureEventPayload, 'fixture');
+    const auction = _.get(fixtureEventPayload, 'auction');
+    const events = _.get(fixtureEventPayload, 'events');
+
+    return(
+      <Fragment>
+        <div className="report__log">
+          <div className="report__log__header">
+            <div>
+              <div>Time</div>
+              <div>Event</div>
             </div>
-          )
-        })
-      }
-    </>
-  )
+          </div>
+          <div className="report__log__body">
+            {
+              _.map(events, event => {
+                return(
+                  <div key={event.id}>
+                    <FixtureEvent fixture={fixture} event={event} />
+                  </div>
+                )
+              })
+            }
+          </div>
+        </div>
+        <button className="auction_list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md" onClick={this.handleExportClick.bind(this)}>
+          <span>Export Fixture Report</span>
+          <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
+        </button>
+      </Fragment>
+    )
+  }
 }
-
-export default FixtureReport;

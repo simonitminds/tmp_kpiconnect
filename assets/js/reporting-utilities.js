@@ -114,3 +114,103 @@ export const parseCSVFromPayloads = (fixturePayloads) => {
   const csv = csvParser.parse(dataForCSV);
   return csv;
 }
+
+export const parseCSVFromEvents = (fixture, auction, events) => {
+  const fixtureId = _.get(fixture, 'id');
+  const auctionId = _.get(auction, 'id');
+
+  const dataForCSV = _
+    .chain(events)
+    .map((event) => {
+      const timeEntered = _.get(event, 'time_entered');
+      const type = _.get(event, 'type');
+      const user = _.get(event, 'user');
+      let changes = _.get(event, 'changes', {});
+      const comment = _.get(changes, 'comment', "");
+
+      changes = _.has(changes, 'comment') ? _
+        .chain(changes)
+        .omit('comment')
+        .value() : changes;
+
+      const previousValues = !!changes ? _
+        .chain(changes)
+        .toPairs()
+        .map(([field, _value]) => {
+          console.log(fixture[field])
+          switch (field) {
+            case "vessel":
+              return { [field]: fixture[field].name };
+            case "supplier":
+              return { [field]: fixture[field].name };
+            case "fuel":
+              return { [field]: fixture[field].name };
+            default:
+              return { [field]: fixture[field] };
+          }
+        })
+        .value()
+        : [];
+
+      changes = !!changes ? _
+        .chain(changes)
+        .toPairs()
+        .map(([field, value]) => {
+          return { [field]: value }
+        })
+        .value()
+        : [];
+
+
+      console.log(previousValues)
+
+      const userName = !!user ? `${user.first_name} ${user.last_name}` : "";
+      const userCompany = !!user ? user.company.name : "";
+
+      const jsonForCSVParser = {
+        'timeEntered': moment(timeEntered).format('DD-MMM-YYYY'),
+        'type': type,
+        'user': userName,
+        'userCompany': userCompany,
+        'previousValues': previousValues,
+        'changes': changes,
+        'comment': comment
+      }
+      return jsonForCSVParser;
+    })
+    .value();
+
+  const fields = [
+    {
+      label: 'Time Entered',
+      value: 'timeEntered'
+    },
+    {
+      label: 'Type',
+      value: 'type'
+    },
+    {
+      label: 'User',
+      value: 'user'
+    },
+    {
+      label: 'User Company',
+      value: 'userCompany'
+    },
+    {
+      label: 'Previous Fixture Values',
+      value: 'previousValues'
+    },
+    {
+      label: 'Fixture Changes',
+      value: 'changes'
+    },
+    {
+      label: 'Comment',
+      value: 'comment'
+    }
+  ];
+
+  const csvParser = new Parser({ fields, unwind: ['previousValues', 'changes'] });
+  return csvParser.parse(dataForCSV);
+}

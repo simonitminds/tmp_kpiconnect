@@ -1,17 +1,21 @@
 import React, { Fragment } from 'react';
+import _ from 'lodash';
 import { formatUTCDateTime } from '../../utilities';
+import FixtureEventDetails from './fixture-event-details';
 
-const FixtureEvent = ({ fixture, auction, event }) => {
-  console.log(event.type)
-  console.log(event)
+const FixtureEvent = ({ fixture, event }) => {
+  const type = _.get(event, 'type');
+  const timeEntered = _.get(event, 'time_entered');
+
   return(
     <Fragment>
-      <div>{formatUTCDateTime(event.time_entered)}</div>
+      <div>{formatUTCDateTime(timeEntered)}</div>
 
       <div>
-        <span className="has-text-weight-bold has-padding-right-xs">
-          {event.type}
-        </span>
+        <div className="has-text-weight-bold has-padding-right-xs has-margin-bottom-sm">
+          {type}
+        </div>
+        <FixtureEventDetails fixture={fixture} eventType={type} event={event} />
       </div>
     </Fragment>
   )

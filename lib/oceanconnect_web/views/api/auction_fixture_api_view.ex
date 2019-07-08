@@ -24,6 +24,6 @@ defmodule OceanconnectWeb.Api.AuctionFixtureView do
   end
 
   def render("events.json", %{data: fixture_event_payload}) do
-    FixtureEventPayload.json_from_payload(fixture_event_payload)
+    FixtureEventPayload.json_from_payload(fixture_event_payload) |> IO.inspect
   end
 end
