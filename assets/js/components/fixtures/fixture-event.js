@@ -12,7 +12,7 @@ const FixtureEvent = ({ fixture, event }) => {
       <div>{formatUTCDateTime(timeEntered)}</div>
 
       <div>
-        <div className="has-text-weight-bold has-padding-right-xs has-margin-bottom-sm">
+        <div className={`has-text-weight-bold has-padding-right-xs has-margin-bottom-sm qa-fixture-event-${event.id}`}>
           {type}
         </div>
         <FixtureEventDetails fixture={fixture} eventType={type} event={event} />

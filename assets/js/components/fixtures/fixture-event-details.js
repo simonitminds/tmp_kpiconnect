@@ -33,13 +33,13 @@ const FixtureEventDetails = ({ fixture, eventType, event }) => {
     const user = _.get(event, 'user');
     return (
       <Fragment>
-        <div className="has-margin-bottom-sm">
+        <div className="has-margin-bottom-sm qa-event-previous_values">
           <span><b>Previous Values</b></span>
-          <FixtureEventChanges eventType={eventType} changes={previousValues} />
+          <FixtureEventChanges event={event} eventType={eventType} changes={previousValues} />
         </div>
-        <div>
+        <div className="qa-event-changes">
           <span><b>Proposed Changes</b></span>
-          <FixtureEventChanges eventType={eventType} changes={changes} comment={comment} />
+          <FixtureEventChanges event={event} eventType={eventType} changes={changes} comment={comment} />
         </div>
         <div className='has-margin-top-sm'>
           <span><b>{user.company.name}</b> </span>
@@ -50,13 +50,13 @@ const FixtureEventDetails = ({ fixture, eventType, event }) => {
   } else if (eventType === "Fixture updated") {
       return (
         <Fragment>
-          <div className="has-margin-bottom-sm">
+          <div className="has-margin-bottom-sm qa-event-previous_values">
             <span><b>Previous Values</b></span>
-            <FixtureEventChanges eventType={eventType} changes={previousValues} />
+            <FixtureEventChanges event={event} eventType={eventType} changes={previousValues} />
           </div>
-          <div>
+          <div className="qa-event-changes">
             <span><b>Changes</b></span>
-            <FixtureEventChanges eventType={eventType} changes={changes} comment={comment} />
+            <FixtureEventChanges event={event} eventType={eventType} changes={changes} comment={comment} />
           </div>
         </Fragment>
       )
@@ -73,8 +73,10 @@ const FixtureEventDetails = ({ fixture, eventType, event }) => {
     originalValues = _.toPairs(originalValues)
     return (
       <Fragment>
-        <span><b>Original Values</b></span>
-        <FixtureEventChanges eventType={eventType} changes={originalValues} />
+        <div className='qa-fixture-original_values'>
+          <span><b>Original Values</b></span>
+          <FixtureEventChanges event={event} eventType={eventType} changes={originalValues} />
+        </div>
       </Fragment>
     )
   } else if (eventType === "Fixture delivered") {
@@ -90,8 +92,10 @@ const FixtureEventDetails = ({ fixture, eventType, event }) => {
     deliveredValues = _.toPairs(deliveredValues)
     return (
       <Fragment>
-        <span><b>Delivered Values</b></span>
-        <FixtureEventChanges eventType={eventType} changes={deliveredValues} />
+        <div className='qa-fixture-delivered_values'>
+          <span><b>Delivered Values</b></span>
+          <FixtureEventChanges event={event} eventType={eventType} changes={deliveredValues} />
+        </div>
       </Fragment>
     )
   } else {

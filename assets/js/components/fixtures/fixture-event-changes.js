@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import _ from 'lodash';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 
-const FixtureEventChanges = ({ eventType, changes, comment }) => {
+const FixtureEventChanges = ({ event, eventType, changes, comment }) => {
   if (changes.length > 0) {
     return (
       <Fragment>
@@ -35,7 +35,7 @@ const FixtureEventChanges = ({ eventType, changes, comment }) => {
            return (
              <Fragment key={key}>
                <span className='has-text-weight-bold has-padding-right-sm'>{fieldName()}:</span>
-               <span>{valueForKey(key, value)}</span>
+               <span className={`qa-fixture-event-${event.id}-${key}`}>{valueForKey(key, value)}</span>
                <br />
              </Fragment>
            )

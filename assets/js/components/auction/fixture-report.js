@@ -35,7 +35,7 @@ export default class FixtureReport extends Component {
               <div>Event</div>
             </div>
           </div>
-          <div className="report__log__body">
+          <div className={`report__log__body qa-fixture-${fixture.id}-events`}>
             {
               _.map(events, event => {
                 return(
