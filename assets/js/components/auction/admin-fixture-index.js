@@ -400,7 +400,6 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                     <tbody>
                       {
                         _.map(fixtures, (fixture) => {
-                          console.log(fixture)
                           const delivered = _.get(fixture, 'delivered', false);
                           const vessel = delivered ? _.get(fixture, 'delivered_vessel.name', '—') : _.get(fixture, 'vessel.name', "—");
                           const fuel = delivered ? _.get(fixture, 'delivered_fuel.name', '—') : _.get(fixture, 'fuel.name', "—");

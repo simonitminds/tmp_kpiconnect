@@ -18,6 +18,14 @@ export function exportCSV(csv, fileName) {
   }
 }
 
+function formatDateForReport(date) {
+  return !!date ? moment(date).format('DD-MM-YYYY') : "Not scheduled";
+}
+
+function formatDateTimeForReport(date) {
+  return moment(date).format('DD-MM-YYYY HH:mm:ss');
+}
+
 export const parseCSVFromPayloads = (fixturePayloads) => {
   const dataForCSV = _
     .chain(fixturePayloads)
@@ -137,20 +145,54 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
         .chain(changes)
         .toPairs()
         .map(([field, _value]) => {
-          console.log(fixture[field])
           switch (field) {
             case "vessel":
-              return { [field]: fixture[field].name };
             case "supplier":
-              return { [field]: fixture[field].name };
             case "fuel":
-              return { [field]: fixture[field].name };
+              return { [field]: event.fixture[field] };
+            case "eta":
+            case "etd":
+              return { [field]: formatDateForReport(event.fixture[field]) }
             default:
-              return { [field]: fixture[field] };
+              return { [field]: event.fixture[field] };
           }
         })
         .value()
         : [];
+
+      const originalValues = type === "Fixture created" ? _
+        .chain({
+          'fuel': _.get(fixture, 'original_fuel.name'),
+          'vessel': _.get(fixture, 'original_vessel.name'),
+          'supplier': _.get(fixture, 'original_supplier.name'),
+          'quantity': _.get(fixture, 'original_quantity'),
+          'price': _.get(fixture, 'original_price'),
+          'eta': formatDateForReport(_.get(fixture, 'original_eta')),
+          'etd': formatDateForReport(_.get(fixture, 'original_etd'))
+        })
+        .toPairs()
+        .map(([field, value]) => {
+          return { [field]: value }
+        })
+        .value()
+        : null;
+
+      const deliveredValues = type === "Fixture delivered" ? _
+        .chain({
+          'fuel': _.get(fixture, 'delivered_fuel.name'),
+          'vessel': _.get(fixture, 'delivered_vessel.name'),
+          'supplier': _.get(fixture, 'delivered_supplier.name'),
+          'quantity': _.get(fixture, 'delivered_quantity'),
+          'price': _.get(fixture, 'delivered_price'),
+          'eta': formatDateForReport(_.get(fixture, 'delivered_eta')),
+          'etd': formatDateForReport(_.get(fixture, 'delivered_etd'))
+        })
+        .toPairs()
+        .map(([field, value]) => {
+          return { [field]: value }
+        })
+        .value()
+        : null;
 
       changes = !!changes ? _
         .chain(changes)
@@ -161,18 +203,17 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
         .value()
         : [];
 
-
-      console.log(previousValues)
-
       const userName = !!user ? `${user.first_name} ${user.last_name}` : "";
       const userCompany = !!user ? user.company.name : "";
 
       const jsonForCSVParser = {
-        'timeEntered': moment(timeEntered).format('DD-MMM-YYYY'),
+        'timeEntered': formatDateTimeForReport(timeEntered),
         'type': type,
         'user': userName,
         'userCompany': userCompany,
         'previousValues': previousValues,
+        'originalValues': originalValues,
+        'deliveredValues': deliveredValues,
         'changes': changes,
         'comment': comment
       }
@@ -200,6 +241,14 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
     {
       label: 'Previous Fixture Values',
       value: 'previousValues'
+    },
+    {
+      label: 'Original Fixture Values',
+      value: 'originalValues'
+    },
+    {
+      label: 'Delivered Fixture Values',
+      value: 'deliveredValues'
     },
     {
       label: 'Fixture Changes',
