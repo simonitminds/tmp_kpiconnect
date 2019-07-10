@@ -19,11 +19,11 @@ export function exportCSV(csv, fileName) {
 }
 
 function formatDateForReport(date) {
-  return !!date ? moment(date).format('DD-MM-YYYY') : "Not scheduled";
+  return !!date ? moment(date).format('DD-MM-YYYY') : '';
 }
 
 function formatDateTimeForReport(date) {
-  return moment(date).format('DD-MM-YYYY HH:mm:ss');
+  return !!date ? moment(date).format('DD-MM-YYYY HH:mm:ss') : '';
 }
 
 export const parseCSVFromPayloads = (fixturePayloads) => {
@@ -133,75 +133,8 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
       const timeEntered = _.get(event, 'time_entered');
       const type = _.get(event, 'type');
       const user = _.get(event, 'user');
-      let changes = _.get(event, 'changes', {});
+      const changes = _.get(event, 'changes', {});
       const comment = _.get(changes, 'comment', "");
-
-      changes = _.has(changes, 'comment') ? _
-        .chain(changes)
-        .omit('comment')
-        .value() : changes;
-
-      const previousValues = !!changes ? _
-        .chain(changes)
-        .toPairs()
-        .map(([field, _value]) => {
-          switch (field) {
-            case "vessel":
-            case "supplier":
-            case "fuel":
-              return { [field]: event.fixture[field] };
-            case "eta":
-            case "etd":
-              return { [field]: formatDateForReport(event.fixture[field]) }
-            default:
-              return { [field]: event.fixture[field] };
-          }
-        })
-        .value()
-        : [];
-
-      const originalValues = type === "Fixture created" ? _
-        .chain({
-          'fuel': _.get(fixture, 'original_fuel.name'),
-          'vessel': _.get(fixture, 'original_vessel.name'),
-          'supplier': _.get(fixture, 'original_supplier.name'),
-          'quantity': _.get(fixture, 'original_quantity'),
-          'price': _.get(fixture, 'original_price'),
-          'eta': formatDateForReport(_.get(fixture, 'original_eta')),
-          'etd': formatDateForReport(_.get(fixture, 'original_etd'))
-        })
-        .toPairs()
-        .map(([field, value]) => {
-          return { [field]: value }
-        })
-        .value()
-        : null;
-
-      const deliveredValues = type === "Fixture delivered" ? _
-        .chain({
-          'fuel': _.get(fixture, 'delivered_fuel.name'),
-          'vessel': _.get(fixture, 'delivered_vessel.name'),
-          'supplier': _.get(fixture, 'delivered_supplier.name'),
-          'quantity': _.get(fixture, 'delivered_quantity'),
-          'price': _.get(fixture, 'delivered_price'),
-          'eta': formatDateForReport(_.get(fixture, 'delivered_eta')),
-          'etd': formatDateForReport(_.get(fixture, 'delivered_etd'))
-        })
-        .toPairs()
-        .map(([field, value]) => {
-          return { [field]: value }
-        })
-        .value()
-        : null;
-
-      changes = !!changes ? _
-        .chain(changes)
-        .toPairs()
-        .map(([field, value]) => {
-          return { [field]: value }
-        })
-        .value()
-        : [];
 
       const userName = !!user ? `${user.first_name} ${user.last_name}` : "";
       const userCompany = !!user ? user.company.name : "";
@@ -211,10 +144,13 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
         'type': type,
         'user': userName,
         'userCompany': userCompany,
-        'previousValues': previousValues,
-        'originalValues': originalValues,
-        'deliveredValues': deliveredValues,
-        'changes': changes,
+        'supplier': attributeForEvent('supplier', event, fixture),
+        'vessel': attributeForEvent('vessel', event, fixture),
+        'fuel': attributeForEvent('fuel', event, fixture),
+        'price': attributeForEvent('price', event, fixture),
+        'quantity': attributeForEvent('quantity', event, fixture),
+        'eta': formatDateTimeForReport(attributeForEvent('eta', event, fixture)),
+        'etd': formatDateTimeForReport(attributeForEvent('ets', event, fixture)),
         'comment': comment
       }
       return jsonForCSVParser;
@@ -239,20 +175,32 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
       value: 'userCompany'
     },
     {
-      label: 'Previous Fixture Values',
-      value: 'previousValues'
+      label: 'Supplier',
+      value: 'supplier'
     },
     {
-      label: 'Original Fixture Values',
-      value: 'originalValues'
+      label: 'Vessel',
+      value: 'vessel'
     },
     {
-      label: 'Delivered Fixture Values',
-      value: 'deliveredValues'
+      label: 'Fuel',
+      value: 'fuel'
     },
     {
-      label: 'Fixture Changes',
-      value: 'changes'
+      label: 'Price',
+      value: 'price'
+    },
+    {
+      label: 'Quantity',
+      value: 'quantity'
+    },
+    {
+      label: 'ETA',
+      value: 'eta'
+    },
+    {
+      label: 'ETD',
+      value: 'etd'
     },
     {
       label: 'Comment',
@@ -260,6 +208,39 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
     }
   ];
 
-  const csvParser = new Parser({ fields, unwind: ['previousValues', 'changes'] });
+  const csvParser = new Parser({ fields });
   return csvParser.parse(dataForCSV);
+}
+
+function attributeForEvent(key, event, fixture) {
+  const type = _.get(event, 'type');
+  let changes = _.get(event, 'changes', {});
+  changes = _.has(changes, 'comment') ? _
+    .chain(changes)
+    .omit('comment')
+    .value() : changes;
+
+  switch(type) {
+    case 'Fixture changes proposed':
+    case 'Fixture updated':
+      return _.get(changes, key, '');
+    case 'Fixture delivered':
+      switch(key) {
+        case 'fuel':
+        case 'vessel':
+        case 'supplier':
+          return _.get(fixture, `delivered_${key}.name`, '');
+        case 'default':
+          return _.get(fixture, key, '');
+      }
+    default: // Fixture created
+      switch(key) {
+        case 'fuel':
+        case 'vessel':
+        case 'supplier':
+          return _.get(fixture, `original_${key}.name`, '');
+        case 'default':
+          return _.get(fixture, key, '');
+      }
+  }
 }
