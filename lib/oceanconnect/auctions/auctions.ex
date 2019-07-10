@@ -1700,7 +1700,7 @@ defmodule Oceanconnect.Auctions do
 
     event =
       fixture
-      |> Repo.preload([:orginal_vessel, :oringal_fuel, :original_supplier])
+      |> Repo.preload([:original_vessel, :original_fuel, :original_supplier])
       |> DeliveryEvent.fixture_created()
 
     event
