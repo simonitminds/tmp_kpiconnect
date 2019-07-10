@@ -197,11 +197,15 @@ export default class AdminAuctionFixturesIndex extends React.Component {
         selectedFixtureForReport: null,
         displayFixtureReport: false,
       })
+
+      ev.target.innerText = 'Show Report';
     } else {
       this.setState({
         selectedFixtureForReport: fixture,
         displayFixtureReport: true,
       })
+
+      ev.target.innerText = 'Hide Report'
     }
   }
 
@@ -433,7 +437,7 @@ export default class AdminAuctionFixturesIndex extends React.Component {
                                   />
                                 </td>
                                 <td>
-                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-show_report-${fixture.id}`} onClick={this.handleReportClick.bind(this, fixture)}>{ this.state.displayFixtureReport ? 'Hide Report' : 'Show Report'}</button>
+                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-show_report-${fixture.id}`} onClick={this.handleReportClick.bind(this, fixture)}>Show Report</button>
                                 </td>
                                 <td className="text-right">
                                   <a href={`/admin/auctions/${fixture.auction_id}/fixtures/${fixture.id}/edit`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-edit-${fixture.id}`}>Edit</a>

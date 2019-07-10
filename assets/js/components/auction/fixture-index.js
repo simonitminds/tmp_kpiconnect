@@ -150,32 +150,21 @@ export default class AuctionFixturesIndex extends React.Component {
   }
 
   handleReportClick(fixture, ev) {
-    const selectedReportCheckbox = this.state.selectedReportCheckbox;
-    const previouslySelectedFixture = this.state.selectedFixtureForReport;
-
-    if (previouslySelectedFixture && !previouslySelectedFixture.delivered && !_.isEqual(selectedReportCheckbox, ev)) {
-      selectedReportCheckbox.checked = false;
-    }
-
-    this.setState({
-      selectedFixtureForReport: fixture,
-      displayFixtureReport: ev.target.checked,
-      selectedReportCheckbox: ev.target
-    })
-  }
-
-  handleReportClick(fixture, ev) {
     ev.preventDefault();
     if (this.state.displayFixtureReport) {
       this.setState({
         selectedFixtureForReport: null,
         displayFixtureReport: false,
       })
+
+      ev.target.innerText = 'Show Report';
     } else {
       this.setState({
         selectedFixtureForReport: fixture,
         displayFixtureReport: true,
       })
+
+      ev.target.innerText = 'Hide Report'
     }
   }
 
@@ -418,7 +407,7 @@ export default class AuctionFixturesIndex extends React.Component {
                                   <CheckBoxField defaultChecked={fixture.delivered} opts={{ readOnly: true }} />
                                 </td>
                                 <td>
-                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-fixture-${fixture.id}-show_report`} onClick={this.handleReportClick.bind(this, fixture)}>{ this.state.displayFixtureReport ? 'Hide Report' : 'Show Report'}</button>
+                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-fixture-${fixture.id}-show_report`} onClick={this.handleReportClick.bind(this, fixture)}>Show Report</button>
                                 </td>
                                 <td className="text-right">
                                   <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propose_changes-${fixture.id}`}>Propose Changes</a>
