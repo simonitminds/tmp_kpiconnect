@@ -7,7 +7,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
   alias Oceanconnect.Auctions.{AuctionVesselFuel, AuctionBid}
 
   @derive {Poison.Encoder,
-           except: [:__meta__, :auction, :original_vessel, :original_fuel, :original_supplier]}
+           except: [:__meta__, :auction, :delivered_supplier, :delivered_fuel, :delivered_vessel]}
   schema "auction_fixtures" do
     # current_relationships
     # TODO: virtualize auction to work with term auctions
@@ -135,7 +135,14 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       :original_price,
       :original_quantity,
       :original_eta,
-      :original_etd
+      :original_etd,
+      :delivered_supplier_id,
+      :delivered_vessel_id,
+      :delivered_fuel_id,
+      :delivered_price,
+      :delivered_quantity,
+      :delivered_eta,
+      :delivered_etd
     ])
     |> validate_required([
       :auction_id,
@@ -159,6 +166,9 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:original_supplier_id)
     |> foreign_key_constraint(:original_fuel_id)
     |> foreign_key_constraint(:original_vessel_id)
+    |> foreign_key_constraint(:delivered_supplier_id)
+    |> foreign_key_constraint(:delivered_fuel_id)
+    |> foreign_key_constraint(:delivered_vessel_id)
   end
 
   def for_auction_vessel_fuel(%AuctionVesselFuel{
@@ -228,7 +238,15 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       original_price: amount,
       original_quantity: quantity,
       original_eta: eta,
-      original_etd: etd
+      original_etd: etd,
+      delivered_supplier_id: supplier_id,
+      delivered_vessel_id: vessel_id,
+      delivered_fuel_id: fuel_id,
+      delivered_price: amount,
+      delivered_quantity: quantity,
+      delivered_eta: eta,
+      delivered_etd: etd,
     })
   end
+
 end

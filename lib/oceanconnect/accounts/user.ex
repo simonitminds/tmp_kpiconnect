@@ -4,7 +4,7 @@ defmodule Oceanconnect.Accounts.User do
   alias Oceanconnect.Accounts.{User, Company}
   alias Oceanconnect.Deliveries.ClaimResponse
 
-  @derive {Poison.Encoder, only: [:email, :company]}
+  @derive {Poison.Encoder, only: [:email, :company, :first_name, :last_name]}
 
   schema "users" do
     field(:email, :string)

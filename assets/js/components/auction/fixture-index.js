@@ -4,8 +4,10 @@ import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MediaQuery from 'react-responsive';
 import DateRangeInput from '../date-range-input';
+import CheckBoxField from '../check-box-field';
 import CollapsibleSection from './common/collapsible-section';
 import AuctionTitle from './common/auction-title';
+import FixtureReportContainer from '../../containers/fixture-report-container';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
 
@@ -23,7 +25,9 @@ export default class AuctionFixturesIndex extends React.Component {
         startTimeRange: null,
         endTimeRange: null,
       },
-      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0))
+      reportsCSV: parseCSVFromPayloads(_.filter(this.props.fixturePayloads, (payload) => payload.fixtures.length > 0)),
+      displayFixtureReport: false,
+      selectedFixtureForReport: null,
     }
   }
 
@@ -143,6 +147,36 @@ export default class AuctionFixturesIndex extends React.Component {
       }
     }
     exportCSV(csv, fileName());
+  }
+
+  handleReportClick(fixture, ev) {
+    const selectedReportCheckbox = this.state.selectedReportCheckbox;
+    const previouslySelectedFixture = this.state.selectedFixtureForReport;
+
+    if (previouslySelectedFixture && !previouslySelectedFixture.delivered && !_.isEqual(selectedReportCheckbox, ev)) {
+      selectedReportCheckbox.checked = false;
+    }
+
+    this.setState({
+      selectedFixtureForReport: fixture,
+      displayFixtureReport: ev.target.checked,
+      selectedReportCheckbox: ev.target
+    })
+  }
+
+  handleReportClick(fixture, ev) {
+    ev.preventDefault();
+    if (this.state.displayFixtureReport) {
+      this.setState({
+        selectedFixtureForReport: null,
+        displayFixtureReport: false,
+      })
+    } else {
+      this.setState({
+        selectedFixtureForReport: fixture,
+        displayFixtureReport: true,
+      })
+    }
   }
 
   render() {
@@ -344,7 +378,7 @@ export default class AuctionFixturesIndex extends React.Component {
               const auction = _.get(payload, 'auction');
               const fixtures = _.chain(payload).get('fixtures').uniq().value();
               return (
-                <div key={auction.id}>
+                <div key={auction.id} className={`qa-auction-${auction.id}`}>
                     <h2 className="admin-panel__content__header has-margin-top-lg">
                       <AuctionTitle auction={auction} />
                     </h2>
@@ -359,6 +393,8 @@ export default class AuctionFixturesIndex extends React.Component {
                           <th>Supplier</th>
                           <th>ETA</th>
                           <th>ETD</th>
+                          <th>Delivered</th>
+                          <th></th>
                           <th></th>
                         </tr>
                       </thead>
@@ -369,17 +405,23 @@ export default class AuctionFixturesIndex extends React.Component {
                             const fuel = _.get(fixture, 'fuel')
                             const supplier = _.get(fixture, 'supplier');
                             return (
-                              <tr key={fixture.id} className={`qa-auction-fixture-${fixture.id}`}>
-                                <td className="qa-auction-fixture-auction-name">{fixture.id}</td>
-                                <td key={vessel.id} className="qa-auction-fixture-vessel">{vessel.name}</td>
-                                <td key={fuel.id} className="qa-auction-fixture-fuel">{fuel.name}</td>
-                                <td className="qa-auction-fixture-price">{formatPrice(fixture.price)}</td>
-                                <td className="qa-auction-fixture-quantity">{fixture.quantity} M/T</td>
-                                <td className="qa-auction-fixture-supplier">{supplier.name}</td>
-                                <td className="qa-auction-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
-                                <td className="qa-auction-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                              <tr key={fixture.id} className={`qa-fixture-${fixture.id}`}>
+                                <td className="qa-fixture">{fixture.id}</td>
+                                <td key={vessel.id} className="qa-fixture-vessel">{vessel.name}</td>
+                                <td key={fuel.id} className="qa-fixture-fuel">{fuel.name}</td>
+                                <td className="qa-fixture-price">{formatPrice(fixture.price)}</td>
+                                <td className="qa-fixture-quantity">{fixture.quantity} M/T</td>
+                                <td className="qa-fixture-supplier">{supplier.name}</td>
+                                <td className="qa-fixture-eta">{formatUTCDateTime(fixture.eta)}</td>
+                                <td className="qa-fixture-etd">{formatUTCDateTime(fixture.etd)}</td>
+                                <td>
+                                  <CheckBoxField defaultChecked={fixture.delivered} opts={{ readOnly: true }} />
+                                </td>
+                                <td>
+                                  <button className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-fixture-${fixture.id}-show_report`} onClick={this.handleReportClick.bind(this, fixture)}>{ this.state.displayFixtureReport ? 'Hide Report' : 'Show Report'}</button>
+                                </td>
                                 <td className="text-right">
-                                  <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propse_chabges-${fixture.id}`}>Propose Changes</a>
+                                  <a href={`/auctions/${fixture.auction_id}/fixtures/${fixture.id}/propose_changes`} className={`button is-small is-primary is-inline-block has-margin-bottom-xs qa-auction-fixture-propose_changes-${fixture.id}`}>Propose Changes</a>
                                 </td>
                               </tr>
                             );
@@ -387,6 +429,9 @@ export default class AuctionFixturesIndex extends React.Component {
                         }
                       </tbody>
                     </table>
+                    { this.state.displayFixtureReport && auction.id === this.state.selectedFixtureForReport.auction_id &&
+                      <FixtureReportContainer fixture={this.state.selectedFixtureForReport} />
+                    }
                 </div>
               );
             })

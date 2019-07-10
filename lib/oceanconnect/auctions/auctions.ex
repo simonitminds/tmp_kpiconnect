@@ -1625,7 +1625,10 @@ defmodule Oceanconnect.Auctions do
       :fuel,
       :delivered_supplier,
       :delivered_vessel,
-      :delivered_fuel
+      :delivered_fuel,
+      :original_supplier,
+      :original_vessel,
+      :original_fuel
     ])
   end
 
@@ -1639,7 +1642,10 @@ defmodule Oceanconnect.Auctions do
       :vessel,
       :delivered_supplier,
       :delivered_fuel,
-      :delivered_vessel
+      :delivered_vessel,
+      :original_supplier,
+      :original_vessel,
+      :original_fuel
     ])
   end
 
@@ -1694,6 +1700,7 @@ defmodule Oceanconnect.Auctions do
 
     event =
       fixture
+      |> Repo.preload([:orginal_vessel, :oringal_fuel, :original_supplier])
       |> DeliveryEvent.fixture_created()
 
     event

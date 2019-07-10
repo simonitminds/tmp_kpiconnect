@@ -13,6 +13,7 @@ import {
   RECEIVE_AUCTION_PAYLOADS,
   RECEIVE_FINALIZED_AUCTION_PAYLOADS,
   RECEIVE_FIXTURE_PAYLOADS,
+  RECEIVE_FIXTURE_EVENT_PAYLOAD,
   RECEIVE_DELIVERED_FIXTURE,
   RECEIVE_COMPANY_BARGES,
   RECEIVE_SUPPLIERS,
@@ -163,6 +164,18 @@ export function getAuctionPayload(auctionId) {
       });
   };
 }
+
+export function getFixtureEventPayload(fixtureId) {
+  return dispatch => {
+    fetch(`/api/auction_fixtures/${fixtureId}/events`, { headers: defaultHeaders })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(receiveFixtureEventPayload(response))
+      })
+  }
+}
+
 export function getCompanyBarges(companyId) {
   return dispatch => {
     fetch(`/api/companies/${companyId}/barges`, { headers: defaultHeaders })
@@ -349,6 +362,11 @@ export function receiveFinalizedAuctionPayloads(auctionPayloads) {
 export function receiveFixturePayloads(fixturePayloads) {
   return {type: RECEIVE_FIXTURE_PAYLOADS,
           fixturePayloads: fixturePayloads};
+}
+
+export function receiveFixtureEventPayload(fixtureEventPayload) {
+  return {type: RECEIVE_FIXTURE_EVENT_PAYLOAD,
+          fixtureEventPayload: fixtureEventPayload};
 }
 
 export function receiveDeliveredFixture(data) {

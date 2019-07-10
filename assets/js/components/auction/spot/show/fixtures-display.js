@@ -33,6 +33,7 @@ const FixturesDisplay = ({auctionPayload}) => {
                   <td className="qa-auction-fixture-supplier">{supplier}</td>
                   <td className="qa-auction-fixture-eta">{eta}</td>
                   <td className="qa-auction-fixture-etd">{etd}</td>
+                  <td className="qa-auction-fixture-delived">{ delivered ? 'Delivered' : '' }</td>
                 </tr>
               );
             })

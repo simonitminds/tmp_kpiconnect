@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.Api.AuctionFixtureController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{Auction, AuctionFixture, Payloads.FixturePayload}
+  alias Oceanconnect.Auctions.{Auction, AuctionFixture, Payloads.FixturePayload, Payloads.FixtureEventPayload}
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Accounts.User
   alias OceanconnectWeb.Plugs.Auth
@@ -53,6 +53,23 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
       conn
       |> put_status(200)
       |> render("show.json", data: delivered_fixture)
+    else
+      _ ->
+        conn
+        |> put_status(421)
+        |> render("show.json", %{success: false, message: "Request unsuccessful"})
+    end
+  end
+
+  def events(conn, %{"fixture_id" => fixture_id}) do
+    fixture_id = String.to_integer(fixture_id)
+
+    with fixture = %AuctionFixture{auction_id: auction_id} <- Auctions.get_fixture!(fixture_id),
+         auction = %Auction{} <- Auctions.get_auction!(auction_id),
+         fixture_event_payload = %FixtureEventPayload{} <- FixtureEventPayload.get_payload!(fixture, auction) do
+      conn
+      |> put_status(200)
+      |> render("events.json", data: fixture_event_payload)
     else
       _ ->
         conn

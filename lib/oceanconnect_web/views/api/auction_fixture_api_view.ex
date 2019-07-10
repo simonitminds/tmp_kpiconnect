@@ -1,6 +1,6 @@
 defmodule OceanconnectWeb.Api.AuctionFixtureView do
   use OceanconnectWeb, :view
-  alias Oceanconnect.Auctions.Payloads.FixturePayload
+  alias Oceanconnect.Auctions.Payloads.{FixturePayload, FixtureEventPayload}
 
   def render("index.json", %{data: fixture_payloads}) do
     %{
@@ -21,5 +21,9 @@ defmodule OceanconnectWeb.Api.AuctionFixtureView do
 
   def render("show.json", %{success: success, message: message}) do
     %{success: success, message: message}
+  end
+
+  def render("events.json", %{data: fixture_event_payload}) do
+    FixtureEventPayload.json_from_payload(fixture_event_payload)
   end
 end
