@@ -18,7 +18,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
 
     # current fields
     field(:price, :decimal)
-    field(:quantity, :integer)
+    field(:quantity, :decimal)
     field(:eta, :utc_datetime_usec)
     field(:etd, :utc_datetime_usec)
     field(:delivered, :boolean, default: false)
@@ -33,7 +33,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     belongs_to(:original_fuel, Oceanconnect.Auctions.Fuel, foreign_key: :original_fuel_id)
 
     # original_fields
-    field(:original_quantity, :integer)
+    field(:original_quantity, :decimal)
     field(:original_eta, :utc_datetime_usec)
     field(:original_etd, :utc_datetime_usec)
     field(:original_price, :decimal)
@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       foreign_key: :delivered_supplier_id
     )
 
-    field(:delivered_quantity, :integer)
+    field(:delivered_quantity, :decimal)
     field(:delivered_eta, :utc_datetime_usec)
     field(:delivered_etd, :utc_datetime_usec)
     field(:delivered_price, :decimal)

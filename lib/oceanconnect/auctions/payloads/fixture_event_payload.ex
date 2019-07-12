@@ -158,15 +158,6 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
-    %{
-      fixture
-      | quantity: Decimal.to_string(quantity),
-        original_quantity: Decimal.to_string(original_quantity),
-        delivered_quantity: Decimal.to_string(delivered_quantity)
-    }
-  end
-
   defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} = fixture) do
     %{
       fixture
