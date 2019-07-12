@@ -134,7 +134,7 @@ export const parseCSVFromEvents = (fixture, auction, events) => {
       const type = _.get(event, 'type');
       const user = _.get(event, 'user');
       const changes = _.get(event, 'changes', {});
-      const comment = _.get(changes, 'comment', "");
+      const comment = _.get(changes, 'comment', '');
 
       const userName = !!user ? `${user.first_name} ${user.last_name}` : "";
       const userCompany = !!user ? user.company.name : "";
@@ -230,8 +230,8 @@ function attributeForEvent(key, event, fixture) {
         case 'vessel':
         case 'supplier':
           return _.get(fixture, `delivered_${key}.name`, '');
-        case 'default':
-          return _.get(fixture, key, '');
+        default:
+          return _.get(fixture, `delivered_${key}`, '');
       }
     default: // Fixture created
       switch(key) {
@@ -239,8 +239,8 @@ function attributeForEvent(key, event, fixture) {
         case 'vessel':
         case 'supplier':
           return _.get(fixture, `original_${key}.name`, '');
-        case 'default':
-          return _.get(fixture, key, '');
+        default:
+          return _.get(fixture, `delivered_${key}`, '');
       }
   }
 }
