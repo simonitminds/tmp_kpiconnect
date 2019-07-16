@@ -8,9 +8,10 @@
 		<div class="content">
 			<section class="admin-panel__content">
 				<h2 class="admin-panel__content__header"><span class="is-4">Edit Auction Fixture</span>
-            <%= link( to: admin_auction_fixtures_path(@conn, :index), class: "button has-margin-left-auto") do %>
-                <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
-            <%  end%>
+          <div class="admin-panel__content__header__actions"><%= link "Delete", to: admin_auction_fixture_path(@conn, :delete, @auction.id, @fixture.id), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs has-margin-left-auto qa-admin-delete" %>
+          <%= link( to: admin_auction_fixtures_path(@conn, :index), class: "button has-margin-left-auto") do %>
+              <i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
+          <%  end%>
 				</h2>
 				<%= render "form.html", Map.put(assigns, :action, admin_auction_fixture_path(@conn, :update, @auction, @fixture)) %>
 			</section>

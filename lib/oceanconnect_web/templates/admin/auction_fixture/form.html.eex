@@ -83,7 +83,7 @@
     		<div class="control">
     			<%= submit "Submit", class: "button is-primary qa-admin-submit" %>
     		</div>
-    	</div>
+      </div>
     </div>
   </div>
 <% end %>
