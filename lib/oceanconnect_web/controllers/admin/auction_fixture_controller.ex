@@ -2,6 +2,7 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{AuctionFixture, Auction}
+  alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
     render(conn, "index.html")
@@ -132,6 +133,35 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
           fuels: fuels,
           vessels: vessels
         )
+    end
+  end
+
+  def delete(conn, %{"auction_id" => auction_id, "fixture_id" => fixture_id}) do
+    with %{is_admin: true} <- Auth.current_user(conn),
+         %Auction{vessels: vessels, port: port, buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
+         status when status in [:closed, :expired] <- Auctions.get_auction_status!(auction),
+         %AuctionFixture{} = fixture <- Auctions.get_fixture!(fixture_id) do
+
+      suppliers = Auctions.supplier_list_for_port(port, buyer_id)
+      fuels = Auctions.list_all_fuels()
+
+      case Auctions.delete_fixture(fixture) do
+        {:ok, _fixture} ->
+          conn
+          |> put_flash(:info, "Fixture deleted successfully.")
+          |> redirect(to: admin_auction_fixtures_path(conn, :index))
+        {:error, changeset} ->
+          conn
+          |> put_flash(:warning, "Something went wrong!")
+          |> render("edit.hmtl",
+            fixture: fixture,
+            changeset: changeset,
+            auction: auction,
+            suppliers: suppliers,
+            fuels: fuels,
+            vessels: vessels
+          )
+      end
     end
   end
 end

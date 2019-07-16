@@ -1712,6 +1712,10 @@ defmodule Oceanconnect.Auctions do
     {:ok, fixture}
   end
 
+  def delete_fixture(%AuctionFixture{} = fixture) do
+    Repo.delete(fixture)
+  end
+
   def update_fixture(%AuctionFixture{} = old_fixture, attrs) do
     changeset =
       old_fixture
