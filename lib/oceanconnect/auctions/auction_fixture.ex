@@ -251,5 +251,4 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       delivered_etd: etd,
     })
   end
-
 end
