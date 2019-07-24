@@ -1,6 +1,7 @@
 defmodule OceanconnectWeb.Admin.AuctionFixtureController do
   use OceanconnectWeb, :controller
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Deliveries
   alias Oceanconnect.Auctions.{AuctionFixture, Auction}
   alias OceanconnectWeb.Plugs.Auth
 
@@ -140,13 +141,16 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
     with %{is_admin: true} <- Auth.current_user(conn),
          %Auction{vessels: vessels, port: port, buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
          status when status in [:closed, :expired] <- Auctions.get_auction_status!(auction),
-         %AuctionFixture{} = fixture <- Auctions.get_fixture!(fixture_id) do
+         %AuctionFixture{id: id} = fixture <- Auctions.get_fixture!(fixture_id),
+         claims <- Deliveries.claims_for_auction(auction),
+         fixture_ids_for_claims <- Enum.map(claims, & &1.fixture_id),
+         false <- id in fixture_ids_for_claims do
 
       suppliers = Auctions.supplier_list_for_port(port, buyer_id)
       fuels = Auctions.list_all_fuels()
 
       case Auctions.delete_fixture(fixture) do
-        {:ok, _fixture} ->
+       {:ok, _fixture} ->
           conn
           |> put_flash(:info, "Fixture deleted successfully.")
           |> redirect(to: admin_auction_fixtures_path(conn, :index))
@@ -162,6 +166,11 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
             vessels: vessels
           )
       end
+    else
+      _ ->
+        conn
+        |> put_flash(:info, "Fixture could not be deleted. There may be a claim open against it.")
+        |> redirect(to: admin_auction_fixtures_path(conn, :index))
     end
   end
 end
