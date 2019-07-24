@@ -1,5 +1,6 @@
 defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
   alias Oceanconnect.Auctions
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions.{Auction, AuctionFixture, AuctionEventStore}
 
   defstruct auction: nil,
