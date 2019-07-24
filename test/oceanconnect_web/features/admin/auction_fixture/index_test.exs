@@ -2,6 +2,7 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
   use Oceanconnect.FeatureCase
   alias Oceanconnect.{AuctionShowPage, AdminPage}
   alias Oceanconnect.Admin, as: Admin
+  alias Oceanconnect.Admin.Fixture.{IndexPage, EditPage}
 
   alias Oceanconnect.Auctions
 
@@ -35,6 +36,23 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
     test "can see a list of fixtures grouped by auction", %{fixtures: fixtures} do
       Admin.Fixture.IndexPage.visit()
 
+      for fixture <- fixtures do
+        assert Admin.Fixture.IndexPage.has_fixture?(fixture)
+      end
+    end
+
+    test "can delete a fixture", %{fixtures: fixtures} do
+      Admin.Fixture.IndexPage.visit()
+
+      for fixture <- fixtures do
+        assert Admin.Fixture.IndexPage.has_fixture?(fixture)
+      end
+      [fixture | fixtures] = fixtures
+
+      IndexPage.edit_fixture(fixture.id)
+      EditPage.delete_fixture()
+
+      refute IndexPage.has_fixture?(fixture)
       for fixture <- fixtures do
         assert Admin.Fixture.IndexPage.has_fixture?(fixture)
       end

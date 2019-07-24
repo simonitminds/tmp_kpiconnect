@@ -76,6 +76,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:fuel_id)
     |> foreign_key_constraint(:vessel_id)
+    |> foreign_key_constraint(:claim_id)
   end
 
   def propose_changeset(%AuctionFixture{} = fixture, attrs) do
@@ -95,6 +96,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:fuel_id)
     |> foreign_key_constraint(:vessel_id)
+    |> foreign_key_constraint(:claim_id)
   end
 
   def deliver_changeset(%AuctionFixture{} = fixture, attrs) do
@@ -169,6 +171,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
     |> foreign_key_constraint(:delivered_supplier_id)
     |> foreign_key_constraint(:delivered_fuel_id)
     |> foreign_key_constraint(:delivered_vessel_id)
+    |> foreign_key_constraint(:claim_id)
   end
 
   def for_auction_vessel_fuel(%AuctionVesselFuel{
