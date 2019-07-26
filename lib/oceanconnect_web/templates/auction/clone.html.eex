@@ -1,12 +1,12 @@
 <div class="auction-app">
   <div class="auction-app__header auction-app__header--create container">
     <div class="content has-margin-top-lg">
-      <h1 class="title has-text-weight-bold">Create New Auction</h1>
+      <h1 class="title has-text-weight-bold">Clone Auction</h1>
     </div>
   </div>
 
-  <script> window.container = "new";</script>
-  <script> window.auctionId = null;</script>
+  <script> window.container = "edit";</script>
+  <script> window.auctionId = <%= @auction.id %>;</script>
 
   <%= render "form.html", Map.merge(assigns, %{action: auction_path(@conn, :create), method: "post"}) %>
 </div>

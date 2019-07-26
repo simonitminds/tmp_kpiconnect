@@ -8,5 +8,5 @@
   <script> window.container = "edit";</script>
   <script> window.auctionId = <%= @auction.id %>;</script>
 
-  <%= render "form.html", Map.put(assigns, :action, auction_path(@conn, :update, @auction)) %>
+  <%= render "form.html", Map.merge(assigns, %{action: auction_path(@conn, :update, @auction), method: "put"}) %>
 </div>

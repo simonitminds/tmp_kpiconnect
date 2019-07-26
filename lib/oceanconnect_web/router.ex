@@ -154,6 +154,7 @@ defmodule OceanconnectWeb.Router do
     get("/auctions/:id/start", AuctionController, :start)
     get("/auctions/:id/cancel", AuctionController, :cancel)
     get("/auctions/:id/rsvp", AuctionRsvpController, :update, as: :auction_rsvp)
+    get("/auctions/:id/clone", AuctionController, :clone)
     resources("/ports", PortController)
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)

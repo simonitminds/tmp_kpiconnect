@@ -23,8 +23,15 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
   const otherSolutions = _.get(auctionPayload, 'solutions.other_solutions');
 
-  const confirmCancellation = (e) => { event.preventDefault();
-                                       return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
+  const confirmCancellation = (e) => {
+    e.preventDefault();
+    return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false;
+  };
+
+  const confirmClone = (e) => {
+    e.preventDefault();
+    return confirm('Are you sure you want to clone this auction?') ? window.location = `/auctions/${auction.id}/clone` : false;
+  };
 
   const claimStatusDisplay = () => {
     let openClaims = _
@@ -133,6 +140,11 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
                   </a>
                 : <span></span>
               }
+              <a id="clone-auction" href={`/auctions/${auction.id}/clone`} onClick={(e) => confirmClone(e)} action-label="Clone Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-clone">
+                <span className="icon is-medium has-text-right">
+                  <FontAwesomeIcon icon="copy" size="lg" />
+                </span>
+              </a>
               {/* End Link to Auction Edit/Delete */}
               {/* Start Link to Auction */}
                 <a href={`/auctions/${auction.id}`} action-label="Go To Auction" className="auction-card__link-to-auction"><span className="icon is-medium has-text-right"><FontAwesomeIcon icon="angle-right" size="2x" /></span></a>

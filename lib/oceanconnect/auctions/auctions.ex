@@ -607,6 +607,13 @@ defmodule Oceanconnect.Auctions do
     |> Repo.update!()
   end
 
+  def clone_auction(%struct{} = auction, user \\ nil) when is_auction(struct) do
+    auction
+    |> Map.from_struct()
+    |> Map.drop([:scheduled_start, :auction_started, :auction_ended, :auction_closed_time, :id])
+    |> create_auction(user)
+  end
+
   def create_auction(attrs \\ %{}, user \\ nil)
 
   def create_auction(attrs = %{"scheduled_start" => start, "type" => type}, user)

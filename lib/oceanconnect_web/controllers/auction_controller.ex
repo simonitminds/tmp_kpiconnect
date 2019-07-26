@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.{Auctions, Messages}
+  alias Oceanconnect.{Auctions, Messages, Accounts}
 
   alias Oceanconnect.Auctions.{
     Auction,
@@ -230,6 +230,41 @@ defmodule OceanconnectWeb.AuctionController do
             credit_margin_amount: credit_margin_amount
           )
       end
+    else
+      _ ->
+        redirect(conn, to: auction_path(conn, :index))
+    end
+  end
+
+  def clone(conn, %{"id" => id}) do
+    with auction = %struct{} when is_auction(struct) <-
+           id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+         true <- auction.buyer_id == Auth.current_user(conn).company_id do
+      changeset =
+        %{auction | scheduled_start: nil}
+        |> Auctions.change_auction()
+        |> Map.put(:action, :create)
+
+      [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
+      [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
+      IO.inspect(auction.vessels)
+      IO.inspect(Poison.decode!(vessels))
+      user = Auth.current_user(conn)
+      credit_margin_amount = user.company.credit_margin_amount
+
+      render(
+        conn,
+        "clone.html",
+        changeset: changeset,
+        auction: auction,
+        json_auction: json_auction,
+        fuels: fuels,
+        fuel_indexes: fuel_indexes,
+        ports: ports,
+        vessels: vessels,
+        suppliers: suppliers,
+        credit_margin_amount: credit_margin_amount
+      )
     else
       _ ->
         redirect(conn, to: auction_path(conn, :index))
