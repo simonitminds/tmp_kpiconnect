@@ -5,6 +5,10 @@ defmodule Oceanconnect.AuctionEditPage do
     navigate_to("/auctions/#{id}/edit")
   end
 
+  def is_current_path?(id) do
+    current_path() == "/auctions/#{id}/edit"
+  end
+
   def has_fields?(fields) do
     Enum.all?(fields, fn field ->
       find_element(:class, "qa-auction-#{field}")

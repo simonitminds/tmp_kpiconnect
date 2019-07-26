@@ -1,5 +1,5 @@
 <div class="form auction-app__body">
-<%= form_for @changeset, @action, [class: "control", onsubmit: "debouncedSubmit()"], fn _f -> %>
+<%= form_for @changeset, @action, [class: "control", onsubmit: "debouncedSubmit()", method: @method], fn _f -> %>
 
   <%= if length(@changeset.errors) > 0 or auction_vessel_fuel_errors?(@changeset) do %>
     <section class="auction-info has-margin-top-none has-padding-top-none">

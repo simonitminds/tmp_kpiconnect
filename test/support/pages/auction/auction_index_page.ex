@@ -33,6 +33,12 @@ defmodule Oceanconnect.AuctionIndexPage do
     Hound.Helpers.Dialog.accept_dialog()
   end
 
+  def clone_auction(auction) do
+    click({:css, "qa-auction-#{auction.id} qa-auction-clone"})
+
+    Hound.Helpers.Dialog.accept_dialog()
+  end
+
   def auction_is_status?(auction, status) do
     actual_status =
       find_element(:class, "qa-#{status}-auctions-list")
