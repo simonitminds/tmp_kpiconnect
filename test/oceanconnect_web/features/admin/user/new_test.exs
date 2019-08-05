@@ -45,5 +45,20 @@ defmodule Oceanconnect.Admin.User.NewTest do
       assert IndexPage.is_current_path?()
       assert IndexPage.user_created_successfully?()
     end
+
+    test "admin can create a new observer", %{company: company} do
+      NewPage.visit()
+
+      EditPage.fill_form(%{
+        email: "NEW@EMAIL.COM",
+        first_name: "new",
+        last_name: "name",
+        is_observer: true
+      })
+
+      EditPage.submit()
+      assert IndexPage.is_current_path?()
+      assert IndexPage.user_created_successfully?()
+    end
   end
 end

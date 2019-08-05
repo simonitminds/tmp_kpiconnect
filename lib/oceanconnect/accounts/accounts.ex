@@ -27,6 +27,11 @@ defmodule Oceanconnect.Accounts do
     |> Repo.paginate(params)
   end
 
+  def list_observers do
+    User.select_observers()
+    |> Repo.all()
+  end
+
   def list_active_users do
     User.select_active()
     |> Repo.all()

@@ -23,6 +23,7 @@ export default class AuctionShow extends React.Component {
     const {
       auctionPayload,
       companyProfile,
+      inviteObserver,
       submitBargeForm,
       unsubmitBargeForm,
       approveBargeForm,
@@ -100,6 +101,7 @@ export default class AuctionShow extends React.Component {
                               auctionPayload={auctionPayload}
                               approveBargeForm={approveBargeForm}
                               rejectBargeForm={rejectBargeForm}
+                              inviteObserver={inviteObserver}
                             />
                           : <SupplierSidebar
                               auctionPayload={auctionPayload}

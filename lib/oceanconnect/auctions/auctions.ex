@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions do
 
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Accounts.{Company, User, Observer}
   alias Oceanconnect.Auctions.AuctionsSupervisor
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
@@ -830,7 +830,8 @@ defmodule Oceanconnect.Auctions do
         [fuel_index: [:fuel, :port]],
         :auction_suppliers,
         [buyer: :users],
-        [suppliers: :users]
+        [suppliers: :users],
+        [observers: :user]
       ])
 
     fully_loaded_auction
@@ -846,7 +847,8 @@ defmodule Oceanconnect.Auctions do
         :auction_suppliers,
         [auction_vessel_fuels: [:vessel, :fuel]],
         [buyer: :users],
-        [suppliers: :users]
+        [suppliers: :users],
+        [observers: :user]
       ])
 
     fully_loaded_auction
@@ -1553,6 +1555,7 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
+
   def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
       when is_auction(struct) do
     query =
@@ -1599,6 +1602,15 @@ defmodule Oceanconnect.Auctions do
       |> Command.reject_barge(user)
       |> AuctionStore.process_command()
     end)
+  end
+
+  def invite_observer(%Auction{id: auction_id}, %User{id: user_id} = user, author \\ nil) do
+    %Observer{}
+    |> Observer.changeset(%{
+      auction_id: auction_id,
+      user_id: user_id
+    })
+    |> Repo.insert()
   end
 
   # Fixtures

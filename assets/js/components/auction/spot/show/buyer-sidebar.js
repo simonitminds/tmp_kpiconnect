@@ -5,12 +5,14 @@ import moment from 'moment';
 import LogLink from './log-link';
 import SidebarDetails from './sidebar-details';
 import InvitedSuppliers from '../../common/invited-suppliers';
+import InvitedObservers from '../../common/show/observers/invited-observers';
 
 const BuyerSidebar = (props) => {
   const {
     auctionPayload,
     approveBargeForm,
-    rejectBargeForm
+    rejectBargeForm,
+    inviteObserver
   } = props;
 
   const { auction, status } = auctionPayload;
@@ -26,6 +28,12 @@ const BuyerSidebar = (props) => {
           <LogLink auction={auction} />
         }
       </div>
+      { isAdmin && status != 'closed' && status != 'canceled' && status != 'expired' &&
+        <InvitedObservers
+          auctionPayload={auctionPayload}
+          inviteObserver={inviteObserver}
+        />
+      }
       <InvitedSuppliers
         auctionPayload={auctionPayload}
         approveBargeForm={approveBargeForm}

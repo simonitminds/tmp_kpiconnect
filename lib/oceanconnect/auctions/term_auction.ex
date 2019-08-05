@@ -57,6 +57,16 @@ defmodule Oceanconnect.Auctions.TermAuction do
       on_delete: :delete_all
     )
 
+    many_to_many(
+      :observers,
+      Oceanconnect.Accounts.User,
+      join_through: Oceanconnect.Accounts.Observer,
+      join_keys: [auction_id: :id, user_id: :id],
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
+
+    has_many(:auction_observers, Oceanconnect.Accounts.Observer)
     has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
 
     timestamps()

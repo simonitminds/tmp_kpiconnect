@@ -10,7 +10,8 @@ const BuyerSidebar = (props) => {
   const {
     auctionPayload,
     approveBargeForm,
-    rejectBargeForm
+    rejectBargeForm,
+    inviteObserver
   } = props;
 
   const { auction, status } = auctionPayload;
@@ -29,6 +30,12 @@ const BuyerSidebar = (props) => {
           <LogLink auction={auction} />
         }
       </div>
+      { isAdmin && status != 'closed' && status != 'canceled' && status != 'expired' &&
+        <InviteObservers
+          auctionPayload={auctionPayload}
+          inviteObserver={inviteObserver}
+        />
+      }
       <InvitedSuppliers
         auctionPayload={auctionPayload}
         approveBargeForm={approveBargeForm}

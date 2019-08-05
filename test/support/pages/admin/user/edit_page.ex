@@ -41,6 +41,12 @@ defmodule Oceanconnect.Admin.User.EditPage do
     |> click
   end
 
+  def fill_form_element(_key, element, _type, value) when is_boolean(value) do
+    if value do
+      click(element)
+    end
+  end
+
   def fill_form_element(_key, element, _type, value) do
     fill_field(element, value)
   end

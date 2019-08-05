@@ -11,6 +11,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     AuctionTimer,
     AuctionSuppliers
   }
+  alias Oceanconnect.Accounts
 
   alias Oceanconnect.Deliveries
 
@@ -27,15 +28,24 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             submitted_barges: [],
             submitted_comments: [],
             claims: [],
-            fixtures: []
+            fixtures: [],
+            observers: [],
+            available_observers: []
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{})
-      when is_auction(struct) and is_auction_state(state_struct) do
-    get_auction_payload!(auction, buyer_id, state)
+
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id, observers: observers}, state = %state_struct{})
+  when is_auction(struct) and is_auction_state(state_struct) do
+    available_observers = Accounts.list_observers()
+                          |> IO.inspect
+        get_auction_payload!(auction, buyer_id, state)
+        |> Map.merge(%{observers: observers, available_observers: available_observers})
   end
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id, observers: observers}) when is_auction(struct) do
+    available_observers = Accounts.list_observers()
+                          |> IO.inspect
     get_auction_payload!(auction, buyer_id)
+    |> Map.merge(%{observers: observers, available_observers: available_observers})
   end
 
   def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id)
@@ -105,7 +115,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           Auctions.fixtures_for_auction(auction),
           &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id)
         )
-        |> format_fixtures()
+        |> format_fixtures(),
+      observers: [],
+      available_observers: [],
     }
   end
 
@@ -145,7 +157,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims: Deliveries.claims_for_auction(auction),
       fixtures:
         Auctions.fixtures_for_auction(auction)
-        |> format_fixtures()
+        |> format_fixtures(),
+      observers: [],
+      available_observers: []
     }
   end
 
@@ -256,7 +270,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         submitted_barges: submitted_barges,
         submitted_comments: submitted_comments,
         claims: claims,
-        fixtures: fixtures
+        fixtures: fixtures,
+        observers: observers,
+        available_observers: available_observers
       }) do
     %{
       time_remaining: time_remaining,
@@ -270,7 +286,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       submitted_barges: submitted_barges,
       submitted_comments: submitted_comments,
       claims: claims,
-      fixtures: fixtures
+      fixtures: fixtures,
+      observers: observers,
+      available_observers: available_observers
     }
   end
 

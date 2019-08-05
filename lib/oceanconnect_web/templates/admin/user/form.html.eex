@@ -81,6 +81,16 @@
           Is Admin
         <%end%>
       </div>
+
+      <div class="field is-horizontal">
+        <div class="control is-inline-block">
+          <%= checkbox f, :is_observer, class: "checkbox qa-admin-user-is_observer" %>
+          <%= error_tag f, :is_observer %>
+        </div>
+        <%= label f, :is_observer, class: "label has-margin-left-md is-inline-block" do %>
+          Is Observer
+        <%end%>
+      </div>
       <div class="field is-margin-top-lg">
         <div class="control">
           <%= submit "Submit", class: "button is-primary qa-admin-submit" %>
