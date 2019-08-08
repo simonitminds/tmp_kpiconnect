@@ -112,10 +112,17 @@ defmodule OceanconnectWeb.Router do
     )
 
     post(
-      "/auctions/:auction_id/observers/:observer_id/invite",
-      AuctionObserversController,
+      "/auctions/:auction_id/observers/:user_id/invite",
+      ObserverController,
       :invite,
-      as: :auction_observers_api_invite
+      as: :auction_observer_api
+    )
+
+    post(
+      "/auctions/:auction_id/observers/:user_id/uninvite",
+      ObserverController,
+      :uninvite,
+      as: :auction_observer_api
     )
 
     get("/ports/:port_id/suppliers", PortSupplierController, :index)

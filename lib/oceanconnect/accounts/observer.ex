@@ -18,7 +18,7 @@ defmodule Oceanconnect.Accounts.Observer do
   def changeset(%__MODULE__{} = observer, attrs) do
     observer
     |> cast(attrs, [:auction_id, :term_auction_id, :user_id])
-    |> validate_required([:supplier_id])
+    |> validate_required([:user_id])
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:term_auction_id)
     |> foreign_key_constraint(:user_id)

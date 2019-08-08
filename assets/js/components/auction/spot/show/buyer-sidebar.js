@@ -12,26 +12,34 @@ const BuyerSidebar = (props) => {
     auctionPayload,
     approveBargeForm,
     rejectBargeForm,
-    inviteObserver
+    inviteObserver,
+    uninviteObserver
   } = props;
 
   const { auction, status } = auctionPayload;
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const isAdmin = window.isAdmin;
+  const isObserver = window.isObserver;
   const isEditable = status != 'open' && status != 'decision';
 
   return (
     <React.Fragment>
-      <div className="box">
-        <h3 className="box__header box__header--bordered has-margin-bottom-md">Auction Reports</h3>
-        { (isAdmin || (status != 'pending')) &&
-          <LogLink auction={auction} />
-        }
-      </div>
+      { !isObserver &&
+        <div className="box">
+          <h3 className="box__header box__header--bordered has-margin-bottom-md">Auction Reports</h3>
+          { (isAdmin && (status == 'closed' || status == 'expired')) &&
+            <a className="button is-info has-family-copy has-margin-right-sm qa-admin-fixtures-link" href={`/admin/auctions/${auctionPayload.auction.id}/fixtures`}>View Fixtures</a>
+          }
+          { (isAdmin || (status != 'pending')) &&
+            <LogLink auction={auction} />
+          }
+        </div>
+      }
       { isAdmin && status != 'closed' && status != 'canceled' && status != 'expired' &&
         <InvitedObservers
           auctionPayload={auctionPayload}
           inviteObserver={inviteObserver}
+          uninviteObserver={uninviteObserver}
         />
       }
       <InvitedSuppliers

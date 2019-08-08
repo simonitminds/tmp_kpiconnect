@@ -17,7 +17,8 @@ import {
   submitComment,
   unsubmitComment,
   updateBidStatus,
-  inviteObserverToAuction
+  inviteObserverToAuction,
+  uninviteObserverFromAuction
 } from '../actions';
 
 const mapStateToProps = (state) => {
@@ -72,6 +73,10 @@ const mapDispatchToProps = (dispatch) => ({
   inviteObserver(auctionId, userId, ev) {
     ev.preventDefault();
     dispatch(inviteObserverToAuction(auctionId, userId))
+  },
+  uninviteObserver(auctionId, userId, ev) {
+    ev.preventDefault();
+    dispatch(uninviteObserverFromAuction(auctionId, userId))
   },
   acceptSolution(auctionId, bidIds, ev) {
     ev.preventDefault();

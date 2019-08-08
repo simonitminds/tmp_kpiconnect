@@ -195,9 +195,23 @@ export function inviteObserverToAuction(auctionId, userId) {
     })
     .then(checkStatus)
     .then(parseJSON)
-      .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
-      })
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+    })
+  }
+}
+
+export function uninviteObserverFromAuction(auctionId, userId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/observers/${userId}/invite`, {
+      headers: defaultHeaders,
+      method: 'POST'
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response})
+    })
   }
 }
 

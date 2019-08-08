@@ -24,6 +24,7 @@ export default class AuctionShow extends React.Component {
       auctionPayload,
       companyProfile,
       inviteObserver,
+      uninviteObserver,
       submitBargeForm,
       unsubmitBargeForm,
       approveBargeForm,
@@ -42,7 +43,8 @@ export default class AuctionShow extends React.Component {
 
     const currentUser = {
       isBuyer: parseInt(this.props.currentUserCompanyId) === auction.buyer_id,
-      isAdmin: window.isAdmin && !window.isImpersonating
+      isAdmin: window.isAdmin && !window.isImpersonating,
+      isObserver: window.isObserver
     };
 
     const auctionType = _.get(auction, 'type');
@@ -68,7 +70,7 @@ export default class AuctionShow extends React.Component {
                           </li>
                         </ul>
                       </div>
-                    { (currentUser.isBuyer || currentUser.isAdmin)
+                    { (currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
                       ? <BuyerBody
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
@@ -96,12 +98,13 @@ export default class AuctionShow extends React.Component {
                         </TabList>
                       </div>
                       <TabPanel>
-                        { currentUser.isBuyer || currentUser.isAdmin
+                        { currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                           ? <BuyerSidebar
                               auctionPayload={auctionPayload}
                               approveBargeForm={approveBargeForm}
                               rejectBargeForm={rejectBargeForm}
                               inviteObserver={inviteObserver}
+                              uninviteObserver={uninviteObserver}
                             />
                           : <SupplierSidebar
                               auctionPayload={auctionPayload}
@@ -132,7 +135,7 @@ export default class AuctionShow extends React.Component {
                     </TabList>
                   </div>
                   <TabPanel>
-                    { (currentUser.isBuyer || currentUser.isAdmin)
+                    { (currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
                       ? <BuyerBody
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
@@ -152,11 +155,13 @@ export default class AuctionShow extends React.Component {
                     }
                   </TabPanel>
                   <TabPanel>
-                    { currentUser.isBuyer || currentUser.isAdmin
+                    { currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                       ? <BuyerSidebar
                           auctionPayload={auctionPayload}
                           approveBargeForm={approveBargeForm}
                           rejectBargeForm={rejectBargeForm}
+                          inviteObserver={inviteObserver}
+                          uninviteObserver={uninviteObserver}
                         />
                       : <SupplierSidebar
                           auctionPayload={auctionPayload}

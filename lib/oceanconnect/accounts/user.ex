@@ -4,7 +4,7 @@ defmodule Oceanconnect.Accounts.User do
   alias Oceanconnect.Accounts.{User, Company}
   alias Oceanconnect.Deliveries.ClaimResponse
 
-  @derive {Poison.Encoder, only: [:email, :company, :first_name, :last_name]}
+  @derive {Poison.Encoder, only: [:email, :company, :first_name, :last_name, :id]}
 
   schema "users" do
     field(:email, :string)
@@ -65,7 +65,8 @@ defmodule Oceanconnect.Accounts.User do
       :is_active,
       :company_id,
       :is_admin,
-      :password
+      :password,
+      :is_observer
     ])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()

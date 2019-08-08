@@ -6,24 +6,28 @@ defmodule OceanconnectWeb.Api.AuctionController do
   alias OceanconnectWeb.Plugs.Auth
 
   def index(conn, _params) do
-    user_id = Auth.current_user(conn).company_id
-
     auction_payloads =
-      case Auth.current_user_is_admin?(conn) do
-        true ->
+      case Auth.current_user(conn) do
+        %User{is_admin: true} ->
           Auctions.list_auctions()
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
             |> AuctionPayload.get_admin_auction_payload!()
           end)
-
-        false ->
-          Auctions.list_participating_auctions(user_id)
+        %User{is_observer: true} = user ->
+          Auctions.list_observing_auctions(user.id)
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
-            |> AuctionPayload.get_auction_payload!(user_id)
+            |> AuctionPayload.get_observer_auction_payload!()
+          end)
+        user ->
+          Auctions.list_participating_auctions(user.company_id)
+          |> Enum.map(fn auction ->
+            auction
+            |> Auctions.fully_loaded()
+            |> AuctionPayload.get_auction_payload!(user.company_id)
           end)
       end
 
@@ -31,18 +35,16 @@ defmodule OceanconnectWeb.Api.AuctionController do
   end
 
   def show(conn, %{"auction_id" => auction_id}) do
-    user_id = OceanconnectWeb.Plugs.Auth.current_user(conn).company_id
     auction = Auctions.get_auction(auction_id)
 
-    %{status: status} = Auctions.get_auction_state!(auction)
-
     auction_payload =
-      case OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn) do
-        true ->
+      case Auth.current_user(conn) do
+        %User{is_admin: true} ->
           AuctionPayload.get_admin_auction_payload!(auction)
-
-        false ->
-          AuctionPayload.get_auction_payload!(auction, user_id)
+        %User{is_observer: true} ->
+          AuctionPayload.get_observer_auction_payload!(auction)
+        user ->
+          AuctionPayload.get_auction_payload!(auction, user.company_id)
       end
 
     render(conn, "show.json", data: auction_payload)

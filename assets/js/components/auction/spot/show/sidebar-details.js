@@ -10,22 +10,23 @@ import InvitedSuppliers from '../../common/invited-suppliers';
 const SidebarDetails = (props) => {
   const { auctionPayload, isEditable } = props;
   const { auction, status } = auctionPayload;
+  const isObserver = window.isObserver;
 
   return(
     <div className="box has-margin-bottom-md">
       <div className="box__subsection">
         <h3 className="box__header">Buyer Information
           <div className="field is-inline-block is-pulled-right">
-          { isEditable &&
+          { isEditable && !isObserver &&
             <a className="button is-primary is-small has-family-copy is-capitalized" href={`/auctions/${auction.id}/edit`}>Edit</a>
           }
           </div>
         </h3>
         <ul className="list has-no-bullets">
           <li className="is-not-flex">
-            <strong className="is-block">Organization</strong> {auction.buyer.name}
+            <strong className="is-block">Organization</strong> {auction.buyer ? auction.buyer.name : 'Buyer Company Name'}
           </li>
-          <li><strong>Buyer</strong> {auction.buyer.contact_name} </li>
+          <li><strong>Buyer</strong> {auction.buyer ? auction.buyer.contact_name : 'Buyer Contact Name'} </li>
           <li><strong>Buyer Reference Number</strong> { auction.buyer_reference_number ? auction.buyer_reference_number : '—' } </li>
         </ul>
       </div>
