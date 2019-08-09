@@ -16,6 +16,7 @@ const BuyerBody = (props) => {
     currentUser,
     acceptSolution
   } = props;
+  const isObserver = window.isObserver;
   const { status, solutions } = auctionPayload;
   const otherSolutions = _.get(solutions, 'other_solutions');
 
@@ -46,7 +47,9 @@ const BuyerBody = (props) => {
   } else if(status ==  'closed') {
       return(
       <div>
-        <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={false} />
+        { !isObserver &&
+          <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={false} />
+        }
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin
           ? <OtherSolutions auctionPayload={auctionPayload} solutions={otherSolutions} showCustom={false} />

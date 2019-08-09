@@ -165,7 +165,9 @@ defmodule Oceanconnect.AuctionIndexTest do
         auctions
         |> hd()
         |> Auctions.fully_loaded()
-        |> Auctions.invite_observer(observer)
+
+      auction
+      |> Auctions.invite_observer(observer)
 
       {:ok, _pid} =
         start_supervised(
@@ -179,9 +181,8 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
 
     test "can see their view of the auction card", %{auction: auction} do
-      assert AuctionIndexPager.has_field_in_auction(auction.id, "observer-card")
       refute AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card")
-      refute AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
     end
   end
 end

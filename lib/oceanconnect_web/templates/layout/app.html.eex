@@ -106,7 +106,7 @@
       <script> window.userToken = "<%= OceanconnectWeb.Plugs.Auth.current_token(@conn) %>";</script>
       <script> window.expiration = "<%= OceanconnectWeb.Plugs.Auth.expiration(@conn) %>";</script>
       <script> window.companyId = "<%= OceanconnectWeb.SessionView.current_user_company_id(@conn) %>";</script>
-      <script> window.isObserver = "<%= OceanconnectWeb.SessionView.is_observing?(@conn) %>";</script>
+      <script> window.isObserver = <%= OceanconnectWeb.SessionView.is_observing?(@conn) %>;</script>
       <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
 
