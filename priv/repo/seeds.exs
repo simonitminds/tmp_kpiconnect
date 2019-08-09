@@ -162,7 +162,7 @@ companies =
       main_phone: "",
       mobile_phone: "",
       postal_code: ""
-    }
+    },
   ]
   |> Enum.map(fn company ->
     Repo.get_or_insert!(Company, company)
@@ -173,6 +173,49 @@ suppliers = [qatargas, petrochina, global, shell, chemoil]
 
 Enum.map(companies, fn c ->
   Repo.get_or_insert_user!(
+    Repo.get_by(User, %{email: String.upcase(c.email)}),
+    String.upcase(c.email),
+    c
+  )
+end)
+
+observer_companies =
+  [
+    %{
+      name: "Observing Company",
+      address1: "",
+      address2: "",
+      city: "London",
+      is_supplier: true,
+      is_broker: true,
+      country: "Britain",
+      contact_name: "Observer User",
+      email: "observer@example.com",
+      main_phone: "",
+      mobile_phone: "",
+      postal_code: ""
+    },
+    %{
+      name: "Spectating Company",
+      address1: "",
+      address2: "",
+      city: "London",
+      is_supplier: true,
+      is_broker: true,
+      country: "Britain",
+      contact_name: "Justa Spectator",
+      email: "spectator@example.com",
+      main_phone: "",
+      mobile_phone: "",
+      postal_code: ""
+    }
+  ]
+  |> Enum.map(fn company ->
+    Repo.get_or_insert!(Company, company)
+  end)
+
+Enum.map(observer_companies, fn c ->
+  Repo.get_or_insert_observer!(
     Repo.get_by(User, %{email: String.upcase(c.email)}),
     String.upcase(c.email),
     c

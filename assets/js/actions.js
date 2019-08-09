@@ -187,6 +187,34 @@ export function getCompanyBarges(companyId) {
   };
 }
 
+export function inviteObserverToAuction(auctionId, userId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/observers/${userId}/invite`, {
+      headers: defaultHeaders,
+      method: 'POST'
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+    })
+  }
+}
+
+export function uninviteObserverFromAuction(auctionId, userId) {
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/observers/${userId}/invite`, {
+      headers: defaultHeaders,
+      method: 'POST'
+    })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then((response) => {
+      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response})
+    })
+  }
+}
+
 export function submitBargeForApproval(auctionId, bargeId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/submit`, {

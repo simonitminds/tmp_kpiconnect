@@ -41,7 +41,7 @@ const Header = ({auctionPayload, connection}) => {
                   <div className="qa-auction-vessels">
                     <h1 className="title auction-header__vessel has-text-weight-bold">
                       <AuctionTitle auction={auction} />
-                      <span className="auction-header__company">{auction.buyer.name}</span>
+                      <span className="auction-header__company">{auction.buyer ? auction.buyer.name : 'Buyer Company Name'}</span>
                     </h1>
                   </div>
                   <div className="auction-header__ports--mobile">

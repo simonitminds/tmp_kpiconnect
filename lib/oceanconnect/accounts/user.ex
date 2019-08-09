@@ -4,7 +4,7 @@ defmodule Oceanconnect.Accounts.User do
   alias Oceanconnect.Accounts.{User, Company}
   alias Oceanconnect.Deliveries.ClaimResponse
 
-  @derive {Poison.Encoder, only: [:email, :company, :first_name, :last_name]}
+  @derive {Poison.Encoder, only: [:email, :company, :first_name, :last_name, :id]}
 
   schema "users" do
     field(:email, :string)
@@ -15,6 +15,7 @@ defmodule Oceanconnect.Accounts.User do
     field(:password_hash, :string)
     field(:password, :string, virtual: true)
     field(:has_2fa, :boolean, default: false)
+    field(:is_observer, :boolean, default: false)
     field(:is_admin, :boolean, default: false)
     field(:is_active, :boolean, default: true)
     field(:impersonated_by, :integer, virtual: true)
@@ -44,7 +45,8 @@ defmodule Oceanconnect.Accounts.User do
       :is_active,
       :company_id,
       :is_admin,
-      :has_2fa
+      :has_2fa,
+      :is_observer
     ])
     |> validate_required([:email, :company_id])
     |> foreign_key_constraint(:company_id)
@@ -63,7 +65,8 @@ defmodule Oceanconnect.Accounts.User do
       :is_active,
       :company_id,
       :is_admin,
-      :password
+      :password,
+      :is_observer
     ])
     |> foreign_key_constraint(:company_id)
     |> upcase_email()
@@ -121,6 +124,13 @@ defmodule Oceanconnect.Accounts.User do
     from(
       q in query,
       where: q.is_admin == true
+    )
+  end
+
+  def select_observers(query \\ User) do
+    from(
+      q in query,
+      where: q.is_observer == true
     )
   end
 

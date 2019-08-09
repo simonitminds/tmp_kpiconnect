@@ -24,11 +24,11 @@ const BuyerBestSolution = ({auctionPayload, acceptSolution}) => {
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header box__header--bordered has-margin-bottom-md">Best Offer(s)</h3>
           { bestSolution &&
-            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall" acceptSolution={acceptSolution} best={true} isExpanded={true} className="qa-auction-solution-best_overall" />
+            <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} title="Best Overall" acceptSolution={acceptSolution} best={true} isExpanded={true} isBuyer={true} className="qa-auction-solution-best_overall" />
           }
 
           { !_.isEqual(bestSolution, bestSingleSupplier) && vesselFuels && vesselFuels.length > 1 && bestSingleSupplier &&
-              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" acceptSolution={acceptSolution} isExpanded={true} className="qa-auction-solution-best_single_supplier" />
+              <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} title="Best Single Supplier" acceptSolution={acceptSolution} isExpanded={true} isBuyer={true} className="qa-auction-solution-best_single_supplier" />
           }
           { !(bestSolution || bestSingleSupplier) &&
             <div className="auction-table-placeholder">

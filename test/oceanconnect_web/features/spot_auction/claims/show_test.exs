@@ -142,7 +142,6 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       AuctionShowPage.visit(auction.id)
       assert AuctionShowPage.is_current_path?(auction.id)
       assert AuctionShowPage.auction_status() == "CLOSED"
-      Hound.Helpers.Screenshot.take_screenshot()
       AuctionShowPage.view_claim(claim.id)
       assert Claims.ShowPage.is_current_path?(auction.id, claim.id)
       Claims.EditPage.enter_response("I'm sorry our fuel sucked so much")

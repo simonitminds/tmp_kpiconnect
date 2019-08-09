@@ -83,7 +83,7 @@ defmodule Oceanconnect.Auctions.AuctionFixtureTest do
       fixture = hd(fixtures)
 
       {:ok, updated_fixture} =
-        Auctions.update_fixture(fixture, %{quantity: fixture.quantity + 1000})
+        Auctions.update_fixture(fixture, %{quantity: Decimal.add(fixture.quantity, 1000)})
 
       assert [
                %Oceanconnect.Auctions.AuctionEvent{

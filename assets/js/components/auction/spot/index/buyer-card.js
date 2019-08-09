@@ -40,7 +40,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
       .value();
     openClaims = openClaims.length
 
-    if (auctionStatus == 'closed') {
+    if (auctionStatus == 'closed' && !isObserver) {
       if (!_.isEmpty(claims)) {
         return (
           <span className="tag is-yellow is-flex has-text-centered has-text-weight-bold"><span className="qa-open-claims has-margin-right-xs">{openClaims}</span> {`Open Claim${openClaims != 1 ? "s" : ""}`}</span>
@@ -156,7 +156,7 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
           <h3 className="title is-size-4 has-text-weight-bold is-marginless">
             <AuctionTitle auction={auction} />
           </h3>
-          <p className="has-family-header has-margin-bottom-xs">{auction.buyer.name}</p>
+          <p className="has-family-header has-margin-bottom-xs">{auction.buyer ? auction.buyer.name : 'Buyer Company Name'}</p>
           <p className="has-family-header"><span className="has-text-weight-bold">{auction.port.name}</span> (<strong>ETA</strong> {cardDateFormat(eta)}<span className="is-hidden-mobile"> &ndash; <strong>ETD</strong> {cardDateFormat(etd)}</span>)</p>
           { claimStatusDisplay() }
         </div>

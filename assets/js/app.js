@@ -73,14 +73,18 @@ if (document.getElementById('auctions-app')) {
     switch (window.container) {
       case "index": { return (
         <div>
-          <AuctionsContainer currentUserCompanyId={currentUserCompanyId} />
-          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+          <AuctionsContainer currentUserCompanyId={currentUserCompanyId} isObserver={window.isObserver}/>
+          { !isObserver &&
+            <MessagesContainer currentUserCompanyId={currentUserCompanyId}/>
+          }
         </div>
       )}
       case "historical_index" : { return (
         <div>
-          <HistoricalAuctionsContainer currentUserCompanyId={currentUserCompanyId} />
-          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+          <HistoricalAuctionsContainer currentUserCompanyId={currentUserCompanyId} isObserver={window.isObserver}/>
+          { !isObserver &&
+            <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+          }
         </div>
       )}
       case "admin_fixture_index" : { return (
@@ -90,14 +94,16 @@ if (document.getElementById('auctions-app')) {
       )}
       case "fixture_index" : { return (
         <div>
-          <FixturesContainer currentUserCompanyId={currentUserCompanyId} />
+          <FixturesContainer currentUserCompanyId={currentUserCompanyId} isObserver={window.isObserver} />
           <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
         </div>
       )}
       case "show": { return (
         <div>
-          <AuctionContainer currentUserCompanyId={currentUserCompanyId} />
-          <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+          <AuctionContainer currentUserCompanyId={currentUserCompanyId} isObserver={window.isObserver} />
+          { !isObserver &&
+            <MessagesContainer currentUserCompanyId={currentUserCompanyId} />
+          }
         </div>
       )}
       case "edit": { return getDataForComponent("AuctionFormContainer")}

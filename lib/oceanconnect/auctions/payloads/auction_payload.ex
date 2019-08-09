@@ -12,6 +12,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     AuctionSuppliers
   }
 
+  alias Oceanconnect.Accounts
+
   alias Oceanconnect.Deliveries
 
   alias Oceanconnect.Auctions.Payloads.{BargesPayload, ProductBidsPayload, SolutionsPayload}
@@ -27,15 +29,34 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             submitted_barges: [],
             submitted_comments: [],
             claims: [],
-            fixtures: []
+            fixtures: [],
+            observers: [],
+            available_observers: []
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}, state = %state_struct{})
+  def get_admin_auction_payload!(
+        auction = %struct{buyer_id: buyer_id, observers: observers},
+        state = %state_struct{}
+      )
       when is_auction(struct) and is_auction_state(state_struct) do
+    available_observers =
+      Accounts.list_observers()
+
     get_auction_payload!(auction, buyer_id, state)
+    |> Map.merge(%{observers: observers, available_observers: available_observers})
   end
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
+  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id, observers: observers})
+      when is_auction(struct) do
+    available_observers =
+      Accounts.list_observers()
+
     get_auction_payload!(auction, buyer_id)
+    |> Map.merge(%{observers: observers, available_observers: available_observers})
+  end
+
+  def get_observer_auction_payload!(%struct{} = auction) when is_auction(struct) do
+    auction_state = Auctions.get_auction_state!(auction)
+    get_observer_auction_payload(auction, auction_state)
   end
 
   def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id)
@@ -105,7 +126,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
           Auctions.fixtures_for_auction(auction),
           &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id)
         )
-        |> format_fixtures()
+        |> format_fixtures(),
+      observers: [],
+      available_observers: []
     }
   end
 
@@ -145,7 +168,46 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims: Deliveries.claims_for_auction(auction),
       fixtures:
         Auctions.fixtures_for_auction(auction)
-        |> format_fixtures()
+        |> format_fixtures(),
+      observers: [],
+      available_observers: []
+    }
+  end
+
+  def get_observer_auction_payload(
+    %struct{buyer_id: buyer_id} = auction,
+    %state_struct{
+      product_bids: product_bids,
+      status: status
+    } = state
+  ) when is_auction(struct) and is_auction_state(state_struct) do
+    %AuctionPayload{
+      time_remaining: get_time_remaining(auction, state),
+      current_server_time: DateTime.utc_now(),
+      auction: scrub_auction(auction, is_observer: true),
+      status: status,
+      solutions:
+        SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
+      bid_history: [],
+      participations: get_participations(auction),
+      product_bids:
+        Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
+          Map.put(
+            acc,
+            vessel_fuel_id,
+            ProductBidsPayload.get_product_bids_payload!(product_state,
+              auction: auction,
+              buyer: buyer_id
+            )
+          )
+        end),
+      submitted_barges:
+        BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
+      submitted_comments: [],
+      claims: [],
+      fixtures: [],
+      observers: [],
+      available_observers: []
     }
   end
 
@@ -196,9 +258,42 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct),
     do: auction
 
+  defp scrub_auction(%Auction{auction_vessel_fuels: auction_vessel_fuels, vessels: vessels, buyer: buyer} = auction, is_observer: true) do
+    {_counter, auction_vessel_fuels} =
+      auction_vessel_fuels
+      |> Enum.reduce({1, []}, fn vf, acc ->
+        {counter, vessel_fuels} = acc
+        {counter + 1, [%{vf | vessel: scrub_vessel(vf.vessel, counter)} | vessel_fuels]}
+      end)
+    {_counter, vessels} =
+      vessels
+      |> Enum.reduce({1, []}, fn vessel, acc ->
+        {counter, vessels} = acc
+        {counter + 1, [scrub_vessel(vessel, counter) | vessels]}
+      end)
+
+    %{auction | auction_vessel_fuels: auction_vessel_fuels, vessels: vessels}
+    |> Map.drop([:buyer, :buyer_reference_number, :additional_information])
+  end
+
+  defp scrub_auction(%TermAuction{vessels: vessels, buyer: buyer} = auction, is_observer: true) do
+    {_counter, vessels} =
+      vessels
+      |> Enum.reduce({1, []}, fn vessel, acc ->
+        {counter, vessels} = acc
+        {counter + 1, [scrub_vessel(vessel, counter) | vessels]}
+      end)
+
+    %{auction | vessels: vessels}
+    |> Map.drop([:buyer, :buyer_reference_number, :additional_information])
+  end
+
   defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
     Map.delete(auction, :suppliers)
   end
+
+
+  defp scrub_vessel(vessel, counter), do: %{vessel | name: "Vessel #{counter}", imo: 12345}
 
   defp scrub_bid_for_supplier(nil, _supplier_id, _auction), do: nil
 
@@ -256,7 +351,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         submitted_barges: submitted_barges,
         submitted_comments: submitted_comments,
         claims: claims,
-        fixtures: fixtures
+        fixtures: fixtures,
+        observers: observers,
+        available_observers: available_observers
       }) do
     %{
       time_remaining: time_remaining,
@@ -270,7 +367,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       submitted_barges: submitted_barges,
       submitted_comments: submitted_comments,
       claims: claims,
-      fixtures: fixtures
+      fixtures: fixtures,
+      observers: observers,
+      available_observers: available_observers
     }
   end
 
@@ -299,7 +398,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -307,7 +408,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -324,7 +427,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   defp format_fixture_prices(fixture), do: fixture
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{
+           quantity: %Decimal{} = quantity,
+           original_quantity: %Decimal{} = original_quantity,
+           delivered_quantity: %Decimal{} = delivered_quantity
+         } = fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -333,7 +442,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -341,7 +453,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),

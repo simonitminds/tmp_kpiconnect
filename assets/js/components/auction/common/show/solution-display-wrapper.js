@@ -74,6 +74,7 @@ export default class SolutionDisplayWrapper extends React.Component {
       endButton
     } = this.props;
     const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
+    const isObserver = window.isObserver;
     const auctionType = _.get(auctionPayload.auction, 'type');
     const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price');
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
@@ -135,7 +136,7 @@ export default class SolutionDisplayWrapper extends React.Component {
                 <span className="auction-solution__title__description">{displaySubtitle}</span>
               </span>
               <MediaQuery query="(max-width: 480px)">
-                { acceptable &&
+                { acceptable && !isObserver &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
@@ -146,7 +147,7 @@ export default class SolutionDisplayWrapper extends React.Component {
                 `(${formatTime(latest_time_entered)})`
               }
               <MediaQuery query="(min-width: 480px)">
-                { acceptable &&
+                { acceptable && !isObserver &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>

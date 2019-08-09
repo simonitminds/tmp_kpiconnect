@@ -47,7 +47,7 @@ const Header = ({auctionPayload, connection}) => {
                   </MediaQuery>
                   <h1 className="auction-header__vessel title">
                     <AuctionTitle auction={auction} />
-                    <span className="auction-header__company">{auction.buyer.name}</span>
+                    <span className="auction-header__company">{auction.buyer ? auction.buyer.name : 'Buyer Company Name'}</span>
                   </h1>
                 </div>
                 <div className={`column ${auctionStatus != 'pending'? 'is-hidden-mobile' : ''}`}>

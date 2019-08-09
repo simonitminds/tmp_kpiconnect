@@ -41,6 +41,13 @@ defmodule OceanconnectWeb.SessionView do
     end
   end
 
+  def is_observing?(conn) do
+    case Auth.current_user(conn) do
+      %User{is_observer: is_observer} -> is_observer
+      _ -> false
+    end
+  end
+
   def current_user(conn) do
     case Auth.current_user(conn) do
       nil -> ""

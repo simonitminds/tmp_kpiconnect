@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import React from 'react';
+import React, { Fragment } from 'react';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cardDateFormat, timeRemainingCountdown } from '../../utilities';
@@ -21,7 +21,8 @@ export default class AuctionsIndex extends React.Component {
   render() {
     const connection = this.props.connection;
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
-    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
+    const isObserver = window.isObserver;
+    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer_id) || currentUserIsAdmin || isObserver); };
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.props.auctionPayloads, (auctionPayload) => {
@@ -117,9 +118,11 @@ export default class AuctionsIndex extends React.Component {
                     </span>&nbsp;GMT
                   </div>
                 </div>
-                <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md">
-                  New Auction
-                </a>
+                { !isObserver &&
+                  <a href="/auctions/new" className="auction-list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md">
+                    New Auction
+                  </a>
+                }
                 <a href="/historical_auctions" className="auction-list__new-auction button is-link is-pulled-right is-small has-margin-bottom-md">
                   <span>Historical Auctions</span>
                   <span className="icon"><i className="fas fa-arrow-right is-pulled-right"></i></span>
@@ -133,9 +136,11 @@ export default class AuctionsIndex extends React.Component {
                   <span>Historical Auctions</span>
                   <span className="icon"><i className="fas fa-arrow-right is-pulled-right"></i></span>
                 </a>
-                <a href="/auctions/new" className="button is-link is-pulled-right has-margin-right-md">
-                  New Auction
-                </a>
+                { !isObserver &&
+                  <a href="/auctions/new" className="button is-link is-pulled-right has-margin-right-md">
+                    New Auction
+                  </a>
+                }
                 <div className="auction-list__time-box">
                   <ChannelConnectionStatus connection={connection} />
                   <div className="auction-list__timer">

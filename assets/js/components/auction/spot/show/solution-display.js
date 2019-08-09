@@ -7,7 +7,8 @@ import SolutionDisplayProductPrices from './solution-display/product-prices';
 
 const SolutionDisplay = (props) => {
   const {auctionPayload, solution, title, acceptSolution, supplierId, revokeBid, highlightOwn, best, className} = props;
-  const isSupplier = !!supplierId;
+  const isObserver = window.isObserver;
+  const isSupplier = !!supplierId && !isObserver;
   const auctionStatus = auctionPayload.status;
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const suppliers = _.get(auctionPayload, 'auction.suppliers');

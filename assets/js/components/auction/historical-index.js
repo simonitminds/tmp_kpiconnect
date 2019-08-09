@@ -155,8 +155,9 @@ export default class HistoricalAuctionsIndex extends React.Component {
     const availablePorts = availableAuctionAttributes('port');
 
     const connection = this.props.connection;
+    const isObserver = window.isObserver;
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
-    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
+    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer_id) || currentUserIsAdmin || isObserver); };
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.state.auctionPayloads, (auctionPayload) => {
@@ -271,24 +272,26 @@ export default class HistoricalAuctionsIndex extends React.Component {
                 <h2 className="has-margin-bottom-md"><legend className="subtitle is-4">Filter Auctions</legend></h2>
                 <div className="historical-auctions__form">
                   <form onChange={this.filterPayloads.bind(this)} onSubmit={this.clearFilter.bind(this)}>
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Vessel</label>
-                        <div className="select">
-                          <select
-                            name="vessel"
-                            className="qa-filter-vessel_id"
-                          >
-                            <option value="" >Select Vessel</option>
-                            { _.map(availableVessels, vessel => (
-                              <option className={`qa-filter-vessel_id-${vessel.id}`} key={vessel.id} value={vessel.id}>
-                                {vessel.name}
-                              </option>
-                            ))}
-                          </select>
+                    { !isObserver &&
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Vessel</label>
+                          <div className="select">
+                            <select
+                              name="vessel"
+                              className="qa-filter-vessel_id"
+                            >
+                              <option value="" >Select Vessel</option>
+                              { _.map(availableVessels, vessel => (
+                                <option className={`qa-filter-vessel_id-${vessel.id}`} key={vessel.id} value={vessel.id}>
+                                  {vessel.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    }
 
                     <div className="field">
                       <div className="control">
@@ -306,21 +309,23 @@ export default class HistoricalAuctionsIndex extends React.Component {
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Buyer</label>
-                        <div className="select">
-                          <select name="buyer" className="qa-filter-buyer_id">
-                            <option value="">Select Buyer</option>
-                            {_.map(availableBuyers, buyer => (
-                              <option key={buyer.id} value={buyer.id} className={`qa-filter-buyer_id-${buyer.id}`}>
-                                {buyer.name}
-                              </option>
-                            ))}
-                          </select>
+                    { !isObserver &&
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Buyer</label>
+                          <div className="select">
+                            <select name="buyer" className="qa-filter-buyer_id">
+                              <option value="">Select Buyer</option>
+                              {_.map(availableBuyers, buyer => (
+                                <option key={buyer.id} value={buyer.id} className={`qa-filter-buyer_id-${buyer.id}`}>
+                                  {buyer.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    }
 
                     { availableSuppliers.length > 0 &&
                       <div className="field">
@@ -340,22 +345,24 @@ export default class HistoricalAuctionsIndex extends React.Component {
                       </div>
                     }
 
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Claim Status</label>
-                        <div className="select">
-                          <select name="claims" className="qa-filter-claims">
-                            <option value="">Select Status</option>
-                            <option value={false} className={`qa-filter-claims-open`}>
-                              Open
-                            </option>
-                            <option value={true} className={`qa-filter-claims-closed`}>
-                              Closed
-                            </option>
-                          </select>
+                    { !isObserver &&
+                      <div className="field">
+                        <div className="control">
+                          <label className="label">Claim Status</label>
+                          <div className="select">
+                            <select name="claims" className="qa-filter-claims">
+                              <option value="">Select Status</option>
+                              <option value={false} className={`qa-filter-claims-open`}>
+                                Open
+                              </option>
+                              <option value={true} className={`qa-filter-claims-closed`}>
+                                Closed
+                              </option>
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    }
 
                     <MediaQuery query="(max-width: 599px)">
                       <div className="field">

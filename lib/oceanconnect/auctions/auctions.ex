@@ -31,7 +31,7 @@ defmodule Oceanconnect.Auctions do
 
   alias Oceanconnect.Auctions.Command
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Accounts.{Company, User, Observer}
   alias Oceanconnect.Auctions.AuctionsSupervisor
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
@@ -346,6 +346,20 @@ defmodule Oceanconnect.Auctions do
     |> Enum.filter(&(&1.status in [:closed, :canceled, :expired]))
     |> Enum.map(& &1.auction_id)
     |> Enum.map(&get_auction!(&1))
+  end
+
+  def is_observer?(%struct{} = auction, %User{id: user_id}) when is_auction(struct) do
+    auction.observers
+    |> Enum.any?(& &1.id == user_id)
+  end
+
+  def list_observing_auctions(user_id) do
+    list_auctions()
+    |> Enum.filter(fn auction ->
+      auction.observers
+      |> Enum.any?(& &1.id == user_id)
+    end)
+    |> Enum.uniq_by(& &1.id)
   end
 
   def list_participating_auctions(company_id) do
@@ -830,7 +844,8 @@ defmodule Oceanconnect.Auctions do
         [fuel_index: [:fuel, :port]],
         :auction_suppliers,
         [buyer: :users],
-        [suppliers: :users]
+        [suppliers: :users],
+        :observers
       ])
 
     fully_loaded_auction
@@ -846,7 +861,8 @@ defmodule Oceanconnect.Auctions do
         :auction_suppliers,
         [auction_vessel_fuels: [:vessel, :fuel]],
         [buyer: :users],
-        [suppliers: :users]
+        [suppliers: :users],
+        :observers
       ])
 
     fully_loaded_auction
@@ -1553,6 +1569,7 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
+
   def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
       when is_auction(struct) do
     query =
@@ -1599,6 +1616,34 @@ defmodule Oceanconnect.Auctions do
       |> Command.reject_barge(user)
       |> AuctionStore.process_command()
     end)
+  end
+
+  def invite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
+    %Observer{}
+    |> Observer.changeset(%{
+      auction_id: auction_id,
+      user_id: user_id
+    })
+    |> Repo.insert()
+  end
+
+  def invite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
+    %Observer{}
+    |> Observer.changeset(%{
+      term_auction_id: auction_id,
+      user_id: user_id
+    })
+    |> Repo.insert()
+  end
+
+  def uninvite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
+    Accounts.get_observer!(auction_id, user_id)
+    |> Repo.delete()
+  end
+
+  def uninvite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
+    Accounts.get_observer!(auction_id, user_id)
+    |> Repo.delete()
   end
 
   # Fixtures

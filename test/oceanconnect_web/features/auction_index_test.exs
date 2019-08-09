@@ -7,10 +7,11 @@ defmodule Oceanconnect.AuctionIndexTest do
   setup do
     buyer_company = insert(:company)
     buyer = insert(:user, company: buyer_company)
+    observer = insert(:user, is_observer: true)
     supplier_company = insert(:company, is_supplier: true)
     supplier = insert(:user, company: supplier_company)
     auctions = insert_list(2, :auction, buyer: buyer_company, suppliers: [supplier_company])
-    {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier}}
+    {:ok, %{auctions: auctions, buyer: buyer, supplier: supplier, observer: observer}}
   end
 
   describe "buyer login" do
@@ -155,6 +156,33 @@ defmodule Oceanconnect.AuctionIndexTest do
       assert AuctionIndexPage.auction_is_status?(auction, "open")
       :timer.sleep(400)
       assert AuctionIndexPage.time_remaining() |> convert_to_millisecs < auction.duration
+    end
+  end
+
+  describe "observer" do
+    setup %{observer: observer, auctions: auctions} do
+      auction =
+        auctions
+        |> hd()
+        |> Auctions.fully_loaded()
+
+      auction
+      |> Auctions.invite_observer(observer)
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
+
+      login_user(observer)
+      AuctionIndexPage.visit()
+      {:ok, %{auction: auction}}
+    end
+
+    test "can see their view of the auction card", %{auction: auction} do
+      refute AuctionIndexPage.has_field_in_auction?(auction.id, "supplier-card")
+      assert AuctionIndexPage.has_field_in_auction?(auction.id, "buyer-card")
     end
   end
 end

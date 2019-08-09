@@ -42,4 +42,23 @@ defmodule Oceanconnect.Repo do
   end
 
   def get_or_insert_user!(user, _email, _company), do: user
+
+  def get_or_insert_observer!(nil, email, company) do
+    [first_name, last_name] = String.split(company.contact_name)
+
+    user_params = %{
+      email: String.upcase(email),
+      first_name: first_name,
+      last_name: last_name,
+      password: "ocmtest",
+      password_confirmation: "ocmtest",
+      is_observer: true,
+      company_id: company.id
+    }
+
+    {:ok, user} = Oceanconnect.Accounts.seed_user(user_params)
+    user
+  end
+
+  def get_or_insert_observer!(user, _email, _company), do: user
 end

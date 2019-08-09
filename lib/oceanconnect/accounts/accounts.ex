@@ -7,7 +7,7 @@ defmodule Oceanconnect.Accounts do
   alias Oceanconnect.Repo
 
   alias Oceanconnect.Accounts.{Company, User}
-  alias Oceanconnect.Auctions.{Barge}
+  alias Oceanconnect.Auctions.{Auction, TermAuction, Barge}
 
   @doc """
   Returns the list of users.
@@ -25,6 +25,11 @@ defmodule Oceanconnect.Accounts do
   def list_users(params) do
     User.alphabetical()
     |> Repo.paginate(params)
+  end
+
+  def list_observers do
+    User.select_observers()
+    |> Repo.all()
   end
 
   def list_active_users do
@@ -52,6 +57,14 @@ defmodule Oceanconnect.Accounts do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+
+  def get_observer!(%Auction{id: auction_id}, user_id) do
+    Repo.get_by!(Observer, auction_id: auction_id, user_id: user_id)
+  end
+
+  def get_observer!(%TermAuction{id: auction_id}, user_id) do
+    Repo.get_by!(Observer, term_auction_id: auction_id, user_id: user_id)
+  end
 
   def get_active_user!(id) do
     User.select_active()

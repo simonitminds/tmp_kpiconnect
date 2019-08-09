@@ -111,6 +111,20 @@ defmodule OceanconnectWeb.Router do
       as: :auction_barges_api_reject
     )
 
+    post(
+      "/auctions/:auction_id/observers/:user_id/invite",
+      ObserverController,
+      :invite,
+      as: :auction_observer_api
+    )
+
+    post(
+      "/auctions/:auction_id/observers/:user_id/uninvite",
+      ObserverController,
+      :uninvite,
+      as: :auction_observer_api
+    )
+
     get("/ports/:port_id/suppliers", PortSupplierController, :index)
     get("/companies/:company_id/barges", CompanyBargesController, :index, as: :company_barges_api)
   end
