@@ -447,7 +447,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   def apply(
         _state,
-        %AuctionEvent{type: :auction_created, data: auction = %TermAuction{}}
+        %AuctionEvent{type: :auction_created, data: auction}
       ) do
     auction = Auctions.fully_loaded(auction)
     {:ok, TermAuctionState.from_auction(auction)}
