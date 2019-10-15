@@ -19,6 +19,7 @@ const BuyerSidebar = (props) => {
   const { auction, status } = auctionPayload;
   const fuel = _.get(auction, 'fuel');
   const isAdmin = window.isAdmin;
+  const isImpersonating = window.isImpersonating;
   const isObserver = window.isObserver;
   const isEditable = status != 'open' && status != 'decision';
 
@@ -32,7 +33,7 @@ const BuyerSidebar = (props) => {
           }
         </div>
       }
-      { isAdmin && status != 'closed' && status != 'canceled' && status != 'expired' &&
+      { isAdmin && !isImpersonating && status != 'closed' && status != 'canceled' && status != 'expired' &&
         <InvitedObservers
           auctionPayload={auctionPayload}
           inviteObserver={inviteObserver}
