@@ -319,17 +319,17 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.delete(:supplier_id)
   end
 
-  defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
-
-  defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{})
-       when is_auction(struct) do
-    supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
-
-    %{bid | supplier_id: nil, min_amount: nil}
-    |> Map.from_struct()
-    |> Map.put(:product, product_for_bid(bid, auction))
-    |> Map.put(:supplier, supplier)
-  end
+  # defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
+  #
+  # defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{})
+  #      when is_auction(struct) do
+  #   supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
+  #
+  #   %{bid | supplier_id: nil, min_amount: nil}
+  #   |> Map.from_struct()
+  #   |> Map.put(:product, product_for_bid(bid, auction))
+  #   |> Map.put(:supplier, supplier)
+  # end
 
   defp product_for_bid(bid, %Auction{auction_vessel_fuels: vessel_fuels}) do
     vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
