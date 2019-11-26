@@ -130,7 +130,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     %{
       fixture
       | price: Decimal.to_string(price),
-        original_price: Decimal.to_string(price),
+        original_price: Decimal.to_string(original_price),
         delivered_price: Decimal.to_string(delivered_price)
     }
   end
