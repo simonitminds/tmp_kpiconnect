@@ -23,13 +23,13 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
   const winningSolution = _.get(auctionPayload, 'solutions.winning_solution');
   const otherSolutions = _.get(auctionPayload, 'solutions.other_solutions');
 
-  const confirmCancellation = (e) => {
-    e.preventDefault();
+  const confirmCancellation = () => {
+    event.preventDefault();
     return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false;
   };
 
-  const confirmClone = (e) => {
-    e.preventDefault();
+  const confirmClone = () => {
+    event.preventDefault();
     return confirm('Are you sure you want to clone this auction?') ? window.location = `/auctions/${auction.id}/clone` : false;
   };
 
@@ -133,14 +133,14 @@ const BuyerCard = ({auctionPayload, timeRemaining}) => {
                 </a>
               }
               { !(auctionStatus == 'canceled' || auctionStatus == 'closed' || auctionStatus == 'expired')
-                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={() => confirmCancellation()} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
+                ? <a id="cancel-auction" href={`/auctions/${auction.id}/cancel`} onClick={confirmCancellation} action-label="Cancel Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-cancel">
                     <span className="icon is-medium has-text-right">
                       <FontAwesomeIcon icon="times" size="lg" />
                     </span>
                   </a>
                 : <span></span>
               }
-              <a id="clone-auction" href={`/auctions/${auction.id}/clone`} onClick={(e) => confirmClone(e)} action-label="Clone Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-clone">
+              <a id="clone-auction" href={`/auctions/${auction.id}/clone`} onClick={confirmClone} action-label="Clone Auction" className="auction-card__link-to-auction-cancel is-hidden-420 qa-auction-clone">
                 <span className="icon is-medium has-text-right">
                   <FontAwesomeIcon icon="copy" size="lg" />
                 </span>

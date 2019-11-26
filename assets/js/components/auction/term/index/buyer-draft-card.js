@@ -18,9 +18,6 @@ const BuyerDraftCard = ({auctionPayload, timeRemaining}) => {
   const fuelQuantity = _.get(auction, 'fuel_quantity');
   const auctionStatus = _.get(auctionPayload, 'status');
 
-  const confirmCancellation = (e) => { event.preventDefault();
-                                       return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
-
   const vesselNameDisplay = _.chain(vessels).map('name').join(", ").value();
   const products = [{fuel: fuel, quantity: fuelQuantity}];
 
