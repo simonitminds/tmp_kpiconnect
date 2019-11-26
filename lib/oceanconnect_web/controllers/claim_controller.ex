@@ -1,6 +1,5 @@
 defmodule OceanconnectWeb.ClaimController do
   use OceanconnectWeb, :controller
-  import Oceanconnect.Auctions.Guards
   alias OceanconnectWeb.Plugs.Auth
 
   alias Oceanconnect.Deliveries
@@ -12,7 +11,7 @@ defmodule OceanconnectWeb.ClaimController do
   action_fallback(OceanconnectWeb.ErrorController)
 
   def show(conn, %{"auction_id" => auction_id, "id" => claim_id}) do
-    %{id: current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
+    %{id: _current_user_id, company_id: current_user_company_id, is_admin: is_admin} =
       Auth.current_user(conn)
 
     with %Auction{buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
@@ -173,8 +172,7 @@ defmodule OceanconnectWeb.ClaimController do
         supplier_id: supplier_id,
         vessel_id: vessel_id,
         fuel_id: fuel_id,
-        price: price,
-        quantity: quantity
+        price: price
       } ->
         Map.merge(claim_params, %{
           "supplier_id" => supplier_id,
@@ -229,7 +227,7 @@ defmodule OceanconnectWeb.ClaimController do
       }
 
       with {:ok, claim} <- Deliveries.update_claim(claim, update_params),
-           {:ok, claim_reponse} <-
+           {:ok, _claim_reponse} <-
              Deliveries.create_claim_response(response_params, claim, current_user) do
         case claim.closed do
           true ->
@@ -238,8 +236,6 @@ defmodule OceanconnectWeb.ClaimController do
             |> redirect(to: auction_path(conn, :show, auction.id))
 
           false ->
-            changeset = Deliveries.change_claim(claim)
-
             conn
             |> put_flash(:info, "Claim successfully updated.")
             |> redirect(to: claim_path(conn, :edit, auction.id, claim.id))

@@ -108,7 +108,7 @@ defmodule Oceanconnect.Auctions.AuctionScheduler do
   end
 
   def handle_cast(
-        {:update_scheduled_start, auction = %struct{scheduled_start: scheduled_start}, _emit},
+        {:update_scheduled_start, %struct{scheduled_start: scheduled_start}, _emit},
         state = %{timer_ref: nil}
       )
       when is_auction(struct) do

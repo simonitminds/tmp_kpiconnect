@@ -9,7 +9,6 @@ defmodule Oceanconnect.Auctions do
     AuctionBid,
     AuctionCache,
     AuctionComment,
-    AuctionEvent,
     AuctionEventStore,
     AuctionEventStorage,
     AuctionFixture,
@@ -42,7 +41,7 @@ defmodule Oceanconnect.Auctions do
     true
   end
 
-  def is_term?(auction) do
+  def is_term?(_auction) do
     false
   end
 
@@ -350,14 +349,14 @@ defmodule Oceanconnect.Auctions do
 
   def is_observer?(%struct{} = auction, %User{id: user_id}) when is_auction(struct) do
     auction.observers
-    |> Enum.any?(& &1.id == user_id)
+    |> Enum.any?(&(&1.id == user_id))
   end
 
   def list_observing_auctions(user_id) do
     list_auctions()
     |> Enum.filter(fn auction ->
       auction.observers
-      |> Enum.any?(& &1.id == user_id)
+      |> Enum.any?(&(&1.id == user_id))
     end)
     |> Enum.uniq_by(& &1.id)
   end
@@ -510,14 +509,8 @@ defmodule Oceanconnect.Auctions do
 
   def get_auction_supplier(_auction_id, nil), do: nil
   def get_auction_supplier(nil, _supplier_id), do: nil
-
-  def get_auction_supplier(auction = %Auction{id: nil}, supplier_id) do
-    nil
-  end
-
-  def get_auction_supplier(auction = %TermAuction{id: nil}, supplier_id) do
-    nil
-  end
+  def get_auction_supplier(%Auction{id: nil}, _supplier_id), do: nil
+  def get_auction_supplier(%TermAuction{id: nil}, _supplier_id), do: nil
 
   def get_auction_supplier(%Auction{id: auction_id}, supplier_id) when not is_nil(auction_id) do
     Repo.get_by(AuctionSuppliers, %{auction_id: auction_id, supplier_id: supplier_id})
@@ -603,7 +596,7 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
-  def finalize_auction(_auction = %TermAuction{id: auction_id}, state = %TermAuctionState{}) do
+  def finalize_auction(_auction = %TermAuction{id: auction_id}, %TermAuctionState{}) do
     with cached_auction = %TermAuction{} <- get_auction(auction_id),
          finalized_auction = %TermAuction{} <- persist_auction_from_cache(cached_auction) do
       {:ok, finalized_auction}
@@ -1568,7 +1561,6 @@ defmodule Oceanconnect.Auctions do
     |> Command.unsubmit_barge(user)
     |> AuctionStore.process_command()
   end
-
 
   def approve_barge(%struct{id: auction_id}, %Barge{id: barge_id}, supplier_id, user \\ nil)
       when is_auction(struct) do

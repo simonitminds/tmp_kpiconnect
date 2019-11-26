@@ -23,24 +23,22 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
         auction: auction,
         events: events
       }) do
-
     %{
-      fixture:
-        format_fixture(fixture),
+      fixture: format_fixture(fixture),
       auction:
         auction
         |> Auctions.strip_non_loaded(),
-      events:
-        format_events(events)
+      events: format_events(events)
     }
   end
 
   defp format_events(events) when is_list(events) do
     events
-    |> Enum.map(& format_events(&1))
+    |> Enum.map(&format_events(&1))
   end
 
-  defp format_events(%{id: id, type: type, data: %{fixture: fixture}, time_entered: time_entered}) when type in [:fixture_created, :fixture_delivered] do
+  defp format_events(%{id: id, type: type, data: %{fixture: fixture}, time_entered: time_entered})
+       when type in [:fixture_created, :fixture_delivered] do
     %{
       id: id,
       type: format_event_type(type),
@@ -49,8 +47,14 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_events(%{id: id, type: :fixture_updated, data: %{original: fixture, updated: %{changes: changes}}, time_entered: time_entered}) do
+  defp format_events(%{
+         id: id,
+         type: :fixture_updated,
+         data: %{original: fixture, updated: %{changes: changes}},
+         time_entered: time_entered
+       }) do
     changes = format_changes(changes)
+
     %{
       id: id,
       type: format_event_type(:fixture_updated),
@@ -60,8 +64,14 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_events(%{id: id, type: :fixture_changes_proposed, data: %{fixture: fixture, changeset: %{changes: changes}, user: user}, time_entered: time_entered}) do
+  defp format_events(%{
+         id: id,
+         type: :fixture_changes_proposed,
+         data: %{fixture: fixture, changeset: %{changes: changes}, user: user},
+         time_entered: time_entered
+       }) do
     changes = format_changes(changes)
+
     %{
       id: id,
       type: format_event_type(:fixture_changes_proposed),
@@ -74,7 +84,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
 
   defp format_changes(changes) do
     changes
-    |> Enum.reduce(%{}, fn ({key, value}, acc) ->
+    |> Enum.reduce(%{}, fn {key, value}, acc ->
       {key, value} = format_change(key, value)
       Map.put(acc, key, value)
     end)
@@ -99,8 +109,8 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
 
   defp format_event_type(type) do
     ~r/_/
-      |> Regex.replace(Atom.to_string(type), " ")
-      |> String.capitalize()
+    |> Regex.replace(Atom.to_string(type), " ")
+    |> String.capitalize()
   end
 
   defp format_fixture(fixture) do
@@ -125,7 +135,9 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -133,7 +145,9 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -150,7 +164,13 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
 
   defp format_fixture_prices(fixture), do: fixture
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{
+           quantity: %Decimal{} = quantity,
+           original_quantity: %Decimal{} = original_quantity,
+           delivered_quantity: %Decimal{} = delivered_quantity
+         } = fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -159,7 +179,10 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -167,7 +190,10 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),

@@ -318,7 +318,6 @@ defmodule Oceanconnect.Auctions.TermAuction do
   defp validate_term_period(changeset, _attrs), do: changeset
 
   defp compare_time(changeset, nil), do: changeset
-  defp compare_time(changeset, nil, nil), do: changeset
 
   defp compare_time(changeset, start_time) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
@@ -331,6 +330,8 @@ defmodule Oceanconnect.Auctions.TermAuction do
         changeset
     end
   end
+
+  defp compare_time(changeset, nil, nil), do: changeset
 
   defp compare_time(changeset, start_date, end_date) do
     case DateTime.compare(end_date, start_date) do

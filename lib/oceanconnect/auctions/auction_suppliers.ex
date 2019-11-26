@@ -47,7 +47,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
     Repo.get_by!(__MODULE__, %{auction_id: auction_id, supplier_id: supplier_id}).alias_name
   end
 
-  def get_name_or_alias(supplier_id, %{suppliers: []}), do: ""
+  def get_name_or_alias(_supplier_id, %{suppliers: []}), do: ""
 
   def get_name_or_alias(supplier_id, %{suppliers: suppliers}) when is_list(suppliers) do
     hd(Enum.filter(suppliers, &(&1.id == supplier_id))).name

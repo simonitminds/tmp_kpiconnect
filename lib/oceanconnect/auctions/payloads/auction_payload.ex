@@ -38,8 +38,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
         state = %state_struct{}
       )
       when is_auction(struct) and is_auction_state(state_struct) do
-    available_observers =
-      Accounts.list_observers()
+    available_observers = Accounts.list_observers()
 
     get_auction_payload!(auction, buyer_id, state)
     |> Map.merge(%{observers: observers, available_observers: available_observers})
@@ -47,8 +46,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id, observers: observers})
       when is_auction(struct) do
-    available_observers =
-      Accounts.list_observers()
+    available_observers = Accounts.list_observers()
 
     get_auction_payload!(auction, buyer_id)
     |> Map.merge(%{observers: observers, available_observers: available_observers})
@@ -175,12 +173,13 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   end
 
   def get_observer_auction_payload(
-    %struct{buyer_id: buyer_id} = auction,
-    %state_struct{
-      product_bids: product_bids,
-      status: status
-    } = state
-  ) when is_auction(struct) and is_auction_state(state_struct) do
+        %struct{buyer_id: buyer_id} = auction,
+        %state_struct{
+          product_bids: product_bids,
+          status: status
+        } = state
+      )
+      when is_auction(struct) and is_auction_state(state_struct) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
@@ -258,13 +257,18 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct),
     do: auction
 
-  defp scrub_auction(%Auction{auction_vessel_fuels: auction_vessel_fuels, vessels: vessels, buyer: buyer} = auction, is_observer: true) do
+  defp scrub_auction(
+         %Auction{auction_vessel_fuels: auction_vessel_fuels, vessels: vessels, buyer: _buyer} =
+           auction,
+         is_observer: true
+       ) do
     {_counter, auction_vessel_fuels} =
       auction_vessel_fuels
       |> Enum.reduce({1, []}, fn vf, acc ->
         {counter, vessel_fuels} = acc
         {counter + 1, [%{vf | vessel: scrub_vessel(vf.vessel, counter)} | vessel_fuels]}
       end)
+
     {_counter, vessels} =
       vessels
       |> Enum.reduce({1, []}, fn vessel, acc ->
@@ -276,7 +280,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.drop([:buyer, :buyer_reference_number, :additional_information])
   end
 
-  defp scrub_auction(%TermAuction{vessels: vessels, buyer: buyer} = auction, is_observer: true) do
+  defp scrub_auction(%TermAuction{vessels: vessels, buyer: _buyer} = auction, is_observer: true) do
     {_counter, vessels} =
       vessels
       |> Enum.reduce({1, []}, fn vessel, acc ->
@@ -291,7 +295,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
     Map.delete(auction, :suppliers)
   end
-
 
   defp scrub_vessel(vessel, counter), do: %{vessel | name: "Vessel #{counter}", imo: 12345}
 

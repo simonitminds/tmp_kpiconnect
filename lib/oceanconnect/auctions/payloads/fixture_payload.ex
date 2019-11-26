@@ -1,6 +1,4 @@
 defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
-  import Oceanconnect.Auctions.Guards
-
   alias __MODULE__
   alias Oceanconnect.Auctions
 

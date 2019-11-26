@@ -39,9 +39,7 @@ defmodule OceanconnectWeb.EmailView do
     end)
   end
 
-  def auction_log_vessel_etas(auction) do
-    []
-  end
+  def auction_log_vessel_etas(_auction), do: []
 
   def duration_minute_string(duration) do
     "#{trunc(duration / 60_000)} minutes"

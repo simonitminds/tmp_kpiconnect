@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.{Auctions, Messages, Accounts}
+  alias Oceanconnect.{Auctions, Messages}
 
   alias Oceanconnect.Auctions.{
     Auction,
@@ -153,7 +153,8 @@ defmodule OceanconnectWeb.AuctionController do
     credit_margin_amount = user.company.credit_margin_amount
     is_admin = OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn)
 
-    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) || is_admin || Auctions.is_observer?(auction, user) do
+    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) || is_admin ||
+         Auctions.is_observer?(auction, user) do
       render(conn, "show.html", auction: auction, credit_margin_amount: credit_margin_amount)
     else
       redirect(conn, to: auction_path(conn, :index))

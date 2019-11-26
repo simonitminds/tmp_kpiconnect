@@ -88,26 +88,9 @@ defmodule Oceanconnect.Deliveries do
     end
   end
 
-  defp handle_response_creation(
-         %{"claim_id" => claim_id} = attrs,
-         %Accounts.User{company_id: company_id} = user
-       ) do
-    with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
-      %ClaimResponse{}
-      |> ClaimResponse.buyer_changeset(attrs)
-      |> Repo.insert()
-    else
-      _ ->
-        %ClaimResponse{}
-        |> ClaimResponse.changeset(attrs)
-        |> Repo.insert()
-    end
-  end
+  defp handle_response_creation(%{} = attrs, %Accounts.User{company_id: company_id}) do
+    claim_id = attrs[:claim_id] || attrs["claim_id"]
 
-  defp handle_response_creation(
-         %{claim_id: claim_id} = attrs,
-         %Accounts.User{company_id: company_id} = user
-       ) do
     with %Claim{buyer_id: buyer_id} when buyer_id == company_id <- get_claim(claim_id) do
       %ClaimResponse{}
       |> ClaimResponse.buyer_changeset(attrs)

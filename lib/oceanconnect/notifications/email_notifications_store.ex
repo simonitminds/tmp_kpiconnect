@@ -33,9 +33,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   # Bamboo sends this message back on successful deliver from `deliver_later`.
-  def handle_info({:delivered_email, email}, state) do
-    {:noreply, state}
-  end
+  def handle_info({:delivered_email, _email}, state), do: {:noreply, state}
 
   def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in @claim_events do
     process(event, claim)
@@ -70,7 +68,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     |> send()
 
     case DelayedNotificationsSupervisor.start_child(notification_name) do
-      {:ok, pid} ->
+      {:ok, _pid} ->
         starting_soon_emails =
           Notifications.emails_for_event(%AuctionEvent{type: :upcoming_auction_notified}, state)
 
@@ -101,7 +99,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     |> send()
 
     case DelayedNotificationsSupervisor.start_child(notification_name) do
-      {:ok, pid} ->
+      {:ok, _pid} ->
         starting_soon_emails =
           Notifications.emails_for_event(%AuctionEvent{type: :upcoming_auction_notified}, state)
 
@@ -134,7 +132,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
       send_time ->
         Command.reschedule_notification(
-          "auction:#{auction_id}:upcoming_reminder",
+          notification_name,
           send_time,
           starting_soon_emails
         )
@@ -151,14 +149,14 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     starting_soon_emails =
       Notifications.emails_for_event(%AuctionEvent{type: :upcoming_auction_notified}, state)
 
-    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder", starting_soon_emails)
+    Command.cancel_notification(notification_name, starting_soon_emails)
     |> DelayedNotifications.process_command()
   end
 
-  defp process(event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, state) do
+  defp process(event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, _state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
 
-    Command.cancel_notification("auction:#{auction_id}:upcoming_reminder", [])
+    Command.cancel_notification(notification_name, [])
     |> DelayedNotifications.process_command()
   end
 
@@ -178,7 +176,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   # TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
-  def needs_processed?(event = %{auction_id: auction_id}) do
+  def needs_processed?(%{auction_id: auction_id}) do
     result = Auctions.get_auction_status!(auction_id)
 
     if result not in [:open, :pending, :canceled, :expired, :closed] do

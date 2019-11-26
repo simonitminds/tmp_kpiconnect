@@ -113,9 +113,9 @@ defmodule OceanconnectWeb.AuctionView do
   def auction_vessel_fuel_errors?(%Ecto.Changeset{
         changes: %{auction_vessel_fuels: vessel_fuel_changesets}
       }) do
-    vessel_fuel_errors =
-      Enum.flat_map(vessel_fuel_changesets, & &1.errors)
-      |> Enum.any?()
+    vessel_fuel_changesets
+    |> Enum.flat_map(& &1.errors)
+    |> Enum.any?()
   end
 
   def auction_vessel_fuel_errors?(_changeset), do: false

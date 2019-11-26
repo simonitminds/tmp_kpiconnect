@@ -30,7 +30,7 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
     ports = Auctions.list_active_ports()
 
     case Auctions.create_fuel_index(fuel_index_params) do
-      {:ok, fuel_index} ->
+      {:ok, _fuel_index} ->
         conn
         |> put_flash(:info, "Fuel index created successfully.")
         |> put_status(302)
@@ -61,7 +61,7 @@ defmodule OceanconnectWeb.Admin.FuelIndexController do
     fuel_index = Auctions.get_fuel_index!(id)
 
     case Auctions.update_fuel_index(fuel_index, fuel_index_params) do
-      {:ok, fuel_index} ->
+      {:ok, _fuel_index} ->
         conn
         |> put_flash(:info, "Fuel index updated successfully.")
         |> redirect(to: admin_fuel_index_path(conn, :index))

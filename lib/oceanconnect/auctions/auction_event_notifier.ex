@@ -4,14 +4,12 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
-    Auction,
     AuctionCache,
     AuctionScheduler,
     AuctionTimer,
     AuctionEvent,
     Command,
-    Aggregate,
-    FinalizedStateCache
+    Aggregate
   }
 
   def emit(state, event = %AuctionEvent{}) do
@@ -82,7 +80,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
 
   def react_to(
         %AuctionEvent{type: :auction_expired, auction_id: auction_id, time_entered: expired_at},
-        state
+        _state
       ) do
     auction = Auctions.get_auction!(auction_id)
     auction = %{auction | auction_closed_time: expired_at}
