@@ -248,7 +248,7 @@ defmodule Oceanconnect.Auctions.AuctionFixture do
       delivered_price: amount,
       delivered_quantity: quantity,
       delivered_eta: eta,
-      delivered_etd: etd,
+      delivered_etd: etd
     })
   end
 end

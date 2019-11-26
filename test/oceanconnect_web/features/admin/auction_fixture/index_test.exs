@@ -47,12 +47,14 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
       for fixture <- fixtures do
         assert Admin.Fixture.IndexPage.has_fixture?(fixture)
       end
+
       [fixture | fixtures] = fixtures
 
       IndexPage.edit_fixture(fixture.id)
       EditPage.delete_fixture()
 
       refute IndexPage.has_fixture?(fixture)
+
       for fixture <- fixtures do
         assert Admin.Fixture.IndexPage.has_fixture?(fixture)
       end

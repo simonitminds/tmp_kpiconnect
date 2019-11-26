@@ -139,21 +139,22 @@ defmodule OceanconnectWeb.Admin.AuctionFixtureController do
 
   def delete(conn, %{"auction_id" => auction_id, "fixture_id" => fixture_id}) do
     with %{is_admin: true} <- Auth.current_user(conn),
-         %Auction{vessels: vessels, port: port, buyer_id: buyer_id} = auction <- Auctions.get_auction!(auction_id),
+         %Auction{vessels: vessels, port: port, buyer_id: buyer_id} = auction <-
+           Auctions.get_auction!(auction_id),
          status when status in [:closed, :expired] <- Auctions.get_auction_status!(auction),
          %AuctionFixture{id: id} = fixture <- Auctions.get_fixture!(fixture_id),
          claims <- Deliveries.claims_for_auction(auction),
          fixture_ids_for_claims <- Enum.map(claims, & &1.fixture_id),
          false <- id in fixture_ids_for_claims do
-
       suppliers = Auctions.supplier_list_for_port(port, buyer_id)
       fuels = Auctions.list_all_fuels()
 
       case Auctions.delete_fixture(fixture) do
-       {:ok, _fixture} ->
+        {:ok, _fixture} ->
           conn
           |> put_flash(:info, "Fixture deleted successfully.")
           |> redirect(to: admin_auction_fixtures_path(conn, :index))
+
         {:error, changeset} ->
           conn
           |> put_flash(:warning, "Something went wrong!")

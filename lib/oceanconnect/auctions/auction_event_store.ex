@@ -3,7 +3,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
   @event_storage Application.get_env(:oceanconnect, :event_storage) || AuctionEventStorage
 
-  @fixture_events [:fixture_created, :fixture_updated, :fixture_changes_proposed, :fixture_delivered]
+  @fixture_events [
+    :fixture_created,
+    :fixture_updated,
+    :fixture_changes_proposed,
+    :fixture_delivered
+  ]
 
   def persist(event = %AuctionEvent{auction_id: auction_id}) do
     %AuctionEventStorage{event: event, auction_id: auction_id}
@@ -55,11 +60,12 @@ defmodule Oceanconnect.Auctions.AuctionEventStore do
 
   def fixture_events(auction_id, fixture_id) do
     event_list(auction_id)
-    |> Enum.filter(& &1.type in @fixture_events)
+    |> Enum.filter(&(&1.type in @fixture_events))
     |> Enum.filter(fn event ->
       cond do
         event.type in List.delete(@fixture_events, :fixture_updated) ->
           event.data.fixture.id == fixture_id
+
         true ->
           event.data.original.id == fixture_id
       end

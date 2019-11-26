@@ -16,7 +16,8 @@ defmodule Oceanconnect.AuctionFixture.IndexPage do
         [
           find_element(:css, ".qa-auction-#{auction.id}")
           |> find_within_element(:css, ".qa-fixture-#{fixture.id}")
-          | acc]
+          | acc
+        ]
       end)
 
     length(fixture_elements) == length(fixtures)
@@ -26,8 +27,8 @@ defmodule Oceanconnect.AuctionFixture.IndexPage do
     fixture
     |> Map.from_struct()
     |> Enum.all?(fn {key, value} ->
-         fixture_has_details?(fixture.id, key, value)
-       end)
+      fixture_has_details?(fixture.id, key, value)
+    end)
   end
 
   def fixture_has_details?(fixture_id, :fuel, fuel) do
@@ -80,15 +81,17 @@ defmodule Oceanconnect.AuctionFixture.IndexPage do
   end
 
   def event_has_details?(fixture, %{type: :fixture_created} = event) do
-    keys = fixture
-    |> Map.from_struct()
-    |> Map.keys()
-    |> Enum.filter(fn key ->
-      key = key
-      |> Atom.to_string()
+    keys =
+      fixture
+      |> Map.from_struct()
+      |> Map.keys()
+      |> Enum.filter(fn key ->
+        key =
+          key
+          |> Atom.to_string()
 
-      String.contains?(key, "original_") and !String.ends_with?(key, "_id")
-    end)
+        String.contains?(key, "original_") and !String.ends_with?(key, "_id")
+      end)
 
     Enum.all?(keys, fn key ->
       fixture
