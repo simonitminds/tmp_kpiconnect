@@ -140,9 +140,9 @@ jobs:
           fingerprints:
             - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
       - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
-      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
+      - run: ssh -A deploy@$SERVER "./build/oceanconnect/scripts/build-release.sh $CIRCLE_SHA1"
+      - run: ssh -A deploy@$SERVER ./build/oceanconnect/scripts/db-migrate.sh
+      - run: ssh -A deploy@$SERVER ./build/oceanconnect/scripts/deploy-local.sh
 
   deploy_production:
     docker:
@@ -159,28 +159,9 @@ jobs:
           fingerprints:
             - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
       - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
-      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
-
-  deploy_demo:
-    docker:
-      # Ensure .tool-versions matches
-      - image: circleci/elixir:1.8.0-node-browsers
-        environment:
-          MIX_ENV: test
-          SERVER: 206.189.247.131 # Floating IP
-    working_directory: ~/lib
-    steps:
-      - attach_workspace:
-          at: .
-      - add_ssh_keys:
-          fingerprints:
-            - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
-      - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
-      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
-      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
+      - run: ssh -A deploy@$SERVER "./build/oceanconnect/scripts/build-release.sh $CIRCLE_SHA1"
+      - run: ssh -A deploy@$SERVER ./build/oceanconnect/scripts/db-migrate.sh
+      - run: ssh -A deploy@$SERVER ./build/oceanconnect/scripts/deploy-local.sh
 
 
 workflows:
@@ -210,15 +191,6 @@ workflows:
             - test
 
       - deploy_production:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v\d+\.\d+\.\d+$/
-          requires:
-            - test
-
-      - deploy_demo:
           filters:
             branches:
               ignore: /.*/
