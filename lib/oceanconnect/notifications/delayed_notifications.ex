@@ -1,12 +1,6 @@
 defmodule Oceanconnect.Notifications.DelayedNotifications do
   use GenServer
 
-  alias Oceanconnect.Auctions.{
-    AuctionEvent,
-    AuctionEventStore,
-    AuctionStore
-  }
-
   alias Oceanconnect.Notifications.Command
   alias OceanconnectWeb.Mailer
 
@@ -84,12 +78,8 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     end
   end
 
-  defp process(
-         %Command{command: :cancel_notification, data: %{emails: emails}},
-         state = %{timer_ref: ref}
-       ) do
+  defp process(%Command{command: :cancel_notification}, state = %{timer_ref: ref}) do
     cancel_timer(ref)
-    # ref = Process.send_after(self(), :send_now, 0)
     {:ok, %{state | timer_ref: nil}}
   end
 

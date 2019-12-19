@@ -17,9 +17,6 @@ const BuyerDraftCard = ({auctionPayload, timeRemaining}) => {
   const vesselFuels = _.get(auction, 'auction_vessel_fuels');
   const auctionStatus = _.get(auctionPayload, 'status');
 
-  const confirmCancellation = (e) => { event.preventDefault();
-                                       return confirm('Are you sure you want to cancel this auction?') ? window.location = `/auctions/${auction.id}/cancel` : false; };
-
   const uniqueFuels = _.chain(vesselFuels)
     .map((vf) => vf.fuel)
     .filter()

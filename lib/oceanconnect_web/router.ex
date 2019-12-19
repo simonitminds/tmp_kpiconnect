@@ -235,7 +235,9 @@ defmodule OceanconnectWeb.Router do
       as: :admin_auction_fixture
     )
 
-    delete("/auctions/:auction_id/fixtures/:fixture_id/delete", AuctionFixtureController, :delete, as: :admin_auction_fixture)
+    delete("/auctions/:auction_id/fixtures/:fixture_id/delete", AuctionFixtureController, :delete,
+      as: :admin_auction_fixture
+    )
 
     resources("/vessels", VesselController, as: :admin_vessel)
     post("/vessels/:vessel_id/deactivate", VesselController, :deactivate, as: :admin_vessel)

@@ -15,8 +15,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
     EventNotifier,
     Solution,
     AuctionStore.AuctionState,
-    AuctionStore.TermAuctionState,
-    AuctionEmailNotifier
+    AuctionStore.TermAuctionState
   }
 
   @registry_name :auctions_registry
@@ -88,7 +87,6 @@ defmodule Oceanconnect.Auctions.AuctionStore do
             end)
 
           # TODO: This should be picked up by a reaction on the notifier
-          active_participants = Auctions.active_participants(auction_id)
           Auctions.AuctionNotifier.notify_participants(new_state)
 
           {:ok, new_state}

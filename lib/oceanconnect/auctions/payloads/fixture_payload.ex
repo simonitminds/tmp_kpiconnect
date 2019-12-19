@@ -1,6 +1,4 @@
 defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
-  import Oceanconnect.Auctions.Guards
-
   alias __MODULE__
   alias Oceanconnect.Auctions
 
@@ -80,7 +78,9 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, original_price: %Decimal{} = original_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -88,7 +88,9 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     }
   end
 
-  defp format_fixture_prices(%{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture) do
+  defp format_fixture_prices(
+         %{price: %Decimal{} = price, delivered_price: %Decimal{} = delivered_price} = fixture
+       ) do
     %{
       fixture
       | price: Decimal.to_string(price),
@@ -105,7 +107,13 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
 
   defp format_fixture_prices(fixture), do: fixture
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{
+           quantity: %Decimal{} = quantity,
+           original_quantity: %Decimal{} = original_quantity,
+           delivered_quantity: %Decimal{} = delivered_quantity
+         } = fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -114,7 +122,10 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, original_quantity: %Decimal{} = original_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),
@@ -122,7 +133,10 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     }
   end
 
-  defp format_fixture_quantities(%{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} = fixture) do
+  defp format_fixture_quantities(
+         %{quantity: %Decimal{} = quantity, delivered_quantity: %Decimal{} = delivered_quantity} =
+           fixture
+       ) do
     %{
       fixture
       | quantity: Decimal.to_string(quantity),

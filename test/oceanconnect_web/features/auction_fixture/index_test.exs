@@ -25,16 +25,18 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
     auction_state = close_auction!(auction)
 
     {:ok, _fixtures} = Auctions.create_fixtures_from_state(auction_state)
+
     fixtures =
       Auctions.fixtures_for_auction(auction)
       |> format_fixture_prices()
 
-    {:ok, %{
-      auction: auction,
-      buyer: buyer,
-      supplier: supplier,
-      fixtures: fixtures
-    }}
+    {:ok,
+     %{
+       auction: auction,
+       buyer: buyer,
+       supplier: supplier,
+       fixtures: fixtures
+     }}
   end
 
   describe "buyer" do
@@ -45,7 +47,10 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
       :ok
     end
 
-    test "can visit the fixtures index page and see fixtures grouped by auctions", %{auction: auction, fixtures: fixtures} do
+    test "can visit the fixtures index page and see fixtures grouped by auctions", %{
+      auction: auction,
+      fixtures: fixtures
+    } do
       assert IndexPage.is_current_path?()
       assert IndexPage.has_auction_fixtures?(auction, fixtures)
     end
@@ -78,7 +83,7 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
       IndexPage.show_report(fixture)
       assert IndexPage.fixture_has_events?(fixture, events)
 
-      event = Enum.find(events, & &1.type == :fixture_created)
+      event = Enum.find(events, &(&1.type == :fixture_created))
       assert IndexPage.event_has_details?(fixture, event)
     end
   end
@@ -90,10 +95,15 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
     end)
   end
 
-  defp format_fixture_prices(%{price: price, original_price: original_price, delivered_price: delivered_price} = fixture) do
-    %{fixture
+  defp format_fixture_prices(
+         %{price: price, original_price: original_price, delivered_price: delivered_price} =
+           fixture
+       ) do
+    %{
+      fixture
       | price: Decimal.to_string(price),
         original_price: Decimal.to_string(original_price),
-        delivered_price: Decimal.to_string(delivered_price)}
+        delivered_price: Decimal.to_string(delivered_price)
+    }
   end
 end

@@ -9,7 +9,6 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   alias Oceanconnect.Auctions.{
     Auction,
     TermAuction,
-    AuctionEvent,
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState,
     Aggregate,
@@ -93,32 +92,11 @@ defmodule Oceanconnect.Auctions.AuctionEventStorage do
   end
 
   def get_latest_snapshot(event_list) when is_list(event_list) do
-    events =
-      event_list
-      |> Enum.filter(fn event -> event.type == :auction_state_snapshotted end)
-
-    cond do
-      length(events) >= 1 ->
-        events
-        |> hd()
-
-      events = [] ->
-        nil
-    end
+    event_list
+    |> Enum.filter(fn event -> event.type == :auction_state_snapshotted end)
+    |> List.first()
   end
 
-  def get_latest_snapshot(auction_id) do
-    events =
-      events_by_auction(auction_id)
-      |> Enum.filter(fn event -> event.type == :auction_state_snapshotted end)
-
-    cond do
-      length(events) >= 1 ->
-        events
-        |> hd
-
-      events = [] ->
-        nil
-    end
-  end
+  def get_latest_snapshot(auction_id),
+    do: auction_id |> events_by_auction() |> get_latest_snapshot()
 end

@@ -46,8 +46,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
          email_type
        ) do
     buyer_company = Accounts.get_company!(buyer_id)
-    buyers = users_in_auction_for_company(buyer_company, active_participants)
-
     bids_by_vessel = bids_by_vessel(auction, bids)
 
     Enum.flat_map(bids_by_vessel, fn {vessel, bids} ->
@@ -79,8 +77,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
          email_type
        ) do
     buyer_company = Accounts.get_company!(buyer_id)
-    buyers = users_in_auction_for_company(buyer_company, active_participants)
-
     bids_by_supplier = bids_by_supplier(bids)
 
     Enum.flat_map(bids_by_supplier, fn {supplier_id, bids} ->
@@ -231,24 +227,14 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
     |> Enum.filter(&(&1.id in active_user_ids))
   end
 
-  defp auction_deliverables(
-         %TermAuction{vessels: vessels, fuel: fuel, fuel_quantity: fuel_quantity},
-         bids
-       ) do
-    bids
-    |> Enum.map(fn bid ->
-      %{
-        fuel: fuel,
-        quantity: fuel_quantity
-      }
-      |> Map.put(:bid, bid)
-    end)
+  defp auction_deliverables(%TermAuction{fuel: fuel, fuel_quantity: fuel_quantity}, bids) do
+    Enum.map(bids, &%{bid: &1, fuel: fuel, quantity: fuel_quantity})
   end
 
   defp auction_deliverables(%Auction{auction_vessel_fuels: vessel_fuels}, bids) do
-    bids
-    |> Enum.map(fn bid ->
-      Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))
+    Enum.map(bids, fn bid ->
+      vessel_fuels
+      |> Enum.find(&("#{&1.id}" == bid.vessel_fuel_id))
       |> Map.put(:bid, bid)
     end)
   end
@@ -270,8 +256,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosed do
       end
     end)
   end
-
-  defp bids_by_vessels(_, _), do: nil
 
   defp bids_by_supplier(bids) do
     Enum.reduce(bids, %{}, fn bid, acc ->

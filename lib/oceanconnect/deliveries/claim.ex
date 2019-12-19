@@ -125,37 +125,37 @@ defmodule Oceanconnect.Deliveries.Claim do
   end
 
   defp maybe_validate_claim_by_type(changeset), do: changeset
-
-  defp maybe_add_fixture(
-         %Ecto.Changeset{
-           changes: %{
-             supplier_id: supplier_id,
-             delivered_fuel_id: fuel_id,
-             receiving_vessel_id: vessel_id
-           }
-         } = changeset
-       ) do
-    case get_field(changeset, :auction_id) || get_field(changeset, :term_auction_id) do
-      nil ->
-        changeset
-
-      auction_id ->
-        fixtures =
-          Auctions.get_auction!(auction_id)
-          |> Auctions.fixtures_for_auction()
-
-        [fixture | _] =
-          Enum.filter(fixtures, fn fixture ->
-            fixture.vessel_id == vessel_id and fixture.fuel_id == fuel_id and
-              fixture.supplier_id == supplier_id
-          end)
-
-        changeset
-        |> change(fixture_id: fixture.id)
-    end
-  end
-
-  defp maybe_add_fixture(changeset), do: changeset
+  #
+  # defp maybe_add_fixture(
+  #        %Ecto.Changeset{
+  #          changes: %{
+  #            supplier_id: supplier_id,
+  #            delivered_fuel_id: fuel_id,
+  #            receiving_vessel_id: vessel_id
+  #          }
+  #        } = changeset
+  #      ) do
+  #   case get_field(changeset, :auction_id) || get_field(changeset, :term_auction_id) do
+  #     nil ->
+  #       changeset
+  #
+  #     auction_id ->
+  #       fixtures =
+  #         Auctions.get_auction!(auction_id)
+  #         |> Auctions.fixtures_for_auction()
+  #
+  #       [fixture | _] =
+  #         Enum.filter(fixtures, fn fixture ->
+  #           fixture.vessel_id == vessel_id and fixture.fuel_id == fuel_id and
+  #             fixture.supplier_id == supplier_id
+  #         end)
+  #
+  #       changeset
+  #       |> change(fixture_id: fixture.id)
+  #   end
+  # end
+  #
+  # defp maybe_add_fixture(changeset), do: changeset
 
   defp maybe_add_notice_recipient(
          %Ecto.Changeset{changes: %{supplier_id: supplier_id, notice_recipient_type: "supplier"}} =
@@ -192,18 +192,18 @@ defmodule Oceanconnect.Deliveries.Claim do
 
   defp maybe_add_last_correspondence(changeset), do: changeset
 
-  defp validate_claim_resolution(
-         %Ecto.Changeset{changes: %{closed: true, claim_resolution: claim_resolution}} = changeset
-       )
-       when is_nil(claim_resolution) or claim_resolution == "" do
-    changeset
-    |> add_error(
-      :claim_resolution,
-      "Must add resolution details when attempting to close a claim."
-    )
-  end
-
-  defp validate_claim_resolution(changeset), do: changeset
+  # defp validate_claim_resolution(
+  #        %Ecto.Changeset{changes: %{closed: true, claim_resolution: claim_resolution}} = changeset
+  #      )
+  #      when is_nil(claim_resolution) or claim_resolution == "" do
+  #   changeset
+  #   |> add_error(
+  #     :claim_resolution,
+  #     "Must add resolution details when attempting to close a claim."
+  #   )
+  # end
+  #
+  # defp validate_claim_resolution(changeset), do: changeset
 
   defp maybe_add_total_fuel_value(
          %Ecto.Changeset{changes: %{quantity_missing: quantity_missing, price_per_unit: price}} =

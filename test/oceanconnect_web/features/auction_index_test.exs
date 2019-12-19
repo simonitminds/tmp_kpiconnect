@@ -29,7 +29,6 @@ defmodule Oceanconnect.AuctionIndexTest do
     end
 
     test "canceling an auction", %{auction: auction} do
-      AuctionIndexPage.visit()
       AuctionIndexPage.cancel_auction(auction)
 
       refute AuctionIndexPage.has_auctions?([auction])

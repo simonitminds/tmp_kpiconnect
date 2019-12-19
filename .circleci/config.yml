@@ -9,72 +9,220 @@ install_hex_rebar: &install_hex_rebar
 
 jobs:
   build:
-    branches:
-      only:
-        - master
     docker:
-      - image:  circleci/elixir:1.8.0-node-browsers
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
         environment:
           MIX_ENV: test
-      - image: circleci/postgres:11.3-alpine
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST: localhost
+          # match POSTGRES_PASSWORD for postgres image below
+          PGPASSWORD: postgres
+          # match POSTGRES_USER for postgres image below
+          PGUSER: postgres
+    working_directory: ~/lib
     resource_class: xlarge
-
     steps:
       - checkout
       - <<: *install_hex_rebar
-
       - run:
           name: "ELIXIR_VERSION.lock"
-          command: echo "${ELIXIR_VERSION}"> ELIXIR_VERSION.lock
-
+          command: echo "${ELIXIR_VERSION}" > ELIXIR_VERSION.lock
       - run:
           name: "OTP_VERSION.lock"
-          command: echo "${OTP_VERSION}"> OTP_VERSION.lock
-
+          command: echo "${OTP_VERSION}" > OTP_VERSION.lock
       - restore_cache:
           keys:
-            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
-            - v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
-      - run:
-          name: Compile Oceanconnect
-          command: mix do deps.get, compile
-          working_directory: ~/project
+             - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+             - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+             - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+      - run: mix deps.get
+      - run: mix compile
+      # `deps` needs to be cached with `_build` because `_build` will symlink into `deps`
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+            - _build
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+          paths:
+            - deps
+            - _build
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+          paths:
+            - deps
+            - _build
+      - restore_cache:
+          keys:
+            - v1-npm-install-{{ .Branch }}-{{ checksum "assets/package-lock.json" }}
+            - v1-npm-install-{{ .Branch }}
+            - v1-npm-install
       - run:
           name: Compile assets
           command: npm install && yarn build
-          working_directory: ~/project/assets
-      - run:
-          name: phx.digest
-          command: mix phx.digest
-          working_directory: ~/project
-
+          working_directory: assets
       - save_cache:
-          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
-          paths:
-            - deps
-            - _build
-            - priv/static
+          key: v1-npm-install-{{ .Branch }}-{{ checksum "assets/package-lock.json" }}
+          paths: assets/node_modules
       - save_cache:
-          key: v2-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+          key: v1-npm-install-{{ .Branch }}
+          paths: assets/node_modules
+      - save_cache:
+          key: v1-npm-install
+          paths: assets/node_modules
+      - persist_to_workspace:
+          root: .
           paths:
-            - deps
+            - ELIXIR_VERSION.lock
+            - OTP_VERSION.lock
             - _build
-            - priv/static
+            - .circleci
+            - .git
+            - ansible
+            - assets
+            - config
+            - deps
+            - lib
+            - priv
+            - rel
+            - scripts
+            - test
+            - .credo.exs
+            - .formatter.exs
+            - .gitignore
+            - mix.exs
+            - mix.lock
 
-      - run:
-         name: Start Chrome Driver
-         command: /usr/local/bin/chromedriver
-         background: true
-      - run:
-          name: Create Test Database
-          command: mix do ecto.create, ecto.migrate
-          working_directory: ~/project
+  test:
+    docker:
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
+        environment:
+          MIX_ENV: test
+          # match POSTGRES_PASSWORD for postgres image below
+          PGPASSWORD: postgres
+          # match POSTGRES_USER for postgres image below
+          PGUSER: postgres
+      - image: circleci/postgres:11.3-alpine
+        environment:
+          # Match config/test.exs config :explorer, Explorer.Repo, database
+          POSTGRES_DB: oceanconnect_test
+          # match PGPASSWORD for elixir image above
+          POSTGRES_PASSWORD: postgres
+          # match PGUSER for elixir image above
+          POSTGRES_USER: postgres
+    working_directory: ~/lib
+    steps:
+      - attach_workspace:
+          at: .
+      - <<: *install_hex_rebar
       - run:  # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-
+      - run:
+          name: Start Chromedriver
+          command: chromedriver
+          background: true
       - run: mix test --trace  # run all tests in project
+
+  deploy_staging:
+    docker:
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
+        environment:
+          MIX_ENV: test
+          SERVER: 206.189.247.123 # Floating IP
+    working_directory: ~/lib
+    steps:
+      - attach_workspace:
+          at: .
+      - add_ssh_keys:
+          fingerprints:
+            - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
+      - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
+      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
+
+  deploy_production:
+    docker:
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
+        environment:
+          MIX_ENV: test
+          SERVER: 67.207.68.53 # Floating IP
+    working_directory: ~/lib
+    steps:
+      - attach_workspace:
+          at: .
+      - add_ssh_keys:
+          fingerprints:
+            - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
+      - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
+      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
+
+  deploy_demo:
+    docker:
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
+        environment:
+          MIX_ENV: test
+          SERVER: 206.189.247.131 # Floating IP
+    working_directory: ~/lib
+    steps:
+      - attach_workspace:
+          at: .
+      - add_ssh_keys:
+          fingerprints:
+            - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
+      - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
+      - run: ssh -A deploy@$SERVER "./build/pre_order_app/scripts/build-release.sh $CIRCLE_SHA1"
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/db-migrate.sh
+      - run: ssh -A deploy@$SERVER ./build/pre_order_app/scripts/deploy-local.sh
+
+
+workflows:
+  version: 2
+  primary:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+
+      - test:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build
+
+      - deploy_staging:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - test
+
+      - deploy_production:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+          requires:
+            - test
+
+      - deploy_demo:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+          requires:
+            - test

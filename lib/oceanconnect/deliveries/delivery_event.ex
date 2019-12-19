@@ -3,7 +3,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
   alias Oceanconnect.Auctions.{AuctionEvent, AuctionFixture}
   alias Oceanconnect.Accounts.User
 
-  def fixture_created(fixture = %AuctionFixture{id: fixture_id, auction_id: auction_id}) do
+  def fixture_created(%AuctionFixture{auction_id: auction_id} = fixture) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :fixture_created,
@@ -14,7 +14,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
   end
 
   def fixture_updated(
-        original = %AuctionFixture{id: fixture_id, auction_id: auction_id},
+        original = %AuctionFixture{auction_id: auction_id},
         changeset = %Ecto.Changeset{}
       ) do
     %AuctionEvent{
@@ -27,7 +27,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
   end
 
   def fixture_changes_proposed(
-        %AuctionFixture{id: fixture_id, auction_id: auction_id} = fixture,
+        %AuctionFixture{auction_id: auction_id} = fixture,
         %Ecto.Changeset{} = changeset,
         %User{} = user
       ) do
@@ -40,7 +40,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
     }
   end
 
-  def fixture_delivered(%AuctionFixture{id: fixture_id, auction_id: auction_id} = fixture) do
+  def fixture_delivered(%AuctionFixture{auction_id: auction_id} = fixture) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       type: :fixture_delivered,
@@ -50,7 +50,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
     }
   end
 
-  def claim_created(%Claim{id: claim_id, auction_id: auction_id} = claim, %User{} = user) do
+  def claim_created(%Claim{auction_id: auction_id} = claim, %User{} = user) do
     %AuctionEvent{
       id: UUID.uuid4(:hex),
       auction_id: auction_id,
@@ -62,7 +62,7 @@ defmodule Oceanconnect.Deliveries.DeliveryEvent do
   end
 
   def claim_response_created(
-        %ClaimResponse{claim_id: claim_id} = response,
+        %ClaimResponse{} = response,
         %Claim{auction_id: auction_id} = claim,
         %User{} = user
       ) do

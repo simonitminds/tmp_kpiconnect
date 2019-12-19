@@ -52,12 +52,13 @@ defmodule Oceanconnect.Notifications.Emails.FixtureUpdated do
     Accounts.users_for_companies([buyer])
   end
 
-  defp supplier_recipients(%{auction_id: auction_id}, %{supplier_id: supplier_id} = changes) do
-    supplier = Accounts.get_company!(supplier_id)
-    Accounts.users_for_companies([supplier])
-  end
+  defp supplier_recipients(%{supplier: supplier}, _changes),
+    do: Accounts.users_for_companies([supplier])
 
-  defp supplier_recipients(%{auction_id: auction_id, supplier: supplier}, changes) do
-    Accounts.users_for_companies([supplier])
+  defp supplier_recipients(_fixture, %{supplier_id: supplier_id}) do
+    supplier_id
+    |> Accounts.get_company!()
+    |> List.wrap()
+    |> Accounts.users_for_companies()
   end
 end
