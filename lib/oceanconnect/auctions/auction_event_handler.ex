@@ -6,7 +6,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
-    AuctionBid,
     AuctionEvent,
     AuctionNotifier
   }
@@ -35,24 +34,6 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
   def handle_info({%AuctionEvent{type: type}, _aggregate_state}, state)
       when type == :auction_state_rebuilt do
-    {:noreply, state}
-  end
-
-  def handle_info(
-        {
-          %AuctionEvent{
-            auction_id: auction_id,
-            type: _type,
-            data: %{bid: bid = %AuctionBid{supplier_id: supplier_id}}
-          },
-          _aggregate_state
-        },
-        state
-      ) do
-    auction_id
-    |> Auctions.get_auction!()
-    |> AuctionNotifier.notify_updated_bid(bid, supplier_id)
-
     {:noreply, state}
   end
 
@@ -149,7 +130,18 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        {%AuctionEvent{type: _, data: auction = %struct{scheduled_start: start}},
+        {%AuctionEvent{auction_id: auction_id, type: _type, data: %{bid: _bid}}, aggregate_state},
+        state
+      ) do
+    auction_id
+    |> Auctions.get_auction!()
+    |> AuctionNotifier.notify_participants(aggregate_state)
+
+    {:noreply, state}
+  end
+
+  def handle_info(
+        {%AuctionEvent{type: _type, data: auction = %struct{scheduled_start: start}},
          aggregate_state},
         state
       )

@@ -8,20 +8,20 @@ defmodule OceanconnectWeb.Api.AuctionController do
   def index(conn, _params) do
     auction_payloads =
       case Auth.current_user(conn) do
-        %User{is_admin: true} ->
+        %User{id: admin_id, is_admin: true} ->
           Auctions.list_auctions()
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
-            |> AuctionPayload.get_admin_auction_payload!()
+            |> AuctionPayload.get_auction_payload!(admin_id)
           end)
 
-        %User{is_observer: true} = user ->
-          Auctions.list_observing_auctions(user.id)
+        %User{id: observer_id, is_observer: true} ->
+          Auctions.list_observing_auctions(observer_id)
           |> Enum.map(fn auction ->
             auction
             |> Auctions.fully_loaded()
-            |> AuctionPayload.get_observer_auction_payload!()
+            |> AuctionPayload.get_auction_payload!(observer_id)
           end)
 
         user ->
@@ -41,11 +41,11 @@ defmodule OceanconnectWeb.Api.AuctionController do
 
     auction_payload =
       case Auth.current_user(conn) do
-        %User{is_admin: true} ->
-          AuctionPayload.get_admin_auction_payload!(auction)
+        %User{id: admin_id, is_admin: true} ->
+          AuctionPayload.get_auction_payload!(auction, admin_id)
 
-        %User{is_observer: true} ->
-          AuctionPayload.get_observer_auction_payload!(auction)
+        %User{id: observer_id, is_observer: true} ->
+          AuctionPayload.get_auction_payload!(auction, observer_id)
 
         user ->
           AuctionPayload.get_auction_payload!(auction, user.company_id)

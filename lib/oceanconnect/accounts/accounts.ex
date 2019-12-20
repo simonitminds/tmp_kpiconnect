@@ -42,6 +42,13 @@ defmodule Oceanconnect.Accounts do
     |> Repo.all()
   end
 
+  def is_admin?(nil), do: false
+
+  def is_admin?(id) do
+    user = Repo.get(User, id)
+    if user, do: user.is_admin, else: false
+  end
+
   @doc """
   Gets a single user.
 

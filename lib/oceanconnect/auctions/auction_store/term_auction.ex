@@ -745,10 +745,10 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   # Utilities
   ###
 
-  def process_bid(
-        state = %TermAuctionState{status: status, auction_id: auction_id},
-        bid = %AuctionBid{vessel_fuel_id: fuel_id}
-      ) do
+  defp process_bid(
+         state = %TermAuctionState{status: status, auction_id: auction_id},
+         bid = %AuctionBid{vessel_fuel_id: fuel_id}
+       ) do
     product_state =
       TermAuctionState.get_state_for_product(state, fuel_id) ||
         ProductBidState.for_product(fuel_id, auction_id)
@@ -756,7 +756,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     AuctionBidCalculator.process(product_state, bid, status)
   end
 
-  def auction_will_extend(state = %TermAuctionState{auction_id: auction_id}, product_state, bid) do
+  defp auction_will_extend(state = %TermAuctionState{auction_id: auction_id}, product_state, bid) do
     should_extend = is_lowest_bid?(product_state, bid) or is_suppliers_first_bid?(state, bid)
 
     case should_extend do

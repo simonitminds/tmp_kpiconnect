@@ -13,15 +13,17 @@ defmodule Oceanconnect.AccountsTest do
     setup do
       company = insert(:company)
 
-      user = insert(:user, %{is_active: true, company: company})
-      admin_user = insert(:user, %{is_admin: true})
-      inactive_user = insert(:user, %{is_active: false})
+      user = insert(:user, is_active: true, company: company)
+      admin_user = insert(:user, is_admin: true)
+      inactive_user = insert(:user, is_active: false)
+      observer_user = insert(:user, is_observer: true)
 
       {:ok,
        %{
          admin_user: admin_user,
          user: user,
          inactive_user: inactive_user,
+         observer_user: observer_user,
          company: company
        }}
     end
@@ -29,49 +31,52 @@ defmodule Oceanconnect.AccountsTest do
     test "list_users/0 returns all users", %{
       admin_user: admin_user,
       user: user,
-      inactive_user: inactive_user
+      inactive_user: inactive_user,
+      observer_user: observer_user
     } do
-      assert Enum.map(Accounts.list_users(), fn f -> f.id end) == [
-               user.id,
-               admin_user.id,
-               inactive_user.id
-             ]
+      assert Accounts.list_users() |> Enum.map(& &1.id) |> Enum.sort() ==
+               Enum.sort([user.id, admin_user.id, inactive_user.id, observer_user.id])
     end
 
     test "list_users/1 returns a paginated list of users", %{
       admin_user: admin_user,
       user: user,
-      inactive_user: inactive_user
+      inactive_user: inactive_user,
+      observer_user: observer_user
     } do
       page = Accounts.list_users(%{})
-      entries = Enum.map(page.entries, & &1.id)
-      assert entries == [user.id, admin_user.id, inactive_user.id]
+
+      assert page.entries |> Enum.map(& &1.id) |> Enum.sort() ==
+               Enum.sort([user.id, admin_user.id, inactive_user.id, observer_user.id])
+    end
+
+    test "list_observers/0 returns all observers", %{observer_user: observer_user} do
+      assert Accounts.list_observers() |> Enum.map(& &1.id) |> Enum.sort() == [observer_user.id]
     end
 
     test "list_active_users/0 returns all users marked as active", %{
       admin_user: admin_user,
       user: user,
-      inactive_user: inactive_user
+      observer_user: observer_user
     } do
-      assert Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [user.id, admin_user.id]
-
-      refute Enum.map(Accounts.list_active_users(), fn f -> f.id end) == [
-               admin_user.id,
-               user.id,
-               inactive_user.id
-             ]
+      assert Accounts.list_active_users() |> Enum.map(& &1.id) |> Enum.sort() ==
+               Enum.sort([user.id, admin_user.id, observer_user.id])
     end
 
-    test "list_admin_users/0 returns all admin users", %{
-      admin_user: admin_user,
-      user: user
-    } do
-      assert Enum.map(Accounts.list_admin_users(), fn f -> f.id end) == [admin_user.id]
+    test "list_admin_users/0 returns all admin users", %{admin_user: admin_user} do
+      assert Accounts.list_admin_users() |> Enum.map(& &1.id) |> Enum.sort() == [admin_user.id]
+    end
 
-      refute Enum.map(Accounts.list_admin_users(), fn f -> f.id end) == [
-               admin_user.id,
-               user.id
-             ]
+    test "is_admin?/1 returns true if admin", %{admin_user: admin_user} do
+      assert Accounts.is_admin?(admin_user.id)
+    end
+
+    test "is_admin?/1 returns false if not admin", %{user: user} do
+      refute Accounts.is_admin?(user.id)
+    end
+
+    test "is_admin?/1 returns false if nil provided" do
+      refute Accounts.is_admin?(nil)
     end
 
     test "get_user!/1 returns the user with given id", %{user: user} do

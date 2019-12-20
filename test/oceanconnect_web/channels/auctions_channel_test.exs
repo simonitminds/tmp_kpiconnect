@@ -759,7 +759,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction, false)
       |> Auctions.place_bid()
 
-      observer_auction_payload = Auctions.AuctionPayload.get_observer_auction_payload!(auction)
+      observer_auction_payload =
+        Auctions.AuctionPayload.get_auction_payload!(auction, observer_id)
 
       observer_payload = observer_auction_payload.product_bids[vessel_fuel_id]
 
@@ -794,7 +795,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       Auctions.end_auction(auction)
 
       decision_observer_auction_payload =
-        Auctions.AuctionPayload.get_observer_auction_payload!(auction)
+        Auctions.AuctionPayload.get_auction_payload!(auction, observer_id)
 
       decision_observer_payload = decision_observer_auction_payload.product_bids[vessel_fuel_id]
 

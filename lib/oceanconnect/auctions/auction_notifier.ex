@@ -9,30 +9,38 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(state = %state_struct{auction_id: auction_id})
       when is_auction_state(state_struct) do
-    auction = Auctions.get_auction!(auction_id)
-    notify_participants(auction, state)
+    auction_id
+    |> Auctions.get_auction!()
+    |> notify_participants(state)
   end
 
   def notify_participants(auction = %struct{}) when is_auction(struct) do
-    participants = Auctions.auction_participant_ids(auction)
-    notify_auction_participants(auction, participants)
-    notify_admin(auction)
-    notify_observers(auction)
+    auction_state = Auctions.get_auction_state!(auction)
+    notify_participants(auction, auction_state)
   end
 
   def notify_participants(auction = %struct{}, state = %state_struct{})
       when is_auction_state(state_struct) and is_auction(struct) do
-    participants = Auctions.auction_participant_ids(auction)
-    notify_auction_participants(auction, participants)
-    notify_admin(auction, state)
-    notify_observers(auction)
+    users =
+      auction
+      |> Auctions.auction_participant_ids()
+      |> MapSet.new()
+      |> MapSet.union(admins_and_observers(auction))
+      |> MapSet.to_list()
+
+    notify_auction_users(auction, users, state)
   end
 
   def notify_buyer_participants(auction = %struct{buyer_id: buyer_id}) when is_auction(struct) do
-    payload = AuctionPayload.get_auction_payload!(auction, buyer_id)
-    send_notification_to_participants("user_auctions", payload, [buyer_id])
-    notify_admin(auction)
-    notify_observers(auction)
+    state = Auctions.get_auction_state!(auction)
+
+    users =
+      [buyer_id]
+      |> MapSet.new()
+      |> MapSet.union(admins_and_observers(auction))
+      |> MapSet.to_list()
+
+    notify_auction_users(auction, users, state)
   end
 
   def send_notification_to_participants(channel, payload, participants) do
@@ -43,43 +51,16 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  # TODO move to new style of passing in auction state
-  def notify_updated_bid(auction, _bid, _supplier_id) do
-    participants = Auctions.auction_participant_ids(auction)
-    notify_auction_participants(auction, participants)
-    notify_admin(auction)
-    notify_observers(auction)
-  end
-
-  defp notify_admin(auction = %struct{}) when is_auction(struct) do
+  defp admins_and_observers(auction) do
     Accounts.list_admin_users()
     |> Enum.map(& &1.id)
-    |> Enum.map(fn admin_id ->
-      admin_payload = AuctionPayload.get_admin_auction_payload!(auction)
-      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-    end)
+    |> MapSet.new()
+    |> MapSet.union(MapSet.new(Auctions.auction_observer_ids(auction)))
   end
 
-  defp notify_admin(auction = %struct{}, state = %state_struct{})
-       when is_auction(struct) and is_auction_state(state_struct) do
-    Accounts.list_admin_users()
-    |> Enum.map(& &1.id)
-    |> Enum.map(fn admin_id ->
-      admin_payload = AuctionPayload.get_admin_auction_payload!(auction, state)
-      send_notification_to_participants("user_auctions", admin_payload, [admin_id])
-    end)
-  end
-
-  defp notify_observers(auction) do
-    Enum.map(Auctions.auction_observer_ids(auction), fn observer_id ->
-      observer_payload = AuctionPayload.get_observer_auction_payload!(auction)
-      send_notification_to_participants("user_auctions", observer_payload, [observer_id])
-    end)
-  end
-
-  defp notify_auction_participants(auction, participants) do
-    Enum.map(participants, fn user_id ->
-      payload = AuctionPayload.get_auction_payload!(auction, user_id)
+  defp notify_auction_users(auction, users, state) do
+    Enum.map(users, fn user_id ->
+      payload = AuctionPayload.get_auction_payload!(auction, user_id, state)
       send_notification_to_participants("user_auctions", payload, [user_id])
     end)
   end

@@ -3,46 +3,53 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, Solution, AuctionPayload, AuctionSupervisor}
+  alias Oceanconnect.Auctions.AuctionStore.{AuctionState, ProductBidState}
 
-  describe "get_auction_payload!/1" do
-    setup do
-      buyer_company = insert(:company, name: "FooCompany")
-      supplier = insert(:company, name: "BarCompany")
-      supplier_2 = insert(:company, name: "BazCompany")
-      supplier_user = insert(:user, company: supplier)
-      supplier_user2 = insert(:user, company: supplier_2)
+  # TODO: Re-write tests to use payload fixtures (buyer, supplier, observer, traded_bid)
+  # and assert that the proper payload is returned based on the user_id provided. Can use
+  # get_auction_payload!/3 to setup proper state for auction payload.
 
-      vessel_fuel = insert(:vessel_fuel)
-      vessel_fuel_id = "#{vessel_fuel.id}"
+  setup do
+    buyer_company = insert(:company, name: "FooCompany")
+    supplier = insert(:company, name: "BarCompany")
+    supplier_2 = insert(:company, name: "BazCompany")
+    supplier_user = insert(:user, company: supplier)
+    supplier_user2 = insert(:user, company: supplier_2)
+    observer = insert(:user, is_observer: true)
 
-      auction =
-        insert(:auction,
-          buyer: buyer_company,
-          suppliers: [supplier, supplier_2],
-          auction_vessel_fuels: [vessel_fuel]
-        )
-        |> Auctions.fully_loaded()
+    vessel_fuel = insert(:vessel_fuel)
+    vessel_fuel_id = "#{vessel_fuel.id}"
 
-      {:ok, _pid} =
-        start_supervised(
-          {AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
-        )
+    auction =
+      insert(:auction,
+        buyer: buyer_company,
+        suppliers: [supplier, supplier_2],
+        observers: [observer],
+        auction_vessel_fuels: [vessel_fuel]
+      )
+      |> Auctions.fully_loaded()
 
-      Auctions.start_auction(auction)
-      :timer.sleep(500)
+    {:ok, _pid} =
+      start_supervised(
+        {AuctionSupervisor,
+         {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+      )
 
-      {:ok,
-       %{
-         auction: auction,
-         supplier: supplier,
-         supplier_2: supplier_2,
-         supplier_user: supplier_user,
-         supplier_user2: supplier_user2,
-         vessel_fuel_id: vessel_fuel_id
-       }}
-    end
+    Auctions.start_auction(auction)
+    :timer.sleep(500)
 
+    {:ok,
+     %{
+       auction: auction,
+       supplier: supplier,
+       supplier_2: supplier_2,
+       supplier_user: supplier_user,
+       supplier_user2: supplier_user2,
+       vessel_fuel_id: vessel_fuel_id
+     }}
+  end
+
+  describe "get_auction_payload!/2" do
     test "returns state payload for a buyer with supplier names in the bid_list", %{
       auction: auction,
       supplier: supplier,
@@ -51,9 +58,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
@@ -74,9 +79,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       create_bid(1.50, nil, supplier_2.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
@@ -139,9 +142,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       create_bid(1.50, nil, supplier_2.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
@@ -173,9 +174,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction, true)
       |> Auctions.place_bid()
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
@@ -207,9 +206,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.end_auction(auction)
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier_2.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
@@ -235,9 +232,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      buyer_auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      buyer_auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       buyer_payload = buyer_auction_payload.product_bids[vessel_fuel_id]
 
@@ -288,9 +283,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
         "Agent 9"
       )
 
-      auction_payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier_2.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier_2.id)
 
       assert %Solution{
                auction_id: ^auction_id,
@@ -306,13 +299,11 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
 
       Auctions.submit_barge(auction, barge, supplier.id)
 
-      payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(supplier.id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, supplier.id)
 
-      assert length(payload.submitted_barges) == 1
+      assert length(auction_payload.submitted_barges) == 1
 
-      first = hd(payload.submitted_barges)
+      first = hd(auction_payload.submitted_barges)
       assert first.barge_id == barge.id
     end
 
@@ -327,15 +318,49 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       Auctions.submit_barge(auction, barge, supplier.id)
       Auctions.submit_barge(auction, barge2, supplier2.id)
 
-      payload =
-        auction
-        |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
-      assert length(payload.submitted_barges) == 2
+      assert length(auction_payload.submitted_barges) == 2
 
-      [first, second] = payload.submitted_barges
+      [first, second] = auction_payload.submitted_barges
       assert first.barge_id == barge.id
       assert second.barge_id == barge2.id
+    end
+  end
+
+  describe "get_auction_payload!/3" do
+    setup %{auction: auction, supplier: supplier, vessel_fuel_id: vessel_fuel_id} do
+      bid = create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
+
+      state = %AuctionState{
+        auction_id: auction.id,
+        status: :open,
+        product_bids: %{
+          "#{vessel_fuel_id}" => %ProductBidState{
+            auction_id: auction.id,
+            vessel_fuel_id: vessel_fuel_id,
+            active_bids: [bid],
+            bids: [bid],
+            lowest_bids: [bid]
+          }
+        }
+      }
+
+      {:ok, %{state: state}}
+    end
+
+    test "returns state payload for a buyer", %{
+      auction: auction,
+      supplier: supplier,
+      vessel_fuel_id: vessel_fuel_id,
+      state: state
+    } do
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id, state)
+      payload = auction_payload.product_bids[vessel_fuel_id]
+
+      assert supplier.name in Enum.map(payload.bid_history, & &1.supplier)
+      assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
+      assert auction_payload.status == :open
     end
   end
 end
