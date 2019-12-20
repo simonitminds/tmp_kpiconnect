@@ -11,6 +11,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     supplier3_company = insert(:company, is_supplier: true)
     supplier_1 = insert(:user, company: supplier_company)
     supplier_2 = insert(:user, company: supplier_company)
+    observer = insert(:user, is_observer: true)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     fuel = insert(:fuel)
@@ -23,6 +24,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
         duration: 1_000,
         decision_duration: 1_000,
         suppliers: [supplier_company, supplier3_company],
+        observers: [observer],
         auction_vessel_fuels: [build(:vessel_fuel, fuel: fuel)]
       )
       |> Auctions.fully_loaded()
@@ -55,6 +57,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
        supplier_1: supplier_1,
        supplier_2: supplier_2,
        supplier3: supplier3_company,
+       observer_id: observer.id,
        buyer_id: buyer_company.id,
        non_participant_id: non_participant_company.id,
        non_participant: non_participant,
@@ -260,6 +263,33 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
     end
 
+    test "broadcasts are pushed to the observer", %{
+      observer_id: observer_id,
+      auction: auction,
+      expected_payload: expected_payload
+    } do
+      channel = "user_auctions:#{Integer.to_string(observer_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.start_auction(auction)
+
+      auction_id = auction.id
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, status: :open},
+          topic: ^channel
+        } ->
+          assert Utilities.round_time_remaining(payload.time_remaining) ==
+                   Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
     test "broadcasts are not pushed to a non_participant", %{
       non_participant_id: non_participant_id,
       auction: auction,
@@ -379,6 +409,33 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       end
     end
 
+    test "observers get notified", %{
+      auction: auction,
+      observer_id: observer_id,
+      expected_payload: expected_payload
+    } do
+      channel = "user_auctions:#{Integer.to_string(observer_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.end_auction(auction)
+
+      auction_id = auction.id
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, status: :decision},
+          topic: ^channel
+        } ->
+          assert Utilities.round_time_remaining(payload.time_remaining) ==
+                   Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
     test "a non participant is not notified", %{
       auction: auction,
       non_participant_id: non_participant_id,
@@ -440,6 +497,33 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
       expected_payload: expected_payload
     } do
       channel = "user_auctions:#{Integer.to_string(supplier_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+      Auctions.expire_auction(auction)
+
+      auction_id = auction.id
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: payload = %{auction: %{id: ^auction_id}, status: :expired},
+          topic: ^channel
+        } ->
+          assert Utilities.round_time_remaining(payload.time_remaining) ==
+                   Utilities.round_time_remaining(expected_payload.time_remaining)
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
+    test "observers get notified", %{
+      auction: auction,
+      observer_id: observer_id,
+      expected_payload: expected_payload
+    } do
+      channel = "user_auctions:#{Integer.to_string(observer_id)}"
       event = "auctions_update"
 
       @endpoint.subscribe(channel)
@@ -655,6 +739,82 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
           assert decision_supplier_payload.lowest_bids == lowest_bids
           refute auction |> Map.has_key?(:suppliers)
           assert time_remaining > auction.decision_duration - 1_000
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+    end
+
+    test "observers get notified", %{
+      auction: auction = %{id: auction_id},
+      observer_id: observer_id,
+      supplier_id: supplier_id,
+      vessel_fuel_id: vessel_fuel_id
+    } do
+      channel = "user_auctions:#{Integer.to_string(observer_id)}"
+      event = "auctions_update"
+
+      @endpoint.subscribe(channel)
+
+      create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction, false)
+      |> Auctions.place_bid()
+
+      observer_auction_payload = Auctions.AuctionPayload.get_observer_auction_payload!(auction)
+
+      observer_payload = observer_auction_payload.product_bids[vessel_fuel_id]
+
+      receive do
+        %Phoenix.Socket.Broadcast{topic: ^channel} -> nil
+      after
+        5000 -> assert false, "Expected message received nothing."
+      end
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{
+            auction: auction = %{id: ^auction_id},
+            status: :open,
+            product_bids: %{
+              ^vessel_fuel_id => %{
+                lowest_bids: lowest_bids,
+                bid_history: bid_history
+              }
+            }
+          },
+          topic: ^channel
+        } ->
+          assert observer_payload.bid_history == bid_history
+          assert observer_payload.lowest_bids == lowest_bids
+      after
+        5000 ->
+          assert false, "Expected message received nothing."
+      end
+
+      Auctions.end_auction(auction)
+
+      decision_observer_auction_payload =
+        Auctions.AuctionPayload.get_observer_auction_payload!(auction)
+
+      decision_observer_payload = decision_observer_auction_payload.product_bids[vessel_fuel_id]
+
+      receive do
+        %Phoenix.Socket.Broadcast{
+          event: ^event,
+          payload: %{
+            auction: auction = %{id: ^auction_id},
+            status: :decision,
+            product_bids: %{
+              ^vessel_fuel_id => %{
+                lowest_bids: lowest_bids,
+                bid_history: bid_history
+              }
+            }
+          },
+          topic: ^channel
+        } ->
+          assert decision_observer_payload.bid_history == bid_history
+          assert decision_observer_payload.lowest_bids == lowest_bids
       after
         5000 ->
           assert false, "Expected message received nothing."

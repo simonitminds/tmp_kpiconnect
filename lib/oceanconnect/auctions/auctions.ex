@@ -290,6 +290,13 @@ defmodule Oceanconnect.Auctions do
     Enum.map(auction_with_participants.suppliers, & &1.id)
   end
 
+  def auction_observer_ids(auction = %struct{}) when is_auction(struct) do
+    auction
+    |> Repo.preload([:observers])
+    |> Map.fetch!(:observers)
+    |> Enum.map(& &1.id)
+  end
+
   def get_participant_name_and_ids_for_auction(auction_id) when is_integer(auction_id) do
     auction =
       auction_id
