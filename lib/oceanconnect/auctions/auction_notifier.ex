@@ -51,7 +51,7 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def send_notification_to_participants(channel, payload, participants) do
-    @task_supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
+    Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
       Enum.map(participants, fn id ->
         OceanconnectWeb.Endpoint.broadcast!("#{channel}:#{id}", "auctions_update", payload)
       end)

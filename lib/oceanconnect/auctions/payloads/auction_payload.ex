@@ -396,7 +396,7 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     %{
       fixture
       | price: Decimal.to_string(price),
-        original_price: Decimal.to_string(original_price),
+        original_price: Decimal.to_string(price),
         delivered_price: Decimal.to_string(delivered_price)
     }
   end
