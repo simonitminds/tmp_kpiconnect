@@ -35,6 +35,8 @@ echo "Compiling"
 mix compile
 
 echo "Updating node libraries"
+# Export path for node, yarn, and yarn dependencies to allow for remote usage
+export PATH=/home/deploy/.asdf/shims:/home/deploy/.yarn/bin:/bin:/usr/bin
 (cd assets && yarn build)
 
 echo "Building release"

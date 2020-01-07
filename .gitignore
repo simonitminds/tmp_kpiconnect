@@ -41,3 +41,7 @@ ansible/secrets.yml
 
 # Browser screenshots from running tests with Hound.
 screenshot-*.png
+
+# Ignore SSL cert files
+priv/*.key
+priv/*.crt
