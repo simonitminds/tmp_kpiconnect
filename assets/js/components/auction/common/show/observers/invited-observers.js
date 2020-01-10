@@ -7,13 +7,14 @@ const InvitedObservers = ({ auctionPayload, inviteObserver, uninviteObserver }) 
   const availableObservers = _.get(auctionPayload, 'available_observers')
   const [invitedObservers, invite] = useState(
     _.reduce(availableObservers, (acc, observer) => {
-      return _.set(acc, observer.id, false)
+      const invited = _.find(observers, ['id', observer.id]) ? true : false;
+      return _.set(acc, observer.id, invited)
     }, {})
   )
   const auctionId = _.get(auctionPayload, 'auction.id');
 
   const isInvited = (observerId) => {
-    return invitedObservers[observerId] || _.intersectionBy(availableObservers, observers, 'id').length > 0;
+    return invitedObservers[observerId];
   }
 
   return (
@@ -42,7 +43,7 @@ const InvitedObservers = ({ auctionPayload, inviteObserver, uninviteObserver }) 
                     }} />
                     <span className="invite-selector__facade">
                       <FontAwesomeIcon icon={isInvited(observer.id) ? "check" : "plus"} className="default-only" />
-                      <FontAwesomeIcon icon="minus" className="hover-only" />
+                      <FontAwesomeIcon icon={isInvited(observer.id) ? "minus" : "plus"} className="hover-only" />
                     </span>
                     <span className="invite-selector__label">{fullname}, {observer.company.name}</span>
                 </label>

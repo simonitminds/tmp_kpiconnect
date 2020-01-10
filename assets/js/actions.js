@@ -203,7 +203,7 @@ export function inviteObserverToAuction(auctionId, userId) {
 
 export function uninviteObserverFromAuction(auctionId, userId) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/observers/${userId}/invite`, {
+    fetch(`/api/auctions/${auctionId}/observers/${userId}/uninvite`, {
       headers: defaultHeaders,
       method: 'POST'
     })

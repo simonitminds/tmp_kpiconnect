@@ -1617,7 +1617,13 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def invite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
+  def invite_observer(auction = %struct{}, %User{id: user_id}) when is_auction(struct) do
+    auction
+    |> Accounts.get_observer(user_id)
+    |> invite_observer(auction, user_id)
+  end
+
+  def invite_observer(nil, %Auction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       auction_id: auction_id,
@@ -1626,7 +1632,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.insert()
   end
 
-  def invite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
+  def invite_observer(nil, %TermAuction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       term_auction_id: auction_id,
@@ -1635,13 +1641,11 @@ defmodule Oceanconnect.Auctions do
     |> Repo.insert()
   end
 
-  def uninvite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
-    Accounts.get_observer!(auction_id, user_id)
-    |> Repo.delete()
-  end
+  def invite_observer(observer, _auction, _user_id), do: {:ok, observer}
 
-  def uninvite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
-    Accounts.get_observer!(auction_id, user_id)
+  def uninvite_observer(auction = %struct{}, %User{id: user_id}) when is_auction(struct) do
+    auction
+    |> Accounts.get_observer(user_id)
     |> Repo.delete()
   end
 
