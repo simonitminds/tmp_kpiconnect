@@ -290,6 +290,13 @@ defmodule Oceanconnect.Auctions do
     Enum.map(auction_with_participants.suppliers, & &1.id)
   end
 
+  def auction_observer_ids(auction = %struct{}) when is_auction(struct) do
+    auction
+    |> Repo.preload([:observers])
+    |> Map.fetch!(:observers)
+    |> Enum.map(& &1.id)
+  end
+
   def get_participant_name_and_ids_for_auction(auction_id) when is_integer(auction_id) do
     auction =
       auction_id
@@ -828,35 +835,49 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def fully_loaded(term_auction = %TermAuction{}) do
+  def fully_loaded(object), do: fully_loaded(object, false)
+
+  def fully_loaded(auctions, force?) when is_list(auctions) do
+    Enum.map(auctions, fn auction -> fully_loaded(auction, force?) end)
+  end
+
+  def fully_loaded(term_auction = %TermAuction{}, force?) do
     fully_loaded_auction =
-      Repo.preload(term_auction, [
-        :port,
-        :vessels,
-        :fuel,
-        [fuel_index: [:fuel, :port]],
-        :auction_suppliers,
-        [buyer: :users],
-        [suppliers: :users],
-        :observers
-      ])
+      Repo.preload(
+        term_auction,
+        [
+          :port,
+          :vessels,
+          :fuel,
+          [fuel_index: [:fuel, :port]],
+          :auction_suppliers,
+          [buyer: :users],
+          [suppliers: :users],
+          :observers
+        ],
+        force: force?
+      )
 
     fully_loaded_auction
     |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
   end
 
-  def fully_loaded(auction = %Auction{}) do
+  def fully_loaded(auction = %Auction{}, force?) do
     fully_loaded_auction =
-      Repo.preload(auction, [
-        :port,
-        :vessels,
-        :fuels,
-        :auction_suppliers,
-        [auction_vessel_fuels: [:vessel, :fuel]],
-        [buyer: :users],
-        [suppliers: :users],
-        :observers
-      ])
+      Repo.preload(
+        auction,
+        [
+          :port,
+          :vessels,
+          :fuels,
+          :auction_suppliers,
+          [auction_vessel_fuels: [:vessel, :fuel]],
+          [buyer: :users],
+          [suppliers: :users],
+          :observers
+        ],
+        force: force?
+      )
 
     fully_loaded_auction
     |> Map.put(:suppliers, suppliers_with_alias_names(fully_loaded_auction))
@@ -864,23 +885,19 @@ defmodule Oceanconnect.Auctions do
     |> Map.put(:fuels, Enum.uniq_by(fully_loaded_auction.fuels, & &1.id))
   end
 
-  def fully_loaded(auctions) when is_list(auctions) do
-    Enum.map(auctions, fn auction -> fully_loaded(auction) end)
+  def fully_loaded(company = %Company{}, force?) do
+    Repo.preload(company, [:users, :vessels, :ports], force: force?)
   end
 
-  def fully_loaded(company = %Company{}) do
-    Repo.preload(company, [:users, :vessels, :ports])
+  def fully_loaded(port = %Port{}, force?) do
+    Repo.preload(port, [:companies], force: force?)
   end
 
-  def fully_loaded(port = %Port{}) do
-    Repo.preload(port, [:companies])
+  def fully_loaded(vessel = %Vessel{}, force?) do
+    Repo.preload(vessel, [:company], force: force?)
   end
 
-  def fully_loaded(vessel = %Vessel{}) do
-    Repo.preload(vessel, [:company])
-  end
-
-  def fully_loaded(struct), do: struct
+  # def fully_loaded(struct, _force?), do: struct
 
   def strip_non_loaded(struct = %{}) do
     Enum.reduce(maybe_convert_struct(struct), %{}, fn {k, v}, acc ->
@@ -1610,7 +1627,13 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def invite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
+  def invite_observer(auction = %struct{}, %User{id: user_id}) when is_auction(struct) do
+    auction
+    |> Accounts.get_observer(user_id)
+    |> invite_observer(auction, user_id)
+  end
+
+  def invite_observer(nil, %Auction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       auction_id: auction_id,
@@ -1619,7 +1642,7 @@ defmodule Oceanconnect.Auctions do
     |> Repo.insert()
   end
 
-  def invite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
+  def invite_observer(nil, %TermAuction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       term_auction_id: auction_id,
@@ -1628,13 +1651,11 @@ defmodule Oceanconnect.Auctions do
     |> Repo.insert()
   end
 
-  def uninvite_observer(%Auction{id: auction_id}, %User{id: user_id}) do
-    Accounts.get_observer!(auction_id, user_id)
-    |> Repo.delete()
-  end
+  def invite_observer(observer, _auction, _user_id), do: {:ok, observer}
 
-  def uninvite_observer(%TermAuction{id: auction_id}, %User{id: user_id}) do
-    Accounts.get_observer!(auction_id, user_id)
+  def uninvite_observer(auction = %struct{}, %User{id: user_id}) when is_auction(struct) do
+    auction
+    |> Accounts.get_observer(user_id)
     |> Repo.delete()
   end
 

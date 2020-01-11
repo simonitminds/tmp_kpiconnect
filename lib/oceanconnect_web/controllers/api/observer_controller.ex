@@ -6,24 +6,26 @@ defmodule OceanconnectWeb.Api.ObserverController do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.User
-  alias Oceanconnect.Auctions.AuctionPayload
+  alias Oceanconnect.Auctions.{AuctionNotifier, AuctionPayload}
 
   def invite(conn, %{"auction_id" => auction_id, "user_id" => user_id}) do
-    with %{is_admin: true} <- Auth.current_user(conn),
+    with %{id: admin_id, is_admin: true} <- Auth.current_user(conn),
          %struct{} = auction when is_auction(struct) <- Auctions.get_auction(auction_id),
-         available_observers <- Accounts.list_observers(),
-         %User{is_observer: true} = user <-
-           Enum.find(available_observers, &(&1.id == String.to_integer(user_id))) do
-      Auctions.invite_observer(auction, user)
+         %User{is_observer: true} = observer <-
+           Enum.find(Accounts.list_observers(), &(&1.id == String.to_integer(user_id))) do
+      Auctions.invite_observer(auction, observer)
 
-      auction_payload =
+      auction =
         auction.id
         |> Auctions.get_auction()
-        |> Auctions.fully_loaded()
-        |> AuctionPayload.get_admin_auction_payload!()
+        |> Auctions.fully_loaded(true)
+
+      AuctionNotifier.notify_participants(auction)
 
       conn
-      |> render("invite.json", %{auction_payload: auction_payload})
+      |> render("invite.json", %{
+        auction_payload: AuctionPayload.get_auction_payload!(auction, admin_id)
+      })
     else
       _ ->
         conn
@@ -33,21 +35,23 @@ defmodule OceanconnectWeb.Api.ObserverController do
   end
 
   def uninvite(conn, %{"auction_id" => auction_id, "user_id" => user_id}) do
-    with %{is_admin: true} <- Auth.current_user(conn),
+    with %{id: admin_id, is_admin: true} <- Auth.current_user(conn),
          %struct{} = auction when is_auction(struct) <- Auctions.get_auction(auction_id),
-         available_observers <- Accounts.list_observers(),
          %User{is_observer: true} = user <-
-           Enum.find(available_observers, &(&1.id == String.to_integer(user_id))) do
+           Enum.find(Accounts.list_observers(), &(&1.id == String.to_integer(user_id))) do
       Auctions.uninvite_observer(auction, user)
 
-      auction_payload =
+      auction =
         auction.id
         |> Auctions.get_auction()
         |> Auctions.fully_loaded()
-        |> AuctionPayload.get_admin_auction_payload!()
+
+      AuctionNotifier.remove_observer(auction, user_id)
 
       conn
-      |> render("invite.json", %{auction_payload: auction_payload})
+      |> render("invite.json", %{
+        auction_payload: AuctionPayload.get_auction_payload!(auction, admin_id)
+      })
     else
       _ ->
         conn

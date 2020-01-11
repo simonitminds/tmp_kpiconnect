@@ -23,7 +23,9 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             auction: nil,
             status: :pending,
             participations: %{},
+            # Supplier's bid history
             bid_history: [],
+            # ProductBidPayloads built for buyer or supplier
             product_bids: %{},
             solutions: %{},
             submitted_barges: [],
@@ -33,73 +35,115 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             observers: [],
             available_observers: []
 
-  def get_admin_auction_payload!(
-        auction = %struct{buyer_id: buyer_id, observers: observers},
-        state = %state_struct{}
-      )
+  def get_auction_payload!(auction = %struct{}, user_id) when is_auction(struct) do
+    auction_state = Auctions.get_auction_state!(auction)
+    get_auction_payload!(auction, user_id, auction_state)
+  end
+
+  def get_auction_payload!(auction = %struct{}, user_id, auction_state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
+    cond do
+      Accounts.is_admin?(user_id) ->
+        get_admin_auction_payload(auction, auction_state)
+
+      user_id == auction.buyer_id ->
+        get_buyer_auction_payload(auction, user_id, auction_state)
+
+      is_observer(auction, user_id) ->
+        get_observer_auction_payload(auction, auction_state)
+
+      user_id in Auctions.auction_supplier_ids(auction) ->
+        get_supplier_auction_payload(auction, user_id, auction_state)
+
+      true ->
+        %AuctionPayload{}
+    end
+  end
+
+  def json_from_payload(%AuctionPayload{
+        time_remaining: time_remaining,
+        current_server_time: current_server_time,
+        auction: auction,
+        bid_history: bid_history,
+        status: status,
+        product_bids: product_bids,
+        participations: participations,
+        solutions: solutions,
+        submitted_barges: submitted_barges,
+        submitted_comments: submitted_comments,
+        claims: claims,
+        fixtures: fixtures,
+        observers: observers,
+        available_observers: available_observers
+      }) do
+    %{
+      time_remaining: time_remaining,
+      current_server_time: current_server_time,
+      auction: auction,
+      bid_history: bid_history,
+      status: status,
+      product_bids: product_bids,
+      participations: participations,
+      solutions: solutions,
+      submitted_barges: submitted_barges,
+      submitted_comments: submitted_comments,
+      claims: claims,
+      fixtures: fixtures,
+      observers: observers,
+      available_observers: available_observers
+    }
+  end
+
+  defp is_observer(%{observers: observers}, user_id) do
+    observers
+    |> Enum.map(& &1.id)
+    |> Enum.member?(user_id)
+  end
+
+  defp get_admin_auction_payload(auction = %{buyer_id: buyer_id, observers: observers}, state) do
     available_observers = Accounts.list_observers()
 
     get_auction_payload!(auction, buyer_id, state)
     |> Map.merge(%{observers: observers, available_observers: available_observers})
   end
 
-  def get_admin_auction_payload!(auction = %struct{buyer_id: buyer_id, observers: observers})
-      when is_auction(struct) do
-    available_observers = Accounts.list_observers()
-
-    get_auction_payload!(auction, buyer_id)
-    |> Map.merge(%{observers: observers, available_observers: available_observers})
+  defp get_buyer_auction_payload(
+         auction,
+         buyer_id,
+         state = %{submitted_comments: submitted_comments}
+       ) do
+    auction
+    |> get_base_payload(state)
+    |> get_base_buyer_payload(buyer_id, state)
+    |> Map.merge(%{
+      submitted_comments: submitted_comments,
+      claims: Deliveries.claims_for_auction(auction),
+      fixtures: auction |> Auctions.fixtures_for_auction() |> format_fixtures()
+    })
   end
 
-  def get_observer_auction_payload!(%struct{} = auction) when is_auction(struct) do
-    auction_state = Auctions.get_auction_state!(auction)
-    get_observer_auction_payload(auction, auction_state)
+  defp get_observer_auction_payload(auction = %{buyer_id: buyer_id}, state) do
+    auction
+    |> get_base_payload(state)
+    |> get_base_buyer_payload(buyer_id, state)
+    |> Map.merge(%{auction: scrub_auction(auction, is_observer: true)})
   end
 
-  def get_auction_payload!(auction = %struct{buyer_id: buyer_id}, buyer_id)
-      when is_auction(struct) do
-    auction_state = Auctions.get_auction_state!(auction)
-    get_buyer_auction_payload(auction, buyer_id, auction_state)
-  end
-
-  def get_auction_payload!(auction = %struct{}, supplier_id) when is_auction(struct) do
-    auction_state = Auctions.get_auction_state!(auction)
-    get_supplier_auction_payload(auction, supplier_id, auction_state)
-  end
-
-  def get_auction_payload!(
-        auction = %struct{buyer_id: buyer_id},
-        buyer_id,
-        auction_state = %state_struct{}
-      )
-      when is_auction(struct) and is_auction_state(state_struct) do
-    get_buyer_auction_payload(auction, buyer_id, auction_state)
-  end
-
-  def get_auction_payload!(auction = %struct{}, supplier_id, auction_state = %state_struct{})
-      when is_auction(struct) and is_auction_state(state_struct) do
-    get_supplier_auction_payload(auction, supplier_id, auction_state)
-  end
-
-  def get_supplier_auction_payload(
-        auction = %struct{},
-        supplier_id,
-        state = %state_struct{
-          product_bids: product_bids,
-          status: status,
-          submitted_comments: submitted_comments
-        }
-      )
-      when is_auction(struct) and is_auction_state(state_struct) do
-    %AuctionPayload{
-      time_remaining: get_time_remaining(auction, state),
-      current_server_time: DateTime.utc_now(),
+  defp get_supplier_auction_payload(
+         auction,
+         supplier_id,
+         state = %{
+           product_bids: product_bids,
+           submitted_comments: submitted_comments
+         }
+       ) do
+    auction
+    |> get_base_payload(state)
+    |> Map.merge(%{
       auction: scrub_auction(auction, supplier_id),
       participations: %{
         supplier_id => get_supplier_participation(auction.auction_suppliers, supplier_id)
       },
-      status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, supplier: supplier_id),
       bid_history: get_bid_history(state, supplier_id, auction),
@@ -120,34 +164,33 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       claims:
         Enum.filter(Deliveries.claims_for_auction(auction), &(&1.supplier_id == supplier_id)),
       fixtures:
-        Enum.filter(
-          Auctions.fixtures_for_auction(auction),
+        auction
+        |> Auctions.fixtures_for_auction()
+        |> Enum.filter(
           &(&1.supplier_id == supplier_id or &1.delivered_supplier_id == supplier_id)
         )
-        |> format_fixtures(),
-      observers: [],
-      available_observers: []
-    }
+        |> format_fixtures()
+    })
   end
 
-  def get_buyer_auction_payload(
-        auction = %struct{},
-        buyer_id,
-        state = %state_struct{
-          product_bids: product_bids,
-          status: status,
-          submitted_comments: submitted_comments
-        }
-      )
-      when is_auction(struct) and is_auction_state(state_struct) do
+  defp get_base_payload(auction, state = %{status: status}) do
     %AuctionPayload{
       time_remaining: get_time_remaining(auction, state),
       current_server_time: DateTime.utc_now(),
+      auction: auction,
+      status: status
+    }
+  end
+
+  defp get_base_buyer_payload(
+         payload = %AuctionPayload{auction: auction},
+         buyer_id,
+         state = %{product_bids: product_bids}
+       ) do
+    Map.merge(payload, %{
       auction: scrub_auction(auction, buyer_id),
-      status: status,
       solutions:
         SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
-      bid_history: [],
       participations: get_participations(auction),
       product_bids:
         Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
@@ -160,54 +203,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             )
           )
         end),
-      submitted_barges:
-        BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
-      submitted_comments: submitted_comments,
-      claims: Deliveries.claims_for_auction(auction),
-      fixtures:
-        Auctions.fixtures_for_auction(auction)
-        |> format_fixtures(),
-      observers: [],
-      available_observers: []
-    }
-  end
-
-  def get_observer_auction_payload(
-        %struct{buyer_id: buyer_id} = auction,
-        %state_struct{
-          product_bids: product_bids,
-          status: status
-        } = state
-      )
-      when is_auction(struct) and is_auction_state(state_struct) do
-    %AuctionPayload{
-      time_remaining: get_time_remaining(auction, state),
-      current_server_time: DateTime.utc_now(),
-      auction: scrub_auction(auction, is_observer: true),
-      status: status,
-      solutions:
-        SolutionsPayload.get_solutions_payload!(state, auction: auction, buyer: buyer_id),
-      bid_history: [],
-      participations: get_participations(auction),
-      product_bids:
-        Enum.reduce(product_bids, %{}, fn {vessel_fuel_id, product_state}, acc ->
-          Map.put(
-            acc,
-            vessel_fuel_id,
-            ProductBidsPayload.get_product_bids_payload!(product_state,
-              auction: auction,
-              buyer: buyer_id
-            )
-          )
-        end),
-      submitted_barges:
-        BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id),
-      submitted_comments: [],
-      claims: [],
-      fixtures: [],
-      observers: [],
-      available_observers: []
-    }
+      submitted_barges: BargesPayload.get_barges_payload!(state.submitted_barges, buyer: buyer_id)
+    })
   end
 
   defp get_bid_history(%state_struct{product_bids: product_bids}, supplier_id, auction)
@@ -340,40 +337,6 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
 
   defp product_for_bid(_bid, %TermAuction{fuel: fuel}) do
     "#{fuel.name}"
-  end
-
-  def json_from_payload(%AuctionPayload{
-        time_remaining: time_remaining,
-        current_server_time: current_server_time,
-        auction: auction,
-        bid_history: bid_history,
-        status: status,
-        product_bids: product_bids,
-        participations: participations,
-        solutions: solutions,
-        submitted_barges: submitted_barges,
-        submitted_comments: submitted_comments,
-        claims: claims,
-        fixtures: fixtures,
-        observers: observers,
-        available_observers: available_observers
-      }) do
-    %{
-      time_remaining: time_remaining,
-      current_server_time: current_server_time,
-      auction: auction,
-      bid_history: bid_history,
-      status: status,
-      product_bids: product_bids,
-      participations: participations,
-      solutions: solutions,
-      submitted_barges: submitted_barges,
-      submitted_comments: submitted_comments,
-      claims: claims,
-      fixtures: fixtures,
-      observers: observers,
-      available_observers: available_observers
-    }
   end
 
   defp format_fixtures(fixtures) when is_list(fixtures) do

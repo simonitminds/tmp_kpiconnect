@@ -5,7 +5,6 @@ import {
   AUCTION_CHANNEL_DISCONNECTED,
   RECEIVE_FINALIZED_AUCTION_PAYLOADS,
   RECEIVE_FILTERED_PAYLOADS,
-  SELECT_FILTER_VESSEL,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
 } from "../constants";
@@ -100,4 +99,3 @@ export default function(state, action) {
     }
   }
 }
-

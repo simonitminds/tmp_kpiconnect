@@ -127,6 +127,7 @@ defmodule Oceanconnect.Auctions.EventNotifier do
          {:ok, finalized_auction} <- Auctions.finalize_auction(auction, state),
          true <-
            Auctions.FinalizedStateCache.add_auction(finalized_auction, state) do
+      :timer.sleep(500)
       Auctions.AuctionsSupervisor.stop_child(finalized_auction)
     else
       {:error, msg} ->

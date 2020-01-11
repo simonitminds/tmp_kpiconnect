@@ -38,6 +38,7 @@ export default class AuctionShow extends React.Component {
       addCommentToSolution,
       connection
     } = this.props;
+    if (!auctionPayload) { window.location.reload() };
     const {auction, status} = auctionPayload;
     const isAdmin = window.isAdmin;
 

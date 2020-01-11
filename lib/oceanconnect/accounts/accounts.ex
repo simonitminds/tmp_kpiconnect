@@ -6,7 +6,7 @@ defmodule Oceanconnect.Accounts do
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
-  alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Accounts.{Company, Observer, User}
   alias Oceanconnect.Auctions.{Auction, TermAuction, Barge}
 
   @doc """
@@ -42,6 +42,13 @@ defmodule Oceanconnect.Accounts do
     |> Repo.all()
   end
 
+  def is_admin?(nil), do: false
+
+  def is_admin?(id) do
+    user = Repo.get(User, id)
+    if user, do: user.is_admin, else: false
+  end
+
   @doc """
   Gets a single user.
 
@@ -58,12 +65,12 @@ defmodule Oceanconnect.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
-  def get_observer!(%Auction{id: auction_id}, user_id) do
-    Repo.get_by!(Observer, auction_id: auction_id, user_id: user_id)
+  def get_observer(%Auction{id: auction_id}, user_id) do
+    Repo.get_by(Observer, auction_id: auction_id, user_id: user_id)
   end
 
-  def get_observer!(%TermAuction{id: auction_id}, user_id) do
-    Repo.get_by!(Observer, term_auction_id: auction_id, user_id: user_id)
+  def get_observer(%TermAuction{id: auction_id}, user_id) do
+    Repo.get_by(Observer, term_auction_id: auction_id, user_id: user_id)
   end
 
   def get_active_user!(id) do

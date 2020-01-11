@@ -25,6 +25,7 @@ import {
   COLLAPSE_MESSAGES_AUCTION,
   COLLAPSE_MESSAGES_CONVERSATION,
   TOGGLE_SUPPLIER,
+  REMOVE_AUCTION,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
   UPDATE_DATE,
@@ -61,6 +62,10 @@ export function subscribeToAuctionUpdates(dispatchAction) {
 
     auctionChannel.on("auctions_update", payload => {
       dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload});
+    });
+
+    auctionChannel.on("remove_auction", ( id ) => {
+      dispatch({type: REMOVE_AUCTION, auctionId: id});
     });
 
     auctionChannel.onError( () => {
@@ -203,7 +208,7 @@ export function inviteObserverToAuction(auctionId, userId) {
 
 export function uninviteObserverFromAuction(auctionId, userId) {
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/observers/${userId}/invite`, {
+    fetch(`/api/auctions/${auctionId}/observers/${userId}/uninvite`, {
       headers: defaultHeaders,
       method: 'POST'
     })
