@@ -52,8 +52,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
       is_observer(auction, user_id) ->
         get_observer_auction_payload(auction, auction_state)
 
-      true ->
+      user_id in Auctions.auction_supplier_ids(auction) ->
         get_supplier_auction_payload(auction, user_id, auction_state)
+
+      true ->
+        %AuctionPayload{}
     end
   end
 

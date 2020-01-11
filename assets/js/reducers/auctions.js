@@ -4,6 +4,7 @@ import {
   AUCTION_CHANNEL_CONNECTED,
   AUCTION_CHANNEL_DISCONNECTED,
   RECEIVE_AUCTION_PAYLOADS,
+  REMOVE_AUCTION,
   UPDATE_AUCTION_PAYLOAD,
   UPDATE_BID_STATUS,
 } from "../constants";
@@ -23,6 +24,17 @@ export default function(state, action) {
       return {
         ...state,
         auctionPayloads: action.auctionPayloads,
+        loading: false
+      };
+    }
+    case REMOVE_AUCTION: {
+      const origAuctionPayload = _.chain(state.auctionPayloads)
+            .filter(['auction.id', action.auctionId.id])
+            .first()
+            .value();
+      return {
+        ...state,
+        auctionPayloads: _.without(state.auctionPayloads, origAuctionPayload),
         loading: false
       };
     }
