@@ -34,11 +34,12 @@ alias Oceanconnect.Auctions.{
 }
 
 defmodule SupplierHelper do
-  def set_suppliers_for_auction(auction, suppliers) when is_list(suppliers) do
+  def set_suppliers_for_auction(auction = %{buyer_id: buyer_id}, suppliers)
+      when is_list(suppliers) do
     auction
     |> Repo.preload(:suppliers)
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:suppliers, suppliers)
+    |> Ecto.Changeset.put_assoc(:suppliers, Enum.filter(suppliers, &(&1.id != buyer_id)))
     |> Repo.update!()
     |> Auctions.create_supplier_aliases()
   end
@@ -162,7 +163,7 @@ companies =
       main_phone: "",
       mobile_phone: "",
       postal_code: ""
-    },
+    }
   ]
   |> Enum.map(fn company ->
     Repo.get_or_insert!(Company, company)
@@ -639,8 +640,12 @@ date_time =
   |> NaiveDateTime.add(5 * 60)
   |> DateTime.from_naive!("Etc/UTC")
 
-fuel_index =
-  %{code: "PUAFT00", name: "Platts Oilgram Bunkerwire", port_id: port1.id, fuel_id: fuel1.id}
+fuel_index = %{
+  code: "PUAFT00",
+  name: "Platts Oilgram Bunkerwire",
+  port_id: port1.id,
+  fuel_id: fuel1.id
+}
 
 Repo.get_or_insert!(FuelIndex, fuel_index)
 
@@ -660,7 +665,12 @@ auctions_params = [
   },
   %Auction{
     auction_vessel_fuels: [
-      %AuctionVesselFuel{vessel_id: hd(vessels).id, fuel_id: fuel1.id, quantity: 1500, eta: date_time}
+      %AuctionVesselFuel{
+        vessel_id: hd(vessels).id,
+        fuel_id: fuel1.id,
+        quantity: 1500,
+        eta: date_time
+      }
     ],
     port_id: fujairah.id,
     scheduled_start: date_time,
@@ -678,7 +688,12 @@ auctions_params = [
         quantity: 1000,
         eta: date_time
       },
-      %AuctionVesselFuel{vessel_id: List.last(vessels).id, fuel_id: hd(fuels).id, quantity: 1000, eta: date_time}
+      %AuctionVesselFuel{
+        vessel_id: List.last(vessels).id,
+        fuel_id: hd(fuels).id,
+        quantity: 1000,
+        eta: date_time
+      }
     ],
     port_id: port1.id,
     scheduled_start: date_time,
@@ -725,7 +740,7 @@ Repo.delete_all(Auction)
 Repo.delete_all(TermAuction)
 
 [auction1, auction2, auction3, term_auction1] =
-  Enum.map(auctions_params, fn (%struct{} = auction_params) ->
+  Enum.map(auctions_params, fn %struct{} = auction_params ->
     auction_params
     |> struct.changeset(%{})
     |> Repo.insert!()
