@@ -119,11 +119,39 @@ jobs:
       - run:  # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: mix test --trace --exclude feature # run non-feature tests
+
+  feature_test:
+    docker:
+      # Ensure .tool-versions matches
+      - image: circleci/elixir:1.8.0-node-browsers
+        environment:
+          MIX_ENV: test
+          # match POSTGRES_PASSWORD for postgres image below
+          PGPASSWORD: postgres
+          # match POSTGRES_USER for postgres image below
+          PGUSER: postgres
+      - image: circleci/postgres:11.3-alpine
+        environment:
+          # Match config/test.exs config :explorer, Explorer.Repo, database
+          POSTGRES_DB: oceanconnect_test
+          # match PGPASSWORD for elixir image above
+          POSTGRES_PASSWORD: postgres
+          # match PGUSER for elixir image above
+          POSTGRES_USER: postgres
+    working_directory: ~/lib
+    steps:
+      - attach_workspace:
+          at: .
+      - <<: *install_hex_rebar
+      - run:  # special utility that stalls main process until DB is ready
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Start Chromedriver
           command: chromedriver
           background: true
-      - run: mix test --trace  # run all tests in project
+      - run: mix test --trace --only feature  # run only feature tests
 
   deploy_staging:
     docker:
@@ -189,6 +217,7 @@ workflows:
                 - master
           requires:
             - test
+            - feature_test
 
       - deploy_production:
           filters:
@@ -198,3 +227,4 @@ workflows:
               only: /^v\d+\.\d+\.\d+$/
           requires:
             - test
+            - feature_test

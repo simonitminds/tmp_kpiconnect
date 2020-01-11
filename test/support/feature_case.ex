@@ -16,6 +16,7 @@ defmodule Oceanconnect.FeatureCase do
       use Phoenix.ConnTest
       use Oceanconnect.Page
       use Hound.Helpers
+      @moduletag :feature
 
       def login_user(user) do
         alias Oceanconnect.Session.NewPage
