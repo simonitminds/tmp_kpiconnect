@@ -131,7 +131,7 @@ defmodule Oceanconnect.Auctions.FinalizedAuctionCacheTest do
       |> Auctions.end_auction()
       |> Auctions.expire_auction()
 
-      :timer.sleep(500)
+      :timer.sleep(1000)
 
       assert {:error, "Auction Store Not Started"} = Auctions.AuctionStore.find_pid(auction.id)
       assert {:ok, %{status: :expired}} = Auctions.FinalizedStateCache.for_auction(auction)
@@ -217,7 +217,7 @@ defmodule Oceanconnect.Auctions.FinalizedAuctionCacheTest do
         "Agent 9"
       )
 
-      :timer.sleep(500)
+      :timer.sleep(1000)
 
       assert {:error, "Auction Store Not Started"} = Auctions.AuctionStore.find_pid(auction_id)
       assert {:ok, state} = Auctions.FinalizedStateCache.for_auction(auction)
