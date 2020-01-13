@@ -22,7 +22,7 @@ export default class AuctionsIndex extends React.Component {
     const connection = this.props.connection;
     const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
     const isObserver = window.isObserver;
-    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer_id) || currentUserIsAdmin || isObserver); };
+    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer_id) || currentUserIsAdmin); };
 
     const filteredAuctionPayloads = (status) => {
       return _.filter(this.props.auctionPayloads, (auctionPayload) => {
@@ -79,14 +79,21 @@ export default class AuctionsIndex extends React.Component {
           <div className="columns is-multiline">
             { _.map(filteredPayloads, (auctionPayload) => {
               const auctionType = _.get(auctionPayload, 'auction.type');
-              const { BuyerCard, SupplierCard } = componentsForAuction(auctionType);
-              if (currentUserIsBuyer(auctionPayload.auction)) {
+              const { BuyerCard, ObserverCard, SupplierCard } = componentsForAuction(auctionType);
+              if (isObserver) {
+                return <ObserverCard
+                  key={auctionPayload.auction.id}
+                  auctionPayload={auctionPayload}
+                  timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
+                />;
+              } else if (currentUserIsBuyer(auctionPayload.auction))  {
                 return <BuyerCard
                   key={auctionPayload.auction.id}
                   auctionPayload={auctionPayload}
                   timeRemaining={this.state.timeRemaining[auctionPayload.auction.id]}
                 />;
-              } else {
+              }
+              else {
                 return <SupplierCard
                   key={auctionPayload.auction.id}
                   auctionPayload={auctionPayload}
