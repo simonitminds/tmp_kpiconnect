@@ -3,6 +3,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   import Oceanconnect.Auctions.Guards
 
+  alias Oceanconnect.Accounts.User
   alias Oceanconnect.{Auctions, Messages}
 
   alias Oceanconnect.Auctions.{
@@ -77,73 +78,91 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def cancel(conn, %{"id" => id}) do
-    user = Auth.current_user(conn)
-
-    id
-    |> Auctions.get_auction!()
-    |> Auctions.fully_loaded()
-    |> Auctions.cancel_auction(user)
-
-    redirect(conn, to: auction_path(conn, :index))
+    with user = %User{id: user_id, is_admin: admin?} <- Auth.current_user(conn),
+         auction = %struct{buyer_id: buyer_id} when is_auction(struct) <-
+           id |> Auctions.get_auction!() |> Auctions.fully_loaded(),
+         true <- buyer_id == user_id or admin? do
+      Auctions.cancel_auction(auction, user)
+      redirect(conn, to: auction_path(conn, :index))
+    else
+      _ ->
+        conn
+        |> put_flash(:error, "Not authorized.")
+        |> redirect(to: auction_path(conn, :index))
+    end
   end
 
   def new(conn, _params) do
-    user = Auth.current_user(conn)
-    credit_margin_amount = user.company.credit_margin_amount
+    user = %User{is_observer: observer?} = Auth.current_user(conn)
 
-    changeset =
-      Auctions.change_auction(%Auction{})
-      |> Map.merge(%{action: :create, errors: []})
+    if observer? do
+      conn
+      |> put_flash(:error, "Not authorized.")
+      |> redirect(to: auction_path(conn, :index))
+    else
+      credit_margin_amount = user.company.credit_margin_amount
 
-    [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
+      changeset =
+        Auctions.change_auction(%Auction{})
+        |> Map.merge(%{action: :create, errors: []})
 
-    render(
-      conn,
-      "new.html",
-      changeset: changeset,
-      auction: %Auction{},
-      fuels: fuels,
-      fuel_indexes: fuel_indexes,
-      ports: ports,
-      vessels: vessels,
-      suppliers: Poison.encode!([]),
-      credit_margin_amount: credit_margin_amount
-    )
+      [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
+
+      render(
+        conn,
+        "new.html",
+        changeset: changeset,
+        auction: %Auction{},
+        fuels: fuels,
+        fuel_indexes: fuel_indexes,
+        ports: ports,
+        vessels: vessels,
+        suppliers: Poison.encode!([]),
+        credit_margin_amount: credit_margin_amount
+      )
+    end
   end
 
   def create(conn, %{"auction" => auction_params}) do
-    user = Auth.current_user(conn)
-    credit_margin_amount = user.company.credit_margin_amount
+    user = %User{is_observer: observer?} = Auth.current_user(conn)
 
-    updated_params =
-      auction_params
-      |> Map.put("buyer_id", user.company.id)
-      |> normalize_auction_params()
+    if observer? do
+      conn
+      |> put_flash(:error, "Not authorized.")
+      |> redirect(to: auction_path(conn, :index))
+    else
+      credit_margin_amount = user.company.credit_margin_amount
 
-    case Auctions.create_auction(updated_params, user) do
-      {:ok, auction} ->
-        conn
-        |> put_flash(:info, "Auction created successfully.")
-        |> redirect(to: auction_path(conn, :show, auction))
+      updated_params =
+        auction_params
+        |> Map.put("buyer_id", user.company.id)
+        |> normalize_auction_params()
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
+      case Auctions.create_auction(updated_params, user) do
+        {:ok, auction} ->
+          conn
+          |> put_flash(:info, "Auction created successfully.")
+          |> redirect(to: auction_path(conn, :show, auction))
 
-        [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
+        {:error, %Ecto.Changeset{} = changeset} ->
+          [auction, json_auction, suppliers] = build_payload_from_changeset(changeset)
 
-        render(
-          conn,
-          "new.html",
-          changeset: changeset,
-          auction: auction,
-          json_auction: json_auction,
-          fuels: fuels,
-          fuel_indexes: fuel_indexes,
-          ports: ports,
-          vessels: vessels,
-          suppliers: suppliers,
-          credit_margin_amount: credit_margin_amount
-        )
+          [fuels, fuel_indexes, ports, vessels] = auction_inputs_by_buyer(conn)
+
+          render(
+            conn,
+            "new.html",
+            changeset: changeset,
+            auction: auction,
+            json_auction: json_auction,
+            fuels: fuels,
+            fuel_indexes: fuel_indexes,
+            ports: ports,
+            vessels: vessels,
+            suppliers: suppliers,
+            credit_margin_amount: credit_margin_amount
+          )
+      end
     end
   end
 
