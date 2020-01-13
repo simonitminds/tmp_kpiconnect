@@ -103,7 +103,8 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
   defp get_admin_auction_payload(auction = %{buyer_id: buyer_id, observers: observers}, state) do
     available_observers = Accounts.list_observers()
 
-    get_auction_payload!(auction, buyer_id, state)
+    auction
+    |> get_buyer_auction_payload(buyer_id, state)
     |> Map.merge(%{observers: observers, available_observers: available_observers})
   end
 
