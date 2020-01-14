@@ -11,6 +11,8 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     DelayedNotificationsSupervisor
   }
 
+  @auction_starting_soon_alert_time 15 * 60 * 1_000
+
   @claim_events [
     :claim_created,
     :claim_response_created
@@ -191,7 +193,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
     if start_time do
       DateTime.to_unix(start_time, :millisecond)
-      |> Kernel.-(3_600_000)
+      |> Kernel.-(@auction_starting_soon_alert_time)
       |> DateTime.from_unix!(:millisecond)
     else
       false
