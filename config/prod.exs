@@ -18,7 +18,7 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
   http: [port: 8080],
   secret_key_base: "JJ3w15AxkbMN+HNA4SrVfaJvyJCySRqlJ8XRJ703WCU5QraHTNFI/x27XX26QPNW",
   load_from_system_env: true,
-  url: [host: System.get_env("APP_HOST"), port: 80],
+  url: [host: System.get_env("APP_HOST"), port: 443, scheme: "https"],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
