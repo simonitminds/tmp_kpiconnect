@@ -12,15 +12,11 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
     get_buyer_fixture_payload!(auction)
   end
 
-  def get_fixture_payload!(auction = %Auction{buyer_id: buyer_id}, %User{company_id: company_id}) do
-    cond do
-      buyer_id == company_id ->
-        get_buyer_fixture_payload!(auction)
+  def get_fixture_payload!(auction = %Auction{buyer_id: buyer_id}, %User{company_id: buyer_id}),
+    do: get_buyer_fixture_payload!(auction)
 
-      true ->
-        get_supplier_fixture_payload!(auction, company_id)
-    end
-  end
+  def get_fixture_payload!(auction = %Auction{}, %User{company_id: company_id}),
+    do: get_supplier_fixture_payload!(auction, company_id)
 
   def get_buyer_fixture_payload!(auction) do
     %FixturePayload{

@@ -294,7 +294,7 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Repo.preload([:observers])
     |> Map.fetch!(:observers)
-    |> Enum.map(& &1.id)
+    |> Enum.map(& &1.company_id)
   end
 
   def get_participant_name_and_ids_for_auction(auction_id) when is_integer(auction_id) do
@@ -308,6 +308,14 @@ defmodule Oceanconnect.Auctions do
     |> Enum.map(&%{id: &1, name: AuctionSuppliers.get_name_or_alias(&1, auction)})
   end
 
+  def is_observer?(%struct{observers: observers}, %User{id: user_id}) when is_auction(struct) do
+    Enum.any?(observers, &(&1.id == user_id))
+  end
+
+  def list_auctions(%User{is_admin: true}), do: list_auctions()
+  def list_auctions(%User{id: user_id, is_observer: true}), do: list_observing_auctions(user_id)
+  def list_auctions(%User{company_id: company_id}), do: list_participating_auctions(company_id)
+
   def list_auctions do
     regular_auctions =
       from(a in Auction, where: a.type == "spot")
@@ -320,43 +328,6 @@ defmodule Oceanconnect.Auctions do
       |> fully_loaded
 
     regular_auctions ++ term_auctions
-  end
-
-  def list_participating_auctions_with_fixtures(company_id) do
-    query =
-      company_id
-      |> Auction.with_buyer()
-
-    query =
-      company_id
-      |> Auction.with_supplier(query)
-
-    query
-    |> Auction.has_fixtures()
-    |> Repo.all()
-    |> Repo.preload([:vessels, :port, fixtures: [:supplier, :vessel, :fuel]])
-  end
-
-  def list_finalized_auctions do
-    list_auctions()
-    |> Enum.map(&get_auction_state!(&1))
-    |> Enum.filter(&(&1.status in [:closed, :canceled, :expired]))
-    |> Enum.map(& &1.auction_id)
-    |> Enum.map(&get_auction!(&1))
-  end
-
-  def list_participating_finalized_auctions(company_id) do
-    company_id
-    |> list_participating_auctions()
-    |> Enum.map(&get_auction_state!(&1))
-    |> Enum.filter(&(&1.status in [:closed, :canceled, :expired]))
-    |> Enum.map(& &1.auction_id)
-    |> Enum.map(&get_auction!(&1))
-  end
-
-  def is_observer?(%struct{} = auction, %User{id: user_id}) when is_auction(struct) do
-    auction.observers
-    |> Enum.any?(&(&1.id == user_id))
   end
 
   def list_observing_auctions(user_id) do
@@ -374,6 +345,17 @@ defmodule Oceanconnect.Auctions do
        supplier_auctions(company_id) ++
        supplier_term_auctions(company_id))
     |> Enum.uniq_by(& &1.id)
+  end
+
+  def list_finalized_auctions(user = %User{}) do
+    user
+    |> list_auctions()
+    |> Enum.filter(&auction_finalized?/1)
+  end
+
+  defp auction_finalized?(auction = %struct{}) when is_auction(struct) do
+    state = get_auction_state!(auction)
+    state.status in [:closed, :canceled, :expired]
   end
 
   def list_upcoming_auctions(time_frame) do

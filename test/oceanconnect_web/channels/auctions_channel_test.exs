@@ -11,7 +11,8 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
     supplier3_company = insert(:company, is_supplier: true)
     supplier_1 = insert(:user, company: supplier_company)
     supplier_2 = insert(:user, company: supplier_company)
-    observer = insert(:user, is_observer: true)
+    observer_company = insert(:company)
+    observer = insert(:user, is_observer: true, company: observer_company)
     non_participant_company = insert(:company)
     non_participant = insert(:user, company: non_participant_company)
     fuel = insert(:fuel)
@@ -57,7 +58,7 @@ defmodule OceanconnectWeb.AuctionsChannelTest do
        supplier_1: supplier_1,
        supplier_2: supplier_2,
        supplier3: supplier3_company,
-       observer_id: observer.id,
+       observer_id: observer_company.id,
        buyer_id: buyer_company.id,
        non_participant_id: non_participant_company.id,
        non_participant: non_participant,

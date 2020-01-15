@@ -12,15 +12,19 @@ defmodule Oceanconnect.AccountsTest do
 
     setup do
       company = insert(:company)
+      admin_company = insert(:company)
+      observer_company = insert(:company)
 
       user = insert(:user, is_active: true, company: company)
-      admin_user = insert(:user, is_admin: true)
+      admin_user = insert(:user, is_admin: true, company: admin_company)
       inactive_user = insert(:user, is_active: false)
-      observer_user = insert(:user, is_observer: true)
+      observer_user = insert(:user, is_observer: true, company: observer_company)
 
       {:ok,
        %{
          admin_user: admin_user,
+         admin_company_id: admin_company.id,
+         observer_company_id: observer_company.id,
          user: user,
          inactive_user: inactive_user,
          observer_user: observer_user,
@@ -67,16 +71,24 @@ defmodule Oceanconnect.AccountsTest do
       assert Accounts.list_admin_users() |> Enum.map(& &1.id) |> Enum.sort() == [admin_user.id]
     end
 
-    test "is_admin?/1 returns true if admin", %{admin_user: admin_user} do
-      assert Accounts.is_admin?(admin_user.id)
+    test "is_admin?/1 returns true if admin", %{admin_company_id: admin_company_id} do
+      assert Accounts.is_admin?(admin_company_id)
     end
 
-    test "is_admin?/1 returns false if not admin", %{user: user} do
-      refute Accounts.is_admin?(user.id)
+    test "is_admin?/1 returns false if not admin", %{company: company} do
+      refute Accounts.is_admin?(company.id)
     end
 
     test "is_admin?/1 returns false if nil provided" do
       refute Accounts.is_admin?(nil)
+    end
+
+    test "is_observer?/1 returns true if admin", %{observer_company_id: observer_company_id} do
+      assert Accounts.is_observer?(observer_company_id)
+    end
+
+    test "is_observer?/1 returns false if not admin", %{company: company} do
+      refute Accounts.is_observer?(company.id)
     end
 
     test "get_user!/1 returns the user with given id", %{user: user} do

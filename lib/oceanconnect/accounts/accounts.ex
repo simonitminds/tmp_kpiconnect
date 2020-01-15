@@ -44,9 +44,26 @@ defmodule Oceanconnect.Accounts do
 
   def is_admin?(nil), do: false
 
-  def is_admin?(id) do
-    user = Repo.get(User, id)
+  def is_admin?(company_id) do
+    user =
+      Company
+      |> Repo.get(company_id)
+      |> Repo.preload([:users])
+      |> Map.fetch!(:users)
+      |> List.first()
+
     if user, do: user.is_admin, else: false
+  end
+
+  def is_observer?(company_id) do
+    user =
+      Company
+      |> Repo.get(company_id)
+      |> Repo.preload([:users])
+      |> Map.fetch!(:users)
+      |> List.first()
+
+    if user, do: user.is_observer, else: false
   end
 
   @doc """

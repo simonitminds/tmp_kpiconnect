@@ -21,14 +21,14 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
 
   def notify_participants(auction = %struct{}, state = %state_struct{})
       when is_auction_state(state_struct) and is_auction(struct) do
-    users =
+    companies =
       auction
       |> Auctions.auction_participant_ids()
       |> MapSet.new()
       |> MapSet.union(admins_and_observers(auction))
       |> MapSet.to_list()
 
-    notify_auction_users(auction, users, state)
+    notify_auction_users(auction, companies, state)
   end
 
   def remove_observer(auction = %struct{id: auction_id}, observer_id) when is_auction(struct) do
@@ -41,25 +41,27 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
     end)
   end
 
-  def send_notification_to_participants(channel, payload, participants) do
+  def send_notification_to_participant(channel, payload, participant_id) do
     Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
-      Enum.map(participants, fn id ->
-        OceanconnectWeb.Endpoint.broadcast!("#{channel}:#{id}", "auctions_update", payload)
-      end)
+      OceanconnectWeb.Endpoint.broadcast!(
+        "#{channel}:#{participant_id}",
+        "auctions_update",
+        payload
+      )
     end)
   end
 
   defp admins_and_observers(auction) do
     Accounts.list_admin_users()
-    |> Enum.map(& &1.id)
+    |> Enum.map(& &1.company_id)
     |> MapSet.new()
     |> MapSet.union(MapSet.new(Auctions.auction_observer_ids(auction)))
   end
 
-  defp notify_auction_users(auction, users, state) do
-    Enum.map(users, fn user_id ->
-      payload = AuctionPayload.get_auction_payload!(auction, user_id, state)
-      send_notification_to_participants("user_auctions", payload, [user_id])
+  defp notify_auction_users(auction, companies, state) do
+    Enum.map(companies, fn company_id ->
+      payload = AuctionPayload.get_auction_payload!(auction, company_id, state)
+      send_notification_to_participant("user_auctions", payload, company_id)
     end)
   end
 end

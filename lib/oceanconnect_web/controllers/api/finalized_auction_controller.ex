@@ -7,32 +7,16 @@ defmodule OceanconnectWeb.Api.FinalizedAuctionController do
   alias Oceanconnect.Accounts.User
 
   def index(conn, _params) do
+    user = %User{company_id: company_id} = Auth.current_user(conn)
+
     auction_payloads =
-      case Auth.current_user(conn) do
-        %User{id: admin_id, is_admin: true} ->
-          Auctions.list_finalized_auctions()
-          |> Enum.map(fn auction ->
-            auction
-            |> Auctions.fully_loaded()
-            |> AuctionPayload.get_auction_payload!(admin_id)
-          end)
-
-        %User{id: observer_id, is_observer: true} = user ->
-          Auctions.list_observing_auctions(user.id)
-          |> Enum.map(fn auction ->
-            auction
-            |> Auctions.fully_loaded()
-            |> AuctionPayload.get_auction_payload!(observer_id)
-          end)
-
-        user ->
-          Auctions.list_participating_finalized_auctions(user.company_id)
-          |> Enum.map(fn auction ->
-            auction
-            |> Auctions.fully_loaded()
-            |> AuctionPayload.get_auction_payload!(user.company_id)
-          end)
-      end
+      user
+      |> Auctions.list_finalized_auctions()
+      |> Enum.map(fn auction ->
+        auction
+        |> Auctions.fully_loaded()
+        |> AuctionPayload.get_auction_payload!(company_id)
+      end)
 
     render(conn, "index.json", data: auction_payloads)
   end

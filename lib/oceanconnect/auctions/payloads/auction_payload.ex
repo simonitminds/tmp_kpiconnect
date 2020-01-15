@@ -1,4 +1,8 @@
 defmodule Oceanconnect.Auctions.AuctionPayload do
+  @moduledoc """
+  This module gets the appropriate auction payload based on the company_id.
+  """
+
   import Oceanconnect.Auctions.Guards
 
   alias __MODULE__
@@ -35,25 +39,25 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             observers: [],
             available_observers: []
 
-  def get_auction_payload!(auction = %struct{}, user_id) when is_auction(struct) do
+  def get_auction_payload!(auction = %struct{}, company_id) when is_auction(struct) do
     auction_state = Auctions.get_auction_state!(auction)
-    get_auction_payload!(auction, user_id, auction_state)
+    get_auction_payload!(auction, company_id, auction_state)
   end
 
-  def get_auction_payload!(auction = %struct{}, user_id, auction_state = %state_struct{})
+  def get_auction_payload!(auction = %struct{}, company_id, auction_state = %state_struct{})
       when is_auction(struct) and is_auction_state(state_struct) do
     cond do
-      Accounts.is_admin?(user_id) ->
+      Accounts.is_admin?(company_id) ->
         get_admin_auction_payload(auction, auction_state)
 
-      user_id == auction.buyer_id ->
-        get_buyer_auction_payload(auction, user_id, auction_state)
+      company_id == auction.buyer_id ->
+        get_buyer_auction_payload(auction, company_id, auction_state)
 
-      is_observer(auction, user_id) ->
+      is_observer(auction, company_id) ->
         get_observer_auction_payload(auction, auction_state)
 
-      user_id in Auctions.auction_supplier_ids(auction) ->
-        get_supplier_auction_payload(auction, user_id, auction_state)
+      company_id in Auctions.auction_supplier_ids(auction) ->
+        get_supplier_auction_payload(auction, company_id, auction_state)
 
       true ->
         %AuctionPayload{}
@@ -94,10 +98,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     }
   end
 
-  defp is_observer(%{observers: observers}, user_id) do
+  defp is_observer(%{observers: observers}, company_id) do
     observers
-    |> Enum.map(& &1.id)
-    |> Enum.member?(user_id)
+    |> Enum.map(& &1.company_id)
+    |> Enum.member?(company_id)
   end
 
   defp get_admin_auction_payload(auction = %{buyer_id: buyer_id, observers: observers}, state) do

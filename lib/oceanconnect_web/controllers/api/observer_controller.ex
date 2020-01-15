@@ -37,7 +37,7 @@ defmodule OceanconnectWeb.Api.ObserverController do
   def uninvite(conn, %{"auction_id" => auction_id, "user_id" => user_id}) do
     with %{id: admin_id, is_admin: true} <- Auth.current_user(conn),
          %struct{} = auction when is_auction(struct) <- Auctions.get_auction(auction_id),
-         %User{is_observer: true} = user <-
+         %User{is_observer: true, company_id: observer_company_id} = user <-
            Enum.find(Accounts.list_observers(), &(&1.id == String.to_integer(user_id))) do
       Auctions.uninvite_observer(auction, user)
 
@@ -46,7 +46,7 @@ defmodule OceanconnectWeb.Api.ObserverController do
         |> Auctions.get_auction()
         |> Auctions.fully_loaded()
 
-      AuctionNotifier.remove_observer(auction, user_id)
+      AuctionNotifier.remove_observer(auction, observer_company_id)
 
       conn
       |> render("invite.json", %{
