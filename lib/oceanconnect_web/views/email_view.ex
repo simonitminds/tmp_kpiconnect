@@ -21,21 +21,9 @@ defmodule OceanconnectWeb.EmailView do
     end
   end
 
-  def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels, vessels: vessels}) do
-    Enum.map(vessels, fn vessel ->
-      eta =
-        vessel_fuels
-        |> Enum.map(fn vessel_fuel -> vessel_fuel.eta end)
-        |> Enum.filter(& &1)
-        |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
-
-      etd =
-        vessel_fuels
-        |> Enum.map(fn vessel_fuel -> vessel_fuel.etd end)
-        |> Enum.filter(& &1)
-        |> Enum.min_by(&DateTime.to_unix/1, fn -> nil end)
-
-      {vessel, eta, etd}
+  def auction_log_vessel_etas(%{auction_vessel_fuels: vessel_fuels}) do
+    Enum.map(vessel_fuels, fn vessel_fuel ->
+      {vessel_fuel.vessel, vessel_fuel.eta, vessel_fuel.etd}
     end)
   end
 
