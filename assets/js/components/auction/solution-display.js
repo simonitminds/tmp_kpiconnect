@@ -71,8 +71,7 @@ export default class SolutionDisplay extends React.Component {
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
     const acceptable = !!acceptSolution;
-    const revokable = isSupplier && revokeBid && !isBuyer;
-    console.log(revokable)
+    const revokable = isSupplier && revokeBid && !isBuyer && _.includes(['pending', 'open'], auctionStatus);
     const isExpanded = this.state.expanded;
 
     const bidsByFuel = _.chain(fuels)

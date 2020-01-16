@@ -58,6 +58,7 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
        conn: authed_conn,
        buyer: buyer,
        bid_params: bid_params,
+       fuel1: fuel1,
        supplier_company: supplier_company,
        supplier2_company: supplier2_company,
        vessel_fuel1: vessel_fuel1,
@@ -335,22 +336,42 @@ defmodule OceanconnectWeb.Api.BidControllerTest do
                "message" => "Bid successfully revoked"
              }
     end
+  end
 
-    test "revoking a bid for an auction in decision", %{
-      auction: auction,
-      conn: conn,
-      vessel_fuel1: vessel_fuel1
-    } do
-      Auctions.end_auction(auction)
-      :timer.sleep(100)
+  test "revoking a bid for a term auction in decision", %{
+    buyer: buyer,
+    supplier_company: supplier_company,
+    supplier2_company: supplier2_company,
+    conn: conn,
+    fuel1: fuel1
+  } do
+    term_auction =
+      insert(
+        :term_auction,
+        buyer: buyer.company,
+        suppliers: [supplier_company, supplier2_company]
+      )
+      |> Auctions.fully_loaded()
 
-      conn = revoke_post(conn, auction, %{"product" => vessel_fuel1.id})
+    Auctions.start_auction(term_auction)
 
-      assert json_response(conn, 200) == %{
-               "success" => true,
-               "message" => "Bid successfully revoked"
-             }
-    end
+    bid_params = %{
+      "bids" => %{
+        fuel1.id => %{"amount" => "3.50", "min_amount" => "", "allow_split" => true}
+      }
+    }
+
+    create_post(conn, term_auction, bid_params)
+
+    Auctions.end_auction(term_auction)
+    :timer.sleep(100)
+
+    conn = revoke_post(conn, term_auction, %{"product" => fuel1.id})
+
+    assert json_response(conn, 200) == %{
+             "success" => true,
+             "message" => "Bid successfully revoked"
+           }
   end
 
   describe "select winning bid" do

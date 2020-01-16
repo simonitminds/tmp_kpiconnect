@@ -163,18 +163,31 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
-  def revoke_supplier_bids_for_product(auction, product_id, supplier_id, user \\ nil) do
-    cond do
-      duration_time_remaining?(auction) == :ok or
-          decision_duration_time_remaining?(auction) == :ok ->
-        auction
-        |> Command.revoke_supplier_bids(product_id, supplier_id, user)
-        |> AuctionStore.process_command()
+  def revoke_supplier_bids_for_product(auction, product_id, supplier_id),
+    do: revoke_supplier_bids_for_product(auction, product_id, supplier_id, nil)
 
-        :ok
+  def revoke_supplier_bids_for_product(auction = %Auction{}, product_id, supplier_id, user) do
+    if duration_time_remaining?(auction) == :ok do
+      auction
+      |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+      |> AuctionStore.process_command()
 
-      true ->
-        {:error, "error while revoking bid"}
+      :ok
+    else
+      {:error, "error while revoking bid"}
+    end
+  end
+
+  def revoke_supplier_bids_for_product(auction = %TermAuction{}, product_id, supplier_id, user) do
+    if duration_time_remaining?(auction) == :ok or
+         decision_duration_time_remaining?(auction) == :ok do
+      auction
+      |> Command.revoke_supplier_bids(product_id, supplier_id, user)
+      |> AuctionStore.process_command()
+
+      :ok
+    else
+      {:error, "error while revoking bid"}
     end
   end
 
