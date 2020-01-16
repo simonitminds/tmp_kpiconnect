@@ -11,30 +11,12 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     AuctionEventStore,
     AuctionTimer,
     Command,
+    EventNotifier,
     SolutionCalculator,
     Solution,
     AuctionStore.AuctionState,
     AuctionStore.ProductBidState
   }
-
-  defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
-         supplier_id: supplier_id
-       }) do
-    !Enum.any?(
-      product_bids,
-      fn {_product_key, %ProductBidState{bids: bids}} ->
-        Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
-      end
-    )
-  end
-
-  defp is_lowest_bid?(
-         product_bids = %ProductBidState{},
-         bid = %AuctionBid{}
-       ) do
-    length(product_bids.lowest_bids) == 0 ||
-      hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
-  end
 
   ###
   # Commands
@@ -169,10 +151,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {will_extend, extension_time} = auction_will_extend(state, new_product_state, bid)
 
     extension_events =
-      case will_extend do
-        true -> [AuctionEvent.duration_extended(auction_id, extension_time)]
-        _ -> []
-      end
+      if will_extend, do: [AuctionEvent.duration_extended(auction_id, extension_time)], else: []
 
     {:ok,
      events ++
@@ -196,10 +175,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
     {will_extend, extension_time} = auction_will_extend(state, new_product_state, bid)
 
     extension_events =
-      case will_extend do
-        true -> [AuctionEvent.duration_extended(auction_id, extension_time)]
-        _ -> []
-      end
+      if will_extend, do: [AuctionEvent.duration_extended(auction_id, extension_time)], else: []
 
     {:ok,
      [
@@ -585,13 +561,18 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
   end
 
   def apply(
-        state = %AuctionState{},
-        %AuctionEvent{type: :auto_bid_triggered}
+        state = %AuctionState{auction_id: auction_id},
+        %AuctionEvent{type: :auto_bid_triggered, data: %{bid: bid, state: new_state}}
       ) do
+    {will_extend, extension_time} = AuctionTimer.should_extend?(auction_id)
+
+    if will_extend,
+      do: EventNotifier.emit(state, AuctionEvent.duration_extended(auction_id, extension_time))
+
     # auto_bid_triggered is a side-effect of `AuctionBidCalculator.process()`.
     # That function will always calculate the final state after all auto bids
     # have been updated, meaning that an application of the
-    # `auto_bid_triggered` event has no effect.
+    # `auto_bid_triggered` event has only a side-effect of extending the auction.
     {:ok, state}
   end
 
@@ -775,10 +756,25 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
 
   defp auction_will_extend(state = %AuctionState{auction_id: auction_id}, product_state, bid) do
     should_extend = is_lowest_bid?(product_state, bid) or is_suppliers_first_bid?(state, bid)
+    if should_extend, do: AuctionTimer.should_extend?(auction_id), else: {false, 0}
+  end
 
-    case should_extend do
-      true -> AuctionTimer.should_extend?(auction_id)
-      _ -> {false, 0}
-    end
+  defp is_suppliers_first_bid?(%AuctionState{product_bids: product_bids}, %AuctionBid{
+         supplier_id: supplier_id
+       }) do
+    !Enum.any?(
+      product_bids,
+      fn {_product_key, %ProductBidState{bids: bids}} ->
+        Enum.any?(bids, fn bid -> bid.supplier_id == supplier_id end)
+      end
+    )
+  end
+
+  defp is_lowest_bid?(
+         product_bids = %ProductBidState{},
+         bid = %AuctionBid{}
+       ) do
+    length(product_bids.lowest_bids) == 0 ||
+      hd(product_bids.lowest_bids).supplier_id == bid.supplier_id
   end
 end
