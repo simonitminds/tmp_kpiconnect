@@ -527,7 +527,7 @@ defmodule Oceanconnect.AuctionsTest do
     end
   end
 
-  describe "bid handling" do
+  describe "bid handling for spot auction" do
     alias Oceanconnect.Auctions.AuctionBid
 
     setup do
@@ -636,20 +636,119 @@ defmodule Oceanconnect.AuctionsTest do
       assert length(product_payload.bid_history) == 1
       assert length(product_payload.lowest_bids) == 0
     end
+  end
 
-    test "revoke_supplier_bids_for_product/4 succeeds when auction is in decision", %{
-      auction: auction,
-      vessel_fuel_id: vessel_fuel_id,
+  describe "bid handling for term auction" do
+    alias Oceanconnect.Auctions.AuctionBid
+
+    setup do
+      supplier_company = insert(:company, is_supplier: true)
+      buyer_company = insert(:company, is_supplier: false)
+
+      term_auction =
+        insert(:term_auction,
+          suppliers: [supplier_company],
+          buyer: buyer_company
+        )
+        |> Auctions.fully_loaded()
+
+      {:ok, _pid} =
+        start_supervised(
+          {Oceanconnect.Auctions.AuctionSupervisor,
+           {term_auction,
+            %{
+              exclude_children: [
+                :auction_reminder_timer,
+                :auction_event_handler,
+                :auction_scheduler
+              ]
+            }}}
+        )
+
+      Auctions.start_auction(term_auction)
+
+      on_exit(fn ->
+        case DynamicSupervisor.which_children(Oceanconnect.Auctions.AuctionsSupervisor) do
+          [] ->
+            nil
+
+          children ->
+            Enum.map(children, fn {_, pid, _, _} ->
+              Process.unlink(pid)
+              Process.exit(pid, :shutdown)
+            end)
+        end
+      end)
+
+      {:ok,
+       %{
+         term_auction: term_auction,
+         supplier_company: supplier_company
+       }}
+    end
+
+    test "place_bid/2 enters bid in bid_list and runs lowest_bid logic", %{
+      term_auction: term_auction,
       supplier_company: supplier_company
     } do
-      create_bid(1.25, nil, supplier_company.id, vessel_fuel_id, auction)
+      amount = 1.25
+
+      assert bid =
+               %AuctionBid{} =
+               create_bid(amount, nil, supplier_company.id, term_auction.fuel_id, term_auction)
+               |> Auctions.place_bid()
+
+      auction_payload =
+        Auctions.AuctionPayload.get_auction_payload!(term_auction, supplier_company.id)
+
+      product_payload = auction_payload.product_bids["#{term_auction.fuel_id}"]
+
+      assert hd(product_payload.bid_history).id == bid.id
+      assert hd(product_payload.lowest_bids).id == bid.id
+    end
+
+    test "revoke_supplier_bids_for_product/4 enters bid in bid_list and runs lowest_bid logic", %{
+      term_auction: term_auction,
+      supplier_company: supplier_company
+    } do
+      create_bid(1.50, nil, supplier_company.id, term_auction.fuel_id, term_auction)
       |> Auctions.place_bid()
 
-      Auctions.end_auction(auction)
+      :timer.sleep(100)
+
+      Auctions.revoke_supplier_bids_for_product(
+        term_auction,
+        term_auction.fuel_id,
+        supplier_company.id
+      )
+
+      auction_payload =
+        Auctions.AuctionPayload.get_auction_payload!(term_auction, supplier_company.id)
+
+      product_payload = auction_payload.product_bids["#{term_auction.fuel_id}"]
+
+      # `bid_history` still contains the bid for auditing, but it is not in
+      # `lowest_bids` because it is inactive.
+      assert length(product_payload.bid_history) == 1
+      assert length(product_payload.lowest_bids) == 0
+    end
+
+    test "revoke_supplier_bids_for_product/4 succeeds when term auction is in decision", %{
+      term_auction: term_auction,
+      supplier_company: supplier_company
+    } do
+      create_bid(1.25, nil, supplier_company.id, term_auction.fuel_id, term_auction)
+      |> Auctions.place_bid()
+
+      Auctions.end_auction(term_auction)
       :timer.sleep(50)
 
       result =
-        Auctions.revoke_supplier_bids_for_product(auction, vessel_fuel_id, supplier_company.id)
+        Auctions.revoke_supplier_bids_for_product(
+          term_auction,
+          term_auction.fuel_id,
+          supplier_company.id
+        )
 
       assert :ok = result
     end

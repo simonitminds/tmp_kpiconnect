@@ -425,26 +425,6 @@ defmodule Oceanconnect.AuctionShowTest do
       assert AuctionShowPage.auction_bid_status() =~ "You have the best overall offer"
     end
 
-    test "supplier can revoke their bid for a product during decision period", %{
-      auction: auction,
-      supplier: supplier,
-      vessel_fuel1: vessel_fuel1,
-      vessel_fuel2: vessel_fuel2
-    } do
-      login_user(supplier)
-      AuctionShowPage.visit(auction.id)
-      assert AuctionShowPage.auction_status() == "DECISION"
-
-      assert AuctionShowPage.auction_bid_status() =~
-               "You have the best overall offer"
-
-      AuctionShowPage.revoke_bid_for_product(vessel_fuel1)
-      :timer.sleep(500)
-      AuctionShowPage.revoke_bid_for_product(vessel_fuel2)
-      :timer.sleep(500)
-      assert AuctionShowPage.auction_bid_status() =~ "You have no bids for this auction"
-    end
-
     test "buyer view of decision period", %{
       auction: auction,
       supplier1_bid1: supplier1_bid1,
