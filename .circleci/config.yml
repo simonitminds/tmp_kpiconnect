@@ -119,7 +119,7 @@ jobs:
       - run:  # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run: mix test --trace --exclude feature # run non-feature tests
+      - run: mix test --exclude feature # run non-feature tests
 
   feature_test:
     docker:
@@ -151,7 +151,7 @@ jobs:
           name: Start Chromedriver
           command: chromedriver
           background: true
-      - run: mix test --trace --only feature  # run only feature tests
+      - run: mix test --only feature  # run only feature tests
 
   deploy_staging:
     docker:
@@ -198,23 +198,20 @@ workflows:
     jobs:
       - build:
           filters:
-            branches:
-              only:
-                - master
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
 
       - test:
           filters:
-            branches:
-              only:
-                - master
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
           requires:
             - build
 
       - feature_test:
           filters:
-            branches:
-              only:
-                - master
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
           requires:
             - build
 
