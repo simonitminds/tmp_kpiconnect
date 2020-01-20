@@ -609,7 +609,9 @@ defmodule Oceanconnect.Auctions do
 
   def persist_auction_from_cache(auction = %struct{id: auction_id}) when is_auction(struct) do
     attrs =
-      Map.take(auction, [:auction_started, :auction_ended, :auction_closed_time, :port_agent])
+      auction
+      |> Map.take([:auction_started, :auction_ended, :auction_closed_time, :port_agent])
+      |> Map.put(:finalized, true)
 
     Repo.get(struct, auction_id)
     |> struct.changeset(attrs)

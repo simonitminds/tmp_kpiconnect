@@ -17,7 +17,10 @@ defmodule Oceanconnect.Auctions.TermAuction do
     field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
     field(:auction_closed_time, :utc_datetime_usec)
+    field(:finalized, :boolean)
+    # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
+    # milliseconds
     field(:decision_duration, :integer, default: 15 * 60_000)
     field(:anonymous_bidding, :boolean)
     field(:is_traded_bid_allowed, :boolean)
@@ -85,9 +88,10 @@ defmodule Oceanconnect.Auctions.TermAuction do
     :auction_started,
     :buyer_id,
     :current_index_price,
-    :duration,
     :decision_duration,
+    :duration,
     :end_date,
+    :finalized,
     :fuel_index_id,
     :fuel_quantity,
     :total_fuel_volume,
