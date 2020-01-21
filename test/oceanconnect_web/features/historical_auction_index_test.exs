@@ -20,6 +20,7 @@ defmodule OceanconnectWeb.HistoricalAuctionIndexTest do
         auction_vessel_fuels: [vessel_fuel1],
         buyer: buyer_company,
         suppliers: [supplier_company],
+        finalized: true,
         claims: [
           insert(:claim,
             closed: false,
@@ -35,6 +36,7 @@ defmodule OceanconnectWeb.HistoricalAuctionIndexTest do
         auction_vessel_fuels: [vessel_fuel2],
         buyer: buyer_company,
         suppliers: [supplier_company2],
+        finalized: true,
         claims: [
           insert(:claim,
             closed: true,

@@ -36,7 +36,7 @@ defmodule Oceanconnect.Auctions.FinalizedAuctionCacheTest do
   end
 
   describe "starting the cache" do
-    test "creates entries for closed, canceled and expired auctions" do
+    setup do
       closed_auction =
         insert(:auction,
           auction_closed_time: DateTime.utc_now(),
@@ -44,22 +44,24 @@ defmodule Oceanconnect.Auctions.FinalizedAuctionCacheTest do
         )
 
       close_auction!(closed_auction)
+      finalized_auction = insert(:auction, finalized: true)
+      {:ok, %{closed_auction: closed_auction, finalized_auction: finalized_auction}}
+    end
 
+    test "creates entries for closed, canceled and expired auctions", %{
+      closed_auction: closed_auction,
+      finalized_auction: finalized_auction
+    } do
       {:ok, _pid} = FinalizedStateCache.start_link()
       :timer.sleep(2_000)
 
       assert {:ok, closed_state} = FinalizedStateCache.for_auction(closed_auction)
     end
 
-    test "does not add non closed auctions" do
-      closed_auction =
-        insert(:auction,
-          auction_closed_time: DateTime.utc_now(),
-          auction_ended: DateTime.utc_now()
-        )
-
-      close_auction!(closed_auction)
-
+    test "does not add non closed auctions", %{
+      closed_auction: closed_auction,
+      finalized_auction: finalized_auction
+    } do
       open_auction = insert(:auction)
       start_auction!(open_auction)
 

@@ -325,26 +325,33 @@ defmodule Oceanconnect.Auctions do
     Enum.any?(observers, &(&1.id == user_id))
   end
 
-  def list_auctions(%User{is_admin: true}), do: list_auctions()
-  def list_auctions(%User{id: user_id, is_observer: true}), do: list_observing_auctions(user_id)
-  def list_auctions(%User{company_id: company_id}), do: list_participating_auctions(company_id)
+  def list_auctions(), do: list_auctions(false)
+  def list_auctions(user = %User{}), do: list_auctions(user, false)
+  def list_auctions(%User{is_admin: true}, finalized?), do: list_auctions(finalized?)
 
-  def list_auctions do
+  def list_auctions(%User{id: user_id, is_observer: true}, finalized?),
+    do: list_observing_auctions(user_id, finalized?)
+
+  def list_auctions(%User{company_id: company_id}, finalized?),
+    do: list_participating_auctions(company_id, finalized?)
+
+  def list_auctions(finalized?) do
     regular_auctions =
-      from(a in Auction, where: a.type == "spot")
+      from(a in Auction, where: a.type == "spot" and a.finalized == ^finalized?)
       |> Repo.all()
       |> fully_loaded
 
     term_auctions =
-      from(ta in TermAuction, where: ta.type in @term_types)
+      from(ta in TermAuction, where: ta.type in @term_types and ta.finalized == ^finalized?)
       |> Repo.all()
       |> fully_loaded
 
     regular_auctions ++ term_auctions
   end
 
-  def list_observing_auctions(user_id) do
-    list_auctions()
+  defp list_observing_auctions(user_id, finalized?) do
+    finalized?
+    |> list_auctions()
     |> Enum.filter(fn auction ->
       auction.observers
       |> Enum.any?(&(&1.id == user_id))
@@ -352,50 +359,25 @@ defmodule Oceanconnect.Auctions do
     |> Enum.uniq_by(& &1.id)
   end
 
-  def list_participating_auctions(company_id) do
-    (buyer_auctions(company_id) ++
-       buyer_term_auctions(company_id) ++
-       supplier_auctions(company_id) ++
-       supplier_term_auctions(company_id))
+  def list_participating_auctions(company_id), do: list_participating_auctions(company_id, false)
+
+  def list_participating_auctions(company_id, finalized?) do
+    (buyer_auctions(company_id, finalized?) ++
+       buyer_term_auctions(company_id, finalized?) ++
+       supplier_auctions(company_id, finalized?) ++
+       supplier_term_auctions(company_id, finalized?))
     |> Enum.uniq_by(& &1.id)
   end
 
   def list_finalized_auctions(user = %User{}) do
-    user
-    |> list_auctions()
-    |> Enum.filter(&auction_finalized?/1)
+    list_auctions(user, true)
   end
 
-  defp auction_finalized?(auction = %struct{}) when is_auction(struct) do
-    state = get_auction_state!(auction)
-    state.status in [:closed, :canceled, :expired]
-  end
-
-  def list_upcoming_auctions(time_frame) do
-    regular_auctions =
-      Auction
-      |> Auction.select_upcoming(time_frame)
-      |> Repo.all()
-
-    term_auctions =
-      TermAuction
-      |> TermAuction.select_upcoming(time_frame)
-      |> Repo.all()
-
-    regular_auctions ++ term_auctions
-  end
-
-  def upcoming_notification_sent?(%struct{id: auction_id}) when is_auction(struct) do
-    Enum.any?(AuctionEventStore.event_list(auction_id), fn event ->
-      event.type == :auction_upcoming_notified
-    end)
-  end
-
-  defp buyer_auctions(buyer_id) do
+  defp buyer_auctions(buyer_id, finalized?) do
     query =
       from(
         a in Auction,
-        where: a.buyer_id == ^buyer_id and a.type == "spot",
+        where: a.buyer_id == ^buyer_id and a.type == "spot" and a.finalized == ^finalized?,
         order_by: a.scheduled_start
       )
 
@@ -404,21 +386,21 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  defp buyer_term_auctions(buyer_id) do
+  defp buyer_term_auctions(buyer_id, finalized?) do
     from(
       ta in TermAuction,
-      where: ta.buyer_id == ^buyer_id and ta.type in @term_types,
+      where: ta.buyer_id == ^buyer_id and ta.type in @term_types and ta.finalized == ^finalized?,
       order_by: ta.scheduled_start
     )
     |> Repo.all()
     |> fully_loaded
   end
 
-  defp supplier_auctions(supplier_id) do
+  defp supplier_auctions(supplier_id, finalized?) do
     from(
       as in AuctionSuppliers,
       join: a in Auction,
-      on: a.id == as.auction_id and a.type == "spot",
+      on: a.id == as.auction_id and a.type == "spot" and a.finalized == ^finalized?,
       where: as.supplier_id == ^supplier_id,
       where: not is_nil(a.scheduled_start),
       select: a,
@@ -428,11 +410,11 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded
   end
 
-  defp supplier_term_auctions(supplier_id) do
+  defp supplier_term_auctions(supplier_id, finalized?) do
     from(
       as in AuctionSuppliers,
       join: ta in TermAuction,
-      on: ta.id == as.term_auction_id and ta.type in @term_types,
+      on: ta.id == as.term_auction_id and ta.type in @term_types and ta.finalized == ^finalized?,
       where: as.supplier_id == ^supplier_id,
       where: not is_nil(ta.scheduled_start),
       select: ta,

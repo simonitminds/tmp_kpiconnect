@@ -20,7 +20,8 @@ defmodule OceanconnectWeb.Claims.ShowTest do
       insert(
         :auction,
         buyer: buyer_company,
-        suppliers: [supplier_company]
+        suppliers: [supplier_company],
+        finalized: true
       )
       |> Auctions.fully_loaded()
 

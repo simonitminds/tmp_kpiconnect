@@ -25,6 +25,8 @@ defmodule Oceanconnect.AuctionsTest do
     setup do
       auction = insert(:auction, @valid_attrs) |> Auctions.fully_loaded()
       term_auction = insert(:term_auction) |> Auctions.fully_loaded()
+      finalized_auction = insert(:auction, finalized: true) |> Auctions.fully_loaded()
+      finalized_term_auction = insert(:term_auction, finalized: true) |> Auctions.fully_loaded()
 
       port = insert(:port)
       vessel = insert(:vessel)
@@ -43,6 +45,8 @@ defmodule Oceanconnect.AuctionsTest do
        %{
          auction: Auctions.get_auction!(auction.id),
          term_auction: Auctions.get_auction!(term_auction.id),
+         finalized_auction: finalized_auction,
+         finalized_term_auction: finalized_term_auction,
          port: port,
          vessel: vessel,
          fuel: fuel,
@@ -236,32 +240,75 @@ defmodule Oceanconnect.AuctionsTest do
       assert changeset.valid?
     end
 
-    test "list_auctions/0 returns all auctions", %{auction: auction, term_auction: term_auction} do
+    test "list_auctions/0 returns all non-finalized auctions", %{
+      auction: auction,
+      term_auction: term_auction
+    } do
       assert Auctions.list_auctions()
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
              |> MapSet.equal?(MapSet.new([auction.id, term_auction.id]))
     end
 
-    test "list_participating_auctions/1 returns all auctions a company is a participant in", %{
-      auction: auction
+    test "list_auctions/1 with false returns all non-finalized auctions", %{
+      auction: auction,
+      term_auction: term_auction
     } do
+      assert Auctions.list_auctions(false)
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([auction.id, term_auction.id]))
+    end
+
+    test "list_auctions/1 with true returns all finalized auctions", %{
+      finalized_auction: finalized_auction,
+      finalized_term_auction: finalized_term_auction
+    } do
+      assert Auctions.list_auctions(true)
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([finalized_auction.id, finalized_term_auction.id]))
+    end
+
+    test "list_participating_auctions/2 with false returns all active auctions a company is a participant in",
+         %{
+           auction: auction
+         } do
       supplier_auction = insert(:auction, suppliers: [Repo.preload(auction, [:buyer]).buyer])
       insert(:auction)
 
-      assert Auctions.list_participating_auctions(auction.buyer_id)
+      assert Auctions.list_participating_auctions(auction.buyer_id, false)
              |> Enum.map(fn a -> a.id end)
              |> MapSet.new()
              |> MapSet.equal?(MapSet.new([auction.id, supplier_auction.id]))
     end
 
-    test "list_participating_auctions/1 doesn't return draft auctions" do
-      supplier_company = insert(:company, is_supplier: true)
-      insert(:auction, scheduled_start: nil, suppliers: [supplier_company])
-      assert Auctions.list_participating_auctions(supplier_company.id) == []
+    test "list_participating_auctions/2 with true returns all finalized auctions a company is a participant in",
+         %{
+           finalized_auction: finalized_auction
+         } do
+      supplier_auction =
+        insert(:auction,
+          suppliers: [Repo.preload(finalized_auction, [:buyer]).buyer],
+          finalized: true
+        )
+
+      insert(:auction, finalized: true)
+
+      assert Auctions.list_participating_auctions(finalized_auction.buyer_id, true)
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([finalized_auction.id, supplier_auction.id]))
     end
 
-    test "list_participating_auctions/1 orders on scheduled_start" do
+    test "list_participating_auctions/2 doesn't return draft auctions" do
+      supplier_company = insert(:company, is_supplier: true)
+      insert(:auction, scheduled_start: nil, suppliers: [supplier_company])
+      assert Auctions.list_participating_auctions(supplier_company.id, false) == []
+      assert Auctions.list_participating_auctions(supplier_company.id, true) == []
+    end
+
+    test "list_participating_auctions/2 orders on scheduled_start" do
       supplier_company = insert(:company, is_supplier: true)
 
       {:ok, first_date, _} = DateTime.from_iso8601("2018-01-01T00:00:00Z")
@@ -279,8 +326,8 @@ defmodule Oceanconnect.AuctionsTest do
       auction_five = insert(:auction, scheduled_start: third_date, buyer: supplier_company)
       auction_six = insert(:auction, scheduled_start: first_date, buyer: supplier_company)
 
-      auctions =
-        Enum.map(Auctions.list_participating_auctions(supplier_company.id), fn a -> a.id end)
+      auction_ids =
+        Enum.map(Auctions.list_participating_auctions(supplier_company.id, false), & &1.id)
 
       assert [
                auction_six.id,
@@ -289,7 +336,19 @@ defmodule Oceanconnect.AuctionsTest do
                auction_two.id,
                auction_three.id,
                auction_one.id
-             ] == auctions
+             ] == auction_ids
+    end
+
+    test "list_finalized_auctions/1 returns only auctions in finalized status for a user", %{
+      finalized_auction: finalized_auction,
+      finalized_term_auction: finalized_term_auction
+    } do
+      admin = insert(:user, is_admin: true)
+
+      assert Auctions.list_finalized_auctions(admin)
+             |> Enum.map(fn a -> a.id end)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([finalized_auction.id, finalized_term_auction.id]))
     end
 
     test "get_auction!/1 returns a spot auction with given id", %{auction: auction} do

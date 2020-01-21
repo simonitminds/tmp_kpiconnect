@@ -20,17 +20,10 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
   end
 
   def handle_info(:populate_finalized_auction_cache, _) do
-    new_state =
-      Auctions.list_auctions()
-      |> Enum.each(fn auction = %{id: auction_id} ->
-        state = %{status: status} = AuctionEventStorage.most_recent_state(auction)
+    add_finalized_auctions()
+    add_newly_finalized_auctions()
 
-        if status in [:expired, :canceled, :closed] do
-          add_entry_to_cache(auction_id, state)
-        end
-      end)
-
-    {:noreply, new_state}
+    {:noreply, %{}}
   end
 
   def handle_call({:add_auction, auction_id, state}, _from, current_state) do
@@ -85,4 +78,25 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
 
   defp add_entry_to_cache(auction_id, state),
     do: :ets.insert(:finalized_state_cache, {auction_id, state})
+
+  defp add_finalized_auctions do
+    true
+    |> Auctions.list_auctions()
+    |> Enum.each(fn auction = %{id: auction_id} ->
+      state = AuctionEventStorage.most_recent_state(auction)
+      add_entry_to_cache(auction_id, state)
+    end)
+  end
+
+  defp add_newly_finalized_auctions do
+    false
+    |> Auctions.list_auctions()
+    |> Enum.each(fn auction = %{id: auction_id} ->
+      state = %{status: status} = AuctionEventStorage.most_recent_state(auction)
+
+      if status in [:expired, :canceled, :closed] do
+        add_entry_to_cache(auction_id, state)
+      end
+    end)
+  end
 end
