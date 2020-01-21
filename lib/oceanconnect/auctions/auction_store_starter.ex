@@ -16,11 +16,8 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
 
   def handle_info(:start_auction_stores, _) do
     results =
-      Auctions.list_auctions()
-      |> Enum.filter(fn auction ->
-        %{status: status} = Oceanconnect.Auctions.AuctionEventStorage.most_recent_state(auction)
-        status in [:draft, :pending, :open, :decision]
-      end)
+      false
+      |> Auctions.list_auctions()
       |> Enum.map(fn auction ->
         with {:ok, core_services_pid} <-
                AuctionsSupervisor.start_child(auction) do

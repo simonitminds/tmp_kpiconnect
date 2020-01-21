@@ -41,6 +41,7 @@ defmodule Oceanconnect.Auctions.Auction do
     field(:auction_started, :utc_datetime_usec)
     field(:auction_ended, :utc_datetime_usec)
     field(:auction_closed_time, :utc_datetime_usec)
+    field(:finalized, :boolean)
     # milliseconds
     field(:duration, :integer, default: 10 * 60_000)
     # milliseconds
@@ -90,6 +91,7 @@ defmodule Oceanconnect.Auctions.Auction do
     :buyer_reference_number,
     :decision_duration,
     :duration,
+    :finalized,
     :is_traded_bid_allowed,
     :po,
     :port_agent,
