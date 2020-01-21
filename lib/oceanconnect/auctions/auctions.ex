@@ -133,7 +133,7 @@ defmodule Oceanconnect.Auctions do
     bid
   end
 
-  def make_bids(auction, bids_params, supplier_id, time_entered) do
+  defp make_bids(auction, bids_params, supplier_id, time_entered) do
     Enum.reduce_while(bids_params, {:ok, []}, fn {product_id, bid_params}, {:ok, acc} ->
       case make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
         {:ok, bid} -> {:cont, {:ok, acc ++ [bid]}}
@@ -142,7 +142,7 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  def make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
+  defp make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
     with bid_params <- maybe_add_amount(bid_params),
          bid_params <- maybe_add_min_amount(bid_params),
          bid_params <- convert_amounts(bid_params),
