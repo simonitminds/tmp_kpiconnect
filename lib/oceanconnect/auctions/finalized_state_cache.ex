@@ -2,7 +2,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
   use GenServer
   import Oceanconnect.Auctions.Guards
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionEventStorage}
+  alias Oceanconnect.Auctions.AuctionEventStorage
 
   # Server
   def start_link(_) do

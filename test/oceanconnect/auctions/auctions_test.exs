@@ -427,11 +427,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert auction == Auctions.get_auction!(auction.id)
     end
 
-    test "delete_auction/1 deletes the auction", %{auction: auction} do
-      assert {:ok, %Auction{}} = Auctions.delete_auction(auction)
-      assert_raise Ecto.NoResultsError, fn -> Auctions.get_auction!(auction.id) end
-    end
-
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end

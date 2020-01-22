@@ -45,7 +45,8 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
        supplier_2: supplier_2,
        supplier_user: supplier_user,
        supplier_user2: supplier_user2,
-       vessel_fuel_id: vessel_fuel_id
+       vessel_fuel_id: vessel_fuel_id,
+       vessel_fuel: vessel_fuel
      }}
   end
 
@@ -65,6 +66,20 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
       assert supplier.name in Enum.map(payload.bid_history, & &1.supplier)
       assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
       assert auction_payload.status == :open
+    end
+
+    test "returns buyer payload that includes supplier coqs", %{
+      auction: auction,
+      supplier: supplier,
+      vessel_fuel: vessel_fuel
+    } do
+      supplier_coq = insert(:auction_supplier_coq, auction: auction)
+      IO.inspect({supplier_coq.auction_id, supplier_coq.supplier_id, supplier_coq.fuel_id})
+      IO.inspect({auction.id, supplier.id, vessel_fuel})
+      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+
+      IO.inspect(auction_payload, label: "PAYLOAD: ")
+      payload = auction_payload.product_bids[vessel_fuel.id]
     end
 
     test "returns correct amount in the payload for a supplier", %{

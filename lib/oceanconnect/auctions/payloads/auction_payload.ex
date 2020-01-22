@@ -39,7 +39,11 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
             observers: [],
             available_observers: []
 
-  def get_auction_payload!(auction = %struct{}, company_id) when is_auction(struct) do
+  def get_auction_payload!(auction, company_id) when is_bitstring(company_id),
+    do: get_auction_payload!(auction, String.to_integer(company_id))
+
+  def get_auction_payload!(auction = %struct{}, company_id)
+      when is_auction(struct) and is_integer(company_id) do
     auction_state = Auctions.get_auction_state!(auction)
     get_auction_payload!(auction, company_id, auction_state)
   end

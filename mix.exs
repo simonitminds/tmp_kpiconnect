@@ -45,6 +45,10 @@ defmodule Oceanconnect.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:poison, "~> 3.1"},
+      {:sweet_xml, "~> 0.6"},
       {:bamboo, "~> 1.1"},
       {:bcrypt_elixir, "~> 1.1"},
       {:comeonin, "~> 4.0"},

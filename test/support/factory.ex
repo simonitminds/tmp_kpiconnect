@@ -34,6 +34,16 @@ defmodule Oceanconnect.Factory do
     |> set_password
   end
 
+  def auction_supplier_coq_factory() do
+    auction = build(:auction)
+
+    %Oceanconnect.Auctions.AuctionSupplierCOQ{
+      auction: auction,
+      supplier: List.first(auction.suppliers),
+      fuel: auction.auction_vessel_fuels |> List.first() |> Map.get(:fuel)
+    }
+  end
+
   def draft_auction_factory() do
     %Oceanconnect.Auctions.Auction{
       port: build(:port)
@@ -140,7 +150,7 @@ defmodule Oceanconnect.Factory do
 
   def fuel_factory() do
     %Oceanconnect.Auctions.Fuel{
-      name: "New Fuel"
+      name: sequence(:name, &"New Fuel #{&1}")
     }
   end
 
