@@ -59,7 +59,6 @@ $navbar-background-color: $primary;
 }
 
 // Additions
-
 .navbar-item {
 
   &--user {
@@ -75,6 +74,10 @@ $navbar-background-color: $primary;
 
     &> .navbar-link {
       width: 152px;
+    }
+
+    &:hover .navbar-dropdown {
+      display: block;
     }
   }
 }
