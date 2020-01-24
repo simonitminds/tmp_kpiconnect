@@ -54,14 +54,43 @@ will require re-building/deploying (manually or through CircleCI deployment) bef
 
 # OCM Notes
 ```
-       __ Users _______
-      /    |           \
-Buyers     Suppliers       Admin
+       __ Users __________________
+      /    |           \          \
+Buyers     Suppliers     Admin      Observers
    |          |   \
  Vessels   Ports   Barges
    |        /
 Auction-----
 ```
+
+## Auction Information
+Auctions can be 2 basic types (Spot and Term) with the same basic behavior (especially during live bidding). An auction
+can have the following statuses:
+
+* DRAFT - no scheduled start_date entered
+* PENDING - has not started
+* OPEN - active auction in bidding phase
+* DECISION - bidding is closed and buyer is deciding on winning bid
+* CLOSED - buyer accepted a winning bid
+* EXPIRED - buyer did not select a winning bid before the decision time expired
+* CANCELED - auction was canceled by the buyer or admin
+
+The final 3 statuses [CLOSED, EXPIRED, CANCELED] known as `finalized` states are categorized as historical auctions.
+
+## Code Architecture
+This codebase implements an event driven architecture and uses an auction cache Genserver to keep auction details and
+auction state (including the current status) for auctions not in `finalized` state in memory for fast retrieval. Commands
+are processed by the AuctionStore for the type of auction, producing events that are processed and emitted. Auction
+events are persisted (with the event payload) and can be used to rebuild the state of an auction at any point in time.
+These auction events are all processed by an AuctionEventHandler that takes appropriate action for each event in FIFO.
+Auction bids (submitted when PENDING or OPEN) are time-stamped upon receipt by the server and processed sequentially,
+triggering any auto-bids necessary based on any minimum bids submitted by suppliers. All notifications for auction
+events are published using the following:
+
+* Phoenix Pub-Sub - for internal notifications to process that need to asynchronously react
+* AuctionNotifier - for broadcasting live updates to clients subscribed to the respective auction channel
+* EmailNotifier - for sending out emails for relevant events
+* DelayedNotifications - for sending emails that are sent with a delay from the trigger event (staring soon emails, etc)
 
 
 ### Ports
