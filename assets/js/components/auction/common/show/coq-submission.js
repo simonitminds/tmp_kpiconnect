@@ -32,23 +32,36 @@ class COQSubmission extends React.Component {
 
   render() {
     const { auctionPayload, deleteCOQ, supplierId } = this.props;
-    const auction = auctionPayload.auction
+    const auction = auctionPayload.auction;
     const supplierCOQs = auction.auction_supplier_coqs;
     const fuels = auction.fuels;
     const auctionState = auctionPayload.status;
-    const renderCOQUploadForm = (fuel) => {
+    const renderCOQ = (fuel) => {
       return (
         <div className={`qa-coq-${fuel.id}`} key={fuel.id}>
-          <form onSubmit={this.submitForm.bind(this)}>
-            {fuel.name}
-            {renderCOQLink(auction.id, fuel.id, supplierId, supplierCOQs)}
-            <input name="coq" type="file" id={`coq-${fuel.id}`} />
-            <input name="fuelId" hidden={true} defaultValue={fuel.id} ref={(ref) => { this.fuelId = ref; }} />
-            {renderSubmitButton()}
-          </form>
+          {fuel.name}
+          {renderCOQLink(auction.id, fuel.id, supplierId, supplierCOQs)}
+          {renderCOQForm(fuel)}
         </div>
       );
     };
+
+    const renderCOQForm = (fuel) => {
+      if (!displayCOQForm()) { return; }
+
+      return (
+        <form onSubmit={this.submitForm.bind(this)}>
+          <input name="coq" type="file" id={`coq-${fuel.id}`} />
+          <input name="fuelId" hidden={true} defaultValue={fuel.id} ref={(ref) => { this.fuelId = ref; }} />
+          {renderSubmitButton()}
+        </form>
+      )
+    }
+
+    const displayCOQForm = () => {
+      if (window.isAdmin || auctionState === 'pending' || auctionState === 'open') { return true; }
+      return false;
+    }
 
     const renderCOQLink = (auctionId, fuelId, supplierId, supplierCOQs) => {
       const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuelId, 'supplier_id': parseInt(supplierId) });
@@ -76,7 +89,7 @@ class COQSubmission extends React.Component {
         <div className="box__subsection has-padding-bottom-none">
           <h3 className="box__header">COQs</h3>
           <div className="qa-coqs">
-            {fuels.map(renderCOQUploadForm)}
+            {fuels.map(renderCOQ)}
           </div>
         </div>
       </div>
