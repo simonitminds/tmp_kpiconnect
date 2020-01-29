@@ -298,8 +298,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.drop([:buyer, :buyer_reference_number, :additional_information])
   end
 
-  defp scrub_auction(auction = %struct{}, _supplier_id) when is_auction(struct) do
-    Map.delete(auction, :suppliers)
+  defp scrub_auction(auction = %struct{}, supplier_id) when is_auction(struct) do
+    auction
+    |> Map.drop([:observers, :suppliers])
+    |> filter_supplier_coqs(supplier_id)
   end
 
   defp scrub_vessel(vessel, counter), do: %{vessel | name: "Vessel #{counter}", imo: 12345}
@@ -325,17 +327,14 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
     |> Map.delete(:supplier_id)
   end
 
-  # defp scrub_bid_for_buyer(nil, _buyer_id, _auction), do: nil
-  #
-  # defp scrub_bid_for_buyer(bid = %AuctionBid{}, _buyer_id, auction = %struct{})
-  #      when is_auction(struct) do
-  #   supplier = AuctionSuppliers.get_name_or_alias(bid.supplier_id, auction)
-  #
-  #   %{bid | supplier_id: nil, min_amount: nil}
-  #   |> Map.from_struct()
-  #   |> Map.put(:product, product_for_bid(bid, auction))
-  #   |> Map.put(:supplier, supplier)
-  # end
+  defp filter_supplier_coqs(auction = %{auction_supplier_coqs: supplier_coqs}, supplier_id) do
+    %{
+      auction
+      | auction_supplier_coqs: Enum.filter(supplier_coqs, &(&1.supplier_id == supplier_id))
+    }
+  end
+
+  defp filter_supplier_coqs(auction, _supplier_id), do: auction
 
   defp product_for_bid(bid, %Auction{auction_vessel_fuels: vessel_fuels}) do
     vf = Enum.find(vessel_fuels, &("#{&1.id}" == bid.vessel_fuel_id))

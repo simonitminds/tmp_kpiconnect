@@ -71,15 +71,41 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "returns buyer payload that includes supplier coqs", %{
       auction: auction,
       supplier: supplier,
+      supplier_2: supplier_2,
       vessel_fuel: vessel_fuel
     } do
-      supplier_coq = insert(:auction_supplier_coq, auction: auction)
-      IO.inspect({supplier_coq.auction_id, supplier_coq.supplier_id, supplier_coq.fuel_id})
-      IO.inspect({auction.id, supplier.id, vessel_fuel})
-      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+      supplier_coq = create_auction_supplier_coq(auction, supplier)
+      supplier_coq_2 = create_auction_supplier_coq(auction, supplier_2)
 
-      IO.inspect(auction_payload, label: "PAYLOAD: ")
-      payload = auction_payload.product_bids[vessel_fuel.id]
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded(true)
+        |> AuctionPayload.get_auction_payload!(auction.buyer_id)
+
+      assert MapSet.equal?(
+               MapSet.new(Enum.map(auction_payload.auction.auction_supplier_coqs, & &1.id)),
+               MapSet.new([supplier_coq.id, supplier_coq_2.id])
+             )
+    end
+
+    test "returns supplier payload with only that supplier's coqs", %{
+      auction: auction,
+      supplier: supplier,
+      supplier_2: supplier_2,
+      vessel_fuel: vessel_fuel
+    } do
+      supplier_coq = create_auction_supplier_coq(auction, supplier)
+      supplier_coq_2 = create_auction_supplier_coq(auction, supplier_2)
+
+      auction_payload =
+        auction
+        |> Auctions.fully_loaded(true)
+        |> AuctionPayload.get_auction_payload!(supplier.id)
+
+      assert MapSet.equal?(
+               MapSet.new(Enum.map(auction_payload.auction.auction_supplier_coqs, & &1.id)),
+               MapSet.new([supplier_coq.id])
+             )
     end
 
     test "returns correct amount in the payload for a supplier", %{

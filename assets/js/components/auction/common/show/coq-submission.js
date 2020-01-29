@@ -36,6 +36,23 @@ class COQSubmission extends React.Component {
     const supplierCOQs = auction.auction_supplier_coqs;
     const fuels = auction.fuels;
     const auctionState = auctionPayload.status;
+    const validAuctionState = auctionState === 'pending' || auctionState === 'open';
+
+    const renderCOQComponent = () => {
+      if (window.isAdmin || validAuctionState || (!validAuctionState && supplierCOQs.length != 0) ) {
+        return (
+          <div className="box has-margin-bottom-md has-padding-bottom-none">
+            <div className="box__subsection has-padding-bottom-none">
+              <h3 className="box__header">COQs</h3>
+              <div className="qa-coqs">
+                {fuels.map(renderCOQ)}
+              </div>
+            </div>
+          </div>
+        )
+      }
+    }
+
     const renderCOQ = (fuel) => {
       return (
         <div className={`qa-coq-${fuel.id}`} key={fuel.id}>
@@ -47,20 +64,15 @@ class COQSubmission extends React.Component {
     };
 
     const renderCOQForm = (fuel) => {
-      if (!displayCOQForm()) { return; }
-
-      return (
-        <form onSubmit={this.submitForm.bind(this)}>
-          <input name="coq" type="file" id={`coq-${fuel.id}`} />
-          <input name="fuelId" hidden={true} defaultValue={fuel.id} ref={(ref) => { this.fuelId = ref; }} />
-          {renderSubmitButton()}
-        </form>
-      )
-    }
-
-    const displayCOQForm = () => {
-      if (window.isAdmin || auctionState === 'pending' || auctionState === 'open') { return true; }
-      return false;
+      if (window.isAdmin || validAuctionState) {
+        return (
+          <form onSubmit={this.submitForm.bind(this)}>
+            <input name="coq" type="file" id={`coq-${fuel.id}`} />
+            <input name="fuelId" hidden={true} defaultValue={fuel.id} ref={(ref) => { this.fuelId = ref; }} />
+            {renderSubmitButton()}
+          </form>
+        )
+      }
     }
 
     const renderCOQLink = (auctionId, fuelId, supplierId, supplierCOQs) => {
@@ -70,7 +82,7 @@ class COQSubmission extends React.Component {
         return (
           <div>
             <a href={`/supplier_coq/${supplierCOQ.id}`} target="_blank">View COQ</a>
-            <a className="button is-danger has-margin-top-sm" onClick={(e) => deleteCOQ(supplierCOQ.id)}>Delete</a>
+            { (window.isAdmin || validAuctionState) ? <a className="button is-danger has-margin-top-sm" onClick={(e) => deleteCOQ(supplierCOQ.id)}>Delete</a> : "" }
           </div>
         )
       }
@@ -85,13 +97,8 @@ class COQSubmission extends React.Component {
     }
 
     return (
-      <div className="box has-margin-bottom-md has-padding-bottom-none">
-        <div className="box__subsection has-padding-bottom-none">
-          <h3 className="box__header">COQs</h3>
-          <div className="qa-coqs">
-            {fuels.map(renderCOQ)}
-          </div>
-        </div>
+      <div>
+        { renderCOQComponent() }
       </div>
     );
   }

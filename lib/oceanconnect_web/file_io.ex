@@ -22,7 +22,6 @@ defmodule OceanconnectWeb.FileIO do
       "#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
     )
     |> ExAws.request!()
-    |> IO.inspect()
 
     :ok
   end
