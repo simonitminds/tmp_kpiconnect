@@ -14,6 +14,7 @@ import {
   rejectBarge,
   submitBid,
   revokeBid,
+  removeCOQ,
   submitCOQ,
   submitComment,
   unsubmitComment,
@@ -48,6 +49,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   addCOQ(auctionId, supplierId, fuelId, spec) {
     dispatch(submitCOQ(auctionId, supplierId, fuelId, spec));
+  },
+  deleteCOQ(coqId) {
+    dispatch(removeCOQ(coqId));
   },
   addCommentToSolution(auctionId, formData) {
     dispatch(submitComment(auctionId, formData));
@@ -116,7 +120,7 @@ export class AuctionContainer extends React.Component {
     if (this.props.loading) {
       return <div className="alert is-info">Loading...</div>
     } else {
-      return <AuctionShow {...this.props}/>
+      return <AuctionShow {...this.props} />
     }
   }
 }

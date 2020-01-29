@@ -10,6 +10,8 @@ import COQSubmission from '../../common/show/coq-submission';
 
 const SupplierSidebar = (props) => {
   const {
+    addCOQ,
+    deleteCOQ,
     auctionPayload,
     submitBargeForm,
     unsubmitBargeForm,
@@ -21,7 +23,7 @@ const SupplierSidebar = (props) => {
 
   return (
     <React.Fragment>
-      { (status == 'pending' || status == 'open') &&
+      {(status == 'pending' || status == 'open') &&
         <AuctionInvitation auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       }
 
@@ -33,6 +35,8 @@ const SupplierSidebar = (props) => {
         supplierId={currentUserCompanyId}
       />
       <COQSubmission
+        addCOQ={addCOQ}
+        deleteCOQ={deleteCOQ}
         auctionPayload={auctionPayload}
         supplierId={currentUserCompanyId}
       />

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {Socket} from "phoenix"
+import { Socket } from "phoenix"
 import thunk from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
@@ -35,12 +35,12 @@ import {
 } from "./constants";
 
 let auctionChannel, connection, messageChannel, socket;
-if(window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
-  socket = new Socket("/socket", {params: {token: window.userToken}});
+if (window.userToken && window.userToken != "" && window.companyId && window.companyId != "") {
+  socket = new Socket("/socket", { params: { token: window.userToken } });
   socket.connect();
 
-  auctionChannel = socket.channel(`user_auctions:${window.companyId}`, {token: window.userToken});
-  messageChannel = socket.channel(`user_messages:${window.companyId}`, {token: window.userToken});
+  auctionChannel = socket.channel(`user_auctions:${window.companyId}`, { token: window.userToken });
+  messageChannel = socket.channel(`user_messages:${window.companyId}`, { token: window.userToken });
 };
 
 const defaultHeaders = {
@@ -54,22 +54,22 @@ export function subscribeToAuctionUpdates(dispatchAction) {
   return (dispatch, getState) => {
     auctionChannel.join()
       .receive("ok", resp => {
-        dispatch({type: AUCTION_CHANNEL_CONNECTED});
+        dispatch({ type: AUCTION_CHANNEL_CONNECTED });
         dispatch(dispatchAction());
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     auctionChannel.on("auctions_update", payload => {
-      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload});
+      dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: payload });
     });
 
-    auctionChannel.on("remove_auction", ( id ) => {
-      dispatch({type: REMOVE_AUCTION, auctionId: id});
+    auctionChannel.on("remove_auction", (id) => {
+      dispatch({ type: REMOVE_AUCTION, auctionId: id });
     });
 
-    auctionChannel.onError( () => {
+    auctionChannel.onError(() => {
       connection = getState().auctionsReducer.connection;
-      if (connection) {dispatch({type: AUCTION_CHANNEL_DISCONNECTED})};
+      if (connection) { dispatch({ type: AUCTION_CHANNEL_DISCONNECTED }) };
     });
   };
 }
@@ -78,49 +78,57 @@ export function subscribeToMessageUpdates() {
   return (dispatch, getState) => {
     messageChannel.join()
       .receive("ok", resp => {
-        dispatch({type: MESSAGE_CHANNEL_CONNECTED});
+        dispatch({ type: MESSAGE_CHANNEL_CONNECTED });
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
 
     messageChannel.on("messages_update", payload => {
-      dispatch({type: UPDATE_MESSAGE_PAYLOAD, messagePayloads: payload.message_payloads});
+      dispatch({ type: UPDATE_MESSAGE_PAYLOAD, messagePayloads: payload.message_payloads });
     });
 
-    messageChannel.onError( () => {
+    messageChannel.onError(() => {
       connection = getState().messagesReducer.connection;
-      if (connection) {dispatch({type: MESSAGE_CHANNEL_DISCONNECTED})};
+      if (connection) { dispatch({ type: MESSAGE_CHANNEL_DISCONNECTED }) };
     });
   };
 }
 
 export function expandMessagesAuction(auctionId, value) {
-  return {type: EXPAND_MESSAGES_AUCTION,
-          auctionId};
+  return {
+    type: EXPAND_MESSAGES_AUCTION,
+    auctionId
+  };
 }
 
 export function expandMessagesConversation(auctionId, conversation, value) {
-  return {type: EXPAND_MESSAGES_CONVERSATION,
-          auctionId,
-          conversation};
+  return {
+    type: EXPAND_MESSAGES_CONVERSATION,
+    auctionId,
+    conversation
+  };
 }
 export function collapseMessagesAuction(auctionId, value) {
-  return {type: COLLAPSE_MESSAGES_AUCTION,
-          auctionId};
+  return {
+    type: COLLAPSE_MESSAGES_AUCTION,
+    auctionId
+  };
 }
 
 export function collapseMessagesConversation(auctionId, conversation, value) {
-  return {type: COLLAPSE_MESSAGES_CONVERSATION,
-          auctionId,
-          conversation};
+  return {
+    type: COLLAPSE_MESSAGES_CONVERSATION,
+    auctionId,
+    conversation
+  };
 }
 
 export function markMessagesAsSeen(messageIds) {
-  messageChannel.push('seen', {ids: messageIds})
+  messageChannel.push('seen', { ids: messageIds })
 }
 
 export function sendMessage(auctionId, recipientCompany, content) {
   return dispatch => {
-    messageChannel.push('send', {auctionId: auctionId, recipient: recipientCompany, content: content})
+    messageChannel.push('send', { auctionId: auctionId, recipient: recipientCompany, content: content })
   };
 }
 
@@ -196,11 +204,11 @@ export function inviteObserverToAuction(auctionId, userId) {
       headers: defaultHeaders,
       method: 'POST'
     })
-    .then(checkStatus)
-    .then(parseJSON)
-    .then((response) => {
-      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
-    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
+      })
   }
 }
 
@@ -210,12 +218,26 @@ export function uninviteObserverFromAuction(auctionId, userId) {
       headers: defaultHeaders,
       method: 'POST'
     })
-    .then(checkStatus)
-    .then(parseJSON)
-    .then((response) => {
-      dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response})
-    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response })
+      })
   }
+}
+
+export function removeCOQ(coqId) {
+  return dispatch => {
+    fetch(`/api/auction_supplier_coqs/${coqId}`, {
+      headers: defaultHeaders,
+      method: 'DELETE'
+    })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
+      });
+  };
 }
 
 export function submitCOQ(auctionId, supplierId, fuelId, spec) {
@@ -227,14 +249,14 @@ export function submitCOQ(auctionId, supplierId, fuelId, spec) {
 
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/suppliers/${supplierId}/coqs/${fuelId}/upload`, {
-        headers: uploadHeaders,
-        method: 'POST',
-        body: spec
-      })
+      headers: uploadHeaders,
+      method: 'POST',
+      body: spec
+    })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
       });
   };
 }
@@ -242,13 +264,13 @@ export function submitCOQ(auctionId, supplierId, fuelId, spec) {
 export function submitBargeForApproval(auctionId, bargeId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/submit`, {
-        headers: defaultHeaders,
-        method: 'POST'
-      })
+      headers: defaultHeaders,
+      method: 'POST'
+    })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
       });
   };
 }
@@ -256,13 +278,13 @@ export function submitBargeForApproval(auctionId, bargeId) {
 export function unsubmitBargeForApproval(auctionId, bargeId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/unsubmit`, {
-        headers: defaultHeaders,
-        method: 'POST'
-      })
+      headers: defaultHeaders,
+      method: 'POST'
+    })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
       });
   };
 }
@@ -274,8 +296,8 @@ export function submitComment(auctionId, comment) {
       method: 'POST',
       body: JSON.stringify(comment)
     })
-    .then(checkStatus)
-    .then(parseJSON)
+      .then(checkStatus)
+      .then(parseJSON)
   };
 }
 
@@ -285,21 +307,21 @@ export function unsubmitComment(auctionId, commentId) {
       headers: defaultHeaders,
       method: 'DELETE',
     })
-    .then(checkStatus)
-    .then(parseJSON)
+      .then(checkStatus)
+      .then(parseJSON)
   }
 }
 
 export function approveBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/approve`, {
-        headers: defaultHeaders,
-        method: 'POST'
-      })
+      headers: defaultHeaders,
+      method: 'POST'
+    })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
       });
   };
 }
@@ -307,13 +329,13 @@ export function approveBarge(auctionId, bargeId, supplierId) {
 export function rejectBarge(auctionId, bargeId, supplierId) {
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/barges/${bargeId}/${supplierId}/reject`, {
-        headers: defaultHeaders,
-        method: 'POST'
-      })
+      headers: defaultHeaders,
+      method: 'POST'
+    })
       .then(checkStatus)
       .then(parseJSON)
       .then((response) => {
-        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+        dispatch({ type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response });
       });
   };
 }
@@ -337,13 +359,13 @@ export function submitBid(auctionId, bidData) {
       method: 'POST',
       body: JSON.stringify(bidData)
     })
-    .then(checkStatus)
-    .then(parseJSON)
-    .then((response) => {
-      return dispatch(updateBidStatus(auctionId, response));
-    }).catch((error) => {
-      return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
-    });
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(updateBidStatus(auctionId, response));
+      }).catch((error) => {
+        return dispatch(updateBidStatus(auctionId, { 'success': false, 'message': 'No connection to server' }));
+      });
   };
 }
 
@@ -354,13 +376,13 @@ export function revokeBid(auctionId, bidData) {
       method: 'POST',
       body: JSON.stringify(bidData)
     })
-    .then(checkStatus)
-    .then(parseJSON)
-    .then((response) => {
-      return dispatch(updateBidStatus(auctionId, response));
-    }).catch((error) => {
-      return dispatch(updateBidStatus(auctionId, {'success': false, 'message': 'No connection to server'}));
-    });
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        return dispatch(updateBidStatus(auctionId, response));
+      }).catch((error) => {
+        return dispatch(updateBidStatus(auctionId, { 'success': false, 'message': 'No connection to server' }));
+      });
   };
 }
 
@@ -395,118 +417,141 @@ export function deliverAuctionFixture(auctionId, fixtureId, delivered) {
 }
 
 export function updateBidStatus(auctionId, response) {
-  return {type: UPDATE_BID_STATUS,
-          auctionId,
-          success: response.success,
-          message: response.message};
+  return {
+    type: UPDATE_BID_STATUS,
+    auctionId,
+    success: response.success,
+    message: response.message
+  };
 }
 
 export function receiveAuctionPayloads(auctionPayloads) {
-  return {type: RECEIVE_AUCTION_PAYLOADS,
-          auctionPayloads: auctionPayloads};
+  return {
+    type: RECEIVE_AUCTION_PAYLOADS,
+    auctionPayloads: auctionPayloads
+  };
 }
 
 export function receiveFinalizedAuctionPayloads(auctionPayloads) {
-  return {type: RECEIVE_FINALIZED_AUCTION_PAYLOADS,
-          auctionPayloads: auctionPayloads};
+  return {
+    type: RECEIVE_FINALIZED_AUCTION_PAYLOADS,
+    auctionPayloads: auctionPayloads
+  };
 }
 
 export function receiveFixturePayloads(fixturePayloads) {
-  return {type: RECEIVE_FIXTURE_PAYLOADS,
-          fixturePayloads: fixturePayloads};
+  return {
+    type: RECEIVE_FIXTURE_PAYLOADS,
+    fixturePayloads: fixturePayloads
+  };
 }
 
 export function receiveFixtureEventPayload(fixtureEventPayload) {
-  return {type: RECEIVE_FIXTURE_EVENT_PAYLOAD,
-          fixtureEventPayload: fixtureEventPayload};
+  return {
+    type: RECEIVE_FIXTURE_EVENT_PAYLOAD,
+    fixtureEventPayload: fixtureEventPayload
+  };
 }
 
 export function receiveDeliveredFixture(data) {
-  const {data: fixture} = data;
-  return {type: RECEIVE_DELIVERED_FIXTURE,
-          deliveredFixture: fixture};
+  const { data: fixture } = data;
+  return {
+    type: RECEIVE_DELIVERED_FIXTURE,
+    deliveredFixture: fixture
+  };
 }
 
 export function receiveSuppliers(port, suppliers) {
-  return {type: RECEIVE_SUPPLIERS,
-          port: port,
-          suppliers: suppliers};
+  return {
+    type: RECEIVE_SUPPLIERS,
+    port: port,
+    suppliers: suppliers
+  };
 }
 
 export function receiveFilteredPayloads(payloads) {
-  return {type: RECEIVE_FILTERED_PAYLOADS,
-          auctionPayloads: payloads};
+  return {
+    type: RECEIVE_FILTERED_PAYLOADS,
+    auctionPayloads: payloads
+  };
 }
 
 export function receiveAuctionFormData(auction, suppliers, fuels, fuel_indexes, ports, vessels, credit_margin_amount) {
-  return {type: RECEIVE_AUCTION_FORM_DATA,
-          data: {
-            auction,
-            suppliers,
-            fuels,
-            fuel_indexes,
-            ports,
-            vessels,
-            credit_margin_amount
-          }
-        };
+  return {
+    type: RECEIVE_AUCTION_FORM_DATA,
+    data: {
+      auction,
+      suppliers,
+      fuels,
+      fuel_indexes,
+      ports,
+      vessels,
+      credit_margin_amount
+    }
+  };
 }
 
 export function receiveCompanyBarges(barges) {
-  return {type: RECEIVE_COMPANY_BARGES,
-          barges: barges};
+  return {
+    type: RECEIVE_COMPANY_BARGES,
+    barges: barges
+  };
 }
 
 export function updateInformation(property, value) {
-  return {type: UPDATE_INFORMATION,
-          data: {
-            property,
-            'value': _.get(value, 'target.value', value)
-          }
-        };
+  return {
+    type: UPDATE_INFORMATION,
+    data: {
+      property,
+      'value': _.get(value, 'target.value', value)
+    }
+  };
 }
 
 export function updateInformationFromCheckbox(property, value) {
 
-  return {type: UPDATE_INFORMATION,
-          data: {
-            property,
-            'value': _.get(value, 'target.checked', value)
-          }
-        };
+  return {
+    type: UPDATE_INFORMATION,
+    data: {
+      property,
+      'value': _.get(value, 'target.checked', value)
+    }
+  };
 }
 
 export function updateDate(property, value) {
-  return {type: UPDATE_DATE,
-          data: {
-            property,
-            'value': _.get(value, 'target.value', value)
-          }
-        };
+  return {
+    type: UPDATE_DATE,
+    data: {
+      property,
+      'value': _.get(value, 'target.value', value)
+    }
+  };
 }
 
 export function updateMonth(property, value) {
-  return {type: UPDATE_MONTH,
-          data: {
-            property,
-            'value': _.get(value, 'target.value', value)
-          }
-        };
+  return {
+    type: UPDATE_MONTH,
+    data: {
+      property,
+      'value': _.get(value, 'target.value', value)
+    }
+  };
 }
 
 export function selectAuctionType(event) {
   const auctionType = event.target.value;
   return {
-           type: SELECT_AUCTION_TYPE,
-           data: {type: auctionType}
-         };
+    type: SELECT_AUCTION_TYPE,
+    data: { type: auctionType }
+  };
 }
 
 export function toggleSupplier(supplier_id) {
   return {
-           type: TOGGLE_SUPPLIER,
-           data: {supplier_id: supplier_id}
-         };
+    type: TOGGLE_SUPPLIER,
+    data: { supplier_id: supplier_id }
+  };
 }
 export function selectAllSuppliers() {
   return {

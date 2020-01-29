@@ -26,6 +26,7 @@ export default class AuctionShow extends React.Component {
       inviteObserver,
       uninviteObserver,
       addCOQ,
+      deleteCOQ,
       submitBargeForm,
       unsubmitBargeForm,
       approveBargeForm,
@@ -40,7 +41,7 @@ export default class AuctionShow extends React.Component {
       connection
     } = this.props;
     if (!auctionPayload) { window.location.reload() };
-    const {auction, status} = auctionPayload;
+    const { auction, status } = auctionPayload;
     const isAdmin = window.isAdmin;
 
     const currentUser = {
@@ -72,13 +73,13 @@ export default class AuctionShow extends React.Component {
                           </li>
                         </ul>
                       </div>
-                    { (currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
-                      ? <BuyerBody
+                      {(currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
+                        ? <BuyerBody
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
                           currentUser={currentUser}
                         />
-                      : <SupplierBody
+                        : <SupplierBody
                           auctionPayload={auctionPayload}
                           currentUser={currentUser}
                           connection={connection}
@@ -89,7 +90,7 @@ export default class AuctionShow extends React.Component {
                           addCommentToSolution={addCommentToSolution}
                           removeCommentFromSolution={removeCommentFromSolution}
                         />
-                    }
+                      }
                     </div>
                     <Tabs className="column is-one-third">
                       <div className="tabs is-fullwidth is-medium">
@@ -100,23 +101,24 @@ export default class AuctionShow extends React.Component {
                         </TabList>
                       </div>
                       <TabPanel>
-                        { currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
+                        {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                           ? <BuyerSidebar
-                              auctionPayload={auctionPayload}
-                              approveBargeForm={approveBargeForm}
-                              rejectBargeForm={rejectBargeForm}
-                              inviteObserver={inviteObserver}
-                              uninviteObserver={uninviteObserver}
-                            />
+                            auctionPayload={auctionPayload}
+                            approveBargeForm={approveBargeForm}
+                            rejectBargeForm={rejectBargeForm}
+                            inviteObserver={inviteObserver}
+                            uninviteObserver={uninviteObserver}
+                          />
                           : <SupplierSidebar
-                              addCOQ={addCOQ}
-                              auctionPayload={auctionPayload}
-                              submitBargeForm={submitBargeForm}
-                              unsubmitBargeForm={unsubmitBargeForm}
-                              rejectBargeForm={rejectBargeForm}
-                              currentUserCompanyId={currentUserCompanyId}
-                              companyProfile={companyProfile}
-                            />
+                            addCOQ={addCOQ}
+                            deleteCOQ={deleteCOQ}
+                            auctionPayload={auctionPayload}
+                            submitBargeForm={submitBargeForm}
+                            unsubmitBargeForm={unsubmitBargeForm}
+                            rejectBargeForm={rejectBargeForm}
+                            currentUserCompanyId={currentUserCompanyId}
+                            companyProfile={companyProfile}
+                          />
                         }
                       </TabPanel>
                     </Tabs>
@@ -138,42 +140,42 @@ export default class AuctionShow extends React.Component {
                     </TabList>
                   </div>
                   <TabPanel>
-                    { (currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
+                    {(currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
                       ? <BuyerBody
-                          auctionPayload={auctionPayload}
-                          acceptSolution={acceptSolution}
-                          currentUser={currentUser}
-                        />
+                        auctionPayload={auctionPayload}
+                        acceptSolution={acceptSolution}
+                        currentUser={currentUser}
+                      />
                       : <SupplierBody
-                          auctionPayload={auctionPayload}
-                          currentUser={currentUser}
-                          connection={connection}
-                          currentUserCompanyId={currentUserCompanyId}
-                          updateBidStatus={updateBidStatus}
-                          revokeSupplierBid={revokeSupplierBid}
-                          formSubmit={formSubmit}
-                          addCommentToSolution={addCommentToSolution}
-                          removeCommentFromSolution={removeCommentFromSolution}
-                        />
+                        auctionPayload={auctionPayload}
+                        currentUser={currentUser}
+                        connection={connection}
+                        currentUserCompanyId={currentUserCompanyId}
+                        updateBidStatus={updateBidStatus}
+                        revokeSupplierBid={revokeSupplierBid}
+                        formSubmit={formSubmit}
+                        addCommentToSolution={addCommentToSolution}
+                        removeCommentFromSolution={removeCommentFromSolution}
+                      />
                     }
                   </TabPanel>
                   <TabPanel>
-                    { currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
+                    {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                       ? <BuyerSidebar
-                          auctionPayload={auctionPayload}
-                          approveBargeForm={approveBargeForm}
-                          rejectBargeForm={rejectBargeForm}
-                          inviteObserver={inviteObserver}
-                          uninviteObserver={uninviteObserver}
-                        />
+                        auctionPayload={auctionPayload}
+                        approveBargeForm={approveBargeForm}
+                        rejectBargeForm={rejectBargeForm}
+                        inviteObserver={inviteObserver}
+                        uninviteObserver={uninviteObserver}
+                      />
                       : <SupplierSidebar
-                          addCOQ={addCOQ}
-                          auctionPayload={auctionPayload}
-                          submitBargeForm={submitBargeForm}
-                          unsubmitBargeForm={unsubmitBargeForm}
-                          currentUserCompanyId={currentUserCompanyId}
-                          companyProfile={companyProfile}
-                        />
+                        addCOQ={addCOQ}
+                        auctionPayload={auctionPayload}
+                        submitBargeForm={submitBargeForm}
+                        unsubmitBargeForm={unsubmitBargeForm}
+                        currentUserCompanyId={currentUserCompanyId}
+                        companyProfile={companyProfile}
+                      />
                     }
                   </TabPanel>
                 </Tabs>
@@ -189,24 +191,24 @@ export default class AuctionShow extends React.Component {
 
 function updateAuctionBodySize() {
   const auctionHeaderSection = document.querySelector('.auction-app__header'),
-        auctionHeaderOffsetHeight = auctionHeaderSection ? auctionHeaderSection.offsetHeight : 0,
-        collapsingBidBox = document.querySelector('.collapsing-auction-bidding'),
-        collapsingBidHeight = collapsingBidBox ? collapsingBidBox.offsetHeight : 0,
-        auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
-        auctionTabBidContentHeight = collapsingBidHeight ? `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20 + collapsingBidHeight}px)` : `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
-        auctionTabWithAlertHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 42}px)`,
-        auctionTabContent = document.querySelector('.auction-content--mobile .react-tabs__tab-panel--selected'),
-        alertPresence = document.querySelector('.alert:not(:empty)'),
-        bidPresence = document.querySelector('.auction-bidding');
+    auctionHeaderOffsetHeight = auctionHeaderSection ? auctionHeaderSection.offsetHeight : 0,
+    collapsingBidBox = document.querySelector('.collapsing-auction-bidding'),
+    collapsingBidHeight = collapsingBidBox ? collapsingBidBox.offsetHeight : 0,
+    auctionTabContentHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
+    auctionTabBidContentHeight = collapsingBidHeight ? `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20 + collapsingBidHeight}px)` : `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 20}px)`,
+    auctionTabWithAlertHeight = `calc(100vh - ${auctionHeaderOffsetHeight + 37 + 48 + 42}px)`,
+    auctionTabContent = document.querySelector('.auction-content--mobile .react-tabs__tab-panel--selected'),
+    alertPresence = document.querySelector('.alert:not(:empty)'),
+    bidPresence = document.querySelector('.auction-bidding');
 
-  if(auctionTabContent != null) {
-    if(alertPresence) {
+  if (auctionTabContent != null) {
+    if (alertPresence) {
       auctionTabContent.style.height = auctionTabWithAlertHeight;
     } else {
       auctionTabContent.style.height = auctionTabContentHeight;
     }
 
-    if(bidPresence) {
+    if (bidPresence) {
       auctionTabContent.style.height = auctionTabBidContentHeight;
     }
   }

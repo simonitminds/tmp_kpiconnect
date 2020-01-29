@@ -10,6 +10,29 @@ defmodule OceanconnectWeb.Api.FileIOController do
 
   @extension_whitelist ~w(jpg jpeg gif png pdf)
 
+  def delete_coq(conn, %{"id" => auction_supplier_coq_id}) do
+    with auction_supplier_coq = %AuctionSupplierCOQ{
+           auction_id: auction_id,
+           supplier_id: supplier_id
+         } <-
+           Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
+         :ok <- FileIO.delete(auction_supplier_coq),
+         {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
+      auction_payload =
+        auction_id
+        |> Auctions.get_auction!()
+        |> AuctionPayload.get_auction_payload!(supplier_id)
+
+      conn
+      |> render("submit.json", auction_payload: auction_payload)
+    else
+      _ ->
+        conn
+        |> put_status(422)
+        |> render("show.json", %{success: false, message: "Invalid"})
+    end
+  end
+
   def upload_coq(
         conn,
         %{"auction_id" => auction_id, "fuel_id" => fuel_id, "supplier_id" => supplier_id}

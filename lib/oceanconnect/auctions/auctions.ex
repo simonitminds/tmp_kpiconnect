@@ -571,6 +571,9 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def delete_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}),
+    do: Repo.delete(auction_supplier_coq)
+
   defp verify_fuel_is_for_auction(auction, fuel_id) when is_bitstring(fuel_id),
     do: verify_fuel_is_for_auction(auction, String.to_integer(fuel_id))
 

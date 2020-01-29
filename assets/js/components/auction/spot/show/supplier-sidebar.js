@@ -12,6 +12,7 @@ const SupplierSidebar = (props) => {
   const {
     auctionPayload,
     addCOQ,
+    deleteCOQ,
     submitBargeForm,
     unsubmitBargeForm,
     currentUserCompanyId,
@@ -23,7 +24,7 @@ const SupplierSidebar = (props) => {
 
   return (
     <React.Fragment>
-      { (status == 'pending' || status == 'open') &&
+      {(status == 'pending' || status == 'open') &&
         <AuctionInvitation auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       }
 
@@ -36,6 +37,7 @@ const SupplierSidebar = (props) => {
       />
       <COQSubmission
         addCOQ={addCOQ}
+        deleteCOQ={deleteCOQ}
         auctionPayload={auctionPayload}
         supplierId={currentUserCompanyId}
       />

@@ -3,6 +3,30 @@ defmodule OceanconnectWeb.FileIO do
 
   @bucket_name Application.get_env(:ex_aws, :bucket, nil)
 
+  def delete(auction_supplier_coq = %AuctionSupplierCOQ{}) do
+    if @bucket_name,
+      do: delete_from_s3(auction_supplier_coq),
+      else: delete_from_local(auction_supplier_coq)
+  end
+
+  defp delete_from_local(auction_supplier_coq) do
+    dir = storage_dir(auction_supplier_coq)
+    file_name = file_name(auction_supplier_coq)
+    File.rm!("#{storage_dir(auction_supplier_coq)}#{file_name}")
+    :ok
+  end
+
+  defp delete_from_s3(auction_supplier_coq) do
+    @bucket_name
+    |> ExAws.S3.delete_object(
+      "#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
+    )
+    |> ExAws.request!()
+    |> IO.inspect()
+
+    :ok
+  end
+
   def get(auction_supplier_coq = %AuctionSupplierCOQ{}) do
     if @bucket_name,
       do: get_from_s3(auction_supplier_coq),
