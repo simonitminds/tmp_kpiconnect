@@ -54,7 +54,6 @@ export function subscribeToAuctionUpdates(dispatchAction) {
   return (dispatch, getState) => {
     auctionChannel.join()
       .receive("ok", resp => {
-        console.log("Joined successful", resp);
         dispatch({type: AUCTION_CHANNEL_CONNECTED});
         dispatch(dispatchAction());
       })
@@ -79,7 +78,6 @@ export function subscribeToMessageUpdates() {
   return (dispatch, getState) => {
     messageChannel.join()
       .receive("ok", resp => {
-        console.log("Joined chat successfully", resp);
         dispatch({type: MESSAGE_CHANNEL_CONNECTED});
       })
       .receive("error", resp => { console.log("Unable to join", resp); });
@@ -218,6 +216,27 @@ export function uninviteObserverFromAuction(auctionId, userId) {
       dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response})
     })
   }
+}
+
+export function submitCOQ(auctionId, supplierId, fuelId, spec) {
+  const uploadHeaders = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${window.userToken}`,
+    'x-expires': window.expiration
+  };
+
+  return dispatch => {
+    fetch(`/api/auctions/${auctionId}/suppliers/${supplierId}/coqs/${fuelId}/upload`, {
+        headers: uploadHeaders,
+        method: 'POST',
+        body: spec
+      })
+      .then(checkStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch({type: UPDATE_AUCTION_PAYLOAD, auctionPayload: response});
+      });
+  };
 }
 
 export function submitBargeForApproval(auctionId, bargeId) {

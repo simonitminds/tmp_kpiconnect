@@ -5,11 +5,13 @@ import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import SidebarDetails from './sidebar-details';
 import BargeSubmission from '../../common/show/barge-submission';
+import COQSubmission from '../../common/show/coq-submission';
 
 
 const SupplierSidebar = (props) => {
   const {
     auctionPayload,
+    addCOQ,
     submitBargeForm,
     unsubmitBargeForm,
     currentUserCompanyId,
@@ -30,6 +32,11 @@ const SupplierSidebar = (props) => {
         unsubmitBargeForm={unsubmitBargeForm}
         auctionPayload={auctionPayload}
         companyBarges={companyProfile.companyBarges}
+        supplierId={currentUserCompanyId}
+      />
+      <COQSubmission
+        addCOQ={addCOQ}
+        auctionPayload={auctionPayload}
         supplierId={currentUserCompanyId}
       />
       <SidebarDetails auctionPayload={auctionPayload} isEditable={false} />

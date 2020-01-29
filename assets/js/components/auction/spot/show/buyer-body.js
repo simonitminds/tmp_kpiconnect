@@ -3,7 +3,6 @@ import React from 'react';
 import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
-import BargeSubmission from '../../common/show/barge-submission';
 import BuyerBestSolution from './buyer-best-solution';
 import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';

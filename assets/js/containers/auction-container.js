@@ -14,6 +14,7 @@ import {
   rejectBarge,
   submitBid,
   revokeBid,
+  submitCOQ,
   submitComment,
   unsubmitComment,
   updateBidStatus,
@@ -44,6 +45,9 @@ const mapDispatchToProps = (dispatch) => ({
   dispatch,
   formSubmit(auctionId, formData) {
     dispatch(submitBid(auctionId, formData));
+  },
+  addCOQ(auctionId, supplierId, fuelId, spec) {
+    dispatch(submitCOQ(auctionId, supplierId, fuelId, spec));
   },
   addCommentToSolution(auctionId, formData) {
     dispatch(submitComment(auctionId, formData));

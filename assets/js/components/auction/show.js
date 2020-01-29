@@ -25,6 +25,7 @@ export default class AuctionShow extends React.Component {
       companyProfile,
       inviteObserver,
       uninviteObserver,
+      addCOQ,
       submitBargeForm,
       unsubmitBargeForm,
       approveBargeForm,
@@ -108,6 +109,7 @@ export default class AuctionShow extends React.Component {
                               uninviteObserver={uninviteObserver}
                             />
                           : <SupplierSidebar
+                              addCOQ={addCOQ}
                               auctionPayload={auctionPayload}
                               submitBargeForm={submitBargeForm}
                               unsubmitBargeForm={unsubmitBargeForm}
@@ -165,6 +167,7 @@ export default class AuctionShow extends React.Component {
                           uninviteObserver={uninviteObserver}
                         />
                       : <SupplierSidebar
+                          addCOQ={addCOQ}
                           auctionPayload={auctionPayload}
                           submitBargeForm={submitBargeForm}
                           unsubmitBargeForm={unsubmitBargeForm}

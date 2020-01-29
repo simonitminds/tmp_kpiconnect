@@ -5,6 +5,7 @@ import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import SidebarDetails from './sidebar-details';
 import BargeSubmission from '../../common/show/barge-submission';
+import COQSubmission from '../../common/show/coq-submission';
 
 
 const SupplierSidebar = (props) => {
@@ -31,10 +32,13 @@ const SupplierSidebar = (props) => {
         companyBarges={companyProfile.companyBarges}
         supplierId={currentUserCompanyId}
       />
+      <COQSubmission
+        auctionPayload={auctionPayload}
+        supplierId={currentUserCompanyId}
+      />
       <SidebarDetails auctionPayload={auctionPayload} isEditable={false} />
     </React.Fragment>
   );
 };
 
 export default SupplierSidebar;
-
