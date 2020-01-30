@@ -19,7 +19,8 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
       insert(:auction,
         buyer: buyer_company,
         suppliers: [supplier_company],
-        auction_vessel_fuels: [vessel_fuel]
+        auction_vessel_fuels: [vessel_fuel],
+        finalized: true
       )
 
     auction_state = close_auction!(auction)

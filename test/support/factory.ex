@@ -207,7 +207,7 @@ defmodule Oceanconnect.Factory do
 
   def auction_fixture_factory() do
     %Oceanconnect.Auctions.AuctionFixture{
-      auction: build(:auction),
+      auction: build(:auction, finalized: true),
       supplier: build(:company, is_supplier: true),
       vessel: build(:vessel),
       fuel: build(:fuel),

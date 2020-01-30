@@ -9,8 +9,8 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
   hound_session()
 
   setup do
-    [auction: auction1, fixtures: fixtures1] = create_auction_with_fixtures
-    [auction: auction2, fixtures: fixtures2] = create_auction_with_fixtures
+    [auction: auction1, fixtures: fixtures1] = create_auction_with_fixtures()
+    [auction: auction2, fixtures: fixtures2] = create_auction_with_fixtures()
     fixtures = fixtures1 ++ fixtures2
 
     {:ok,
@@ -72,7 +72,8 @@ defmodule Oceanconnect.Admin.AuctionFixture.IndexTest do
       insert(
         :auction,
         buyer: buyer_company,
-        suppliers: [supplier_company]
+        suppliers: [supplier_company],
+        finalized: true
       )
 
     auction_state = close_auction!(auction)
