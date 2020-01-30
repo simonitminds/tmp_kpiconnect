@@ -34,7 +34,12 @@ class COQSubmission extends React.Component {
     const { auctionPayload, deleteCOQ, supplierId } = this.props;
     const auction = auctionPayload.auction;
     const supplierCOQs = auction.auction_supplier_coqs;
-    const fuels = auction.fuels;
+    let fuels = _.get(auction, "auction_vessel_fuels", null);
+    if (fuels) {
+      fuels = _.map(fuels, "fuel");
+    } else {
+      fuels = [auction.fuel];
+    }
     const auctionState = auctionPayload.status;
     const validAuctionState = auctionState === 'pending' || auctionState === 'open';
 
@@ -81,7 +86,7 @@ class COQSubmission extends React.Component {
       if (supplierCOQ) {
         return (
           <div>
-            <a href={`/supplier_coq/${supplierCOQ.id}`} target="_blank">View COQ</a>
+            <a href={`/auction_supplier_coqs/${supplierCOQ.id}`} target="_blank">View COQ</a>
             { (window.isAdmin || validAuctionState) ? <a className="button is-danger has-margin-top-sm" onClick={(e) => deleteCOQ(supplierCOQ.id)}>Delete</a> : "" }
           </div>
         )

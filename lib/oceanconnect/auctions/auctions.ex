@@ -491,6 +491,9 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def get_auction_status!(auction_id) when is_bitstring(auction_id),
+    do: get_auction_status!(String.to_integer(auction_id))
+
   def get_auction_status!(auction) do
     %{status: status} = get_auction_state!(auction)
     status

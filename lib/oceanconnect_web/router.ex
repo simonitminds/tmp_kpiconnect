@@ -188,7 +188,7 @@ defmodule OceanconnectWeb.Router do
     resources("/fuels", FuelController)
     get("/fixtures", AuctionFixtureController, :index)
 
-    get("/supplier_coq/:id", FileIOController, :view_coq, as: :view_coq)
+    get("/auction_supplier_coqs/:id", FileIOController, :view_coq, as: :view_coq)
 
     get(
       "/auctions/:auction_id/fixtures/:fixture_id/propose_changes",

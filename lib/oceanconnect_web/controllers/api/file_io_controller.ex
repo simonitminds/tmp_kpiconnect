@@ -11,11 +11,13 @@ defmodule OceanconnectWeb.Api.FileIOController do
   @extension_whitelist ~w(jpg jpeg gif png pdf)
 
   def delete_coq(conn, %{"id" => auction_supplier_coq_id}) do
-    with auction_supplier_coq = %AuctionSupplierCOQ{
+    with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
+         auction_supplier_coq = %AuctionSupplierCOQ{
            auction_id: auction_id,
            supplier_id: supplier_id
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
+         true <- is_authorized_to_change?(auction_id, user, supplier_id),
          %AuctionSupplierCOQ{} <- FileIO.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
       auction_payload =
@@ -38,6 +40,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
         %{"auction_id" => auction_id, "fuel_id" => fuel_id, "supplier_id" => supplier_id}
       ) do
     with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
+         true <- is_authorized_to_change?(auction_id, user, String.to_integer(supplier_id)),
          {:ok, coq_binary, _conn} <- Plug.Conn.read_body(conn),
          {:ok, file_extension} <- get_file_extension(conn),
          %AuctionSupplierCOQ{} <-
@@ -80,4 +83,11 @@ defmodule OceanconnectWeb.Api.FileIOController do
       do: {:ok, file_extension},
       else: {:file_error, "Incorrect file type."}
   end
+
+  defp is_authorized_to_change?(_auction_id, %User{is_admin: true}, _supplier_id), do: true
+
+  defp is_authorized_to_change?(auction_id, %User{company_id: supplier_id}, supplier_id),
+    do: Auctions.get_auction_status!(auction_id) in [:pending, :open]
+
+  defp is_authorized_to_change?(_auction_id, _user, _supplier_id), do: false
 end
