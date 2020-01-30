@@ -43,7 +43,7 @@ defmodule OceanconnectWeb.Api.AuctionFixtureControllerTest do
     assert conn.status == 200
     fixture_payload = conn.assigns.data |> List.first()
 
-    assert fixture_payload.auction == auction
+    assert fixture_payload.auction.id == auction.id
 
     assert MapSet.equal?(
              MapSet.new(Enum.map(fixtures, & &1.id)),
