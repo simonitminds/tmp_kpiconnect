@@ -10,7 +10,7 @@ defmodule OceanconnectWeb.Api.AuctionController do
 
     auction_payloads =
       user
-      |> Auctions.list_auctions()
+      |> Auctions.list_auctions(false)
       |> Enum.map(fn auction ->
         auction
         |> Auctions.fully_loaded()

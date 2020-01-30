@@ -16,7 +16,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
       build_conn()
       |> login_user(non_admin)
 
-    auction = insert(:auction)
+    auction = insert(:auction, finalized: true)
 
     {:ok, %{admin_conn: admin_conn, non_admin_conn: non_admin_conn, auction: auction}}
   end
@@ -34,7 +34,7 @@ defmodule OceanconnectWeb.Admin.FixtureControllerTest do
       assert %{fixtures: [%AuctionFixture{}]} = final_conn.assigns
     end
 
-    test "redirects without admin an session", %{non_admin_conn: non_admin_conn, auction: auction} do
+    test "redirects without an admin session", %{non_admin_conn: non_admin_conn, auction: auction} do
       conn = get(non_admin_conn, admin_auction_fixtures_path(non_admin_conn, :show, auction.id))
       assert redirected_to(conn) == auction_path(conn, :index)
     end
