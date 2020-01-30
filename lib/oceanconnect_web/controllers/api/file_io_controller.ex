@@ -16,7 +16,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
            supplier_id: supplier_id
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
-         :ok <- FileIO.delete(auction_supplier_coq),
+         %AuctionSupplierCOQ{} <- FileIO.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
       auction_payload =
         auction_id

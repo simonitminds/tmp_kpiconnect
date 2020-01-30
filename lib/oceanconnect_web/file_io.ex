@@ -13,7 +13,7 @@ defmodule OceanconnectWeb.FileIO do
     dir = storage_dir(auction_supplier_coq)
     file_name = file_name(auction_supplier_coq)
     File.rm!("#{storage_dir(auction_supplier_coq)}#{file_name}")
-    :ok
+    auction_supplier_coq
   end
 
   defp delete_from_s3(auction_supplier_coq) do
@@ -23,7 +23,7 @@ defmodule OceanconnectWeb.FileIO do
     )
     |> ExAws.request!()
 
-    :ok
+    auction_supplier_coq
   end
 
   def get(auction_supplier_coq = %AuctionSupplierCOQ{}) do

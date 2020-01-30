@@ -516,9 +516,16 @@ defmodule Oceanconnect.Auctions do
     |> get_auction!()
     |> get_auction_supplier_coq(supplier_id, fuel_id)
     |> case do
-      nil -> create_auction_supplier_coq(auction_id, supplier_id, fuel_id, file_extension)
-      :error -> :error
-      auction_supplier_coq -> auction_supplier_coq
+      nil ->
+        create_auction_supplier_coq(auction_id, supplier_id, fuel_id, file_extension)
+
+      :error ->
+        :error
+
+      auction_supplier_coq ->
+        auction_supplier_coq
+        |> FileIO.delete()
+        |> update_auction_supplier_coq(%{file_extension: file_extension})
     end
     |> FileIO.upload(coq_binary)
   end
@@ -573,6 +580,12 @@ defmodule Oceanconnect.Auctions do
 
   def delete_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}),
     do: Repo.delete(auction_supplier_coq)
+
+  def update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
+    auction_supplier_coq
+    |> AuctionSupplierCOQ.changeset(attrs)
+    |> Repo.update!()
+  end
 
   defp verify_fuel_is_for_auction(auction, fuel_id) when is_bitstring(fuel_id),
     do: verify_fuel_is_for_auction(auction, String.to_integer(fuel_id))
