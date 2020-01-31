@@ -71,8 +71,7 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "returns buyer payload that includes supplier coqs", %{
       auction: auction,
       supplier: supplier,
-      supplier_2: supplier_2,
-      vessel_fuel: vessel_fuel
+      supplier_2: supplier_2
     } do
       supplier_coq = create_auction_supplier_coq(auction, supplier)
       supplier_coq_2 = create_auction_supplier_coq(auction, supplier_2)
@@ -91,11 +90,10 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
     test "returns supplier payload with only that supplier's coqs", %{
       auction: auction,
       supplier: supplier,
-      supplier_2: supplier_2,
-      vessel_fuel: vessel_fuel
+      supplier_2: supplier_2
     } do
       supplier_coq = create_auction_supplier_coq(auction, supplier)
-      supplier_coq_2 = create_auction_supplier_coq(auction, supplier_2)
+      create_auction_supplier_coq(auction, supplier_2)
 
       auction_payload =
         auction
@@ -264,8 +262,6 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
         Oceanconnect.Repo.update!(Ecto.Changeset.change(auction, %{anonymous_bidding: true}))
         |> Auctions.create_supplier_aliases()
         |> Auctions.fully_loaded()
-
-      Auctions.update_cache(auction)
 
       create_bid(1.25, nil, supplier_2.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()

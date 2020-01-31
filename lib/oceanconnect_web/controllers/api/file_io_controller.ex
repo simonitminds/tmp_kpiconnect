@@ -1,11 +1,11 @@
 defmodule OceanconnectWeb.Api.FileIOController do
   use OceanconnectWeb, :controller
-  import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.{Company, User}
+  alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Auctions.{AuctionPayload, AuctionSuppliers, AuctionSupplierCOQ}
+
+  alias Oceanconnect.Auctions.{AuctionNotifier, AuctionPayload, AuctionSupplierCOQ}
+
   alias OceanconnectWeb.FileIO
 
   @extension_whitelist ~w(jpg jpeg gif png pdf)
@@ -20,15 +20,17 @@ defmodule OceanconnectWeb.Api.FileIOController do
          true <- is_authorized_to_change?(auction_id, user, supplier_id),
          %AuctionSupplierCOQ{} <- FileIO.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
-      auction_payload =
-        auction_id
-        |> Auctions.get_auction!()
-        |> AuctionPayload.get_auction_payload!(supplier_id)
+      auction = Auctions.get_auction!(auction_id)
+      AuctionNotifier.notify_participants(auction)
 
       conn
-      |> render("submit.json", auction_payload: auction_payload)
+      |> render("submit.json",
+        auction_payload: AuctionPayload.get_auction_payload!(auction, supplier_id)
+      )
     else
-      _ ->
+      error ->
+        IO.inspect(error, label: "ERROR: ")
+
         conn
         |> put_status(422)
         |> render("show.json", %{success: false, message: "Invalid"})
@@ -51,13 +53,13 @@ defmodule OceanconnectWeb.Api.FileIOController do
              coq_binary,
              file_extension
            ) do
-      auction_payload =
-        auction_id
-        |> Auctions.get_auction!()
-        |> AuctionPayload.get_auction_payload!(supplier_id)
+      auction = Auctions.get_auction!(auction_id)
+      AuctionNotifier.notify_participants(auction)
 
       conn
-      |> render("submit.json", auction_payload: auction_payload)
+      |> render("submit.json",
+        auction_payload: AuctionPayload.get_auction_payload!(auction, supplier_id)
+      )
     else
       {:file_error, message} ->
         conn

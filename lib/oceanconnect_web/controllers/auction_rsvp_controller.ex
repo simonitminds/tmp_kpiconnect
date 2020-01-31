@@ -15,8 +15,7 @@ defmodule OceanconnectWeb.AuctionRsvpController do
          true <- response in ["yes", "no", "maybe"] do
       Auctions.update_participation_for_supplier(auction, company_id, response)
 
-      Auctions.get_auction!(auction_id)
-      |> AuctionNotifier.notify_participants()
+      auction_id |> Auctions.get_auction!() |> AuctionNotifier.notify_participants()
 
       conn
       |> redirect(to: auction_path(conn, :show, auction_id))

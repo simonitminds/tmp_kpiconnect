@@ -557,32 +557,41 @@ defmodule Oceanconnect.Auctions do
     with auction = %struct{} when is_auction(struct) <- get_auction!(auction_id),
          true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
-      if struct == Auction do
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(%{
-          auction_id: auction_id,
-          supplier_id: supplier_id,
-          fuel_id: fuel_id,
-          file_extension: file_extension
-        })
-        |> Repo.insert!()
-      else
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(%{
-          term_auction_id: auction_id,
-          supplier_id: supplier_id,
-          fuel_id: fuel_id,
-          file_extension: file_extension
-        })
-        |> Repo.insert!()
-      end
+      auction_supplier_coq =
+        if struct == Auction do
+          %AuctionSupplierCOQ{}
+          |> AuctionSupplierCOQ.changeset(%{
+            auction_id: auction_id,
+            supplier_id: supplier_id,
+            fuel_id: fuel_id,
+            file_extension: file_extension
+          })
+          |> Repo.insert!()
+        else
+          %AuctionSupplierCOQ{}
+          |> AuctionSupplierCOQ.changeset(%{
+            term_auction_id: auction_id,
+            supplier_id: supplier_id,
+            fuel_id: fuel_id,
+            file_extension: file_extension
+          })
+          |> Repo.insert!()
+        end
+
+      update_cache(auction)
+      auction_supplier_coq
     else
       _ -> :error
     end
   end
 
-  def delete_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}),
-    do: Repo.delete(auction_supplier_coq)
+  def delete_auction_supplier_coq(
+        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: auction_id}
+      ) do
+    response = Repo.delete(auction_supplier_coq)
+    update_cache(auction_id)
+    response
+  end
 
   def update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
@@ -599,7 +608,7 @@ defmodule Oceanconnect.Auctions do
   defp verify_fuel_is_for_auction(%TermAuction{fuel: %Fuel{id: fuel_id}}, fuel_id), do: true
   defp verify_fuel_is_for_auction(_auction, _fuel_id), do: false
 
-  def update_participation_for_supplier(%Auction{id: auction_id}, supplier_id, response)
+  def update_participation_for_supplier(auction = %Auction{id: auction_id}, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
     result =
       from(auction_supplier in AuctionSuppliers,
@@ -609,12 +618,15 @@ defmodule Oceanconnect.Auctions do
       )
       |> Repo.update_all(set: [participation: response])
 
-    auction = Repo.get(Auction, auction_id) |> fully_loaded()
     update_cache(auction)
     result
   end
 
-  def update_participation_for_supplier(%TermAuction{id: term_auction_id}, supplier_id, response)
+  def update_participation_for_supplier(
+        auction = %TermAuction{id: term_auction_id},
+        supplier_id,
+        response
+      )
       when response in ["yes", "no", "maybe"] do
     result =
       from(auction_supplier in AuctionSuppliers,
@@ -624,7 +636,6 @@ defmodule Oceanconnect.Auctions do
       )
       |> Repo.update_all(set: [participation: response])
 
-    auction = Repo.get(TermAuction, term_auction_id) |> fully_loaded()
     update_cache(auction)
     result
   end
@@ -800,10 +811,17 @@ defmodule Oceanconnect.Auctions do
     {:ok, auction}
   end
 
-  def update_cache(auction = %struct{}) when is_auction(struct) do
+  defp update_cache(auction = %struct{}) when is_auction(struct) do
     auction
+    |> fully_loaded(true)
     |> Command.update_cache()
     |> AuctionCache.process_command()
+  end
+
+  defp update_cache(auction_id) do
+    auction_id
+    |> get_auction!()
+    |> update_cache()
   end
 
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
@@ -1704,22 +1722,26 @@ defmodule Oceanconnect.Auctions do
     |> invite_observer(auction, user_id)
   end
 
-  def invite_observer(nil, %Auction{id: auction_id}, user_id) do
+  def invite_observer(nil, auction = %Auction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       auction_id: auction_id,
       user_id: user_id
     })
     |> Repo.insert()
+
+    update_cache(auction)
   end
 
-  def invite_observer(nil, %TermAuction{id: auction_id}, user_id) do
+  def invite_observer(nil, auction = %TermAuction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       term_auction_id: auction_id,
       user_id: user_id
     })
     |> Repo.insert()
+
+    update_cache(auction)
   end
 
   def invite_observer(observer, _auction, _user_id), do: {:ok, observer}
@@ -1728,6 +1750,8 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Accounts.get_observer(user_id)
     |> Repo.delete()
+
+    update_cache(auction)
   end
 
   # Fixtures

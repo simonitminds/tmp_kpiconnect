@@ -1,13 +1,10 @@
 defmodule OceanconnectWeb.FileIOController do
   use OceanconnectWeb, :controller
-  import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionSupplierCOQ
   alias OceanconnectWeb.FileIO
-
-  @extension_whitelist ~w(jpg jpeg gif png pdf)
 
   def view_coq(conn, %{"id" => auction_supplier_coq_id}) do
     with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
@@ -29,9 +26,9 @@ defmodule OceanconnectWeb.FileIOController do
 
   defp is_authorized_to_view?(_auction_id, %User{is_admin: true}, _supplier_id), do: true
 
-  defp is_authorized_to_view?(auction_id, %User{company_id: supplier_id}, supplier_id), do: true
+  defp is_authorized_to_view?(_auction_id, %User{company_id: supplier_id}, supplier_id), do: true
 
-  defp is_authorized_to_view?(auction_id, %User{company_id: buyer_id}),
+  defp is_authorized_to_view?(auction_id, %User{company_id: buyer_id}, _supplier_id),
     do: auction_id |> Auctions.get_auction!() |> Map.get(:buyer_id) == buyer_id
 
   defp is_authorized_to_view?(_auction_id, _user, _supplier_id), do: false
