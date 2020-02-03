@@ -4,7 +4,8 @@ defmodule OceanconnectWeb.FileIOController do
   alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionSupplierCOQ
-  alias OceanconnectWeb.FileIO
+
+  @file_io Application.get_env(:oceanconnect, :file_io, OceanconnectWeb.FileIO)
 
   def view_coq(conn, %{"id" => auction_supplier_coq_id}) do
     with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
@@ -15,7 +16,7 @@ defmodule OceanconnectWeb.FileIOController do
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
          true <- is_authorized_to_view?(auction_id, user, supplier_id),
-         %{body: coq} <- FileIO.get(auction_supplier_coq) do
+         %{body: coq} <- @file_io.get(auction_supplier_coq) do
       conn
       |> put_resp_content_type(MIME.type(file_extension))
       |> send_resp(200, coq)

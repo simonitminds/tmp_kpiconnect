@@ -87,14 +87,14 @@ defmodule OceanconnectWeb.Router do
       "/auction_supplier_coqs/:id",
       FileIOController,
       :delete_coq,
-      as: :delete_coq_api
+      as: :file_io_api
     )
 
     post(
       "/auctions/:auction_id/suppliers/:supplier_id/coqs/:fuel_id/upload",
       FileIOController,
       :upload_coq,
-      as: :upload_coq_api
+      as: :file_io_api
     )
 
     post(

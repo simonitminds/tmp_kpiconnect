@@ -124,21 +124,15 @@ defmodule Oceanconnect.Auctions.Auction do
     |> maybe_add_suppliers(attrs)
   end
 
-  def validate_suppliers(changeset, %{"suppliers" => suppliers})
-      when is_nil(suppliers) or suppliers == [] do
-    changeset
-    |> add_error(:suppliers, "Must invite suppliers to create a pending auction")
+  def from_params(params) do
+    params
+    |> maybe_parse_date_field("scheduled_start")
+    |> maybe_convert_checkbox("is_traded_bid_allowed")
+    |> maybe_convert_checkbox("anonymous_bidding")
+    |> maybe_convert_duration("duration")
+    |> maybe_convert_duration("decision_duration")
+    |> maybe_load_suppliers("suppliers")
   end
-
-  def validate_suppliers(changeset, _attrs), do: changeset
-
-  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels})
-      when is_nil(vessel_fuels) or vessel_fuels == [] do
-    changeset
-    |> add_error(:auction_vessel_fuels, "No auction vessel fuels set")
-  end
-
-  def validate_vessel_fuels(changeset, _attrs), do: changeset
 
   def maybe_add_suppliers(changeset, %{"suppliers" => suppliers}) do
     put_assoc(changeset, :suppliers, suppliers)
@@ -198,30 +192,6 @@ defmodule Oceanconnect.Auctions.Auction do
 
   def maybe_add_vessel_fuels(changeset, _auction, _attrs), do: changeset
 
-  defp find_existing_or_new_vessel_fuel(vessel_fuels, %{
-         "fuel_id" => fuel_id,
-         "vessel_id" => vessel_id
-       }) do
-    Enum.find(vessel_fuels, %AuctionVesselFuel{}, fn %AuctionVesselFuel{
-                                                       fuel_id: vf_fuel_id,
-                                                       vessel_id: vf_vessel_id
-                                                     } ->
-      "#{vf_fuel_id}" == fuel_id && "#{vf_vessel_id}" == vessel_id
-    end)
-  end
-
-  defp find_existing_or_new_vessel_fuel(_vessel_fuels, _vf), do: %AuctionVesselFuel{}
-
-  def from_params(params) do
-    params
-    |> maybe_parse_date_field("scheduled_start")
-    |> maybe_convert_checkbox("is_traded_bid_allowed")
-    |> maybe_convert_checkbox("anonymous_bidding")
-    |> maybe_convert_duration("duration")
-    |> maybe_convert_duration("decision_duration")
-    |> maybe_load_suppliers("suppliers")
-  end
-
   def maybe_convert_checkbox(params, key) do
     case params do
       %{^key => value} ->
@@ -230,17 +200,6 @@ defmodule Oceanconnect.Auctions.Auction do
         else
           Map.put(params, key, false)
         end
-
-      _ ->
-        params
-    end
-  end
-
-  def maybe_parse_date_field(params, key) do
-    case params do
-      %{^key => date} ->
-        updated_date = parse_date(date)
-        Map.put(params, key, updated_date)
 
       _ ->
         params
@@ -282,6 +241,33 @@ defmodule Oceanconnect.Auctions.Auction do
         params
     end
   end
+
+  def maybe_parse_date_field(params, key) do
+    case params do
+      %{^key => date} ->
+        updated_date = parse_date(date)
+        Map.put(params, key, updated_date)
+
+      _ ->
+        params
+    end
+  end
+
+  def validate_suppliers(changeset, %{"suppliers" => suppliers})
+      when is_nil(suppliers) or suppliers == [] do
+    changeset
+    |> add_error(:suppliers, "Must invite suppliers to create a pending auction")
+  end
+
+  def validate_suppliers(changeset, _attrs), do: changeset
+
+  def validate_vessel_fuels(changeset, %{"auction_vessel_fuels" => vessel_fuels})
+      when is_nil(vessel_fuels) or vessel_fuels == [] do
+    changeset
+    |> add_error(:auction_vessel_fuels, "No auction vessel fuels set")
+  end
+
+  def validate_vessel_fuels(changeset, _attrs), do: changeset
 
   defp parse_duration(duration) when is_binary(duration), do: String.to_integer(duration)
   defp parse_duration(duration) when is_integer(duration), do: duration
@@ -333,18 +319,6 @@ defmodule Oceanconnect.Auctions.Auction do
     )
   end
 
-  defp validate_scheduled_start(changeset, %{scheduled_start: scheduled_start}) do
-    scheduled_start = maybe_convert_start_time(scheduled_start)
-    compare_start_time(changeset, scheduled_start)
-  end
-
-  defp validate_scheduled_start(changeset, %{"scheduled_start" => scheduled_start}) do
-    scheduled_start = maybe_convert_start_time(scheduled_start)
-    compare_start_time(changeset, scheduled_start)
-  end
-
-  defp validate_scheduled_start(changeset, _attrs), do: changeset
-
   defp compare_start_time(changeset, nil), do: changeset
 
   defp compare_start_time(changeset, start_time) do
@@ -359,6 +333,20 @@ defmodule Oceanconnect.Auctions.Auction do
     end
   end
 
+  defp find_existing_or_new_vessel_fuel(vessel_fuels, %{
+         "fuel_id" => fuel_id,
+         "vessel_id" => vessel_id
+       }) do
+    Enum.find(vessel_fuels, %AuctionVesselFuel{}, fn %AuctionVesselFuel{
+                                                       fuel_id: vf_fuel_id,
+                                                       vessel_id: vf_vessel_id
+                                                     } ->
+      "#{vf_fuel_id}" == fuel_id && "#{vf_vessel_id}" == vessel_id
+    end)
+  end
+
+  defp find_existing_or_new_vessel_fuel(_vessel_fuels, _vf), do: %AuctionVesselFuel{}
+
   defp maybe_convert_start_time(""), do: nil
 
   defp maybe_convert_start_time(scheduled_start) when is_binary(scheduled_start) do
@@ -369,4 +357,16 @@ defmodule Oceanconnect.Auctions.Auction do
   defp maybe_convert_start_time(scheduled_start) do
     scheduled_start
   end
+
+  defp validate_scheduled_start(changeset, %{scheduled_start: scheduled_start}) do
+    scheduled_start = maybe_convert_start_time(scheduled_start)
+    compare_start_time(changeset, scheduled_start)
+  end
+
+  defp validate_scheduled_start(changeset, %{"scheduled_start" => scheduled_start}) do
+    scheduled_start = maybe_convert_start_time(scheduled_start)
+    compare_start_time(changeset, scheduled_start)
+  end
+
+  defp validate_scheduled_start(changeset, _attrs), do: changeset
 end

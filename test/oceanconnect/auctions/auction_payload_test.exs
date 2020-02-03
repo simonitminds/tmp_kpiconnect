@@ -51,21 +51,26 @@ defmodule Oceanconnect.Auctions.AuctionPayloadTest do
   end
 
   describe "get_auction_payload!/2" do
-    test "returns state payload for a buyer with supplier names in the bid_list", %{
-      auction: auction,
-      supplier: supplier,
-      vessel_fuel_id: vessel_fuel_id
-    } do
+    test "returns state payload for a buyer with supplier names in the bid_list and no observers",
+         %{
+           auction: auction,
+           supplier: supplier,
+           vessel_fuel_id: vessel_fuel_id
+         } do
       create_bid(1.25, nil, supplier.id, vessel_fuel_id, auction)
       |> Auctions.place_bid()
 
-      auction_payload = AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
+      auction_payload =
+        %AuctionPayload{auction: returned_auction} =
+        AuctionPayload.get_auction_payload!(auction, auction.buyer_id)
 
       payload = auction_payload.product_bids[vessel_fuel_id]
 
       assert supplier.name in Enum.map(payload.bid_history, & &1.supplier)
       assert supplier.name in Enum.map(payload.lowest_bids, & &1.supplier)
       assert auction_payload.status == :open
+
+      refute Map.has_key?(returned_auction, :observers)
     end
 
     test "returns buyer payload that includes supplier coqs", %{

@@ -3,11 +3,9 @@ defmodule OceanconnectWeb.Api.FileIOController do
 
   alias Oceanconnect.Accounts.User
   alias Oceanconnect.Auctions
-
   alias Oceanconnect.Auctions.{AuctionNotifier, AuctionPayload, AuctionSupplierCOQ}
 
-  alias OceanconnectWeb.FileIO
-
+  @file_io Application.get_env(:oceanconnect, :file_io, OceanconnectWeb.FileIO)
   @extension_whitelist ~w(jpg jpeg gif png pdf)
 
   def delete_coq(conn, %{"id" => auction_supplier_coq_id}) do
@@ -18,7 +16,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
          true <- is_authorized_to_change?(auction_id, user, supplier_id),
-         %AuctionSupplierCOQ{} <- FileIO.delete(auction_supplier_coq),
+         %AuctionSupplierCOQ{} <- @file_io.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
       auction = Auctions.get_auction!(auction_id)
       AuctionNotifier.notify_participants(auction)
@@ -28,9 +26,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
         auction_payload: AuctionPayload.get_auction_payload!(auction, supplier_id)
       )
     else
-      error ->
-        IO.inspect(error, label: "ERROR: ")
-
+      _ ->
         conn
         |> put_status(422)
         |> render("show.json", %{success: false, message: "Invalid"})

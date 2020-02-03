@@ -6,7 +6,7 @@ defmodule Oceanconnect.Auctions.AuctionSuppliers do
 
   alias __MODULE__
   alias Oceanconnect.Accounts.Company
-  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, AuctionSupplierCOQ, TermAuction}
+  alias Oceanconnect.Auctions.{Auction, AuctionSuppliers, TermAuction}
   alias Oceanconnect.Repo
 
   schema "auction_suppliers" do

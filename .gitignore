@@ -45,6 +45,9 @@ screenshot-*.png
 # Ignore cover file info from running mix test --cover
 /cover/
 
+# Ignore any locally uploaded files
+/uploads/
+
 # Ignore SSL cert files
 priv/*.key
 priv/*.crt

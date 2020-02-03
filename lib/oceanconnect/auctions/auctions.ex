@@ -35,8 +35,8 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Auctions.AuctionsSupervisor
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
-  alias OceanconnectWeb.FileIO
 
+  @file_io Application.get_env(:oceanconnect, :file_io, OceanconnectWeb.FileIO)
   @term_types ["forward_fixed", "formula_related"]
 
   def is_term?(%{type: TermAuction}) do
@@ -332,13 +332,6 @@ defmodule Oceanconnect.Auctions do
 
   def list_auctions(), do: list_auctions(false)
   def list_auctions(user = %User{}), do: list_auctions(user, false)
-  def list_auctions(%User{is_admin: true}, finalized?), do: list_auctions(finalized?)
-
-  def list_auctions(%User{id: user_id, is_observer: true}, finalized?),
-    do: list_observing_auctions(user_id, finalized?)
-
-  def list_auctions(%User{company_id: company_id}, finalized?),
-    do: list_participating_auctions(company_id, finalized?)
 
   def list_auctions(finalized?) do
     regular_auctions =
@@ -353,6 +346,14 @@ defmodule Oceanconnect.Auctions do
 
     regular_auctions ++ term_auctions
   end
+
+  def list_auctions(%User{is_admin: true}, finalized?), do: list_auctions(finalized?)
+
+  def list_auctions(%User{id: user_id, is_observer: true}, finalized?),
+    do: list_observing_auctions(user_id, finalized?)
+
+  def list_auctions(%User{company_id: company_id}, finalized?),
+    do: list_participating_auctions(company_id, finalized?)
 
   defp list_observing_auctions(user_id, finalized?) do
     finalized?
@@ -429,46 +430,21 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded()
   end
 
-  def get_auction(id) do
-    with {:ok, auction} <- AuctionCache.read(id) do
-      auction
-    else
-      _ ->
-        if auction_type = get_auction_type(id) do
-          Repo.get(auction_type, id)
-          |> fully_loaded()
-        end
-    end
-  end
+  def get_auction(id), do: get_auction!(id)
 
   def get_auction!(id) do
     with {:ok, auction} <- AuctionCache.read(id) do
       auction
     else
       _ ->
-        get_auction_type!(id)
-        |> Repo.get!(id)
+        Auction
+        |> Repo.get(id)
+        |> case do
+          nil -> nil
+          auction = %Auction{type: "spot"} -> auction
+          _ -> Repo.get(TermAuction, id)
+        end
         |> fully_loaded()
-    end
-  end
-
-  defp get_auction_type(auction_id) do
-    try do
-      get_auction_type!(auction_id)
-    rescue
-      Ecto.NoResultsError -> nil
-    end
-  end
-
-  defp get_auction_type!(auction_id) do
-    auction_type =
-      from(a in Auction, select: a.type)
-      |> Repo.get!(auction_id)
-
-    case auction_type do
-      "spot" -> Auction
-      t when t in @term_types -> TermAuction
-      _ -> nil
     end
   end
 
@@ -527,10 +503,10 @@ defmodule Oceanconnect.Auctions do
 
       auction_supplier_coq ->
         auction_supplier_coq
-        |> FileIO.delete()
+        |> @file_io.delete()
         |> update_auction_supplier_coq(%{file_extension: file_extension})
     end
-    |> FileIO.upload(coq_binary)
+    |> @file_io.upload(coq_binary)
   end
 
   def get_auction_supplier_coq(auction_supplier_coq_id) do
@@ -552,6 +528,8 @@ defmodule Oceanconnect.Auctions do
       fuel_id: fuel_id
     })
   end
+
+  def get_auction_supplier_coq(nil, _supplier_id, _fuel_id), do: nil
 
   def create_auction_supplier_coq(auction_id, supplier_id, fuel_id, file_extension) do
     with auction = %struct{} when is_auction(struct) <- get_auction!(auction_id),
@@ -593,7 +571,7 @@ defmodule Oceanconnect.Auctions do
     response
   end
 
-  def update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
+  defp update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
     |> AuctionSupplierCOQ.changeset(attrs)
     |> Repo.update!()
@@ -986,7 +964,7 @@ defmodule Oceanconnect.Auctions do
     Repo.preload(vessel, [:company], force: force?)
   end
 
-  # def fully_loaded(struct, _force?), do: struct
+  def fully_loaded(nil, _force?), do: nil
 
   def strip_non_loaded(struct = %{}) do
     Enum.reduce(maybe_convert_struct(struct), %{}, fn {k, v}, acc ->

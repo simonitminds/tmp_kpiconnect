@@ -260,6 +260,10 @@ defmodule Oceanconnect.Auctions.AuctionPayload do
        when is_auction(struct) and is_auction_state(state_struct),
        do: 0
 
+  defp scrub_auction(auction = %struct{buyer_id: buyer_id, observers: _observers}, buyer_id)
+       when is_auction(struct),
+       do: Map.delete(auction, :observers)
+
   defp scrub_auction(auction = %struct{buyer_id: buyer_id}, buyer_id) when is_auction(struct),
     do: auction
 

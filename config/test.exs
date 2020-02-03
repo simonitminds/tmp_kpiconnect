@@ -26,6 +26,8 @@ config :oceanconnect, :sql_sandbox, true
 config :oceanconnect, :task_supervisor, Oceanconnect.FakeTaskSupervisor
 config :oceanconnect, :exclude_optional_services, true
 
+config :oceanconnect, :file_io, Oceanconnect.FakeIO
+
 config :hound,
   driver: "chrome_driver"
 

@@ -19,7 +19,7 @@ defmodule OceanconnectWeb.FileIO do
   defp delete_from_s3(auction_supplier_coq) do
     @bucket_name
     |> ExAws.S3.delete_object(
-      "#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
+      "/#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
     )
     |> ExAws.request!()
 
@@ -41,7 +41,7 @@ defmodule OceanconnectWeb.FileIO do
   defp get_from_s3(auction_supplier_coq) do
     @bucket_name
     |> ExAws.S3.get_object(
-      "#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
+      "/#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}"
     )
     |> ExAws.request!()
   end
@@ -57,15 +57,15 @@ defmodule OceanconnectWeb.FileIO do
   defp upload_to_local(auction_supplier_coq, coq_binary) do
     dir = storage_dir(auction_supplier_coq)
     file_name = file_name(auction_supplier_coq)
-    File.mkdir_p!(dir)
-    File.write!("#{storage_dir(auction_supplier_coq)}#{file_name}", coq_binary)
+    :ok = File.mkdir_p(dir)
+    :ok = File.write("#{storage_dir(auction_supplier_coq)}#{file_name}", coq_binary)
     auction_supplier_coq
   end
 
   defp upload_to_s3(auction_supplier_coq, coq_binary) do
     @bucket_name
     |> ExAws.S3.put_object(
-      "#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}",
+      "/#{storage_dir(auction_supplier_coq)}#{file_name(auction_supplier_coq)}",
       coq_binary
     )
     |> ExAws.request!()
@@ -82,10 +82,10 @@ defmodule OceanconnectWeb.FileIO do
   end
 
   defp storage_dir(%AuctionSupplierCOQ{auction_id: nil, term_auction_id: auction_id}) do
-    "/uploads/#{auction_id}/coqs/"
+    "uploads/#{auction_id}/coqs/"
   end
 
   defp storage_dir(%AuctionSupplierCOQ{auction_id: auction_id}) do
-    "/uploads/#{auction_id}/coqs/"
+    "uploads/#{auction_id}/coqs/"
   end
 end

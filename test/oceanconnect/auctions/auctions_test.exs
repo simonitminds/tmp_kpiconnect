@@ -1,6 +1,7 @@
 defmodule Oceanconnect.AuctionsTest do
   use Oceanconnect.DataCase
 
+  alias Oceanconnect.Accounts.Company
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -10,20 +11,20 @@ defmodule Oceanconnect.AuctionsTest do
     AuctionSupervisor,
     AuctionEvent,
     AuctionStore.AuctionState,
+    AuctionSupplierCOQ,
     Aggregate,
     Command,
+    Fuel,
     Solution
   }
 
   describe "auctions" do
-    alias Oceanconnect.Auctions.Auction
-
     @invalid_attrs %{port_id: "not a valid attribute"}
     @valid_attrs %{po: "some po"}
     @update_attrs %{po: "some updated po"}
 
     setup do
-      auction = insert(:auction, @valid_attrs) |> Auctions.fully_loaded()
+      auction = insert(:auction) |> Auctions.fully_loaded()
       term_auction = insert(:term_auction) |> Auctions.fully_loaded()
       finalized_auction = insert(:auction, finalized: true) |> Auctions.fully_loaded()
       finalized_term_auction = insert(:term_auction, finalized: true) |> Auctions.fully_loaded()
@@ -54,190 +55,6 @@ defmodule Oceanconnect.AuctionsTest do
          term_auction_attrs: term_auction_attrs,
          invalid_start_time: invalid_start_time
        }}
-    end
-
-    test "#maybe_parse_date_field" do
-      expected_date = DateTime.from_naive!(~N[2017-12-28 01:30:00.000], "Etc/UTC")
-
-      epoch =
-        expected_date
-        |> DateTime.to_unix(:millisecond)
-        |> Integer.to_string()
-
-      params = %{"scheduled_start" => epoch}
-
-      %{"scheduled_start" => parsed_date} =
-        Auction.maybe_parse_date_field(params, "scheduled_start")
-
-      assert parsed_date == expected_date |> DateTime.to_iso8601()
-    end
-
-    test "#maybe_convert_duration" do
-      params = %{"duration" => "10", "decision_duration" => "15"}
-      %{"duration" => duration} = Auction.maybe_convert_duration(params, "duration")
-
-      %{"decision_duration" => decision_duration} =
-        Auction.maybe_convert_duration(params, "decision_duration")
-
-      assert duration == 10 * 60_000
-      assert decision_duration == 15 * 60_000
-    end
-
-    test "#maybe_load_suppliers" do
-      supplier = insert(:company, is_supplier: true)
-      params = %{"suppliers" => %{"supplier-#{supplier.id}" => "#{supplier.id}"}}
-      %{"suppliers" => suppliers} = Auction.maybe_load_suppliers(params, "suppliers")
-
-      assert List.first(suppliers).id == supplier.id
-    end
-
-    test "#participation_for_supplier" do
-      supplier = insert(:company, is_supplier: true)
-      auction = insert(:auction, suppliers: [supplier])
-
-      assert Auctions.get_auction_supplier(auction, supplier.id).participation == nil
-      Auctions.update_participation_for_supplier(auction, supplier.id, "yes")
-      assert Auctions.get_auction_supplier(auction, supplier.id).participation == "yes"
-    end
-
-    test "#maybe_add_vessel_fuels does not require quantity for draft auctions", %{
-      port: port,
-      vessel: vessel,
-      fuel: fuel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => nil,
-        "auction_vessel_fuels" => [
-          %{
-            "vessel_id" => vessel.id,
-            "fuel_id" => fuel.id,
-            "quantity" => nil,
-            "eta" => DateTime.utc_now()
-          }
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      assert changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is valid with just vessel_ids for draft auctions", %{
-      port: port,
-      vessel: vessel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => nil,
-        "auction_vessel_fuels" => [
-          %{"vessel_id" => vessel.id, "eta" => DateTime.utc_now()}
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      assert changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is valid with just fuel_ids for draft auctions", %{
-      port: port,
-      fuel: fuel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => nil,
-        "auction_vessel_fuels" => [
-          %{"fuel_id" => fuel.id, "eta" => DateTime.utc_now()}
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      assert changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is invalid without fuel quantities for scheduled auctions", %{
-      port: port,
-      vessel: vessel,
-      fuel: fuel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => DateTime.utc_now(),
-        "auction_vessel_fuels" => [
-          %{
-            "vessel_id" => vessel.id,
-            "fuel_id" => fuel.id,
-            "quantity" => nil,
-            "eta" => DateTime.utc_now()
-          }
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      refute changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is invalid without vessel ids for scheduled auctions", %{
-      port: port,
-      fuel: fuel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => DateTime.utc_now(),
-        "auction_vessel_fuels" => [
-          %{
-            "vessel_id" => nil,
-            "fuel_id" => fuel.id,
-            "quantity" => 1500,
-            "eta" => DateTime.utc_now()
-          }
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      refute changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is invalid without fuel ids for scheduled auctions", %{
-      port: port,
-      vessel: vessel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => DateTime.utc_now(),
-        "auction_vessel_fuels" => [
-          %{
-            "vessel_id" => vessel.id,
-            "fuel_id" => nil,
-            "quantity" => 1500,
-            "eta" => DateTime.utc_now()
-          }
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      refute changeset.valid?
-    end
-
-    test "#maybe_add_vessel_fuels is valid with fuel quantities for scheduled auctions", %{
-      port: port,
-      vessel: vessel,
-      fuel: fuel
-    } do
-      params = %{
-        "port_id" => port.id,
-        "scheduled_start" => DateTime.utc_now(),
-        "auction_vessel_fuels" => [
-          %{
-            "vessel_id" => vessel.id,
-            "fuel_id" => fuel.id,
-            "quantity" => 1500,
-            "eta" => DateTime.utc_now()
-          }
-        ]
-      }
-
-      changeset = Auction.changeset(%Auction{}, params)
-      assert changeset.valid?
     end
 
     test "list_auctions/0 returns all non-finalized auctions", %{
@@ -430,40 +247,14 @@ defmodule Oceanconnect.AuctionsTest do
     test "change_auction/1 returns a auction changeset", %{auction: auction} do
       assert %Ecto.Changeset{} = Auctions.change_auction(auction)
     end
-  end
 
-  describe "starting an auction" do
-    setup do
-      admin = insert(:user, is_admin: true)
+    test "update_participation_for_supplier/3 updates a supplier's participation" do
+      supplier = insert(:company, is_supplier: true)
+      auction = insert(:auction, suppliers: [supplier])
 
-      {:ok, scheduled_start} =
-        (DateTime.to_unix(DateTime.utc_now()) + 60_000)
-        |> DateTime.from_unix()
-
-      auction =
-        :auction
-        |> insert(scheduled_start: scheduled_start, duration: 1_000, decision_duration: 1_000)
-        |> Auctions.fully_loaded()
-
-      {:ok, _pid} =
-        start_supervised(
-          {AuctionSupervisor,
-           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
-        )
-
-      {:ok, %{auction: auction, admin: admin}}
-    end
-
-    test "start_auction/2 starts the given auction and adds auction_started field to auction", %{
-      auction: auction,
-      admin: admin
-    } do
-      auction = Auctions.start_auction(auction, admin)
-      :timer.sleep(500)
-      {:ok, auction} = Oceanconnect.Auctions.AuctionCache.read(auction.id)
-
-      assert auction.auction_started != nil
-      assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
+      assert Auctions.get_auction_supplier(auction, supplier.id).participation == nil
+      Auctions.update_participation_for_supplier(auction, supplier.id, "yes")
+      assert Auctions.get_auction_supplier(auction, supplier.id).participation == "yes"
     end
   end
 
@@ -504,6 +295,213 @@ defmodule Oceanconnect.AuctionsTest do
                Auctions.get_participant_name_and_ids_for_auction(anon_auction.id),
                &(&1 in expected_result)
              )
+    end
+  end
+
+  describe "auction_supplier_coqs" do
+    setup do
+      supplier_company = insert(:company, is_supplier: true)
+      supplier2_company = insert(:company, is_supplier: true)
+      vessel_fuels = insert_list(2, :vessel_fuel)
+      fuel = vessel_fuels |> hd() |> Map.get(:fuel)
+
+      auction =
+        :auction
+        |> insert(
+          auction_vessel_fuels: vessel_fuels,
+          suppliers: [supplier_company, supplier2_company]
+        )
+        |> Auctions.fully_loaded()
+
+      term_auction =
+        :term_auction
+        |> insert(fuel: fuel, suppliers: [supplier_company, supplier2_company])
+        |> Auctions.fully_loaded()
+
+      existing_coq =
+        insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier2_company)
+
+      {:ok,
+       %{
+         auction: auction,
+         existing_coq: existing_coq,
+         fuel: fuel,
+         supplier: supplier_company,
+         supplier2: supplier2_company,
+         term_auction: term_auction
+       }}
+    end
+
+    test "store_auction_supplier_coq/5 creates an auction_supplier_coq", %{
+      auction: %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert %AuctionSupplierCOQ{
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier_id,
+               file_extension: "pdf"
+             } =
+               Auctions.store_auction_supplier_coq(
+                 auction_id,
+                 supplier_id,
+                 fuel_id,
+                 "test",
+                 "pdf"
+               )
+    end
+
+    test "store_auction_supplier_coq/5 updates an existing auction_supplier_coq", %{
+      auction: %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier2: %{id: supplier2_id},
+      existing_coq: %{id: existing_coq_id}
+    } do
+      assert %AuctionSupplierCOQ{
+               id: ^existing_coq_id,
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier2_id,
+               file_extension: "jpg"
+             } =
+               Auctions.store_auction_supplier_coq(
+                 auction_id,
+                 supplier2_id,
+                 fuel_id,
+                 "test",
+                 "jpg"
+               )
+    end
+
+    test "store_auction_supplier_coq/5 returns :error if invalid input", %{
+      fuel: %{id: fuel_id},
+      supplier2: %{id: supplier2_id}
+    } do
+      assert :error ==
+               Auctions.store_auction_supplier_coq("0", supplier2_id, fuel_id, "test", "pdf")
+    end
+
+    test "create_auction_supplier_coqs/4 succeeds for a spot auction", %{
+      auction: %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert %AuctionSupplierCOQ{
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier_id,
+               file_extension: "pdf"
+             } = Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+    end
+
+    test "create_auction_supplier_coqs/4 succeeds for a term auction", %{
+      term_auction: %{id: term_auction_id},
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert %AuctionSupplierCOQ{
+               term_auction_id: ^term_auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier_id,
+               file_extension: "pdf"
+             } =
+               Auctions.create_auction_supplier_coq(term_auction_id, supplier_id, fuel_id, "pdf")
+    end
+
+    test "create_auction_supplier_coqs/4 fails if invalid auction provided", %{
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert :error ==
+               Auctions.create_auction_supplier_coq(0, supplier_id, fuel_id, "pdf")
+    end
+
+    test "create_auction_supplier_coqs/4 fails if supplier not invited to auction", %{
+      auction: %{id: auction_id},
+      fuel: %{id: fuel_id}
+    } do
+      %Company{id: supplier_id} = insert(:company, is_supplier: true)
+
+      assert :error ==
+               Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+    end
+
+    test "create_auction_supplier_coqs/4 fails if fuel is not associated to auction", %{
+      auction: %{id: auction_id},
+      supplier: %{id: supplier_id}
+    } do
+      %Fuel{id: fuel_id} = insert(:fuel)
+
+      assert :error ==
+               Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+    end
+
+    test "delete_auction_supplier_coq/1 succeeds", %{existing_coq: existing_coq} do
+      Auctions.delete_auction_supplier_coq(existing_coq)
+      assert nil == Auctions.get_auction_supplier_coq(existing_coq.id)
+    end
+
+    test "get_auction_supplier_coq/1 returns struct", %{existing_coq: %{id: existing_coq_id}} do
+      assert %AuctionSupplierCOQ{id: ^existing_coq_id} =
+               Auctions.get_auction_supplier_coq(existing_coq_id)
+    end
+
+    test "get_auction_supplier_coq/1 returns nil if invalid id" do
+      assert nil == Auctions.get_auction_supplier_coq(0)
+    end
+
+    test "get_auction_supplier_coq/3 returns struct", %{
+      auction: auction,
+      fuel: %{id: fuel_id},
+      supplier2: %{id: supplier2_id},
+      existing_coq: %{id: existing_coq_id}
+    } do
+      assert %AuctionSupplierCOQ{id: ^existing_coq_id} =
+               Auctions.get_auction_supplier_coq(auction, supplier2_id, fuel_id)
+    end
+
+    test "get_auction_supplier_coq/3 returns nil if no existing coq", %{
+      auction: auction,
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert nil == Auctions.get_auction_supplier_coq(auction, supplier_id, fuel_id)
+    end
+  end
+
+  describe "starting an auction" do
+    setup do
+      admin = insert(:user, is_admin: true)
+
+      {:ok, scheduled_start} =
+        (DateTime.to_unix(DateTime.utc_now()) + 60_000)
+        |> DateTime.from_unix()
+
+      auction =
+        :auction
+        |> insert(scheduled_start: scheduled_start, duration: 1_000, decision_duration: 1_000)
+        |> Auctions.fully_loaded()
+
+      {:ok, _pid} =
+        start_supervised(
+          {AuctionSupervisor,
+           {auction, %{exclude_children: [:auction_reminder_timer, :auction_scheduler]}}}
+        )
+
+      {:ok, %{auction: auction, admin: admin}}
+    end
+
+    test "start_auction/2 starts the given auction and adds auction_started field to auction", %{
+      auction: auction,
+      admin: admin
+    } do
+      auction = Auctions.start_auction(auction, admin)
+      :timer.sleep(500)
+      {:ok, auction} = Oceanconnect.Auctions.AuctionCache.read(auction.id)
+
+      assert auction.auction_started != nil
+      assert %AuctionState{status: :open} = Auctions.get_auction_state!(auction)
     end
   end
 
@@ -1528,12 +1526,12 @@ defmodule Oceanconnect.AuctionsTest do
       auction = insert(:auction)
       auction2 = insert(:auction)
       fixtures = insert_list(2, :auction_fixture, auction: auction)
-      fixtures2 = insert_list(2, :auction_fixture, auction: auction2)
+      insert_list(2, :auction_fixture, auction: auction2)
       %{auction: auction, fixtures: fixtures}
     end
 
     test "auctions_with_fixtures/0", %{auction: auction, fixtures: fixtures} do
-      non_closed_auction = insert(:auction)
+      _non_closed_auction = insert(:auction)
       auction_id = auction.id
       result = Auctions.auctions_with_fixtures()
       assert Map.has_key?(result, auction_id)

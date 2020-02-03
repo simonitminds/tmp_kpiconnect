@@ -38,8 +38,9 @@ defmodule Oceanconnect.Factory do
   def auction_supplier_coq_factory() do
     %Oceanconnect.Auctions.AuctionSupplierCOQ{
       auction: build(:auction),
+      fuel: build(:fuel),
       supplier: build(:company),
-      fuel: build(:fuel)
+      file_extension: "pdf"
     }
   end
 
@@ -47,11 +48,11 @@ defmodule Oceanconnect.Factory do
 
   def create_auction_supplier_coq(auction = %Auction{}, supplier) do
     fuel = auction.auction_vessel_fuels |> List.first() |> Map.get(:fuel)
-    insert(:auction_supplier_coq, auction: auction, supplier: supplier, fuel: fuel)
+    insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier)
   end
 
   def create_auction_supplier_coq(auction = %TermAuction{fuel: fuel}, supplier) do
-    insert(:auction_supplier_coq, auction: auction, supplier: supplier, fuel: fuel)
+    insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier)
   end
 
   def draft_auction_factory() do
