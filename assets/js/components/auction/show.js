@@ -104,6 +104,8 @@ export default class AuctionShow extends React.Component {
                         {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                           ? <BuyerSidebar
                             auctionPayload={auctionPayload}
+                            addCOQ={addCOQ}
+                            deleteCOQ={deleteCOQ}
                             approveBargeForm={approveBargeForm}
                             rejectBargeForm={rejectBargeForm}
                             inviteObserver={inviteObserver}
@@ -163,6 +165,8 @@ export default class AuctionShow extends React.Component {
                     {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                       ? <BuyerSidebar
                         auctionPayload={auctionPayload}
+                        addCOQ={addCOQ}
+                        deleteCOQ={deleteCOQ}
                         approveBargeForm={approveBargeForm}
                         rejectBargeForm={rejectBargeForm}
                         inviteObserver={inviteObserver}

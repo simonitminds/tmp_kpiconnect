@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import ViewCOQ from './view-coq';
 
 class COQSubmission extends React.Component {
   constructor(props) {
@@ -22,73 +23,35 @@ class COQSubmission extends React.Component {
     this.setState({ uploading: true });
     const form = ev.target;
     const data = new FormData(form);
-    const fuelId = data.get("fuelId");
     const coq = data.get("coq");
-    const { addCOQ, auctionPayload, supplierId } = this.props;
+    const { addCOQ, auctionPayload, fuel, supplierId } = this.props;
     const { auction } = auctionPayload;
-    addCOQ(auction.id, supplierId, fuelId, coq);
-    document.querySelector(`#coq-${fuelId}`).value = null;
+    addCOQ(auction.id, supplierId, fuel.id, coq);
+    document.querySelector(`#coq-${fuel.id}`).value = null;
   }
 
   render() {
-    const { auctionPayload, deleteCOQ, supplierId } = this.props;
-    const auction = auctionPayload.auction;
-    const supplierCOQs = auction.auction_supplier_coqs;
-    let fuels = _.get(auction, "auction_vessel_fuels", null);
-    if (fuels) {
-      fuels = _.map(fuels, "fuel");
-    } else {
-      fuels = [auction.fuel];
-    }
-    const auctionState = auctionPayload.status;
+    const { auctionPayload, deleteCOQ, fuel, supplierCOQ } = this.props;
+    const auction = _.get(auctionPayload, 'auction');
+    const auctionState = _.get(auctionPayload, 'status');
     const validAuctionState = auctionState === 'pending' || auctionState === 'open';
 
-    const renderCOQComponent = () => {
-      if (window.isAdmin || validAuctionState || (!validAuctionState && supplierCOQs.length != 0) ) {
-        return (
-          <div className="box has-margin-bottom-md has-padding-bottom-none">
-            <div className="box__subsection has-padding-bottom-none">
-              <h3 className="box__header">COQs</h3>
-              <div className="qa-coqs">
-                {fuels.map(renderCOQ)}
-              </div>
-            </div>
-          </div>
-        )
-      }
-    }
-
-    const renderCOQ = (fuel) => {
+    const renderCOQ = () => {
       return (
         <div className={`qa-coq-${fuel.id}`} key={fuel.id}>
-          {fuel.name}
-          {renderCOQLink(auction.id, fuel.id, supplierId, supplierCOQs)}
-          {renderCOQForm(fuel)}
+          <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} allowedToDelete={validAuctionState} />
+          {renderCOQForm()}
         </div>
       );
     };
 
-    const renderCOQForm = (fuel) => {
-      if (window.isAdmin || validAuctionState) {
+    const renderCOQForm = () => {
+      if ((window.isAdmin && !window.isImpersonating) || validAuctionState) {
         return (
           <form onSubmit={this.submitForm.bind(this)}>
             <input name="coq" type="file" id={`coq-${fuel.id}`} />
-            <input name="fuelId" hidden={true} defaultValue={fuel.id} ref={(ref) => { this.fuelId = ref; }} />
             {renderSubmitButton()}
           </form>
-        )
-      }
-    }
-
-    const renderCOQLink = (auctionId, fuelId, supplierId, supplierCOQs) => {
-      const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuelId, 'supplier_id': parseInt(supplierId) });
-
-      if (supplierCOQ) {
-        return (
-          <div>
-            <a href={`/auction_supplier_coqs/${supplierCOQ.id}`} target="_blank">View COQ</a>
-            { (window.isAdmin || validAuctionState) ? <a className="button is-danger has-margin-top-sm" onClick={(e) => deleteCOQ(supplierCOQ.id)}>Delete</a> : "" }
-          </div>
         )
       }
     }
@@ -103,7 +66,7 @@ class COQSubmission extends React.Component {
 
     return (
       <div>
-        { renderCOQComponent() }
+        { renderCOQ() }
       </div>
     );
   }

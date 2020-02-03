@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 import CollapsingBargeList from './show/collapsing-barge-list';
 import CollapsingBarge from './show/collapsing-barge';
+import COQSubmission from './show/coq-submission';
+import ViewCOQ from './show/view-coq';
 
 function rsvpSortingRank(response) {
   switch(response) {
@@ -13,10 +15,12 @@ function rsvpSortingRank(response) {
   }
 }
 
-const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) => {
+const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, addCOQ, deleteCOQ}) => {
   const auctionState = _.get(auctionPayload, 'status');
   const participations = _.get(auctionPayload, 'participations');
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
+  const coqList = _.get(auctionPayload, 'auction.auction_supplier_coqs');
+  const fuels = _.get(auctionPayload, 'auction.fuels');
   const rsvpSortingOrder = ["yes", "maybe", null, "no"];
   const suppliers = _.chain(auctionPayload)
     .get('auction.suppliers')
@@ -60,6 +64,46 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
     );
   };
 
+  const renderCOQs = (supplierCOQs, supplierId) => {
+    if (window.isAdmin) {
+      return (
+        <div>
+          {
+            fuels.map((fuel) => {
+              const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': parseInt(supplierId) });
+              return (
+                <COQSubmission
+                  auctionPayload={auctionPayload}
+                  addCOQ={addCOQ}
+                  deleteCOQ={deleteCOQ}
+                  fuel={fuel}
+                  supplierId={supplierId}
+                  supplierCOQ={supplierCOQ}
+                />
+              )
+            })
+          }
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {
+            supplierCOQs.map((supplierCOQ) => {
+              const fuelId = _.get(supplierCOQ, 'fuel_id');
+              const fuel = _.chain(fuels).filter(['id', fuelId]).first().value();
+              return (
+                <div key={fuelId}>
+                  <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel}/>
+                </div>
+              );
+            })
+          }
+        </div>
+      );
+    }
+  };
+
   const renderSupplierParticipation = (status, supplier) => {
     if (status == "yes") {
       return <span className={`icon has-text-success has-margin-right-sm qa-auction-rsvp-response-${supplier.id}`}><FontAwesomeIcon icon="check-circle" /></span>;
@@ -79,6 +123,8 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
         { _.map(suppliers, (supplier) => {
           const bargeList = auctionBargesBySupplier[supplier.id] || [];
           const bargeCount = bargeList.length;
+          const supplierCOQs = _.filter(coqList, ['supplier_id', supplier.id]);
+          const supplierCOQsCount = supplierCOQs.length;
           const hasPendingBarges = bargeList.some((barge) => {
             return barge.approval_status == 'PENDING'
           })
@@ -101,6 +147,18 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm}) =
                     contentChildCount={bargeCount}
                     >
                     { bargesForSupplier(supplier) }
+                  </CollapsingBargeList>
+                }
+                { (window.isAdmin || supplierCOQsCount != 0) &&
+                  <CollapsingBargeList
+                    trigger="COQ"
+                    open={supplierCOQsCount != 0}
+                    pendingBargeFlag = {false}
+                    triggerClassString="collapsible-barge-list__container__trigger"
+                    classParentString="qa-open-barges-list collapsing-barge-list__container"
+                    contentChildCount={supplierCOQsCount}
+                    >
+                    { renderCOQs(supplierCOQs, supplier.id) }
                   </CollapsingBargeList>
                 }
               </div>

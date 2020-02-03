@@ -5,7 +5,7 @@ import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import SidebarDetails from './sidebar-details';
 import BargeSubmission from '../../common/show/barge-submission';
-import COQSubmission from '../../common/show/coq-submission';
+import SupplierCOQs from '../../common/show/supplier-coqs';
 
 
 const SupplierSidebar = (props) => {
@@ -34,7 +34,7 @@ const SupplierSidebar = (props) => {
         companyBarges={companyProfile.companyBarges}
         supplierId={currentUserCompanyId}
       />
-      <COQSubmission
+      <SupplierCOQs
         addCOQ={addCOQ}
         deleteCOQ={deleteCOQ}
         auctionPayload={auctionPayload}
