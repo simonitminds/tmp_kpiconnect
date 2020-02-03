@@ -212,16 +212,19 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
       margin-right: 1rem;
     }
 
-    a {
+    a:not(.button) {
       color: $gray-3;
-      transition: color 0.1s ease-in;
       &:hover, &:focus {
         color: darken($gray-3, 20%);
       }
     }
+
+    a {
+      transition: color 0.1s ease-in;
+    }
   }
 
-  .collapsing-barge__barge__button.buttons button { // Target button text for when window size is too narrow.
+  .collapsing-barge__barge__button.buttons .button { // Target button text for when window size is too narrow.
     @media (min-width: 1280px) {
       svg { display: none; }
       span { display: inline; }

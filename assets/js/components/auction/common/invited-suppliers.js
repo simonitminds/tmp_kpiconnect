@@ -65,7 +65,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
   };
 
   const renderCOQs = (supplierCOQs, supplierId) => {
-    if (window.isAdmin) {
+    if (window.isAdmin && !window.isImpersonating) {
       return (
         <div>
           {
@@ -93,8 +93,10 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
               const fuelId = _.get(supplierCOQ, 'fuel_id');
               const fuel = _.chain(fuels).filter(['id', fuelId]).first().value();
               return (
-                <div key={fuelId}>
-                  <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel}/>
+                <div className="collapsing-barge__barge" key={fuelId}>
+                  <div className="container is-fullhd">
+                    <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel}/>
+                  </div>
                 </div>
               );
             })
@@ -149,7 +151,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
                     { bargesForSupplier(supplier) }
                   </CollapsingBargeList>
                 }
-                { (window.isAdmin || supplierCOQsCount != 0) &&
+                { ((window.isAdmin && !window.isImpersonating) || supplierCOQsCount != 0) &&
                   <CollapsingBargeList
                     trigger="COQ"
                     open={supplierCOQsCount != 0}

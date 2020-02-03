@@ -19,15 +19,12 @@ class COQSubmission extends React.Component {
   }
 
   submitForm(ev) {
-    ev.preventDefault();
+    ev.preventDefault
     this.setState({ uploading: true });
-    const form = ev.target;
-    const data = new FormData(form);
-    const coq = data.get("coq");
+    const coq = ev.target.files[0];
     const { addCOQ, auctionPayload, fuel, supplierId } = this.props;
     const { auction } = auctionPayload;
     addCOQ(auction.id, supplierId, fuel.id, coq);
-    document.querySelector(`#coq-${fuel.id}`).value = null;
   }
 
   render() {
@@ -38,29 +35,31 @@ class COQSubmission extends React.Component {
 
     const renderCOQ = () => {
       return (
-        <div className={`qa-coq-${fuel.id}`} key={fuel.id}>
-          <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} allowedToDelete={validAuctionState} />
-          {renderCOQForm()}
+        <div className="collapsing-barge__barge" key={fuel.id}>
+          <div className="container is-fullhd">
+            <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} allowedToDelete={validAuctionState} />
+            {renderCOQForm()}
+          </div>
         </div>
       );
     };
 
     const renderCOQForm = () => {
       if ((window.isAdmin && !window.isImpersonating) || validAuctionState) {
-        return (
-          <form onSubmit={this.submitForm.bind(this)}>
-            <input name="coq" type="file" id={`coq-${fuel.id}`} />
-            {renderSubmitButton()}
-          </form>
-        )
-      }
+        return renderSubmitButton();
+      } else { return ""; }
     }
 
     const renderSubmitButton = () => {
       if (this.state.uploading) {
-        return (<button disabled={true} className="button is-primary has-margin-top-sm">Processing...</button>)
+        return (<button disabled={true} className="button is-primary full-width has-margin-bottom-md">Processing...</button>)
       } else {
-        return (<button type="submit" className="button is-primary has-margin-top-sm">Upload COQ</button>)
+        return (
+          <label htmlFor={`coq-${fuel.id}`} className="button is-primary full-width has-margin-bottom-md">
+            <input onChange={this.submitForm.bind(this)} name="coq" type="file" id={`coq-${fuel.id}`} hidden={true} />
+            Upload COQ
+          </label>
+        )
       }
     }
 
