@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const ViewCOQ = ({fuel, supplierCOQ, allowedToDelete}) => {
+const ViewCOQ = ({fuel, supplierCOQ, deleteCOQ, allowedToDelete}) => {
   const renderCOQView = () => {
     if (supplierCOQ) {
       return (
@@ -16,7 +16,7 @@ const ViewCOQ = ({fuel, supplierCOQ, allowedToDelete}) => {
   }
 
   return (
-    <div className="content submitted">
+    <div className="content submitted has-margin-bottom-sm">
       <h2 className="collapsing-barge__barge__trigger"><span className="collapsible-section__title">{fuel.name}</span></h2>
       {renderCOQView()}
     </div>

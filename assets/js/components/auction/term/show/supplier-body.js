@@ -15,6 +15,8 @@ import CollapsibleSection from '../../common/collapsible-section';
 
 const SupplierBody = (props) => {
   const {
+    addCOQ,
+    deleteCOQ,
     auctionPayload,
     currentUser,
     connection,

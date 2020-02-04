@@ -10,7 +10,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
   @extension_whitelist ~w(jpg jpeg gif png pdf)
 
   def delete_coq(conn, %{"id" => auction_supplier_coq_id}) do
-    with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
+    with user = %User{company_id: company_id} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
          auction_supplier_coq = %AuctionSupplierCOQ{
            auction_id: auction_id,
            supplier_id: supplier_id
@@ -25,7 +25,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
 
       conn
       |> render("submit.json",
-        auction_payload: AuctionPayload.get_auction_payload!(auction, supplier_id)
+        auction_payload: AuctionPayload.get_auction_payload!(auction, company_id)
       )
     else
       _ ->
@@ -35,8 +35,8 @@ defmodule OceanconnectWeb.Api.FileIOController do
     end
   end
 
-  def upload_coq(conn, params = %{"auction_id" => auction_id, "supplier_id" => supplier_id}) do
-    with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
+  def upload_coq(conn, params = %{"auction_id" => auction_id}) do
+    with user = %User{company_id: company_id} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
          auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
          true <- is_authorized_to_change?(auction, user, params),
          {:ok, coq_binary, _conn} <- Plug.Conn.read_body(conn),
@@ -50,7 +50,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
 
       conn
       |> render("submit.json",
-        auction_payload: AuctionPayload.get_auction_payload!(updated_auction, supplier_id)
+        auction_payload: AuctionPayload.get_auction_payload!(updated_auction, company_id)
       )
     else
       {:file_error, message} ->
@@ -98,11 +98,9 @@ defmodule OceanconnectWeb.Api.FileIOController do
        }),
        do: true
 
-  defp is_authorized_to_change?(
-         %{finalized: true},
-         %User{company_id: supplier_id},
-         params = %{"supplier_id" => supplier_id}
-       ),
+  defp is_authorized_to_change?(%{finalized: true}, %User{company_id: supplier_id}, %{
+         "supplier_id" => supplier_id
+       }),
        do: false
 
   defp is_authorized_to_change?(%{id: auction_id}, %User{company_id: supplier_id}, %{

@@ -20,7 +20,13 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
   const participations = _.get(auctionPayload, 'participations');
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const coqList = _.get(auctionPayload, 'auction.auction_supplier_coqs');
-  const fuels = _.get(auctionPayload, 'auction.fuels');
+  const auction = _.get(auctionPayload, 'auction');
+  let fuels = _.get(auction, "auction_vessel_fuels", null);
+  if (fuels) {
+    fuels = _.map(fuels, "fuel");
+  } else {
+    fuels = [auction.fuel];
+  }
   const rsvpSortingOrder = ["yes", "maybe", null, "no"];
   const suppliers = _.chain(auctionPayload)
     .get('auction.suppliers')
@@ -72,14 +78,17 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
             fuels.map((fuel) => {
               const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': parseInt(supplierId) });
               return (
-                <COQSubmission
-                  auctionPayload={auctionPayload}
-                  addCOQ={addCOQ}
-                  deleteCOQ={deleteCOQ}
-                  fuel={fuel}
-                  supplierId={supplierId}
-                  supplierCOQ={supplierCOQ}
-                />
+                <div key={`${supplierId}-${fuel.id}`}>
+                  <COQSubmission
+                    auctionPayload={auctionPayload}
+                    addCOQ={addCOQ}
+                    deleteCOQ={deleteCOQ}
+                    fuel={fuel}
+                    supplierId={supplierId}
+                    supplierCOQ={supplierCOQ}
+                    delivered={false}
+                  />
+                </div>
               )
             })
           }
@@ -125,7 +134,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
         { _.map(suppliers, (supplier) => {
           const bargeList = auctionBargesBySupplier[supplier.id] || [];
           const bargeCount = bargeList.length;
-          const supplierCOQs = _.filter(coqList, ['supplier_id', supplier.id]);
+          const supplierCOQs = _.filter(coqList, {'supplier_id': supplier.id, 'delivered': false});
           const supplierCOQsCount = supplierCOQs.length;
           const hasPendingBarges = bargeList.some((barge) => {
             return barge.approval_status == 'PENDING'

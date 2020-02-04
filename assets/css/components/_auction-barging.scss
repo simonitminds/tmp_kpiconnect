@@ -140,6 +140,7 @@ h2.collapsing-barge__barge { // Ehhh, just playing around here to see what happe
 
   > .container {
     width: auto;
+    box-shadow: $box-shadow;
 
     &> .content {
       display: flex;

@@ -240,15 +240,16 @@ export function removeCOQ(coqId) {
   };
 }
 
-export function submitCOQ(auctionId, supplierId, fuelId, spec) {
+export function submitCOQ(auctionId, supplierId, fuelId, spec, delivered) {
   const uploadHeaders = {
     'Accept': 'application/json',
     'Authorization': `Bearer ${window.userToken}`,
     'x-expires': window.expiration
   };
 
+  const query = delivered ? '?delivered=true' : '';
   return dispatch => {
-    fetch(`/api/auctions/${auctionId}/suppliers/${supplierId}/coqs/${fuelId}/upload`, {
+    fetch(`/api/auctions/${auctionId}/suppliers/${supplierId}/coqs/${fuelId}/upload${query}`, {
       headers: uploadHeaders,
       method: 'POST',
       body: spec

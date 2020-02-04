@@ -75,11 +75,15 @@ export default class AuctionShow extends React.Component {
                       </div>
                       {(currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
                         ? <BuyerBody
+                          addCOQ={addCOQ}
+                          deleteCOQ={deleteCOQ}
                           auctionPayload={auctionPayload}
                           acceptSolution={acceptSolution}
                           currentUser={currentUser}
                         />
                         : <SupplierBody
+                          addCOQ={addCOQ}
+                          deleteCOQ={deleteCOQ}
                           auctionPayload={auctionPayload}
                           currentUser={currentUser}
                           connection={connection}
@@ -103,9 +107,9 @@ export default class AuctionShow extends React.Component {
                       <TabPanel>
                         {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                           ? <BuyerSidebar
-                            auctionPayload={auctionPayload}
                             addCOQ={addCOQ}
                             deleteCOQ={deleteCOQ}
+                            auctionPayload={auctionPayload}
                             approveBargeForm={approveBargeForm}
                             rejectBargeForm={rejectBargeForm}
                             inviteObserver={inviteObserver}
@@ -144,11 +148,15 @@ export default class AuctionShow extends React.Component {
                   <TabPanel>
                     {(currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver)
                       ? <BuyerBody
+                        addCOQ={addCOQ}
+                        deleteCOQ={deleteCOQ}
                         auctionPayload={auctionPayload}
                         acceptSolution={acceptSolution}
                         currentUser={currentUser}
                       />
                       : <SupplierBody
+                        addCOQ={addCOQ}
+                        deleteCOQ={deleteCOQ}
                         auctionPayload={auctionPayload}
                         currentUser={currentUser}
                         connection={connection}
@@ -164,9 +172,9 @@ export default class AuctionShow extends React.Component {
                   <TabPanel>
                     {currentUser.isBuyer || currentUser.isAdmin || currentUser.isObserver
                       ? <BuyerSidebar
-                        auctionPayload={auctionPayload}
                         addCOQ={addCOQ}
                         deleteCOQ={deleteCOQ}
+                        auctionPayload={auctionPayload}
                         approveBargeForm={approveBargeForm}
                         rejectBargeForm={rejectBargeForm}
                         inviteObserver={inviteObserver}
@@ -174,6 +182,7 @@ export default class AuctionShow extends React.Component {
                       />
                       : <SupplierSidebar
                         addCOQ={addCOQ}
+                        deleteCOQ={deleteCOQ}
                         auctionPayload={auctionPayload}
                         submitBargeForm={submitBargeForm}
                         unsubmitBargeForm={unsubmitBargeForm}

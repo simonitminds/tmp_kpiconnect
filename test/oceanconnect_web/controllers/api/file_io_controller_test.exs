@@ -164,9 +164,9 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
 
     test "can NOT upload delivered coq for non-finalized auction", %{
       conn: conn,
-      auction: auction = %{id: auction_id},
+      auction: %{id: auction_id},
       fuel: %{id: fuel_id},
-      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+      supplier2_company: %{id: supplier2_company_id}
     } do
       conn =
         post(
@@ -315,7 +315,7 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
       conn: conn,
       auction: auction = %{id: auction_id},
       fuel: %{id: fuel_id},
-      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+      supplier2_company: %{id: supplier2_company_id}
     } do
       close_auction!(auction)
 
@@ -389,9 +389,9 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
 
     test "can NOT upload delivered coq for non-finalized auction", %{
       conn: conn,
-      auction: auction = %{id: auction_id},
+      auction: %{id: auction_id},
       fuel: %{id: fuel_id},
-      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+      supplier2_company: %{id: supplier2_company_id}
     } do
       conn =
         post(

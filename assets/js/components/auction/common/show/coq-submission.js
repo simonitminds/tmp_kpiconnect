@@ -22,22 +22,22 @@ class COQSubmission extends React.Component {
     ev.preventDefault
     this.setState({ uploading: true });
     const coq = ev.target.files[0];
-    const { addCOQ, auctionPayload, fuel, supplierId } = this.props;
+    const { addCOQ, auctionPayload, fuel, supplierId, delivered } = this.props;
     const { auction } = auctionPayload;
-    addCOQ(auction.id, supplierId, fuel.id, coq);
+    addCOQ(auction.id, supplierId, fuel.id, coq, delivered);
   }
 
   render() {
-    const { auctionPayload, deleteCOQ, fuel, supplierCOQ } = this.props;
+    const { auctionPayload, deleteCOQ, fuel, supplierId, supplierCOQ, delivered } = this.props;
     const auction = _.get(auctionPayload, 'auction');
     const auctionState = _.get(auctionPayload, 'status');
     const validAuctionState = auctionState === 'pending' || auctionState === 'open';
 
     const renderCOQ = () => {
       return (
-        <div className="collapsing-barge__barge" key={fuel.id}>
+        <div className="collapsing-barge__barge">
           <div className="container is-fullhd">
-            <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} allowedToDelete={validAuctionState} />
+            <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} deleteCOQ={deleteCOQ} allowedToDelete={(validAuctionState || delivered)} />
             {renderCOQForm()}
           </div>
         </div>
@@ -45,7 +45,7 @@ class COQSubmission extends React.Component {
     };
 
     const renderCOQForm = () => {
-      if ((window.isAdmin && !window.isImpersonating) || validAuctionState) {
+      if ((window.isAdmin && !window.isImpersonating) || (validAuctionState || delivered)) {
         return renderSubmitButton();
       } else { return ""; }
     }
@@ -55,19 +55,15 @@ class COQSubmission extends React.Component {
         return (<button disabled={true} className="button is-primary full-width has-margin-bottom-md">Processing...</button>)
       } else {
         return (
-          <label htmlFor={`coq-${fuel.id}`} className="button is-primary full-width has-margin-bottom-md">
-            <input onChange={this.submitForm.bind(this)} name="coq" type="file" id={`coq-${fuel.id}`} hidden={true} />
+          <label htmlFor={`coq-${supplierId}-${fuel.id}`} className="button is-primary full-width has-margin-bottom-md">
+            <input onChange={this.submitForm.bind(this)} name="coq" type="file" id={`coq-${supplierId}-${fuel.id}`} hidden={true} />
             Upload COQ
           </label>
         )
       }
     }
 
-    return (
-      <div>
-        { renderCOQ() }
-      </div>
-    );
+    return renderCOQ()
   }
 }
 

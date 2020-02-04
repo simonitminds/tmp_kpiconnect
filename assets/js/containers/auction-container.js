@@ -47,8 +47,8 @@ const mapDispatchToProps = (dispatch) => ({
   formSubmit(auctionId, formData) {
     dispatch(submitBid(auctionId, formData));
   },
-  addCOQ(auctionId, supplierId, fuelId, spec) {
-    dispatch(submitCOQ(auctionId, supplierId, fuelId, spec));
+  addCOQ(auctionId, supplierId, fuelId, spec, delivered) {
+    dispatch(submitCOQ(auctionId, supplierId, fuelId, spec, delivered));
   },
   deleteCOQ(coqId) {
     dispatch(removeCOQ(coqId));

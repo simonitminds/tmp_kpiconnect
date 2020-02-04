@@ -40,6 +40,7 @@ const SupplierSidebar = (props) => {
         deleteCOQ={deleteCOQ}
         auctionPayload={auctionPayload}
         supplierId={currentUserCompanyId}
+        delivered={false}
       />
       <SidebarDetails auctionPayload={auctionPayload} isEditable={false} />
     </React.Fragment>
