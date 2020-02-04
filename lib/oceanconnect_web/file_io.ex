@@ -1,5 +1,5 @@
 defmodule OceanconnectWeb.FileIO do
-  alias Oceanconnect.Auctions.{AuctionSuppliers, AuctionSupplierCOQ}
+  alias Oceanconnect.Auctions.AuctionSupplierCOQ
 
   @bucket_name Application.get_env(:ex_aws, :bucket, nil)
 
@@ -10,7 +10,6 @@ defmodule OceanconnectWeb.FileIO do
   end
 
   defp delete_from_local(auction_supplier_coq) do
-    dir = storage_dir(auction_supplier_coq)
     file_name = file_name(auction_supplier_coq)
     File.rm!("#{storage_dir(auction_supplier_coq)}#{file_name}")
     auction_supplier_coq
@@ -33,7 +32,6 @@ defmodule OceanconnectWeb.FileIO do
   end
 
   defp get_from_local(auction_supplier_coq) do
-    dir = storage_dir(auction_supplier_coq)
     file_name = file_name(auction_supplier_coq)
     File.read!("#{storage_dir(auction_supplier_coq)}#{file_name}")
   end
@@ -81,11 +79,16 @@ defmodule OceanconnectWeb.FileIO do
     "#{supplier_id}-#{fuel_id}.#{file_extension}"
   end
 
-  defp storage_dir(%AuctionSupplierCOQ{auction_id: nil, term_auction_id: auction_id}) do
-    "uploads/#{auction_id}/coqs/"
-  end
+  defp storage_dir(%AuctionSupplierCOQ{
+         auction_id: nil,
+         term_auction_id: auction_id,
+         delivered: delivered
+       }),
+       do: dir_path(auction_id, delivered)
 
-  defp storage_dir(%AuctionSupplierCOQ{auction_id: auction_id}) do
-    "uploads/#{auction_id}/coqs/"
-  end
+  defp storage_dir(%AuctionSupplierCOQ{auction_id: auction_id, delivered: delivered}),
+    do: dir_path(auction_id, delivered)
+
+  defp dir_path(auction_id, true), do: "uploads/#{auction_id}/delivered_coqs/"
+  defp dir_path(auction_id, _), do: "uploads/#{auction_id}/coqs/"
 end

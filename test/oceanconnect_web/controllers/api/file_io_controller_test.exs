@@ -121,9 +121,60 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
                fuel_id: ^fuel_id,
                supplier_id: ^supplier2_company_id,
                file_extension: "pdf"
-             } = hd(supplier_coqs)
+             } =
+               supplier_coqs
+               |> Enum.filter(&(&1.supplier_id == supplier2_company_id))
+               |> List.first()
 
       assert %AuctionSupplierCOQ{} = Auctions.get_auction_supplier_coq(new_coq_id)
+    end
+
+    test "can upload delivered coq", %{
+      conn: conn,
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+    } do
+      Auctions.update_auction(auction, %{finalized: true}, supplier2_company)
+
+      conn =
+        post(
+          conn,
+          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier2_company_id, fuel_id)}?delivered=true"
+        )
+
+      assert 200 == conn.status
+
+      assert %AuctionPayload{auction: %Auction{auction_supplier_coqs: supplier_coqs}} =
+               conn.assigns.auction_payload
+
+      assert %AuctionSupplierCOQ{
+               id: new_coq_id,
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier2_company_id,
+               file_extension: "pdf"
+             } =
+               supplier_coqs
+               |> Enum.filter(&(&1.supplier_id == supplier2_company_id))
+               |> List.first()
+
+      assert %AuctionSupplierCOQ{} = Auctions.get_auction_supplier_coq(new_coq_id)
+    end
+
+    test "can NOT upload delivered coq for non-finalized auction", %{
+      conn: conn,
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+    } do
+      conn =
+        post(
+          conn,
+          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier2_company_id, fuel_id)}?delivered=true"
+        )
+
+      assert 422 == conn.status
     end
 
     test "can delete coq", %{
@@ -260,6 +311,23 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
       assert %AuctionSupplierCOQ{} = Auctions.get_auction_supplier_coq(new_coq_id)
     end
 
+    test "can NOT upload coq for an auction not :pending or :open", %{
+      conn: conn,
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+    } do
+      close_auction!(auction)
+
+      conn =
+        post(
+          conn,
+          file_io_api_path(conn, :upload_coq, auction_id, supplier2_company_id, fuel_id)
+        )
+
+      assert 422 == conn.status
+    end
+
     test "can update existing coq", %{
       conn: conn,
       existing_coq: %{auction_id: auction_id, fuel_id: fuel_id, supplier_id: supplier_company_id}
@@ -286,6 +354,52 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
                supplier_id: ^supplier_company_id,
                file_extension: "png"
              } = hd(supplier_coqs)
+    end
+
+    test "can upload delivered coq", %{
+      conn: conn,
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier_company: supplier_company = %{id: supplier_company_id}
+    } do
+      Auctions.update_auction(auction, %{finalized: true}, supplier_company)
+
+      conn =
+        post(
+          conn,
+          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier_company_id, fuel_id)}?delivered=true"
+        )
+
+      assert 200 == conn.status
+
+      assert %AuctionPayload{auction: %Auction{auction_supplier_coqs: supplier_coqs}} =
+               conn.assigns.auction_payload
+
+      assert %AuctionSupplierCOQ{
+               id: new_coq_id,
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier_company_id,
+               file_extension: "pdf",
+               delivered: true
+             } = List.last(supplier_coqs)
+
+      assert %AuctionSupplierCOQ{} = Auctions.get_auction_supplier_coq(new_coq_id)
+    end
+
+    test "can NOT upload delivered coq for non-finalized auction", %{
+      conn: conn,
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier2_company: supplier2_company = %{id: supplier2_company_id}
+    } do
+      conn =
+        post(
+          conn,
+          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier2_company_id, fuel_id)}?delivered=true"
+        )
+
+      assert 422 == conn.status
     end
 
     test "can delete coq", %{

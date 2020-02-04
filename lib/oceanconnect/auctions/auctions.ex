@@ -489,14 +489,13 @@ defmodule Oceanconnect.Auctions do
     Repo.get_by(AuctionSuppliers, %{term_auction_id: term_auction_id, supplier_id: supplier_id})
   end
 
-  def store_auction_supplier_coq(auction_id, supplier_id, fuel_id, coq_binary, file_extension)
+  def store_auction_supplier_coq(attrs = %{"coq_binary" => coq_binary}, auction)
       when is_binary(coq_binary) do
-    auction_id
-    |> get_auction!()
-    |> get_auction_supplier_coq(supplier_id, fuel_id)
+    auction
+    |> get_auction_supplier_coq(attrs)
     |> case do
       nil ->
-        create_auction_supplier_coq(auction_id, supplier_id, fuel_id, file_extension)
+        create_auction_supplier_coq(auction, attrs)
 
       :error ->
         :error
@@ -504,7 +503,7 @@ defmodule Oceanconnect.Auctions do
       auction_supplier_coq ->
         auction_supplier_coq
         |> @file_io.delete()
-        |> update_auction_supplier_coq(%{file_extension: file_extension})
+        |> update_auction_supplier_coq(attrs)
     end
     |> @file_io.upload(coq_binary)
   end
@@ -513,48 +512,99 @@ defmodule Oceanconnect.Auctions do
     Repo.get(AuctionSupplierCOQ, auction_supplier_coq_id)
   end
 
-  def get_auction_supplier_coq(%Auction{id: auction_id}, supplier_id, fuel_id) do
+  def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id,
+        "delivered" => _
+      }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       auction_id: auction_id,
       supplier_id: supplier_id,
-      fuel_id: fuel_id
+      fuel_id: fuel_id,
+      delivered: true
     })
   end
 
-  def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, supplier_id, fuel_id) do
+  def get_auction_supplier_coq(
+        %Auction{id: auction_id},
+        params = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      auction_id: auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: false
+    })
+  end
+
+  def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id,
+        "delivered" => _
+      }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       term_auction_id: term_auction_id,
       supplier_id: supplier_id,
-      fuel_id: fuel_id
+      fuel_id: fuel_id,
+      delivered: true
     })
   end
 
-  def get_auction_supplier_coq(nil, _supplier_id, _fuel_id), do: nil
+  def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id
+      }) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      term_auction_id: term_auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: false
+    })
+  end
 
-  def create_auction_supplier_coq(auction_id, supplier_id, fuel_id, file_extension) do
-    with auction = %struct{} when is_auction(struct) <- get_auction!(auction_id),
-         true <- is_participant?(auction, supplier_id),
+  def get_auction_supplier_coq(nil, _params), do: nil
+
+  def create_auction_supplier_coq(
+        auction = %Auction{},
+        attrs = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    with true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
       auction_supplier_coq =
-        if struct == Auction do
-          %AuctionSupplierCOQ{}
-          |> AuctionSupplierCOQ.changeset(%{
-            auction_id: auction_id,
-            supplier_id: supplier_id,
-            fuel_id: fuel_id,
-            file_extension: file_extension
-          })
-          |> Repo.insert!()
-        else
-          %AuctionSupplierCOQ{}
-          |> AuctionSupplierCOQ.changeset(%{
-            term_auction_id: auction_id,
-            supplier_id: supplier_id,
-            fuel_id: fuel_id,
-            file_extension: file_extension
-          })
-          |> Repo.insert!()
-        end
+        %AuctionSupplierCOQ{}
+        |> AuctionSupplierCOQ.changeset(attrs)
+        |> Repo.insert!()
+
+      update_cache(auction)
+      auction_supplier_coq
+    else
+      _ -> :error
+    end
+  end
+
+  def create_auction_supplier_coq(
+        auction = %TermAuction{id: auction_id},
+        attrs = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    with true <- is_participant?(auction, supplier_id),
+         true <- verify_fuel_is_for_auction(auction, fuel_id) do
+      auction_supplier_coq =
+        %AuctionSupplierCOQ{}
+        |> AuctionSupplierCOQ.changeset(
+          attrs
+          |> Map.delete("auction_id")
+          |> Map.put("term_auction_id", auction_id)
+        )
+        |> Repo.insert!()
 
       update_cache(auction)
       auction_supplier_coq
@@ -573,7 +623,7 @@ defmodule Oceanconnect.Auctions do
 
   defp update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
-    |> AuctionSupplierCOQ.changeset(attrs)
+    |> AuctionSupplierCOQ.update_changeset(attrs)
     |> Repo.update!()
   end
 

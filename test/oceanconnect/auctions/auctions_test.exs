@@ -332,8 +332,8 @@ defmodule Oceanconnect.AuctionsTest do
        }}
     end
 
-    test "store_auction_supplier_coq/5 creates an auction_supplier_coq", %{
-      auction: %{id: auction_id},
+    test "store_auction_supplier_coq/2 creates an auction_supplier_coq", %{
+      auction: auction = %{id: auction_id},
       fuel: %{id: fuel_id},
       supplier: %{id: supplier_id}
     } do
@@ -344,16 +344,19 @@ defmodule Oceanconnect.AuctionsTest do
                file_extension: "pdf"
              } =
                Auctions.store_auction_supplier_coq(
-                 auction_id,
-                 supplier_id,
-                 fuel_id,
-                 "test",
-                 "pdf"
+                 %{
+                   "auction_id" => auction_id,
+                   "fuel_id" => fuel_id,
+                   "supplier_id" => supplier_id,
+                   "coq_binary" => "test",
+                   "file_extension" => "pdf"
+                 },
+                 auction
                )
     end
 
-    test "store_auction_supplier_coq/5 updates an existing auction_supplier_coq", %{
-      auction: %{id: auction_id},
+    test "store_auction_supplier_coq/2 updates an existing auction_supplier_coq", %{
+      auction: auction = %{id: auction_id},
       fuel: %{id: fuel_id},
       supplier2: %{id: supplier2_id},
       existing_coq: %{id: existing_coq_id}
@@ -366,24 +369,36 @@ defmodule Oceanconnect.AuctionsTest do
                file_extension: "jpg"
              } =
                Auctions.store_auction_supplier_coq(
-                 auction_id,
-                 supplier2_id,
-                 fuel_id,
-                 "test",
-                 "jpg"
+                 %{
+                   "auction_id" => auction_id,
+                   "fuel_id" => fuel_id,
+                   "supplier_id" => supplier2_id,
+                   "coq_binary" => "test",
+                   "file_extension" => "jpg"
+                 },
+                 auction
                )
     end
 
-    test "store_auction_supplier_coq/5 returns :error if invalid input", %{
-      fuel: %{id: fuel_id},
+    test "store_auction_supplier_coq/2 returns :error if invalid input", %{
+      auction: auction = %{id: auction_id},
       supplier2: %{id: supplier2_id}
     } do
       assert :error ==
-               Auctions.store_auction_supplier_coq("0", supplier2_id, fuel_id, "test", "pdf")
+               Auctions.store_auction_supplier_coq(
+                 %{
+                   "auction_id" => auction_id,
+                   "fuel_id" => "0",
+                   "supplier_id" => supplier2_id,
+                   "coq_binary" => "test",
+                   "file_extension" => "pdf"
+                 },
+                 auction
+               )
     end
 
-    test "create_auction_supplier_coqs/4 succeeds for a spot auction", %{
-      auction: %{id: auction_id},
+    test "create_auction_supplier_coqs/2 succeeds for a spot auction", %{
+      auction: auction = %{id: auction_id},
       fuel: %{id: fuel_id},
       supplier: %{id: supplier_id}
     } do
@@ -391,12 +406,40 @@ defmodule Oceanconnect.AuctionsTest do
                auction_id: ^auction_id,
                fuel_id: ^fuel_id,
                supplier_id: ^supplier_id,
-               file_extension: "pdf"
-             } = Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+               file_extension: "pdf",
+               delivered: false
+             } =
+               Auctions.create_auction_supplier_coq(auction, %{
+                 "auction_id" => auction_id,
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier_id,
+                 "file_extension" => "pdf"
+               })
     end
 
-    test "create_auction_supplier_coqs/4 succeeds for a term auction", %{
-      term_auction: %{id: term_auction_id},
+    test "create_auction_supplier_coqs/2 succeeds for a finalized auction", %{
+      auction: auction = %{id: auction_id},
+      fuel: %{id: fuel_id},
+      supplier: %{id: supplier_id}
+    } do
+      assert %AuctionSupplierCOQ{
+               auction_id: ^auction_id,
+               fuel_id: ^fuel_id,
+               supplier_id: ^supplier_id,
+               file_extension: "pdf",
+               delivered: true
+             } =
+               Auctions.create_auction_supplier_coq(auction, %{
+                 "auction_id" => auction_id,
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier_id,
+                 "file_extension" => "pdf",
+                 "delivered" => "true"
+               })
+    end
+
+    test "create_auction_supplier_coqs/2 succeeds for a term auction", %{
+      term_auction: term_auction = %{id: term_auction_id},
       fuel: %{id: fuel_id},
       supplier: %{id: supplier_id}
     } do
@@ -406,35 +449,42 @@ defmodule Oceanconnect.AuctionsTest do
                supplier_id: ^supplier_id,
                file_extension: "pdf"
              } =
-               Auctions.create_auction_supplier_coq(term_auction_id, supplier_id, fuel_id, "pdf")
+               Auctions.create_auction_supplier_coq(term_auction, %{
+                 "auction_id" => term_auction_id,
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier_id,
+                 "file_extension" => "pdf"
+               })
     end
 
-    test "create_auction_supplier_coqs/4 fails if invalid auction provided", %{
-      fuel: %{id: fuel_id},
-      supplier: %{id: supplier_id}
-    } do
-      assert :error ==
-               Auctions.create_auction_supplier_coq(0, supplier_id, fuel_id, "pdf")
-    end
-
-    test "create_auction_supplier_coqs/4 fails if supplier not invited to auction", %{
-      auction: %{id: auction_id},
+    test "create_auction_supplier_coqs/2 fails if supplier not invited to auction", %{
+      auction: auction = %{id: auction_id},
       fuel: %{id: fuel_id}
     } do
-      %Company{id: supplier_id} = insert(:company, is_supplier: true)
+      %Company{id: uninvited_supplier_id} = insert(:company, is_supplier: true)
 
       assert :error ==
-               Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+               Auctions.create_auction_supplier_coq(auction, %{
+                 "auction_id" => auction_id,
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => uninvited_supplier_id,
+                 "file_extension" => "pdf"
+               })
     end
 
-    test "create_auction_supplier_coqs/4 fails if fuel is not associated to auction", %{
-      auction: %{id: auction_id},
+    test "create_auction_supplier_coqs/2 fails if fuel is not associated to auction", %{
+      auction: auction = %{id: auction_id},
       supplier: %{id: supplier_id}
     } do
-      %Fuel{id: fuel_id} = insert(:fuel)
+      %Fuel{id: unrelated_fuel_id} = insert(:fuel)
 
       assert :error ==
-               Auctions.create_auction_supplier_coq(auction_id, supplier_id, fuel_id, "pdf")
+               Auctions.create_auction_supplier_coq(auction, %{
+                 "auction_id" => auction_id,
+                 "fuel_id" => unrelated_fuel_id,
+                 "supplier_id" => supplier_id,
+                 "file_extension" => "pdf"
+               })
     end
 
     test "delete_auction_supplier_coq/1 succeeds", %{existing_coq: existing_coq} do
@@ -451,22 +501,53 @@ defmodule Oceanconnect.AuctionsTest do
       assert nil == Auctions.get_auction_supplier_coq(0)
     end
 
-    test "get_auction_supplier_coq/3 returns struct", %{
+    test "get_auction_supplier_coq/2 returns struct", %{
       auction: auction,
       fuel: %{id: fuel_id},
       supplier2: %{id: supplier2_id},
       existing_coq: %{id: existing_coq_id}
     } do
       assert %AuctionSupplierCOQ{id: ^existing_coq_id} =
-               Auctions.get_auction_supplier_coq(auction, supplier2_id, fuel_id)
+               Auctions.get_auction_supplier_coq(auction, %{
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier2_id
+               })
     end
 
-    test "get_auction_supplier_coq/3 returns nil if no existing coq", %{
+    test "get_auction_supplier_coq/2 returns nil if no existing coq", %{
       auction: auction,
       fuel: %{id: fuel_id},
       supplier: %{id: supplier_id}
     } do
-      assert nil == Auctions.get_auction_supplier_coq(auction, supplier_id, fuel_id)
+      assert nil ==
+               Auctions.get_auction_supplier_coq(auction, %{
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier_id
+               })
+    end
+
+    test "get_auction_supplier_coq/2 returns delivered auction_supplier_coq", %{
+      auction: auction,
+      fuel: fuel = %{id: fuel_id},
+      supplier2: supplier2 = %{id: supplier2_id},
+      existing_coq: %{id: existing_coq_id}
+    } do
+      %AuctionSupplierCOQ{id: delivered_coq_id} =
+        insert(:auction_supplier_coq,
+          auction: auction,
+          fuel: fuel,
+          supplier: supplier2,
+          delivered: true
+        )
+
+      assert %AuctionSupplierCOQ{id: ^delivered_coq_id} =
+               Auctions.get_auction_supplier_coq(auction, %{
+                 "fuel_id" => fuel_id,
+                 "supplier_id" => supplier2_id,
+                 "delivered" => true
+               })
+
+      refute existing_coq_id == delivered_coq_id
     end
   end
 

@@ -5,6 +5,7 @@ defmodule Oceanconnect.Auctions.AuctionSupplierCOQ do
   alias __MODULE__
 
   schema "auction_supplier_coqs" do
+    field(:delivered, :boolean, default: false)
     field(:file_extension, :string)
     # Auctions and TermAuctions both reference this table. Each knows which
     # column to use as the foreign_key_constraint.
@@ -16,15 +17,28 @@ defmodule Oceanconnect.Auctions.AuctionSupplierCOQ do
     timestamps()
   end
 
-  def changeset(%AuctionSupplierCOQ{} = auction_supplier_coq, attrs) do
+  def changeset(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
-    |> cast(attrs, [:auction_id, :term_auction_id, :supplier_id, :fuel_id, :file_extension])
+    |> cast(attrs, [
+      :auction_id,
+      :term_auction_id,
+      :supplier_id,
+      :fuel_id,
+      :file_extension,
+      :delivered
+    ])
     |> validate_required([:supplier_id, :fuel_id, :file_extension])
     |> validate_belongs_to_an_auction()
     |> foreign_key_constraint(:auction_id)
     |> foreign_key_constraint(:term_auction_id)
     |> foreign_key_constraint(:supplier_id)
     |> foreign_key_constraint(:fuel_id)
+  end
+
+  def update_changeset(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
+    auction_supplier_coq
+    |> cast(attrs, [:file_extension, :delivered])
+    |> validate_required([:file_extension, :delivered])
   end
 
   defp validate_belongs_to_an_auction(changeset) do
