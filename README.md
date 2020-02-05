@@ -202,6 +202,11 @@ Then, after provisioning the server the rest of the way, edit the `config/prod.s
 
 
 ### Restoring database from backup
+**Create backup**  
+Save the database with `pg_dump -U <user name> <database name> > <backup tar file>` (eg: `pg_dump -U oceanconnect oceanconnect_prod > 2020_02_05_oceanconnect_staging.tar`).  
+**Note**: If the copy is on the server, you can copy it locally with `scp <user>@<server>:<path to file>/<tar file name> <local storage dir>` (eg: `scp root@206.189.247.123:~/2020_02_05_oceanconnect_staging.tar ~/Downloads/`).
+
+**Restore from backup**  
 `pg_restore -Ft -c -U <database user> -d <database name> <path to pg_dump tar file>`
 (eg: `pg_restore -Ft -c -U oceanconnect -d oceanconnect_dev ~/Desktop/2019-02-26-oceanconnect_staging.tar`)
 Use the database password found in the dev.secret.exs or prod.secret.exs file. You may see 5 groupings of messages that
