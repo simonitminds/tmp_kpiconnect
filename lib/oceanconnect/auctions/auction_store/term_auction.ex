@@ -90,7 +90,8 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
       ) do
     {:ok,
      [
-       AuctionEvent.auction_canceled(auction, canceled_at, state, user)
+       AuctionEvent.auction_canceled(auction, canceled_at, state, user),
+       AuctionEvent.auction_finalized(auction)
      ]}
   end
 
