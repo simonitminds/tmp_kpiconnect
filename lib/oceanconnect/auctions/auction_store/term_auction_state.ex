@@ -16,10 +16,10 @@ defmodule Oceanconnect.Auctions.AuctionStore.TermAuctionState do
     }
   end
 
-  def from_auction(%TermAuction{id: auction_id, fuel: fuel}) do
+  def from_auction(%TermAuction{id: auction_id, fuel_id: fuel_id}) do
     %__MODULE__{
       auction_id: auction_id,
-      product_bids: %{"#{fuel.id}" => ProductBidState.for_product(fuel.id, auction_id)}
+      product_bids: %{"#{fuel_id}" => ProductBidState.for_product(fuel_id, auction_id)}
     }
   end
 
