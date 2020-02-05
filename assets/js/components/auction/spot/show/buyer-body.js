@@ -3,7 +3,6 @@ import React from 'react';
 import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
-import BargeSubmission from '../../common/show/barge-submission';
 import BuyerBestSolution from './buyer-best-solution';
 import BuyerGradeDisplay from './buyer-grade-display';
 import OtherSolutions from './other-solutions';
@@ -12,6 +11,8 @@ import FullfillmentOptions from './fullfillment-options';
 
 const BuyerBody = (props) => {
   const {
+    addCOQ,
+    deleteCOQ,
     auctionPayload,
     currentUser,
     acceptSolution
@@ -48,7 +49,7 @@ const BuyerBody = (props) => {
       return(
       <div>
         { !isObserver &&
-          <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={false} />
+          <FullfillmentOptions addCOQ={addCOQ} deleteCOQ={deleteCOQ} auctionPayload={auctionPayload} isSupplier={false} />
         }
         <WinningSolution auctionPayload={auctionPayload} />
         { currentUser.isAdmin

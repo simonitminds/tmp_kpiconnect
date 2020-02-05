@@ -16,6 +16,7 @@ defmodule Oceanconnect.Auctions do
     AuctionStore.AuctionState,
     AuctionStore.TermAuctionState,
     AuctionSuppliers,
+    AuctionSupplierCOQ,
     AuctionBarge,
     AuctionTimer,
     AuctionVesselFuel,
@@ -35,6 +36,7 @@ defmodule Oceanconnect.Auctions do
   alias Oceanconnect.Deliveries
   alias Oceanconnect.Deliveries.DeliveryEvent
 
+  @file_io Application.get_env(:oceanconnect, :file_io, OceanconnectWeb.FileIO)
   @term_types ["forward_fixed", "formula_related"]
 
   def is_term?(%{type: TermAuction}) do
@@ -290,6 +292,9 @@ defmodule Oceanconnect.Auctions do
     |> AuctionStore.process_command()
   end
 
+  def is_participant?(auction, company_id) when is_bitstring(company_id),
+    do: is_participant?(auction, String.to_integer(company_id))
+
   def is_participant?(auction = %struct{}, company_id) when is_auction(struct) do
     company_id in auction_participant_ids(auction)
   end
@@ -327,6 +332,21 @@ defmodule Oceanconnect.Auctions do
 
   def list_auctions(), do: list_auctions(false)
   def list_auctions(user = %User{}), do: list_auctions(user, false)
+
+  def list_auctions(finalized?) do
+    regular_auctions =
+      from(a in Auction, where: a.type == "spot" and a.finalized == ^finalized?)
+      |> Repo.all()
+      |> fully_loaded()
+
+    term_auctions =
+      from(ta in TermAuction, where: ta.type in @term_types and ta.finalized == ^finalized?)
+      |> Repo.all()
+      |> fully_loaded()
+
+    regular_auctions ++ term_auctions
+  end
+
   def list_auctions(%User{is_admin: true}, finalized?), do: list_auctions(finalized?)
 
   def list_auctions(%User{id: user_id, is_observer: true}, finalized?),
@@ -334,20 +354,6 @@ defmodule Oceanconnect.Auctions do
 
   def list_auctions(%User{company_id: company_id}, finalized?),
     do: list_participating_auctions(company_id, finalized?)
-
-  def list_auctions(finalized?) do
-    regular_auctions =
-      from(a in Auction, where: a.type == "spot" and a.finalized == ^finalized?)
-      |> Repo.all()
-      |> fully_loaded
-
-    term_auctions =
-      from(ta in TermAuction, where: ta.type in @term_types and ta.finalized == ^finalized?)
-      |> Repo.all()
-      |> fully_loaded
-
-    regular_auctions ++ term_auctions
-  end
 
   defp list_observing_auctions(user_id, finalized?) do
     finalized?
@@ -383,7 +389,7 @@ defmodule Oceanconnect.Auctions do
 
     query
     |> Repo.all()
-    |> fully_loaded
+    |> fully_loaded()
   end
 
   defp buyer_term_auctions(buyer_id, finalized?) do
@@ -393,7 +399,7 @@ defmodule Oceanconnect.Auctions do
       order_by: ta.scheduled_start
     )
     |> Repo.all()
-    |> fully_loaded
+    |> fully_loaded()
   end
 
   defp supplier_auctions(supplier_id, finalized?) do
@@ -407,7 +413,7 @@ defmodule Oceanconnect.Auctions do
       order_by: a.scheduled_start
     )
     |> Repo.all()
-    |> fully_loaded
+    |> fully_loaded()
   end
 
   defp supplier_term_auctions(supplier_id, finalized?) do
@@ -421,49 +427,24 @@ defmodule Oceanconnect.Auctions do
       order_by: ta.scheduled_start
     )
     |> Repo.all()
-    |> fully_loaded
+    |> fully_loaded()
   end
 
-  def get_auction(id) do
-    with {:ok, auction} <- AuctionCache.read(id) do
-      auction
-    else
-      _ ->
-        if auction_type = get_auction_type(id) do
-          Repo.get(auction_type, id)
-          |> fully_loaded
-        end
-    end
-  end
+  def get_auction(id), do: get_auction!(id)
 
   def get_auction!(id) do
     with {:ok, auction} <- AuctionCache.read(id) do
       auction
     else
       _ ->
-        get_auction_type!(id)
-        |> Repo.get!(id)
-        |> fully_loaded
-    end
-  end
-
-  defp get_auction_type(auction_id) do
-    try do
-      get_auction_type!(auction_id)
-    rescue
-      Ecto.NoResultsError -> nil
-    end
-  end
-
-  defp get_auction_type!(auction_id) do
-    auction_type =
-      from(a in Auction, select: a.type)
-      |> Repo.get!(auction_id)
-
-    case auction_type do
-      "spot" -> Auction
-      t when t in @term_types -> TermAuction
-      _ -> nil
+        Auction
+        |> Repo.get(id)
+        |> case do
+          nil -> nil
+          auction = %Auction{type: "spot"} -> auction
+          _ -> Repo.get(TermAuction, id)
+        end
+        |> fully_loaded()
     end
   end
 
@@ -486,6 +467,9 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  def get_auction_status!(auction_id) when is_bitstring(auction_id),
+    do: get_auction_status!(String.to_integer(auction_id))
+
   def get_auction_status!(auction) do
     %{status: status} = get_auction_state!(auction)
     status
@@ -505,7 +489,154 @@ defmodule Oceanconnect.Auctions do
     Repo.get_by(AuctionSuppliers, %{term_auction_id: term_auction_id, supplier_id: supplier_id})
   end
 
-  def update_participation_for_supplier(%Auction{id: auction_id}, supplier_id, response)
+  def store_auction_supplier_coq(attrs = %{"coq_binary" => coq_binary}, auction)
+      when is_binary(coq_binary) do
+    auction
+    |> get_auction_supplier_coq(attrs)
+    |> case do
+      nil ->
+        create_auction_supplier_coq(auction, attrs)
+
+      :error ->
+        :error
+
+      auction_supplier_coq ->
+        auction_supplier_coq
+        |> @file_io.delete()
+        |> update_auction_supplier_coq(attrs)
+    end
+    |> @file_io.upload(coq_binary)
+  end
+
+  def get_auction_supplier_coq(auction_supplier_coq_id) do
+    Repo.get(AuctionSupplierCOQ, auction_supplier_coq_id)
+  end
+
+  def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id,
+        "delivered" => _
+      }) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      auction_id: auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: true
+    })
+  end
+
+  def get_auction_supplier_coq(
+        %Auction{id: auction_id},
+        params = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      auction_id: auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: false
+    })
+  end
+
+  def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id,
+        "delivered" => _
+      }) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      term_auction_id: term_auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: true
+    })
+  end
+
+  def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id
+      }) do
+    Repo.get_by(AuctionSupplierCOQ, %{
+      term_auction_id: term_auction_id,
+      supplier_id: supplier_id,
+      fuel_id: fuel_id,
+      delivered: false
+    })
+  end
+
+  def get_auction_supplier_coq(nil, _params), do: nil
+
+  def create_auction_supplier_coq(
+        auction = %Auction{},
+        attrs = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    with true <- is_participant?(auction, supplier_id),
+         true <- verify_fuel_is_for_auction(auction, fuel_id) do
+      auction_supplier_coq =
+        %AuctionSupplierCOQ{}
+        |> AuctionSupplierCOQ.changeset(attrs)
+        |> Repo.insert!()
+
+      update_cache(auction)
+      auction_supplier_coq
+    else
+      _ -> :error
+    end
+  end
+
+  def create_auction_supplier_coq(
+        auction = %TermAuction{id: auction_id},
+        attrs = %{
+          "fuel_id" => fuel_id,
+          "supplier_id" => supplier_id
+        }
+      ) do
+    with true <- is_participant?(auction, supplier_id),
+         true <- verify_fuel_is_for_auction(auction, fuel_id) do
+      auction_supplier_coq =
+        %AuctionSupplierCOQ{}
+        |> AuctionSupplierCOQ.changeset(
+          attrs
+          |> Map.delete("auction_id")
+          |> Map.put("term_auction_id", auction_id)
+        )
+        |> Repo.insert!()
+
+      update_cache(auction)
+      auction_supplier_coq
+    else
+      _ -> :error
+    end
+  end
+
+  def delete_auction_supplier_coq(
+        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: auction_id}
+      ) do
+    response = Repo.delete(auction_supplier_coq)
+    update_cache(auction_id)
+    response
+  end
+
+  defp update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
+    auction_supplier_coq
+    |> AuctionSupplierCOQ.update_changeset(attrs)
+    |> Repo.update!()
+  end
+
+  defp verify_fuel_is_for_auction(auction, fuel_id) when is_bitstring(fuel_id),
+    do: verify_fuel_is_for_auction(auction, String.to_integer(fuel_id))
+
+  defp verify_fuel_is_for_auction(%Auction{fuels: fuels}, fuel_id),
+    do: fuels |> Enum.map(& &1.id) |> Enum.member?(fuel_id)
+
+  defp verify_fuel_is_for_auction(%TermAuction{fuel: %Fuel{id: fuel_id}}, fuel_id), do: true
+  defp verify_fuel_is_for_auction(_auction, _fuel_id), do: false
+
+  def update_participation_for_supplier(auction = %Auction{id: auction_id}, supplier_id, response)
       when response in ["yes", "no", "maybe"] do
     result =
       from(auction_supplier in AuctionSuppliers,
@@ -515,12 +646,15 @@ defmodule Oceanconnect.Auctions do
       )
       |> Repo.update_all(set: [participation: response])
 
-    auction = Repo.get(Auction, auction_id) |> fully_loaded()
     update_cache(auction)
     result
   end
 
-  def update_participation_for_supplier(%TermAuction{id: term_auction_id}, supplier_id, response)
+  def update_participation_for_supplier(
+        auction = %TermAuction{id: term_auction_id},
+        supplier_id,
+        response
+      )
       when response in ["yes", "no", "maybe"] do
     result =
       from(auction_supplier in AuctionSuppliers,
@@ -530,7 +664,6 @@ defmodule Oceanconnect.Auctions do
       )
       |> Repo.update_all(set: [participation: response])
 
-    auction = Repo.get(TermAuction, term_auction_id) |> fully_loaded()
     update_cache(auction)
     result
   end
@@ -614,7 +747,7 @@ defmodule Oceanconnect.Auctions do
     with {:ok, auction} <-
            %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -626,7 +759,7 @@ defmodule Oceanconnect.Auctions do
     with {:ok, auction} <-
            %TermAuction{} |> TermAuction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -637,7 +770,7 @@ defmodule Oceanconnect.Auctions do
       when type in @term_types do
     with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -648,7 +781,7 @@ defmodule Oceanconnect.Auctions do
       when type in @term_types do
     with {:ok, auction} <- %TermAuction{} |> TermAuction.changeset(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -659,7 +792,7 @@ defmodule Oceanconnect.Auctions do
     with {:ok, auction} <-
            %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -670,7 +803,7 @@ defmodule Oceanconnect.Auctions do
     with {:ok, auction} <-
            %Auction{} |> Auction.changeset_for_scheduled_auction(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -680,7 +813,7 @@ defmodule Oceanconnect.Auctions do
   def create_auction(attrs, user) do
     with {:ok, auction} <- %Auction{} |> Auction.changeset(attrs) |> Repo.insert() do
       auction
-      |> fully_loaded
+      |> fully_loaded()
       |> handle_auction_creation(user)
     else
       error -> error
@@ -706,10 +839,17 @@ defmodule Oceanconnect.Auctions do
     {:ok, auction}
   end
 
-  def update_cache(auction = %struct{}) when is_auction(struct) do
+  defp update_cache(auction = %struct{}) when is_auction(struct) do
     auction
+    |> fully_loaded(true)
     |> Command.update_cache()
     |> AuctionCache.process_command()
+  end
+
+  defp update_cache(auction_id) do
+    auction_id
+    |> get_auction!()
+    |> update_cache()
   end
 
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
@@ -780,10 +920,6 @@ defmodule Oceanconnect.Auctions do
     |> auction_update_command(user)
   end
 
-  def delete_auction(%struct{} = auction) when is_auction(struct) do
-    Repo.delete(auction)
-  end
-
   def change_auction(%struct{} = auction) when is_auction(struct) do
     struct.changeset(auction, %{})
   end
@@ -830,6 +966,7 @@ defmodule Oceanconnect.Auctions do
           :fuel,
           [fuel_index: [:fuel, :port]],
           :auction_suppliers,
+          :auction_supplier_coqs,
           [buyer: :users],
           [suppliers: :users],
           :observers
@@ -850,6 +987,7 @@ defmodule Oceanconnect.Auctions do
           :vessels,
           :fuels,
           :auction_suppliers,
+          :auction_supplier_coqs,
           [auction_vessel_fuels: [:vessel, :fuel]],
           [buyer: :users],
           [suppliers: :users],
@@ -876,7 +1014,7 @@ defmodule Oceanconnect.Auctions do
     Repo.preload(vessel, [:company], force: force?)
   end
 
-  # def fully_loaded(struct, _force?), do: struct
+  def fully_loaded(nil, _force?), do: nil
 
   def strip_non_loaded(struct = %{}) do
     Enum.reduce(maybe_convert_struct(struct), %{}, fn {k, v}, acc ->
@@ -888,7 +1026,7 @@ defmodule Oceanconnect.Auctions do
 
   defp auction_update_command({:ok, auction}, user) do
     auction
-    |> fully_loaded
+    |> fully_loaded()
     |> Command.update_auction(user)
     |> AuctionStore.process_command()
 
@@ -899,7 +1037,7 @@ defmodule Oceanconnect.Auctions do
 
   defp auction_update_command(auction, user) do
     auction
-    |> fully_loaded
+    |> fully_loaded()
     |> Command.update_auction(user)
     |> AuctionStore.process_command()
 
@@ -1612,22 +1750,26 @@ defmodule Oceanconnect.Auctions do
     |> invite_observer(auction, user_id)
   end
 
-  def invite_observer(nil, %Auction{id: auction_id}, user_id) do
+  def invite_observer(nil, auction = %Auction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       auction_id: auction_id,
       user_id: user_id
     })
     |> Repo.insert()
+
+    update_cache(auction)
   end
 
-  def invite_observer(nil, %TermAuction{id: auction_id}, user_id) do
+  def invite_observer(nil, auction = %TermAuction{id: auction_id}, user_id) do
     %Observer{}
     |> Observer.changeset(%{
       term_auction_id: auction_id,
       user_id: user_id
     })
     |> Repo.insert()
+
+    update_cache(auction)
   end
 
   def invite_observer(observer, _auction, _user_id), do: {:ok, observer}
@@ -1636,6 +1778,8 @@ defmodule Oceanconnect.Auctions do
     auction
     |> Accounts.get_observer(user_id)
     |> Repo.delete()
+
+    update_cache(auction)
   end
 
   # Fixtures

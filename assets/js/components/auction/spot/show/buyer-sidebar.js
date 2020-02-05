@@ -10,6 +10,8 @@ import InvitedObservers from '../../common/show/observers/invited-observers';
 const BuyerSidebar = (props) => {
   const {
     auctionPayload,
+    addCOQ,
+    deleteCOQ,
     approveBargeForm,
     rejectBargeForm,
     inviteObserver,
@@ -45,6 +47,8 @@ const BuyerSidebar = (props) => {
       }
       <InvitedSuppliers
         auctionPayload={auctionPayload}
+        addCOQ={addCOQ}
+        deleteCOQ={deleteCOQ}
         approveBargeForm={approveBargeForm}
         rejectBargeForm={rejectBargeForm}
       />

@@ -3,7 +3,6 @@ import React from 'react';
 import { formatUTCDateTime } from '../../../../utilities';
 import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
-import BargeSubmission from '../../common/show/barge-submission';
 import BidStatus from './bid-status';
 import BiddingForm from './bidding-form';
 import SupplierBestSolution from './supplier-best-solution';
@@ -15,6 +14,8 @@ import FullfillmentOptions from './fullfillment-options';
 
 const SupplierBody = (props) => {
   const {
+    addCOQ,
+    deleteCOQ,
     auctionPayload,
     currentUser,
     connection,
@@ -47,7 +48,7 @@ const SupplierBody = (props) => {
       <div>
         { message && <BidStatus auctionPayload={auctionPayload} updateBidStatus={updateBidStatus} /> }
         <SupplierBidStatus auctionPayload={auctionPayload} connection={connection} supplierId={currentUserCompanyId} />
-        <FullfillmentOptions auctionPayload={auctionPayload} isSupplier={true} />
+        <FullfillmentOptions addCOQ={addCOQ} deleteCOQ={deleteCOQ} auctionPayload={auctionPayload} isSupplier={true} supplierId={currentUserCompanyId} />
         <WinningSolution auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
         <SupplierBidList auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       </div>

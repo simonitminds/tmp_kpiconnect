@@ -5,11 +5,14 @@ import moment from 'moment';
 import AuctionInvitation from '../../common/auction-invitation';
 import SidebarDetails from './sidebar-details';
 import BargeSubmission from '../../common/show/barge-submission';
+import SupplierCOQs from '../../common/show/supplier-coqs';
 
 
 const SupplierSidebar = (props) => {
   const {
     auctionPayload,
+    addCOQ,
+    deleteCOQ,
     submitBargeForm,
     unsubmitBargeForm,
     currentUserCompanyId,
@@ -21,7 +24,7 @@ const SupplierSidebar = (props) => {
 
   return (
     <React.Fragment>
-      { (status == 'pending' || status == 'open') &&
+      {(status == 'pending' || status == 'open') &&
         <AuctionInvitation auctionPayload={auctionPayload} supplierId={currentUserCompanyId} />
       }
 
@@ -31,6 +34,13 @@ const SupplierSidebar = (props) => {
         auctionPayload={auctionPayload}
         companyBarges={companyProfile.companyBarges}
         supplierId={currentUserCompanyId}
+      />
+      <SupplierCOQs
+        addCOQ={addCOQ}
+        deleteCOQ={deleteCOQ}
+        auctionPayload={auctionPayload}
+        supplierId={currentUserCompanyId}
+        delivered={false}
       />
       <SidebarDetails auctionPayload={auctionPayload} isEditable={false} />
     </React.Fragment>

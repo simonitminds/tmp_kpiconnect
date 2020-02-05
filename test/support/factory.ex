@@ -3,6 +3,7 @@ defmodule Oceanconnect.Factory do
 
   alias Oceanconnect.Auctions.{
     Auction,
+    TermAuction,
     AuctionEventStore,
     Solution,
     Command,
@@ -32,6 +33,26 @@ defmodule Oceanconnect.Factory do
       company: build(:company)
     }
     |> set_password
+  end
+
+  def auction_supplier_coq_factory() do
+    %Oceanconnect.Auctions.AuctionSupplierCOQ{
+      auction: build(:auction),
+      fuel: build(:fuel),
+      supplier: build(:company),
+      file_extension: "pdf"
+    }
+  end
+
+  def create_auction_supplier_coq(), do: insert(:auction_supplier_coq)
+
+  def create_auction_supplier_coq(auction = %Auction{}, supplier) do
+    fuel = auction.auction_vessel_fuels |> List.first() |> Map.get(:fuel)
+    insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier)
+  end
+
+  def create_auction_supplier_coq(auction = %TermAuction{fuel: fuel}, supplier) do
+    insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier)
   end
 
   def draft_auction_factory() do
@@ -140,7 +161,7 @@ defmodule Oceanconnect.Factory do
 
   def fuel_factory() do
     %Oceanconnect.Auctions.Fuel{
-      name: "New Fuel"
+      name: sequence(:name, &"New Fuel #{&1}")
     }
   end
 

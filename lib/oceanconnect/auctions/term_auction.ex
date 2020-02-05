@@ -70,6 +70,7 @@ defmodule Oceanconnect.Auctions.TermAuction do
 
     has_many(:auction_observers, Oceanconnect.Accounts.Observer)
     has_many(:auction_suppliers, Oceanconnect.Auctions.AuctionSuppliers)
+    has_many(:auction_supplier_coqs, Oceanconnect.Auctions.AuctionSupplierCOQ)
 
     timestamps()
   end

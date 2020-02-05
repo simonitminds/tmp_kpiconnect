@@ -83,6 +83,20 @@ defmodule OceanconnectWeb.Router do
       as: :auction_bid_api
     )
 
+    delete(
+      "/auction_supplier_coqs/:id",
+      FileIOController,
+      :delete_coq,
+      as: :file_io_api
+    )
+
+    post(
+      "/auctions/:auction_id/suppliers/:supplier_id/coqs/:fuel_id/upload",
+      FileIOController,
+      :upload_coq,
+      as: :file_io_api
+    )
+
     post(
       "/auctions/:auction_id/barges/:barge_id/submit",
       AuctionBargesController,
@@ -173,6 +187,8 @@ defmodule OceanconnectWeb.Router do
     resources("/vessels", VesselController)
     resources("/fuels", FuelController)
     get("/fixtures", AuctionFixtureController, :index)
+
+    get("/auction_supplier_coqs/:id", FileIOController, :view_coq, as: :view_coq)
 
     get(
       "/auctions/:auction_id/fixtures/:fixture_id/propose_changes",

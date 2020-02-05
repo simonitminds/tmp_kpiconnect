@@ -58,3 +58,7 @@ config :oceanconnect, Oceanconnect.Repo,
   pool_size: 10
 
 config :oceanconnect, OceanconnectWeb.Mailer, adapter: Bamboo.LocalAdapter
+
+if File.exists?("config/dev.secret.exs") do
+  import_config "dev.secret.exs"
+end
