@@ -17,7 +17,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
          auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
-         true <- is_authorized_to_change?(auction, user, %{"supplier_id" => supplier_id}),
+         true <- is_authorized_to_change?(auction, user, %{"supplier_id" => supplier_id, "delivered" => true}),
          %AuctionSupplierCOQ{} <- @file_io.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
       auction = Auctions.get_auction!(auction_id)

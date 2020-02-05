@@ -19,9 +19,11 @@ const SupplierCOQs = (props) => {
     return fuels.map((fuel) => {
         const fuelSupplier = supplierId ? parseInt(supplierId) : fuelSuppliers[fuel.id];
         const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': fuelSupplier });
-        return (
-          <COQSubmission {...props} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />
-        )
+        if (fuelSupplier) {
+          return <COQSubmission {...props} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />;
+        } else {
+          return '';
+        }
       })
   }
 

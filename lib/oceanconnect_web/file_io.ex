@@ -33,7 +33,7 @@ defmodule OceanconnectWeb.FileIO do
 
   defp get_from_local(auction_supplier_coq) do
     file_name = file_name(auction_supplier_coq)
-    File.read!("#{storage_dir(auction_supplier_coq)}#{file_name}")
+    %{body: File.read!("#{storage_dir(auction_supplier_coq)}#{file_name}")}
   end
 
   defp get_from_s3(auction_supplier_coq) do
