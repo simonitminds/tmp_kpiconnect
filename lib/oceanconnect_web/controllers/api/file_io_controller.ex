@@ -12,12 +12,13 @@ defmodule OceanconnectWeb.Api.FileIOController do
   def delete_coq(conn, %{"id" => auction_supplier_coq_id}) do
     with user = %User{company_id: company_id} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
          auction_supplier_coq = %AuctionSupplierCOQ{
-           auction_id: auction_id,
-           supplier_id: supplier_id
+          supplier_id: supplier_id,
+          delivered: delivered
          } <-
            Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
+           auction_id <- get_auction_id(auction_supplier_coq),
          auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
-         true <- is_authorized_to_change?(auction, user, %{"supplier_id" => supplier_id, "delivered" => true}),
+         true <- is_authorized_to_change?(auction, user, set_params(supplier_id, delivered)),
          %AuctionSupplierCOQ{} <- @file_io.delete(auction_supplier_coq),
          {:ok, _} <- Auctions.delete_auction_supplier_coq(auction_supplier_coq) do
       auction = Auctions.get_auction!(auction_id)
@@ -65,6 +66,9 @@ defmodule OceanconnectWeb.Api.FileIOController do
     end
   end
 
+  defp get_auction_id(%AuctionSupplierCOQ{auction_id: auction_id, term_auction_id: nil}), do: auction_id
+  defp get_auction_id(%AuctionSupplierCOQ{term_auction_id: term_auction_id}), do: term_auction_id
+
   defp get_file_extension(conn) do
     file_extension =
       conn
@@ -108,5 +112,8 @@ defmodule OceanconnectWeb.Api.FileIOController do
        }),
        do: Auctions.get_auction_status!(auction_id) in [:pending, :open]
 
-  defp is_authorized_to_change?(_auction, _user, _params), do: false
+  defp is_authorized_to_change?(_auction, _user, _params), do: false |> IO.inspect
+
+  defp set_params(supplier_id, true), do: %{"supplier_id" => supplier_id, "delivered" => true}
+  defp set_params(supplier_id, _), do: %{"supplier_id" => supplier_id}
 end
