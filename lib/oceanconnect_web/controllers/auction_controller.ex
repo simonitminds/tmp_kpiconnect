@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.AuctionController do
 
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Accounts.User
+  alias Oceanconnect.Accounts.{Company, User}
   alias Oceanconnect.{Auctions, Messages}
 
   alias Oceanconnect.Auctions.{
@@ -167,22 +167,22 @@ defmodule OceanconnectWeb.AuctionController do
   end
 
   def show(conn, %{"id" => id}) do
-    auction = Auctions.get_auction!(id)
-    user = Auth.current_user(conn)
-    credit_margin_amount = user.company.credit_margin_amount
-    is_admin = OceanconnectWeb.Plugs.Auth.current_user_is_admin?(conn)
-
-    if Auctions.is_participant?(auction, Auth.current_user(conn).company_id) || is_admin ||
-         Auctions.is_observer?(auction, user) do
+    with user = %User{
+           is_admin: is_admin,
+           company: %Company{id: company_id, credit_margin_amount: credit_margin_amount}
+         } <- OceanconnectWeb.Plugs.Auth.current_user(conn),
+         auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(id),
+         true <-
+           Auctions.is_participant?(auction, company_id) || is_admin ||
+             Auctions.is_observer?(auction, user) do
       render(conn, "show.html", auction: auction, credit_margin_amount: credit_margin_amount)
     else
-      redirect(conn, to: auction_path(conn, :index))
+      _ -> redirect(conn, to: auction_path(conn, :index))
     end
   end
 
   def edit(conn, %{"id" => id}) do
-    with auction = %struct{} when is_auction(struct) <-
-           id |> Auctions.get_auction() |> Auctions.fully_loaded(),
+    with auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(id),
          true <- auction.buyer_id == Auth.current_user(conn).company_id,
          false <- Auctions.get_auction_state!(auction).status in [:open, :decision] do
       changeset =
