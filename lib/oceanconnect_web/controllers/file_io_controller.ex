@@ -10,11 +10,10 @@ defmodule OceanconnectWeb.FileIOController do
   def view_coq(conn, %{"id" => auction_supplier_coq_id}) do
     with user = %User{} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
          auction_supplier_coq = %AuctionSupplierCOQ{
-           auction_id: auction_id,
            file_extension: file_extension,
            supplier_id: supplier_id
-         } <-
-           Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
+         } <- Auctions.get_auction_supplier_coq(auction_supplier_coq_id),
+         auction_id <- get_auction_id(auction_supplier_coq),
          true <- is_authorized_to_view?(auction_id, user, supplier_id),
          %{body: coq} <- @file_io.get(auction_supplier_coq) do
       conn
@@ -24,6 +23,11 @@ defmodule OceanconnectWeb.FileIOController do
       _ -> send_resp(conn, 401, "Not Authorized")
     end
   end
+
+  defp get_auction_id(%AuctionSupplierCOQ{auction_id: auction_id, term_auction_id: nil}),
+    do: auction_id
+
+  defp get_auction_id(%AuctionSupplierCOQ{term_auction_id: term_auction_id}), do: term_auction_id
 
   defp is_authorized_to_view?(_auction_id, %User{is_admin: true}, _supplier_id), do: true
 
