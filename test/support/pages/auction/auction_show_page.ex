@@ -204,7 +204,7 @@ defmodule Oceanconnect.AuctionShowPage do
   end
 
   def solution_has_bids?(solution, bids) when is_atom(solution) do
-    element = find_element(:css, ".qa-auction-solution-best_overall")
+    element = find_element(:css, ".qa-auction-solution-#{solution}")
 
     Enum.all?(bids, fn bid ->
       find_within_element(element, :css, ".qa-auction-bid-#{bid.id}")

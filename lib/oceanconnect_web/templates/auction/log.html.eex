@@ -64,6 +64,9 @@
                       <span class="qa-auction-detail-winning-solution-entry-fuel"><%= auction_log_fuel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
                       from
                       <span><%= bid.supplier %></span>
+                      <%= if bid.comment && bid.comment != "" do %>
+                        <b>Comment: <span><%= bid.comment %></span></b>
+                      <% end %>
                       <%= if bid_is_traded?(bid) do %>
                         &nbsp;
                         <i class="fas fa-exchange-alt has-text-gray-3 qa-event-bid-is_traded"></i>

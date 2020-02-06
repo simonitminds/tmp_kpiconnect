@@ -22,6 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
   def from_params_to_auction_bid(
         params = %{
           "amount" => amount,
+          "comment" => comment,
           "min_amount" => min_amount,
           "vessel_fuel_id" => vessel_fuel_id,
           "supplier_id" => supplier_id,
@@ -36,6 +37,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       supplier_id: supplier_id,
       vessel_fuel_id: vessel_fuel_id,
       amount: amount,
+      comment: comment,
       min_amount: min_amount,
       time_entered: time_entered,
       original_time_entered: time_entered,
