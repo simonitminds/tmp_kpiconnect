@@ -207,12 +207,6 @@ defmodule OceanconnectWeb.Router do
 
     resources("/users", UserController)
     post("/users/:user_id/reset_password", UserController, :reset_password)
-
-    # TODO: remove this after emails are designed
-    post("/send_email/invitation", EmailController, :send_invitation)
-    post("/send_email/upcoming", EmailController, :send_upcoming)
-    post("/send_email/cancellation", EmailController, :send_cancellation)
-    post("/send_email/completion", EmailController, :send_completion)
   end
 
   scope "/admin", OceanconnectWeb.Admin do

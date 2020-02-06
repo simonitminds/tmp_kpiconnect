@@ -12,4 +12,9 @@ defmodule OceanconnectWeb.Mailer do
     Email.user_interest(new_user_info)
     |> deliver_later()
   end
+
+  def password_reset(user, token) do
+    Email.password_reset(user, token)
+    |> deliver_later()
+  end
 end

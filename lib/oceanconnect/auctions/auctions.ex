@@ -614,7 +614,10 @@ defmodule Oceanconnect.Auctions do
   end
 
   def delete_auction_supplier_coq(
-        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: nil, term_auction_id: term_auction_id}
+        auction_supplier_coq = %AuctionSupplierCOQ{
+          auction_id: nil,
+          term_auction_id: term_auction_id
+        }
       ) do
     response = Repo.delete(auction_supplier_coq)
     update_cache(term_auction_id)
