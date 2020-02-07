@@ -23,6 +23,7 @@ defmodule Oceanconnect.Auctions do
     Barge,
     Fuel,
     FuelIndex,
+    NonEventNotifier,
     Port,
     Solution,
     TermAuction,
@@ -144,7 +145,10 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  defp make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
+  defp make_bid(auction, product_id, bid_params, supplier_id, nil),
+    do: make_bid(auction, product_id, bid_params, supplier_id, DateTime.utc_now())
+
+  defp make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
     with bid_params <- maybe_add_amount(bid_params),
          bid_params <- maybe_add_min_amount(bid_params),
          bid_params <- convert_amounts(bid_params),
@@ -506,6 +510,7 @@ defmodule Oceanconnect.Auctions do
         |> update_auction_supplier_coq(attrs)
     end
     |> @file_io.upload(coq_binary)
+    |> NonEventNotifier.emit(:coq_uploaded)
   end
 
   def get_auction_supplier_coq(auction_supplier_coq_id) do
@@ -525,13 +530,10 @@ defmodule Oceanconnect.Auctions do
     })
   end
 
-  def get_auction_supplier_coq(
-        %Auction{id: auction_id},
-        params = %{
-          "fuel_id" => fuel_id,
-          "supplier_id" => supplier_id
-        }
-      ) do
+  def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id
+      }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       auction_id: auction_id,
       supplier_id: supplier_id,
@@ -576,20 +578,16 @@ defmodule Oceanconnect.Auctions do
       ) do
     with true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
-      auction_supplier_coq =
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(attrs)
-        |> Repo.insert!()
-
-      update_cache(auction)
-      auction_supplier_coq
+      %AuctionSupplierCOQ{}
+      |> AuctionSupplierCOQ.changeset(attrs)
+      |> Repo.insert!()
     else
       _ -> :error
     end
   end
 
   def create_auction_supplier_coq(
-        auction = %TermAuction{id: auction_id},
+        auction = %TermAuction{id: term_auction_id},
         attrs = %{
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id
@@ -597,40 +595,20 @@ defmodule Oceanconnect.Auctions do
       ) do
     with true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
-      auction_supplier_coq =
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(
-          attrs
-          |> Map.delete("auction_id")
-          |> Map.put("term_auction_id", auction_id)
-        )
-        |> Repo.insert!()
-
-      update_cache(auction)
-      auction_supplier_coq
+      %AuctionSupplierCOQ{}
+      |> AuctionSupplierCOQ.changeset(
+        attrs
+        |> Map.delete("auction_id")
+        |> Map.put("term_auction_id", term_auction_id)
+      )
+      |> Repo.insert!()
     else
       _ -> :error
     end
   end
 
-  def delete_auction_supplier_coq(
-        auction_supplier_coq = %AuctionSupplierCOQ{
-          auction_id: nil,
-          term_auction_id: term_auction_id
-        }
-      ) do
-    response = Repo.delete(auction_supplier_coq)
-    update_cache(term_auction_id)
-    response
-  end
-
-  def delete_auction_supplier_coq(
-        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: auction_id}
-      ) do
-    response = Repo.delete(auction_supplier_coq)
-    update_cache(auction_id)
-    response
-  end
+  def delete_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}),
+    do: auction_supplier_coq |> Repo.delete() |> NonEventNotifier.emit()
 
   defp update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
@@ -855,12 +833,6 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded(true)
     |> Command.update_cache()
     |> AuctionCache.process_command()
-  end
-
-  defp update_cache(auction_id) do
-    auction_id
-    |> get_auction!()
-    |> update_cache()
   end
 
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do

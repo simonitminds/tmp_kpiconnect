@@ -6,32 +6,37 @@ defmodule Oceanconnect.Notifications.Email do
       alias Oceanconnect.Accounts
       alias Oceanconnect.Accounts.Company
 
+      @default_emails Application.get_env(:oceanconnect, :emails, %{
+                        admin: "admin@example.com",
+                        system: "system@example.com"
+                      })
+
       defp base_email(user) do
         new_email()
-        |> cc("nbolton@oceanconnectmarine.com")
-        |> from("bunkers@oceanconnectmarine.com")
+        |> cc(@default_emails.admin)
+        |> from(@default_emails.system)
         |> to(user)
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
       end
 
       defp admin_email(user) do
         new_email()
-        |> from("bunkers@oceanconnectmarine.com")
+        |> from(@default_emails.system)
         |> to(user)
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
       end
 
       defp two_factor_email(user) do
         new_email()
-        |> from("bunkers@oceanconnectmarine.com")
+        |> from(@default_emails.system)
         |> to(user)
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
       end
 
       defp user_interest_email do
         new_email()
-        |> from("bunkers@oceanconnectmarine.com")
-        |> to("nbolton@oceanconnectmarine.com")
+        |> from(@default_emails.system)
+        |> to(@default_emails.admin)
         |> put_html_layout({OceanconnectWeb.LayoutView, "email.html"})
       end
 

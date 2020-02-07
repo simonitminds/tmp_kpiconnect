@@ -13,12 +13,9 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   @auction_starting_soon_alert_time 15 * 60 * 1_000
 
-  @claim_events [
+  @delivery_events [
     :claim_created,
-    :claim_response_created
-  ]
-
-  @fixture_events [
+    :claim_response_created,
     :fixture_created,
     :fixture_updated,
     :fixture_delivered,
@@ -37,15 +34,15 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   # Bamboo sends this message back on successful deliver from `deliver_later`.
   def handle_info({:delivered_email, _email}, state), do: {:noreply, state}
 
-  def handle_info({%AuctionEvent{type: type} = event, claim}, state) when type in @claim_events do
-    process(event, claim)
+  def handle_info({:non_event_notification, type, data}, state) do
+    process(:non_event_notification, type, data)
 
     {:noreply, state}
   end
 
-  def handle_info({%AuctionEvent{type: type} = event, fixture}, state)
-      when type in @fixture_events do
-    process(event, fixture)
+  def handle_info({%AuctionEvent{type: type} = event, data}, state)
+      when type in @delivery_events do
+    process(event, data)
 
     {:noreply, state}
   end
@@ -61,6 +58,11 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   def handle_info(msg, state) do
     Logger.warn("EmailNotificationStore received an unexpected message: #{inspect(msg)}")
     {:noreply, state}
+  end
+
+  defp process(:non_event_notification, type, data) do
+    Notifications.emails_for_non_event(type, data)
+    |> send()
   end
 
   defp process(event = %AuctionEvent{type: :auction_created, auction_id: auction_id}, state) do
@@ -180,12 +182,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   # TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
   def needs_processed?(%{auction_id: auction_id}) do
     result = Auctions.get_auction_status!(auction_id)
-
-    if result not in [:open, :pending, :canceled, :expired, :closed] do
-      false
-    else
-      true
-    end
+    result in [:open, :pending, :canceled, :expired, :closed]
   end
 
   defp calculate_upcoming_reminder_send_time(auction_id) do

@@ -96,4 +96,8 @@ defmodule Oceanconnect.Notifications do
       ) do
     []
   end
+
+  def emails_for_non_event(:delivered_coq_uploaded, auction_supplier_coq) do
+    Emails.DeliveredCOQUploaded.generate(auction_supplier_coq)
+  end
 end

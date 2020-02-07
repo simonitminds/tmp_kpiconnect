@@ -39,7 +39,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
     with user = %User{company_id: company_id} <- OceanconnectWeb.Plugs.Auth.current_user(conn),
          auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id),
          true <- is_authorized_to_change?(auction, user, params),
-         {:ok, coq_binary, _conn} <- Plug.Conn.read_body(conn),
+         {:ok, coq_binary, _conn} <- Plug.Conn.read_body(conn, length: 25_000_000),
          {:ok, file_extension} <- get_file_extension(conn),
          %AuctionSupplierCOQ{} <-
            params

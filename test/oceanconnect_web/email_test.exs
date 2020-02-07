@@ -2,6 +2,7 @@ defmodule OceanconnectWeb.EmailTest do
   use Oceanconnect.DataCase
 
   alias OceanconnectWeb.Email
+  @admin_email Application.get_env(:emails, :admin)
 
   describe "password reset emails" do
     setup do
