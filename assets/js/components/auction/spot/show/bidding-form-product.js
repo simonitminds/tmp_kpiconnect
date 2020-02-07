@@ -12,6 +12,7 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
     .get('auction.auction_vessel_fuels')
     .filter((avf) => avf.fuel_id == fuelId)
     .value();
+  const auctionVesselFuels = _.get(auctionPayload, 'auction.auction_vessel_fuels');
   const totalQuantity = _.sumBy(vesselFuels, (vf) => vf.quantity);
 
   const lowestFuelBid = _.chain(vesselFuels)
@@ -22,6 +23,15 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
 
   const hasLowestBid = lowestFuelBid && supplierId && (lowestFuelBid.supplier_id == supplierId);
 
+  const prevComments = _.reduce(auctionPayload.product_bids, (result, productBid) => {
+    const prevBid = _.chain(productBid).get('bid_history').head().value();
+    const comment = _.get(prevBid, 'comment');
+    const vesselFuelId = _.get(prevBid, 'vessel_fuel_id');
+    const bidFuelId = _.chain(auctionVesselFuels).filter(['id', parseInt(vesselFuelId)]).first().get('fuel_id').value();
+    result[bidFuelId] ? result : result[bidFuelId] = comment;
+    return result
+  }, {});
+  console.log(prevComments)
 
   return (
     <div className="auction-bidding__product-group has-margin-bottom-md">
@@ -138,8 +148,8 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
           <span className="has-text-weight-bold">Comment:</span>
         </div>
         <div className="column columns">
-          <div className="column is-narrow">
-            <textarea id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId} onChange={onUpdate}></textarea>
+          <div className="column">
+            <textarea className="textarea" rows="1" id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId} onChange={onUpdate}>{prevComments[fuelId]}</textarea>
           </div>
         </div>
       </div>

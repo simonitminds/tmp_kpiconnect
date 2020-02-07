@@ -46,7 +46,7 @@
         <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Fuel Index:</b> <%= @auction.fuel_index.name %> (<%= @auction.fuel_index.code %>)</p>
       <% end %>
       <%= if deliverable.bid.comment do %>
-        <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><%= deliverable.bid.comment %></p>
+        <p style="margin-top: 0.25rem; margin-bottom: 0.25rem;"><b>Comment:</b> <%= deliverable.bid.comment %></p>
       <% end %>
     <% end %>
     <br>
