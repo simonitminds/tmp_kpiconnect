@@ -108,11 +108,9 @@ defmodule Oceanconnect.AuctionShowTest do
       [s1, s2, _s3] = auction.suppliers
 
       create_bid(1.75, nil, s1.id, vessel_fuel1, auction, true)
-      |> Map.put(:comment, "Bid 1")
       |> Auctions.place_bid(insert(:user, company: s1))
 
       create_bid(1.75, nil, s2.id, vessel_fuel1, auction, false)
-      |> Map.put(:comment, "Bid 2")
       |> Auctions.place_bid(insert(:user, company: s2))
 
       auction_state =
@@ -125,8 +123,7 @@ defmodule Oceanconnect.AuctionShowTest do
 
       bid_list_card_expectations =
         stored_bid_list
-        |> Enum.with_index()
-        |> Enum.map(fn {bid, index} ->
+        |> Enum.map(fn bid ->
           is_traded_bid = if bid.is_traded_bid, do: "Traded Bid", else: ""
 
           %{
@@ -134,8 +131,7 @@ defmodule Oceanconnect.AuctionShowTest do
             "data" => %{
               "amount" => "$#{bid.amount}",
               "supplier" => bid.supplier,
-              "is_traded_bid" => is_traded_bid,
-              "comment" => "Bid #{index + 1}"
+              "is_traded_bid" => is_traded_bid
             }
           }
         end)
@@ -234,11 +230,20 @@ defmodule Oceanconnect.AuctionShowTest do
         Enum.map(stored_bid_list, fn bid ->
           %{
             "id" => bid.id,
+            "data" => %{"amount" => "$#{bid.amount}"}
+          }
+        end)
+
+      best_offer_params =
+        Enum.map(stored_bid_list, fn bid ->
+          %{
+            "id" => bid.id,
             "data" => %{"amount" => "$#{bid.amount}", "comment" => "Wahoo! I placed a bid!"}
           }
         end)
 
       assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_params)
+      assert AuctionShowPage.solution_has_bids?(best_offer_params)
       assert AuctionShowPage.has_bid_message?("Bids successfully placed")
     end
 
@@ -438,6 +443,7 @@ defmodule Oceanconnect.AuctionShowTest do
     test "buyer view of decision period", %{
       auction: auction,
       supplier1_bid1: supplier1_bid1,
+      supplier1_bid2: supplier1_bid2,
       supplier2_bid1: supplier2_bid1,
       buyer: buyer
     } do
@@ -445,15 +451,23 @@ defmodule Oceanconnect.AuctionShowTest do
       AuctionShowPage.visit(auction.id)
 
       bid_list_card_expectations =
-        Enum.map({supplier1_bid1, supplier2_bid1}, fn bid ->
+        Enum.map([supplier1_bid1, supplier2_bid1], fn bid ->
+          %{
+            "id" => bid.id,
+            "data" => %{"amount" => "$#{bid.amount}"}
+          }
+        end)
+
+      best_overall_card_expectations =
+        Enum.map([supplier1_bid1, supplier1_bid2], fn bid ->
           %{
             "id" => bid.id,
             "data" => %{"amount" => "$#{bid.amount}", "comment" => bid.comment}
           }
         end)
 
-      assert AuctionShowPage.bid_list_has_bids?("supplier", bid_list_card_expectations)
-      assert AuctionShowPage.solution_has_bids?(:best_overall, [supplier1_bid1])
+      assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_card_expectations)
+      assert AuctionShowPage.solution_has_bids?(best_overall_card_expectations)
       assert AuctionShowPage.solution_has_bids?(0, [supplier2_bid1])
     end
 

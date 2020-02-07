@@ -148,7 +148,7 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
         </div>
         <div className="column columns">
           <div className="column">
-            <textarea className="textarea" rows="1" id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId} onChange={onUpdate}>{prevComments[fuelId]}</textarea>
+            <textarea className="textarea qa-auction-bid-comment" rows="1" defaultValue={prevComments[fuelId]} id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId} onChange={onUpdate}></textarea>
           </div>
         </div>
       </div>

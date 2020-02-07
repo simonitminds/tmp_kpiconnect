@@ -53,7 +53,6 @@ const SolutionDisplayProductSection = ({ bids, fuel, vesselFuels, supplierId, hi
     return confirm(`Are you sure you want to cancel your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId) : false;
   };
 
-
   return (
     <table className="auction-solution__product-table table is-gray-1">
       <thead>
@@ -68,29 +67,31 @@ const SolutionDisplayProductSection = ({ bids, fuel, vesselFuels, supplierId, hi
             const vessel = vesselFuel.vessel;
 
             return (
-              <React.Fragment>
-                <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
+              <React.Fragment key={bid.id}>
+                <tr className={`qa-auction-bid-${bid.id}`}>
                   <td className="auction-solution__product-table__vessel">
                     {vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
                   </td>
                   <td className="auction-solution__product-table__bid">
                     {bid
                       ? <span>
-                        <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {vesselFuel.quantity} MT </span>
-                        <span className="auction__traded-bid-tag__container qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
-                        <span className="auction__nonsplittable-bid-tag__container qa-auction-bid-is_nonsplittable_bid">{isNonsplittableBid(bid)}</span>
-                      </span>
+                          <span className="auction__bid-amount qa-auction-bid-amount">${formatPrice(bid.amount)}<span className="has-text-gray-3">/unit</span> &times; {vesselFuel.quantity} MT </span>
+                          <span className="auction__traded-bid-tag__container qa-auction-bid-is_traded_bid">{isTradedBid(bid)}</span>
+                          <span className="auction__nonsplittable-bid-tag__container qa-auction-bid-is_nonsplittable_bid">{isNonsplittableBid(bid)}</span>
+                        </span>
                       : <i>No bid</i>
                     }
                   </td>
-                  <td className="auction-solution__product-table__supplier"><span className="qa-auction-bid-supplier">
-                    {supplierName(bid) == "Your Bid" && highlightOwn
-                      ? <span className="tag auction-solution__your-bid-tag">
-                        {supplierName(bid)}
-                      </span>
-                      : supplierName(bid)
-                    }
-                  </span></td>
+                  <td className="auction-solution__product-table__supplier">
+                    <span className="qa-auction-bid-supplier">
+                      {supplierName(bid) == "Your Bid" && highlightOwn
+                        ? <span className="tag auction-solution__your-bid-tag">
+                            {supplierName(bid)}
+                          </span>
+                        : supplierName(bid)
+                      }
+                    </span>
+                  </td>
                   <td className="auction-solution__product-table__bid-time"><span className="qa-auction-bid-time_entered">({formatTime(bid.time_entered)})</span></td>
                   {bid.supplier_id == supplierId && !isAdmin && !isObserver && revokable &&
                     <td className="auction-solution__product-table__revoke">
@@ -100,7 +101,7 @@ const SolutionDisplayProductSection = ({ bids, fuel, vesselFuels, supplierId, hi
                     </td>
                   }
                 </tr>
-                {bid.comment && <tr><td className="auction-solution__product-table__bid-comment"><span className="qa-auction-bid-comment"><b>Comment: </b>{bid.comment}</span></td></tr>}
+                {bid.comment && <tr><td className="auction-solution__product-table__bid-comment"><b>Comment: </b><span className={`qa-auction-bid-comment-${bid.id}`}>{bid.comment}</span></td></tr>}
               </React.Fragment>
             );
           })

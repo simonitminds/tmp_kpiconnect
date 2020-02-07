@@ -46,6 +46,9 @@ defmodule Oceanconnect.Auctions.AuctionBid do
     }
   end
 
+  def from_params_to_auction_bid(params, auction),
+    do: from_params_to_auction_bid(Map.put(params, "comment", nil), auction)
+
   # When replaying events, if the Bid struct has changed (particularly when new
   # keys are added), the structs that come out of the events will be invalid.
   # This function ensures that bids from events always have all of the values

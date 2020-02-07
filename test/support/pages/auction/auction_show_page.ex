@@ -95,7 +95,11 @@ defmodule Oceanconnect.AuctionShowPage do
   def enter_bid(params = %{}) do
     params
     |> Enum.map(fn {key, value} ->
-      element = find_element(:css, "input.qa-auction-bid-#{key}")
+      element =
+        if key == :comment,
+          do: find_element(:css, "textarea.qa-auction-bid-#{key}"),
+          else: find_element(:css, "input.qa-auction-bid-#{key}")
+
       type = Hound.Helpers.Element.tag_name(element)
       fill_form_element(key, element, type, value)
     end)
@@ -200,6 +204,24 @@ defmodule Oceanconnect.AuctionShowPage do
       container
       |> find_within_element(:css, ".qa-bid-#{bid_id}")
       |> click()
+    end)
+  end
+
+  def solution_has_bids?(bid_list) do
+    Enum.all?(bid_list, fn bid ->
+      element =
+        :css
+        |> find_element(".qa-auction-solution-best_overall")
+        |> find_within_element(:css, ".qa-auction-bid-#{bid["id"]}")
+
+      Enum.all?(bid["data"], fn {k, v} ->
+        text =
+          if k == "comment",
+            do: find_element(:css, ".qa-auction-bid-comment-#{bid["id"]}") |> inner_text,
+            else: element |> find_within_element(:css, ".qa-auction-bid-#{k}") |> inner_text
+
+        text =~ v
+      end)
     end)
   end
 

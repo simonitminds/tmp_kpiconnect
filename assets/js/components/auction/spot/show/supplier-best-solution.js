@@ -45,7 +45,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
             <div className="box__subsection">
               <h3 className="box__header box__header--bordered">{status == 'closed' ? `Winning Offer` : `Best Offers`}</h3>
               { bestSolution &&
-                <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" revokeBid={revokeBid} />
+                <SolutionDisplay auctionPayload={auctionPayload} solution={bestSolution} isExpanded={true} supplierId={supplierId} highlightOwn={true} title="Best Overall Offer" revokeBid={revokeBid} className="qa-auction-solution-best_overall" />
               }
               { bestSingleSupplier && !_.isEqual(bestSolution, bestSingleSupplier) && vesselFuels && vesselFuels.length > 1 &&
                 <SolutionDisplay auctionPayload={auctionPayload} solution={bestSingleSupplier} isExpanded={false} supplierId={supplierId} highlightOwn={true} title={`Best Single Supplier Offer`} revokeBid={revokeBid} />
