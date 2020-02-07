@@ -24,14 +24,14 @@ export default class SolutionDisplayWrapper extends React.Component {
     clearTimeout(this.state.overflowTimer);
   }
   selectSolution() {
-    this.setState({selected: true})
+    this.setState({ selected: true })
   }
 
   cancelSelection(e) {
     e.preventDefault();
     const selectionWindow = this.container.current.querySelector(".auction-solution__confirmation");
     selectionWindow.classList.add("clear");
-    setTimeout(() => this.setState({selected: false}), 750);
+    setTimeout(() => this.setState({ selected: false }), 750);
     return false;
   }
 
@@ -45,13 +45,13 @@ export default class SolutionDisplayWrapper extends React.Component {
 
   toggleExpanded(e) {
     e.preventDefault();
-    this.setState({expanded: !this.state.expanded});
+    this.setState({ expanded: !this.state.expanded });
   }
 
   toggleOverflow(e) {
-    this.setState({hasOverflow: true});
-    let timer = setTimeout(() => {this.setState({hasOverflow: false})}, 750);
-    this.setState({overflowTimer: timer})
+    this.setState({ hasOverflow: true });
+    let timer = setTimeout(() => { this.setState({ hasOverflow: false }) }, 750);
+    this.setState({ overflowTimer: timer })
     return false;
   }
 
@@ -73,9 +73,9 @@ export default class SolutionDisplayWrapper extends React.Component {
       price,
       endButton
     } = this.props;
-    const {bids, normalized_price, total_price, latest_time_entered, valid} = solution;
-    const isObserver = window.isObserver;
-    const auctionType = _.get(auctionPayload.auction, 'type');
+    const { bids, normalized_price, total_price, latest_time_entered, valid } = solution;
+    const auctionStatus = _.get(auctionPayload, 'status');
+    const auctionType = _.get(auctionPayload, 'auction.type');
     const currentIndexPrice = _.get(auctionPayload, 'auction.current_index_price');
     const solutionSuppliers = _.chain(bids).map((bid) => bid.supplier).uniq().value();
     const isSingleSupplier = (solutionSuppliers.length == 1);
@@ -99,17 +99,21 @@ export default class SolutionDisplayWrapper extends React.Component {
       }
     }
 
+    const isSelectable = () => {
+      return (auctionStatus === 'decision' || (window.isAdmin && !window.isImpersonating && auctionStatus !== 'closed'));
+    }
+
     const estimatedPrice = currentIndexPrice ? `$${formatPrice(currentIndexPrice + normalized_price)}` : null;
 
     const solutionTitle = () => {
-      if(isSingleSupplier) {
+      if (isSingleSupplier) {
         return solutionSuppliers[0];
       } else {
         return (
           <span>
             <span className="split-offer-indicator">Split Offer </span>
             <span className="has-text-gray-3">
-              ({ _.join(solutionSuppliers, ", ") })
+              ({_.join(solutionSuppliers, ", ")})
             </span>
           </span>
         );
@@ -122,7 +126,7 @@ export default class SolutionDisplayWrapper extends React.Component {
       return isExpanded
         ? <FontAwesomeIcon icon="minus" className="has-padding-right-md" />
         : <FontAwesomeIcon icon="plus" className="has-padding-right-md" />
-      ;
+        ;
     }
 
     return (
@@ -130,13 +134,13 @@ export default class SolutionDisplayWrapper extends React.Component {
         <div className="auction-solution__header auction-solution__header--bordered">
           <div className="auction-solution__header__row">
             <h4 className="auction-solution__title qa-auction-solution-expand" onClick={this.toggleExpanded.bind(this)}>
-              { !headerOnly && expandIcon(isExpanded) }
+              {!headerOnly && expandIcon(isExpanded)}
               <span className="is-inline-block">
                 <span className="auction-solution__title__category">{title}</span>
                 <span className="auction-solution__title__description">{displaySubtitle}</span>
               </span>
               <MediaQuery query="(max-width: 480px)">
-                { acceptable && !isObserver &&
+                {isSelectable() && acceptable && !isObserver &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
@@ -147,7 +151,7 @@ export default class SolutionDisplayWrapper extends React.Component {
                 `(${formatTime(latest_time_entered)})`
               }
               <MediaQuery query="(min-width: 480px)">
-                { acceptable && !isObserver &&
+                {isSelectable() && acceptable && !isObserver &&
                   <button className="button is-small has-margin-left-md qa-auction-select-solution" onClick={this.selectSolution.bind(this)}>Select</button>
                 }
               </MediaQuery>
@@ -157,12 +161,12 @@ export default class SolutionDisplayWrapper extends React.Component {
           {headerExtras}
         </div>
 
-        { !headerOnly &&
+        {!headerOnly &&
           <div className="auction-solution__body">
             {children}
           </div>
         }
-        { acceptable && this.state.selected &&
+        {acceptable && this.state.selected &&
           <SolutionAcceptDisplay auctionPayload={auctionPayload} bestSolutionSelected={best} acceptSolution={this.onConfirm.bind(this)} cancelSelection={this.cancelSelection.bind(this)} />
         }
       </div>

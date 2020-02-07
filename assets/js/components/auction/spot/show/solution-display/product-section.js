@@ -70,12 +70,8 @@ const SolutionDisplayProductSection = ({ bids, fuel, vesselFuels, supplierId, hi
             return (
               <React.Fragment>
                 <tr key={bid.id} className={`qa-auction-bid-${bid.id}`}>
-                  <td className="auction-solution__product-table__vessel">{vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
-                    {revokable &&
-                      <span className={`tag auction-solution__product-table__revoke revoke-bid__button has-margin-left-auto qa-auction-product-${vesselFuel.id}-revoke`} onClick={confirmBidRevoke} data-product-id={vesselFuel.id}>
-                        <FontAwesomeIcon icon="times" />
-                      </span>
-                    }
+                  <td className="auction-solution__product-table__vessel">
+                    {vessel.name} <span className="has-text-gray-3 has-margin-left-xs">({vessel.imo})</span>
                   </td>
                   <td className="auction-solution__product-table__bid">
                     {bid

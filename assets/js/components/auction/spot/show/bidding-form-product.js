@@ -31,7 +31,6 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
     result[bidFuelId] ? result : result[bidFuelId] = comment;
     return result
   }, {});
-  console.log(prevComments)
 
   return (
     <div className="auction-bidding__product-group has-margin-bottom-md">
