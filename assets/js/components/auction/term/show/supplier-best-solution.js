@@ -19,7 +19,7 @@ const SupplierBestSolution = ({auctionPayload, connection, supplierId, revokeBid
     const productId = ev.currentTarget.dataset.productId;
     const auctionId = auctionPayload.auction.id;
 
-    return confirm(`Are you sure you want to cancel your bid?`) ? revokeBid(auctionId, productId) : false;
+    return confirm(`Are you sure you want to cancel your bid?`) ? revokeBid(auctionId, productId, supplierId) : false;
   };
 
   const endButton =

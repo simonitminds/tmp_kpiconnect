@@ -50,7 +50,7 @@ const SolutionDisplayProductSection = ({ bids, fuel, vesselFuels, supplierId, hi
     const auctionId = auctionPayload.auction.id;
     const vesselFuel = _.find(vesselFuels, ({ id }) => `${id}` == productId);
 
-    return confirm(`Are you sure you want to cancel your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId) : false;
+    return confirm(`Are you sure you want to cancel your bid for ${vesselFuel.fuel.name} to ${vesselFuel.vessel.name}?`) ? revokeBid(auctionId, productId, supplierId) : false;
   };
 
   return (
