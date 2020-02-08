@@ -59,8 +59,8 @@ const mapDispatchToProps = (dispatch) => ({
   removeCommentFromSolution(auctionId, commentId) {
     dispatch(unsubmitComment(auctionId, commentId))
   },
-  revokeSupplierBid(auctionId, productId) {
-    dispatch(revokeBid(auctionId, { "product": productId }));
+  revokeSupplierBid(auctionId, productId, bidSupplierId) {
+    dispatch(revokeBid(auctionId, { "product": productId, "supplier": bidSupplierId }));
   },
   submitBargeForm(auctionId, bargeId, ev) {
     ev.preventDefault();

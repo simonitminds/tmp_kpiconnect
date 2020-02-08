@@ -3,7 +3,6 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
   use Bamboo.Test, shared: true
   alias Oceanconnect.{AuctionShowPage, AuctionNewPage}
   alias Oceanconnect.Auctions
-  alias Oceanconnect.Notifications.Emails
 
   hound_session()
 
@@ -130,17 +129,14 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
       assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_expectations)
     end
 
-    test "buyer selects solution while auction is open", %{
-      auction: auction,
-      fuel_id: fuel_id,
-      buyer: buyer
-    } do
+    test "buyer selects solution while auction is open", %{auction: auction, fuel_id: fuel_id} do
       supplier = hd(auction.suppliers)
 
       bid =
         create_bid(1.75, nil, supplier.id, fuel_id, auction, true)
         |> Auctions.place_bid(insert(:user, company: supplier))
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
       :timer.sleep(500)
@@ -161,6 +157,7 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
         create_bid(-1.75, nil, supplier.id, fuel_id, auction, true)
         |> Auctions.place_bid(insert(:user, company: supplier))
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
       :timer.sleep(100)
@@ -191,6 +188,7 @@ defmodule Oceanconnect.FormulaRelatedAuctionShowTest do
         assert AuctionShowPage.has_content?("Hi")
       end)
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       :timer.sleep(100)
       AuctionShowPage.select_solution(0)

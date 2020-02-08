@@ -22,6 +22,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
   def from_params_to_auction_bid(
         params = %{
           "amount" => amount,
+          "comment" => comment,
           "min_amount" => min_amount,
           "vessel_fuel_id" => vessel_fuel_id,
           "supplier_id" => supplier_id,
@@ -36,6 +37,7 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       supplier_id: supplier_id,
       vessel_fuel_id: vessel_fuel_id,
       amount: amount,
+      comment: comment,
       min_amount: min_amount,
       time_entered: time_entered,
       original_time_entered: time_entered,
@@ -43,6 +45,9 @@ defmodule Oceanconnect.Auctions.AuctionBid do
       is_traded_bid: Map.get(params, "is_traded_bid", false)
     }
   end
+
+  def from_params_to_auction_bid(params, auction),
+    do: from_params_to_auction_bid(Map.put(params, "comment", nil), auction)
 
   # When replaying events, if the Bid struct has changed (particularly when new
   # keys are added), the structs that come out of the events will be invalid.

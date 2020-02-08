@@ -70,6 +70,9 @@
                       <% end %>
                       to
                       <span class="qa-auction-detail-winning-solution-entry-vessel"><%= auction_log_vessel_from_vessel_fuel_id(@auction_payload.auction, bid.vessel_fuel_id) %></span>
+                      <%= if bid.comment && bid.comment != "" do %>
+                        <br /><b>Comment: </b><%= bid.comment %>
+                      <% end %>
                     <% else %>
                       <span class="qa-auction-detail-winning-solution-entry-fuel"><%= @auction_payload.auction.fuel.name %></span>
                       from

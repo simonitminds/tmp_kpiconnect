@@ -117,16 +117,14 @@ defmodule Oceanconnect.TermAuctionShowTest do
       assert AuctionShowPage.bid_list_has_bids?("buyer", bid_list_expectations)
     end
 
-    test "buyer selects solution", %{
-      auction: auction,
-      fuel_id: fuel_id
-    } do
+    test "buyer selects solution", %{auction: auction, fuel_id: fuel_id} do
       supplier = hd(auction.suppliers)
 
       bid =
         create_bid(1.75, nil, supplier.id, fuel_id, auction, true)
         |> Auctions.place_bid(insert(:user, company: supplier))
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
       :timer.sleep(500)
@@ -147,6 +145,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
         create_bid(1.75, nil, supplier.id, fuel_id, auction, true)
         |> Auctions.place_bid(insert(:user, company: supplier))
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       AuctionShowPage.select_solution(0)
       :timer.sleep(100)
@@ -177,6 +176,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
         assert AuctionShowPage.has_content?("Hi")
       end)
 
+      Auctions.end_auction(auction)
       AuctionShowPage.visit(auction.id)
       :timer.sleep(100)
       AuctionShowPage.select_solution(0)
@@ -290,10 +290,7 @@ defmodule Oceanconnect.TermAuctionShowTest do
                "You have the best overall offer for this auction"
     end
 
-    test "supplier can revoke their bid for a product", %{
-      auction: auction,
-      fuel_id: fuel_id
-    } do
+    test "supplier can revoke their bid for a product", %{auction: auction, fuel_id: fuel_id} do
       AuctionShowPage.enter_bid(%{amount: 10.00, min_amount: 9.00})
       AuctionShowPage.submit_bid()
       :timer.sleep(700)
