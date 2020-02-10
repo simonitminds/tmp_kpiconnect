@@ -31,6 +31,7 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
     result[bidFuelId] ? result : result[bidFuelId] = comment;
     return result
   }, {});
+  const prevComment = prevComments[fuelId];
 
   return (
     <div className="auction-bidding__product-group has-margin-bottom-md">
@@ -148,7 +149,7 @@ const BiddingFormProduct = ({ fuel, auctionPayload, onUpdate, supplierId }) => {
         </div>
         <div className="column columns">
           <div className="column">
-            <textarea className="textarea qa-auction-bid-comment" rows="1" defaultValue={prevComments[fuelId]} id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId} onChange={onUpdate}></textarea>
+            <textarea className="textarea qa-auction-bid-comment" rows="1" defaultValue={prevComment} id={`comment-${fuelId}`} name="comment" data-fuel-input data-fuel={fuelId}></textarea>
           </div>
         </div>
       </div>

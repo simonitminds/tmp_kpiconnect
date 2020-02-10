@@ -78,8 +78,9 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
             fuels.map((fuel) => {
               const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': parseInt(supplierId) });
               return (
-                <div key={`${supplierId}-${fuel.id}`}>
+                <div>
                   <COQSubmission
+                    key={`${supplierId}-${fuel.id}`}
                     auctionPayload={auctionPayload}
                     addCOQ={addCOQ}
                     deleteCOQ={deleteCOQ}

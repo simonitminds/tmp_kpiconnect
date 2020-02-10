@@ -17,14 +17,14 @@ const SupplierCOQs = (props) => {
 
   const renderCOQs = () => {
     return fuels.map((fuel) => {
-        const fuelSupplier = supplierId ? parseInt(supplierId) : fuelSuppliers[fuel.id];
-        const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': fuelSupplier });
-        if (fuelSupplier) {
-          return <COQSubmission {...props} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />;
-        } else {
-          return '';
-        }
-      })
+      const fuelSupplier = supplierId ? parseInt(supplierId) : fuelSuppliers[fuel.id];
+      const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': fuelSupplier });
+      if (fuelSupplier) {
+        return <COQSubmission {...props} key={`${fuelSupplier}-${fuel.id}`} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />;
+      } else {
+        return '';
+      }
+    })
   }
 
   const renderCOQComponent = () => {
