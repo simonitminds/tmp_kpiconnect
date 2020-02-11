@@ -4,6 +4,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   alias OceanconnectWeb.Mailer
   alias Oceanconnect.{Notifications, Auctions, Auctions.AuctionEvent}
+  alias Oceanconnect.Auctions.{Auction, TermAuction}
 
   alias Oceanconnect.Notifications.{
     Command,
@@ -12,6 +13,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   }
 
   @auction_starting_soon_alert_time 15 * 60 * 1_000
+  @delivered_coq_reminder_alert_time 24 * 60 * 60 * 1_000
 
   @delivery_events [
     :claim_created,
@@ -164,6 +166,36 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     |> DelayedNotifications.process_command()
   end
 
+  defp process(
+         event = %AuctionEvent{
+           type: :select_winning_solution,
+           auction_id: auction_id,
+           data: %{solution: solution}
+         },
+         state
+       ) do
+    notification_name = "auction:#{auction_id}:upcoming_reminder"
+
+    case DelayedNotificationsSupervisor.start_child(notification_name) do
+      {:ok, _pid} ->
+        reminder_emails = Notifications.emails_for_event(event, state)
+
+        auction = Oceanconnect.Auctions.get_auction!(auction_id)
+
+        case calculate_upcoming_reminder_send_time(auction) do
+          false ->
+            {:ok, :nothing_to_schedule}
+
+          send_time ->
+            Command.schedule_notification(notification_name, send_time, reminder_emails)
+            |> DelayedNotifications.process_command()
+        end
+
+      _ ->
+        {:ok, :nothing_to_schedule}
+    end
+  end
+
   defp process(event, state) do
     Notifications.emails_for_event(event, state)
     |> send()
@@ -183,6 +215,30 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   def needs_processed?(%{auction_id: auction_id}) do
     result = Auctions.get_auction_status!(auction_id)
     result in [:open, :pending, :canceled, :expired, :closed]
+  end
+
+  defp calculate_upcoming_reminder_send_time(%Auction{auction_vessel_fuels: auction_vessel_fuels}) do
+    earliest_eta =
+      auction_vessel_fuels
+      |> Enum.sort_by(&DateTime.to_unix(&1.eta))
+      |> List.first()
+      |> Map.get(:eta)
+
+    if earliest_eta do
+      DateTime.to_unix(earliest_eta, :millisecond)
+      |> Kernel.-(@delivered_coq_reminder_alert_time)
+      |> DateTime.from_unix!(:millisecond)
+    else
+      false
+    end
+  end
+
+  defp calculate_upcoming_reminder_send_time(%TermAuction{start_date: nil}), do: false
+
+  defp calculate_upcoming_reminder_send_time(%TermAuction{start_date: start_date}) do
+    DateTime.to_unix(start_date, :millisecond)
+    |> Kernel.-(@delivered_coq_reminder_alert_time)
+    |> DateTime.from_unix!(:millisecond)
   end
 
   defp calculate_upcoming_reminder_send_time(auction_id) do

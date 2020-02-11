@@ -90,6 +90,14 @@ defmodule Oceanconnect.Notifications do
     Emails.FixtureChangesProposed.generate(fixture, changeset, user)
   end
 
+  def emails_for_event(%AuctionEvent{
+        type: :select_winning_solution,
+        auction_id: auction_id,
+        data: %{solution: solution}
+      }) do
+    Emails.DeliveredCOQReminder.generate(auction_id, solution)
+  end
+
   def emails_for_event(
         %AuctionEvent{type: _type},
         _auction_state
