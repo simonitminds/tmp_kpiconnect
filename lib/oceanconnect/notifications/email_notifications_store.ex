@@ -178,8 +178,6 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
     case DelayedNotificationsSupervisor.start_child(notification_name) do
       {:ok, _pid} ->
-        reminder_emails = Notifications.emails_for_event(event, state)
-
         auction = Oceanconnect.Auctions.get_auction!(auction_id)
 
         case calculate_upcoming_reminder_send_time(auction) do
@@ -187,7 +185,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
             {:ok, :nothing_to_schedule}
 
           send_time ->
-            Command.schedule_notification(notification_name, send_time, reminder_emails)
+            Command.schedule_reminder(notification_name, auction_id, send_time, solution)
             |> DelayedNotifications.process_command()
         end
 
@@ -233,13 +231,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     end
   end
 
-  defp calculate_upcoming_reminder_send_time(%TermAuction{start_date: nil}), do: false
-
-  defp calculate_upcoming_reminder_send_time(%TermAuction{start_date: start_date}) do
-    DateTime.to_unix(start_date, :millisecond)
-    |> Kernel.-(@delivered_coq_reminder_alert_time)
-    |> DateTime.from_unix!(:millisecond)
-  end
+  defp calculate_upcoming_reminder_send_time(%TermAuction{}), do: false
 
   defp calculate_upcoming_reminder_send_time(auction_id) do
     %{scheduled_start: start_time} = Oceanconnect.Auctions.get_auction!(auction_id)

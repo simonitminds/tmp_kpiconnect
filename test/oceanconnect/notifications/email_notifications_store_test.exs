@@ -100,6 +100,8 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
 
     winning_solution = Solution.from_bids(solution_bids, product_bids, auction)
 
+    fixture = insert(:auction_fixture, auction: auction, fuel: fuel, vessel: hd(vessels))
+
     approved_barges = [
       insert(:auction_barge,
         auction: auction,
@@ -128,6 +130,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
      %{
        auction: auction,
        draft_auction: draft_auction,
+       fixture: fixture,
        vessel_name_list: vessel_name_list,
        port_name: port_name,
        buyer: buyer,
@@ -286,14 +289,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
   end
 
   describe "non-event notifications" do
-    test "uploading delivered coq produces email", %{auction: auction} do
+    test "uploading delivered coq produces email", %{auction: auction, fixture: fixture} do
       auction_supplier_coq =
         %AuctionSupplierCOQ{id: id} =
-        insert(:auction_supplier_coq, auction: auction, delivered: true)
+        insert(:auction_supplier_coq, auction: auction, delivered: true, auction_fixture: fixture)
 
-      assert %AuctionSupplierCOQ{id: ^id} =
-               NonEventNotifier.emit(auction_supplier_coq, :coq_uploaded)
-
+      assert %AuctionSupplierCOQ{id: ^id} = NonEventNotifier.emit(auction_supplier_coq)
       emails = Emails.DeliveredCOQUploaded.generate(auction_supplier_coq)
 
       for email <- emails do

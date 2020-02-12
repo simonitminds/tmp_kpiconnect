@@ -10,6 +10,7 @@ defmodule Oceanconnect.Auctions.AuctionSupplierCOQ do
     # Auctions and TermAuctions both reference this table. Each knows which
     # column to use as the foreign_key_constraint.
     belongs_to(:auction, Oceanconnect.Auctions.Auction)
+    belongs_to(:auction_fixture, Oceanconnect.Auctions.AuctionFixture)
     belongs_to(:term_auction, Oceanconnect.Auctions.TermAuction)
     belongs_to(:supplier, Oceanconnect.Accounts.Company)
     belongs_to(:fuel, Oceanconnect.Auctions.Fuel)
@@ -21,24 +22,26 @@ defmodule Oceanconnect.Auctions.AuctionSupplierCOQ do
     auction_supplier_coq
     |> cast(attrs, [
       :auction_id,
-      :term_auction_id,
-      :supplier_id,
-      :fuel_id,
+      :auction_fixture_id,
+      :delivered,
       :file_extension,
-      :delivered
+      :fuel_id,
+      :supplier_id,
+      :term_auction_id
     ])
     |> validate_required([:supplier_id, :fuel_id, :file_extension])
     |> validate_belongs_to_an_auction()
     |> foreign_key_constraint(:auction_id)
-    |> foreign_key_constraint(:term_auction_id)
-    |> foreign_key_constraint(:supplier_id)
+    |> foreign_key_constraint(:auction_fixture_id)
     |> foreign_key_constraint(:fuel_id)
+    |> foreign_key_constraint(:supplier_id)
+    |> foreign_key_constraint(:term_auction_id)
   end
 
   def update_changeset(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
-    |> cast(attrs, [:file_extension, :delivered])
-    |> validate_required([:file_extension, :delivered])
+    |> cast(attrs, [:file_extension])
+    |> validate_required([:file_extension])
   end
 
   defp validate_belongs_to_an_auction(changeset) do

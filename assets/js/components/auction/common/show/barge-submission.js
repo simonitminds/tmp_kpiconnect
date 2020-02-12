@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import CollapsibleSection from '../collapsible-section';
 import CollapsingBarge from './collapsing-barge';
 
 const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, approveBargeForm, rejectBargeForm, companyBarges, isBuyer, supplierId}) => {

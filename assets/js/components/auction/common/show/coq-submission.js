@@ -22,9 +22,9 @@ class COQSubmission extends React.Component {
     ev.preventDefault
     this.setState({ uploading: true });
     const coq = ev.target.files[0];
-    const { addCOQ, auctionPayload, fuel, supplierId, delivered } = this.props;
+    const { addCOQ, auctionPayload, fuel, supplierId, delivered, fixtureId } = this.props;
     const { auction } = auctionPayload;
-    addCOQ(auction.id, supplierId, fuel.id, coq, delivered);
+    addCOQ(auction.id, supplierId, fuel.id, coq, delivered, fixtureId);
   }
 
   render() {

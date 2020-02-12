@@ -1,19 +1,17 @@
 <p style='font-family: "Arial";'><b>Dear <%= full_name(@user) %>,</b></p>
 <br/>
 <p style='font-family: "Arial";'>
-  <%= if length(@fuels) == 1 do %>
-    Please upload a Certificate of Quality on Auction <%= @auction.id %> for <%= hd(@fuels).name %>.
+  <%= if length(@fixtures) == 1 do %>
+    Please go to the below link to upload your COQ for <%= hd(@fixtures).fuel.name %> that will be delivered to <%= hd(@fixtures).vessel.name  %> at <%= @auction.port.name %>.
   <% else %>
-    Please upload a Certificate of Quality on Auction <%= @auction.id %> for the following fuels:
-    <ul>
-      <%= for fuel <- @fuels do %>
-        <li><%= fuel.name %></li>
-      <% end %>
-    </ul>
+    Please go to the below link to upload your COQs for the listed fixtures delivered at <%= @auction.port.name %>:
+    <%= for fixture <- @fixtures do %>
+      <%= fixture.vessel.name  %> - <%= fixture.fuel.name %>
+    <% end %>
   <% end %>
 </p>
 <br/>
-<p style='font-family: "Arial"; margin-bottom: 1rem;'>Please click on the link below to upload certifcate(s) for this auction: <a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>"><%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %></a></p>
+<p style='font-family: "Arial"; margin-bottom: 1rem;'><a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>"><%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>Link to auction</a></p>
 
 <p style="margin-bottom: 0.5rem; font-family: 'Arial';"><b>If you need any assistance please contact:</b></p>
 <img src="data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAASgAAAA8CAYAAADVNycgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAJ1hJREFUeNrsXQmAJEWV/RGZWdU9FzPDOZxyONwgt4qiKKy4ooiKIrLIirDKijeggHghCIoieCCigigI6nqBCnKogJzCcIl4cDk4zDDM3d1VlRkR+3/Ej6zsnMys6p4BejA/xGR1ZWZUXvHy/Rc/foQv+PxpUGZGCBBSYgkApHB/CwlAS/yP/nffCb+H/R/c37Px311xuSN9xrIu

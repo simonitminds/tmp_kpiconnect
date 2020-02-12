@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Notifications.DelayedNotifications do
   use GenServer
 
-  alias Oceanconnect.Notifications.Command
+  alias Oceanconnect.Notifications.{Command, Emails}
   alias OceanconnectWeb.Mailer
 
   # Client
@@ -49,6 +49,33 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     send(emails)
 
     {:noreply, %{state | timer_ref: nil}}
+  end
+
+  def handle_info(
+        :send_reminder,
+        state = %{auction_id: auction_id, solution: solution, timer_ref: ref}
+      ) do
+    cancel_timer(ref)
+
+    auction_id
+    |> Emails.DeliveredCOQReminder.generate(solution)
+    |> send()
+
+    {:noreply, %{state | timer_ref: nil}}
+  end
+
+  defp process(
+         %Command{
+           command: :schedule_reminder,
+           data: %{auction_id: auction_id, send_time: send_time, solution: solution}
+         },
+         state = %{timer_ref: nil}
+       ) do
+    delay = time_until(send_time)
+    ref = Process.send_after(self(), :send_reminder, delay)
+
+    {:ok,
+     %{state | auction_id: auction_id, send_time: send_time, solution: solution, timer_ref: ref}}
   end
 
   defp process(

@@ -518,12 +518,14 @@ defmodule Oceanconnect.Auctions do
   end
 
   def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "auction_fixture_id" => auction_fixture_id,
         "fuel_id" => fuel_id,
         "supplier_id" => supplier_id,
         "delivered" => _
       }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       auction_id: auction_id,
+      auction_fixture_id: auction_fixture_id,
       supplier_id: supplier_id,
       fuel_id: fuel_id,
       delivered: true
@@ -565,6 +567,13 @@ defmodule Oceanconnect.Auctions do
       fuel_id: fuel_id,
       delivered: false
     })
+  end
+
+  def get_auction_supplier_coq(auction_fixture_id, supplier_id) do
+    Repo.get_by(AuctionSupplierCOQ,
+      auction_fixture_id: auction_fixture_id,
+      supplier_id: supplier_id
+    )
   end
 
   def get_auction_supplier_coq(nil, _params), do: nil
@@ -973,6 +982,7 @@ defmodule Oceanconnect.Auctions do
           :auction_supplier_coqs,
           [auction_vessel_fuels: [:vessel, :fuel]],
           [buyer: :users],
+          [fixtures: [:fuel, :vessel]],
           [suppliers: :users],
           :observers
         ],

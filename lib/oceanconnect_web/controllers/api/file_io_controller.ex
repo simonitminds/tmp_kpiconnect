@@ -113,7 +113,7 @@ defmodule OceanconnectWeb.Api.FileIOController do
        }),
        do: Auctions.get_auction_status!(auction_id) in [:pending, :open]
 
-  defp is_authorized_to_change?(_auction, _user, _params), do: false |> IO.inspect()
+  defp is_authorized_to_change?(_auction, _user, _params), do: false
 
   defp set_params(supplier_id, true), do: %{"supplier_id" => supplier_id, "delivered" => true}
   defp set_params(supplier_id, _), do: %{"supplier_id" => supplier_id}

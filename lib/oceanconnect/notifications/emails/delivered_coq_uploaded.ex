@@ -16,28 +16,24 @@ defmodule Oceanconnect.Notifications.Emails.DeliveredCOQUploaded do
   def generate(auction_supplier_coq = %AuctionSupplierCOQ{auction_id: auction_id}),
     do: emails(Auctions.get_auction!(auction_id), auction_supplier_coq)
 
+  def generate(_auction_supplier_coq), do: []
+
   defp emails(auction = %{buyer: buyer}, %AuctionSupplierCOQ{
-         fuel_id: fuel_id,
+         auction_fixture_id: auction_fixture_id,
          supplier_id: supplier_id
        }) do
-    fuel = Auctions.get_fuel!(fuel_id)
-    supplier = Accounts.get_company!(supplier_id)
+    fixture = Auctions.get_auction_supplier_coq(auction_fixture_id, supplier_id).auction_fixture
 
     [buyer]
     |> Accounts.users_for_companies()
     |> Enum.map(fn recipient ->
       recipient
       |> base_email()
-      |> subject(
-        "A Certificate of Quality has been added by #{supplier.name} on Auction #{auction.id} for #{
-          fuel.name
-        }"
-      )
+      |> subject("The COQ has been uploaded in Auction #{auction.id} at #{auction.port.name}")
       |> render(
         "delivered_coq_uploaded.html",
         auction: auction,
-        fuel: fuel,
-        supplier: supplier,
+        fixture: fixture,
         user: recipient
       )
     end)

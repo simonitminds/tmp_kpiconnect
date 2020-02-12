@@ -22,6 +22,8 @@ defmodule Oceanconnect.Auctions.NonEventNotifier do
     auction_supplier_coq
   end
 
+  def emit(:error), do: :error
+
   def broadcast(type, data) do
     :ok =
       Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {:non_event_notification, type, data})

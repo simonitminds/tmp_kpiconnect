@@ -240,14 +240,14 @@ export function removeCOQ(coqId) {
   };
 }
 
-export function submitCOQ(auctionId, supplierId, fuelId, spec, delivered) {
+export function submitCOQ(auctionId, supplierId, fuelId, spec, delivered, fixtureId) {
   const uploadHeaders = {
     'Accept': 'application/json',
     'Authorization': `Bearer ${window.userToken}`,
     'x-expires': window.expiration
   };
 
-  const query = delivered ? '?delivered=true' : '';
+  const query = delivered ? `?delivered=true&auction_fixture_id=${fixtureId}` : '';
   return dispatch => {
     fetch(`/api/auctions/${auctionId}/suppliers/${supplierId}/coqs/${fuelId}/upload${query}`, {
       headers: uploadHeaders,
