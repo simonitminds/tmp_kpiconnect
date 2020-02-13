@@ -110,8 +110,11 @@ defmodule Oceanconnect.Deliveries do
   end
 
   def get_claim_response(id) do
-    Repo.get(ClaimResponse, id)
-    |> Repo.preload(
+    ClaimResponse |> Repo.get(id) |> fully_loaded()
+  end
+
+  def fully_loaded(claim_response = %ClaimResponse{}) do
+    Repo.preload(claim_response,
       claim: [:fixture, :receiving_vessel, :delivered_fuel, :buyer, :supplier, auction: :port],
       author: :company
     )

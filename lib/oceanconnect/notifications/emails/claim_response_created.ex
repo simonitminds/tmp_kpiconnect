@@ -6,22 +6,12 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
 
   alias Oceanconnect.Accounts
 
-  def generate(%ClaimResponse{id: response_id}) do
-    case Deliveries.get_claim_response(response_id) do
-      nil ->
-        []
+  def generate(claim_response = %ClaimResponse{}), do: claim_response |> Deliveries.fully_loaded() |> emails()
 
-      response ->
-        emails(response)
-    end
-  end
-
-  defp emails(%{
-         claim: %{buyer_id: buyer_id, supplier: supplier} = claim,
+  defp emails(claim_response = %{
+         claim: claim = %{buyer: buyer = %Company{id: company_id}, supplier: supplier},
          author: %{company_id: company_id} = author
-       })
-       when buyer_id == company_id do
-    buyer = Accounts.get_company!(buyer_id)
+       }) do
     recipients = Accounts.users_for_companies([supplier])
 
     author_name = Accounts.User.full_name(author)
@@ -34,6 +24,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
       |> render("supplier_claim_response_created.html",
         user: recipient,
         claim: claim,
+        claim_response: claim_response,
         author_name: author_name,
         supplier: supplier,
         buyer: buyer
@@ -41,8 +32,8 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
     end)
   end
 
-  defp emails(%{
-         claim: %{buyer: buyer, supplier: supplier} = claim,
+  defp emails(claim_response = %{
+         claim: claim = %{buyer: buyer, supplier: supplier},
          author: author
        }) do
     recipients = Accounts.users_for_companies([buyer])
@@ -57,6 +48,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
       |> render("buyer_claim_response_created.html",
         user: recipient,
         claim: claim,
+        claim_response: claim_response,
         author_name: author_name,
         supplier: supplier,
         buyer: buyer
