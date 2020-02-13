@@ -1799,18 +1799,6 @@ defmodule Oceanconnect.AuctionsTest do
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_barge!(inactive_barge.id) end
     end
 
-    test "strip non loaded" do
-      auction = insert(:auction)
-
-      partially_loaded_auction =
-        Oceanconnect.Auctions.Auction
-        |> Repo.get(auction.id)
-        |> Repo.preload([:vessels])
-
-      result = Auctions.strip_non_loaded(partially_loaded_auction)
-      assert hd(result.vessels).company == nil
-    end
-
     test "create_barge/1 with valid data creates a barge", %{port: port} do
       attrs = Map.merge(@valid_attrs, %{port_id: port.id})
       assert {:ok, %Barge{} = barge} = Auctions.create_barge(attrs)
