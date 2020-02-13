@@ -14,6 +14,14 @@ defmodule Oceanconnect.Notifications.Command do
     }
   end
 
+  def schedule_reminder(name, auction_id, send_time, solution) do
+    %Command{
+      command: :schedule_reminder,
+      notification_name: name,
+      data: %{auction_id: auction_id, send_time: send_time, solution: solution}
+    }
+  end
+
   def reschedule_notification(name, send_time, emails) do
     %Command{
       command: :reschedule_notification,

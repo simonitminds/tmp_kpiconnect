@@ -23,7 +23,7 @@ defmodule OceanconnectWeb.Api.AuctionController do
   end
 
   def show(conn, %{"auction_id" => auction_id}) do
-    with user = %User{company_id: company_id} <- Auth.current_user(conn),
+    with %User{company_id: company_id} <- Auth.current_user(conn),
          auction = %struct{} when is_auction(struct) <- Auctions.get_auction!(auction_id) do
       render(conn, "show.json", data: AuctionPayload.get_auction_payload!(auction, company_id))
     else

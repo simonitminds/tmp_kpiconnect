@@ -96,4 +96,20 @@ defmodule Oceanconnect.Notifications do
       ) do
     []
   end
+
+  def emails_for_non_event(:delivered_coq_uploaded, auction_supplier_coq) do
+    Emails.DeliveredCOQUploaded.generate(auction_supplier_coq)
+  end
+
+  def emails_for_non_event(:password_reset, %{user: user, token: token}) do
+    Emails.PasswordReset.generate(user, token)
+  end
+
+  def emails_for_non_event(:two_factor_auth, %{user: user, one_time_pass: one_time_pass}) do
+    Emails.TwoFactorAuth.generate(user, one_time_pass)
+  end
+
+  def emails_for_non_event(:user_interest, new_user_info) do
+    Emails.UserInterest.generate(new_user_info)
+  end
 end

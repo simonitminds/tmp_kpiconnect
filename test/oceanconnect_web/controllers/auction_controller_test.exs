@@ -94,7 +94,6 @@ defmodule OceanconnectWeb.AuctionControllerTest do
       assert conn.assigns[:vessels] ==
                buyer
                |> Auctions.vessels_for_buyer()
-               |> Auctions.strip_non_loaded()
                |> Poison.encode!()
     end
   end

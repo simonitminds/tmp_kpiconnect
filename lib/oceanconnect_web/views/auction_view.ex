@@ -47,56 +47,48 @@ defmodule OceanconnectWeb.AuctionView do
   @events_for_barges [:barge_approved, :barge_rejected, :barge_submitted, :barge_unsubmitted]
 
   def auction_json_for_form(auction = %Auction{}) do
-    auction_map =
-      auction
-      |> Auctions.strip_non_loaded()
-
     %{
-      po: auction_map.po,
-      port_agent: auction_map.port_agent,
-      scheduled_start: auction_map.scheduled_start,
-      auction_started: auction_map.auction_started,
-      auction_ended: auction_map.auction_ended,
-      auction_closed_time: auction_map.auction_closed_time,
-      duration: auction_map.duration,
-      decision_duration: auction_map.decision_duration,
-      anonymous_bidding: auction_map.anonymous_bidding,
-      additional_information: auction_map.additional_information,
-      port_id: auction_map.port_id,
-      buyer: auction_map.buyer,
-      suppliers: auction_map.suppliers || [],
-      vessel_fuels: auction_map.auction_vessel_fuels || [],
-      is_traded_bid_allowed: auction_map.is_traded_bid_allowed,
-      type: auction_map.type
+      po: auction.po,
+      port_agent: auction.port_agent,
+      scheduled_start: auction.scheduled_start,
+      auction_started: auction.auction_started,
+      auction_ended: auction.auction_ended,
+      auction_closed_time: auction.auction_closed_time,
+      duration: auction.duration,
+      decision_duration: auction.decision_duration,
+      anonymous_bidding: auction.anonymous_bidding,
+      additional_information: auction.additional_information,
+      port_id: auction.port_id,
+      buyer: auction.buyer,
+      suppliers: auction.suppliers || [],
+      vessel_fuels: auction.auction_vessel_fuels || [],
+      is_traded_bid_allowed: auction.is_traded_bid_allowed,
+      type: auction.type
     }
     |> Poison.encode!()
   end
 
   def auction_json_for_form(auction = %TermAuction{}) do
-    auction_map =
-      auction
-      |> Auctions.strip_non_loaded()
-
     %{
-      po: auction_map.po,
-      port_agent: auction_map.port_agent,
-      start_date: auction_map.start_date,
-      end_date: auction_map.end_date,
-      scheduled_start: auction_map.scheduled_start,
-      auction_started: auction_map.auction_started,
-      auction_ended: auction_map.auction_ended,
-      auction_closed_time: auction_map.auction_closed_time,
-      duration: auction_map.duration,
-      anonymous_bidding: auction_map.anonymous_bidding,
-      additional_information: auction_map.additional_information,
-      port_id: auction_map.port_id,
-      buyer: auction_map.buyer,
-      suppliers: auction_map.suppliers || [],
-      vessels: auction_map.vessels || [],
-      fuel: auction_map.fuel,
-      fuel_quantity: auction_map.fuel_quantity,
-      is_traded_bid_allowed: auction_map.is_traded_bid_allowed,
-      type: auction_map.type
+      po: auction.po,
+      port_agent: auction.port_agent,
+      start_date: auction.start_date,
+      end_date: auction.end_date,
+      scheduled_start: auction.scheduled_start,
+      auction_started: auction.auction_started,
+      auction_ended: auction.auction_ended,
+      auction_closed_time: auction.auction_closed_time,
+      duration: auction.duration,
+      anonymous_bidding: auction.anonymous_bidding,
+      additional_information: auction.additional_information,
+      port_id: auction.port_id,
+      buyer: auction.buyer,
+      suppliers: auction.suppliers || [],
+      vessels: auction.vessels || [],
+      fuel: auction.fuel,
+      fuel_quantity: auction.fuel_quantity,
+      is_traded_bid_allowed: auction.is_traded_bid_allowed,
+      type: auction.type
     }
     |> Poison.encode!()
   end

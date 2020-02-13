@@ -96,8 +96,7 @@ defmodule OceanconnectWeb.Admin.UserController do
     {:ok, token, _claims} =
       Guardian.encode_and_sign(user, %{user_id: user.id, email: true}, ttl: {1, :hours})
 
-    OceanconnectWeb.Email.password_reset(user, token)
-    |> OceanconnectWeb.Mailer.deliver_later()
+    Oceanconnect.Auctions.NonEventNotifier.emit(user, token)
 
     conn
     |> put_flash(

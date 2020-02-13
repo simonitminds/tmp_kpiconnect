@@ -14,7 +14,7 @@ defmodule OceanconnectWeb.SessionController do
         case user.has_2fa do
           true ->
             {token, one_time_pass} = Auth.generate_one_time_pass(user)
-            OceanconnectWeb.Mailer.deliver_2fa_email(user, one_time_pass)
+            Oceanconnect.Auctions.NonEventNotifier.emit(user, one_time_pass)
 
             conn
             |> Auth.assign_otp_data_to_session(token, user.id)

@@ -12,6 +12,7 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
     supplier2 = insert(:user, company: supplier2_company)
     vessel_fuels = insert_list(2, :vessel_fuel)
     fuel = vessel_fuels |> hd() |> Map.get(:fuel)
+    vessel = vessel_fuels |> hd() |> Map.get(:vessel)
 
     auction =
       insert(:auction,
@@ -23,6 +24,8 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
 
     existing_coq =
       insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier_company)
+
+    fixture = insert(:auction_fixture, auction: auction, fuel: fuel, vessel: vessel)
 
     term_auction =
       insert(:term_auction,
@@ -49,6 +52,7 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
      %{
        auction: auction,
        term_auction: term_auction,
+       fixture: fixture,
        fuel: fuel,
        buyer: buyer,
        existing_coq: existing_coq,
@@ -359,6 +363,7 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
     test "can upload delivered coq", %{
       conn: conn,
       auction: auction = %{id: auction_id},
+      fixture: %{id: fixture_id},
       fuel: %{id: fuel_id},
       supplier_company: supplier_company = %{id: supplier_company_id}
     } do
@@ -367,7 +372,9 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
       conn =
         post(
           conn,
-          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier_company_id, fuel_id)}?delivered=true"
+          "#{file_io_api_path(conn, :upload_coq, auction_id, supplier_company_id, fuel_id)}?delivered=true&auction_fixture_id=#{
+            fixture_id
+          }"
         )
 
       assert 200 == conn.status
@@ -381,7 +388,8 @@ defmodule OceanconnectWeb.Api.FileIOControllerTest do
                fuel_id: ^fuel_id,
                supplier_id: ^supplier_company_id,
                file_extension: "pdf",
-               delivered: true
+               delivered: true,
+               auction_fixture_id: ^fixture_id
              } = List.last(supplier_coqs)
 
       assert %AuctionSupplierCOQ{} = Auctions.get_auction_supplier_coq(new_coq_id)

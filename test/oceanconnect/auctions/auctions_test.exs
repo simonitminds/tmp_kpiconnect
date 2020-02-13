@@ -304,6 +304,7 @@ defmodule Oceanconnect.AuctionsTest do
       supplier2_company = insert(:company, is_supplier: true)
       vessel_fuels = insert_list(2, :vessel_fuel)
       fuel = vessel_fuels |> hd() |> Map.get(:fuel)
+      vessel = vessel_fuels |> hd() |> Map.get(:vessel)
 
       auction =
         :auction
@@ -321,10 +322,13 @@ defmodule Oceanconnect.AuctionsTest do
       existing_coq =
         insert(:auction_supplier_coq, auction: auction, fuel: fuel, supplier: supplier2_company)
 
+      fixture = insert(:auction_fixture, auction: auction, fuel: fuel, vessel: vessel)
+
       {:ok,
        %{
          auction: auction,
          existing_coq: existing_coq,
+         fixture: fixture,
          fuel: fuel,
          supplier: supplier_company,
          supplier2: supplier2_company,
@@ -419,6 +423,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "create_auction_supplier_coqs/2 succeeds for a finalized auction", %{
       auction: auction = %{id: auction_id},
+      fixture: %{id: fixture_id},
       fuel: %{id: fuel_id},
       supplier: %{id: supplier_id}
     } do
@@ -427,14 +432,16 @@ defmodule Oceanconnect.AuctionsTest do
                fuel_id: ^fuel_id,
                supplier_id: ^supplier_id,
                file_extension: "pdf",
-               delivered: true
+               delivered: true,
+               auction_fixture_id: ^fixture_id
              } =
                Auctions.create_auction_supplier_coq(auction, %{
                  "auction_id" => auction_id,
                  "fuel_id" => fuel_id,
                  "supplier_id" => supplier_id,
                  "file_extension" => "pdf",
-                 "delivered" => "true"
+                 "delivered" => "true",
+                 "auction_fixture_id" => fixture_id
                })
     end
 
@@ -528,6 +535,7 @@ defmodule Oceanconnect.AuctionsTest do
 
     test "get_auction_supplier_coq/2 returns delivered auction_supplier_coq", %{
       auction: auction,
+      fixture: fixture = %{id: fixture_id},
       fuel: fuel = %{id: fuel_id},
       supplier2: supplier2 = %{id: supplier2_id},
       existing_coq: %{id: existing_coq_id}
@@ -537,6 +545,7 @@ defmodule Oceanconnect.AuctionsTest do
           auction: auction,
           fuel: fuel,
           supplier: supplier2,
+          auction_fixture: fixture,
           delivered: true
         )
 
@@ -544,8 +553,31 @@ defmodule Oceanconnect.AuctionsTest do
                Auctions.get_auction_supplier_coq(auction, %{
                  "fuel_id" => fuel_id,
                  "supplier_id" => supplier2_id,
-                 "delivered" => true
+                 "delivered" => true,
+                 "auction_fixture_id" => fixture_id
                })
+
+      refute existing_coq_id == delivered_coq_id
+    end
+
+    test "get_auction_supplier_coq/2 returns delivered coq based on fixture and supplier", %{
+      auction: auction,
+      fixture: fixture = %{id: fixture_id},
+      fuel: fuel,
+      supplier2: supplier2 = %{id: supplier2_id},
+      existing_coq: %{id: existing_coq_id}
+    } do
+      %AuctionSupplierCOQ{id: delivered_coq_id} =
+        insert(:auction_supplier_coq,
+          auction: auction,
+          fuel: fuel,
+          supplier: supplier2,
+          auction_fixture: fixture,
+          delivered: true
+        )
+
+      assert %AuctionSupplierCOQ{id: ^delivered_coq_id} =
+               Auctions.get_auction_supplier_coq(fixture_id, supplier2_id)
 
       refute existing_coq_id == delivered_coq_id
     end
@@ -1765,18 +1797,6 @@ defmodule Oceanconnect.AuctionsTest do
     } do
       assert Auctions.get_active_barge!(barge.id) == barge
       assert_raise Ecto.NoResultsError, fn -> Auctions.get_active_barge!(inactive_barge.id) end
-    end
-
-    test "strip non loaded" do
-      auction = insert(:auction)
-
-      partially_loaded_auction =
-        Oceanconnect.Auctions.Auction
-        |> Repo.get(auction.id)
-        |> Repo.preload([:vessels])
-
-      result = Auctions.strip_non_loaded(partially_loaded_auction)
-      assert hd(result.vessels).company == nil
     end
 
     test "create_barge/1 with valid data creates a barge", %{port: port} do

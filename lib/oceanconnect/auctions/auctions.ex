@@ -23,6 +23,7 @@ defmodule Oceanconnect.Auctions do
     Barge,
     Fuel,
     FuelIndex,
+    NonEventNotifier,
     Port,
     Solution,
     TermAuction,
@@ -144,7 +145,10 @@ defmodule Oceanconnect.Auctions do
     end)
   end
 
-  defp make_bid(auction, product_id, bid_params, supplier_id, time_entered \\ DateTime.utc_now()) do
+  defp make_bid(auction, product_id, bid_params, supplier_id, nil),
+    do: make_bid(auction, product_id, bid_params, supplier_id, DateTime.utc_now())
+
+  defp make_bid(auction, product_id, bid_params, supplier_id, time_entered) do
     with bid_params <- maybe_add_amount(bid_params),
          bid_params <- maybe_add_min_amount(bid_params),
          bid_params <- convert_amounts(bid_params),
@@ -506,38 +510,41 @@ defmodule Oceanconnect.Auctions do
         |> update_auction_supplier_coq(attrs)
     end
     |> @file_io.upload(coq_binary)
+    |> NonEventNotifier.emit()
   end
 
   def get_auction_supplier_coq(auction_supplier_coq_id) do
     Repo.get(AuctionSupplierCOQ, auction_supplier_coq_id)
+    |> fully_loaded()
   end
 
   def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "auction_fixture_id" => auction_fixture_id,
         "fuel_id" => fuel_id,
         "supplier_id" => supplier_id,
         "delivered" => _
       }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       auction_id: auction_id,
+      auction_fixture_id: auction_fixture_id,
       supplier_id: supplier_id,
       fuel_id: fuel_id,
       delivered: true
     })
+    |> fully_loaded()
   end
 
-  def get_auction_supplier_coq(
-        %Auction{id: auction_id},
-        params = %{
-          "fuel_id" => fuel_id,
-          "supplier_id" => supplier_id
-        }
-      ) do
+  def get_auction_supplier_coq(%Auction{id: auction_id}, %{
+        "fuel_id" => fuel_id,
+        "supplier_id" => supplier_id
+      }) do
     Repo.get_by(AuctionSupplierCOQ, %{
       auction_id: auction_id,
       supplier_id: supplier_id,
       fuel_id: fuel_id,
       delivered: false
     })
+    |> fully_loaded()
   end
 
   def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
@@ -551,6 +558,7 @@ defmodule Oceanconnect.Auctions do
       fuel_id: fuel_id,
       delivered: true
     })
+    |> fully_loaded()
   end
 
   def get_auction_supplier_coq(%TermAuction{id: term_auction_id}, %{
@@ -563,6 +571,15 @@ defmodule Oceanconnect.Auctions do
       fuel_id: fuel_id,
       delivered: false
     })
+    |> fully_loaded()
+  end
+
+  def get_auction_supplier_coq(auction_fixture_id, supplier_id) do
+    Repo.get_by(AuctionSupplierCOQ,
+      auction_fixture_id: auction_fixture_id,
+      supplier_id: supplier_id
+    )
+    |> fully_loaded()
   end
 
   def get_auction_supplier_coq(nil, _params), do: nil
@@ -576,20 +593,16 @@ defmodule Oceanconnect.Auctions do
       ) do
     with true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
-      auction_supplier_coq =
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(attrs)
-        |> Repo.insert!()
-
-      update_cache(auction)
-      auction_supplier_coq
+      %AuctionSupplierCOQ{}
+      |> AuctionSupplierCOQ.changeset(attrs)
+      |> Repo.insert!()
     else
       _ -> :error
     end
   end
 
   def create_auction_supplier_coq(
-        auction = %TermAuction{id: auction_id},
+        auction = %TermAuction{id: term_auction_id},
         attrs = %{
           "fuel_id" => fuel_id,
           "supplier_id" => supplier_id
@@ -597,37 +610,20 @@ defmodule Oceanconnect.Auctions do
       ) do
     with true <- is_participant?(auction, supplier_id),
          true <- verify_fuel_is_for_auction(auction, fuel_id) do
-      auction_supplier_coq =
-        %AuctionSupplierCOQ{}
-        |> AuctionSupplierCOQ.changeset(
-          attrs
-          |> Map.delete("auction_id")
-          |> Map.put("term_auction_id", auction_id)
-        )
-        |> Repo.insert!()
-
-      update_cache(auction)
-      auction_supplier_coq
+      %AuctionSupplierCOQ{}
+      |> AuctionSupplierCOQ.changeset(
+        attrs
+        |> Map.delete("auction_id")
+        |> Map.put("term_auction_id", term_auction_id)
+      )
+      |> Repo.insert!()
     else
       _ -> :error
     end
   end
 
-  def delete_auction_supplier_coq(
-        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: nil, term_auction_id: term_auction_id}
-      ) do
-    response = Repo.delete(auction_supplier_coq)
-    update_cache(term_auction_id)
-    response
-  end
-
-  def delete_auction_supplier_coq(
-        auction_supplier_coq = %AuctionSupplierCOQ{auction_id: auction_id}
-      ) do
-    response = Repo.delete(auction_supplier_coq)
-    update_cache(auction_id)
-    response
-  end
+  def delete_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}),
+    do: auction_supplier_coq |> Repo.delete() |> NonEventNotifier.emit()
 
   defp update_auction_supplier_coq(auction_supplier_coq = %AuctionSupplierCOQ{}, attrs) do
     auction_supplier_coq
@@ -854,12 +850,6 @@ defmodule Oceanconnect.Auctions do
     |> AuctionCache.process_command()
   end
 
-  defp update_cache(auction_id) do
-    auction_id
-    |> get_auction!()
-    |> update_cache()
-  end
-
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
     :random.seed()
 
@@ -998,6 +988,7 @@ defmodule Oceanconnect.Auctions do
           :auction_supplier_coqs,
           [auction_vessel_fuels: [:vessel, :fuel]],
           [buyer: :users],
+          [fixtures: [:fuel, :vessel]],
           [suppliers: :users],
           :observers
         ],
@@ -1022,15 +1013,11 @@ defmodule Oceanconnect.Auctions do
     Repo.preload(vessel, [:company], force: force?)
   end
 
-  def fully_loaded(nil, _force?), do: nil
-
-  def strip_non_loaded(struct = %{}) do
-    Enum.reduce(maybe_convert_struct(struct), %{}, fn {k, v}, acc ->
-      Map.put(acc, k, maybe_replace_non_loaded(v))
-    end)
+  def fully_loaded(auction_supplier_coq = %AuctionSupplierCOQ{}, force?) do
+    Repo.preload(auction_supplier_coq, [auction_fixture: :vessel], force: force?)
   end
 
-  def strip_non_loaded(struct), do: struct
+  def fully_loaded(nil, _force?), do: nil
 
   defp auction_update_command({:ok, auction}, user) do
     auction
@@ -1059,19 +1046,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   defp maybe_convert_struct(data), do: data
-
-  defp maybe_replace_non_loaded(%Ecto.Association.NotLoaded{}), do: nil
-
-  defp maybe_replace_non_loaded(value) when is_list(value) do
-    Enum.map(value, fn list_item ->
-      strip_non_loaded(list_item)
-    end)
-  end
-
-  defp maybe_replace_non_loaded(value = %{__meta__: _meta}), do: strip_non_loaded(value)
-  defp maybe_replace_non_loaded(value = %DateTime{}), do: value
-  defp maybe_replace_non_loaded(value = %{}), do: strip_non_loaded(value)
-  defp maybe_replace_non_loaded(value), do: value
 
   @doc """
   Returns the list of ports.

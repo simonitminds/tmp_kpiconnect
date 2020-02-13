@@ -55,7 +55,6 @@ defmodule Oceanconnect.Auctions.Payloads.FixturePayload do
       fixture
       |> format_fixture_prices()
       |> format_fixture_quantities()
-      |> Auctions.strip_non_loaded()
     end)
   end
 

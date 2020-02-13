@@ -167,7 +167,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
                     open={supplierCOQsCount != 0}
                     pendingBargeFlag = {false}
                     triggerClassString="collapsible-barge-list__container__trigger"
-                    classParentString="qa-open-barges-list collapsing-barge-list__container"
+                    classParentString="collapsing-barge-list__container"
                     contentChildCount={supplierCOQsCount}
                     >
                     { renderCOQs(supplierCOQs, supplier.id) }

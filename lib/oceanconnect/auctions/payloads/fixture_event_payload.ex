@@ -25,9 +25,7 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
       }) do
     %{
       fixture: format_fixture(fixture),
-      auction:
-        auction
-        |> Auctions.strip_non_loaded(),
+      auction: auction,
       events: format_events(events)
     }
   end
@@ -117,7 +115,6 @@ defmodule Oceanconnect.Auctions.Payloads.FixtureEventPayload do
     fixture
     |> format_fixture_prices()
     |> format_fixture_quantities()
-    |> Auctions.strip_non_loaded()
   end
 
   defp format_fixture_prices(
