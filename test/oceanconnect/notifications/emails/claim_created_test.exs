@@ -1,7 +1,6 @@
 defmodule Oceanconnect.Notifications.Emails.ClaimCreatedTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Notifications.Emails
-  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
 
   setup do

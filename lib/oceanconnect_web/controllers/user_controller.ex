@@ -48,7 +48,7 @@ defmodule OceanconnectWeb.UserController do
     {:ok, token, _claims} =
       Guardian.encode_and_sign(user, %{user_id: user.id, email: true}, ttl: {1, :hours})
 
-    OceanconnectWeb.Mailer.password_reset(user, token)
+    Oceanconnect.Auctions.NonEventNotifier.emit(user, token)
 
     conn
     |> put_flash(:info, "An email has been sent with instructions to reset your password")

@@ -13,7 +13,7 @@ defmodule OceanconnectWeb.RegistrationController do
         |> render("user_interest.html")
 
       _ ->
-        OceanconnectWeb.Mailer.deliver_user_interest_email(new_user_information)
+        Oceanconnect.Auctions.NonEventNotifier.emit(:user_interest, new_user_information)
 
         conn
         |> put_flash(

@@ -4,16 +4,6 @@ defmodule Oceanconnect.Notifications.Emails.AuctionInvitationTest do
   alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
 
-  alias Oceanconnect.Auctions.{
-    Solution,
-    TermAuction
-  }
-
-  alias Oceanconnect.Auctions.AuctionStore.{
-    AuctionState,
-    TermAuctionState
-  }
-
   describe "spot auctions" do
     setup do
       buyer_company = insert(:company)

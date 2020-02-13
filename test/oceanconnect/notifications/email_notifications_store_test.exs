@@ -304,18 +304,48 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionsSupervisor.stop_child(auction)
     end
 
-    test "non-delivered coq does not produce an email", %{auction: auction} do
-      auction_supplier_coq =
-        %AuctionSupplierCOQ{id: id} =
-        insert(:auction_supplier_coq, auction: auction, delivered: false)
+    test "password reset produces email", %{auction: auction} do
+      user = insert(:user)
 
-      assert %AuctionSupplierCOQ{id: ^id} =
-               NonEventNotifier.emit(auction_supplier_coq, :coq_uploaded)
-
-      emails = Emails.DeliveredCOQUploaded.generate(auction_supplier_coq)
+      NonEventNotifier.emit(user, "test")
+      emails = Emails.PasswordReset.generate(user, "test")
 
       for email <- emails do
-        refute_delivered_email(email)
+        assert_delivered_email(email)
+      end
+
+      AuctionsSupervisor.stop_child(auction)
+    end
+
+    test "two factor auth produces email", %{auction: auction} do
+      user = insert(:user, has_2fa: true)
+
+      NonEventNotifier.emit(user, "test")
+      emails = Emails.TwoFactorAuth.generate(user, "test")
+
+      for email <- emails do
+        assert_delivered_email(email)
+      end
+
+      AuctionsSupervisor.stop_child(auction)
+    end
+
+    test "user interest produces email", %{auction: auction} do
+      new_user_info = %{
+        "first_name" => "Joe",
+        "last_name" => "Schmoe",
+        "company_name" => "Big Co.",
+        "country" => "'Murica'",
+        "office_phone" => "867-5309",
+        "mobile_phone" => "",
+        "reason" => "cuz"
+      }
+
+      NonEventNotifier.emit(:user_interest, new_user_info)
+      emails = Emails.UserInterest.generate(new_user_info)
+
+      for email <- emails do
+        assert_delivered_email(email)
       end
 
       AuctionsSupervisor.stop_child(auction)

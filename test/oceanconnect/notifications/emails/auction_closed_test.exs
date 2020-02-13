@@ -7,8 +7,7 @@ defmodule Oceanconnect.Notifications.Emails.AuctionClosedTest do
   alias Oceanconnect.Auctions.{
     AuctionStore.AuctionState,
     Solution,
-    AuctionStore.TermAuctionState,
-    TermAuction
+    AuctionStore.TermAuctionState
   }
 
   describe "Spot Auctions" do
