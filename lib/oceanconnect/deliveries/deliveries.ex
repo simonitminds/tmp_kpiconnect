@@ -1,7 +1,9 @@
 defmodule Oceanconnect.Deliveries do
-  alias Oceanconnect.Repo
+  import Ecto.Query
 
+  alias Oceanconnect.Repo
   alias Oceanconnect.Deliveries.{Claim, DeliveryEvent, EventNotifier, ClaimResponse}
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Auctions
 
   alias Oceanconnect.Auctions.{
@@ -11,8 +13,6 @@ defmodule Oceanconnect.Deliveries do
     AuctionFixture,
     AuctionEventStorage
   }
-
-  alias Oceanconnect.Accounts
 
   def change_claim(%Claim{} = claim) do
     Claim.changeset(claim, %{})
@@ -87,6 +87,9 @@ defmodule Oceanconnect.Deliveries do
         {:error, changeset}
     end
   end
+
+  def get_claim_responses_for_claim(%Claim{id: claim_id}),
+    do: ClaimResponse |> where(claim_id: ^claim_id) |> Repo.all()
 
   defp handle_response_creation(%{} = attrs, %Accounts.User{company_id: company_id}) do
     claim_id = attrs[:claim_id] || attrs["claim_id"]

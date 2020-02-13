@@ -259,6 +259,14 @@ defmodule Oceanconnect.Factory do
     }
   end
 
+  def claim_response_factory() do
+    %Oceanconnect.Deliveries.ClaimResponse{
+      author: build(:user),
+      claim: build(:claim),
+      content: "I don't care what you say!"
+    }
+  end
+
   def create_bid(amount, min_amount, supplier_id, vessel_fuel_id, auction, is_traded_bid \\ false) do
     bid_params = %{
       "amount" => amount,
