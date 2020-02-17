@@ -9,9 +9,9 @@
 			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
 			<section class="admin-panel__content column is-three-quarters">
 				<h2 class="admin-panel__content__header"><span class="is-4 is-inline-block">Ports</span>
-				<%= link to: admin_port_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" do %>
-					<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Port
-				<% end %>
+					<%= link to: admin_port_path(@conn, :new), class: "button is-link is-inline-block has-margin-left-auto" do %>
+						<i class="fas fa-plus is-inline-block has-margin-right-sm"></i> Add Port
+					<% end %>
 				</h2>
 				<table class="admin-panel__table">
 					<thead>
