@@ -239,23 +239,29 @@ defmodule Oceanconnect.Factory do
   end
 
   def claim_factory() do
-    supplier = build(:company, is_supplier: true)
-
     %Oceanconnect.Deliveries.Claim{
       type: "quantity",
       closed: false,
       quantity_missing: 100,
       price_per_unit: 100,
       total_fuel_value: 10_000,
-      supplier: supplier,
+      supplier: build(:company, is_supplier: true),
       receiving_vessel: build(:vessel),
       delivered_fuel: build(:fuel),
       delivering_barge: build(:barge),
       additional_information: "Your fuel sucked!",
       notice_recipient_type: "supplier",
-      notice_recipient: supplier,
+      notice_recipient: build(:company, is_supplier: true),
       auction: build(:auction),
       fixture: build(:auction_fixture)
+    }
+  end
+
+  def claim_response_factory() do
+    %Oceanconnect.Deliveries.ClaimResponse{
+      author: build(:user),
+      claim: build(:claim),
+      content: "I don't care what you say!"
     }
   end
 
