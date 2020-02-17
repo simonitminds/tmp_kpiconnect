@@ -94,6 +94,31 @@ defmodule Oceanconnect.Accounts.User do
     )
   end
 
+  def alphabetical(query \\ User), do: order_by(query, :last_name)
+
+  def select_active(query \\ User), do: query |> alphabetical() |> where(is_active: true)
+
+  def select_admins(query \\ User), do: query |> alphabetical() |> where(is_admin: true)
+
+  def select_observers(query \\ User), do: query |> alphabetical() |> where(is_observer: true)
+
+  def for_companies(company_ids) when is_list(company_ids),
+    do: where(User, [u], u.company_id in ^company_ids)
+
+  def with_company(user = %User{}), do: Oceanconnect.Repo.preload(user, :company)
+
+  def full_name(%User{first_name: first_name, last_name: last_name}),
+    do: "#{first_name} #{last_name}"
+
+  def email_exists?(email),
+    do: if(Oceanconnect.Repo.get_by(User, email: String.upcase(email)), do: true, else: false)
+
+  defimpl Bamboo.Formatter, for: User do
+    def format_email_address(user = %User{email: email}, _opts \\ []) do
+      {User.full_name(user), email}
+    end
+  end
+
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
@@ -105,60 +130,4 @@ defmodule Oceanconnect.Accounts.User do
   end
 
   defp upcase_email(changeset), do: changeset
-
-  def alphabetical(query \\ User) do
-    from(
-      q in query,
-      order_by: q.last_name
-    )
-  end
-
-  def select_active(query \\ User) do
-    from(
-      q in query,
-      where: q.is_active == true
-    )
-  end
-
-  def select_admins(query \\ User) do
-    from(
-      q in query,
-      where: q.is_admin == true
-    )
-  end
-
-  def select_observers(query \\ User) do
-    from(
-      q in query,
-      where: q.is_observer == true
-    )
-  end
-
-  def for_companies(company_ids) when is_list(company_ids) do
-    from(
-      u in User,
-      where: u.company_id in ^company_ids
-    )
-  end
-
-  def with_company(user = %User{}) do
-    Oceanconnect.Repo.preload(user, :company)
-  end
-
-  def full_name(%User{first_name: first_name, last_name: last_name}) do
-    "#{first_name} #{last_name}"
-  end
-
-  def email_exists?(email) do
-    case Oceanconnect.Repo.get_by(User, email: String.upcase(email)) do
-      nil -> false
-      %User{} -> true
-    end
-  end
-
-  defimpl Bamboo.Formatter, for: User do
-    def format_email_address(user = %User{email: email}, _opts \\ []) do
-      {User.full_name(user), email}
-    end
-  end
 end
