@@ -10,7 +10,7 @@
 			<section class="admin-panel__content column is-three-quarters">
 				<h2 class="admin-panel__content__header"><span class="is-4"><span class="has-margin-right-sm has-text-gray-3">Edit Port</span> <%= @port.name %>, <%= @port.country %></span>
 					<div class="admin-panel__content__header__actions"><%= link "Delete", to: admin_port_path(@conn, :delete, @port), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs has-margin-left-auto qa-admin-delete" %>
-					<%= link to: admin_port_path(@conn, :index), class: "button has-margin-left-sm" do %>
+					<%= link to: admin_port_path(@conn, :index), class: "button has-margin-left-auto" do %>
 						<i class="fas fa-chevron-left has-text-gray-3 has-margin-right-sm"></i> Back
 					<%end%></div>
 				</h2>

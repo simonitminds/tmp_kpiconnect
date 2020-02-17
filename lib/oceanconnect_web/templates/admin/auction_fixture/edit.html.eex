@@ -5,8 +5,9 @@
 		</div>
 	</div>
 	<div class="admin-panel__body container">
-		<div class="content">
-			<section class="admin-panel__content">
+		<div class="content columns">
+			<%= render OceanconnectWeb.Admin.SharedView, "menu.html", conn: @conn %>
+			<section class="admin-panel__content column is-three-quarters">
 				<h2 class="admin-panel__content__header"><span class="is-4">Edit Auction Fixture</span>
           <div class="admin-panel__content__header__actions"><%= link "Delete", to: admin_auction_fixture_path(@conn, :delete, @auction.id, @fixture.id), method: :delete, data: [confirm: "Are you sure?"], class: "button is-danger is-inline-block has-margin-bottom-xs has-margin-left-auto qa-admin-delete" %>
           <%= link( to: admin_auction_fixtures_path(@conn, :index), class: "button has-margin-left-auto") do %>
