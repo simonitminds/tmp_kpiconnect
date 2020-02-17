@@ -1,6 +1,10 @@
 <p style='font-family: "Arial";'><b>Dear <%= full_name(@user) %>,</b></p>
 <br/>
-<p style='font-family: "Arial";'><%= @author_name %> from <%= @supplier.name %> has responded to the claim that <%= @buyer.name %> made against them.</p>
+<%= if @buyer do %>
+  <p style='font-family: "Arial";'><%= @author_name %> from <%= @buyer.name %> has responded to the claim made against <%= @supplier.name %>.</p>
+<% else %>
+  <p style='font-family: "Arial";'><%= @author_name %> from <%= @supplier.name %> has responded to the claim that <%= @buyer.name %> made against them.</p>
+<% end %>
 <br/>
 
 <p style="font-family: 'Arial';"><b>Response:</b> <%= @claim_response.content %></p>
@@ -23,11 +27,10 @@
     <%= @claim.quality_description %>
   <p>
 <% end %>
-<br>
+
 <br/>
 <p style='font-family: "Arial";'>To view this auction claim, please click the following link: <a href="<%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %>"><%= claim_url(OceanconnectWeb.Endpoint, :show, @claim.auction.id, @claim.id) %></a></p>
 <br/>
 <br/>
 
 <%= render "_email_footer.html" %>
-

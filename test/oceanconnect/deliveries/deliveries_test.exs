@@ -60,6 +60,7 @@ defmodule Oceanconnect.DeliveriesTest do
 
     {:ok,
      %{
+       auction: auction,
        claim_params: claim_params,
        claim: claim,
        update_params: update_params,
@@ -141,7 +142,7 @@ defmodule Oceanconnect.DeliveriesTest do
                )
     end
 
-    test "get_claim_responses_for_claim/1 returns list of claim_responses for claim", %{
+    test "get_claim_responses_for_claims/1 returns list of claim_responses for claim", %{
       claim: claim,
       supplier_company: supplier_company
     } do
@@ -156,8 +157,33 @@ defmodule Oceanconnect.DeliveriesTest do
 
       assert MapSet.equal?(
                claim_responses |> Enum.map(& &1.id) |> MapSet.new(),
-               claim
-               |> Deliveries.get_claim_responses_for_claim()
+               [claim]
+               |> Deliveries.get_claim_responses_for_claims()
+               |> Enum.map(& &1.id)
+               |> MapSet.new()
+             )
+    end
+
+    test "get_claim_responses_for_claims/1 returns claim_responses multiple claims", %{
+      auction: auction,
+      claim: claim,
+      supplier_company: supplier_company
+    } do
+      claim_for_different_supplier = insert(:claim, auction: auction)
+      diff_supplier_claim_response = insert(:claim_response, claim: claim_for_different_supplier)
+
+      other_claim_for_supplier = insert(:claim, auction: auction, supplier: supplier_company)
+
+      other_claim_response = insert(:claim_response, claim: other_claim_for_supplier)
+      claim_responses = insert_list(2, :claim_response, claim: claim)
+
+      assert MapSet.equal?(
+               [diff_supplier_claim_response, other_claim_response]
+               |> Kernel.++(claim_responses)
+               |> Enum.map(& &1.id)
+               |> MapSet.new(),
+               [claim, claim_for_different_supplier, other_claim_for_supplier]
+               |> Deliveries.get_claim_responses_for_claims()
                |> Enum.map(& &1.id)
                |> MapSet.new()
              )

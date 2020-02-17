@@ -26,7 +26,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
       |> subject(
         "#{author_name} from #{buyer.name} added a response to the claim against #{supplier.name}"
       )
-      |> render("supplier_claim_response_created.html",
+      |> render("claim_response_created.html",
         user: claim_contact,
         claim: claim,
         claim_response: claim_response,
@@ -43,7 +43,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
             supplier.name
           }"
         )
-        |> render("supplier_claim_response_created.html",
+        |> render("claim_response_created.html",
           user: recipient,
           claim: claim,
           claim_response: claim_response,
@@ -70,7 +70,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
       |> subject(
         "#{author_name} from #{supplier.name} responded to the claim made by #{buyer.name}"
       )
-      |> render("buyer_claim_response_created.html",
+      |> render("claim_response_created.html",
         user: recipient,
         claim: claim,
         claim_response: claim_response,
@@ -81,14 +81,18 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
     end)
   end
 
-  defp most_recent_supplier_contact(claim, recipients) do
-    claim
-    |> Deliveries.get_claim_responses_for_claim()
-    |> Enum.sort_by(&DateTime.to_unix(&1.inserted_at), &>=/2)
+  defp most_recent_supplier_contact(%Claim{auction_id: auction_id}, recipients) do
+    recipient_ids = Enum.map(recipients, & &1.id)
+
+    auction_id
+    |> Deliveries.claims_for_auction()
+    |> Deliveries.get_claim_responses_for_claims()
+    |> Enum.sort_by(
+      &(&1.inserted_at |> DateTime.from_naive!("Etc/UTC") |> DateTime.to_unix()),
+      &>=/2
+    )
     |> Enum.map(& &1.author_id)
-    |> MapSet.new()
-    |> MapSet.intersection(recipients |> Enum.map(& &1.id) |> MapSet.new())
-    |> MapSet.to_list()
+    |> Enum.filter(&Enum.member?(recipient_ids, &1))
     |> List.first()
   end
 end
