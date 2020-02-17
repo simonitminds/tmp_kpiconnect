@@ -574,6 +574,8 @@ defmodule Oceanconnect.Auctions do
     |> fully_loaded()
   end
 
+  def get_auction_supplier_coq(nil, _params), do: nil
+
   def get_auction_supplier_coq(auction_fixture_id, supplier_id) do
     Repo.get_by(AuctionSupplierCOQ,
       auction_fixture_id: auction_fixture_id,
@@ -581,8 +583,6 @@ defmodule Oceanconnect.Auctions do
     )
     |> fully_loaded()
   end
-
-  def get_auction_supplier_coq(nil, _params), do: nil
 
   def create_auction_supplier_coq(
         auction = %Auction{},

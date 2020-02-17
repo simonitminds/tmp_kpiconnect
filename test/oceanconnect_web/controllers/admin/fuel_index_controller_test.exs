@@ -3,7 +3,7 @@ defmodule OceanconnectWeb.Admin.FuelIndexControllerTest do
 
   alias Oceanconnect.Auctions
 
-  @invalid_attrs %{name: nil, code: nil, fuel_id: nil, port_id: nil}
+  @invalid_attrs %{name: "some name", code: "some code", fuel_id: nil, port_id: nil}
   @update_attrs %{name: "some new name"}
 
   setup do

@@ -1,7 +1,7 @@
 defmodule OceanconnectWeb.AuctionView do
   use OceanconnectWeb, :view
   import Oceanconnect.Auctions.Guards
-  alias Oceanconnect.{Accounts, Auctions}
+  alias Oceanconnect.Accounts
   alias Oceanconnect.Accounts.User
   alias Oceanconnect.Deliveries.Claim
 

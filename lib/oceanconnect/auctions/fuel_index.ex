@@ -21,9 +21,9 @@ defmodule Oceanconnect.Auctions.FuelIndex do
   def changeset(%__MODULE__{} = fuel_index, attrs) do
     fuel_index
     |> cast(attrs, [:code, :name, :is_active, :fuel_id, :port_id])
-    |> validate_required([:code, :name])
-    |> cast_assoc(:fuel)
-    |> cast_assoc(:port)
+    |> validate_required([:code, :name, :fuel_id, :port_id])
+    |> foreign_key_constraint(:fuel_id)
+    |> foreign_key_constraint(:port_id)
   end
 
   def select_active(query \\ __MODULE__) do
