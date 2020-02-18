@@ -65,6 +65,7 @@ defmodule Oceanconnect.Auctions.Barge do
       join: cb in "company_barges",
       where: cb.barge_id == b.id and cb.company_id == ^company_id
     )
+    |> alphabetical()
   end
 
   def alphabetical(query \\ Barge), do: order_by(query, :name)

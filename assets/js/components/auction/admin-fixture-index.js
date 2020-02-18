@@ -1,11 +1,10 @@
 import _ from 'lodash';
 import React from 'react';
 import moment from 'moment';
-import MediaQuery from 'react-responsive';
-import DateRangeInput from '../date-range-input';
 import CheckBoxField from '../check-box-field';
 import AuctionTitle from './common/auction-title';
 import FixtureDeliveryForm from './fixture-delivery-form';
+import FixtureFilterForm from './fixture-filter-form';
 import FixtureReportContainer from '../../containers/fixture-report-container';
 import { formatUTCDateTime, formatPrice } from '../../utilities';
 import { exportCSV, parseCSVFromPayloads } from '../../reporting-utilities';
@@ -210,155 +209,6 @@ export default class AdminAuctionFixturesIndex extends React.Component {
   }
 
   render() {
-    const availableAuctions = _
-      .chain(this.props.fixturePayloads)
-      .filter((payload) => payload.fixtures.length > 0)
-      .map((payload) => payload.auction);
-
-    const availableFixtureAttributes = (type) => {
-      switch (type) {
-        case 'vessels':
-        case 'suppliers':
-          return _
-            .chain(availableAuctions)
-            .flatMap((auction) => auction[type])
-            .reject((supplier) => supplier == undefined)
-            .uniqBy('id')
-            .value();
-        case 'buyer':
-        case 'port':
-          return _
-            .chain(availableAuctions)
-            .map((auction) => auction[type])
-            .uniqBy('id')
-            .value();
-      }
-    }
-
-    const availableVessels = availableFixtureAttributes('vessels');
-    const availableSuppliers = availableFixtureAttributes('suppliers');
-    const availableBuyers = availableFixtureAttributes('buyer');
-    const availablePorts = availableFixtureAttributes('port');
-
-    const renderFilterForm = () => {
-      return (
-        <section className="is-gray-1 has-margin-top-md has-margin-bottom-md">
-          <div className="container">
-            <div className="content has-padding-top-lg has-padding-bottom-md">
-              <h2 className="has-margin-bottom-md"><legend className="subtitle is-4">Filter Auctions</legend></h2>
-              <div className="historical-auctions__form">
-                <form onChange={this.filterPayloads.bind(this)} onSubmit={this.clearFilter.bind(this)}>
-                  <div className="field">
-                    <div className="control">
-                      <label className="label">Vessel</label>
-                      <div className="select">
-                        <select
-                          name="vessel"
-                          className="qa-filter-vessel_id"
-                        >
-                          <option value="" >Select Vessel</option>
-                          { _.map(availableVessels, vessel => (
-                            <option className={`qa-filter-vessel_id-${vessel.id}`} key={vessel.id} value={vessel.id}>
-                              {vessel.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <div className="control">
-                      <label className="label">Port</label>
-                      <div className="select">
-                        <select name="port" className="qa-filter-port_id">
-                          <option value="">Select Port</option>
-                          {_.map(availablePorts, port => (
-                            <option key={port.id} value={port.id} className={`qa-filter-port_id-${port.id}`}>
-                              {port.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <div className="control">
-                      <label className="label">Buyer</label>
-                      <div className="select">
-                        <select name="buyer" className="qa-filter-buyer_id">
-                          <option value="">Select Buyer</option>
-                          {_.map(availableBuyers, buyer => (
-                            <option key={buyer.id} value={buyer.id} className={`qa-filter-buyer_id-${buyer.id}`}>
-                              {buyer.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  { availableSuppliers.length > 0 &&
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Supplier</label>
-                        <div className="select">
-                          <select name="supplier" className="qa-filter-supplier_id" >
-                            <option value="">Select Supplier</option>
-                              {_.map(availableSuppliers, supplier => (
-                                <option key={supplier.id} value={supplier.id} className={`qa-filter-supplier_id-${supplier.id}`}>
-                                  {supplier.name}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  }
-
-                  <MediaQuery query="(max-width: 599px)">
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Time Period</label>
-                        <DateRangeInput
-                          orientation={"vertical"}
-                          startDate={this.state.filterParams.startTimeRange}
-                          endDate={this.state.filterParams.endTimeRange}
-                          onChange={this.handleTimeRange.bind(this)}
-                        />
-                      </div>
-                    </div>
-                  </MediaQuery>
-                  <MediaQuery query="(min-width: 600px)">
-                    <div className="field">
-                      <div className="control">
-                        <label className="label">Time Period</label>
-                        <DateRangeInput
-                          startDate={this.state.filterParams.startTimeRange}
-                          endDate={this.state.filterParams.endTimeRange}
-                          onChange={this.handleTimeRange.bind(this)}
-                        />
-                      </div>
-                    </div>
-                  </MediaQuery>
-                  <div className="field">
-                    <div className="control">
-                      <button className="button">Clear Filter</button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
-      );
-    }
-    const connection = this.props.connection;
-    const currentUserIsAdmin = window.isAdmin && !window.isImpersonating;
-    const currentUserIsBuyer = (auction) => { return((parseInt(this.props.currentUserCompanyId) === auction.buyer.id) || currentUserIsAdmin); };
-
-
     const fixturePayloads = this.state.fixturePayloads;
 
     return(
@@ -370,7 +220,14 @@ export default class AdminAuctionFixturesIndex extends React.Component {
             <span className="icon"><i className="fas fa-file-export is-pulled-right"></i></span>
           </button>
         </h2>
-        { renderFilterForm() }
+        <FixtureFilterForm
+          clearFilter={this.clearFilter.bind(this)}
+          filterPayloads={this.filterPayloads.bind(this)}
+          fixturePayloads={this.props.fixturePayloads}
+          handleTimeRange={this.handleTimeRange.bind(this)}
+          startTimeRange={this.state.filterParams.startTimeRange}
+          endTimeRange={this.state.filterParams.endTimeRange}
+        />
         { fixturePayloads.length > 0 ?
           _.map(fixturePayloads, (payload) => {
             const auction = _.get(payload, 'auction');

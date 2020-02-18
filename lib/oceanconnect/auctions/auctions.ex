@@ -339,12 +339,14 @@ defmodule Oceanconnect.Auctions do
 
   def list_auctions(finalized?) do
     regular_auctions =
-      from(a in Auction, where: a.type == "spot" and a.finalized == ^finalized?)
+      Auction
+      |> where([a], a.type == "spot" and a.finalized == ^finalized?)
       |> Repo.all()
       |> fully_loaded()
 
     term_auctions =
-      from(ta in TermAuction, where: ta.type in @term_types and ta.finalized == ^finalized?)
+      TermAuction
+      |> where([a], a.type in @term_types and a.finalized == ^finalized?)
       |> Repo.all()
       |> fully_loaded()
 
@@ -932,11 +934,11 @@ defmodule Oceanconnect.Auctions do
     |> List.flatten()
   end
 
-  def suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct),
+  defp suppliers_with_alias_names(_auction = %struct{suppliers: nil}) when is_auction(struct),
     do: nil
 
-  def suppliers_with_alias_names(auction = %struct{suppliers: suppliers})
-      when is_auction(struct) do
+  defp suppliers_with_alias_names(auction = %struct{suppliers: suppliers})
+       when is_auction(struct) do
     Enum.map(suppliers, fn supplier ->
       alias_name =
         case get_auction_supplier(auction, supplier.id) do
@@ -960,7 +962,7 @@ defmodule Oceanconnect.Auctions do
         term_auction,
         [
           :port,
-          :vessels,
+          [vessels: from(v in Vessel, order_by: v.name)],
           :fuel,
           [fuel_index: [:fuel, :port]],
           :auction_suppliers,
@@ -982,8 +984,8 @@ defmodule Oceanconnect.Auctions do
         auction,
         [
           :port,
-          :vessels,
-          :fuels,
+          [vessels: from(v in Vessel, order_by: v.name)],
+          [fuels: from(f in Fuel, order_by: f.name)],
           :auction_suppliers,
           :auction_supplier_coqs,
           [auction_vessel_fuels: [:vessel, :fuel]],

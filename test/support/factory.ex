@@ -228,7 +228,7 @@ defmodule Oceanconnect.Factory do
 
   def auction_fixture_factory() do
     %Oceanconnect.Auctions.AuctionFixture{
-      auction: build(:auction, finalized: true),
+      auction: build(:auction, finalized: true, auction_closed_time: DateTime.utc_now()),
       supplier: build(:company, is_supplier: true),
       vessel: build(:vessel),
       fuel: build(:fuel),
