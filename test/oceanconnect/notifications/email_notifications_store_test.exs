@@ -149,7 +149,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionEvent.auction_created(auction, nil)
       |> EventNotifier.broadcast(auction_state)
 
-      :timer.sleep(1000)
+      :timer.sleep(500)
 
       emails = Emails.AuctionInvitation.generate(auction_state)
 
@@ -176,7 +176,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       )
       |> EventNotifier.broadcast(auction_state)
 
-      :timer.sleep(2000)
+      :timer.sleep(500)
 
       emails = Emails.AuctionInvitation.generate(auction_state)
 
@@ -204,7 +204,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionEvent.auction_created(auction, nil)
       |> EventNotifier.broadcast(auction_state)
 
-      :timer.sleep(2000)
+      :timer.sleep(500)
 
       emails = Emails.AuctionInvitation.generate(auction_state)
 
@@ -224,12 +224,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionEvent.auction_rescheduled(auction, buyer)
       |> EventNotifier.broadcast(auction_state)
 
-      :timer.sleep(2000)
+      :timer.sleep(500)
 
       emails = Emails.AuctionRescheduled.generate(auction_state)
 
       for email <- emails do
-        assert_receive({:delivered_email, email}, 100, Bamboo.Test.flunk_no_emails_received())
+        assert_delivered_email(email)
       end
 
       AuctionsSupervisor.stop_child(auction)
@@ -246,18 +246,18 @@ defmodule Oceanconnect.Notifications.EmailNotificationStoreTest do
       AuctionEvent.auction_canceled(auction, DateTime.utc_now(), auction_state, buyer)
       |> EventNotifier.broadcast(auction_state)
 
-      :timer.sleep(1000)
+      :timer.sleep(500)
 
       emails = Emails.AuctionCanceled.generate(auction_state)
       buyer_emails = Enum.filter(emails, &(&1.to.id == buyer.id))
       supplier_emails = Enum.filter(emails, &(&1.to.id != buyer.id))
 
       for email <- buyer_emails do
-        assert_receive({:delivered_email, email}, 100, Bamboo.Test.flunk_no_emails_received())
+        assert_delivered_email(email)
       end
 
       for email <- supplier_emails do
-        assert_receive({:delivered_email, email}, 100, Bamboo.Test.flunk_no_emails_received())
+        assert_delivered_email(email)
       end
 
       AuctionsSupervisor.stop_child(auction)

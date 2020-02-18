@@ -21,12 +21,8 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
   const auctionBarges = _.get(auctionPayload, 'submitted_barges');
   const coqList = _.get(auctionPayload, 'auction.auction_supplier_coqs');
   const auction = _.get(auctionPayload, 'auction');
-  let fuels = _.get(auction, "auction_vessel_fuels", null);
-  if (fuels) {
-    fuels = _.map(fuels, "fuel");
-  } else {
-    fuels = [auction.fuel];
-  }
+  let fuels = _.get(auction, "fuels", null);
+  if (!fuels) { fuels = [auction.fuel]; }
   const rsvpSortingOrder = ["yes", "maybe", null, "no"];
   const suppliers = _.chain(auctionPayload)
     .get('auction.suppliers')
@@ -78,9 +74,8 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
             fuels.map((fuel) => {
               const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': parseInt(supplierId) });
               return (
-                <div>
+                <div key={`${supplierId}-${fuel.id}`}>
                   <COQSubmission
-                    key={`${supplierId}-${fuel.id}`}
                     auctionPayload={auctionPayload}
                     addCOQ={addCOQ}
                     deleteCOQ={deleteCOQ}
@@ -103,7 +98,7 @@ const InvitedSuppliers = ({auctionPayload, approveBargeForm, rejectBargeForm, ad
               const fuelId = _.get(supplierCOQ, 'fuel_id');
               const fuel = _.chain(fuels).filter(['id', fuelId]).first().value();
               return (
-                <div className="collapsing-barge__barge" key={fuelId}>
+                <div className="collapsing-barge__barge" key={`${supplierCOQ.supplier_id}-${fuelId}`}>
                   <div className="container is-fullhd">
                     <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel}/>
                   </div>

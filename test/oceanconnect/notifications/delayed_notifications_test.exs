@@ -13,6 +13,11 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
     AuctionStore.AuctionState
   }
 
+  @email_config Application.get_env(:oceanconnect, :emails, %{
+                  auction_starting_soon_offset: 2_000,
+                  delivered_coq_reminder_offset: 2_000
+                })
+
   setup do
     buyer_company = insert(:company)
     buyers = insert_list(2, :user, company: buyer_company)
@@ -22,9 +27,9 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
     start_time =
       DateTime.utc_now()
-      |> DateTime.to_unix(:second)
-      |> Kernel.+(4_000)
-      |> DateTime.from_unix!(:second)
+      |> DateTime.to_unix(:millisecond)
+      |> Kernel.+(@email_config.auction_starting_soon_offset + 1_000)
+      |> DateTime.from_unix!(:millisecond)
 
     port = insert(:port)
     fuel = insert(:fuel)
@@ -39,6 +44,8 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
     vessel_fuels = insert_list(2, :vessel_fuel)
 
+    {:ok, pid} = Oceanconnect.Notifications.NotificationsSupervisor.start_link()
+
     {:ok,
      %{
        auction_attrs: auction_attrs,
@@ -49,7 +56,7 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
   end
 
   describe "auction starting soon notification" do
-    test "auction creation with start over an hour in the future doesn't send upcoming notification",
+    test "auction creation with start time greater than the offset will not immediately send upcoming notification",
          %{
            auction_attrs: auction_attrs,
            buyers: buyers,
@@ -64,12 +71,34 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
       :timer.sleep(500)
 
+      # assert_no_emails_delivered()
+
       for email <- emails do
         refute_delivered_email(email)
       end
     end
 
-    test "rescheduling an creation with start time greater than an hour from now doesn't trigger upcoming auction emails",
+    test "upcoming auction start notification is sent when within the offset time",
+         %{
+           auction_attrs: auction_attrs,
+           buyers: buyers,
+           vessel_fuels: vessel_fuels,
+           buyer_company: buyer_company
+         } do
+      {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
+      auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
+      auction_state = AuctionState.from_auction(auction)
+
+      emails = Emails.AuctionStartingSoon.generate(auction_state)
+
+      :timer.sleep(1_000)
+
+      for email <- emails do
+        assert_delivered_email(email)
+      end
+    end
+
+    test "rescheduling an auction with start time greater than the offset doesn't immediately send upcoming notification",
          %{
            auction_attrs: auction_attrs,
            vessel_fuels: vessel_fuels,
@@ -81,10 +110,9 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
       new_start_time =
         DateTime.utc_now()
-        |> DateTime.to_unix(:second)
-        # add number of seconds > hour
-        |> Kernel.+(4_000)
-        |> DateTime.from_unix!(:second)
+        |> DateTime.to_unix(:millisecond)
+        |> Kernel.+(@email_config.auction_starting_soon_offset + 1_500)
+        |> DateTime.from_unix!(:millisecond)
 
       {:ok, auction} =
         Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
@@ -100,6 +128,42 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
       for email <- emails do
         refute_delivered_email(email)
+      end
+    end
+
+    test "upcoming auction start notification is sent when within the recheduled offset time",
+         %{
+           auction_attrs: auction_attrs,
+           vessel_fuels: vessel_fuels,
+           buyer_company: buyer_company,
+           buyers: buyers
+         } do
+      {:ok, auction} = Auctions.create_auction(auction_attrs, hd(buyers))
+      auction = %{auction | auction_vessel_fuels: vessel_fuels, buyer: buyer_company}
+      {:ok, pid} = Oceanconnect.Auctions.AuctionStoreStarter.start_link()
+
+      new_start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix(:millisecond)
+        |> Kernel.+(@email_config.auction_starting_soon_offset + 1_500)
+        |> DateTime.from_unix!(:millisecond)
+
+      {:ok, auction} =
+        Auctions.update_auction(auction, %{"scheduled_start" => new_start_time}, hd(buyers))
+
+      :timer.sleep(500)
+
+      auction_state = AuctionState.from_auction(auction)
+
+      AuctionEvent.auction_created(auction, hd(buyers))
+      |> EventNotifier.broadcast(auction_state)
+
+      emails = Emails.AuctionStartingSoon.generate(auction_state)
+
+      :timer.sleep(1_500)
+
+      for email <- emails do
+        assert_delivered_email(email)
       end
     end
   end

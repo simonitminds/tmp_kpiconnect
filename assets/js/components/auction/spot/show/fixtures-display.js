@@ -16,7 +16,8 @@ const FixturesDisplay = ({ addCOQ, deleteCOQ, auctionPayload, isSupplier }) => {
       .first()
       .value();
 
-    const renderCOQSubmission = () => {
+
+    if (window.isAdmin && !window.isImpersonating || isSupplier) {
       return (
         <COQSubmission
           auctionPayload={auctionPayload}
@@ -28,49 +29,21 @@ const FixturesDisplay = ({ addCOQ, deleteCOQ, auctionPayload, isSupplier }) => {
           fixtureId={fixtureId}
           delivered={true}
         />
+    );
+    } else if (!!supplierCOQ) {
+      return (
+        <div className="collapsing-barge__barge">
+          <div className="container is-fullhd">
+            <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel} />
+          </div>
+        </div>
       )
-    }
-
-    const renderCOQ = () => {
-      if (window.isAdmin && !window.isImpersonating) {
-        return (
-          <CollapsingBargeList
-            trigger="COQ"
-            open={!!supplierCOQ}
-            pendingBargeFlag = {false}
-            triggerClassString="collapsible-barge-list__container__trigger"
-            classParentString="has-padding-bottom-md has-padding-right-sm"
-            contentChildCount={!!supplierCOQ ? 1 : 0}
-            >
-            {renderCOQSubmission()}
-          </CollapsingBargeList>
-        )
-      } else if (!!supplierCOQ) {
-        return (
-          <CollapsingBargeList
-            trigger="COQ"
-            open={!!supplierCOQ}
-            pendingBargeFlag = {false}
-            triggerClassString="collapsible-barge-list__container__trigger"
-            classParentString="has-padding-bottom-md has-padding-right-sm"
-            contentChildCount={!!supplierCOQ ? 1 : 0}
-            >
-            <div className="collapsing-barge__barge">
-              <div className="container is-fullhd">
-                <ViewCOQ supplierCOQ={supplierCOQ} allowedToDelete={false} fuel={fuel} />
-              </div>
-            </div>
-          </CollapsingBargeList>
-        )
-      } else {
-        return ""
-      }
-    }
-
-    if (isSupplier) {
-      return renderCOQSubmission()
     } else {
-      return renderCOQ()
+      return (
+        <div className="container is-fullhd has-margin-top-md has-margin-bottom-md">
+          <i><b>No COQ uploaded for delivery</b></i>
+        </div>
+      )
     }
   }
 
@@ -111,7 +84,7 @@ const FixturesDisplay = ({ addCOQ, deleteCOQ, auctionPayload, isSupplier }) => {
           return (
             <React.Fragment>
               {renderFixture(fixture)}
-              <tr>
+              <tr key={`coq-${fixture.id}`}>
                 <td colSpan="8" className="has-padding-top-none">
                   {renderCOQSection(fixture)}
                 </td>

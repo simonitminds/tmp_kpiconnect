@@ -26,10 +26,12 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Configure default email addresses
+# Configure default email addresses and delay offsets
 config :oceanconnect, :emails, %{
   system: "bunkers@oceanconnectmarine.com",
-  admin: "nbolton@oceanconnectmarine.com"
+  admin: "nbolton@oceanconnectmarine.com",
+  auction_starting_soon_offset: 15 * 60 * 1_000,
+  delivered_coq_reminder_offset: 24 * 60 * 60 * 1_000
 }
 
 # Import environment specific config. This must remain at the bottom

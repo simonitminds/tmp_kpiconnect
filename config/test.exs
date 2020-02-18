@@ -21,6 +21,7 @@ config :oceanconnect, Oceanconnect.Repo,
   ownership_timeout: 25_000
 
 config :oceanconnect, :disable_css_transitions, true
+
 config :oceanconnect, :sql_sandbox, true
 
 config :oceanconnect, :task_supervisor, Oceanconnect.FakeTaskSupervisor
@@ -31,7 +32,14 @@ config :oceanconnect, :file_io, Oceanconnect.FakeIO
 config :hound,
   driver: "chrome_driver"
 
-config :bamboo, :refute_timeout, 1_000
+config :bamboo, :refute_timeout, 10
+
+config :oceanconnect, :emails, %{
+  system: "system@example.com",
+  admin: "admin@example.com",
+  auction_starting_soon_offset: 1_000,
+  delivered_coq_reminder_offset: 1_000
+}
 
 # browser: "chrome_headless"
 

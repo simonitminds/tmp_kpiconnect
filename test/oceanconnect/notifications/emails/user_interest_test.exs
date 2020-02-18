@@ -2,6 +2,8 @@ defmodule Oceanconnect.Notifications.Emails.UserInterestTest do
   use Oceanconnect.DataCase
   alias Oceanconnect.Notifications.Emails.UserInterest
 
+  @email_config Application.get_env(:oceanconnect, :emails, %{admin: "admin@example.com"})
+
   describe "registration emails" do
     setup do
       user = insert(:user)
@@ -21,7 +23,7 @@ defmodule Oceanconnect.Notifications.Emails.UserInterestTest do
 
       [user_interest_email] = UserInterest.generate(new_user_info)
 
-      assert user_interest_email.to == "nbolton@oceanconnectmarine.com"
+      assert user_interest_email.to == @email_config.admin
       assert user_interest_email.assigns.new_user_info == new_user_info
     end
   end

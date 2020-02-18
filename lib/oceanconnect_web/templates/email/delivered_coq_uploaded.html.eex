@@ -2,7 +2,7 @@
 <br/>
 
 <p style='font-family: "Arial";'>
-Please note the COQ for the supply to <%= @fixture.vessel.name %> has been uploaded into your auction. This is the specification that will be supplied on <%= @fixture.eta %> at <%= @auction.port.name %>.
+Please note the COQ for the supply to <%= @fixture.vessel.name %> has been uploaded into your auction. This is the specification that will be supplied on <%= convert_date?(@fixture.eta) %> at <%= @auction.port.name %>.
 </p>
 
 <p style='font-family: "Arial"; margin-bottom: 1rem;'>

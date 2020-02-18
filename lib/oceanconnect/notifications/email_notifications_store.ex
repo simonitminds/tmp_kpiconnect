@@ -12,8 +12,10 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     DelayedNotificationsSupervisor
   }
 
-  @auction_starting_soon_alert_time 15 * 60 * 1_000
-  @delivered_coq_reminder_alert_time 24 * 60 * 60 * 1_000
+  @email_config Application.get_env(:oceanconnect, :emails, %{
+                  auction_starting_soon_offset: 15 * 60 * 1_000,
+                  delivered_coq_reminder_offset: 24 * 60 * 60 * 1_000
+                })
 
   @delivery_events [
     :claim_created,
@@ -224,7 +226,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
     if earliest_eta do
       DateTime.to_unix(earliest_eta, :millisecond)
-      |> Kernel.-(@delivered_coq_reminder_alert_time)
+      |> Kernel.-(@email_config.delivered_coq_reminder_offset)
       |> DateTime.from_unix!(:millisecond)
     else
       false
@@ -238,7 +240,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
     if start_time do
       DateTime.to_unix(start_time, :millisecond)
-      |> Kernel.-(@auction_starting_soon_alert_time)
+      |> Kernel.-(@email_config.auction_starting_soon_offset)
       |> DateTime.from_unix!(:millisecond)
     else
       false

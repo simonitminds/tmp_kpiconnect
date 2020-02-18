@@ -28,14 +28,14 @@ class COQSubmission extends React.Component {
   }
 
   render() {
-    const { auctionPayload, deleteCOQ, fuel, key, supplierId, supplierCOQ, delivered } = this.props;
+    const { auctionPayload, deleteCOQ, fuel, supplierId, supplierCOQ, delivered } = this.props;
     const auction = _.get(auctionPayload, 'auction');
     const auctionState = _.get(auctionPayload, 'status');
     const validAuctionState = auctionState === 'pending' || auctionState === 'open';
 
     const renderCOQ = () => {
       return (
-        <div className="collapsing-barge__barge" key={key}>
+        <div className="collapsing-barge__barge">
           <div className="container is-fullhd">
             <ViewCOQ fuel={fuel} supplierCOQ={supplierCOQ} deleteCOQ={deleteCOQ} allowedToDelete={(validAuctionState || delivered)} />
             {renderCOQForm()}
