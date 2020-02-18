@@ -383,7 +383,6 @@ defmodule Oceanconnect.Accounts do
   def list_company_barges(company_id) do
     company_id
     |> Barge.by_company()
-    |> Barge.select_active()
     |> Repo.all()
     |> Repo.preload(:port)
   end

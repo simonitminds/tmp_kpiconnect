@@ -1513,7 +1513,6 @@ defmodule Oceanconnect.Auctions do
 
   def list_active_barges do
     Barge.select_active()
-    |> Barge.alphabetical()
     |> Repo.all()
   end
 
