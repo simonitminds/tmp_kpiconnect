@@ -11,12 +11,11 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
 
   defp emails(
          claim_response = %{
-           claim: claim = %Claim{buyer: buyer = %Company{id: company_id}, supplier: supplier},
-           author: %{company_id: company_id} = author
+           claim: claim = %Claim{buyer: buyer = %Company{id: buyer_id}, supplier: supplier},
+           author: %{company_id: buyer_id} = author
          }
        ) do
     recipients = Accounts.users_for_companies([supplier])
-
     author_name = Accounts.User.full_name(author)
 
     if claim_contact_id = most_recent_supplier_contact(claim, recipients) do
@@ -62,23 +61,40 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreated do
          }
        ) do
     recipients = Accounts.users_for_companies([buyer])
-
     author_name = Accounts.User.full_name(author)
 
-    Enum.map(recipients, fn recipient ->
-      base_email(recipient)
+    if claim_contact_id = most_recent_supplier_contact(claim, recipients) do
+      claim_contact = recipients |> Enum.filter(&(&1.id == claim_contact_id)) |> List.first()
+
+      base_email(claim_contact)
       |> subject(
         "#{author_name} from #{supplier.name} responded to the claim made by #{buyer.name}"
       )
       |> render("claim_response_created.html",
-        user: recipient,
+        user: claim_contact,
         claim: claim,
         claim_response: claim_response,
         author_name: author_name,
         supplier: supplier,
         buyer: buyer
       )
-    end)
+      |> List.wrap()
+    else
+      Enum.map(recipients, fn recipient ->
+        base_email(recipient)
+        |> subject(
+          "#{author_name} from #{supplier.name} responded to the claim made by #{buyer.name}"
+        )
+        |> render("claim_response_created.html",
+          user: recipient,
+          claim: claim,
+          claim_response: claim_response,
+          author_name: author_name,
+          supplier: supplier,
+          buyer: buyer
+        )
+      end)
+    end
   end
 
   defp most_recent_supplier_contact(%Claim{auction_id: auction_id}, recipients) do

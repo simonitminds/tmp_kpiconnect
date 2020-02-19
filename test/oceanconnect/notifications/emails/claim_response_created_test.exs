@@ -6,13 +6,15 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreatedTest do
   setup do
     buyer_company = insert(:company, name: "The Buyer Company")
     buyer = insert(:user, company: buyer_company, first_name: "Buyer", last_name: "Dude")
+    buyer2 = insert(:user, company: buyer_company, first_name: "Other", last_name: "Buyer")
 
     supplier_company = insert(:company, is_supplier: true, name: "Some Supplier Company")
     other_supplier_company = insert(:company, is_supplier: true)
 
     supplier_user = insert(:user, company: supplier_company, first_name: "Some", last_name: "Guy")
 
-    other_supplier_user = insert(:user, company: supplier_company)
+    other_supplier_user =
+      insert(:user, company: supplier_company, first_name: "Another", last_name: "User")
 
     auction =
       insert(
@@ -56,6 +58,7 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreatedTest do
        claim: claim,
        claim_response: claim_response,
        buyer: buyer,
+       buyer2: buyer2,
        buyer_company: buyer_company,
        fixture: fixture,
        other_supplier_user: other_supplier_user,
@@ -64,91 +67,182 @@ defmodule Oceanconnect.Notifications.Emails.ClaimResponseCreatedTest do
      }}
   end
 
-  test "generate/1 creates email to the buyer for a supplier claim response", %{
-    buyer: buyer,
-    claim_response: claim_response
-  } do
-    emails = Emails.ClaimResponseCreated.generate(claim_response)
+  describe "claim responses received by buyer" do
+    test "generate/1 creates email to all the buyer users for a supplier claim response", %{
+      claim_response: claim_response
+    } do
+      emails = Emails.ClaimResponseCreated.generate(claim_response)
 
-    for email <- emails do
-      assert email.subject ==
-               "Some Guy from Some Supplier Company responded to the claim made by The Buyer Company"
+      assert 2 == length(emails)
 
-      assert email.to.id == buyer.id
-      assert email.html_body =~ "I hate you"
+      for email <- emails do
+        assert email.subject ==
+                 "Some Guy from Some Supplier Company responded to the claim made by The Buyer Company"
+
+        assert email.html_body =~ "I hate you"
+      end
+    end
+
+    test "generate/1 creates email for responding buyer user only", %{
+      buyer: buyer,
+      claim: claim,
+      supplier_user: supplier_user
+    } do
+      insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+
+      supplier_second_response =
+        insert(:claim_response, author: supplier_user, claim: claim, content: "It is what it is")
+
+      emails = Emails.ClaimResponseCreated.generate(supplier_second_response)
+
+      for email <- emails do
+        assert email.subject ==
+                 "Some Guy from Some Supplier Company responded to the claim made by The Buyer Company"
+
+        assert email.to.id == buyer.id
+        assert email.html_body =~ "It is what it is"
+      end
+    end
+
+    test "generate/1 sends email to most recent responding buyer user only", %{
+      buyer: buyer,
+      claim: claim,
+      other_supplier_user: other_supplier_user,
+      supplier_user: supplier_user
+    } do
+      insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+      insert(:claim_response, author: supplier_user, claim: claim, content: "It is what it is")
+
+      :timer.sleep(1_000)
+
+      other_supplier_response =
+        insert(:claim_response, author: other_supplier_user, claim: claim, content: "Yeah, ditto!")
+
+      emails = Emails.ClaimResponseCreated.generate(other_supplier_response)
+
+      for email <- emails do
+        assert email.subject ==
+                 "Another User from Some Supplier Company responded to the claim made by The Buyer Company"
+
+        assert email.to.id == buyer.id
+        assert email.html_body =~ "Yeah, ditto!"
+      end
+    end
+
+    test "generate/1 sends email to most recent responding buyer user of any claim", %{
+      auction: auction,
+      buyer: buyer,
+      buyer2: buyer2,
+      claim: claim,
+      fixture: fixture,
+      supplier_user: supplier_user
+    } do
+      insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+
+      new_claim =
+        insert(
+          :claim,
+          type: "quality",
+          fixture: fixture,
+          additional_information: "Your fuel sucked too!",
+          auction: auction,
+          receiving_vessel: fixture.vessel,
+          delivered_fuel: fixture.fuel,
+          supplier: fixture.supplier,
+          notice_recipient_type: "supplier",
+          notice_recipient: fixture.supplier
+        )
+
+      :timer.sleep(1_000)
+      insert(:claim_response, author: buyer2, claim: new_claim, content: "Quality is jacked!")
+
+      supplier_second_response =
+        insert(:claim_response, author: supplier_user, claim: claim, content: "It is what it is")
+
+      emails = Emails.ClaimResponseCreated.generate(supplier_second_response)
+
+      for email <- emails do
+        assert email.subject ==
+                 "Some Guy from Some Supplier Company responded to the claim made by The Buyer Company"
+
+        assert email.to.id == buyer2.id
+        assert email.html_body =~ "It is what it is"
+      end
     end
   end
 
-  test "generate/1 creates email for responding supplier user only", %{
-    buyer: buyer,
-    claim: claim,
-    supplier_user: supplier_user
-  } do
-    buyer_response = insert(:claim_response, claim: claim, author: buyer, content: "WTF buddy")
-    emails = Emails.ClaimResponseCreated.generate(buyer_response)
+  describe "claim responses received by supplier" do
+    test "generate/1 creates email for responding supplier user only", %{
+      buyer: buyer,
+      claim: claim,
+      supplier_user: supplier_user
+    } do
+      buyer_response = insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+      emails = Emails.ClaimResponseCreated.generate(buyer_response)
 
-    for email <- emails do
-      assert email.subject ==
-               "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
+      for email <- emails do
+        assert email.subject ==
+                 "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
 
-      assert email.to.id == supplier_user.id
-      assert email.html_body =~ "WTF buddy"
+        assert email.to.id == supplier_user.id
+        assert email.html_body =~ "WTF buddy"
+      end
     end
-  end
 
-  test "generate/1 sends email to most recent responding supplier user only", %{
-    buyer: buyer,
-    claim: claim,
-    other_supplier_user: other_supplier_user
-  } do
-    :timer.sleep(1_000)
-    insert(:claim_response, claim: claim, author: other_supplier_user, content: "Yeah, ditto!")
+    test "generate/1 sends email to most recent responding supplier user only", %{
+      buyer: buyer,
+      claim: claim,
+      other_supplier_user: other_supplier_user
+    } do
+      :timer.sleep(1_000)
+      insert(:claim_response, author: other_supplier_user, claim: claim, content: "Yeah, ditto!")
 
-    buyer_response = insert(:claim_response, claim: claim, author: buyer, content: "WTF buddy")
-    emails = Emails.ClaimResponseCreated.generate(buyer_response)
+      buyer_response = insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+      emails = Emails.ClaimResponseCreated.generate(buyer_response)
 
-    for email <- emails do
-      assert email.subject ==
-               "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
+      for email <- emails do
+        assert email.subject ==
+                 "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
 
-      assert email.to.id == other_supplier_user.id
-      assert email.html_body =~ "WTF buddy"
+        assert email.to.id == other_supplier_user.id
+        assert email.html_body =~ "WTF buddy"
+      end
     end
-  end
 
-  test "generate/1 sends email to most recent responding supplier user of any claim", %{
-    auction: auction,
-    buyer: buyer,
-    claim: claim,
-    fixture: fixture,
-    other_supplier_user: other_supplier_user
-  } do
-    new_claim =
-      insert(
-        :claim,
-        type: "quality",
-        fixture: fixture,
-        additional_information: "Your fuel sucked too!",
-        auction: auction,
-        receiving_vessel: fixture.vessel,
-        delivered_fuel: fixture.fuel,
-        supplier: fixture.supplier,
-        notice_recipient_type: "supplier",
-        notice_recipient: fixture.supplier
-      )
+    test "generate/1 sends email to most recent responding supplier user of any claim", %{
+      auction: auction,
+      buyer: buyer,
+      claim: claim,
+      fixture: fixture,
+      other_supplier_user: other_supplier_user
+    } do
+      new_claim =
+        insert(
+          :claim,
+          type: "quality",
+          fixture: fixture,
+          additional_information: "Your fuel sucked too!",
+          auction: auction,
+          receiving_vessel: fixture.vessel,
+          delivered_fuel: fixture.fuel,
+          supplier: fixture.supplier,
+          notice_recipient_type: "supplier",
+          notice_recipient: fixture.supplier
+        )
 
-    :timer.sleep(1_000)
+      :timer.sleep(1_000)
 
-    insert(:claim_response, claim: new_claim, author: other_supplier_user, content: "It wrong!")
-    buyer_response = insert(:claim_response, claim: claim, author: buyer, content: "WTF buddy")
-    emails = Emails.ClaimResponseCreated.generate(buyer_response)
+      insert(:claim_response, author: other_supplier_user, claim: new_claim, content: "It wrong!")
+      buyer_response = insert(:claim_response, author: buyer, claim: claim, content: "WTF buddy")
+      emails = Emails.ClaimResponseCreated.generate(buyer_response)
 
-    for email <- emails do
-      assert email.subject ==
-               "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
+      for email <- emails do
+        assert email.subject ==
+                 "Buyer Dude from The Buyer Company added a response to the claim against Some Supplier Company"
 
-      assert email.to.id == other_supplier_user.id
-      assert email.html_body =~ "WTF buddy"
+        assert email.to.id == other_supplier_user.id
+        assert email.html_body =~ "WTF buddy"
+      end
     end
   end
 end
