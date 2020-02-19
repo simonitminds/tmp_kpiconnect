@@ -19,7 +19,7 @@ defmodule Oceanconnect.Accounts do
 
   """
   def list_users do
-    Repo.all(User)
+    User.alphabetical() |> Repo.all()
   end
 
   def list_users(params) do
@@ -233,30 +233,14 @@ defmodule Oceanconnect.Accounts do
       [%Company{}, ...]
 
   """
-  def list_companies do
-    Repo.all(Company)
-  end
+  def list_companies, do: Company.alphabetical() |> Repo.all()
+  def list_companies(params), do: Company.alphabetical() |> Repo.paginate(params)
 
-  def list_companies(params) do
-    Company
-    |> Repo.paginate(params)
-  end
+  def list_active_companies, do: Company.select_active() |> Repo.all()
 
-  def list_broker_entities do
-    Company.select_brokers()
-    |> Repo.all()
-  end
+  def list_broker_entities, do: Company.select_brokers() |> Repo.all()
 
-  def list_companies_by_ids(ids) do
-    ids
-    |> Company.by_ids()
-    |> Repo.all()
-  end
-
-  def list_active_companies do
-    Company.select_active()
-    |> Repo.all()
-  end
+  def list_companies_by_ids(ids), do: ids |> Company.by_ids() |> Repo.all()
 
   def users_for_companies(companies) when is_list(companies) do
     Enum.map(companies, & &1.id)
@@ -399,7 +383,6 @@ defmodule Oceanconnect.Accounts do
   def list_company_barges(company_id) do
     company_id
     |> Barge.by_company()
-    |> Barge.select_active()
     |> Repo.all()
     |> Repo.preload(:port)
   end

@@ -7,14 +7,10 @@ defmodule OceanconnectWeb.Admin.CompanyController do
   def index(conn, params) do
     page = Accounts.list_companies(params)
 
-    alphabetized_companies =
-      page.entries
-      |> Enum.sort_by(&String.first(&1.name))
-
     render(
       conn,
       "index.html",
-      companies: alphabetized_companies,
+      companies: page.entries,
       page_number: page.page_number,
       page_size: page.page_size,
       total_pages: page.total_pages,

@@ -56,30 +56,17 @@ defmodule Oceanconnect.Auctions.Barge do
     |> validate_required([:name, :port_id])
   end
 
-  def admin_changeset(%Barge{} = barge, attrs) do
-    changeset(barge, attrs)
-  end
+  def admin_changeset(%Barge{} = barge, attrs), do: changeset(barge, attrs)
 
   def by_company(company_id) do
-    from(
-      b in Barge,
-      distinct: b.id,
-      join: cb in "company_barges",
-      where: cb.barge_id == b.id and cb.company_id == ^company_id
-    )
+    "company_barges"
+    |> join(:inner, [cb], barge in Barge, on: barge.id == cb.barge_id)
+    |> where([cb, barge], cb.company_id == ^company_id and barge.is_active == true)
+    |> select([_cb, barge], barge)
+    |> order_by([_cb, barge], barge.name)
   end
 
-  def alphabetical(query \\ Barge) do
-    from(
-      q in query,
-      order_by: [asc: q.name]
-    )
-  end
+  def alphabetical(query \\ Barge), do: order_by(query, :name)
 
-  def select_active(query \\ Barge) do
-    from(
-      q in query,
-      where: q.is_active == true
-    )
-  end
+  def select_active(query \\ Barge), do: query |> alphabetical() |> where(is_active: true)
 end

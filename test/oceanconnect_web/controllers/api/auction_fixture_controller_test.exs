@@ -17,7 +17,8 @@ defmodule OceanconnectWeb.Api.AuctionFixtureControllerTest do
         :auction,
         buyer: buyer_company,
         suppliers: [supplier_company],
-        finalized: true
+        finalized: true,
+        auction_closed_time: DateTime.utc_now()
       )
 
     auction_state = close_auction!(auction)

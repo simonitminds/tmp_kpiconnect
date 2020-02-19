@@ -20,8 +20,8 @@ defmodule OceanconnectWeb.Api.AuctionFixtureController do
       current_user
       |> Auctions.list_auctions(true)
       |> Enum.reject(&(&1.type != "spot"))
-      |> Oceanconnect.Repo.preload(:fixtures)
       |> Enum.reject(&(is_nil(&1.fixtures) or &1.fixtures == []))
+      |> Enum.sort_by(&DateTime.to_unix(&1.auction_closed_time), &>=/2)
       |> Enum.map(fn auction ->
         auction
         |> FixturePayload.get_fixture_payload!(current_user)

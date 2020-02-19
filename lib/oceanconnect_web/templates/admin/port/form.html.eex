@@ -5,7 +5,7 @@
     </div>
   <% end %>
   <div class="columns">
-    <div class="column is-one-third">
+    <div class="column">
       <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">

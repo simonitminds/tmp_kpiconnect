@@ -53,7 +53,8 @@ defmodule Oceanconnect.Admin.User.NewTest do
         email: "NEW@EMAIL.COM",
         first_name: "new",
         last_name: "name",
-        is_observer: true
+        is_observer: true,
+        company_id: company.id
       })
 
       EditPage.submit()

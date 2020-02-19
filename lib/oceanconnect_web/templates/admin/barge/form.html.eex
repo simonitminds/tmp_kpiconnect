@@ -5,7 +5,7 @@
     </div>
   <% end %>
   <div class="columns">
-    <div class="column is-one-third">
+    <div class="column">
       <div class="field" >
         <%= label f, :name, class: "label" %>
     		<div class="control">
@@ -40,7 +40,7 @@
 				<% end %>
 				<div class="control">
 					<div class="select">
-					  <%= select f, :port_id, Enum.map(@ports, &{&1.name, &1.id}), class: "qa-admin-barge-port_id" %>
+					  <%= select f, :port_id, OceanconnectWeb.Admin.SharedView.selection_list(@ports), class: "qa-admin-barge-port_id" %>
 						<%= error_tag f, :port_id %>
 					</div>
 				</div>

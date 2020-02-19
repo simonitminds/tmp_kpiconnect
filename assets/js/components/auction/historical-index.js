@@ -101,58 +101,34 @@ export default class HistoricalAuctionsIndex extends React.Component {
   }
 
   render() {
-    const isWinningSupplier = (auctionPayload, supplierName) => {
-      let winningSolution = _
-        .chain(auctionPayload)
-        .get('solutions.winning_solution')
-        .value();
-      if (winningSolution) {
-        return _.some(winningSolution.bids, {'supplier': supplierName});
-      } else {
-        return false;
-      }
-    }
-
     const availableAuctions = _.map(this.props.auctionPayloads, (payload) => payload.auction);
 
-    const availableAuctionAttributes = (type) => {
-      switch (type) {
-        case 'vessels':
-          return _
-            .chain(availableAuctions)
-            .flatMap((auction) => auction[type])
-            .reject((vessel) => vessel == undefined)
-            .uniqBy('id')
-            .value();
-        case 'suppliers':
-          const suppliers = _
-            .chain(availableAuctions)
-            .flatMap((auction) => auction[type])
-            .reject((supplier) => supplier == undefined)
-            .uniqBy('id')
-            .value();
-          const winningSuppliers = _
-            .chain(this.props.auctionPayloads)
-            .flatMap((payload) => {
-              return _.filter(suppliers, (supplier) => isWinningSupplier(payload, supplier.name));
-            })
-            .uniq()
-            .value();
-
-          return winningSuppliers;
-        case 'buyer':
-        case 'port':
-          return _
-            .chain(availableAuctions)
-            .map((auction)=> auction[type])
-            .uniqBy('id')
-            .value();
-      }
+    const availableItems = (type) => {
+      return _
+        .chain(availableAuctions)
+        .flatMap((auction) => auction[type])
+        .reject((item) => item == undefined)
+        .uniqBy('id')
+        .orderBy(['name'])
+        .value();
     }
-    const availableVessels = availableAuctionAttributes('vessels');
-    const availableSuppliers = availableAuctionAttributes('suppliers')
-    const availableBuyers = availableAuctionAttributes('buyer');
-    const availablePorts = availableAuctionAttributes('port');
+
+    const winningSuppliers = (type) => {
+      const suppliers = availableItems('suppliers');
+      const winningSupplierNames = _
+        .chain(this.props.auctionPayloads)
+        .flatMap((payload) => {
+          return _.chain(payload).get('solutions.winning_solution.bids').map((bid) => _.get(bid, 'supplier')).value();
+        })
+        .uniq()
+        .value();
+      return _.filter(suppliers, (supplier) => _.includes(winningSupplierNames, supplier.name));
+    }
+
+    const availableVessels = availableItems('vessels');
+    const availableSuppliers = winningSuppliers('suppliers')
+    const availableBuyers = availableItems('buyer');
+    const availablePorts = availableItems('port');
 
     const connection = this.props.connection;
     const isObserver = window.isObserver;

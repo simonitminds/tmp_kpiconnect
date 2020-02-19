@@ -5,14 +5,14 @@
     </div>
   <% end %>
   <div class="columns">
-    <div class="column is-one-third">
+    <div class="column">
       <div class="field">
         <%= label f, :vessel_id, class: "label" do %>
           Vessel
         <%end%>
     		<div class="control">
           <div class="select">
-              <%= select f, :vessel_id, [{nil, nil}] ++ Enum.map(@vessels, &{&1.name, &1.id}), class: "qa-admin-fixture-vessel_id" %>
+              <%= select f, :vessel_id, OceanconnectWeb.Admin.SharedView.selection_list(@vessels), class: "qa-admin-fixture-vessel_id" %>
               <%= error_tag f, :vessel_id %>
           </div>
         </div>
@@ -23,7 +23,7 @@
 				<% end %>
 				<div class="control">
 					<div class="select">
-						<%= select f, :supplier_id, [{nil, nil}] ++ Enum.map(@suppliers, &{&1.name, &1.id}), class: "qa-admin-vessel-company_id" %>
+						<%= select f, :supplier_id, OceanconnectWeb.Admin.SharedView.selection_list(@suppliers), class: "qa-admin-vessel-company_id" %>
 						<%= error_tag f, :supplier_id %>
 					</div>
 				</div>
@@ -35,7 +35,7 @@
           <% end %>
           <div class="control">
               <div class="select">
-                  <%= select f, :fuel_id, [{nil, nil}] ++ Enum.map(@fuels, &{&1.name, &1.id}), class: "qa-admin-fixture-fuel_id" %>
+                  <%= select f, :fuel_id, OceanconnectWeb.Admin.SharedView.selection_list(@fuels), class: "qa-admin-fixture-fuel_id" %>
                   <%= error_tag f, :supplier_id %>
               </div>
           </div>

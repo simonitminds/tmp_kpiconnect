@@ -20,7 +20,8 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
         buyer: buyer_company,
         suppliers: [supplier_company],
         auction_vessel_fuels: [vessel_fuel],
-        finalized: true
+        finalized: true,
+        auction_closed_time: DateTime.utc_now()
       )
 
     auction_state = close_auction!(auction)
@@ -76,6 +77,7 @@ defmodule Oceanconnect.AuctionFixture.IndexTest do
 
     test "fixture created event has correct details", %{auction: auction, fixtures: fixtures} do
       assert IndexPage.is_current_path?()
+      # :timer.sleep(40_000)
       assert IndexPage.has_auction_fixtures?(auction, fixtures)
       fixture = hd(fixtures)
       assert IndexPage.fixture_has_details?(fixture)

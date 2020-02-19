@@ -5,7 +5,7 @@
     </div>
   <% end %>
   <div class="columns">
-    <div class="column is-one-third">
+    <div class="column">
       <div class="field" >
         <%= label f, :code, class: "label" do %>
           Index Code
@@ -32,7 +32,7 @@
 				<% end %>
 				<div class="control">
 					<div class="select">
-					  <%= select f, :fuel_id, Enum.map(@fuels, &{&1.name, &1.id}), class: "qa-admin-fuel_index-fuel_id", prompt: "Select a fuel type" %>
+					  <%= select f, :fuel_id, OceanconnectWeb.Admin.SharedView.selection_list(@fuels), class: "qa-admin-fuel_index-fuel_id" %>
 						<%= error_tag f, :fuel_id %>
 					</div>
 				</div>
@@ -44,7 +44,7 @@
 				<% end %>
 				<div class="control">
 					<div class="select">
-					  <%= select f, :port_id, Enum.map(@ports, &{&1.name, &1.id}), class: "qa-admin-fuel_index-port_id", prompt: "Select a port" %>
+					  <%= select f, :port_id, OceanconnectWeb.Admin.SharedView.selection_list(@ports), class: "qa-admin-fuel_index-port_id" %>
 						<%= error_tag f, :port_id %>
 					</div>
 				</div>

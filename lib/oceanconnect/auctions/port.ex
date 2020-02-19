@@ -47,6 +47,7 @@ defmodule Oceanconnect.Auctions.Port do
       where: p.id == ^port_id and c.is_supplier == true,
       select: c
     )
+    |> alphabetical()
   end
 
   def suppliers_for_port_id(port_id, buyer_id) do
@@ -56,19 +57,10 @@ defmodule Oceanconnect.Auctions.Port do
       where: p.id == ^port_id and c.is_supplier == true and c.id != ^buyer_id,
       select: c
     )
+    |> alphabetical()
   end
 
-  def alphabetical(query \\ Port) do
-    from(
-      q in query,
-      order_by: [asc: q.name]
-    )
-  end
+  def alphabetical(query \\ Port), do: order_by(query, :name)
 
-  def select_active(query \\ Port) do
-    from(
-      q in query,
-      where: q.is_active == true
-    )
-  end
+  def select_active(query \\ Port), do: query |> alphabetical() |> where(is_active: true)
 end

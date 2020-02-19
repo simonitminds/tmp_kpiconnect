@@ -102,6 +102,9 @@
       flex-wrap: wrap;
       flex-direction: column-reverse;
     }
+    @media (min-width: 769px) {
+      min-width: 750px;
+    }
 
     &__actions {
       margin-left: auto;

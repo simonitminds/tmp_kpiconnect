@@ -75,26 +75,13 @@ defmodule Oceanconnect.Accounts.Company do
     |> maybe_set_credit_margin_amount_to_nil
   end
 
-  def select_active(query \\ Company) do
-    from(
-      q in query,
-      where: q.is_active == true
-    )
-  end
+  def alphabetical(query \\ Company), do: order_by(query, :name)
 
-  def select_brokers(query \\ Company) do
-    from(
-      q in query,
-      where: q.is_broker == true
-    )
-  end
+  def select_active(query \\ Company), do: query |> alphabetical() |> where(is_active: true)
 
-  def by_ids(ids, query \\ Company) when is_list(ids) do
-    from(
-      q in query,
-      where: q.id in ^ids
-    )
-  end
+  def select_brokers(query \\ Company), do: query |> alphabetical() |> where(is_broker: true)
+
+  def by_ids(ids, query \\ Company) when is_list(ids), do: where(query, [c], c.id in ^ids)
 
   defp maybe_set_credit_margin_amount_to_nil(changeset) do
     case get_change(changeset, :credit_margin_amount) do

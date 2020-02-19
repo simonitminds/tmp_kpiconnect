@@ -56,7 +56,7 @@
 				<% end %>
 				<div class="control">
 					<div class="select">
-						<%= select f, :company_id, Enum.map(@companies, &{&1.name, &1.id}), class: "qa-admin-user-company_id" %>
+						<%= select f, :company_id, OceanconnectWeb.Admin.SharedView.selection_list(@companies), class: "qa-admin-user-company_id" %>
 						<%= error_tag f, :company_id %>
 					</div>
 				</div>
