@@ -436,7 +436,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
         _state,
         %AuctionEvent{
           type: :auction_created,
-          data: auction = %{__struct_: Oceanconnect.Auctions.Auction}
+          data: auction
         }
       ) do
     auction = Auctions.fully_loaded(auction)

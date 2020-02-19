@@ -8,19 +8,19 @@ const SupplierCOQs = (props) => {
   const validAuctionState = auctionState === 'pending' || auctionState === 'open';
   const supplierCOQs = _.chain(auctionPayload).get('auction.auction_supplier_coqs').filter(['delivered', delivered]).value();
   const auction = _.get(auctionPayload, 'auction');
-  let fuels = _.get(auction, "auction_vessel_fuels", null);
-  if (fuels) {
-    fuels = _.map(fuels, "fuel");
-  } else {
-    fuels = [auction.fuel];
-  }
+  let fuels = _.get(auction, "fuels", null);
+  if (!fuels) { fuels = [auction.fuel]; }
 
   const renderCOQs = () => {
     return fuels.map((fuel) => {
       const fuelSupplier = supplierId ? parseInt(supplierId) : fuelSuppliers[fuel.id];
       const supplierCOQ = _.find(supplierCOQs, { 'fuel_id': fuel.id, 'supplier_id': fuelSupplier });
       if (fuelSupplier) {
-        return <COQSubmission {...props} key={`${fuelSupplier}-${fuel.id}`} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />;
+        return (
+          <React.Fragment key={`${fuelSupplier}-${fuel.id}`}>
+            <COQSubmission {...props} supplierId={fuelSupplier} fuel={fuel} supplierCOQ={supplierCOQ} />
+          </React.Fragment>
+        );
       } else {
         return '';
       }
