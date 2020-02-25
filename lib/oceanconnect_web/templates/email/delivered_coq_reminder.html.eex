@@ -11,6 +11,6 @@
   <% end %>
 </p>
 <br/>
-<p style='font-family: "Arial"; margin-bottom: 1rem;'><a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>"><%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>Link to auction</a></p>
+<p style='font-family: "Arial"; margin-bottom: 1rem;'><a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>">Link to auction</a></p>
 
 <%= render "_email_footer.html" %>

@@ -9,6 +9,6 @@ Please note the COQ for the supply to <%= @fixture.vessel.name %> has been uploa
 An approved barge will be used and advised to your agent shortly.
 </p>
 
-<p style='font-family: "Arial"; margin-bottom: 1rem;'><a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>"><%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>Link to auction</a></p>
+<p style='font-family: "Arial"; margin-bottom: 1rem;'><a href="<%= auction_url(OceanconnectWeb.Endpoint, :show, @auction) %>">Link to auction</a></p>
 
 <%= render "_email_footer.html" %>
