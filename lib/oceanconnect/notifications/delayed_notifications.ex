@@ -74,8 +74,15 @@ defmodule Oceanconnect.Notifications.DelayedNotifications do
     delay = time_until(send_time)
     ref = Process.send_after(self(), :send_reminder, delay)
 
-    {:ok,
-     %{state | auction_id: auction_id, send_time: send_time, solution: solution, timer_ref: ref}}
+    new_state =
+      Map.merge(state, %{
+        auction_id: auction_id,
+        send_time: send_time,
+        solution: solution,
+        timer_ref: ref
+      })
+
+    {:ok, new_state}
   end
 
   defp process(

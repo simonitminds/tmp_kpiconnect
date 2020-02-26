@@ -5,12 +5,13 @@ defmodule Oceanconnect.Notifications.Emails.DeliveredCOQReminder do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.{Auction, Solution}
 
-  def generate(auction_id, solution), do: emails(Auctions.get_auction!(auction_id), solution)
+  def generate(auction_id, solution),
+    do: auction_id |> Auctions.get_auction!() |> Auctions.fully_loaded() |> emails(solution)
 
   # TODO: The email(s) could have been produced without the solution using just the fixtures to get
   #       the supplier list. It could also be triggered by a Fixture Created/Updated Event
   defp emails(auction = %Auction{fixtures: fixtures, port: port}, %Solution{bids: bids}) do
-    suppliers = Enum.map(bids, &Accounts.get_company!(&1.supplier_id))
+    suppliers = bids |> Enum.map(&Accounts.get_company!(&1.supplier_id)) |> Enum.uniq()
 
     suppliers
     |> Enum.map(fn supplier ->

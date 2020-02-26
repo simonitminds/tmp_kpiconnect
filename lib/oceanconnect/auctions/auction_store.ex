@@ -73,7 +73,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
       GenServer.call(pid, {:process, command})
     else
       {:error, msg} ->
-        if %{is_admin: true} = user do
+        if user && (%{is_admin: true} = user) do
           closed_at = DateTime.utc_now()
           current_state = Auctions.get_auction_state!(auction)
 
@@ -128,6 +128,7 @@ defmodule Oceanconnect.Auctions.AuctionStore do
 
   def handle_call({:process, command = %Command{}}, _from, current_state) do
     with {:ok, events} <- Aggregate.process(current_state, command) do
+      # immediately calls handle_continue to further process events
       {:reply, {:ok, :command_accepted}, current_state, {:continue, events}}
     else
       {:error, message} ->

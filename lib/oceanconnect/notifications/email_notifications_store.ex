@@ -170,13 +170,13 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
 
   defp process(
          event = %AuctionEvent{
-           type: :select_winning_solution,
+           type: :winning_solution_selected,
            auction_id: auction_id,
            data: %{solution: solution}
          },
          state
        ) do
-    notification_name = "auction:#{auction_id}:upcoming_reminder"
+    notification_name = "auction:#{auction_id}:coq_reminder"
 
     case DelayedNotificationsSupervisor.start_child(notification_name) do
       {:ok, _pid} ->

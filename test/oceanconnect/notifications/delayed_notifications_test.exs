@@ -4,13 +4,13 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
 
   alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Notifications.{Emails}
+  alias Oceanconnect.Notifications.Emails
 
   alias Oceanconnect.Auctions.{
     AuctionEvent,
-    AuctionSupervisor,
     EventNotifier,
-    AuctionStore.AuctionState
+    AuctionStore.AuctionState,
+    AuctionSupervisor
   }
 
   @email_config Application.get_env(:oceanconnect, :emails, %{
@@ -19,43 +19,45 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
                 })
 
   setup do
-    buyer_company = insert(:company)
-    buyers = insert_list(2, :user, company: buyer_company)
-    supplier_companies = insert_list(2, :company, is_supplier: true)
-    Enum.each(supplier_companies, &insert(:user, company: &1))
-    suppliers = Accounts.users_for_companies(supplier_companies)
-
-    start_time =
-      DateTime.utc_now()
-      |> DateTime.to_unix(:millisecond)
-      |> Kernel.+(@email_config.auction_starting_soon_offset + 1_000)
-      |> DateTime.from_unix!(:millisecond)
-
-    port = insert(:port)
-    fuel = insert(:fuel)
-
-    auction_attrs = %{
-      "port_id" => port.id,
-      "type" => "spot",
-      "scheduled_start" => start_time,
-      "suppliers" => supplier_companies,
-      "buyer_id" => buyer_company.id
-    }
-
-    vessel_fuels = insert_list(2, :vessel_fuel)
-
-    {:ok, pid} = Oceanconnect.Notifications.NotificationsSupervisor.start_link()
-
-    {:ok,
-     %{
-       auction_attrs: auction_attrs,
-       buyers: buyers,
-       vessel_fuels: vessel_fuels,
-       buyer_company: buyer_company
-     }}
+    {:ok, _pid} = Oceanconnect.Notifications.NotificationsSupervisor.start_link()
+    :ok
   end
 
   describe "auction starting soon notification" do
+    setup do
+      buyer_company = insert(:company)
+      buyers = insert_list(2, :user, company: buyer_company)
+      supplier_companies = insert_list(2, :company, is_supplier: true)
+      Enum.each(supplier_companies, &insert(:user, company: &1))
+      suppliers = Accounts.users_for_companies(supplier_companies)
+
+      start_time =
+        DateTime.utc_now()
+        |> DateTime.to_unix(:millisecond)
+        |> Kernel.+(@email_config.auction_starting_soon_offset + 1_000)
+        |> DateTime.from_unix!(:millisecond)
+
+      port = insert(:port)
+
+      auction_attrs = %{
+        "port_id" => port.id,
+        "type" => "spot",
+        "scheduled_start" => start_time,
+        "suppliers" => supplier_companies,
+        "buyer_id" => buyer_company.id
+      }
+
+      vessel_fuels = insert_list(2, :vessel_fuel)
+
+      {:ok,
+       %{
+         auction_attrs: auction_attrs,
+         buyers: buyers,
+         vessel_fuels: vessel_fuels,
+         buyer_company: buyer_company
+       }}
+    end
+
     test "auction creation with start time greater than the offset will not immediately send upcoming notification",
          %{
            auction_attrs: auction_attrs,
@@ -68,10 +70,7 @@ defmodule Oceanconnect.Notifications.DelayedNotificationsTest do
       auction_state = AuctionState.from_auction(auction)
 
       emails = Emails.AuctionStartingSoon.generate(auction_state)
-
       :timer.sleep(500)
-
-      # assert_no_emails_delivered()
 
       for email <- emails do
         refute_delivered_email(email)
