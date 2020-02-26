@@ -439,7 +439,7 @@ defimpl Oceanconnect.Auctions.Aggregate, for: Oceanconnect.Auctions.AuctionStore
           data: auction
         }
       ) do
-    auction = Auctions.fully_loaded(auction)
+    auction = Auctions.get_auction!(auction.id)
     {:ok, AuctionState.from_auction(auction)}
   end
 
