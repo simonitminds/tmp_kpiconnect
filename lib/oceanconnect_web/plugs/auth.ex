@@ -5,9 +5,6 @@ defmodule OceanconnectWeb.Plugs.Auth do
   alias Oceanconnect.Accounts.{User}
   alias Oceanconnect.Guardian
 
-  alias Oceanconnect.Accounts
-  alias Oceanconnect.Accounts.{User}
-
   def build_session(conn, user) do
     user_with_company = Accounts.load_company_on_user(user)
 

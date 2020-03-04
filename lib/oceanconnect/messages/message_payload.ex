@@ -13,9 +13,11 @@ defmodule Oceanconnect.Messages.MessagePayload do
             unseen_messages: 0
 
   def get_message_payloads_for_company(company_id) do
-    company_id
-    |> Auctions.list_participating_auctions()
-    |> Enum.map(&get_message_payload_for_auction(&1, company_id))
+    participating_auctions =
+      Auctions.list_participating_auctions(company_id, false) ++
+        Auctions.list_participating_auctions(company_id, true)
+
+    Enum.map(participating_auctions, &get_message_payload_for_auction(&1, company_id))
   end
 
   defp get_message_payload_for_auction(
