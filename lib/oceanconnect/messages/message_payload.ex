@@ -14,8 +14,10 @@ defmodule Oceanconnect.Messages.MessagePayload do
 
   def get_message_payloads_for_company(company_id) do
     participating_auctions =
-      Auctions.list_participating_auctions(company_id, false) ++
-        Auctions.list_participating_auctions(company_id, true)
+      company_id
+      |> Auctions.list_participating_auctions(false)
+      |> Kernel.++(Auctions.list_participating_auctions(company_id, true))
+      |> Enum.sort_by(& &1.id, &>=/2)
 
     Enum.map(participating_auctions, &get_message_payload_for_auction(&1, company_id))
   end
