@@ -2,7 +2,7 @@
   <div class="content">
     <div class="columns is-centered">
       <div class="column is-two-fifths has-padding-left-lg has-padding-right-lg">
-        <h1 class="title has-text-weight-bold has-margin-bottom-md has-margin-top-xl">Learn More About OceanConnect Marine's Auction Site</h1>
+        <h1 class="title has-text-weight-bold has-margin-bottom-md has-margin-top-xl">Learn More About AuctionConnect's Auction Site</h1>
         <p class="has-text-gray-3 has-margin-bottom-lg">Please enter and submit the following information, and one of our auction administrators will contact you soon.</p>
         <%= form_for @conn, registration_path(@conn, :create), fn f -> %>
 
@@ -99,7 +99,7 @@
           <div class="field is-expanded">
             <div class="field-label">
               <div class="control">
-                <label class="label" for="mobile_phone">What is your interest in OceanConnect Marine?</label>
+                <label class="label" for="mobile_phone">What is your interest in AuctionConnect?</label>
               </div>
             </div>
             <div class="field-body">
