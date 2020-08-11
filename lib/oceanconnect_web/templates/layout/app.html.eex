@@ -17,7 +17,7 @@
       <nav role="navigation" class="navbar is-primary">
         <div class="navbar-brand">
           <a href="/auctions" class="navbar-item">
-            <img src="<%= static_path(@conn, "/images/ocm_transparentlogo_reverse.png") %>">
+            <img src="<%= static_path(@conn, "/images/ocm_transparentlogo.png") %>">
           </a>
         <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>
           <button class="button navbar-burger is-primary" data-target="navMenubd-example">
