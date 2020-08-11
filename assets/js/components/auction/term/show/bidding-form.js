@@ -89,7 +89,7 @@ class BiddingForm extends React.Component {
                   onChange={this.handleTradedBidCheckboxChange.bind(this)}
                   opts={{labelClass: 'label is-capitalized is-inline-block has-margin-left-sm'}}
                 />
-                <i>Buyer's Credit Margin with OCM: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
+                <i>Buyer's Credit Margin with KPI OceanConnect: $<span className="qa-auction-credit_margin_amount">{credit_margin_amount}</span></i>
               </div>
             </div>
           }
