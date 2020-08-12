@@ -1,6 +1,6 @@
 <div class="container container--auction-log is-fullhd">
   <div class="report content">
-    <img class="report__logo--print is-hidden-screen"src="<%= static_path(@conn, "/images/ocmlogo_print.png") %>">
+    <img class="report__logo--print is-hidden-screen"src="<%= static_path(@conn, "/images/kpi_oceanconnectlogo_print.png") %>">
     <h1 class="title has-text-weight-bold has-margin-bottom-lg">Auction Event Log</h1>
     <h2>Auction Details</h2>
     <div class="has-margin-bottom-xl">
