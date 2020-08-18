@@ -62,7 +62,7 @@
                 <%= radio_button(f, :notice_recipient_type, "supplier", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-supplier") %>
                 <%= error_tag f, :notice_recipient_type %>
                 <div>
-                  Supplier &amp; OceanConnect Marine
+                  Supplier &amp; KPI OceanConnect
                   <p class="help has-margin-bottom-md has-text-gray-3">
                     Last Correspondence Sent: <%= if @claim, do: @claim.supplier_last_correspondence, else: "—" %>
                   </p>
@@ -72,7 +72,7 @@
                 <%= radio_button(f, :notice_recipient_type, "admin", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-admin") %>
                 <%= error_tag f, :notice_recipient_type %>
                 <div>
-                  OceanConnect Marine
+                  KPI OceanConnect
                   <p class="help has-margin-bottom-md has-text-gray-3">
                     Last Correspondence Sent: <%= if @claim, do: @claim.admin_last_correspondence, else: "—" %>
                   </p>
