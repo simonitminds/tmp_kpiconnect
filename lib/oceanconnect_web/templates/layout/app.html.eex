@@ -14,13 +14,13 @@
 
   <body class="<%= "#{ if OceanconnectWeb.SessionView.current_user_is_admin?(@conn),  do:  "body--admin",  else:  "body"}" %>">
     <header class="header">
-      <nav role="navigation" class="navbar is-primary">
+      <nav role="navigation" class="navbar is-white">
         <div class="navbar-brand">
           <a href="/auctions" class="navbar-item">
             <img src="<%= static_path(@conn, "/images/ocm_transparentlogo.png") %>">
           </a>
         <%= if (OceanconnectWeb.SessionView.current_user(@conn) != "") do %>
-          <button class="button navbar-burger is-primary" data-target="navMenubd-example">
+          <button class="button navbar-burger" data-target="navMenubd-example">
             <span></span>
             <span></span>
             <span></span>
@@ -28,6 +28,7 @@
         <% end %>
         </div>
         <div id="navMenubd-example" class="navbar-menu">
+          <img class="navbar-background" src="<%= static_path(@conn, "/images/header_slice.png") %>" />
           <div class="navbar-end">
             <div class="navbar-item navbar-item--user has-text-weight-bold">
               <%= OceanconnectWeb.SessionView.current_user(@conn) %>

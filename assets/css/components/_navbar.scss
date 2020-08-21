@@ -7,7 +7,7 @@
 
 // Associated Variables
 
-$navbar-background-color: $primary;
+$navbar-background-color: $white;
 
 // Adaptations
 
@@ -31,6 +31,11 @@ $navbar-background-color: $primary;
   @media (max-width: 1023px) {
     background-color: $white !important;
   }
+}
+
+.navbar-background {
+  position: absolute;
+  top: -10px;
 }
 
 .navbar-dropdown { // Set the nav dropdown to be flush right
