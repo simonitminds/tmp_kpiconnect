@@ -18,7 +18,7 @@ defmodule OceanconnectWeb.RegistrationController do
         conn
         |> put_flash(
           :info,
-          "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator."
+          "Thank you for expressing interest in AuctionConnect. You will be contacted by an auction administrator."
         )
         |> put_status(302)
         |> redirect(to: session_path(conn, :new))

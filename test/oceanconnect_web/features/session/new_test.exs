@@ -70,7 +70,7 @@ defmodule OceanconnectWeb.Session.NewTest do
     assert NewPage.is_current_path?()
 
     assert NewPage.has_content?(
-             "Thank you for expressing interest in OceanConnect Marine. You will be contacted by an auction administrator."
+             "Thank you for expressing interest in AuctionConnect. You will be contacted by an auction administrator."
            )
   end
 end
