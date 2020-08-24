@@ -81,7 +81,7 @@ const BargeSubmission = ({auctionPayload, submitBargeForm, unsubmitBargeForm, ap
             </div>
           )}
           { submittedBarges.length == 0 && availableBarges.length == 0 && (
-            <div className="auction-table-placeholder is-white has-margin-top-md has-margin-bottom-md has-margin-left-xs has-margin-right-xs"><i>No barges are associated with your company. Please contact OceanConnect Marine to configure your account.</i></div>
+            <div className="auction-table-placeholder is-white has-margin-top-md has-margin-bottom-md has-margin-left-xs has-margin-right-xs"><i>No barges are associated with your company. Please contact KPI OceanConnect to configure your account.</i></div>
           )}
         </form>
       </div>

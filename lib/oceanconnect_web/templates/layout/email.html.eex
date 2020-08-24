@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>OceanConnect Marine | Marine Fuel Auctions</title>
+    <title>KPI OceanConnect | Marine Fuel Auctions</title>
     <link rel="stylesheet" href="<%= static_path(OceanconnectWeb.Endpoint, "/css/app.css") %>">
   </head>
 

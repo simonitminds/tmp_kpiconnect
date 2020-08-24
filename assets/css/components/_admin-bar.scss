@@ -49,7 +49,6 @@
 
 .admin-bar {
   width: 100%;
-  border: 5px solid $gray-3;
 
   &--login {
     margin-top: 2rem;
@@ -79,10 +78,9 @@
   display: flex;
   flex-shrink: 0;
   padding: 0.5rem;
-  background-color: $gray-3;
 
   label {
-    color: $white;
+    color: $black;
     margin-left: auto;
     margin-right: 1rem;
     margin-bottom: 0;

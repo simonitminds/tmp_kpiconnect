@@ -95,7 +95,7 @@
                   <label class="radio is-flex has-margin-left-none has-margin-bottom-sm">
                     <%= radio_button(f, :notice_recipient_type, "admin", class: "has-margin-top-xs has-margin-right-sm qa-claim-place_notice-admin readonly", disabled: "") %>
                     <div>
-                      OceanConnect Marine
+                      KPI OceanConnect
                       <p class="help has-margin-bottom-md has-text-gray-3">Last Correspondence Sent: <span class="qa-claim-admin_last_correspondence"><%= if @claim.admin_last_correspondence, do: convert_date?(@claim.admin_last_correspondence), else: "—" %></span></p>
                     </div>
                   </label>
