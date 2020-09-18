@@ -4,7 +4,7 @@
 
 ### Requirements
 * [asdf](https://github.com/asdf-vm/asdf) - Program version management
-* [ansible](https://docs.ansible.com/ansible/2.7/installation_guide/intro_installation.html)  
+* [ansible](https://docs.ansible.com/ansible/2.7/installation_guide/intro_installation.html)
 `brew install ansible`
 * [Erlang/OTP](https://github.com/erlang/otp) version in .tools-versions
 * [Elixir](https://elixir-lang.org/) version in .tools-versions
@@ -41,7 +41,6 @@ To run tests locally, we no longer depend on selenium and just use `chromedriver
 * Run `mix run priv/repo/seeds.exs`
 
 There is a separate `prod_seeds.exs` file that only creates an admin user for production environments.
-
 
 ### Clearing All Data
 ```elixir
@@ -109,17 +108,24 @@ The application is intended to be used by companies with most access and authori
 
 There are also 2 special users (admin and observer) that should only be associated with a company that contains no other user types (i.e. an admin user belongs to a company that only has admin users, etc).
 
-**Observers**  
+**Observers**
 An observer is a user/company that can be used to demo the application to prospective clients. An admin can invite an observer to view an auction and receive all the live updates as the auction changes. Observers will be able to see supplier information, but all buyer and vessel information is anonymous. An observer can only view an auction, not take any action. Buyers and suppliers are not able to tell if an auction is being observed.
 
-**Admin**  
+**Admin**
 An admin has administrative rights to the application which allows them to see and control anything. Admins can take action as themselves or they can `impersonate` any other user in the system. While impersonating another user, the admin's view and rights would represent that of the impersonated user, but any action taken would log the admin in the database. The admin can also setup and manage companies, users, ports, vessels, etc using the Admin Panel.
 
 ### Ports
 -  have an associated Timezone for ETD ETA of Ship Arrival on Auction
 
-
 # Dev Ops
+
+## Production & Staging Logs
+You can access the production and staging applicaiton log via the journalctl
+utility once logged in via ssh. (The `sudo` command is not needed if logged
+in at the `root` user.)
+```sh
+sudo journalctl -t oceanconnect -n 500
+```
 
 ## Releasing
 
@@ -167,14 +173,12 @@ This will change the link of the current release back to the previous and restar
 If something goes wrong with deploying a release, 9 times out of 10 it's because that particular environment is out storage space for new releases.
 You can find all the previous and current releases in `/opt/ocm/oceanconnect/releases`. When removing them, be careful not to delete the most recent release.
 
-
 ### Adding new servers
 The `ansible/inventory/hosts` file lists out the hostnames/ips of servers that will be managed by Ansible using an INI format. These servers are sorted into _groups_ that Ansible can reference.
 
 We currently have two primary groups set up: `staging`, and `production`. Additionally, `web-servers`, `build-servers`, and `db-servers` are also set up with both the staging and production servers for a semantic representation of our infrastructure.
 
 The only required groups are `[py3-hosts]` and `[py3-hosts:vars]`. Most modern OSs have Python 3 installed by default, but Ansible defaults to Python 2. These groups tell Ansible to use Python 3 on those servers. Other groupings are up to you.
-
 
 ### Provisioning new servers
 Ansible should make this fairly easy. If you've added the host names to `./ansible/inventory/hosts`, setup should be as simple as:
@@ -194,24 +198,21 @@ Alternatively, since we mainly run all components (web, build, and db) on a sing
 
 One thing to note with this set of commands is that each server will be provisioned as the database, build server, _and_ application server all together. You can use different `hosts` file groups for each playbook to separate these components as needed. _Note: the `config` and `setup` steps for each type (web, build, db) must still be done on the same servers._
 
-
 ### Using an external database
 If you have an external database setup to use, you can skip the `setup-db` playbook. This will avoid installing postgres and creating a database on the server.
 
 Then, after provisioning the server the rest of the way, edit the `config/prod.secret.exs` file under the build directory (`~deploy/build/oceanconnect`) with your database's connection information.
 
-
 ### Restoring database from backup
-**Create backup**  
-Save the database with `pg_dump -Ft -U <user name> <database name> > <backup tar file>` (eg: `pg_dump -Ft -U oceanconnect oceanconnect_prod > 2020_02_05_oceanconnect_staging.tar`).  
+**Create backup**
+Save the database with `pg_dump -Ft -U <user name> <database name> > <backup tar file>` (eg: `pg_dump -Ft -U oceanconnect oceanconnect_prod > 2020_02_05_oceanconnect_staging.tar`).
 **Note**: If the copy is on the server, you can copy it locally with `scp <user>@<server>:<path to file>/<tar file name> <local storage dir>` (eg: `scp root@206.189.247.123:~/2020_02_05_oceanconnect_staging.tar ~/Downloads/`).
 
-**Restore from backup**  
+**Restore from backup**
 `pg_restore -Ft -c -U <database user> -d <database name> <path to pg_dump tar file>`
 (eg: `pg_restore -Ft -c -U oceanconnect -d oceanconnect_dev ~/Desktop/2019-02-26-oceanconnect_staging.tar`)
 Use the database password found in the dev.secret.exs or prod.secret.exs file. You may see 5 groupings of messages that
 mention ERROR for query execution, which is normal.
-
 
 ### Setting hostname
 In order for `*_url` helpers to work properly, Phoenix needs to be configured with the hostname that the site lives at. By default, Ansible will set this up as `localhost`, which is obviously not correct for remote servers. Since this is generally a per-server configuration, it has not been added as a configurable option there.
@@ -226,7 +227,6 @@ cat config/prod.exs
 nano config/prod.secret.exs
 # Paste the `Endpoint` config and replace the `System.get_env("APP_HOST")` with the proper domain name.
 ```
-
 
 ### SSH errors
 If you get an error while running `setup-build.yml` about cloning the repository, make sure that your SSH key tied to your GitHub account is addded to the active SSH keyring running on your computer. You can check this with `ssh-add -l`. If it is not listed there, add it with `ssh-add -k <key_path>`.
@@ -245,7 +245,6 @@ ansible-playbook -u root -v -l build-servers playbooks/manage-users.yml -D
 ```
 
 It is safe to run this while the server is running and will not restart the application.
-
 
 ## Observing the Application
 Get the port numbers for the running erlang processes by SSHing into the server as the `deploy` user and running `epmd -names`. If `epmd` is not available, reshim with asdf.
