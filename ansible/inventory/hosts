@@ -32,3 +32,8 @@ ansible_python_interpreter=/usr/bin/python3
 
 [local]
 localhost ansible_sudo=false
+
+
+[letsencrypt]
+auctionstaging.oceanconnectmarine.com letsencrypt_email=bill@gaslight.co
+auctionstaging.kpioceanconnect.com letsencrypt_email=bill@gaslight.co

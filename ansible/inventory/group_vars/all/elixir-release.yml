@@ -21,9 +21,6 @@ elixir_release_deploy_group: "{{ elixir_release_deploy_user }}"
 # Port that Phoenix listens on
 elixir_release_http_listen_port: 4001
 
-# Same as above, but configuring firewall
-iptables_http_app_port: "{{ elixir_release_http_listen_port }}"
-
 # Config dir base
 elixir_release_conf_dir_base: "/etc"
 

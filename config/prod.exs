@@ -15,7 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 
 config :oceanconnect, OceanconnectWeb.Endpoint,
-  http: [port: 8080],
+  http: [port: 4001],
   secret_key_base: "JJ3w15AxkbMN+HNA4SrVfaJvyJCySRqlJ8XRJ703WCU5QraHTNFI/x27XX26QPNW",
   load_from_system_env: true,
   url: [host: System.get_env("APP_HOST"), port: 443, scheme: "https"],

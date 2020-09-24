@@ -2,14 +2,6 @@
 # Build system setup
 # ansible-playbook -u $USER -v -l build-server playbooks/setup-build.yml -D
 
-# - name: Bootstrap Python 2
-#   hosts: debian-servers
-#   gather_facts: false
-#   become: true
-#   pre_tasks:
-#     - name: Install python 2
-#       raw: test -e /usr/bin/python2 || (apt -y update && apt install -y python)
-
 - name: Manage users
   hosts: '*'
   become: true
@@ -33,7 +25,6 @@
   roles:
     - common-minimal
     - tools-other
-    - iptables
 
 - name: Install asdf
   hosts: '*'

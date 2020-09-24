@@ -181,6 +181,12 @@ We currently have two primary groups set up: `staging`, and `production`. Additi
 The only required groups are `[py3-hosts]` and `[py3-hosts:vars]`. Most modern OSs have Python 3 installed by default, but Ansible defaults to Python 2. These groups tell Ansible to use Python 3 on those servers. Other groupings are up to you.
 
 ### Provisioning new servers
+Install Ansible dependencies:
+
+```
+./ansible/ansible-galaxy install -r install_roles.yml
+```
+
 Ansible should make this fairly easy. If you've added the host names to `./ansible/inventory/hosts`, setup should be as simple as:
 
 ```bash
@@ -190,6 +196,7 @@ ansible-playbook -u root -v -l <server-group> playbooks/config-web.yml -D
 ansible-playbook -u root -v -l <server-group> playbooks/setup-build.yml -D
 ansible-playbook -u root -v -l <server-group> playbooks/setup-db.yml -D
 ansible-playbook -u root -v -l <server-group> playbooks/config-build.yml -D
+ansible-playbook -u root -v -l letsencrypt playbooks/letsencrypt.yml -D
 ```
 
 Here, `<server-group>` is a host group defined in `./ansible/inventory/hosts`. You can also specify individual servers for more control/avoiding taking down other nodes.
