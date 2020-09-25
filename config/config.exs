@@ -28,8 +28,8 @@ config :logger, :console,
 
 # Configure default email addresses and delay offsets
 config :oceanconnect, :emails, %{
-  system: "bunkers@oceanconnectmarine.com",
-  admin: "nbolton@oceanconnectmarine.com",
+  system: "auctions@KPIocean.com",
+  admin: "nbol@KPIocean.com",
   auction_starting_soon_offset: 15 * 60 * 1_000,
   delivered_coq_reminder_offset: 24 * 60 * 60 * 1_000
 }

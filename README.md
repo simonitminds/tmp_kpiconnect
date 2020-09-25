@@ -197,6 +197,7 @@ ansible-playbook -u root -v -l <server-group> playbooks/setup-build.yml -D
 ansible-playbook -u root -v -l <server-group> playbooks/setup-db.yml -D
 ansible-playbook -u root -v -l <server-group> playbooks/config-build.yml -D
 ansible-playbook -u root -v -l letsencrypt playbooks/letsencrypt.yml -D
+ansible-playbook -u root -v -l <server-group> playbooks/manage-users.yml -D
 ```
 
 Here, `<server-group>` is a host group defined in `./ansible/inventory/hosts`. You can also specify individual servers for more control/avoiding taking down other nodes.
@@ -227,7 +228,7 @@ In order for `*_url` helpers to work properly, Phoenix needs to be configured wi
 Instead, you'll need to log in to the new server as the `deploy` user and edit the `config/prod.secret.exs` file manually to set the `url.host` value to whatever domain name the deployment lives on:
 
 ```bash
-ssh -A deploy@auctionstaging.oceanconnectmarine.com
+ssh -A deploy@auctionstaging.kpioceanconnect.com
 cd ~/build/oceanconnect
 cat config/prod.exs
 # Copy the `OceanconnectWeb.Endpoint` configuration block
