@@ -37,3 +37,5 @@ localhost ansible_sudo=false
 [letsencrypt]
 auctionstaging.oceanconnectmarine.com letsencrypt_email=bill@gaslight.co
 auctionstaging.kpioceanconnect.com letsencrypt_email=bill@gaslight.co
+auction.oceanconnectmarine.com letsencrypt_email=bill@gaslight.co
+auction.kpioceanconnect.com letsencrypt_email=bill@gaslight.co
