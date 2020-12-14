@@ -23,7 +23,7 @@ ocm_params = %{
   is_supplier: true,
   country: "Britain",
   contact_name: "Neal Bolton",
-  email: "nbolton@oceanconnectmarine.com",
+  email: "nbol@KPIocean.com",
   main_phone: "",
   mobile_phone: "",
   postal_code: ""
@@ -32,7 +32,7 @@ ocm_params = %{
 ocm = Repo.get_or_insert!(Company, ocm_params)
 
 user_params = %{
-  email: "NBOLTON@OCEANCONNECTMARINE.COM",
+  email: "NBOL@KPIOCEAN.COM",
   is_admin: true,
   first_name: "Neal",
   last_name: "Bolton",

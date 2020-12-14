@@ -159,7 +159,7 @@ companies =
       is_broker: true,
       country: "Britain",
       contact_name: "Neal Bolton",
-      email: "nbolton@oceanconnectmarine.com",
+      email: "nbol@KPIocean.com",
       main_phone: "",
       mobile_phone: "",
       postal_code: ""
