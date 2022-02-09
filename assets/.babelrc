@@ -1,3 +1,16 @@
 {
-  "presets" : ["@babel/preset-env",   "@babel/preset-react"]
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "8.9.4",
+          "esmodules": true
+        },
+        "corejs": "^2.6.12",
+        "useBuiltIns": "entry"
+      }
+    ],
+    "@babel/preset-react"
+  ]
 }
