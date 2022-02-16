@@ -185,7 +185,7 @@ jobs:
           at: .
       - add_ssh_keys:
           fingerprints:
-            - "09:16:09:15:03:7a:9b:7b:82:3f:4b:ea:39:2b:68:87"
+            - "44:1a:3c:f3:c2:a0:e5:8e:d8:d9:84:3e:b9:d5:e2:9f"
       - run: ssh-keyscan $SERVER >> ~/.ssh/known_hosts
       - run: ssh -A deploy@$SERVER "./build/oceanconnect/scripts/build-release.sh $CIRCLE_SHA1"
       - run: ssh -A deploy@$SERVER ./build/oceanconnect/scripts/db-migrate.sh
