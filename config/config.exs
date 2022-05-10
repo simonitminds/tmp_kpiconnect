@@ -8,6 +8,7 @@ use Mix.Config
 # General application configuration
 config :oceanconnect,
   ecto_repos: [Oceanconnect.Repo]
+config :phoenix, :json_library, Poison 
 
 # guardian config
 config :oceanconnect, Oceanconnect.Guardian,
@@ -19,7 +20,7 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "VNn8or6QKekZ6Wg74hL/GvtqU7/8E1dx7ckxT7YWsZ702Y2hCgLoYd5ABtKLHqDY",
   render_errors: [view: OceanconnectWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Oceanconnect.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: [name: Oceanconnect.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -120,7 +120,7 @@ defmodule Oceanconnect.Accounts.User do
   end
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
-    change(changeset, Comeonin.Bcrypt.add_hash(password))
+    change(changeset, Bcrypt.add_hash(password))
   end
 
   defp put_pass_hash(changeset), do: changeset

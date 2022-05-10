@@ -21,7 +21,7 @@ defmodule Oceanconnect.Application do
         supervisor(Oceanconnect.Repo, []),
         # Start the endpoint when the application starts
         supervisor(OceanconnectWeb.Endpoint, []),
-        supervisor(Phoenix.PubSub.PG2, [:auction_pubsub, []]),
+        {Phoenix.PubSub, [name: Oceanconnect.PubSub, adapter: Phoenix.PubSub.PG2]},
         {Registry, keys: :unique, name: :auction_supervisor_registry},
         {Registry, keys: :unique, name: :auctions_registry},
         {Registry, keys: :unique, name: :auction_cache_registry},

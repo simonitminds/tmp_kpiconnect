@@ -50,17 +50,17 @@ defmodule Oceanconnect.Mixfile do
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
       {:bamboo, "~> 1.1"},
-      {:bcrypt_elixir, "~> 1.1"},
-      {:comeonin, "~> 4.0"},
-      {:cowboy, "~> 1.0"},
-      {:plug_cowboy, "~> 1.0"},
+      {:bcrypt_elixir, "~> 3.0"},
+      {:comeonin, "~> 5.3.3"},
+      {:cowboy, "~> 2.7"},
+      {:plug_cowboy, "~> 2.2"},
       {:distillery, "~> 1.5", runtime: false},
-      {:phoenix, "~> 1.3.0"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.6.0"},
+      {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
-      {:postgrex, "~> 0.14"},
-      {:phoenix_html, "~> 2.10"},
+      {:postgrex, ">= 0.0.0"},
+      {:phoenix_html, "~> 3.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ex_machina, "~> 2.2"},
       {:hackney, "~> 1.14"},
@@ -87,3 +87,4 @@ defmodule Oceanconnect.Mixfile do
     ]
   end
 end
+

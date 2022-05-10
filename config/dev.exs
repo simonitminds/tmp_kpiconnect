@@ -52,7 +52,7 @@ config :phoenix, :stacktrace_depth, 20
 config :oceanconnect, Oceanconnect.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: System.get_env("DATA_DB_USER") || "postgres",
-  password: System.get_env("DATA_DB_PASS") || "postgres",
+  password: System.get_env("DATA_DB_PASS") || "changeme",
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
   database: "oceanconnect_dev",
   pool_size: 10
