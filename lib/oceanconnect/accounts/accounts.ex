@@ -216,7 +216,7 @@ defmodule Oceanconnect.Accounts do
     # TODO: don't pass comeonin error message to end user
     case Repo.get_by(User, email: String.upcase(email)) do
       nil -> {:error, "Invalid email/password"}
-      user -> Comeonin.Bcrypt.check_pass(user, password)
+      user -> Bcrypt.check_pass(user, password)
     end
   end
 

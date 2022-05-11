@@ -24,7 +24,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
   test "start auction based on scheduler", %{
     auction: auction = %Auction{id: auction_id, scheduled_start: start}
   } do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
     assert Auctions.get_auction_state!(auction).status == :pending
 
     receive do
@@ -45,7 +45,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
   end
 
   test "update start time", %{auction: auction = %Auction{id: auction_id}} do
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
     now = DateTime.utc_now()
     Auctions.update_auction(auction, %{scheduled_start: now}, nil)
 
@@ -72,7 +72,7 @@ defmodule Oceanconnect.Auctions.AuctionSchedulerTest do
 
     AuctionSupervisor.start_link({draft_auction, %{exclude_children: []}})
 
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
     now = DateTime.utc_now()
 
     assert %{status: :draft} = Auctions.get_auction_state!(draft_auction)

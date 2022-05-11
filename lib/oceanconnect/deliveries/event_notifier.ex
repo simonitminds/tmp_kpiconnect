@@ -7,6 +7,6 @@ defmodule Oceanconnect.Deliveries.EventNotifier do
   end
 
   defp broadcast(event, claim) do
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {event, claim})
+    :ok = Phoenix.PubSub.broadcast(Oceanconnect.PubSub, "auctions", {event, claim})
   end
 end

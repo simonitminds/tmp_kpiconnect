@@ -49,14 +49,13 @@ defmodule Oceanconnect.Mixfile do
       {:ex_aws_s3, "~> 2.0"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
-      {:bamboo, "~> 1.1"},
+      {:bamboo, "~> 2.2.0"},
+      {:bamboo_phoenix, "~> 1.0"},
       {:bcrypt_elixir, "~> 3.0"},
       {:comeonin, "~> 5.3.3"},
       {:cowboy, "~> 2.7"},
       {:plug_cowboy, "~> 2.2"},
-      {:distillery, "~> 1.5", runtime: false},
       {:phoenix, "~> 1.6.0"},
-      {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
@@ -65,11 +64,12 @@ defmodule Oceanconnect.Mixfile do
       {:ex_machina, "~> 2.2"},
       {:hackney, "~> 1.14"},
       {:hound, "~> 1.1", only: :test},
-      {:guardian, "~> 1.2.1"},
+      {:guardian, "~> 2.2.3"},
+      {:guardian_phoenix, "~> 2.0"},
       {:gettext, "~> 0.16"},
       {:scrivener_ecto, "~> 2.0"},
       {:uuid, "~> 1.1"},
-      {:pot, "~> 0.9.6"}
+      {:pot, "~> 1.0.2"}
     ]
   end
 
@@ -87,4 +87,3 @@ defmodule Oceanconnect.Mixfile do
     ]
   end
 end
-

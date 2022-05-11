@@ -65,7 +65,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandlerTest do
     vessel_fuel: vessel_fuel
   } do
     vessel_fuel_id = vessel_fuel.id
-    assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
     Auctions.start_auction(auction)
 

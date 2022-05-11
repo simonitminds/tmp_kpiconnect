@@ -11,7 +11,7 @@ defmodule Oceanconnect.Factory do
   }
 
   def set_password(user) do
-    hashed_password = Comeonin.Bcrypt.hashpwsalt(user.password)
+    hashed_password = Bcrypt.hash_pwd_salt(user.password)
     %{user | password_hash: hashed_password}
   end
 

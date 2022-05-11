@@ -32,23 +32,19 @@ defmodule Oceanconnect.Auctions.AuctionNotifier do
   end
 
   def remove_observer(%struct{id: auction_id}, observer_id) when is_auction(struct) do
-    Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
-      OceanconnectWeb.Endpoint.broadcast!(
-        "user_auctions:#{observer_id}",
-        "remove_auction",
-        %{id: auction_id}
-      )
-    end)
+    OceanconnectWeb.Endpoint.broadcast!(
+      "user_auctions:#{observer_id}",
+      "remove_auction",
+      %{id: auction_id}
+    )
   end
 
   def send_notification_to_participant(channel, payload, participant_id) do
-    Task.Supervisor.async_nolink(Oceanconnect.Notifications.TaskSupervisor, fn ->
-      OceanconnectWeb.Endpoint.broadcast!(
-        "#{channel}:#{participant_id}",
-        "auctions_update",
-        payload
-      )
-    end)
+    OceanconnectWeb.Endpoint.broadcast!(
+      "#{channel}:#{participant_id}",
+      "auctions_update",
+      payload
+    )
   end
 
   defp admins_and_observers(auction) do

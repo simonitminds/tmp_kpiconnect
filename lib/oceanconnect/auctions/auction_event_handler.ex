@@ -28,7 +28,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   # Server
 
   def init(auction_id) do
-    Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+    Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
     {:ok, auction_id}
   end
 

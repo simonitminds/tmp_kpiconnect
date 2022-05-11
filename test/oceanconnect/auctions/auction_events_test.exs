@@ -54,7 +54,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     end
 
     test "subscribing to and receiving auction events", %{auction: %{id: auction_id}} do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       Oceanconnect.Auctions.EventNotifier.emit(%{}, %AuctionEvent{
         type: :auction_started,
@@ -91,7 +91,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     test "update_auction/2 adds an auction_updated event to the event store", %{
       auction: auction = %Auction{id: auction_id}
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.update_auction(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
       assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
@@ -99,7 +99,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
 
     test "update_auction!/3 adds an auction_updated event to the event store and cache is updated",
          %{auction: auction = %Auction{id: auction_id}} do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       updated_auction = Auctions.update_auction!(auction, %{anonymous_bidding: true}, nil)
       :timer.sleep(200)
       assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
@@ -118,7 +118,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
         |> Kernel.+(1_000_000)
         |> DateTime.from_unix!()
 
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.update_auction(auction, %{scheduled_start: new_start_time}, nil)
       :timer.sleep(200)
       assert_received {%AuctionEvent{type: :auction_updated, auction_id: ^auction_id}, _state}
@@ -128,7 +128,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     test "starting an auction adds an auction_started event to the event store", %{
       auction: auction = %Auction{id: auction_id}
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
       :timer.sleep(400)
       assert_received {%AuctionEvent{type: :auction_started, auction_id: ^auction_id}, _state}
@@ -142,7 +142,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction = %Auction{id: auction_id},
       vessel_fuel_id: vessel_fuel_id
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
       create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction)
@@ -162,7 +162,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction = %Auction{id: auction_id},
       vessel_fuel_id: vessel_fuel_id
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
       create_bid(1.25, nil, hd(auction.suppliers).id, vessel_fuel_id, auction, true)
@@ -188,7 +188,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     } do
       supplier_id = hd(auction.suppliers).id
 
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
 
       create_bid(1.25, nil, supplier_id, vessel_fuel_id, auction)
@@ -211,7 +211,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     test "ending an auction adds an auction_ended event to the event store", %{
       auction: auction = %Auction{id: auction_id}
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       Auctions.start_auction(auction)
       Auctions.end_auction(auction)
       :timer.sleep(200)
@@ -228,7 +228,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction = %Auction{id: auction_id},
       vessel_fuel_id: vessel_fuel_id
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
 
@@ -269,7 +269,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction = %Auction{id: auction_id},
       vessel_fuel_id: vessel_fuel_id
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       Auctions.start_auction(auction)
 
@@ -293,7 +293,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     end
 
     test "submitting a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -310,7 +310,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       auction: auction = %Auction{id: auction_id},
       supplier: supplier
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -326,7 +326,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     end
 
     test "approving a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -342,7 +342,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
     end
 
     test "rejecting a barge", %{auction: auction = %Auction{id: auction_id}, supplier: supplier} do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
       barge = insert(:barge, companies: [supplier])
 
       Auctions.submit_barge(auction, barge, supplier.id)
@@ -382,7 +382,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       term_auction: auction = %TermAuction{id: auction_id},
       supplier: supplier
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
       :timer.sleep(200)
@@ -398,7 +398,7 @@ defmodule Oceanconnect.Auctions.AuctionEventsTest do
       term_auction: auction = %TermAuction{id: auction_id},
       supplier: supplier
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       {:ok, comment} = Auctions.submit_comment(auction, %{"comment" => "Hi"}, supplier.id)
       :timer.sleep(200)

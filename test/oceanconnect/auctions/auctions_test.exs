@@ -672,7 +672,7 @@ defmodule Oceanconnect.AuctionsTest do
     test "ending an auction saves the auction_ended timestamp on the auction", %{
       auction: auction = %Auction{id: auction_id}
     } do
-      assert :ok = Phoenix.PubSub.subscribe(:auction_pubsub, "auction:#{auction_id}")
+      assert :ok = Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auction:#{auction_id}")
 
       auction
       |> Auctions.start_auction()

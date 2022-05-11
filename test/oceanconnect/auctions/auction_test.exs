@@ -1,5 +1,5 @@
 defmodule Oceanconnect.AuctionTest do
-  use Oceanconnect.DataCase
+  use Oceanconnect.DataCase, async: true
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.Auction
 

@@ -128,10 +128,11 @@ defmodule Oceanconnect.AccountsTest do
       assert user.id == Accounts.get_user!(user.id).id
     end
 
-    test "reset_password/2 with valid data updates the user's password", %{user: user} do
-      assert {:ok, %User{} = user} = Accounts.reset_password(user, %{"password" => "password"})
+    test "reset_password/2 with valid data updates the user's password", %{user: initial_user} do
+      assert {:ok, user = ^initial_user} =
+               Accounts.reset_password(initial_user, %{"password" => "password"})
 
-      assert {:ok, user} =
+      assert {:ok, _user} =
                Accounts.verify_login(%{"email" => user.email, "password" => "password"})
     end
 

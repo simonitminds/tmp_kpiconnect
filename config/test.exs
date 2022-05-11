@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
@@ -12,11 +12,10 @@ config :logger, level: :warn
 
 # Configure your database
 config :oceanconnect, Oceanconnect.Repo,
-  adapter: Ecto.Adapters.Postgres,
   username: System.get_env("DATA_DB_USER") || "postgres",
-  password: System.get_env("DATA_DB_PASS") || "postgres",
+  password: System.get_env("DATA_DB_PASS") || "changeme",
   hostname: System.get_env("DATA_DB_HOST") || "localhost",
-  database: "oceanconnect_test",
+  database: "oceanconnect_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   ownership_timeout: 25_000
 

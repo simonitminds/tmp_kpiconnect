@@ -18,10 +18,11 @@ defmodule Oceanconnect.Application do
     children =
       [
         # Start the Ecto repository
-        supervisor(Oceanconnect.Repo, []),
+        Oceanconnect.Repo,
+
         # Start the endpoint when the application starts
-        supervisor(OceanconnectWeb.Endpoint, []),
-        {Phoenix.PubSub, [name: Oceanconnect.PubSub, adapter: Phoenix.PubSub.PG2]},
+        OceanconnectWeb.Endpoint,
+        {Phoenix.PubSub, name: Oceanconnect.PubSub},
         {Registry, keys: :unique, name: :auction_supervisor_registry},
         {Registry, keys: :unique, name: :auctions_registry},
         {Registry, keys: :unique, name: :auction_cache_registry},

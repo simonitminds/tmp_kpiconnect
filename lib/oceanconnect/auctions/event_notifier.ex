@@ -21,8 +21,8 @@ defmodule Oceanconnect.Auctions.EventNotifier do
   end
 
   def broadcast(event = %AuctionEvent{auction_id: auction_id}, state) do
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auction:#{auction_id}", {event, state})
-    :ok = Phoenix.PubSub.broadcast(:auction_pubsub, "auctions", {event, state})
+    :ok = Phoenix.PubSub.broadcast(Oceanconnect.PubSub, "auction:#{auction_id}", {event, state})
+    :ok = Phoenix.PubSub.broadcast(Oceanconnect.PubSub, "auctions", {event, state})
   end
 
   def react_to(%AuctionEvent{type: :auction_updated, data: auction}, _state) do

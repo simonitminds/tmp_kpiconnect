@@ -161,7 +161,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     |> DelayedNotifications.process_command()
   end
 
-  defp process(event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, _state) do
+  defp process(_event = %AuctionEvent{type: :auction_started, auction_id: auction_id}, _state) do
     notification_name = "auction:#{auction_id}:upcoming_reminder"
 
     Command.cancel_notification(notification_name, [])
@@ -169,12 +169,12 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   defp process(
-         event = %AuctionEvent{
+         _event = %AuctionEvent{
            type: :winning_solution_selected,
            auction_id: auction_id,
            data: %{solution: solution}
          },
-         state
+         _state
        ) do
     notification_name = "auction:#{auction_id}:coq_reminder"
 
@@ -208,7 +208,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
   end
 
   defp subscribe_to_notifications() do
-    Phoenix.PubSub.subscribe(:auction_pubsub, "auctions")
+    Phoenix.PubSub.subscribe(Oceanconnect.PubSub, "auctions")
   end
 
   # TODO IMPLEMENT THIS WITH NEW SENT EVENTS FOR EMAILS
