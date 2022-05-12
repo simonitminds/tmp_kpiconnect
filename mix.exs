@@ -5,7 +5,7 @@ defmodule Oceanconnect.Mixfile do
     [
       app: :oceanconnect,
       version: "0.0.1",
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -83,6 +83,7 @@ defmodule Oceanconnect.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "assets.deploy": ["phx.digest"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end

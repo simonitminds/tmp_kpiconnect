@@ -1,0 +1,52 @@
+version: "3.5"
+
+services:
+  postgres:
+    container_name: prod_kpi_local
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  app:
+    container_name: oc_app
+    image: oceanconnect/kpiconnect:v3
+    environment:
+      DATABASE_URL: "ecto://postgres:changeme@localhost:5432/oceanconnect_dev"
+      SECRET_KEY_BASE: "2rYcDKl9w89+iuAN5xDMu951aMCYYOb5OHYieBa6HL4IkwcdIqdlfg7h+kQIaEX3"
+      PORT: "9000"
+    ports:
+      - "6000:9000"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_prod
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5052}:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

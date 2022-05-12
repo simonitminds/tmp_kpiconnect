@@ -3,6 +3,7 @@
   "license": "MIT",
   "scripts": {
     "build": "parcel build --no-minify css/app.scss js/app.js --out-dir ../priv/static/ && parcel build static/images/*.* --out-dir ../priv/static/images/",
+    "build:prod": "parcel build css/app.scss js/app.js --out-dir ../priv/static/ && parcel build static/images/*.* --out-dir ../priv/static/images/",
     "watch": "parcel watch --no-hmr css/app.scss js/app.js --out-dir ../priv/static/ && parcel build static/images/*.* --out-dir ../priv/static/images/",
     "test": "jest"
   },
@@ -16,7 +17,6 @@
     "dot-prop-immutable": "^2.1.1",
     "downshift": "^6.1.7",
     "es6-promise": "^4.2.8",
-    "isomorphic-fetch": "^3.0.0",
     "json2csv": "^5.0.7",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",

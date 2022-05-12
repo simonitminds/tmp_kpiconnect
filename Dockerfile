@@ -15,6 +15,7 @@
 ARG ELIXIR_VERSION=1.12.3
 ARG OTP_VERSION=24.0.1
 ARG DEBIAN_VERSION=bullseye-20210902-slim
+ARG NPM_VERSION=16.15.0
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
@@ -22,7 +23,10 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y build-essential git curl\
+    && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install nodejs \
+    && npm i -g yarn\
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # prepare build dir
@@ -53,6 +57,9 @@ COPY priv priv
 # your Elixir templates, you will need to move the asset compilation
 # step down so that `lib` is available.
 COPY assets assets
+WORKDIR /app/assets
+RUN yarn  && yarn build:prod 
+WORKDIR /app
 
 # compile assets
 RUN mix assets.deploy
@@ -67,7 +74,6 @@ COPY config/runtime.exs config/
 
 COPY rel rel
 RUN mix release
-
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
@@ -89,7 +95,7 @@ RUN chown nobody /app
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/my_app ./
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/oceanconnect ./
 
 USER nobody
 

@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { Socket } from "phoenix"
 import thunk from 'redux-thunk';
-import fetch from 'isomorphic-fetch';
 import { polyfill } from 'es6-promise';
 import {
   AUCTION_CHANNEL_CONNECTED,
