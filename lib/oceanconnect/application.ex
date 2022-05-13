@@ -4,11 +4,10 @@ defmodule Oceanconnect.Application do
   alias Oceanconnect.Auctions.{
     AuctionsSupervisor,
     AuctionStoreStarter,
-    FinalizedStateCacheSupervisor
+    FinalizedStateCache
   }
 
   alias Oceanconnect.Notifications.NotificationsSupervisor
-  import Supervisor.Spec
 
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
@@ -22,6 +21,7 @@ defmodule Oceanconnect.Application do
 
         # Start the endpoint when the application starts
         OceanconnectWeb.Endpoint,
+        FinalizedStateCache,
         {Phoenix.PubSub, name: Oceanconnect.PubSub},
         {Registry, keys: :unique, name: :auction_supervisor_registry},
         {Registry, keys: :unique, name: :auctions_registry},
@@ -31,8 +31,7 @@ defmodule Oceanconnect.Application do
         {Registry, keys: :unique, name: :auction_timers_registry},
         {Registry, keys: :unique, name: :delayed_notifications_registry},
         {Task.Supervisor, name: Oceanconnect.Notifications.TaskSupervisor},
-        worker(AuctionsSupervisor, [], restart: :permanent),
-        worker(FinalizedStateCacheSupervisor, [], restart: :permanent)
+        {AuctionsSupervisor, restart: :permanent}
         # Start your own worker by calling: Oceanconnect.Worker.start_link(arg1, arg2, arg3)
       ]
       |> maybe_start_store()
@@ -51,13 +50,13 @@ defmodule Oceanconnect.Application do
   end
 
   defp maybe_start_store(children) do
-    if(Application.get_env(:oceanconnect, :exclude_optional_services)) do
+    if Application.get_env(:oceanconnect, :exclude_optional_services) do
       children
     else
       children ++
         [
-          worker(AuctionStoreStarter, []),
-          worker(NotificationsSupervisor, [], restart: :permanent)
+          AuctionStoreStarter,
+          {NotificationsSupervisor, restart: :permanent}
         ]
     end
   end

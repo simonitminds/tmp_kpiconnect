@@ -151,7 +151,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        {%AuctionEvent{type: _type, data: auction_state = %state_struct{}}, aggregate_state},
+        {%AuctionEvent{type: _type, data: _auction_state = %state_struct{}}, aggregate_state},
         state
       )
       when is_auction_state(state_struct) do
@@ -160,7 +160,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
   end
 
   def handle_info(
-        {%AuctionEvent{type: _type, data: %{state: auction_state = %state_struct{}}},
+        {%AuctionEvent{type: _type, data: %{state: _auction_state = %state_struct{}}},
          aggregate_state},
         state
       )
@@ -173,7 +173,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         {
           %AuctionEvent{
             type: :comment_submitted,
-            data: %{state: auction_state = %state_struct{}}
+            data: %{state: _auction_state = %state_struct{}}
           },
           aggregate_state
         },
@@ -188,7 +188,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         {
           %AuctionEvent{
             type: :comment_unsubmitted,
-            data: %{state: auction_state = %state_struct{}}
+            data: %{state: _auction_state = %state_struct{}}
           },
           aggregate_state
         },
@@ -203,7 +203,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         {
           %AuctionEvent{
             type: :barge_submitted,
-            data: %{state: auction_state = %state_struct{}}
+            data: %{state: _auction_state = %state_struct{}}
           },
           aggregate_state
         },
@@ -218,7 +218,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
         {
           %AuctionEvent{
             type: :barge_unsubmitted,
-            data: %{state: auction_state = %state_struct{}}
+            data: %{state: _auction_state = %state_struct{}}
           },
           aggregate_state
         },
@@ -231,7 +231,7 @@ defmodule Oceanconnect.Auctions.AuctionEventHandler do
 
   def handle_info(
         {
-          %AuctionEvent{type: :barge_approved, data: %{state: auction_state = %state_struct{}}},
+          %AuctionEvent{type: :barge_approved, data: %{state: _auction_state = %state_struct{}}},
           aggregate_state
         },
         state

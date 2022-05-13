@@ -69,7 +69,8 @@ defmodule Oceanconnect.Mixfile do
       {:gettext, "~> 0.16"},
       {:scrivener_ecto, "~> 2.0"},
       {:uuid, "~> 1.1"},
-      {:pot, "~> 1.0.2"}
+      {:pot, "~> 1.0.2"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 

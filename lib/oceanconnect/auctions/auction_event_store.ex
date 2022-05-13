@@ -1,7 +1,7 @@
 defmodule Oceanconnect.Auctions.AuctionEventStore do
   alias Oceanconnect.Auctions.{AuctionEvent, AuctionEventStorage}
 
-  @event_storage Application.get_env(:oceanconnect, :event_storage) || AuctionEventStorage
+  @event_storage Application.compile_env(:oceanconnect, :event_storage) || AuctionEventStorage
 
   @fixture_events [
     :fixture_created,

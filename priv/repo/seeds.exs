@@ -637,7 +637,12 @@ fujairah = Repo.get_by(Port, name: "Fujairah")
 date_time =
   DateTime.utc_now()
   |> DateTime.to_naive()
-  |> NaiveDateTime.add(5 * 60)
+  |> NaiveDateTime.add(5 * 60 * -1)
+  |> DateTime.from_naive!("Etc/UTC")
+
+date_time_now =
+  DateTime.utc_now()
+  |> DateTime.to_naive()
   |> DateTime.from_naive!("Etc/UTC")
 
 fuel_index = %{
@@ -661,7 +666,9 @@ auctions_params = [
     duration: 1 * 5_000,
     decision_duration: 1 * 5_000,
     anonymous_bidding: true,
-    type: "spot"
+    type: "spot",
+    finalized: true,
+    auction_closed_time: date_time_now
   },
   %Auction{
     auction_vessel_fuels: [
@@ -678,7 +685,9 @@ auctions_params = [
     buyer_id: chevron.id,
     duration: 4 * 60_000,
     decision_duration: 4 * 60_000,
-    type: "spot"
+    type: "spot",
+    finalized: true,
+    auction_closed_time: date_time_now
   },
   %Auction{
     auction_vessel_fuels: [
@@ -695,6 +704,7 @@ auctions_params = [
         eta: date_time
       }
     ],
+    auction_ended: date_time_now,
     port_id: port1.id,
     scheduled_start: date_time,
     po: "3456789",
@@ -702,7 +712,9 @@ auctions_params = [
     duration: 10 * 60_000,
     decision_duration: 15 * 60_000,
     is_traded_bid_allowed: true,
-    type: "spot"
+    type: "spot",
+    finalized: true,
+    auction_closed_time: date_time_now
   },
   %TermAuction{
     type: "forward_fixed",
@@ -764,6 +776,7 @@ end
 
 1..500 |> Enum.each(fn d ->
  [auction1, auction2, auction3, term_auction1] = create_auctions.()
+  SupplierHelper.set_suppliers_for_auction(auction1, suppliers)
   SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
   SupplierHelper.set_suppliers_for_auction(auction3, suppliers)
   SupplierHelper.set_suppliers_for_auction(term_auction1, suppliers)

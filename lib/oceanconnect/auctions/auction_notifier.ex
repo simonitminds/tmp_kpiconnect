@@ -1,11 +1,9 @@
 defmodule Oceanconnect.Auctions.AuctionNotifier do
   import Oceanconnect.Auctions.Guards
 
-  alias Oceanconnect.Auctions
   alias Oceanconnect.Accounts
-  alias Oceanconnect.Auctions.{AuctionPayload}
-
-  @task_supervisor Application.get_env(:oceanconnect, :task_supervisor) || Task.Supervisor
+  alias Oceanconnect.Auctions
+  alias Oceanconnect.Auctions.AuctionPayload
 
   def notify_participants(state = %state_struct{auction_id: auction_id})
       when is_auction_state(state_struct) do

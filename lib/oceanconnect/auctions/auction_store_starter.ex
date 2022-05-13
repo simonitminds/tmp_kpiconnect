@@ -3,7 +3,7 @@ defmodule Oceanconnect.Auctions.AuctionStoreStarter do
   alias Oceanconnect.Auctions
   alias Oceanconnect.Auctions.AuctionsSupervisor
 
-  def start_link do
+  def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
