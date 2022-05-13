@@ -338,15 +338,27 @@ defmodule Oceanconnect.Auctions do
   def list_auctions(user = %User{}), do: list_auctions(user, false)
 
   def list_auctions(finalized?) do
+    query =
+      from(p in Auction, where: p.type == "spot", where: p.finalized == ^finalized?, limit: 5)
+
+    # Auction
+    # |> where([a], a.type == "spot" and a.finalized == ^finalized?)
     regular_auctions =
-      Auction
-      |> where([a], a.type == "spot" and a.finalized == ^finalized?)
+      query
       |> Repo.all()
       |> fully_loaded()
 
+    query =
+      from(p in TermAuction,
+        where: p.type in @term_types,
+        where: p.finalized == ^finalized?,
+        limit: 5
+      )
+
+    # TermAuction
+    # |> where([a], a.type in @term_types and a.finalized == ^finalized?)
     term_auctions =
-      TermAuction
-      |> where([a], a.type in @term_types and a.finalized == ^finalized?)
+      query
       |> Repo.all()
       |> fully_loaded()
 

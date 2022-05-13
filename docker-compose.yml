@@ -20,7 +20,7 @@ services:
     container_name: oc_app
     image: oceanconnect/kpiconnect:v3
     environment:
-      DATABASE_URL: "ecto://postgres:changeme@localhost:5432/oceanconnect_dev"
+      DATABASE_URL: "postgres:changeme@localhost/oceanconnect_dev"
       SECRET_KEY_BASE: "2rYcDKl9w89+iuAN5xDMu951aMCYYOb5OHYieBa6HL4IkwcdIqdlfg7h+kQIaEX3"
       PORT: "9000"
     ports:

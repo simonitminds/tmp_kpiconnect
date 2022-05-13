@@ -739,17 +739,14 @@ Repo.delete_all(AuctionVesselFuel)
 Repo.delete_all(Auction)
 Repo.delete_all(TermAuction)
 
-[auction1, auction2, auction3, term_auction1] =
+create_auctions = fn () ->
   Enum.map(auctions_params, fn %struct{} = auction_params ->
-    auction_params
+    auction = auction_params
     |> struct.changeset(%{})
     |> Repo.insert!()
-  end)
 
-[auction1, auction2, auction3, term_auction1]
-|> Enum.map(fn auction ->
-  state =
-    case auction do
+    state =
+      case auction do
       %Auction{} -> %AuctionState{auction_id: auction.id}
       %TermAuction{} -> %TermAuctionState{auction_id: auction.id}
     end
@@ -761,9 +758,13 @@ Repo.delete_all(TermAuction)
 
   {:ok, events} = Aggregate.process(state, command)
   Enum.map(events, &AuctionEventStore.persist/1)
-end)
+    auction
+  end)
+end
 
-SupplierHelper.set_suppliers_for_auction(auction1, suppliers)
-SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
-SupplierHelper.set_suppliers_for_auction(auction3, suppliers)
-SupplierHelper.set_suppliers_for_auction(term_auction1, suppliers)
+1..500 |> Enum.each(fn d ->
+ [auction1, auction2, auction3, term_auction1] = create_auctions.()
+  SupplierHelper.set_suppliers_for_auction(auction2, [petrochina])
+  SupplierHelper.set_suppliers_for_auction(auction3, suppliers)
+  SupplierHelper.set_suppliers_for_auction(term_auction1, suppliers)
+end)

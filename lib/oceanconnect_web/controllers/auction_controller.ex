@@ -80,7 +80,7 @@ defmodule OceanconnectWeb.AuctionController do
   def cancel(conn, %{"id" => id}) do
     with user = %User{company_id: company_id, is_admin: admin?} <- Auth.current_user(conn),
          auction = %struct{buyer_id: buyer_id} when is_auction(struct) <-
-           id |> Auctions.get_auction!() |> Auctions.fully_loaded(),
+           id |> Auctions.get_auction!(),
          true <- buyer_id == company_id or admin? do
       Auctions.cancel_auction(auction, user)
       redirect(conn, to: auction_path(conn, :index))

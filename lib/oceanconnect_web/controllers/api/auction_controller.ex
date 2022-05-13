@@ -15,9 +15,10 @@ defmodule OceanconnectWeb.Api.AuctionController do
       |> Auctions.list_auctions(false)
       |> Enum.map(fn auction ->
         auction
-        |> Auctions.fully_loaded()
         |> AuctionPayload.get_auction_payload!(company_id)
       end)
+
+    IO.inspect(auction_payloads |> Enum.count())
 
     render(conn, "index.json", data: auction_payloads)
   end
