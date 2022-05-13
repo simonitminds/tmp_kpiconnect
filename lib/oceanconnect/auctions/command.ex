@@ -1,4 +1,7 @@
 defmodule Oceanconnect.Auctions.Command do
+  @moduledoc """
+  Utility helpers for creating commands to be processed by the system.
+  """
   import Oceanconnect.Auctions.Guards
 
   alias Oceanconnect.Auctions.{AuctionBarge, AuctionBid, AuctionComment, Solution}

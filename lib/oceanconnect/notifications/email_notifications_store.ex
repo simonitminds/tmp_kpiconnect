@@ -12,7 +12,7 @@ defmodule Oceanconnect.Notifications.EmailNotificationStore do
     DelayedNotificationsSupervisor
   }
 
-  @email_config Application.get_env(:oceanconnect, :emails, %{
+  @email_config Application.compile_env(:oceanconnect, :emails, %{
                   auction_starting_soon_offset: 15 * 60 * 1_000,
                   delivered_coq_reminder_offset: 24 * 60 * 60 * 1_000
                 })
