@@ -882,8 +882,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
-    :rand.seed()
-
     Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
       AuctionSuppliers
       |> Repo.get_by!(%{auction_id: auction_id, supplier_id: supplier.id})
@@ -897,8 +895,6 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_supplier_aliases(auction = %TermAuction{suppliers: suppliers}) do
-    :random.seed()
-
     Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
       AuctionSuppliers
       |> Repo.get_by(%{term_auction_id: auction.id, supplier_id: supplier.id})
