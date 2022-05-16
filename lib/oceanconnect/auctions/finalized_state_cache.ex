@@ -80,8 +80,7 @@ defmodule Oceanconnect.Auctions.FinalizedStateCache do
     do: :ets.insert(:finalized_state_cache, {auction_id, state})
 
   defp add_finalized_auctions do
-    true
-    |> Auctions.list_auctions()
+    Auctions.list_auctions(true)
     |> Enum.each(fn auction = %{id: auction_id} ->
       state = AuctionEventStorage.most_recent_state(auction)
       add_entry_to_cache(auction_id, state)

@@ -1,4 +1,21 @@
 defmodule Oceanconnect.Auctions do
+  @moduledoc """
+  This module pertains all IO to the database regarding data on an auction.
+
+
+  All changes made to a auction must go through a command
+  Just like the `place_bid/2` function
+
+
+  ...
+  - Barges
+  - Auctions
+  - Fuels
+  - FuelIndex
+  - Ports
+  - Solutions
+  - Vessels
+  """
   import Ecto.Query, warn: false
   alias Oceanconnect.Repo
 
@@ -128,6 +145,9 @@ defmodule Oceanconnect.Auctions do
     end
   end
 
+  @doc """
+  Places a bid on a specific auction
+  """
   def place_bid(bid, user \\ nil) do
     bid
     |> Command.process_new_bid(user)
@@ -327,6 +347,7 @@ defmodule Oceanconnect.Auctions do
 
     auction
     |> auction_participant_ids()
+    # FIXME n+1
     |> Enum.map(&%{id: &1, name: AuctionSuppliers.get_name_or_alias(&1, auction)})
   end
 
@@ -338,11 +359,9 @@ defmodule Oceanconnect.Auctions do
   def list_auctions(user = %User{}), do: list_auctions(user, false)
 
   def list_auctions(finalized?) do
-    query =
-      from(p in Auction, where: p.type == "spot", where: p.finalized == ^finalized?, limit: 5)
+    query = from(p in Auction, where: p.type == "spot", where: p.finalized == ^finalized?)
 
     # Auction
-    # |> where([a], a.type == "spot" and a.finalized == ^finalized?)
     regular_auctions =
       query
       |> Repo.all()
@@ -351,12 +370,10 @@ defmodule Oceanconnect.Auctions do
     query =
       from(p in TermAuction,
         where: p.type in @term_types,
-        where: p.finalized == ^finalized?,
-        limit: 5
+        where: p.finalized == ^finalized?
       )
 
     # TermAuction
-    # |> where([a], a.type in @term_types and a.finalized == ^finalized?)
     term_auctions =
       query
       |> Repo.all()
@@ -865,7 +882,7 @@ defmodule Oceanconnect.Auctions do
   end
 
   def create_supplier_aliases(auction = %Auction{id: auction_id, suppliers: suppliers}) do
-    :random.seed()
+    :rand.seed()
 
     Enum.reduce(Enum.shuffle(suppliers), 1, fn supplier, acc ->
       AuctionSuppliers
@@ -964,6 +981,7 @@ defmodule Oceanconnect.Auctions do
 
   def fully_loaded(object), do: fully_loaded(object, false)
 
+  # FIXME n+1
   def fully_loaded(auctions, force?) when is_list(auctions) do
     Enum.map(auctions, fn auction -> fully_loaded(auction, force?) end)
   end
@@ -1052,14 +1070,6 @@ defmodule Oceanconnect.Auctions do
 
     auction
   end
-
-  defp maybe_convert_struct(struct = %{__meta__: _meta}) do
-    struct
-    |> Map.from_struct()
-    |> Map.drop([:__meta__, :inserted_at, :updated_at])
-  end
-
-  defp maybe_convert_struct(data), do: data
 
   @doc """
   Returns the list of ports.
@@ -1597,6 +1607,7 @@ defmodule Oceanconnect.Auctions do
     Repo.delete(barge)
   end
 
+  @doc "Updates a barge to an active state"
   def activate_barge(barge = %Barge{}) do
     barge
     |> Barge.changeset(%{is_active: true})
