@@ -1,5 +1,6 @@
 defmodule OceanconnectWeb.Router do
   use OceanconnectWeb, :router
+  import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -288,5 +289,15 @@ defmodule OceanconnectWeb.Router do
   # TODO: remove this when finished designing emails
   if Mix.env() == :dev do
     forward("/sent_emails", Bamboo.SentEmailViewerPlug)
+
+    scope "/" do
+      pipe_through(:browser)
+
+      live_dashboard("/dashboard",
+        metrics: OceanconnectWeb.Telemetry,
+        ecto_repos: [Oceanconnect.Repo],
+        ecto_psql_extras_options: [long_running_queries: [threshold: "200 milliseconds"]]
+      )
+    end
   end
 end

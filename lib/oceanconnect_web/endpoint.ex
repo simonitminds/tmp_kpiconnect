@@ -6,6 +6,7 @@ defmodule OceanconnectWeb.Endpoint do
   end
 
   socket("/socket", OceanconnectWeb.UserSocket)
+  socket("/live", Phoenix.LiveView.Socket)
 
   # Serve at "/" the static files from "priv/static" directory.
   #

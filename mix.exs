@@ -10,19 +10,7 @@ defmodule Oceanconnect.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      deploy_dir: "/opt/ocm/oceanconnect/",
-      mix_systemd: [
-        # Enable restart from flag file
-        restart_flag: true,
-        # Enable conform config file
-        conform: true,
-        # Enable chroot
-        chroot: true,
-        # Enable extra restrictions
-        paranoia: true,
-        base_path: "/opt/ocm/oceanconnect"
-      ]
+      deps: deps()
     ]
   end
 
@@ -32,7 +20,15 @@ defmodule Oceanconnect.Mixfile do
   def application do
     [
       mod: {Oceanconnect.Application, []},
-      extra_applications: [:comeonin, :scrivener_ecto, :sasl, :logger, :runtime_tools, :bamboo]
+      extra_applications: [
+        :comeonin,
+        :scrivener_ecto,
+        :sasl,
+        :logger,
+        :runtime_tools,
+        :bamboo,
+        :os_mon
+      ]
     ]
   end
 
@@ -56,8 +52,10 @@ defmodule Oceanconnect.Mixfile do
       {:cowboy, "~> 2.7"},
       {:plug_cowboy, "~> 2.2"},
       {:phoenix, "~> 1.6.0"},
+      {:phoenix_live_dashboard, "~> 0.5"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
+      {:ecto_psql_extras, "~> 0.6"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 3.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
@@ -71,7 +69,9 @@ defmodule Oceanconnect.Mixfile do
       {:uuid, "~> 1.1"},
       {:pot, "~> 1.0.2"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:telemetry_poller, "~> 0.4"},
+      {:telemetry_metrics, "~> 0.4"}
     ]
   end
 

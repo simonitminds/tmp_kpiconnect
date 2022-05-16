@@ -21,6 +21,7 @@ defmodule Oceanconnect.Application do
 
         # Start the endpoint when the application starts
         OceanconnectWeb.Endpoint,
+        OceanconnectWeb.Telemetry,
         FinalizedStateCache,
         {Phoenix.PubSub, name: Oceanconnect.PubSub},
         {Registry, keys: :unique, name: :auction_supervisor_registry},

@@ -21,7 +21,11 @@ config :oceanconnect, OceanconnectWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "VNn8or6QKekZ6Wg74hL/GvtqU7/8E1dx7ckxT7YWsZ702Y2hCgLoYd5ABtKLHqDY",
   render_errors: [view: OceanconnectWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: Oceanconnect.PubSub
+  pubsub_server: Oceanconnect.PubSub,
+  live_view: [
+    signing_salt:
+      "ZuX+5QXW7meodE9P3tusLZS6PiZTY5jZrsrqyZTCz0yUWG9tgysx+9YWqGGTyTVadNYx8ishQpJIjtmkwtn2CdjNQPQu3o3v3Ozds0yCH1Wr2qzjdQNEu0Xsnxte679dg"
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,
